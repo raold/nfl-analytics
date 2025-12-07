@@ -23,7 +23,6 @@ def test_get_task_score_basic():
     assert result is not None
 
 
-
 def test_get_task_score_edge_cases():
     """Test get_task_score: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_get_task_score_edge_cases():
     assert result is not None
 
 
-
 def test_get_task_score_error_handling():
     """Test get_task_score error handling."""
     with pytest.raises(ValueError):
         get_task_score(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_get_task_score_property_idempotent(self, task_type, task_config):
 
     # Assert property
     assert get_task_score(task_type, task_config) == result, "idempotent violated"
-
 
 
 def test_should_defer_task_basic():
@@ -67,7 +63,6 @@ def test_should_defer_task_basic():
     assert result is not None
 
 
-
 def test_should_defer_task_edge_cases():
     """Test should_defer_task: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_should_defer_task_edge_cases():
     assert result is not None
 
 
-
 def test_should_defer_task_error_handling():
     """Test should_defer_task error handling."""
     with pytest.raises(ValueError):
         should_defer_task(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -96,7 +89,6 @@ def test_should_defer_task_property_idempotent(self, task_type, task_config):
 
     # Assert property
     assert should_defer_task(task_type, task_config) == result, "idempotent violated"
-
 
 
 def test_optimize_config_basic():
@@ -111,7 +103,6 @@ def test_optimize_config_basic():
     assert result is not None
 
 
-
 def test_optimize_config_edge_cases():
     """Test optimize_config: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_optimize_config_edge_cases():
     assert result is not None
 
 
-
 def test_optimize_config_error_handling():
     """Test optimize_config error handling."""
     with pytest.raises(ValueError):
         optimize_config(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_optimize_config_property_idempotent(self, task_type, config):
 
     # Assert property
     assert optimize_config(task_type, config) == result, "idempotent violated"
-
 
 
 def test_score_machine_for_task_basic():
@@ -155,7 +143,6 @@ def test_score_machine_for_task_basic():
     assert result is not None
 
 
-
 def test_score_machine_for_task_edge_cases():
     """Test score_machine_for_task: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_score_machine_for_task_edge_cases():
     assert result is not None
 
 
-
 def test_score_machine_for_task_error_handling():
     """Test score_machine_for_task error handling."""
     with pytest.raises(ValueError):
         score_machine_for_task(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(min_value=1, max_value=1000))
@@ -183,8 +168,9 @@ def test_score_machine_for_task_property_idempotent(self, self, task_type, task_
     result = score_machine_for_task(self, task_type, task_config, machine_id)
 
     # Assert property
-    assert score_machine_for_task(self, task_type, task_config, machine_id) == result, "idempotent violated"
-
+    assert (
+        score_machine_for_task(self, task_type, task_config, machine_id) == result
+    ), "idempotent violated"
 
 
 def test_should_defer_task_basic():
@@ -199,7 +185,6 @@ def test_should_defer_task_basic():
     assert result is not None
 
 
-
 def test_should_defer_task_edge_cases():
     """Test should_defer_task: edge cases."""
     # Arrange
@@ -212,12 +197,10 @@ def test_should_defer_task_edge_cases():
     assert result is not None
 
 
-
 def test_should_defer_task_error_handling():
     """Test should_defer_task error handling."""
     with pytest.raises(ValueError):
         should_defer_task(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -228,7 +211,6 @@ def test_should_defer_task_property_idempotent(self, self, task_type, task_confi
 
     # Assert property
     assert should_defer_task(self, task_type, task_config) == result, "idempotent violated"
-
 
 
 def test_optimize_task_config_basic():
@@ -243,7 +225,6 @@ def test_optimize_task_config_basic():
     assert result is not None
 
 
-
 def test_optimize_task_config_edge_cases():
     """Test optimize_task_config: edge cases."""
     # Arrange
@@ -256,12 +237,10 @@ def test_optimize_task_config_edge_cases():
     assert result is not None
 
 
-
 def test_optimize_task_config_error_handling():
     """Test optimize_task_config error handling."""
     with pytest.raises(ValueError):
         optimize_task_config(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -272,7 +251,6 @@ def test_optimize_task_config_property_idempotent(self, self, task_type, base_co
 
     # Assert property
     assert optimize_task_config(self, task_type, base_config) == result, "idempotent violated"
-
 
 
 def test_get_routing_report_basic():
@@ -287,7 +265,6 @@ def test_get_routing_report_basic():
     assert result is not None
 
 
-
 def test_get_routing_report_edge_cases():
     """Test get_routing_report: edge cases."""
     # Arrange
@@ -300,12 +277,10 @@ def test_get_routing_report_edge_cases():
     assert result is not None
 
 
-
 def test_get_routing_report_error_handling():
     """Test get_routing_report error handling."""
     with pytest.raises(ValueError):
         get_routing_report(invalid_input)
-
 
 
 @given(st.integers())
@@ -316,4 +291,3 @@ def test_get_routing_report_property_idempotent(val):
 
     # Assert property
     assert get_routing_report(val) == result, "idempotent violated"
-

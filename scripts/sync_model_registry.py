@@ -134,7 +134,8 @@ def get_db_models(conn) -> list[dict]:
     """Get all models from database"""
 
     with conn.cursor() as cur:
-        cur.execute("""
+        cur.execute(
+            """
             SELECT
                 model_id,
                 model_name,
@@ -149,7 +150,8 @@ def get_db_models(conn) -> list[dict]:
                 description
             FROM ml.model_registry
             ORDER BY model_id
-        """)
+        """
+        )
 
         return [dict(row) for row in cur.fetchall()]
 
@@ -244,7 +246,11 @@ def export_to_markdown(output_file: str = "MODEL_REGISTRY_FROM_DB.md"):
 """
 
     for m in production:
-        desc = (m["description"] or "")[:60] + "..." if m["description"] and len(m["description"]) > 60 else (m["description"] or "")
+        desc = (
+            (m["description"] or "")[:60] + "..."
+            if m["description"] and len(m["description"]) > 60
+            else (m["description"] or "")
+        )
         md += f"| {m['model_id']} | {m['model_name']} | {m['model_type']} | {m['version']} | {m['status']} | {desc} |\n"
 
     md += f"""
@@ -257,7 +263,11 @@ def export_to_markdown(output_file: str = "MODEL_REGISTRY_FROM_DB.md"):
 """
 
     for m in experimental:
-        desc = (m["description"] or "")[:60] + "..." if m["description"] and len(m["description"]) > 60 else (m["description"] or "")
+        desc = (
+            (m["description"] or "")[:60] + "..."
+            if m["description"] and len(m["description"]) > 60
+            else (m["description"] or "")
+        )
         md += f"| {m['model_id']} | {m['model_name']} | {m['model_type']} | {m['version']} | {m['status']} | {desc} |\n"
 
     md += """
@@ -301,11 +311,15 @@ ORDER BY mr.model_name, mm.metric_name;
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Sync model registry between database and filesystem")
+    parser = argparse.ArgumentParser(
+        description="Sync model registry between database and filesystem"
+    )
     parser.add_argument("--check", action="store_true", help="Check sync status")
     parser.add_argument("--scan", action="store_true", help="Scan filesystem only")
     parser.add_argument("--export-md", action="store_true", help="Export database to markdown")
-    parser.add_argument("--populate-all", action="store_true", help="Populate database from filesystem (dangerous!)")
+    parser.add_argument(
+        "--populate-all", action="store_true", help="Populate database from filesystem (dangerous!)"
+    )
 
     args = parser.parse_args()
 

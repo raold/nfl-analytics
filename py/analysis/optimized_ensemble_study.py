@@ -96,20 +96,20 @@ class OptimizedEnsembleStudy:
         - Only 2 beneficial Phase 5 features (away_short_rest, is_conference_game)
         """
         xgb_params = {
-            'objective': 'binary:logistic',
-            'eval_metric': 'logloss',
-            'tree_method': 'hist',
-            'n_estimators': 100,
-            'max_depth': 4,
-            'learning_rate': 0.1,
-            'subsample': 0.8,
-            'colsample_bytree': 0.8,
+            "objective": "binary:logistic",
+            "eval_metric": "logloss",
+            "tree_method": "hist",
+            "n_estimators": 100,
+            "max_depth": 4,
+            "learning_rate": 0.1,
+            "subsample": 0.8,
+            "colsample_bytree": 0.8,
             # INCREASED regularization (was 2.0)
-            'alpha': 5.0,
-            'lambda': 5.0,
-            'min_child_weight': 5,
-            'gamma': 0.5,
-            'n_jobs': -1,
+            "alpha": 5.0,
+            "lambda": 5.0,
+            "min_child_weight": 5,
+            "gamma": 0.5,
+            "n_jobs": -1,
         }
 
         ensemble = RealisticGameOutcomeEnsemble(xgb_params=xgb_params)
@@ -124,9 +124,9 @@ class OptimizedEnsembleStudy:
 
     def run_step1_3_optimized_ensemble(self):
         """Steps 1-3: Train optimized ensemble with increased reg + reduced features."""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("STEPS 1-3: OPTIMIZED ENSEMBLE")
-        print("="*80)
+        print("=" * 80)
         print("\nConfiguration:")
         print("  - XGBoost regularization: alpha=5.0, lambda=5.0")
         print("  - Phase 5 features: away_short_rest, is_conference_game")
@@ -170,7 +170,9 @@ class OptimizedEnsembleStudy:
         print(f"Test Accuracy: {self.results['optimized_uncalibrated']['test_accuracy']:.1%}")
         print(f"Test Brier:    {self.results['optimized_uncalibrated']['test_brier']:.4f}")
         print(f"Test LogLoss:  {self.results['optimized_uncalibrated']['test_logloss']:.4f}")
-        print(f"Calibration Error: {self.results['optimized_uncalibrated']['calibration_error']:.4f}")
+        print(
+            f"Calibration Error: {self.results['optimized_uncalibrated']['calibration_error']:.4f}"
+        )
 
         # Save ensemble and predictions for calibration step
         self.ensemble = ensemble
@@ -180,9 +182,9 @@ class OptimizedEnsembleStudy:
 
     def run_step4_platt_scaling(self):
         """Step 4: Add Platt Scaling calibration."""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("STEP 4: PLATT SCALING CALIBRATION")
-        print("="*80)
+        print("=" * 80)
 
         # Use 2022 as calibration set
         calibration_df = self.test_df[self.test_df["season"] == 2022]
@@ -225,18 +227,20 @@ class OptimizedEnsembleStudy:
 
         # Calculate improvement
         cal_error_reduction = (
-            self.results["optimized_uncalibrated"]["calibration_error"] -
-            self.results["optimized_calibrated"]["calibration_error"]
+            self.results["optimized_uncalibrated"]["calibration_error"]
+            - self.results["optimized_calibrated"]["calibration_error"]
         )
-        print(f"\nCalibration error reduction: {cal_error_reduction:.4f} ({cal_error_reduction/self.results['optimized_uncalibrated']['calibration_error']:.1%})")
+        print(
+            f"\nCalibration error reduction: {cal_error_reduction:.4f} ({cal_error_reduction/self.results['optimized_uncalibrated']['calibration_error']:.1%})"
+        )
 
         self.test_preds_calibrated = test_preds_calibrated
 
     def run_step5_temporal_validation(self):
         """Step 5: Run temporal validation (train 2019-2020, test each year)."""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("STEP 5: TEMPORAL VALIDATION")
-        print("="*80)
+        print("=" * 80)
 
         # Train on 2019-2020 only
         train_seasons = [2019, 2020]
@@ -269,16 +273,20 @@ class OptimizedEnsembleStudy:
             logloss = log_loss(year_target, year_preds)
             calibration = calculate_calibration_metrics(year_target, year_preds)
 
-            temporal_results.append({
-                "year": year,
-                "n_games": len(year_df),
-                "accuracy": accuracy,
-                "brier": brier,
-                "logloss": logloss,
-                "calibration_error": calibration["mean_calibration_error"],
-            })
+            temporal_results.append(
+                {
+                    "year": year,
+                    "n_games": len(year_df),
+                    "accuracy": accuracy,
+                    "brier": brier,
+                    "logloss": logloss,
+                    "calibration_error": calibration["mean_calibration_error"],
+                }
+            )
 
-            print(f"Year {year}: Accuracy={accuracy:.1%}, Brier={brier:.4f}, CalError={calibration['mean_calibration_error']:.4f}")
+            print(
+                f"Year {year}: Accuracy={accuracy:.1%}, Brier={brier:.4f}, CalError={calibration['mean_calibration_error']:.4f}"
+            )
 
         self.results["temporal_validation"] = temporal_results
 
@@ -295,9 +303,9 @@ class OptimizedEnsembleStudy:
 
     def compare_all_configurations(self):
         """Compare all configurations."""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("FINAL COMPARISON - ALL CONFIGURATIONS")
-        print("="*80)
+        print("=" * 80)
 
         # Load previous results for comparison
         baseline_path = Path("analysis/ablation/feature_ablation_results.json")
@@ -305,32 +313,34 @@ class OptimizedEnsembleStudy:
             with open(baseline_path) as f:
                 previous_results = json.load(f)
 
-            comparison = pd.DataFrame([
-                {
-                    "Configuration": "Previous - Current (α=2, λ=2, 5 features)",
-                    "Test Acc": f"{previous_results['current']['test_accuracy']:.1%}",
-                    "Test Brier": f"{previous_results['current']['test_brier']:.4f}",
-                    "Cal Error": "N/A",
-                },
-                {
-                    "Configuration": "Previous - Increased Reg (α=5, λ=5, 5 features)",
-                    "Test Acc": f"{previous_results['increased_reg']['test_accuracy']:.1%}",
-                    "Test Brier": f"{previous_results['increased_reg']['test_brier']:.4f}",
-                    "Cal Error": "N/A",
-                },
-                {
-                    "Configuration": "Optimized (α=5, λ=5, 2 features)",
-                    "Test Acc": f"{self.results['optimized_uncalibrated']['test_accuracy']:.1%}",
-                    "Test Brier": f"{self.results['optimized_uncalibrated']['test_brier']:.4f}",
-                    "Cal Error": f"{self.results['optimized_uncalibrated']['calibration_error']:.4f}",
-                },
-                {
-                    "Configuration": "Optimized + Calibrated (BEST)",
-                    "Test Acc": f"{self.results['optimized_calibrated']['test_accuracy']:.1%}",
-                    "Test Brier": f"{self.results['optimized_calibrated']['test_brier']:.4f}",
-                    "Cal Error": f"{self.results['optimized_calibrated']['calibration_error']:.4f}",
-                },
-            ])
+            comparison = pd.DataFrame(
+                [
+                    {
+                        "Configuration": "Previous - Current (α=2, λ=2, 5 features)",
+                        "Test Acc": f"{previous_results['current']['test_accuracy']:.1%}",
+                        "Test Brier": f"{previous_results['current']['test_brier']:.4f}",
+                        "Cal Error": "N/A",
+                    },
+                    {
+                        "Configuration": "Previous - Increased Reg (α=5, λ=5, 5 features)",
+                        "Test Acc": f"{previous_results['increased_reg']['test_accuracy']:.1%}",
+                        "Test Brier": f"{previous_results['increased_reg']['test_brier']:.4f}",
+                        "Cal Error": "N/A",
+                    },
+                    {
+                        "Configuration": "Optimized (α=5, λ=5, 2 features)",
+                        "Test Acc": f"{self.results['optimized_uncalibrated']['test_accuracy']:.1%}",
+                        "Test Brier": f"{self.results['optimized_uncalibrated']['test_brier']:.4f}",
+                        "Cal Error": f"{self.results['optimized_uncalibrated']['calibration_error']:.4f}",
+                    },
+                    {
+                        "Configuration": "Optimized + Calibrated (BEST)",
+                        "Test Acc": f"{self.results['optimized_calibrated']['test_accuracy']:.1%}",
+                        "Test Brier": f"{self.results['optimized_calibrated']['test_brier']:.4f}",
+                        "Cal Error": f"{self.results['optimized_calibrated']['calibration_error']:.4f}",
+                    },
+                ]
+            )
 
             print("\n", comparison.to_string(index=False))
 
@@ -365,14 +375,20 @@ def main():
     # Save results
     study.save_results()
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("OPTIMIZED ENSEMBLE STUDY COMPLETE")
-    print("="*80)
+    print("=" * 80)
 
     print("\nKEY TAKEAWAYS:")
-    print(f"  1. Optimized config improves test accuracy to {study.results['optimized_uncalibrated']['test_accuracy']:.1%}")
-    print(f"  2. Calibration reduces calibration error to {study.results['optimized_calibrated']['calibration_error']:.4f}")
-    print(f"  3. Best configuration: {study.results['optimized_calibrated']['test_accuracy']:.1%} accuracy")
+    print(
+        f"  1. Optimized config improves test accuracy to {study.results['optimized_uncalibrated']['test_accuracy']:.1%}"
+    )
+    print(
+        f"  2. Calibration reduces calibration error to {study.results['optimized_calibrated']['calibration_error']:.4f}"
+    )
+    print(
+        f"  3. Best configuration: {study.results['optimized_calibrated']['test_accuracy']:.1%} accuracy"
+    )
 
 
 if __name__ == "__main__":

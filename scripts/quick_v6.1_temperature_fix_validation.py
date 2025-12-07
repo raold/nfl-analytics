@@ -32,10 +32,7 @@ import psycopg2
 
 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -46,54 +43,47 @@ def calculate_betting_metrics(df: pd.DataFrame) -> dict:
     # - Standard -110 vig
 
     # Determine if we have edge
-    df['has_edge'] = (df['predicted'] > df['line'] + 5) | (df['predicted'] < df['line'] - 5)
+    df["has_edge"] = (df["predicted"] > df["line"] + 5) | (df["predicted"] < df["line"] - 5)
 
     # Determine bet outcome (win if actual matches our edge direction)
-    df['bet_over'] = df['predicted'] > df['line'] + 5
-    df['bet_under'] = df['predicted'] < df['line'] - 5
+    df["bet_over"] = df["predicted"] > df["line"] + 5
+    df["bet_under"] = df["predicted"] < df["line"] - 5
 
     # Calculate wins
-    df['win'] = (
-        ((df['bet_over']) & (df['actual'] > df['line'])) |
-        ((df['bet_under']) & (df['actual'] < df['line']))
+    df["win"] = ((df["bet_over"]) & (df["actual"] > df["line"])) | (
+        (df["bet_under"]) & (df["actual"] < df["line"])
     )
 
     # Filter to bets we would actually make
-    bets_df = df[df['has_edge']].copy()
+    bets_df = df[df["has_edge"]].copy()
 
     if len(bets_df) == 0:
-        return {
-            'total_bets': 0,
-            'win_rate': 0.0,
-            'roi': 0.0,
-            'sharpe': 0.0,
-            'total_pnl': 0.0
-        }
+        return {"total_bets": 0, "win_rate": 0.0, "roi": 0.0, "sharpe": 0.0, "total_pnl": 0.0}
 
     # Calculate P&L (assuming -110 vig)
-    bets_df['pnl'] = bets_df['win'].apply(lambda w: 100.0 if w else -110.0)
+    bets_df["pnl"] = bets_df["win"].apply(lambda w: 100.0 if w else -110.0)
 
     # Calculate metrics
     total_bets = len(bets_df)
-    wins = bets_df['win'].sum()
+    wins = bets_df["win"].sum()
     win_rate = wins / total_bets if total_bets > 0 else 0.0
 
-    total_pnl = bets_df['pnl'].sum()
+    total_pnl = bets_df["pnl"].sum()
     total_risked = total_bets * 110.0  # Account for vig
     roi = (total_pnl / total_risked) * 100 if total_risked > 0 else 0.0
 
     # Sharpe ratio (per-bet returns)
-    returns = bets_df['pnl'] / 110.0
+    returns = bets_df["pnl"] / 110.0
     sharpe = (returns.mean() / returns.std()) * np.sqrt(total_bets) if len(returns) > 1 else 0.0
 
     return {
-        'total_bets': total_bets,
-        'wins': int(wins),
-        'win_rate': win_rate * 100,
-        'roi': roi,
-        'sharpe': sharpe,
-        'total_pnl': total_pnl,
-        'avg_bet_pnl': total_pnl / total_bets if total_bets > 0 else 0.0
+        "total_bets": total_bets,
+        "wins": int(wins),
+        "win_rate": win_rate * 100,
+        "roi": roi,
+        "sharpe": sharpe,
+        "total_pnl": total_pnl,
+        "avg_bet_pnl": total_pnl / total_bets if total_bets > 0 else 0.0,
     }
 
 
@@ -105,7 +95,7 @@ def fetch_historical_games(seasons: list[int]) -> pd.DataFrame:
         port=5544,
         database="devdb01",
         user="dro",
-        password="sicillionbillions"  # pragma: allowlist secret
+        password="sicillionbillions",  # pragma: allowlist secret
     )
 
     query = """
@@ -131,7 +121,7 @@ def fetch_historical_games(seasons: list[int]) -> pd.DataFrame:
     ORDER BY g.season, g.week, g.game_id
     """
 
-    df = pd.read_sql(query, conn, params={'seasons': seasons})
+    df = pd.read_sql(query, conn, params={"seasons": seasons})
     conn.close()
 
     logger.info(f"Loaded {len(df)} player-games from seasons {seasons}")
@@ -140,16 +130,16 @@ def fetch_historical_games(seasons: list[int]) -> pd.DataFrame:
 
 
 def main():
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("QUICK V6.1 TEMPERATURE FIX VALIDATION")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("")
     logger.info("Goal: Test if temperature fix (T=1.0771 → T=0.7083) explains")
     logger.info("      dissertation claims vs Nov 8 backtest discrepancy")
     logger.info("")
     logger.info("Dissertation Claims: 60.8% win rate, +6.45% ROI, Sharpe 2.51")
     logger.info("Nov 8 Backtest:      52.2% win rate, -36.0% ROI, Sharpe 0.16")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("")
 
     # Initialize v6.1 ensemble with corrected temperature
@@ -159,7 +149,7 @@ def main():
         db_port=5544,
         db_name="devdb01",
         db_user="dro",
-        db_password="sicillionbillions"  # pragma: allowlist secret
+        db_password="sicillionbillions",  # pragma: allowlist secret
     )
     logger.info("")
 
@@ -179,28 +169,30 @@ def main():
 
         try:
             pred = ensemble.predict(
-                player_id=row['player_id'],
-                season=row['season'],
-                week=row['week']
+                player_id=row["player_id"], season=row["season"], week=row["week"]
             )
 
-            predictions.append({
-                'player_id': row['player_id'],
-                'player_name': row['player_name'],
-                'game_id': row['game_id'],
-                'season': row['season'],
-                'week': row['week'],
-                'predicted': pred['mean'],
-                'predicted_std': pred['std'],
-                'actual': row['actual_yards'],
-                'line': 240.0,  # Standard placeholder line for now
-                'mae': abs(pred['mean'] - row['actual_yards'])
-            })
+            predictions.append(
+                {
+                    "player_id": row["player_id"],
+                    "player_name": row["player_name"],
+                    "game_id": row["game_id"],
+                    "season": row["season"],
+                    "week": row["week"],
+                    "predicted": pred["mean"],
+                    "predicted_std": pred["std"],
+                    "actual": row["actual_yards"],
+                    "line": 240.0,  # Standard placeholder line for now
+                    "mae": abs(pred["mean"] - row["actual_yards"]),
+                }
+            )
 
         except Exception as e:
             errors += 1
             if errors <= 5:
-                logger.warning(f"Prediction failed for {row['player_name']} (S{row['season']} W{row['week']}): {e}")
+                logger.warning(
+                    f"Prediction failed for {row['player_name']} (S{row['season']} W{row['week']}): {e}"
+                )
 
     logger.info("")
     logger.info(f"✅ Generated {len(predictions)} predictions ({errors} errors)")
@@ -210,22 +202,21 @@ def main():
     pred_df = pd.DataFrame(predictions)
 
     # Calculate metrics
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("RESULTS: V6.1 WITH CORRECTED TEMPERATURE (T=0.7083)")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("")
 
     # MAE
-    mae = pred_df['mae'].mean()
+    mae = pred_df["mae"].mean()
     logger.info(f"MAE: {mae:.2f} yards")
     logger.info("")
 
     # Calibration (90% PI coverage)
-    pred_df['in_90pi'] = (
-        (pred_df['actual'] >= pred_df['predicted'] - 1.645 * pred_df['predicted_std']) &
-        (pred_df['actual'] <= pred_df['predicted'] + 1.645 * pred_df['predicted_std'])
-    )
-    calibration = pred_df['in_90pi'].mean() * 100
+    pred_df["in_90pi"] = (
+        pred_df["actual"] >= pred_df["predicted"] - 1.645 * pred_df["predicted_std"]
+    ) & (pred_df["actual"] <= pred_df["predicted"] + 1.645 * pred_df["predicted_std"])
+    calibration = pred_df["in_90pi"].mean() * 100
     logger.info(f"Calibration (90% PI): {calibration:.1f}%")
     logger.info("")
 
@@ -242,12 +233,12 @@ def main():
     logger.info("")
 
     # Compare to dissertation claims
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("COMPARISON TO DISSERTATION CLAIMS")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("")
     logger.info(f"{'Metric':<20} {'Dissertation':<15} {'V6.1 Actual':<15} {'Difference':<15}")
-    logger.info("-"*65)
+    logger.info("-" * 65)
     win_rate_str = f"{betting['win_rate']:.1f}%"
     win_rate_diff = f"{betting['win_rate'] - 60.8:+.1f}pp"
     logger.info(f"{'Win Rate':<20} {'60.8%':<15} {win_rate_str:<15} {win_rate_diff:<15}")
@@ -272,15 +263,15 @@ def main():
     logger.info("")
 
     # Summary
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("CONCLUSION")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("")
 
-    if betting['win_rate'] >= 58 and betting['roi'] >= 5:
+    if betting["win_rate"] >= 58 and betting["roi"] >= 5:
         logger.info("✅ PASS: V6.1 with corrected temperature meets production targets")
         logger.info("   Temperature fix likely explains previous underperformance")
-    elif betting['win_rate'] >= 55 and betting['roi'] >= 3:
+    elif betting["win_rate"] >= 55 and betting["roi"] >= 3:
         logger.info("⚠️  MARGINAL: V6.1 shows improvement but below dissertation claims")
         logger.info("   Additional investigation needed")
     else:

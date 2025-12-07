@@ -354,7 +354,15 @@ def analyze_edge_a_west_coast_penalty(
             )
         ),
         "qb_details": west_coast_with_baseline[
-            ["player_display_name", "current_team", "season", "week", "stat_yards", "avg_yards", "penalty"]
+            [
+                "player_display_name",
+                "current_team",
+                "season",
+                "week",
+                "stat_yards",
+                "avg_yards",
+                "penalty",
+            ]
         ].to_dict("records"),
     }
 
@@ -542,17 +550,19 @@ def analyze_edge_c_lingering_fatigue(intl_games: pd.DataFrame) -> dict:
                 qb_perf = pd.read_sql(qb_query, conn)
 
                 if len(qb_perf) > 0:
-                    fatigue_data.append({
-                        "team": team,
-                        "intl_season": season,
-                        "intl_week": week,
-                        "next_season": next_season,
-                        "next_week": next_week,
-                        "days_since_intl": next_game["days_since_intl"].iloc[0],
-                        "player_id": qb_perf["player_id"].iloc[0],
-                        "player_name": qb_perf["player_display_name"].iloc[0],
-                        "stat_yards": qb_perf["stat_yards"].iloc[0],
-                    })
+                    fatigue_data.append(
+                        {
+                            "team": team,
+                            "intl_season": season,
+                            "intl_week": week,
+                            "next_season": next_season,
+                            "next_week": next_week,
+                            "days_since_intl": next_game["days_since_intl"].iloc[0],
+                            "player_id": qb_perf["player_id"].iloc[0],
+                            "player_name": qb_perf["player_display_name"].iloc[0],
+                            "stat_yards": qb_perf["stat_yards"].iloc[0],
+                        }
+                    )
 
     conn.close()
 
@@ -591,8 +601,8 @@ def analyze_edge_c_lingering_fatigue(intl_games: pd.DataFrame) -> dict:
     )
 
     # Model: penalty = -10 * exp(-days_since / 7)
-    fatigue_with_baseline["predicted_penalty"] = (
-        -10 * np.exp(-fatigue_with_baseline["days_since_intl"] / 7.0)
+    fatigue_with_baseline["predicted_penalty"] = -10 * np.exp(
+        -fatigue_with_baseline["days_since_intl"] / 7.0
     )
 
     # Statistical test
@@ -652,7 +662,11 @@ def analyze_edge_c_lingering_fatigue(intl_games: pd.DataFrame) -> dict:
         "interpretation": (
             f"QBs in next game after international travel averaged {avg_penalty:.1f} yards "
             f"vs domestic baseline (p={p_value:.4f}). "
-            + (f"Short rest (<7 days): {short_rest_penalty:.1f} yards penalty. " if short_rest_penalty else "")
+            + (
+                f"Short rest (<7 days): {short_rest_penalty:.1f} yards penalty. "
+                if short_rest_penalty
+                else ""
+            )
             + (
                 f"VIABLE: Edge exists, estimated {roi:.1f}% ROI at -110 odds."
                 if viable
@@ -752,8 +766,10 @@ def main():
     logger.info("SUMMARY")
     logger.info("=" * 80)
     logger.info(f"Viable edges: {results['summary']['viable_edges']}/3")
-    logger.info(f"Best edge: {results['summary']['best_edge'][0]} "
-                f"(ROI: {results['summary']['best_edge'][1]:.2f}%)")
+    logger.info(
+        f"Best edge: {results['summary']['best_edge'][0]} "
+        f"(ROI: {results['summary']['best_edge'][1]:.2f}%)"
+    )
 
     for edge_name, edge_data in results["edges"].items():
         logger.info(f"\n{edge_data['name']}:")
@@ -765,7 +781,9 @@ def main():
 
     # Exit code based on success criteria
     if results["summary"]["viable_edges"] >= 1:
-        logger.info("\n✅ SUCCESS: At least 1 viable betting edge identified with +5% ROI potential")
+        logger.info(
+            "\n✅ SUCCESS: At least 1 viable betting edge identified with +5% ROI potential"
+        )
         sys.exit(0)
     else:
         logger.warning("\n⚠️ WARNING: No viable betting edges found meeting +5% ROI criteria")

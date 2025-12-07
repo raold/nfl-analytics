@@ -23,7 +23,6 @@ def test_reset_basic():
     assert result is not None
 
 
-
 def test_reset_edge_cases():
     """Test reset: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_reset_edge_cases():
     assert result is not None
 
 
-
 def test_reset_error_handling():
     """Test reset error handling."""
     with pytest.raises(ValueError):
         reset(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_reset_property_idempotent(val):
 
     # Assert property
     assert reset(val) == result, "idempotent violated"
-
 
 
 def test_step_basic():
@@ -67,7 +63,6 @@ def test_step_basic():
     assert result is not None
 
 
-
 def test_step_edge_cases():
     """Test step: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_step_edge_cases():
     assert result is not None
 
 
-
 def test_step_error_handling():
     """Test step error handling."""
     with pytest.raises(ValueError):
         step(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -96,7 +89,6 @@ def test_step_property_idempotent(self, self, action):
 
     # Assert property
     assert step(self, action) == result, "idempotent violated"
-
 
 
 def test_render_basic():
@@ -111,7 +103,6 @@ def test_render_basic():
     assert result is not None
 
 
-
 def test_render_edge_cases():
     """Test render: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_render_edge_cases():
     assert result is not None
 
 
-
 def test_render_error_handling():
     """Test render error handling."""
     with pytest.raises(ValueError):
         render(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_render_property_idempotent(self, self, mode):
 
     # Assert property
     assert render(self, mode) == result, "idempotent violated"
-
 
 
 def test_close_basic():
@@ -155,7 +143,6 @@ def test_close_basic():
     assert result is not None
 
 
-
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_close_edge_cases():
     assert result is not None
 
 
-
 def test_close_error_handling():
     """Test close error handling."""
     with pytest.raises(ValueError):
         close(invalid_input)
-
 
 
 @given(st.integers())
@@ -184,7 +169,6 @@ def test_close_property_idempotent(val):
 
     # Assert property
     assert close(val) == result, "idempotent violated"
-
 
 
 def test_get_episode_stats_basic():
@@ -199,7 +183,6 @@ def test_get_episode_stats_basic():
     assert result is not None
 
 
-
 def test_get_episode_stats_edge_cases():
     """Test get_episode_stats: edge cases."""
     # Arrange
@@ -212,12 +195,10 @@ def test_get_episode_stats_edge_cases():
     assert result is not None
 
 
-
 def test_get_episode_stats_error_handling():
     """Test get_episode_stats error handling."""
     with pytest.raises(ValueError):
         get_episode_stats(invalid_input)
-
 
 
 @given(st.integers())
@@ -228,4 +209,3 @@ def test_get_episode_stats_property_idempotent(val):
 
     # Assert property
     assert get_episode_stats(val) == result, "idempotent violated"
-

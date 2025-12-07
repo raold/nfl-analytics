@@ -21,7 +21,6 @@ def test_generate_slippage_table_basic():
     assert result is not None
 
 
-
 def test_generate_slippage_table_edge_cases():
     """Test generate_slippage_table: edge cases."""
     # Arrange
@@ -34,12 +33,10 @@ def test_generate_slippage_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_slippage_table_error_handling():
     """Test generate_slippage_table error handling."""
     with pytest.raises(ValueError):
         generate_slippage_table(invalid_input)
-
 
 
 def test_generate_acceptance_test_results_basic():
@@ -54,7 +51,6 @@ def test_generate_acceptance_test_results_basic():
     assert result is not None
 
 
-
 def test_generate_acceptance_test_results_edge_cases():
     """Test generate_acceptance_test_results: edge cases."""
     # Arrange
@@ -67,12 +63,10 @@ def test_generate_acceptance_test_results_edge_cases():
     assert result is not None
 
 
-
 def test_generate_acceptance_test_results_error_handling():
     """Test generate_acceptance_test_results error handling."""
     with pytest.raises(ValueError):
         generate_acceptance_test_results(invalid_input)
-
 
 
 def test_generate_convergence_diagnostics_basic():
@@ -87,7 +81,6 @@ def test_generate_convergence_diagnostics_basic():
     assert result is not None
 
 
-
 def test_generate_convergence_diagnostics_edge_cases():
     """Test generate_convergence_diagnostics: edge cases."""
     # Arrange
@@ -100,9 +93,7 @@ def test_generate_convergence_diagnostics_edge_cases():
     assert result is not None
 
 
-
 def test_generate_convergence_diagnostics_error_handling():
     """Test generate_convergence_diagnostics error handling."""
     with pytest.raises(ValueError):
         generate_convergence_diagnostics(invalid_input)
-

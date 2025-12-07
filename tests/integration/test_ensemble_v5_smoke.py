@@ -251,9 +251,7 @@ def test_single_prediction_e2e(loaded_ensemble, test_player):
     assert 5 <= std <= 100, f"Unrealistic uncertainty: {std:.1f} yards"
 
     # Log results
-    logger.info(
-        f"✅ Prediction: {mean:.1f} ± {std:.1f} yards (latency: {latency:.1f}ms)"
-    )
+    logger.info(f"✅ Prediction: {mean:.1f} ± {std:.1f} yards (latency: {latency:.1f}ms)")
 
     # Warn if latency too high
     if latency > 400:
@@ -368,7 +366,9 @@ def test_batch_prediction_smoke():
         logger.warning(f"⚠️ {len(errors)} prediction errors: {errors[:3]}")
 
     success_rate = len(predictions) / len(test_cases) * 100
-    logger.info(f"✅ Batch prediction: {len(predictions)}/{len(test_cases)} succeeded ({success_rate:.1f}%)")
+    logger.info(
+        f"✅ Batch prediction: {len(predictions)}/{len(test_cases)} succeeded ({success_rate:.1f}%)"
+    )
 
     # Validate minimum success rate
     assert success_rate >= 70, f"Success rate too low: {success_rate:.1f}%"
@@ -443,6 +443,7 @@ def test_ensemble_load_time(benchmark):
 
     Target: < 10 seconds
     """
+
     def load_ensemble():
         ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
         ensemble.load_models()
@@ -464,6 +465,7 @@ def test_prediction_latency(loaded_ensemble, test_player, benchmark):
 
     Target: < 400ms
     """
+
     def predict_once():
         return loaded_ensemble.predict(
             player_id=test_player["player_id"],

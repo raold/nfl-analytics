@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_historical_bets_basic():
@@ -56,7 +53,6 @@ def test_load_historical_bets_basic():
     assert result is not None
 
 
-
 def test_load_historical_bets_edge_cases():
     """Test load_historical_bets: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_historical_bets_edge_cases():
     assert result is not None
 
 
-
 def test_load_historical_bets_error_handling():
     """Test load_historical_bets error handling."""
     with pytest.raises(ValueError):
         load_historical_bets(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_load_historical_bets_property_idempotent(self, self, start_season, end_
 
     # Assert property
     assert load_historical_bets(self, start_season, end_season) == result, "idempotent violated"
-
 
 
 def test_simulate_pinnacle_performance_basic():
@@ -100,7 +93,6 @@ def test_simulate_pinnacle_performance_basic():
     assert result is not None
 
 
-
 def test_simulate_pinnacle_performance_edge_cases():
     """Test simulate_pinnacle_performance: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_simulate_pinnacle_performance_edge_cases():
     assert result is not None
 
 
-
 def test_simulate_pinnacle_performance_error_handling():
     """Test simulate_pinnacle_performance error handling."""
     with pytest.raises(ValueError):
         simulate_pinnacle_performance(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_simulate_pinnacle_performance_property_idempotent(self, self, historica
 
     # Assert property
     assert simulate_pinnacle_performance(self, historical_bets) == result, "idempotent violated"
-
 
 
 def test_generate_report_basic():
@@ -144,7 +133,6 @@ def test_generate_report_basic():
     assert result is not None
 
 
-
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_generate_report_edge_cases():
     assert result is not None
 
 
-
 def test_generate_report_error_handling():
     """Test generate_report error handling."""
     with pytest.raises(ValueError):
         generate_report(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -173,4 +159,3 @@ def test_generate_report_property_idempotent(self, self, results, output_path):
 
     # Assert property
     assert generate_report(self, results, output_path) == result, "idempotent violated"
-

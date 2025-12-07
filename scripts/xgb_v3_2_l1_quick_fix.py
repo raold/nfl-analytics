@@ -48,7 +48,7 @@ import time
 from pathlib import Path
 
 # Add project root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import numpy as np
 import pandas as pd
@@ -57,46 +57,45 @@ import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Database connection
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'port': int(os.getenv('DB_PORT', '5544')),
-    'user': os.getenv('DB_USER', 'dro'),
-    'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
-    'database': os.getenv('DB_NAME', 'devdb01')
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", "5544")),
+    "user": os.getenv("DB_USER", "dro"),
+    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
+    "database": os.getenv("DB_NAME", "devdb01"),
 }
 
 # Aligned training window (EPA available 2018+)
 ALIGNED_WINDOW = {
-    'train_start': 2018,  # Aligned with EPA availability
-    'train_end': 2024,
-    'test_season': 2025,
-    'note': 'No decay years - clean 2018-2024 only'
+    "train_start": 2018,  # Aligned with EPA availability
+    "train_end": 2024,
+    "test_season": 2025,
+    "note": "No decay years - clean 2018-2024 only",
 }
 
 # Feature coverage requirements
 COVERAGE_THRESHOLD = 0.80  # Minimum 80% non-null coverage
-COVERAGE_TARGET = 0.95     # Target 95% coverage for clean features
+COVERAGE_TARGET = 0.95  # Target 95% coverage for clean features
 
 # XGBoost hyperparameters (same as v3 for fair comparison)
 XGBOOST_PARAMS = {
-    'objective': 'reg:squarederror',
-    'eval_metric': 'mae',
-    'max_depth': 7,
-    'learning_rate': 0.05,
-    'subsample': 0.85,
-    'colsample_bytree': 0.85,
-    'min_child_weight': 3,
-    'gamma': 0.05,
-    'reg_alpha': 0.15,
-    'reg_lambda': 1.5,
-    'seed': 42,
-    'n_jobs': -1,
+    "objective": "reg:squarederror",
+    "eval_metric": "mae",
+    "max_depth": 7,
+    "learning_rate": 0.05,
+    "subsample": 0.85,
+    "colsample_bytree": 0.85,
+    "min_child_weight": 3,
+    "gamma": 0.05,
+    "reg_alpha": 0.15,
+    "reg_lambda": 1.5,
+    "seed": 42,
+    "n_jobs": -1,
 }
 
 NUM_BOOST_ROUNDS = 1000
@@ -110,7 +109,7 @@ def audit_feature_coverage(
     df: pd.DataFrame,
     features: list[str],
     threshold: float = COVERAGE_THRESHOLD,
-    fail_on_low_coverage: bool = True
+    fail_on_low_coverage: bool = True,
 ) -> dict[str, float]:
     """
     Audit feature coverage before model training (CRITICAL GATE).
@@ -301,7 +300,7 @@ def load_opponent_strength_features():
     logger.info("LOADING OPPONENT STRENGTH FEATURES")
     logger.info("=" * 70)
 
-    features_path = Path('data/processed/features/opponent_strength_features.csv')
+    features_path = Path("data/processed/features/opponent_strength_features.csv")
 
     if not features_path.exists():
         raise FileNotFoundError(
@@ -315,15 +314,14 @@ def load_opponent_strength_features():
     logger.info(f"  Seasons: {opp_df.season.min()}-{opp_df.season.max()}")
 
     # Select only the features we need
-    opp_features = opp_df[[
-        'game_id', 'team',
-        'opp_def_epa_exp',
-        'opp_pass_def_rank',
-        'matchup_difficulty'
-    ]].copy()
+    opp_features = opp_df[
+        ["game_id", "team", "opp_def_epa_exp", "opp_pass_def_rank", "matchup_difficulty"]
+    ].copy()
 
     # Check coverage
-    non_null_counts = opp_features[['opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty']].notna().sum()
+    non_null_counts = (
+        opp_features[["opp_def_epa_exp", "opp_pass_def_rank", "matchup_difficulty"]].notna().sum()
+    )
     logger.info("\nOpponent feature availability:")
     for col, count in non_null_counts.items():
         logger.info(f"  {col}: {count:,} ({count/len(opp_features)*100:.1f}%)")
@@ -347,16 +345,12 @@ def engineer_features(df: pd.DataFrame, opp_features: pd.DataFrame) -> pd.DataFr
     logger.info("=" * 70)
 
     # Sort for rolling windows
-    df = df.sort_values(['player_id', 'season', 'week']).copy()
+    df = df.sort_values(["player_id", "season", "week"]).copy()
 
     # ===== MERGE OPPONENT STRENGTH FEATURES =====
     logger.info("\nMerging opponent strength features...")
     before_merge = len(df)
-    df = df.merge(
-        opp_features,
-        on=['game_id', 'team'],
-        how='left'
-    )
+    df = df.merge(opp_features, on=["game_id", "team"], how="left")
     after_merge = len(df)
 
     if after_merge != before_merge:
@@ -366,44 +360,52 @@ def engineer_features(df: pd.DataFrame, opp_features: pd.DataFrame) -> pd.DataFr
 
     # ===== BASIC EFFICIENCY METRICS (3 features) =====
     logger.info("\nCreating basic efficiency metrics...")
-    df['yards_per_attempt'] = df['yards'] / df['attempts'].replace(0, np.nan)
-    df['td_rate'] = df['touchdowns'] / df['attempts'].replace(0, np.nan)
-    df['log_attempts'] = np.log1p(df['attempts'])
+    df["yards_per_attempt"] = df["yards"] / df["attempts"].replace(0, np.nan)
+    df["td_rate"] = df["touchdowns"] / df["attempts"].replace(0, np.nan)
+    df["log_attempts"] = np.log1p(df["attempts"])
 
     # ===== WEATHER FEATURES (3 features) =====
     logger.info("Creating weather features...")
-    df['temp'] = pd.to_numeric(df['temp'], errors='coerce')
-    df['wind'] = pd.to_numeric(df['wind'], errors='coerce')
+    df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
+    df["wind"] = pd.to_numeric(df["wind"], errors="coerce")
 
-    df['is_dome'] = (df['roof'].isin(['dome', 'closed'])).astype(int)
-    df['is_cold'] = ((df['temp'] < 32) & (~df['is_dome'].astype(bool))).astype(int)
-    df['is_windy'] = ((df['wind'] > 15) & (~df['is_dome'].astype(bool))).astype(int)
-    df['is_bad_weather'] = (df['is_cold'] | df['is_windy']).astype(int)
+    df["is_dome"] = (df["roof"].isin(["dome", "closed"])).astype(int)
+    df["is_cold"] = ((df["temp"] < 32) & (~df["is_dome"].astype(bool))).astype(int)
+    df["is_windy"] = ((df["wind"] > 15) & (~df["is_dome"].astype(bool))).astype(int)
+    df["is_bad_weather"] = (df["is_cold"] | df["is_windy"]).astype(int)
 
     # ===== GAME SCRIPT FEATURES (2 features) =====
     logger.info("Creating game script features...")
-    df['spread_abs'] = df['spread_close'].abs()
-    df['total_line'] = df['total_close']
+    df["spread_abs"] = df["spread_close"].abs()
+    df["total_line"] = df["total_close"]
 
     # ===== SCHEDULE FACTORS (1 feature) =====
     logger.info("Creating schedule factors...")
-    df['week_in_season'] = df['week'].astype(float)
+    df["week_in_season"] = df["week"].astype(float)
 
     # ===== ROLLING AVERAGES (3 features - ANTI-LEAKAGE) =====
     logger.info("Creating rolling averages (L3 only)...")
 
-    for col in ['yards', 'yards_per_attempt', 'td_rate']:
-        df[f'{col}_L3'] = (
-            df.groupby('player_id')[col]
+    for col in ["yards", "yards_per_attempt", "td_rate"]:
+        df[f"{col}_L3"] = (
+            df.groupby("player_id")[col]
             .transform(lambda x: x.rolling(window=3, min_periods=1).mean())
             .shift(1)  # CRITICAL: Shift to avoid lookahead bias
         )
 
     # Fill NaNs ONLY for non-opponent features
     baseline_numeric_cols = [
-        'yards_per_attempt', 'td_rate', 'log_attempts',
-        'temp', 'wind', 'spread_abs', 'total_line', 'week_in_season',
-        'yards_L3', 'yards_per_attempt_L3', 'td_rate_L3'
+        "yards_per_attempt",
+        "td_rate",
+        "log_attempts",
+        "temp",
+        "wind",
+        "spread_abs",
+        "total_line",
+        "week_in_season",
+        "yards_L3",
+        "yards_per_attempt_L3",
+        "td_rate_L3",
     ]
 
     for col in baseline_numeric_cols:
@@ -440,23 +442,23 @@ def prepare_train_test_split(df: pd.DataFrame) -> tuple:
     # 16 features: 13 baseline + 3 opponent strength
     feature_cols = [
         # Baseline 13 features
-        'log_attempts',
-        'yards_per_attempt',
-        'td_rate',
-        'is_home',
-        'spread_abs',
-        'total_line',
-        'is_bad_weather',
-        'yards_L3',
-        'yards_per_attempt_L3',
-        'td_rate_L3',
-        'week_in_season',
-        'temp',
-        'wind',
+        "log_attempts",
+        "yards_per_attempt",
+        "td_rate",
+        "is_home",
+        "spread_abs",
+        "total_line",
+        "is_bad_weather",
+        "yards_L3",
+        "yards_per_attempt_L3",
+        "td_rate_L3",
+        "week_in_season",
+        "temp",
+        "wind",
         # New opponent strength features (v3)
-        'opp_def_epa_exp',
-        'opp_pass_def_rank',
-        'matchup_difficulty'
+        "opp_def_epa_exp",
+        "opp_pass_def_rank",
+        "matchup_difficulty",
     ]
 
     # Verify all features exist
@@ -465,14 +467,15 @@ def prepare_train_test_split(df: pd.DataFrame) -> tuple:
         raise ValueError(f"Missing features: {missing_features}")
 
     # Train/test split (aligned window)
-    train_df = df[df['season'].between(
-        ALIGNED_WINDOW['train_start'],
-        ALIGNED_WINDOW['train_end']
-    )].copy()
-    test_df = df[df['season'] == ALIGNED_WINDOW['test_season']].copy()
+    train_df = df[
+        df["season"].between(ALIGNED_WINDOW["train_start"], ALIGNED_WINDOW["train_end"])
+    ].copy()
+    test_df = df[df["season"] == ALIGNED_WINDOW["test_season"]].copy()
 
     logger.info("\n✓ Split complete:")
-    logger.info(f"  Train: {len(train_df):,} samples ({ALIGNED_WINDOW['train_start']}-{ALIGNED_WINDOW['train_end']})")
+    logger.info(
+        f"  Train: {len(train_df):,} samples ({ALIGNED_WINDOW['train_start']}-{ALIGNED_WINDOW['train_end']})"
+    )
     logger.info(f"  Test: {len(test_df):,} samples ({ALIGNED_WINDOW['test_season']})")
     logger.info(f"  Features: {len(feature_cols)}")
 
@@ -482,20 +485,24 @@ def prepare_train_test_split(df: pd.DataFrame) -> tuple:
         train_df,
         feature_cols,
         threshold=COVERAGE_THRESHOLD,
-        fail_on_low_coverage=True  # BLOCK training if coverage fails
+        fail_on_low_coverage=True,  # BLOCK training if coverage fails
     )
 
     # Extract features AFTER coverage audit passes
     X_train = train_df[feature_cols].values
-    y_train = train_df['yards'].values
+    y_train = train_df["yards"].values
 
     X_test = test_df[feature_cols].values
-    y_test = test_df['yards'].values
+    y_test = test_df["yards"].values
 
     logger.info("\n16 Features (13 Baseline + 3 Opponent Strength):")
     for i, col in enumerate(feature_cols, 1):
         coverage = coverage_report.get(col, 0.0)
-        marker = " [NEW]" if col in ['opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty'] else ""
+        marker = (
+            " [NEW]"
+            if col in ["opp_def_epa_exp", "opp_pass_def_rank", "matchup_difficulty"]
+            else ""
+        )
         logger.info(f"  {i:2d}. {col:30s} ({coverage:5.1%} coverage){marker}")
 
     return X_train, y_train, X_test, y_test, feature_cols, train_df
@@ -530,7 +537,7 @@ def train_xgboost_model(X_train, y_train, X_test, y_test, feature_cols):
     logger.info("Note: No exponential decay weights (uniform 2018-2024)")
 
     # Training
-    evals = [(dtrain, 'train'), (dtest, 'test')]
+    evals = [(dtrain, "train"), (dtest, "test")]
     evals_result = {}
 
     model = xgb.train(
@@ -540,7 +547,7 @@ def train_xgboost_model(X_train, y_train, X_test, y_test, feature_cols):
         evals=evals,
         evals_result=evals_result,
         early_stopping_rounds=EARLY_STOPPING_ROUNDS,
-        verbose_eval=50
+        verbose_eval=50,
     )
 
     training_time = time.time() - start_time
@@ -562,16 +569,16 @@ def train_xgboost_model(X_train, y_train, X_test, y_test, feature_cols):
     baseline_mae = mean_absolute_error(y_test, np.full_like(y_test, y_train.mean()))
 
     metrics = {
-        'mae': mae,
-        'rmse': rmse,
-        'r2': r2,
-        'baseline_mae': baseline_mae,
-        'improvement_pct': (1 - mae / baseline_mae) * 100,
-        'training_time_minutes': training_time / 60,
-        'best_iteration': model.best_iteration,
-        'num_features': len(feature_cols),
-        'train_samples': len(X_train),
-        'test_samples': len(X_test),
+        "mae": mae,
+        "rmse": rmse,
+        "r2": r2,
+        "baseline_mae": baseline_mae,
+        "improvement_pct": (1 - mae / baseline_mae) * 100,
+        "training_time_minutes": training_time / 60,
+        "best_iteration": model.best_iteration,
+        "num_features": len(feature_cols),
+        "train_samples": len(X_train),
+        "test_samples": len(X_test),
     }
 
     return model, y_pred, metrics
@@ -604,7 +611,7 @@ def evaluate_and_save(model, y_test, y_pred, metrics, feature_cols):
     logger.info(f"  Improvement: {metrics['improvement_pct']:.1f}%")
 
     # Compare to v2 baseline
-    improvement_vs_v2 = ((V2_BASELINE_MAE - metrics['mae']) / V2_BASELINE_MAE) * 100
+    improvement_vs_v2 = ((V2_BASELINE_MAE - metrics["mae"]) / V2_BASELINE_MAE) * 100
     logger.info("\nv2 Baseline Comparison:")
     logger.info(f"  v2 MAE: {V2_BASELINE_MAE:.2f} yards")
     logger.info(f"  v3.1 MAE: {metrics['mae']:.2f} yards")
@@ -618,7 +625,7 @@ def evaluate_and_save(model, y_test, y_pred, metrics, feature_cols):
     logger.info(f"  Test samples: {metrics['test_samples']:,}")
 
     # Feature importance
-    importance = model.get_score(importance_type='gain')
+    importance = model.get_score(importance_type="gain")
     sorted_importance = sorted(importance.items(), key=lambda x: x[1], reverse=True)
 
     logger.info("\n" + "=" * 70)
@@ -630,48 +637,53 @@ def evaluate_and_save(model, y_test, y_pred, metrics, feature_cols):
 
     for i, (feat, score) in enumerate(sorted_importance, 1):
         pct = (score / total_importance) * 100
-        marker = " [NEW]" if feat in ['opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty'] else ""
+        marker = (
+            " [NEW]"
+            if feat in ["opp_def_epa_exp", "opp_pass_def_rank", "matchup_difficulty"]
+            else ""
+        )
         logger.info(f"  {i:2d}. {feat:30s} {score:10.1f} ({pct:5.1f}%){marker}")
 
     # Save model
-    model_dir = Path('models/xgboost')
+    model_dir = Path("models/xgboost")
     model_dir.mkdir(parents=True, exist_ok=True)
 
-    model_path = model_dir / 'passing_xgboost_v3_1_aligned.pkl'
+    model_path = model_dir / "passing_xgboost_v3_1_aligned.pkl"
     model.save_model(str(model_path))
 
     # Save metadata
     metadata = {
-        'model_name': 'XGBoost Passing v3.1 (Aligned Window 2018-2024, 16 Features)',
-        'training_date': pd.Timestamp.now().isoformat(),
-        'aligned_window': ALIGNED_WINDOW,
-        'hyperparameters': XGBOOST_PARAMS,
-        'metrics': {k: float(v) if isinstance(v, (int, float, np.number)) else v
-                   for k, v in metrics.items()},
-        'feature_cols': feature_cols,
-        'num_features': len(feature_cols),
-        'ensemble_compatible': True,
-        'feature_importance_all': {k: float(v) for k, v in sorted_importance},
-        'ensemble_weight': 0.30,
-        'test_season': ALIGNED_WINDOW['test_season'],
-        'train_seasons': f"{ALIGNED_WINDOW['train_start']}-{ALIGNED_WINDOW['train_end']}",
-        'opponent_strength_features': [
-            'opp_def_epa_exp',
-            'opp_pass_def_rank',
-            'matchup_difficulty'
-        ],
-        'postmortem_fix': {
-            'issue': 'XGBoost v3 had 35% missing opponent data (2016-2017)',
-            'solution': 'Aligned training window with feature availability (2018-2024)',
-            'coverage_threshold': COVERAGE_THRESHOLD,
-            'v2_baseline_mae': V2_BASELINE_MAE,
-            'v3_1_improvement': improvement_vs_v2,
+        "model_name": "XGBoost Passing v3.1 (Aligned Window 2018-2024, 16 Features)",
+        "training_date": pd.Timestamp.now().isoformat(),
+        "aligned_window": ALIGNED_WINDOW,
+        "hyperparameters": XGBOOST_PARAMS,
+        "metrics": {
+            k: float(v) if isinstance(v, (int, float, np.number)) else v for k, v in metrics.items()
         },
-        'note': 'v3.1 fixes v3 regression by aligning training window with EPA availability',
+        "feature_cols": feature_cols,
+        "num_features": len(feature_cols),
+        "ensemble_compatible": True,
+        "feature_importance_all": {k: float(v) for k, v in sorted_importance},
+        "ensemble_weight": 0.30,
+        "test_season": ALIGNED_WINDOW["test_season"],
+        "train_seasons": f"{ALIGNED_WINDOW['train_start']}-{ALIGNED_WINDOW['train_end']}",
+        "opponent_strength_features": [
+            "opp_def_epa_exp",
+            "opp_pass_def_rank",
+            "matchup_difficulty",
+        ],
+        "postmortem_fix": {
+            "issue": "XGBoost v3 had 35% missing opponent data (2016-2017)",
+            "solution": "Aligned training window with feature availability (2018-2024)",
+            "coverage_threshold": COVERAGE_THRESHOLD,
+            "v2_baseline_mae": V2_BASELINE_MAE,
+            "v3_1_improvement": improvement_vs_v2,
+        },
+        "note": "v3.1 fixes v3 regression by aligning training window with EPA availability",
     }
 
-    metadata_path = model_dir / 'passing_xgboost_v3_1_aligned_metadata.json'
-    with open(metadata_path, 'w') as f:
+    metadata_path = model_dir / "passing_xgboost_v3_1_aligned_metadata.json"
+    with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
     logger.info("\n" + "=" * 70)
@@ -690,11 +702,15 @@ def main():
     logger.info("\n" + "=" * 70)
     logger.info("XGBOOST v3.1 TRAINING (ALIGNED WINDOW - POSTMORTEM FIX)")
     logger.info("=" * 70)
-    logger.info(f"Training Window: {ALIGNED_WINDOW['train_start']}-{ALIGNED_WINDOW['train_end']} (aligned with EPA)")
+    logger.info(
+        f"Training Window: {ALIGNED_WINDOW['train_start']}-{ALIGNED_WINDOW['train_end']} (aligned with EPA)"
+    )
     logger.info(f"Test Set: {ALIGNED_WINDOW['test_season']} season")
     logger.info("Features: 16 (13 baseline + 3 opponent strength)")
     logger.info(f"Target: Beat v2 baseline (MAE < {V2_BASELINE_MAE:.2f} yards)")
-    logger.info(f"Coverage Gate: >{COVERAGE_THRESHOLD:.0%} required (target: >{COVERAGE_TARGET:.0%})")
+    logger.info(
+        f"Coverage Gate: >{COVERAGE_THRESHOLD:.0%} required (target: >{COVERAGE_TARGET:.0%})"
+    )
     logger.info("=" * 70 + "\n")
 
     pipeline_start = time.time()
@@ -719,9 +735,7 @@ def main():
         return
 
     # 5. Train model (only if coverage audit passed)
-    model, y_pred, metrics = train_xgboost_model(
-        X_train, y_train, X_test, y_test, feature_cols
-    )
+    model, y_pred, metrics = train_xgboost_model(X_train, y_train, X_test, y_test, feature_cols)
 
     # 6. Evaluate and save
     model_path, metadata_path, improvement_vs_v2 = evaluate_and_save(
@@ -738,14 +752,14 @@ def main():
     logger.info(f"v3.1 Aligned MAE: {metrics['mae']:.2f} yards")
     logger.info(f"Improvement: {improvement_vs_v2:+.2f}%")
 
-    if metrics['mae'] < V2_BASELINE_MAE:
+    if metrics["mae"] < V2_BASELINE_MAE:
         decision = "✓ DEPLOY"
         recommendation = (
             f"v3.1 beats v2 baseline by {improvement_vs_v2:.2f}%.\n"
             f"Opponent strength features add value.\n"
             f"RECOMMENDED: Integrate into ensemble v6.1 (30% weight)"
         )
-    elif metrics['mae'] < V2_BASELINE_MAE * 1.02:  # Within 2% margin
+    elif metrics["mae"] < V2_BASELINE_MAE * 1.02:  # Within 2% margin
         decision = "⚠ BORDERLINE"
         recommendation = (
             "v3.1 performance within 2% of v2 baseline.\n"
@@ -762,7 +776,7 @@ def main():
 
     logger.info(f"\nDecision: {decision}")
     logger.info("\nRecommendation:")
-    for line in recommendation.split('\n'):
+    for line in recommendation.split("\n"):
         logger.info(f"  {line}")
 
     logger.info("\n" + "=" * 70)
@@ -775,5 +789,5 @@ def main():
     logger.info("=" * 70 + "\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -35,11 +35,7 @@ from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 def get_db_connection():
     """Get database connection."""
     return psycopg2.connect(
-        host="localhost",
-        port=5544,
-        dbname="devdb01",
-        user="dro",
-        password="sicillionbillions"
+        host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
     )
 
 
@@ -70,11 +66,7 @@ def get_validation_games(season: int) -> pd.DataFrame:
         conn.close()
 
 
-def validate_season(
-    ensemble: EnhancedEnsemble5Way,
-    season: int,
-    output_file: Path
-) -> dict:
+def validate_season(ensemble: EnhancedEnsemble5Way, season: int, output_file: Path) -> dict:
     """Validate ensemble on a single season."""
     print(f"\n{'=' * 80}")
     print(f"VALIDATING SEASON {season}")
@@ -90,77 +82,81 @@ def validate_season(
     results = []
     errors = []
     component_stats = {
-        'state_space_count': 0,
-        'hierarchical_count': 0,
-        'xgboost_v4_count': 0,
-        'informative_priors_count': 0,
-        'hybrid_count': 0
+        "state_space_count": 0,
+        "hierarchical_count": 0,
+        "xgboost_v4_count": 0,
+        "informative_priors_count": 0,
+        "hybrid_count": 0,
     }
 
-    print(f"Running predictions (0/{len(games_df)})...", end='\r')
+    print(f"Running predictions (0/{len(games_df)})...", end="\r")
 
     for idx, row in games_df.iterrows():
         try:
             # Make prediction (request component predictions)
             pred = ensemble.predict(
-                player_id=row['player_id'],
-                season=row['season'],
-                week=row['week'],
-                return_components=True  # CRITICAL: Request component predictions
+                player_id=row["player_id"],
+                season=row["season"],
+                week=row["week"],
+                return_components=True,  # CRITICAL: Request component predictions
             )
 
             # Extract component predictions from 'components' dict
-            components = pred.get('components', {})
-            state_space_pred = components.get('state_space_v2', {}).get('mean')
-            hierarchical_pred = components.get('hierarchical_v2', {}).get('mean')
-            xgboost_v4_pred = components.get('xgboost_v4_ridge', {}).get('mean')
-            informative_priors_pred = components.get('informative_priors_v2', {}).get('mean')
-            hybrid_pred = components.get('hybrid_static_incremental', {}).get('mean')
+            components = pred.get("components", {})
+            state_space_pred = components.get("state_space_v2", {}).get("mean")
+            hierarchical_pred = components.get("hierarchical_v2", {}).get("mean")
+            xgboost_v4_pred = components.get("xgboost_v4_ridge", {}).get("mean")
+            informative_priors_pred = components.get("informative_priors_v2", {}).get("mean")
+            hybrid_pred = components.get("hybrid_static_incremental", {}).get("mean")
 
             # Track component contributions
             if state_space_pred is not None:
-                component_stats['state_space_count'] += 1
+                component_stats["state_space_count"] += 1
             if hierarchical_pred is not None:
-                component_stats['hierarchical_count'] += 1
+                component_stats["hierarchical_count"] += 1
             if xgboost_v4_pred is not None:
-                component_stats['xgboost_v4_count'] += 1
+                component_stats["xgboost_v4_count"] += 1
             if informative_priors_pred is not None:
-                component_stats['informative_priors_count'] += 1
+                component_stats["informative_priors_count"] += 1
             if hybrid_pred is not None:
-                component_stats['hybrid_count'] += 1
+                component_stats["hybrid_count"] += 1
 
             # Store result
-            results.append({
-                'player_id': row['player_id'],
-                'player_display_name': row['player_display_name'],
-                'season': row['season'],
-                'week': row['week'],
-                'actual': row['actual_yards'],
-                'predicted': pred['ensemble_mean'],
-                'std': pred['ensemble_std'],
-                'lower_90': pred.get('lower_90', None),
-                'upper_90': pred.get('upper_90', None),
-                'n_components': len(pred.get('valid_components', [])),
-                # Component predictions
-                'state_space_pred': state_space_pred,
-                'hierarchical_pred': hierarchical_pred,
-                'xgboost_v4_pred': xgboost_v4_pred,
-                'informative_priors_pred': informative_priors_pred,
-                'hybrid_pred': hybrid_pred
-            })
+            results.append(
+                {
+                    "player_id": row["player_id"],
+                    "player_display_name": row["player_display_name"],
+                    "season": row["season"],
+                    "week": row["week"],
+                    "actual": row["actual_yards"],
+                    "predicted": pred["ensemble_mean"],
+                    "std": pred["ensemble_std"],
+                    "lower_90": pred.get("lower_90", None),
+                    "upper_90": pred.get("upper_90", None),
+                    "n_components": len(pred.get("valid_components", [])),
+                    # Component predictions
+                    "state_space_pred": state_space_pred,
+                    "hierarchical_pred": hierarchical_pred,
+                    "xgboost_v4_pred": xgboost_v4_pred,
+                    "informative_priors_pred": informative_priors_pred,
+                    "hybrid_pred": hybrid_pred,
+                }
+            )
 
         except Exception as e:
-            errors.append({
-                'player_id': row['player_id'],
-                'player_display_name': row['player_display_name'],
-                'season': row['season'],
-                'week': row['week'],
-                'error': str(e)
-            })
+            errors.append(
+                {
+                    "player_id": row["player_id"],
+                    "player_display_name": row["player_display_name"],
+                    "season": row["season"],
+                    "week": row["week"],
+                    "error": str(e),
+                }
+            )
 
         # Progress update
         if (idx + 1) % 10 == 0 or idx == len(games_df) - 1:
-            print(f"Running predictions ({idx + 1}/{len(games_df)})...", end='\r')
+            print(f"Running predictions ({idx + 1}/{len(games_df)})...", end="\r")
 
     print()  # New line after progress
 
@@ -169,14 +165,13 @@ def validate_season(
 
     # Calculate metrics
     if len(results_df) > 0:
-        mae = np.mean(np.abs(results_df['actual'] - results_df['predicted']))
-        rmse = np.sqrt(np.mean((results_df['actual'] - results_df['predicted']) ** 2))
+        mae = np.mean(np.abs(results_df["actual"] - results_df["predicted"]))
+        rmse = np.sqrt(np.mean((results_df["actual"] - results_df["predicted"]) ** 2))
 
         # Calibration (90% CI coverage)
-        if 'lower_90' in results_df.columns and results_df['lower_90'].notna().any():
-            in_ci = (
-                (results_df['actual'] >= results_df['lower_90']) &
-                (results_df['actual'] <= results_df['upper_90'])
+        if "lower_90" in results_df.columns and results_df["lower_90"].notna().any():
+            in_ci = (results_df["actual"] >= results_df["lower_90"]) & (
+                results_df["actual"] <= results_df["upper_90"]
             )
             calibration = in_ci.sum() / len(results_df) * 100
         else:
@@ -184,31 +179,33 @@ def validate_season(
 
         # Component contribution rates
         component_rates = {
-            'state_space': component_stats['state_space_count'] / len(results_df) * 100,
-            'hierarchical': component_stats['hierarchical_count'] / len(results_df) * 100,
-            'xgboost_v4': component_stats['xgboost_v4_count'] / len(results_df) * 100,
-            'informative_priors': component_stats['informative_priors_count'] / len(results_df) * 100,
-            'hybrid': component_stats['hybrid_count'] / len(results_df) * 100
+            "state_space": component_stats["state_space_count"] / len(results_df) * 100,
+            "hierarchical": component_stats["hierarchical_count"] / len(results_df) * 100,
+            "xgboost_v4": component_stats["xgboost_v4_count"] / len(results_df) * 100,
+            "informative_priors": component_stats["informative_priors_count"]
+            / len(results_df)
+            * 100,
+            "hybrid": component_stats["hybrid_count"] / len(results_df) * 100,
         }
 
         metrics = {
-            'season': season,
-            'n_games': len(results_df),
-            'n_errors': len(errors),
-            'mae': float(mae),
-            'rmse': float(rmse),
-            'calibration_90': float(calibration) if calibration is not None else None,
-            'component_contribution_rates': component_rates,
-            'component_counts': component_stats
+            "season": season,
+            "n_games": len(results_df),
+            "n_errors": len(errors),
+            "mae": float(mae),
+            "rmse": float(rmse),
+            "calibration_90": float(calibration) if calibration is not None else None,
+            "component_contribution_rates": component_rates,
+            "component_counts": component_stats,
         }
     else:
         metrics = {
-            'season': season,
-            'n_games': 0,
-            'n_errors': len(errors),
-            'mae': None,
-            'rmse': None,
-            'calibration_90': None
+            "season": season,
+            "n_games": 0,
+            "n_errors": len(errors),
+            "mae": None,
+            "rmse": None,
+            "calibration_90": None,
         }
 
     # Print results
@@ -260,6 +257,7 @@ def main():
     except Exception as e:
         print(f"❌ FATAL: Ensemble initialization failed: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 
@@ -281,19 +279,21 @@ def main():
     print("OVERALL RESULTS (2022-2024)")
     print(f"{'=' * 80}\n")
 
-    total_games = sum(m['n_games'] for m in all_metrics)
-    total_errors = sum(m['n_errors'] for m in all_metrics)
+    total_games = sum(m["n_games"] for m in all_metrics)
+    total_errors = sum(m["n_errors"] for m in all_metrics)
 
     # Weighted average MAE (by number of games)
-    valid_metrics = [m for m in all_metrics if m['mae'] is not None]
+    valid_metrics = [m for m in all_metrics if m["mae"] is not None]
     if valid_metrics:
-        overall_mae = sum(m['mae'] * m['n_games'] for m in valid_metrics) / total_games
-        overall_rmse = sum(m['rmse'] * m['n_games'] for m in valid_metrics) / total_games
+        overall_mae = sum(m["mae"] * m["n_games"] for m in valid_metrics) / total_games
+        overall_rmse = sum(m["rmse"] * m["n_games"] for m in valid_metrics) / total_games
 
         # Average calibration
-        calib_metrics = [m for m in valid_metrics if m['calibration_90'] is not None]
+        calib_metrics = [m for m in valid_metrics if m["calibration_90"] is not None]
         if calib_metrics:
-            overall_calib = sum(m['calibration_90'] * m['n_games'] for m in calib_metrics) / sum(m['n_games'] for m in calib_metrics)
+            overall_calib = sum(m["calibration_90"] * m["n_games"] for m in calib_metrics) / sum(
+                m["n_games"] for m in calib_metrics
+            )
         else:
             overall_calib = None
 
@@ -301,7 +301,11 @@ def main():
         print(f"Total errors: {total_errors}")
         print(f"Overall MAE: {overall_mae:.2f} yards")
         print(f"Overall RMSE: {overall_rmse:.2f} yards")
-        print(f"Overall Calibration (90% CI): {overall_calib:.1f}%" if overall_calib else "Overall Calibration: N/A")
+        print(
+            f"Overall Calibration (90% CI): {overall_calib:.1f}%"
+            if overall_calib
+            else "Overall Calibration: N/A"
+        )
         print()
 
         # Comparison to previous validation
@@ -322,22 +326,22 @@ def main():
 
         # Save summary
         summary = {
-            'validation_date': datetime.now().isoformat(),
-            'ensemble_version': 'v6.0_recovered_xgb',
-            'seasons': seasons,
-            'total_games': total_games,
-            'total_errors': total_errors,
-            'overall_mae': float(overall_mae),
-            'overall_rmse': float(overall_rmse),
-            'overall_calibration_90': float(overall_calib) if overall_calib else None,
-            'previous_mae': previous_mae,
-            'improvement_yards': float(improvement),
-            'improvement_pct': float(improvement_pct),
-            'season_metrics': all_metrics
+            "validation_date": datetime.now().isoformat(),
+            "ensemble_version": "v6.0_recovered_xgb",
+            "seasons": seasons,
+            "total_games": total_games,
+            "total_errors": total_errors,
+            "overall_mae": float(overall_mae),
+            "overall_rmse": float(overall_rmse),
+            "overall_calibration_90": float(overall_calib) if overall_calib else None,
+            "previous_mae": previous_mae,
+            "improvement_yards": float(improvement),
+            "improvement_pct": float(improvement_pct),
+            "season_metrics": all_metrics,
         }
 
         summary_file = results_dir / "validation_summary.json"
-        with open(summary_file, 'w') as f:
+        with open(summary_file, "w") as f:
             json.dump(summary, f, indent=2)
 
         print(f"✅ Summary saved: {summary_file}")

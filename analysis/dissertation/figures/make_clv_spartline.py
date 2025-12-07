@@ -22,6 +22,7 @@ CLI
       --input analysis/figures/data/bets.csv \
       --output analysis/figures/out/clv_sparkline_2025.pdf
 """
+
 import argparse
 import os
 

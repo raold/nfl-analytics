@@ -23,7 +23,6 @@ def test_load_training_log_basic():
     assert result is not None
 
 
-
 def test_load_training_log_edge_cases():
     """Test load_training_log: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_load_training_log_edge_cases():
     assert result is not None
 
 
-
 def test_load_training_log_error_handling():
     """Test load_training_log error handling."""
     with pytest.raises(ValueError):
         load_training_log(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_load_training_log_property_idempotent(self, log_path):
 
     # Assert property
     assert load_training_log(log_path) == result, "idempotent violated"
-
 
 
 def test_extract_epochs_and_rewards_basic():
@@ -67,7 +63,6 @@ def test_extract_epochs_and_rewards_basic():
     assert result is not None
 
 
-
 def test_extract_epochs_and_rewards_edge_cases():
     """Test extract_epochs_and_rewards: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_extract_epochs_and_rewards_edge_cases():
     assert result is not None
 
 
-
 def test_extract_epochs_and_rewards_error_handling():
     """Test extract_epochs_and_rewards error handling."""
     with pytest.raises(ValueError):
         extract_epochs_and_rewards(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_extract_epochs_and_rewards_property_idempotent(self, log):
 
     # Assert property
     assert extract_epochs_and_rewards(log) == result, "idempotent violated"
-
 
 
 def test_compute_rolling_stats_basic():
@@ -111,7 +103,6 @@ def test_compute_rolling_stats_basic():
     assert result is not None
 
 
-
 def test_compute_rolling_stats_edge_cases():
     """Test compute_rolling_stats: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_compute_rolling_stats_edge_cases():
     assert result is not None
 
 
-
 def test_compute_rolling_stats_error_handling():
     """Test compute_rolling_stats error handling."""
     with pytest.raises(ValueError):
         compute_rolling_stats(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_compute_rolling_stats_property_idempotent(self, rewards, window):
 
     # Assert property
     assert compute_rolling_stats(rewards, window) == result, "idempotent violated"
-
 
 
 def test_plot_learning_curves_basic():
@@ -155,7 +143,6 @@ def test_plot_learning_curves_basic():
     assert result is not None
 
 
-
 def test_plot_learning_curves_edge_cases():
     """Test plot_learning_curves: edge cases."""
     # Arrange
@@ -168,23 +155,24 @@ def test_plot_learning_curves_edge_cases():
     assert result is not None
 
 
-
 def test_plot_learning_curves_error_handling():
     """Test plot_learning_curves error handling."""
     with pytest.raises(ValueError):
         plot_learning_curves(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_plot_learning_curves_property_idempotent(self, dqn_log_path, ppo_log_path, output_path, window):
+def test_plot_learning_curves_property_idempotent(
+    self, dqn_log_path, ppo_log_path, output_path, window
+):
     """Property test: function is idempotent."""
     # Act
     result = plot_learning_curves(dqn_log_path, ppo_log_path, output_path, window)
 
     # Assert property
-    assert plot_learning_curves(dqn_log_path, ppo_log_path, output_path, window) == result, "idempotent violated"
-
+    assert (
+        plot_learning_curves(dqn_log_path, ppo_log_path, output_path, window) == result
+    ), "idempotent violated"
 
 
 def test_main_basic():
@@ -199,7 +187,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -212,9 +199,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

@@ -23,7 +23,6 @@ def test_fit_basic():
     assert result is not None
 
 
-
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
@@ -36,23 +35,32 @@ def test_fit_edge_cases():
     assert result is not None
 
 
-
 def test_fit_error_handling():
     """Test fit error handling."""
     with pytest.raises(ValueError):
         fit(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_fit_property_idempotent(self, self, X_bayesian, X_xgb, bayesian_uncertainty, y, context, cv_splits):
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_fit_property_idempotent(
+    self, self, X_bayesian, X_xgb, bayesian_uncertainty, y, context, cv_splits
+):
     """Property test: function is idempotent."""
     # Act
     result = fit(self, X_bayesian, X_xgb, bayesian_uncertainty, y, context, cv_splits)
 
     # Assert property
-    assert fit(self, X_bayesian, X_xgb, bayesian_uncertainty, y, context, cv_splits) == result, "idempotent violated"
-
+    assert (
+        fit(self, X_bayesian, X_xgb, bayesian_uncertainty, y, context, cv_splits) == result
+    ), "idempotent violated"
 
 
 def test_predict_proba_basic():
@@ -67,7 +75,6 @@ def test_predict_proba_basic():
     assert result is not None
 
 
-
 def test_predict_proba_edge_cases():
     """Test predict_proba: edge cases."""
     # Arrange
@@ -80,23 +87,24 @@ def test_predict_proba_edge_cases():
     assert result is not None
 
 
-
 def test_predict_proba_error_handling():
     """Test predict_proba error handling."""
     with pytest.raises(ValueError):
         predict_proba(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_predict_proba_property_idempotent(self, self, X_bayesian, X_xgb, bayesian_uncertainty, context):
+def test_predict_proba_property_idempotent(
+    self, self, X_bayesian, X_xgb, bayesian_uncertainty, context
+):
     """Property test: function is idempotent."""
     # Act
     result = predict_proba(self, X_bayesian, X_xgb, bayesian_uncertainty, context)
 
     # Assert property
-    assert predict_proba(self, X_bayesian, X_xgb, bayesian_uncertainty, context) == result, "idempotent violated"
-
+    assert (
+        predict_proba(self, X_bayesian, X_xgb, bayesian_uncertainty, context) == result
+    ), "idempotent violated"
 
 
 def test_get_feature_importance_basic():
@@ -111,7 +119,6 @@ def test_get_feature_importance_basic():
     assert result is not None
 
 
-
 def test_get_feature_importance_edge_cases():
     """Test get_feature_importance: edge cases."""
     # Arrange
@@ -124,12 +131,10 @@ def test_get_feature_importance_edge_cases():
     assert result is not None
 
 
-
 def test_get_feature_importance_error_handling():
     """Test get_feature_importance error handling."""
     with pytest.raises(ValueError):
         get_feature_importance(invalid_input)
-
 
 
 @given(st.integers())
@@ -140,7 +145,6 @@ def test_get_feature_importance_property_idempotent(val):
 
     # Assert property
     assert get_feature_importance(val) == result, "idempotent violated"
-
 
 
 def test_save_basic():
@@ -155,7 +159,6 @@ def test_save_basic():
     assert result is not None
 
 
-
 def test_save_edge_cases():
     """Test save: edge cases."""
     # Arrange
@@ -168,12 +171,10 @@ def test_save_edge_cases():
     assert result is not None
 
 
-
 def test_save_error_handling():
     """Test save error handling."""
     with pytest.raises(ValueError):
         save(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -184,7 +185,6 @@ def test_save_property_idempotent(self, self, path):
 
     # Assert property
     assert save(self, path) == result, "idempotent violated"
-
 
 
 def test_load_basic():
@@ -199,7 +199,6 @@ def test_load_basic():
     assert result is not None
 
 
-
 def test_load_edge_cases():
     """Test load: edge cases."""
     # Arrange
@@ -212,12 +211,10 @@ def test_load_edge_cases():
     assert result is not None
 
 
-
 def test_load_error_handling():
     """Test load error handling."""
     with pytest.raises(ValueError):
         load(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -228,7 +225,6 @@ def test_load_property_idempotent(self, cls, path):
 
     # Assert property
     assert load(cls, path) == result, "idempotent violated"
-
 
 
 def test_fit_basic():
@@ -243,7 +239,6 @@ def test_fit_basic():
     assert result is not None
 
 
-
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
@@ -256,12 +251,10 @@ def test_fit_edge_cases():
     assert result is not None
 
 
-
 def test_fit_error_handling():
     """Test fit error handling."""
     with pytest.raises(ValueError):
         fit(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -271,8 +264,9 @@ def test_fit_property_idempotent(self, self, bayesian_preds, xgb_preds, bayesian
     result = fit(self, bayesian_preds, xgb_preds, bayesian_uncertainty, y)
 
     # Assert property
-    assert fit(self, bayesian_preds, xgb_preds, bayesian_uncertainty, y) == result, "idempotent violated"
-
+    assert (
+        fit(self, bayesian_preds, xgb_preds, bayesian_uncertainty, y) == result
+    ), "idempotent violated"
 
 
 def test_predict_basic():
@@ -287,7 +281,6 @@ def test_predict_basic():
     assert result is not None
 
 
-
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
@@ -300,12 +293,10 @@ def test_predict_edge_cases():
     assert result is not None
 
 
-
 def test_predict_error_handling():
     """Test predict error handling."""
     with pytest.raises(ValueError):
         predict(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -315,5 +306,6 @@ def test_predict_property_idempotent(self, self, bayesian_preds, xgb_preds, baye
     result = predict(self, bayesian_preds, xgb_preds, bayesian_uncertainty)
 
     # Assert property
-    assert predict(self, bayesian_preds, xgb_preds, bayesian_uncertainty) == result, "idempotent violated"
-
+    assert (
+        predict(self, bayesian_preds, xgb_preds, bayesian_uncertainty) == result
+    ), "idempotent violated"

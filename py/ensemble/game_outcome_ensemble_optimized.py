@@ -87,20 +87,20 @@ class OptimizedGameOutcomeEnsemble(GameOutcomeEnsemble):
         # Override XGBoost params with STRONG REGULARIZATION
         if xgb_params is None:
             self.xgb_params = {
-                'objective': 'binary:logistic',
-                'eval_metric': 'logloss',
-                'tree_method': 'hist',
-                'n_estimators': 100,
-                'max_depth': 4,  # REDUCED from 6 to prevent overfitting
-                'learning_rate': 0.1,
-                'subsample': 0.8,
-                'colsample_bytree': 0.8,
+                "objective": "binary:logistic",
+                "eval_metric": "logloss",
+                "tree_method": "hist",
+                "n_estimators": 100,
+                "max_depth": 4,  # REDUCED from 6 to prevent overfitting
+                "learning_rate": 0.1,
+                "subsample": 0.8,
+                "colsample_bytree": 0.8,
                 # STRONG L1/L2 REGULARIZATION to combat overfitting
-                'alpha': 2.0,  # L1 regularization term on weights
-                'lambda': 2.0,  # L2 regularization term on weights
-                'min_child_weight': 5,  # Higher min child weight for regularization
-                'gamma': 0.5,  # Minimum loss reduction required for split
-                'n_jobs': -1,
+                "alpha": 2.0,  # L1 regularization term on weights
+                "lambda": 2.0,  # L2 regularization term on weights
+                "min_child_weight": 5,  # Higher min child weight for regularization
+                "gamma": 0.5,  # Minimum loss reduction required for split
+                "n_jobs": -1,
             }
         else:
             self.xgb_params = xgb_params
@@ -181,18 +181,20 @@ class OptimizedGameOutcomeEnsemble(GameOutcomeEnsemble):
                 away_points_allowed = 21.0
                 away_away_win_pct = 0.5
 
-            baseline_features.append({
-                "game_id": row["game_id"],
-                "home_win_pct": home_win_pct,
-                "away_win_pct": away_win_pct,
-                "home_points_avg": home_points_avg,
-                "away_points_avg": away_points_avg,
-                "home_points_allowed_avg": home_points_allowed,
-                "away_points_allowed_avg": away_points_allowed,
-                "home_home_win_pct": home_home_win_pct,
-                "away_away_win_pct": away_away_win_pct,
-                "week": week,
-            })
+            baseline_features.append(
+                {
+                    "game_id": row["game_id"],
+                    "home_win_pct": home_win_pct,
+                    "away_win_pct": away_win_pct,
+                    "home_points_avg": home_points_avg,
+                    "away_points_avg": away_points_avg,
+                    "home_points_allowed_avg": home_points_allowed,
+                    "away_points_allowed_avg": away_points_allowed,
+                    "home_home_win_pct": home_home_win_pct,
+                    "away_away_win_pct": away_away_win_pct,
+                    "week": week,
+                }
+            )
 
         baseline_df = pd.DataFrame(baseline_features)
 
@@ -270,7 +272,9 @@ class OptimizedGameOutcomeEnsemble(GameOutcomeEnsemble):
         print(f"\n{'-'*80}")
         print("[2/5] Training XGBoost Model (OPTIMIZED + REGULARIZED)")
         print(f"{'-'*80}")
-        print(f"  Regularization: alpha={self.xgb_params['alpha']}, lambda={self.xgb_params['lambda']}")
+        print(
+            f"  Regularization: alpha={self.xgb_params['alpha']}, lambda={self.xgb_params['lambda']}"
+        )
         print(f"  Tree depth: max_depth={self.xgb_params['max_depth']}")
         print(f"  Min child weight: {self.xgb_params['min_child_weight']}")
 
@@ -280,10 +284,14 @@ class OptimizedGameOutcomeEnsemble(GameOutcomeEnsemble):
         # Define feature columns
         feature_cols = [
             # Baseline features (9)
-            "home_win_pct", "away_win_pct",
-            "home_points_avg", "away_points_avg",
-            "home_points_allowed_avg", "away_points_allowed_avg",
-            "home_home_win_pct", "away_away_win_pct",
+            "home_win_pct",
+            "away_win_pct",
+            "home_points_avg",
+            "away_points_avg",
+            "home_points_allowed_avg",
+            "away_points_allowed_avg",
+            "home_home_win_pct",
+            "away_away_win_pct",
             "week",
         ]
 
@@ -292,7 +300,9 @@ class OptimizedGameOutcomeEnsemble(GameOutcomeEnsemble):
 
         # Filter to columns that exist
         available_cols = [col for col in feature_cols if col in train_features_df.columns]
-        print(f"  Using {len(available_cols)} features (9 baseline + {len(available_cols)-9} top Phase 5)")
+        print(
+            f"  Using {len(available_cols)} features (9 baseline + {len(available_cols)-9} top Phase 5)"
+        )
 
         X_train = train_features_df[available_cols].values
 
@@ -336,8 +346,10 @@ class OptimizedGameOutcomeEnsemble(GameOutcomeEnsemble):
         }
         print(f"  Train Brier: {xgb_train_metrics['brier']:.4f}")
         print(f"  Train Accuracy: {xgb_train_metrics['accuracy']:.1%}")
-        if xgb_train_metrics['accuracy'] > 0.90:
-            print(f"  ⚠  WARNING: Training accuracy {xgb_train_metrics['accuracy']:.1%} still high - may be overfitting")
+        if xgb_train_metrics["accuracy"] > 0.90:
+            print(
+                f"  ⚠  WARNING: Training accuracy {xgb_train_metrics['accuracy']:.1%} still high - may be overfitting"
+            )
 
         # ====================================================================
         # Component 3: Bayesian Logistic Regression
@@ -382,12 +394,14 @@ class OptimizedGameOutcomeEnsemble(GameOutcomeEnsemble):
         print("[5/5] Training Meta-Learner (Stacking)")
         print(f"{'-'*80}")
 
-        meta_features_train = np.column_stack([
-            ss_train_preds,
-            xgb_train_preds,
-            lr_train_preds,
-            nn_train_preds,
-        ])
+        meta_features_train = np.column_stack(
+            [
+                ss_train_preds,
+                xgb_train_preds,
+                lr_train_preds,
+                nn_train_preds,
+            ]
+        )
 
         self.meta_learner.fit(meta_features_train, train_target)
         ensemble_train_preds = self.meta_learner.predict_proba(meta_features_train)[:, 1]
@@ -428,10 +442,12 @@ class OptimizedGameOutcomeEnsemble(GameOutcomeEnsemble):
                 self.team_stats_cache[season] = get_team_season_stats(season)
 
         # Component 1: State-Space
-        ss_preds = np.array([
-            self.state_space.predict_prob_home_win(row["home_team"], row["away_team"])
-            for _, row in df.iterrows()
-        ])
+        ss_preds = np.array(
+            [
+                self.state_space.predict_prob_home_win(row["home_team"], row["away_team"])
+                for _, row in df.iterrows()
+            ]
+        )
 
         # Components 2-4: Optimized feature-based models
         features_df = self._engineer_optimized_features(df)

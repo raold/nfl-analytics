@@ -23,7 +23,6 @@ def test_check_training_complete_basic():
     assert result is not None
 
 
-
 def test_check_training_complete_edge_cases():
     """Test check_training_complete: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_check_training_complete_edge_cases():
     assert result is not None
 
 
-
 def test_check_training_complete_error_handling():
     """Test check_training_complete error handling."""
     with pytest.raises(ValueError):
         check_training_complete(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_check_training_complete_property_idempotent(self, sigma_values):
 
     # Assert property
     assert check_training_complete(sigma_values) == result, "idempotent violated"
-
 
 
 def test_load_results_basic():
@@ -67,7 +63,6 @@ def test_load_results_basic():
     assert result is not None
 
 
-
 def test_load_results_edge_cases():
     """Test load_results: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_load_results_edge_cases():
     assert result is not None
 
 
-
 def test_load_results_error_handling():
     """Test load_results error handling."""
     with pytest.raises(ValueError):
         load_results(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_load_results_property_idempotent(self, sigma_values):
 
     # Assert property
     assert load_results(sigma_values) == result, "idempotent violated"
-
 
 
 def test_analyze_results_basic():
@@ -111,7 +103,6 @@ def test_analyze_results_basic():
     assert result is not None
 
 
-
 def test_analyze_results_edge_cases():
     """Test analyze_results: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_analyze_results_edge_cases():
     assert result is not None
 
 
-
 def test_analyze_results_error_handling():
     """Test analyze_results error handling."""
     with pytest.raises(ValueError):
         analyze_results(invalid_input)
-
 
 
 @given(st.integers())
@@ -140,7 +129,6 @@ def test_analyze_results_property_idempotent(self, df):
 
     # Assert property
     assert analyze_results(df) == result, "idempotent violated"
-
 
 
 def test_print_status_basic():
@@ -155,7 +143,6 @@ def test_print_status_basic():
     assert result is not None
 
 
-
 def test_print_status_edge_cases():
     """Test print_status: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_print_status_edge_cases():
     assert result is not None
 
 
-
 def test_print_status_error_handling():
     """Test print_status error handling."""
     with pytest.raises(ValueError):
         print_status(invalid_input)
-
 
 
 def test_main_basic():
@@ -188,7 +173,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -201,9 +185,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

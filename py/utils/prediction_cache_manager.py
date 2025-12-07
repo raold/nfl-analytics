@@ -413,15 +413,11 @@ class PredictionCacheManager:
             total_predictions = cursor.fetchone()[0]
 
             # Unique players
-            cursor.execute(
-                "SELECT COUNT(DISTINCT player_id) FROM ml.r_model_predictions"
-            )
+            cursor.execute("SELECT COUNT(DISTINCT player_id) FROM ml.r_model_predictions")
             unique_players = cursor.fetchone()[0]
 
             # Unique models
-            cursor.execute(
-                "SELECT COUNT(DISTINCT model_name) FROM ml.r_model_predictions"
-            )
+            cursor.execute("SELECT COUNT(DISTINCT model_name) FROM ml.r_model_predictions")
             unique_models = cursor.fetchone()[0]
 
             # Cache size
@@ -465,14 +461,10 @@ class PredictionCacheManager:
 
             # Calculate hit rate
             total_lookups = self._hit_count + self._miss_count
-            hit_rate = (
-                (self._hit_count / total_lookups * 100) if total_lookups > 0 else 0.0
-            )
+            hit_rate = (self._hit_count / total_lookups * 100) if total_lookups > 0 else 0.0
 
             # Average lookup time
-            avg_lookup_time = (
-                np.mean(self._lookup_times) if self._lookup_times else 0.0
-            )
+            avg_lookup_time = np.mean(self._lookup_times) if self._lookup_times else 0.0
 
             return CacheStats(
                 total_predictions=total_predictions,
@@ -551,9 +543,7 @@ class PredictionCacheManager:
                 # Check for NaN
                 if prediction is None or np.isnan(prediction):
                     nan_predictions += 1
-                    issues.append(
-                        f"NaN prediction for {player_id}/{stat_type}/{season}/{week}"
-                    )
+                    issues.append(f"NaN prediction for {player_id}/{stat_type}/{season}/{week}")
                     continue
 
                 # Check range
@@ -604,13 +594,9 @@ class PredictionCacheManager:
             )
             orphaned_predictions = cursor.fetchone()[0] or 0
             if orphaned_predictions > 0:
-                issues.append(
-                    f"{orphaned_predictions} predictions for players not in database"
-                )
+                issues.append(f"{orphaned_predictions} predictions for players not in database")
 
-            invalid_predictions = (
-                nan_predictions + out_of_range_predictions + duplicate_predictions
-            )
+            invalid_predictions = nan_predictions + out_of_range_predictions + duplicate_predictions
 
             return ValidationReport(
                 total_checked=total_checked,
@@ -723,9 +709,7 @@ class PredictionCacheManager:
         Returns:
             Tuple of (total_predictions, cached_predictions)
         """
-        logger.info(
-            f"Starting backfill for {model_name}/{stat_type} across {len(seasons)} seasons"
-        )
+        logger.info(f"Starting backfill for {model_name}/{stat_type} across {len(seasons)} seasons")
 
         total_predictions = 0
         cached_predictions = 0
@@ -748,9 +732,7 @@ class PredictionCacheManager:
                 # Cache in batches
                 for i in range(0, len(predictions_df), self.BACKFILL_BATCH_SIZE):
                     batch = predictions_df.iloc[i : i + self.BACKFILL_BATCH_SIZE]
-                    cached = self.cache_predictions(
-                        batch, model_name, stat_type, validate=True
-                    )
+                    cached = self.cache_predictions(batch, model_name, stat_type, validate=True)
                     cached_predictions += cached
 
                     logger.info(
@@ -769,9 +751,7 @@ class PredictionCacheManager:
 
         return total_predictions, cached_predictions
 
-    def _validate_predictions(
-        self, predictions: pd.DataFrame, stat_type: str
-    ) -> pd.DataFrame:
+    def _validate_predictions(self, predictions: pd.DataFrame, stat_type: str) -> pd.DataFrame:
         """
         Validate predictions before caching.
 
@@ -792,8 +772,7 @@ class PredictionCacheManager:
         if stat_type in self.STAT_RANGES:
             min_val, max_val = self.STAT_RANGES[stat_type]
             predictions = predictions[
-                (predictions["prediction"] >= min_val)
-                & (predictions["prediction"] <= max_val)
+                (predictions["prediction"] >= min_val) & (predictions["prediction"] <= max_val)
             ]
 
         # Remove invalid player IDs
@@ -801,12 +780,8 @@ class PredictionCacheManager:
         predictions = predictions[predictions["player_id"] != ""]
 
         # Remove invalid seasons/weeks
-        predictions = predictions[
-            (predictions["season"] >= 2015) & (predictions["season"] <= 2030)
-        ]
-        predictions = predictions[
-            (predictions["week"] >= 1) & (predictions["week"] <= 22)
-        ]
+        predictions = predictions[(predictions["season"] >= 2015) & (predictions["season"] <= 2030)]
+        predictions = predictions[(predictions["week"] >= 1) & (predictions["week"] <= 22)]
 
         removed = initial_count - len(predictions)
         if removed > 0:

@@ -23,7 +23,6 @@ def test_generate_architecture_table_basic():
     assert result is not None
 
 
-
 def test_generate_architecture_table_edge_cases():
     """Test generate_architecture_table: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_generate_architecture_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_architecture_table_error_handling():
     """Test generate_architecture_table error handling."""
     with pytest.raises(ValueError):
         generate_architecture_table(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_generate_architecture_table_property_idempotent(self, df, output_path):
 
     # Assert property
     assert generate_architecture_table(df, output_path) == result, "idempotent violated"
-
 
 
 def test_generate_alpha_sensitivity_table_basic():
@@ -67,7 +63,6 @@ def test_generate_alpha_sensitivity_table_basic():
     assert result is not None
 
 
-
 def test_generate_alpha_sensitivity_table_edge_cases():
     """Test generate_alpha_sensitivity_table: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_generate_alpha_sensitivity_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_alpha_sensitivity_table_error_handling():
     """Test generate_alpha_sensitivity_table error handling."""
     with pytest.raises(ValueError):
         generate_alpha_sensitivity_table(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -96,7 +89,6 @@ def test_generate_alpha_sensitivity_table_property_idempotent(self, df, output_p
 
     # Assert property
     assert generate_alpha_sensitivity_table(df, output_path) == result, "idempotent violated"
-
 
 
 def test_generate_convergence_table_basic():
@@ -111,7 +103,6 @@ def test_generate_convergence_table_basic():
     assert result is not None
 
 
-
 def test_generate_convergence_table_edge_cases():
     """Test generate_convergence_table: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_generate_convergence_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_convergence_table_error_handling():
     """Test generate_convergence_table error handling."""
     with pytest.raises(ValueError):
         generate_convergence_table(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_generate_convergence_table_property_idempotent(self, df, output_path):
 
     # Assert property
     assert generate_convergence_table(df, output_path) == result, "idempotent violated"
-
 
 
 def test_generate_ensemble_uncertainty_table_basic():
@@ -155,7 +143,6 @@ def test_generate_ensemble_uncertainty_table_basic():
     assert result is not None
 
 
-
 def test_generate_ensemble_uncertainty_table_edge_cases():
     """Test generate_ensemble_uncertainty_table: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_generate_ensemble_uncertainty_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_ensemble_uncertainty_table_error_handling():
     """Test generate_ensemble_uncertainty_table error handling."""
     with pytest.raises(ValueError):
         generate_ensemble_uncertainty_table(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -184,7 +169,6 @@ def test_generate_ensemble_uncertainty_table_property_idempotent(self, df, outpu
 
     # Assert property
     assert generate_ensemble_uncertainty_table(df, output_path) == result, "idempotent violated"
-
 
 
 def test_generate_betting_performance_table_basic():
@@ -199,7 +183,6 @@ def test_generate_betting_performance_table_basic():
     assert result is not None
 
 
-
 def test_generate_betting_performance_table_edge_cases():
     """Test generate_betting_performance_table: edge cases."""
     # Arrange
@@ -212,12 +195,10 @@ def test_generate_betting_performance_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_betting_performance_table_error_handling():
     """Test generate_betting_performance_table error handling."""
     with pytest.raises(ValueError):
         generate_betting_performance_table(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -227,8 +208,9 @@ def test_generate_betting_performance_table_property_idempotent(self, betting_re
     result = generate_betting_performance_table(betting_results, output_path)
 
     # Assert property
-    assert generate_betting_performance_table(betting_results, output_path) == result, "idempotent violated"
-
+    assert (
+        generate_betting_performance_table(betting_results, output_path) == result
+    ), "idempotent violated"
 
 
 def test_main_basic():
@@ -243,7 +225,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -256,9 +237,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

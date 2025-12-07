@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_connect_db_basic():
@@ -56,7 +53,6 @@ def test_connect_db_basic():
     assert result is not None
 
 
-
 def test_connect_db_edge_cases():
     """Test connect_db: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_connect_db_edge_cases():
     assert result is not None
 
 
-
 def test_connect_db_error_handling():
     """Test connect_db error handling."""
     with pytest.raises(ValueError):
         connect_db(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_connect_db_property_idempotent(val):
 
     # Assert property
     assert connect_db(val) == result, "idempotent violated"
-
 
 
 def test_detect_latest_completed_week_basic():
@@ -100,7 +93,6 @@ def test_detect_latest_completed_week_basic():
     assert result is not None
 
 
-
 def test_detect_latest_completed_week_edge_cases():
     """Test detect_latest_completed_week: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_detect_latest_completed_week_edge_cases():
     assert result is not None
 
 
-
 def test_detect_latest_completed_week_error_handling():
     """Test detect_latest_completed_week error handling."""
     with pytest.raises(ValueError):
         detect_latest_completed_week(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_detect_latest_completed_week_property_idempotent(val):
 
     # Assert property
     assert detect_latest_completed_week(val) == result, "idempotent violated"
-
 
 
 def test_refresh_materialized_views_basic():
@@ -144,7 +133,6 @@ def test_refresh_materialized_views_basic():
     assert result is not None
 
 
-
 def test_refresh_materialized_views_edge_cases():
     """Test refresh_materialized_views: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_refresh_materialized_views_edge_cases():
     assert result is not None
 
 
-
 def test_refresh_materialized_views_error_handling():
     """Test refresh_materialized_views error handling."""
     with pytest.raises(ValueError):
         refresh_materialized_views(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_refresh_materialized_views_property_idempotent(self, self, season, week
 
     # Assert property
     assert refresh_materialized_views(self, season, week) == result, "idempotent violated"
-
 
 
 def test_generate_win_probability_predictions_basic():
@@ -188,7 +173,6 @@ def test_generate_win_probability_predictions_basic():
     assert result is not None
 
 
-
 def test_generate_win_probability_predictions_edge_cases():
     """Test generate_win_probability_predictions: edge cases."""
     # Arrange
@@ -201,23 +185,24 @@ def test_generate_win_probability_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_generate_win_probability_predictions_error_handling():
     """Test generate_win_probability_predictions error handling."""
     with pytest.raises(ValueError):
         generate_win_probability_predictions(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_generate_win_probability_predictions_property_idempotent(self, self, season, current_week, weeks_ahead):
+def test_generate_win_probability_predictions_property_idempotent(
+    self, self, season, current_week, weeks_ahead
+):
     """Property test: function is idempotent."""
     # Act
     result = generate_win_probability_predictions(self, season, current_week, weeks_ahead)
 
     # Assert property
-    assert generate_win_probability_predictions(self, season, current_week, weeks_ahead) == result, "idempotent violated"
-
+    assert (
+        generate_win_probability_predictions(self, season, current_week, weeks_ahead) == result
+    ), "idempotent violated"
 
 
 def test_generate_spread_predictions_basic():
@@ -232,7 +217,6 @@ def test_generate_spread_predictions_basic():
     assert result is not None
 
 
-
 def test_generate_spread_predictions_edge_cases():
     """Test generate_spread_predictions: edge cases."""
     # Arrange
@@ -245,23 +229,24 @@ def test_generate_spread_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_generate_spread_predictions_error_handling():
     """Test generate_spread_predictions error handling."""
     with pytest.raises(ValueError):
         generate_spread_predictions(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_generate_spread_predictions_property_idempotent(self, self, season, current_week, weeks_ahead):
+def test_generate_spread_predictions_property_idempotent(
+    self, self, season, current_week, weeks_ahead
+):
     """Property test: function is idempotent."""
     # Act
     result = generate_spread_predictions(self, season, current_week, weeks_ahead)
 
     # Assert property
-    assert generate_spread_predictions(self, season, current_week, weeks_ahead) == result, "idempotent violated"
-
+    assert (
+        generate_spread_predictions(self, season, current_week, weeks_ahead) == result
+    ), "idempotent violated"
 
 
 def test_log_refresh_completion_basic():
@@ -276,7 +261,6 @@ def test_log_refresh_completion_basic():
     assert result is not None
 
 
-
 def test_log_refresh_completion_edge_cases():
     """Test log_refresh_completion: edge cases."""
     # Arrange
@@ -289,12 +273,10 @@ def test_log_refresh_completion_edge_cases():
     assert result is not None
 
 
-
 def test_log_refresh_completion_error_handling():
     """Test log_refresh_completion error handling."""
     with pytest.raises(ValueError):
         log_refresh_completion(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -305,7 +287,6 @@ def test_log_refresh_completion_property_idempotent(self, self, season, week, su
 
     # Assert property
     assert log_refresh_completion(self, season, week, success) == result, "idempotent violated"
-
 
 
 def test_run_pipeline_basic():
@@ -320,7 +301,6 @@ def test_run_pipeline_basic():
     assert result is not None
 
 
-
 def test_run_pipeline_edge_cases():
     """Test run_pipeline: edge cases."""
     # Arrange
@@ -333,12 +313,10 @@ def test_run_pipeline_edge_cases():
     assert result is not None
 
 
-
 def test_run_pipeline_error_handling():
     """Test run_pipeline error handling."""
     with pytest.raises(ValueError):
         run_pipeline(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -348,5 +326,6 @@ def test_run_pipeline_property_idempotent(self, self, season, week, auto_detect,
     result = run_pipeline(self, season, week, auto_detect, weeks_ahead)
 
     # Assert property
-    assert run_pipeline(self, season, week, auto_detect, weeks_ahead) == result, "idempotent violated"
-
+    assert (
+        run_pipeline(self, season, week, auto_detect, weeks_ahead) == result
+    ), "idempotent violated"

@@ -23,7 +23,6 @@ def test_demo_book_router_basic():
     assert result is not None
 
 
-
 def test_demo_book_router_edge_cases():
     """Test demo_book_router: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_demo_book_router_edge_cases():
     assert result is not None
 
 
-
 def test_demo_book_router_error_handling():
     """Test demo_book_router error handling."""
     with pytest.raises(ValueError):
         demo_book_router(invalid_input)
-
 
 
 def test_calculate_withdrawal_cost_basic():
@@ -56,7 +53,6 @@ def test_calculate_withdrawal_cost_basic():
     assert result is not None
 
 
-
 def test_calculate_withdrawal_cost_edge_cases():
     """Test calculate_withdrawal_cost: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_calculate_withdrawal_cost_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_withdrawal_cost_error_handling():
     """Test calculate_withdrawal_cost error handling."""
     with pytest.raises(ValueError):
         calculate_withdrawal_cost(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -84,8 +78,9 @@ def test_calculate_withdrawal_cost_property_idempotent(self, amount, policy, las
     result = calculate_withdrawal_cost(amount, policy, last_withdrawal)
 
     # Assert property
-    assert calculate_withdrawal_cost(amount, policy, last_withdrawal) == result, "idempotent violated"
-
+    assert (
+        calculate_withdrawal_cost(amount, policy, last_withdrawal) == result
+    ), "idempotent violated"
 
 
 def test_calculate_bonus_cost_basic():
@@ -100,7 +95,6 @@ def test_calculate_bonus_cost_basic():
     assert result is not None
 
 
-
 def test_calculate_bonus_cost_edge_cases():
     """Test calculate_bonus_cost: edge cases."""
     # Arrange
@@ -113,12 +107,10 @@ def test_calculate_bonus_cost_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_bonus_cost_error_handling():
     """Test calculate_bonus_cost error handling."""
     with pytest.raises(ValueError):
         calculate_bonus_cost(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -129,7 +121,6 @@ def test_calculate_bonus_cost_property_idempotent(self, bet_amount, odds, bonus)
 
     # Assert property
     assert calculate_bonus_cost(bet_amount, odds, bonus) == result, "idempotent violated"
-
 
 
 def test_calculate_heat_cost_basic():
@@ -144,7 +135,6 @@ def test_calculate_heat_cost_basic():
     assert result is not None
 
 
-
 def test_calculate_heat_cost_edge_cases():
     """Test calculate_heat_cost: edge cases."""
     # Arrange
@@ -157,23 +147,24 @@ def test_calculate_heat_cost_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_heat_cost_error_handling():
     """Test calculate_heat_cost error handling."""
     with pytest.raises(ValueError):
         calculate_heat_cost(invalid_input)
 
 
-
 @given(st.integers(), st.datetimes(), st.integers(), st.integers())
-def test_calculate_heat_cost_property_idempotent(self, current_heat, lifetime_profit, bet_amount, book_tier):
+def test_calculate_heat_cost_property_idempotent(
+    self, current_heat, lifetime_profit, bet_amount, book_tier
+):
     """Property test: function is idempotent."""
     # Act
     result = calculate_heat_cost(current_heat, lifetime_profit, bet_amount, book_tier)
 
     # Assert property
-    assert calculate_heat_cost(current_heat, lifetime_profit, bet_amount, book_tier) == result, "idempotent violated"
-
+    assert (
+        calculate_heat_cost(current_heat, lifetime_profit, bet_amount, book_tier) == result
+    ), "idempotent violated"
 
 
 def test_calculate_total_friction_basic():
@@ -188,7 +179,6 @@ def test_calculate_total_friction_basic():
     assert result is not None
 
 
-
 def test_calculate_total_friction_edge_cases():
     """Test calculate_total_friction: edge cases."""
     # Arrange
@@ -201,23 +191,24 @@ def test_calculate_total_friction_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_total_friction_error_handling():
     """Test calculate_total_friction error handling."""
     with pytest.raises(ValueError):
         calculate_total_friction(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_calculate_total_friction_property_idempotent(self, bet_amount, odds, book, last_withdrawal):
+def test_calculate_total_friction_property_idempotent(
+    self, bet_amount, odds, book, last_withdrawal
+):
     """Property test: function is idempotent."""
     # Act
     result = calculate_total_friction(bet_amount, odds, book, last_withdrawal)
 
     # Assert property
-    assert calculate_total_friction(bet_amount, odds, book, last_withdrawal) == result, "idempotent violated"
-
+    assert (
+        calculate_total_friction(bet_amount, odds, book, last_withdrawal) == result
+    ), "idempotent violated"
 
 
 def test_route_bet_basic():
@@ -232,7 +223,6 @@ def test_route_bet_basic():
     assert result is not None
 
 
-
 def test_route_bet_edge_cases():
     """Test route_bet: edge cases."""
     # Arrange
@@ -245,23 +235,38 @@ def test_route_bet_edge_cases():
     assert result is not None
 
 
-
 def test_route_bet_error_handling():
     """Test route_bet error handling."""
     with pytest.raises(ValueError):
         route_bet(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_route_bet_property_idempotent(self, self, bet_id, market, team, model_prob, available_lines, desired_amount, user_state):
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_route_bet_property_idempotent(
+    self, self, bet_id, market, team, model_prob, available_lines, desired_amount, user_state
+):
     """Property test: function is idempotent."""
     # Act
-    result = route_bet(self, bet_id, market, team, model_prob, available_lines, desired_amount, user_state)
+    result = route_bet(
+        self, bet_id, market, team, model_prob, available_lines, desired_amount, user_state
+    )
 
     # Assert property
-    assert route_bet(self, bet_id, market, team, model_prob, available_lines, desired_amount, user_state) == result, "idempotent violated"
-
+    assert (
+        route_bet(
+            self, bet_id, market, team, model_prob, available_lines, desired_amount, user_state
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_optimize_portfolio_basic():
@@ -276,7 +281,6 @@ def test_optimize_portfolio_basic():
     assert result is not None
 
 
-
 def test_optimize_portfolio_edge_cases():
     """Test optimize_portfolio: edge cases."""
     # Arrange
@@ -289,12 +293,10 @@ def test_optimize_portfolio_edge_cases():
     assert result is not None
 
 
-
 def test_optimize_portfolio_error_handling():
     """Test optimize_portfolio error handling."""
     with pytest.raises(ValueError):
         optimize_portfolio(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -305,7 +307,6 @@ def test_optimize_portfolio_property_idempotent(self, self, bets, target_exposur
 
     # Assert property
     assert optimize_portfolio(self, bets, target_exposure) == result, "idempotent violated"
-
 
 
 def test_generate_routing_report_basic():
@@ -320,7 +321,6 @@ def test_generate_routing_report_basic():
     assert result is not None
 
 
-
 def test_generate_routing_report_edge_cases():
     """Test generate_routing_report: edge cases."""
     # Arrange
@@ -333,12 +333,10 @@ def test_generate_routing_report_edge_cases():
     assert result is not None
 
 
-
 def test_generate_routing_report_error_handling():
     """Test generate_routing_report error handling."""
     with pytest.raises(ValueError):
         generate_routing_report(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -349,4 +347,3 @@ def test_generate_routing_report_property_idempotent(self, self, routes):
 
     # Assert property
     assert generate_routing_report(self, routes) == result, "idempotent violated"
-

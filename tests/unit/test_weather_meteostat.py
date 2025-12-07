@@ -24,7 +24,6 @@ def test_make_engine_basic():
     assert result is not None
 
 
-
 def test_make_engine_edge_cases():
     """Test make_engine: edge cases."""
     # Arrange
@@ -37,12 +36,10 @@ def test_make_engine_edge_cases():
     assert result is not None
 
 
-
 def test_make_engine_error_handling():
     """Test make_engine error handling."""
     with pytest.raises(ValueError):
         make_engine(invalid_input)
-
 
 
 def test_main_basic():
@@ -57,7 +54,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -70,12 +66,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_safe_float_basic():
@@ -90,7 +84,6 @@ def test_safe_float_basic():
     assert result is not None
 
 
-
 def test_safe_float_edge_cases():
     """Test safe_float: edge cases."""
     # Arrange
@@ -103,12 +96,10 @@ def test_safe_float_edge_cases():
     assert result is not None
 
 
-
 def test_safe_float_error_handling():
     """Test safe_float error handling."""
     with pytest.raises(ValueError):
         safe_float(invalid_input)
-
 
 
 @given(st.integers())
@@ -119,4 +110,3 @@ def test_safe_float_property_idempotent(self, val):
 
     # Assert property
     assert safe_float(val) == result, "idempotent violated"
-

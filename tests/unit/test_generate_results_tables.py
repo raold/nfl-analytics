@@ -23,7 +23,6 @@ def test_format_roi_basic():
     assert result is not None
 
 
-
 def test_format_roi_edge_cases():
     """Test format_roi: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_format_roi_edge_cases():
     assert result is not None
 
 
-
 def test_format_roi_error_handling():
     """Test format_roi error handling."""
     with pytest.raises(ValueError):
         format_roi(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_format_roi_property_idempotent(self, roi):
 
     # Assert property
     assert format_roi(roi) == result, "idempotent violated"
-
 
 
 def test_format_brier_basic():
@@ -67,7 +63,6 @@ def test_format_brier_basic():
     assert result is not None
 
 
-
 def test_format_brier_edge_cases():
     """Test format_brier: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_format_brier_edge_cases():
     assert result is not None
 
 
-
 def test_format_brier_error_handling():
     """Test format_brier error handling."""
     with pytest.raises(ValueError):
         format_brier(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_format_brier_property_idempotent(self, b):
 
     # Assert property
     assert format_brier(b) == result, "idempotent violated"
-
 
 
 def test_format_logloss_basic():
@@ -111,7 +103,6 @@ def test_format_logloss_basic():
     assert result is not None
 
 
-
 def test_format_logloss_edge_cases():
     """Test format_logloss: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_format_logloss_edge_cases():
     assert result is not None
 
 
-
 def test_format_logloss_error_handling():
     """Test format_logloss error handling."""
     with pytest.raises(ValueError):
         format_logloss(invalid_input)
-
 
 
 @given(st.integers())
@@ -140,7 +129,6 @@ def test_format_logloss_property_idempotent(self, ll):
 
     # Assert property
     assert format_logloss(ll) == result, "idempotent violated"
-
 
 
 def test_format_acc_basic():
@@ -155,7 +143,6 @@ def test_format_acc_basic():
     assert result is not None
 
 
-
 def test_format_acc_edge_cases():
     """Test format_acc: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_format_acc_edge_cases():
     assert result is not None
 
 
-
 def test_format_acc_error_handling():
     """Test format_acc error handling."""
     with pytest.raises(ValueError):
         format_acc(invalid_input)
-
 
 
 @given(st.integers())
@@ -184,7 +169,6 @@ def test_format_acc_property_idempotent(self, acc):
 
     # Assert property
     assert format_acc(acc) == result, "idempotent violated"
-
 
 
 def test_clean_model_name_basic():
@@ -199,7 +183,6 @@ def test_clean_model_name_basic():
     assert result is not None
 
 
-
 def test_clean_model_name_edge_cases():
     """Test clean_model_name: edge cases."""
     # Arrange
@@ -212,12 +195,10 @@ def test_clean_model_name_edge_cases():
     assert result is not None
 
 
-
 def test_clean_model_name_error_handling():
     """Test clean_model_name error handling."""
     with pytest.raises(ValueError):
         clean_model_name(invalid_input)
-
 
 
 @given(st.text(min_size=1, max_size=100))
@@ -228,7 +209,6 @@ def test_clean_model_name_property_idempotent(self, name):
 
     # Assert property
     assert clean_model_name(name) == result, "idempotent violated"
-
 
 
 def test_generate_multimodel_comparison_table_basic():
@@ -243,7 +223,6 @@ def test_generate_multimodel_comparison_table_basic():
     assert result is not None
 
 
-
 def test_generate_multimodel_comparison_table_edge_cases():
     """Test generate_multimodel_comparison_table: edge cases."""
     # Arrange
@@ -256,12 +235,10 @@ def test_generate_multimodel_comparison_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_multimodel_comparison_table_error_handling():
     """Test generate_multimodel_comparison_table error handling."""
     with pytest.raises(ValueError):
         generate_multimodel_comparison_table(invalid_input)
-
 
 
 def test_generate_per_season_summary_basic():
@@ -276,7 +253,6 @@ def test_generate_per_season_summary_basic():
     assert result is not None
 
 
-
 def test_generate_per_season_summary_edge_cases():
     """Test generate_per_season_summary: edge cases."""
     # Arrange
@@ -289,12 +265,10 @@ def test_generate_per_season_summary_edge_cases():
     assert result is not None
 
 
-
 def test_generate_per_season_summary_error_handling():
     """Test generate_per_season_summary error handling."""
     with pytest.raises(ValueError):
         generate_per_season_summary(invalid_input)
-
 
 
 def test_generate_rl_comparison_table_basic():
@@ -309,7 +283,6 @@ def test_generate_rl_comparison_table_basic():
     assert result is not None
 
 
-
 def test_generate_rl_comparison_table_edge_cases():
     """Test generate_rl_comparison_table: edge cases."""
     # Arrange
@@ -322,12 +295,10 @@ def test_generate_rl_comparison_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_rl_comparison_table_error_handling():
     """Test generate_rl_comparison_table error handling."""
     with pytest.raises(ValueError):
         generate_rl_comparison_table(invalid_input)
-
 
 
 def test_generate_zero_weeks_table_basic():
@@ -342,7 +313,6 @@ def test_generate_zero_weeks_table_basic():
     assert result is not None
 
 
-
 def test_generate_zero_weeks_table_edge_cases():
     """Test generate_zero_weeks_table: edge cases."""
     # Arrange
@@ -355,12 +325,10 @@ def test_generate_zero_weeks_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_zero_weeks_table_error_handling():
     """Test generate_zero_weeks_table error handling."""
     with pytest.raises(ValueError):
         generate_zero_weeks_table(invalid_input)
-
 
 
 def test_generate_core_ablation_table_basic():
@@ -375,7 +343,6 @@ def test_generate_core_ablation_table_basic():
     assert result is not None
 
 
-
 def test_generate_core_ablation_table_edge_cases():
     """Test generate_core_ablation_table: edge cases."""
     # Arrange
@@ -388,12 +355,10 @@ def test_generate_core_ablation_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_core_ablation_table_error_handling():
     """Test generate_core_ablation_table error handling."""
     with pytest.raises(ValueError):
         generate_core_ablation_table(invalid_input)
-
 
 
 def test_main_basic():
@@ -408,7 +373,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -421,9 +385,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

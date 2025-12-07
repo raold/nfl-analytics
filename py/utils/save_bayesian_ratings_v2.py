@@ -173,9 +173,7 @@ def main():
         logger.info("This may take 2-5 minutes depending on model size...")
 
         result = r_service.execute(
-            r_code=R_SCRIPT,
-            timeout=300,  # 5 minutes max
-            retry=True    # Enable automatic retries
+            r_code=R_SCRIPT, timeout=300, retry=True  # 5 minutes max  # Enable automatic retries
         )
 
         # Print R output

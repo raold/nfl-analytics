@@ -23,7 +23,6 @@ def test_connect_db_basic():
     assert result is not None
 
 
-
 def test_connect_db_edge_cases():
     """Test connect_db: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_connect_db_edge_cases():
     assert result is not None
 
 
-
 def test_connect_db_error_handling():
     """Test connect_db error handling."""
     with pytest.raises(ValueError):
         connect_db(invalid_input)
-
 
 
 def test_fetch_completed_games_basic():
@@ -56,7 +53,6 @@ def test_fetch_completed_games_basic():
     assert result is not None
 
 
-
 def test_fetch_completed_games_edge_cases():
     """Test fetch_completed_games: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_fetch_completed_games_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_completed_games_error_handling():
     """Test fetch_completed_games error handling."""
     with pytest.raises(ValueError):
         fetch_completed_games(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_fetch_completed_games_property_idempotent(self, conn, start_season):
 
     # Assert property
     assert fetch_completed_games(conn, start_season) == result, "idempotent violated"
-
 
 
 def test_compute_margin_distribution_basic():
@@ -100,7 +93,6 @@ def test_compute_margin_distribution_basic():
     assert result is not None
 
 
-
 def test_compute_margin_distribution_edge_cases():
     """Test compute_margin_distribution: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_compute_margin_distribution_edge_cases():
     assert result is not None
 
 
-
 def test_compute_margin_distribution_error_handling():
     """Test compute_margin_distribution error handling."""
     with pytest.raises(ValueError):
         compute_margin_distribution(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_compute_margin_distribution_property_idempotent(self, df):
 
     # Assert property
     assert compute_margin_distribution(df) == result, "idempotent violated"
-
 
 
 def test_compute_key_number_masses_basic():
@@ -144,7 +133,6 @@ def test_compute_key_number_masses_basic():
     assert result is not None
 
 
-
 def test_compute_key_number_masses_edge_cases():
     """Test compute_key_number_masses: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_compute_key_number_masses_edge_cases():
     assert result is not None
 
 
-
 def test_compute_key_number_masses_error_handling():
     """Test compute_key_number_masses error handling."""
     with pytest.raises(ValueError):
         compute_key_number_masses(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_compute_key_number_masses_property_idempotent(self, df, key_numbers):
 
     # Assert property
     assert compute_key_number_masses(df, key_numbers) == result, "idempotent violated"
-
 
 
 def test_compute_total_distribution_basic():
@@ -188,7 +173,6 @@ def test_compute_total_distribution_basic():
     assert result is not None
 
 
-
 def test_compute_total_distribution_edge_cases():
     """Test compute_total_distribution: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_compute_total_distribution_edge_cases():
     assert result is not None
 
 
-
 def test_compute_total_distribution_error_handling():
     """Test compute_total_distribution error handling."""
     with pytest.raises(ValueError):
         compute_total_distribution(invalid_input)
-
 
 
 @given(st.integers())
@@ -217,7 +199,6 @@ def test_compute_total_distribution_property_idempotent(self, df):
 
     # Assert property
     assert compute_total_distribution(df) == result, "idempotent violated"
-
 
 
 def test_compute_score_dependence_basic():
@@ -232,7 +213,6 @@ def test_compute_score_dependence_basic():
     assert result is not None
 
 
-
 def test_compute_score_dependence_edge_cases():
     """Test compute_score_dependence: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_compute_score_dependence_edge_cases():
     assert result is not None
 
 
-
 def test_compute_score_dependence_error_handling():
     """Test compute_score_dependence error handling."""
     with pytest.raises(ValueError):
         compute_score_dependence(invalid_input)
-
 
 
 @given(st.integers())
@@ -261,7 +239,6 @@ def test_compute_score_dependence_property_idempotent(self, df):
 
     # Assert property
     assert compute_score_dependence(df) == result, "idempotent violated"
-
 
 
 def test_compute_upset_rate_basic():
@@ -276,7 +253,6 @@ def test_compute_upset_rate_basic():
     assert result is not None
 
 
-
 def test_compute_upset_rate_edge_cases():
     """Test compute_upset_rate: edge cases."""
     # Arrange
@@ -289,12 +265,10 @@ def test_compute_upset_rate_edge_cases():
     assert result is not None
 
 
-
 def test_compute_upset_rate_error_handling():
     """Test compute_upset_rate error handling."""
     with pytest.raises(ValueError):
         compute_upset_rate(invalid_input)
-
 
 
 @given(st.integers())
@@ -305,7 +279,6 @@ def test_compute_upset_rate_property_idempotent(self, df):
 
     # Assert property
     assert compute_upset_rate(df) == result, "idempotent violated"
-
 
 
 def test_generate_historical_metrics_basic():
@@ -320,7 +293,6 @@ def test_generate_historical_metrics_basic():
     assert result is not None
 
 
-
 def test_generate_historical_metrics_edge_cases():
     """Test generate_historical_metrics: edge cases."""
     # Arrange
@@ -333,12 +305,10 @@ def test_generate_historical_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_generate_historical_metrics_error_handling():
     """Test generate_historical_metrics error handling."""
     with pytest.raises(ValueError):
         generate_historical_metrics(invalid_input)
-
 
 
 @given(st.integers())
@@ -349,4 +319,3 @@ def test_generate_historical_metrics_property_idempotent(self, output_path):
 
     # Assert property
     assert generate_historical_metrics(output_path) == result, "idempotent violated"
-

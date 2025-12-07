@@ -14,7 +14,7 @@ import pandas as pd
 import psycopg2
 import xgboost as xgb
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 print("=" * 70)
 print(" FULL HISTORICAL BACKTEST (1999-2025) ".center(70))
@@ -22,8 +22,7 @@ print("=" * 70)
 
 # Database connection
 conn = psycopg2.connect(
-    host='localhost', port=5544, dbname='devdb01',
-    user='dro', password='sicillionbillions'
+    host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
 )
 
 # Load all games with betting data
@@ -92,7 +91,7 @@ try:
     if xgb_path.exists():
         bst = xgb.Booster()
         bst.load_model(str(xgb_path))
-        models['xgboost'] = bst
+        models["xgboost"] = bst
         print("[OK] Loaded XGBoost model")
 except Exception as e:
     print(f"[FAIL] Failed to load XGBoost: {e}")
@@ -102,7 +101,7 @@ try:
     ss_path = Path("models/state_space/predictions.csv")
     if ss_path.exists():
         ss_preds = pd.read_csv(ss_path)
-        models['state_space'] = ss_preds
+        models["state_space"] = ss_preds
         print(f"[OK] Loaded State-Space predictions ({len(ss_preds):,} games)")
 except Exception as e:
     print(f"[FAIL] Failed to load State-Space: {e}")
@@ -111,13 +110,14 @@ except Exception as e:
 try:
     gnn_path = Path("models/gnn/gnn_sklearn_model.pkl")
     if gnn_path.exists():
-        models['gnn'] = joblib.load(gnn_path)
-        models['gnn_scaler'] = joblib.load(Path("models/gnn/gnn_sklearn_scaler.pkl"))
+        models["gnn"] = joblib.load(gnn_path)
+        models["gnn_scaler"] = joblib.load(Path("models/gnn/gnn_sklearn_scaler.pkl"))
         print("[OK] Loaded GNN model")
 except Exception as e:
     print(f"[FAIL] Failed to load GNN: {e}")
 
 print(f"\n[OK] Loaded {len(models)} model types")
+
 
 # Backtesting functions
 def kelly_criterion(p_win, odds=1.91, fraction=0.25):
@@ -131,13 +131,14 @@ def kelly_criterion(p_win, odds=1.91, fraction=0.25):
         return 0
 
     q = 1 - p_win
-    edge = (p_win * odds - 1)
+    edge = p_win * odds - 1
 
     if edge <= 0:
         return 0
 
     kelly = (p_win * odds - 1) / odds
     return min(kelly * fraction, 0.1)  # Cap at 10% of bankroll
+
 
 def simulate_betting(predictions, actuals, spreads, min_edge=0.02, kelly_fraction=0.25):
     """
@@ -155,7 +156,9 @@ def simulate_betting(predictions, actuals, spreads, min_edge=0.02, kelly_fractio
             continue
 
         # Calculate edge
-        market_prob = 1 / (1 + np.exp(spread / 7.0)) if spread < 0 else 1 - 1 / (1 + np.exp(-spread / 7.0))
+        market_prob = (
+            1 / (1 + np.exp(spread / 7.0)) if spread < 0 else 1 - 1 / (1 + np.exp(-spread / 7.0))
+        )
         edge = pred - market_prob
 
         # Only bet if we have an edge
@@ -179,31 +182,34 @@ def simulate_betting(predictions, actuals, spreads, min_edge=0.02, kelly_fractio
                 else:
                     bankroll -= bet_size
 
-                history.append({
-                    'game': i,
-                    'bankroll': bankroll,
-                    'bet_size': bet_size,
-                    'edge': edge,
-                    'win': win,
-                    'roi': (bankroll - initial_bankroll) / initial_bankroll
-                })
+                history.append(
+                    {
+                        "game": i,
+                        "bankroll": bankroll,
+                        "bet_size": bet_size,
+                        "edge": edge,
+                        "win": win,
+                        "roi": (bankroll - initial_bankroll) / initial_bankroll,
+                    }
+                )
 
     return history, {
-        'total_bets': bets_placed,
-        'wins': bets_won,
-        'win_rate': bets_won / max(bets_placed, 1),
-        'final_bankroll': bankroll,
-        'total_roi': (bankroll - initial_bankroll) / initial_bankroll,
-        'max_drawdown': calculate_max_drawdown(history),
-        'sharpe_ratio': calculate_sharpe(history)
+        "total_bets": bets_placed,
+        "wins": bets_won,
+        "win_rate": bets_won / max(bets_placed, 1),
+        "final_bankroll": bankroll,
+        "total_roi": (bankroll - initial_bankroll) / initial_bankroll,
+        "max_drawdown": calculate_max_drawdown(history),
+        "sharpe_ratio": calculate_sharpe(history),
     }
+
 
 def calculate_max_drawdown(history):
     """Calculate maximum drawdown from peak."""
     if not history:
         return 0
 
-    bankrolls = [h['bankroll'] for h in history]
+    bankrolls = [h["bankroll"] for h in history]
     peak = bankrolls[0]
     max_dd = 0
 
@@ -214,6 +220,7 @@ def calculate_max_drawdown(history):
 
     return max_dd
 
+
 def calculate_sharpe(history, risk_free_rate=0.02):
     """Calculate Sharpe ratio."""
     if len(history) < 2:
@@ -221,7 +228,7 @@ def calculate_sharpe(history, risk_free_rate=0.02):
 
     returns = []
     for i in range(1, len(history)):
-        r = (history[i]['bankroll'] - history[i-1]['bankroll']) / history[i-1]['bankroll']
+        r = (history[i]["bankroll"] - history[i - 1]["bankroll"]) / history[i - 1]["bankroll"]
         returns.append(r)
 
     if not returns:
@@ -233,7 +240,8 @@ def calculate_sharpe(history, risk_free_rate=0.02):
     if std_return == 0:
         return 0
 
-    return (avg_return - risk_free_rate/252) / std_return * np.sqrt(252)
+    return (avg_return - risk_free_rate / 252) / std_return * np.sqrt(252)
+
 
 # Run backtest for each model
 print("\n3. Running backtests...")
@@ -242,26 +250,26 @@ print("-" * 70)
 backtest_results = {}
 
 # Prepare features for models that need them
-feature_cols = ['home_epa', 'away_epa', 'epa_diff', 'spread_close']
+feature_cols = ["home_epa", "away_epa", "epa_diff", "spread_close"]
 X = df[feature_cols].fillna(0).values
 
 # XGBoost predictions
-if 'xgboost' in models:
+if "xgboost" in models:
     print("\nXGBoost Backtest:")
     try:
         dtest = xgb.DMatrix(X)
-        xgb_preds = models['xgboost'].predict(dtest)
+        xgb_preds = models["xgboost"].predict(dtest)
 
         # Run backtest
         history, stats = simulate_betting(
-            xgb_preds[df['season'] >= 2020],
-            df[df['season'] >= 2020]['home_win'].values,
-            df[df['season'] >= 2020]['spread_close'].values,
+            xgb_preds[df["season"] >= 2020],
+            df[df["season"] >= 2020]["home_win"].values,
+            df[df["season"] >= 2020]["spread_close"].values,
             min_edge=0.02,
-            kelly_fraction=0.25
+            kelly_fraction=0.25,
         )
 
-        backtest_results['xgboost'] = stats
+        backtest_results["xgboost"] = stats
         print(f"  ROI: {stats['total_roi']:.1%}")
         print(f"  Win Rate: {stats['win_rate']:.1%}")
         print(f"  Bets Placed: {stats['total_bets']}")
@@ -272,29 +280,26 @@ if 'xgboost' in models:
         print(f"  Error: {e}")
 
 # State-Space predictions
-if 'state_space' in models:
+if "state_space" in models:
     print("\nState-Space Backtest:")
     try:
-        ss_preds = models['state_space']
+        ss_preds = models["state_space"]
 
         # Merge predictions with actual games
         merged = pd.merge(
-            df[df['season'] >= 2020],
-            ss_preds[['game_id', 'win_prob']],
-            on='game_id',
-            how='left'
+            df[df["season"] >= 2020], ss_preds[["game_id", "win_prob"]], on="game_id", how="left"
         )
 
         # Run backtest
         history, stats = simulate_betting(
-            merged['win_prob'].values,
-            merged['home_win'].values,
-            merged['spread_close'].values,
+            merged["win_prob"].values,
+            merged["home_win"].values,
+            merged["spread_close"].values,
             min_edge=0.02,
-            kelly_fraction=0.25
+            kelly_fraction=0.25,
         )
 
-        backtest_results['state_space'] = stats
+        backtest_results["state_space"] = stats
         print(f"  ROI: {stats['total_roi']:.1%}")
         print(f"  Win Rate: {stats['win_rate']:.1%}")
         print(f"  Bets Placed: {stats['total_bets']}")
@@ -311,13 +316,13 @@ try:
     valid_models = 0
 
     # Collect all predictions
-    if 'xgboost' in models:
-        xgb_preds_subset = xgb_preds[df['season'] >= 2020]
+    if "xgboost" in models:
+        xgb_preds_subset = xgb_preds[df["season"] >= 2020]
         ensemble_preds.append(xgb_preds_subset)
         valid_models += 1
 
-    if 'state_space' in models and 'merged' in locals():
-        ensemble_preds.append(merged['win_prob'].fillna(0.5).values)
+    if "state_space" in models and "merged" in locals():
+        ensemble_preds.append(merged["win_prob"].fillna(0.5).values)
         valid_models += 1
 
     if valid_models > 0:
@@ -327,13 +332,13 @@ try:
         # Run backtest
         history, stats = simulate_betting(
             ensemble_avg,
-            df[df['season'] >= 2020]['home_win'].values,
-            df[df['season'] >= 2020]['spread_close'].values,
+            df[df["season"] >= 2020]["home_win"].values,
+            df[df["season"] >= 2020]["spread_close"].values,
             min_edge=0.015,  # Lower threshold for ensemble
-            kelly_fraction=0.3  # Slightly higher Kelly for ensemble
+            kelly_fraction=0.3,  # Slightly higher Kelly for ensemble
         )
 
-        backtest_results['ensemble'] = stats
+        backtest_results["ensemble"] = stats
         print(f"  ROI: {stats['total_roi']:.1%}")
         print(f"  Win Rate: {stats['win_rate']:.1%}")
         print(f"  Bets Placed: {stats['total_bets']}")
@@ -349,7 +354,7 @@ print(" BACKTEST SUMMARY ".center(70))
 print("=" * 70)
 
 best_model = None
-best_roi = -float('inf')
+best_roi = -float("inf")
 
 for model_name, stats in backtest_results.items():
     print(f"\n{model_name.upper()}:")
@@ -359,8 +364,8 @@ for model_name, stats in backtest_results.items():
     print(f"  Win Rate: {stats['win_rate']:.1%}")
     print(f"  Sharpe: {stats['sharpe_ratio']:.2f}")
 
-    if stats['total_roi'] > best_roi:
-        best_roi = stats['total_roi']
+    if stats["total_roi"] > best_roi:
+        best_roi = stats["total_roi"]
         best_model = model_name
 
 if best_model:
@@ -370,7 +375,7 @@ if best_model:
 output_dir = Path("analysis/backtest")
 output_dir.mkdir(parents=True, exist_ok=True)
 
-with open(output_dir / "full_backtest_results.json", 'w') as f:
+with open(output_dir / "full_backtest_results.json", "w") as f:
     json.dump(backtest_results, f, indent=2, default=float)
 
 print(f"\n[DONE] Results saved to {output_dir}/full_backtest_results.json")

@@ -23,7 +23,6 @@ def test_test_basic():
     assert result is not None
 
 
-
 def test_test_edge_cases():
     """Test test: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_test_edge_cases():
     assert result is not None
 
 
-
 def test_test_error_handling():
     """Test test error handling."""
     with pytest.raises(ValueError):
         test(invalid_input)
-
 
 
 def test_create_statistical_report_basic():
@@ -56,7 +53,6 @@ def test_create_statistical_report_basic():
     assert result is not None
 
 
-
 def test_create_statistical_report_edge_cases():
     """Test create_statistical_report: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_create_statistical_report_edge_cases():
     assert result is not None
 
 
-
 def test_create_statistical_report_error_handling():
     """Test create_statistical_report error handling."""
     with pytest.raises(ValueError):
         create_statistical_report(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -84,8 +78,9 @@ def test_create_statistical_report_property_idempotent(self, self, title, author
     result = create_statistical_report(self, title, author, results, data)
 
     # Assert property
-    assert create_statistical_report(self, title, author, results, data) == result, "idempotent violated"
-
+    assert (
+        create_statistical_report(self, title, author, results, data) == result
+    ), "idempotent violated"
 
 
 def test_create_ab_test_report_basic():
@@ -100,7 +95,6 @@ def test_create_ab_test_report_basic():
     assert result is not None
 
 
-
 def test_create_ab_test_report_edge_cases():
     """Test create_ab_test_report: edge cases."""
     # Arrange
@@ -113,12 +107,10 @@ def test_create_ab_test_report_edge_cases():
     assert result is not None
 
 
-
 def test_create_ab_test_report_error_handling():
     """Test create_ab_test_report error handling."""
     with pytest.raises(ValueError):
         create_ab_test_report(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -129,7 +121,6 @@ def test_create_ab_test_report_property_idempotent(self, self, test_results, tes
 
     # Assert property
     assert create_ab_test_report(self, test_results, test_config) == result, "idempotent violated"
-
 
 
 def test_create_power_analysis_report_basic():
@@ -144,7 +135,6 @@ def test_create_power_analysis_report_basic():
     assert result is not None
 
 
-
 def test_create_power_analysis_report_edge_cases():
     """Test create_power_analysis_report: edge cases."""
     # Arrange
@@ -157,12 +147,10 @@ def test_create_power_analysis_report_edge_cases():
     assert result is not None
 
 
-
 def test_create_power_analysis_report_error_handling():
     """Test create_power_analysis_report error handling."""
     with pytest.raises(ValueError):
         create_power_analysis_report(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -172,8 +160,9 @@ def test_create_power_analysis_report_property_idempotent(self, self, power_resu
     result = create_power_analysis_report(self, power_results, design_params)
 
     # Assert property
-    assert create_power_analysis_report(self, power_results, design_params) == result, "idempotent violated"
-
+    assert (
+        create_power_analysis_report(self, power_results, design_params) == result
+    ), "idempotent violated"
 
 
 def test_render_document_basic():
@@ -188,7 +177,6 @@ def test_render_document_basic():
     assert result is not None
 
 
-
 def test_render_document_edge_cases():
     """Test render_document: edge cases."""
     # Arrange
@@ -201,12 +189,10 @@ def test_render_document_edge_cases():
     assert result is not None
 
 
-
 def test_render_document_error_handling():
     """Test render_document error handling."""
     with pytest.raises(ValueError):
         render_document(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.text(min_size=1, max_size=100), st.integers())
@@ -217,7 +203,6 @@ def test_render_document_property_idempotent(self, self, doc, filename, render):
 
     # Assert property
     assert render_document(self, doc, filename, render) == result, "idempotent violated"
-
 
 
 def test_create_latex_table_basic():
@@ -232,7 +217,6 @@ def test_create_latex_table_basic():
     assert result is not None
 
 
-
 def test_create_latex_table_edge_cases():
     """Test create_latex_table: edge cases."""
     # Arrange
@@ -245,12 +229,10 @@ def test_create_latex_table_edge_cases():
     assert result is not None
 
 
-
 def test_create_latex_table_error_handling():
     """Test create_latex_table error handling."""
     with pytest.raises(ValueError):
         create_latex_table(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -260,5 +242,6 @@ def test_create_latex_table_property_idempotent(self, self, data, caption, label
     result = create_latex_table(self, data, caption, label, format_dict)
 
     # Assert property
-    assert create_latex_table(self, data, caption, label, format_dict) == result, "idempotent violated"
-
+    assert (
+        create_latex_table(self, data, caption, label, format_dict) == result
+    ), "idempotent violated"

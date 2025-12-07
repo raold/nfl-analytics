@@ -117,9 +117,7 @@ class TestBNNModelLoading:
             np.array([40.0]),  # High std
         )
 
-        with patch(
-            "py.models.bayesian_neural_network.BayesianNeuralNetwork.load"
-        ) as mock_load:
+        with patch("py.models.bayesian_neural_network.BayesianNeuralNetwork.load") as mock_load:
             # Low uncertainty prediction
             mock_load.return_value = mock_model_low_std
             result_low = predictor._predict_bnn_model(
@@ -147,9 +145,7 @@ class TestBNNModelLoading:
         model_path = Path("models/bayesian/bnn_passing_v1.pkl")
 
         # Mock BayesianNeuralNetwork as None (not installed)
-        with patch(
-            "py.ensemble.strategy.ensemble_predictor.BayesianNeuralNetwork", None
-        ):
+        with patch("py.ensemble.strategy.ensemble_predictor.BayesianNeuralNetwork", None):
             result = predictor._predict_bnn_model(
                 model_name="bnn_v1",
                 path=model_path,

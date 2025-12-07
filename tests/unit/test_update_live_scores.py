@@ -24,7 +24,6 @@ def test_fetch_espn_scores_basic():
     assert result is not None
 
 
-
 def test_fetch_espn_scores_edge_cases():
     """Test fetch_espn_scores: edge cases."""
     # Arrange
@@ -37,12 +36,10 @@ def test_fetch_espn_scores_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_espn_scores_error_handling():
     """Test fetch_espn_scores error handling."""
     with pytest.raises(ValueError):
         fetch_espn_scores(invalid_input)
-
 
 
 def test_update_game_scores_basic():
@@ -57,7 +54,6 @@ def test_update_game_scores_basic():
     assert result is not None
 
 
-
 def test_update_game_scores_edge_cases():
     """Test update_game_scores: edge cases."""
     # Arrange
@@ -70,12 +66,10 @@ def test_update_game_scores_edge_cases():
     assert result is not None
 
 
-
 def test_update_game_scores_error_handling():
     """Test update_game_scores error handling."""
     with pytest.raises(ValueError):
         update_game_scores(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -88,25 +82,17 @@ def test_update_game_scores_property_idempotent(self, conn, games_data):
     assert update_game_scores(conn, games_data) == result, "idempotent violated"
 
 
-
 def test_update_game_scores_no_temporal_leakage():
     """Ensure update_game_scores doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = update_game_scores(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"
 
 
 def test_update_retrospectives_basic():
@@ -121,7 +107,6 @@ def test_update_retrospectives_basic():
     assert result is not None
 
 
-
 def test_update_retrospectives_edge_cases():
     """Test update_retrospectives: edge cases."""
     # Arrange
@@ -134,12 +119,10 @@ def test_update_retrospectives_edge_cases():
     assert result is not None
 
 
-
 def test_update_retrospectives_error_handling():
     """Test update_retrospectives error handling."""
     with pytest.raises(ValueError):
         update_retrospectives(invalid_input)
-
 
 
 @given(st.integers())
@@ -152,25 +135,17 @@ def test_update_retrospectives_property_idempotent(self, conn):
     assert update_retrospectives(conn) == result, "idempotent violated"
 
 
-
 def test_update_retrospectives_no_temporal_leakage():
     """Ensure update_retrospectives doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = update_retrospectives(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"
 
 
 def test_main_basic():
@@ -185,7 +160,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -198,9 +172,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

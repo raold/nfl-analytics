@@ -24,7 +24,6 @@ def test_fdr_benjamini_hochberg_basic():
     assert result is not None
 
 
-
 def test_fdr_benjamini_hochberg_edge_cases():
     """Test fdr_benjamini_hochberg: edge cases."""
     # Arrange
@@ -37,12 +36,10 @@ def test_fdr_benjamini_hochberg_edge_cases():
     assert result is not None
 
 
-
 def test_fdr_benjamini_hochberg_error_handling():
     """Test fdr_benjamini_hochberg error handling."""
     with pytest.raises(ValueError):
         fdr_benjamini_hochberg(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -53,7 +50,6 @@ def test_fdr_benjamini_hochberg_property_idempotent(self, p_values, alpha):
 
     # Assert property
     assert fdr_benjamini_hochberg(p_values, alpha) == result, "idempotent violated"
-
 
 
 def test_fdr_benjamini_yekutieli_basic():
@@ -68,7 +64,6 @@ def test_fdr_benjamini_yekutieli_basic():
     assert result is not None
 
 
-
 def test_fdr_benjamini_yekutieli_edge_cases():
     """Test fdr_benjamini_yekutieli: edge cases."""
     # Arrange
@@ -81,12 +76,10 @@ def test_fdr_benjamini_yekutieli_edge_cases():
     assert result is not None
 
 
-
 def test_fdr_benjamini_yekutieli_error_handling():
     """Test fdr_benjamini_yekutieli error handling."""
     with pytest.raises(ValueError):
         fdr_benjamini_yekutieli(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -97,7 +90,6 @@ def test_fdr_benjamini_yekutieli_property_idempotent(self, p_values, alpha):
 
     # Assert property
     assert fdr_benjamini_yekutieli(p_values, alpha) == result, "idempotent violated"
-
 
 
 def test_bonferroni_correction_basic():
@@ -112,7 +104,6 @@ def test_bonferroni_correction_basic():
     assert result is not None
 
 
-
 def test_bonferroni_correction_edge_cases():
     """Test bonferroni_correction: edge cases."""
     # Arrange
@@ -125,12 +116,10 @@ def test_bonferroni_correction_edge_cases():
     assert result is not None
 
 
-
 def test_bonferroni_correction_error_handling():
     """Test bonferroni_correction error handling."""
     with pytest.raises(ValueError):
         bonferroni_correction(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -141,7 +130,6 @@ def test_bonferroni_correction_property_idempotent(self, p_values, alpha):
 
     # Assert property
     assert bonferroni_correction(p_values, alpha) == result, "idempotent violated"
-
 
 
 def test_holm_bonferroni_basic():
@@ -156,7 +144,6 @@ def test_holm_bonferroni_basic():
     assert result is not None
 
 
-
 def test_holm_bonferroni_edge_cases():
     """Test holm_bonferroni: edge cases."""
     # Arrange
@@ -169,12 +156,10 @@ def test_holm_bonferroni_edge_cases():
     assert result is not None
 
 
-
 def test_holm_bonferroni_error_handling():
     """Test holm_bonferroni error handling."""
     with pytest.raises(ValueError):
         holm_bonferroni(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -185,7 +170,6 @@ def test_holm_bonferroni_property_idempotent(self, p_values, alpha):
 
     # Assert property
     assert holm_bonferroni(p_values, alpha) == result, "idempotent violated"
-
 
 
 def test_test_basic():
@@ -200,7 +184,6 @@ def test_test_basic():
     assert result is not None
 
 
-
 def test_test_edge_cases():
     """Test test: edge cases."""
     # Arrange
@@ -213,12 +196,10 @@ def test_test_edge_cases():
     assert result is not None
 
 
-
 def test_test_error_handling():
     """Test test error handling."""
     with pytest.raises(ValueError):
         test(invalid_input)
-
 
 
 def test_summary_basic():
@@ -233,7 +214,6 @@ def test_summary_basic():
     assert result is not None
 
 
-
 def test_summary_edge_cases():
     """Test summary: edge cases."""
     # Arrange
@@ -246,12 +226,10 @@ def test_summary_edge_cases():
     assert result is not None
 
 
-
 def test_summary_error_handling():
     """Test summary error handling."""
     with pytest.raises(ValueError):
         summary(invalid_input)
-
 
 
 @given(st.integers())
@@ -262,7 +240,6 @@ def test_summary_property_idempotent(val):
 
     # Assert property
     assert summary(val) == result, "idempotent violated"
-
 
 
 def test_correct_basic():
@@ -277,7 +254,6 @@ def test_correct_basic():
     assert result is not None
 
 
-
 def test_correct_edge_cases():
     """Test correct: edge cases."""
     # Arrange
@@ -290,12 +266,10 @@ def test_correct_edge_cases():
     assert result is not None
 
 
-
 def test_correct_error_handling():
     """Test correct error handling."""
     with pytest.raises(ValueError):
         correct(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -306,7 +280,6 @@ def test_correct_property_idempotent(self, self, p_values, method):
 
     # Assert property
     assert correct(self, p_values, method) == result, "idempotent violated"
-
 
 
 def test_compare_methods_basic():
@@ -321,7 +294,6 @@ def test_compare_methods_basic():
     assert result is not None
 
 
-
 def test_compare_methods_edge_cases():
     """Test compare_methods: edge cases."""
     # Arrange
@@ -334,12 +306,10 @@ def test_compare_methods_edge_cases():
     assert result is not None
 
 
-
 def test_compare_methods_error_handling():
     """Test compare_methods error handling."""
     with pytest.raises(ValueError):
         compare_methods(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -350,7 +320,6 @@ def test_compare_methods_property_idempotent(self, self, p_values, methods):
 
     # Assert property
     assert compare_methods(self, p_values, methods) == result, "idempotent violated"
-
 
 
 def test_power_analysis_basic():
@@ -365,7 +334,6 @@ def test_power_analysis_basic():
     assert result is not None
 
 
-
 def test_power_analysis_edge_cases():
     """Test power_analysis: edge cases."""
     # Arrange
@@ -378,20 +346,21 @@ def test_power_analysis_edge_cases():
     assert result is not None
 
 
-
 def test_power_analysis_error_handling():
     """Test power_analysis error handling."""
     with pytest.raises(ValueError):
         power_analysis(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_power_analysis_property_idempotent(self, self, effect_sizes, sample_sizes, method, n_simulations):
+def test_power_analysis_property_idempotent(
+    self, self, effect_sizes, sample_sizes, method, n_simulations
+):
     """Property test: function is idempotent."""
     # Act
     result = power_analysis(self, effect_sizes, sample_sizes, method, n_simulations)
 
     # Assert property
-    assert power_analysis(self, effect_sizes, sample_sizes, method, n_simulations) == result, "idempotent violated"
-
+    assert (
+        power_analysis(self, effect_sizes, sample_sizes, method, n_simulations) == result
+    ), "idempotent violated"

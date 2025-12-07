@@ -93,7 +93,8 @@ def check_table(conn, table: str, min_rows: int, criticality: str) -> CheckResul
     try:
         with conn.cursor() as cur:
             # Check if table/view exists
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT EXISTS (
                     SELECT 1 FROM information_schema.tables
                     WHERE table_schema = %s AND table_name = %s
@@ -101,7 +102,9 @@ def check_table(conn, table: str, min_rows: int, criticality: str) -> CheckResul
                     SELECT 1 FROM pg_matviews
                     WHERE schemaname = %s AND matviewname = %s
                 )
-            """, (schema, table_name, schema, table_name))
+            """,
+                (schema, table_name, schema, table_name),
+            )
             exists = cur.fetchone()[0]
 
             if not exists:
@@ -109,7 +112,7 @@ def check_table(conn, table: str, min_rows: int, criticality: str) -> CheckResul
                     name=table,
                     status=Status.FAIL if criticality == "critical" else Status.WARN,
                     message="Table/view does not exist",
-                    expected_min=min_rows
+                    expected_min=min_rows,
                 )
 
             # Get row count
@@ -122,7 +125,7 @@ def check_table(conn, table: str, min_rows: int, criticality: str) -> CheckResul
                     status=Status.PASS,
                     message=f"OK ({count:,} rows)",
                     row_count=count,
-                    expected_min=min_rows
+                    expected_min=min_rows,
                 )
             elif count == 0 and min_rows == 0:
                 return CheckResult(
@@ -130,7 +133,7 @@ def check_table(conn, table: str, min_rows: int, criticality: str) -> CheckResul
                     status=Status.SKIP,
                     message="Empty (optional)",
                     row_count=count,
-                    expected_min=min_rows
+                    expected_min=min_rows,
                 )
             elif count == 0:
                 return CheckResult(
@@ -138,7 +141,7 @@ def check_table(conn, table: str, min_rows: int, criticality: str) -> CheckResul
                     status=Status.FAIL if criticality == "critical" else Status.WARN,
                     message=f"EMPTY (expected {min_rows:,}+)",
                     row_count=count,
-                    expected_min=min_rows
+                    expected_min=min_rows,
                 )
             else:
                 return CheckResult(
@@ -146,15 +149,12 @@ def check_table(conn, table: str, min_rows: int, criticality: str) -> CheckResul
                     status=Status.WARN,
                     message=f"LOW: {count:,} rows (expected {min_rows:,}+)",
                     row_count=count,
-                    expected_min=min_rows
+                    expected_min=min_rows,
                 )
 
     except Exception as e:
         return CheckResult(
-            name=table,
-            status=Status.FAIL,
-            message=f"ERROR: {str(e)[:50]}",
-            expected_min=min_rows
+            name=table, status=Status.FAIL, message=f"ERROR: {str(e)[:50]}", expected_min=min_rows
         )
 
 
@@ -164,47 +164,55 @@ def check_schema_consistency(conn) -> list[CheckResult]:
 
     with conn.cursor() as cur:
         # Check injuries table has correct schema
-        cur.execute("""
+        cur.execute(
+            """
             SELECT column_name FROM information_schema.columns
             WHERE table_schema = 'public' AND table_name = 'injuries'
             ORDER BY ordinal_position
-        """)
+        """
+        )
         injury_cols = [r[0] for r in cur.fetchall()]
-        expected_cols = ['season', 'game_type', 'team', 'week', 'gsis_id']
+        expected_cols = ["season", "game_type", "team", "week", "gsis_id"]
 
         if all(c in injury_cols for c in expected_cols):
-            results.append(CheckResult(
-                name="schema.injuries",
-                status=Status.PASS,
-                message="Correct schema (gsis_id PK)"
-            ))
+            results.append(
+                CheckResult(
+                    name="schema.injuries",
+                    status=Status.PASS,
+                    message="Correct schema (gsis_id PK)",
+                )
+            )
         else:
-            results.append(CheckResult(
-                name="schema.injuries",
-                status=Status.FAIL,
-                message=f"Wrong schema! Has: {injury_cols[:5]}"
-            ))
+            results.append(
+                CheckResult(
+                    name="schema.injuries",
+                    status=Status.FAIL,
+                    message=f"Wrong schema! Has: {injury_cols[:5]}",
+                )
+            )
 
         # Check mart views exist
-        cur.execute("""
+        cur.execute(
+            """
             SELECT matviewname FROM pg_matviews WHERE schemaname = 'mart'
-        """)
+        """
+        )
         views = [r[0] for r in cur.fetchall()]
-        expected_views = ['player_hierarchy', 'player_game_stats', 'game_summary']
+        expected_views = ["player_hierarchy", "player_game_stats", "game_summary"]
 
         for view in expected_views:
             if view in views:
-                results.append(CheckResult(
-                    name=f"mview.mart.{view}",
-                    status=Status.PASS,
-                    message="Exists"
-                ))
+                results.append(
+                    CheckResult(name=f"mview.mart.{view}", status=Status.PASS, message="Exists")
+                )
             else:
-                results.append(CheckResult(
-                    name=f"mview.mart.{view}",
-                    status=Status.FAIL,
-                    message="MISSING - run migration 100"
-                ))
+                results.append(
+                    CheckResult(
+                        name=f"mview.mart.{view}",
+                        status=Status.FAIL,
+                        message="MISSING - run migration 100",
+                    )
+                )
 
     return results
 
@@ -215,65 +223,79 @@ def check_data_quality(conn) -> list[CheckResult]:
 
     with conn.cursor() as cur:
         # Check games have scores
-        cur.execute("""
+        cur.execute(
+            """
             SELECT
                 COUNT(*) as total,
                 COUNT(home_score) as with_scores,
                 COUNT(spread_close) as with_spreads
             FROM games
             WHERE season >= 2020
-        """)
+        """
+        )
         total, with_scores, with_spreads = cur.fetchone()
 
         if total > 0:
             score_pct = (with_scores / total) * 100
             spread_pct = (with_spreads / total) * 100
 
-            results.append(CheckResult(
-                name="quality.games.scores",
-                status=Status.PASS if score_pct > 90 else Status.WARN,
-                message=f"{score_pct:.1f}% have scores (since 2020)"
-            ))
-            results.append(CheckResult(
-                name="quality.games.spreads",
-                status=Status.PASS if spread_pct > 90 else Status.WARN,
-                message=f"{spread_pct:.1f}% have spreads (since 2020)"
-            ))
+            results.append(
+                CheckResult(
+                    name="quality.games.scores",
+                    status=Status.PASS if score_pct > 90 else Status.WARN,
+                    message=f"{score_pct:.1f}% have scores (since 2020)",
+                )
+            )
+            results.append(
+                CheckResult(
+                    name="quality.games.spreads",
+                    status=Status.PASS if spread_pct > 90 else Status.WARN,
+                    message=f"{spread_pct:.1f}% have spreads (since 2020)",
+                )
+            )
 
         # Check plays have EPA (join with games for season filter)
-        cur.execute("""
+        cur.execute(
+            """
             SELECT
                 COUNT(*) as total,
                 COUNT(p.epa) as with_epa
             FROM plays p
             JOIN games g ON p.game_id = g.game_id
             WHERE g.season >= 2020
-        """)
+        """
+        )
         total, with_epa = cur.fetchone()
 
         if total > 0:
             epa_pct = (with_epa / total) * 100
-            results.append(CheckResult(
-                name="quality.plays.epa",
-                status=Status.PASS if epa_pct > 80 else Status.WARN,
-                message=f"{epa_pct:.1f}% have EPA values (since 2020)"
-            ))
+            results.append(
+                CheckResult(
+                    name="quality.plays.epa",
+                    status=Status.PASS if epa_pct > 80 else Status.WARN,
+                    message=f"{epa_pct:.1f}% have EPA values (since 2020)",
+                )
+            )
 
         # Check team_epa coverage
-        cur.execute("""
+        cur.execute(
+            """
             SELECT COUNT(DISTINCT game_id) FROM mart.team_epa
-        """)
+        """
+        )
         epa_games = cur.fetchone()[0]
         cur.execute("SELECT COUNT(*) FROM games")
         total_games = cur.fetchone()[0]
 
         if total_games > 0:
             coverage = (epa_games / total_games) * 100
-            results.append(CheckResult(
-                name="quality.team_epa.coverage",
-                status=Status.PASS if coverage > 95 else Status.WARN,
-                message=f"{coverage:.1f}% game coverage"
-            ))
+            results.append(
+                CheckResult(
+                    name="quality.team_epa.coverage",
+                    status=Status.PASS if coverage > 95 else Status.WARN,
+                    message=f"{coverage:.1f}% game coverage",
+                )
+            )
 
     return results
 
@@ -284,34 +306,42 @@ def check_foreign_keys(conn) -> list[CheckResult]:
 
     with conn.cursor() as cur:
         # Check plays reference valid games
-        cur.execute("""
+        cur.execute(
+            """
             SELECT COUNT(DISTINCT p.game_id)
             FROM plays p
             LEFT JOIN games g ON p.game_id = g.game_id
             WHERE g.game_id IS NULL
-        """)
+        """
+        )
         orphan_plays = cur.fetchone()[0]
 
-        results.append(CheckResult(
-            name="fk.plays_games",
-            status=Status.PASS if orphan_plays == 0 else Status.WARN,
-            message=f"Orphan game_ids in plays: {orphan_plays}"
-        ))
+        results.append(
+            CheckResult(
+                name="fk.plays_games",
+                status=Status.PASS if orphan_plays == 0 else Status.WARN,
+                message=f"Orphan game_ids in plays: {orphan_plays}",
+            )
+        )
 
         # Check player_hierarchy references valid players
-        cur.execute("""
+        cur.execute(
+            """
             SELECT COUNT(*)
             FROM mart.player_hierarchy ph
             LEFT JOIN players p ON ph.player_id = p.player_id
             WHERE p.player_id IS NULL
-        """)
+        """
+        )
         orphan_hierarchy = cur.fetchone()[0]
 
-        results.append(CheckResult(
-            name="fk.hierarchy_players",
-            status=Status.PASS if orphan_hierarchy == 0 else Status.WARN,
-            message=f"Orphan players in hierarchy: {orphan_hierarchy}"
-        ))
+        results.append(
+            CheckResult(
+                name="fk.hierarchy_players",
+                status=Status.PASS if orphan_hierarchy == 0 else Status.WARN,
+                message=f"Orphan players in hierarchy: {orphan_hierarchy}",
+            )
+        )
 
     return results
 

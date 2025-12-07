@@ -112,13 +112,14 @@ def test_detect_hardcoded_password(mock_file_with_credentials):
     # Patterns to detect
     password_patterns = [
         r'password\s*=\s*["\'].*["\']',
-        r'sicillionbillions',
+        r"sicillionbillions",
         r'DB_PASSWORD\s*=\s*["\'].*["\']',
     ]
 
     detections = []
     for pattern in password_patterns:
         import re
+
         if re.search(pattern, content, re.IGNORECASE):
             detections.append(pattern)
 
@@ -131,9 +132,10 @@ def test_detect_api_keys(mock_file_with_credentials):
     content = mock_file_with_credentials
 
     # API key pattern
-    api_key_pattern = r'sk-[a-zA-Z0-9]{16,}'
+    api_key_pattern = r"sk-[a-zA-Z0-9]{16,}"
 
     import re
+
     match = re.search(api_key_pattern, content)
 
     assert match is not None, "Failed to detect API key"
@@ -147,6 +149,7 @@ def test_clean_file_no_credentials(mock_file_clean):
     hardcoded_pattern = r'password\s*=\s*["\'][^os\.].*["\']'
 
     import re
+
     match = re.search(hardcoded_pattern, content)
 
     # Should not match environment variable loading
@@ -162,11 +165,12 @@ def test_detect_aws_credentials():
 
     # AWS patterns
     aws_patterns = [
-        r'AKIA[0-9A-Z]{16}',  # AWS Access Key ID
+        r"AKIA[0-9A-Z]{16}",  # AWS Access Key ID
         r'["\'][a-zA-Z0-9/+=]{40}["\']',  # AWS Secret Key
     ]
 
     import re
+
     detections = [p for p in aws_patterns if re.search(p, content)]
 
     assert len(detections) > 0, "Failed to detect AWS credentials"
@@ -197,6 +201,7 @@ def test_detect_exposed_database_ports(mock_docker_compose_insecure):
 
     # Check for exposed ports without 127.0.0.1 binding
     import re
+
     exposed_port_pattern = r'^\s*-\s*"(\d+):(\d+)"'
 
     matches = re.findall(exposed_port_pattern, content, re.MULTILINE)
@@ -206,9 +211,9 @@ def test_detect_exposed_database_ports(mock_docker_compose_insecure):
 
     # Check if database port (5432) exposed without localhost binding
     for host_port, container_port in matches:
-        if container_port == '5432':
+        if container_port == "5432":
             # Should be bound to localhost (127.0.0.1)
-            if '127.0.0.1' not in content:
+            if "127.0.0.1" not in content:
                 severity = "HIGH"
                 assert severity == "HIGH", "Database should not be exposed to internet"
 
@@ -305,7 +310,7 @@ def test_detect_ssh_keys_wrong_permissions():
         perms_octal = oct(file_stat.st_mode & 0o777)
 
         # SSH requires 600 for private keys
-        assert perms_octal != '0o600', "SSH key has wrong permissions"
+        assert perms_octal != "0o600", "SSH key has wrong permissions"
 
 
 # ============================================================================
@@ -323,8 +328,8 @@ def test_detect_missing_authentication():
     """
 
     # Check for authentication decorators/checks
-    has_auth_decorator = '@requires_auth' in api_code or '@login_required' in api_code
-    has_auth_check = 'if not authenticated' in api_code
+    has_auth_decorator = "@requires_auth" in api_code or "@login_required" in api_code
+    has_auth_check = "if not authenticated" in api_code
 
     has_any_auth = has_auth_decorator or has_auth_check
 
@@ -363,7 +368,7 @@ def test_secure_api_endpoint_has_auth():
         return jsonify(predictions)
     """
 
-    has_auth = '@requires_auth' in secure_api
+    has_auth = "@requires_auth" in secure_api
 
     assert has_auth, "Endpoint should have authentication"
 
@@ -377,13 +382,14 @@ def test_detect_outdated_dependencies():
     """Test detection of outdated dependencies."""
     # Mock outdated package
     outdated_packages = [
-        {'name': 'requests', 'version': '2.25.0', 'latest': '2.31.0'},
-        {'name': 'flask', 'version': '1.0.0', 'latest': '3.0.0'},  # Very outdated
+        {"name": "requests", "version": "2.25.0", "latest": "2.31.0"},
+        {"name": "flask", "version": "1.0.0", "latest": "3.0.0"},  # Very outdated
     ]
 
     critical_outdated = [
-        p for p in outdated_packages
-        if tuple(map(int, p['version'].split('.'))) < tuple(map(int, p['latest'].split('.')))
+        p
+        for p in outdated_packages
+        if tuple(map(int, p["version"].split("."))) < tuple(map(int, p["latest"].split(".")))
     ]
 
     assert len(critical_outdated) > 0, "Should detect outdated packages"
@@ -393,17 +399,17 @@ def test_detect_known_cves():
     """Test detection of packages with known CVEs."""
     # Mock vulnerability database
     vulnerable_packages = {
-        'flask': {
-            '1.0.0': ['CVE-2023-30861'],  # XSS vulnerability
+        "flask": {
+            "1.0.0": ["CVE-2023-30861"],  # XSS vulnerability
         },
-        'requests': {
-            '2.25.0': ['CVE-2023-32681'],  # Certificate validation
+        "requests": {
+            "2.25.0": ["CVE-2023-32681"],  # Certificate validation
         },
     }
 
     current_packages = {
-        'flask': '1.0.0',
-        'requests': '2.25.0',
+        "flask": "1.0.0",
+        "requests": "2.25.0",
     }
 
     # Check for vulnerabilities
@@ -424,13 +430,13 @@ def test_detect_known_cves():
 def test_production_security_checklist():
     """Test complete production security checklist."""
     checklist = {
-        'no_hardcoded_credentials': True,
-        'no_privileged_containers': True,
-        'api_authentication': True,
-        'correct_file_permissions': True,
-        'no_critical_cves': False,  # Fail: Has critical vulnerability
-        'https_only': True,
-        'secrets_in_env': True,
+        "no_hardcoded_credentials": True,
+        "no_privileged_containers": True,
+        "api_authentication": True,
+        "correct_file_permissions": True,
+        "no_critical_cves": False,  # Fail: Has critical vulnerability
+        "https_only": True,
+        "secrets_in_env": True,
     }
 
     # All items must pass
@@ -441,38 +447,38 @@ def test_production_security_checklist():
     # Identify failures
     failures = [item for item, passed in checklist.items() if not passed]
 
-    assert 'no_critical_cves' in failures
+    assert "no_critical_cves" in failures
 
 
 def test_security_audit_report_generation():
     """Test security audit report generation."""
     findings = [
         {
-            'severity': 'CRITICAL',
-            'category': 'credentials',
-            'description': 'Hardcoded password in config.py',
-            'file': 'config.py',
-            'line': 10,
+            "severity": "CRITICAL",
+            "category": "credentials",
+            "description": "Hardcoded password in config.py",
+            "file": "config.py",
+            "line": 10,
         },
         {
-            'severity': 'HIGH',
-            'category': 'docker',
-            'description': 'Privileged container mode enabled',
-            'file': 'docker-compose.yml',
-            'line': 8,
+            "severity": "HIGH",
+            "category": "docker",
+            "description": "Privileged container mode enabled",
+            "file": "docker-compose.yml",
+            "line": 8,
         },
         {
-            'severity': 'MEDIUM',
-            'category': 'permissions',
-            'description': '.env file is world-readable',
-            'file': '.env',
-            'line': None,
+            "severity": "MEDIUM",
+            "category": "permissions",
+            "description": ".env file is world-readable",
+            "file": ".env",
+            "line": None,
         },
     ]
 
     # Count by severity
-    critical_count = len([f for f in findings if f['severity'] == 'CRITICAL'])
-    high_count = len([f for f in findings if f['severity'] == 'HIGH'])
+    critical_count = len([f for f in findings if f["severity"] == "CRITICAL"])
+    high_count = len([f for f in findings if f["severity"] == "HIGH"])
 
     assert critical_count == 1
     assert high_count == 1
@@ -492,10 +498,10 @@ def test_security_audit_in_cicd():
     """Test security audit integration in CI/CD pipeline."""
     # Simulate CI/CD check
     security_checks = {
-        'credential_scan': True,   # Passed
-        'docker_scan': True,       # Passed
-        'dependency_scan': False,  # Failed
-        'permission_scan': True,   # Passed
+        "credential_scan": True,  # Passed
+        "docker_scan": True,  # Passed
+        "dependency_scan": False,  # Failed
+        "permission_scan": True,  # Passed
     }
 
     # Any failure should fail CI/CD
@@ -517,7 +523,7 @@ def test_false_positive_credential_in_comment():
     """
 
     # Even in comments, credentials should be flagged (potential leak via git history)
-    has_credential = 'sicillionbillions' in code
+    has_credential = "sicillionbillions" in code
 
     assert has_credential, "Credential in comment should still be flagged"
 
@@ -531,6 +537,7 @@ def test_base64_encoded_credentials():
 
     # Should detect base64 patterns
     import re
+
     base64_pattern = r'["\'][A-Za-z0-9+/]{20,}={0,2}["\']'
 
     match = re.search(base64_pattern, code)
@@ -545,9 +552,10 @@ def test_url_with_credentials():
     """
 
     # Pattern: user:password@ in URL
-    url_cred_pattern = r'://.*:.*@'
+    url_cred_pattern = r"://.*:.*@"
 
     import re
+
     match = re.search(url_cred_pattern, code)
 
     assert match is not None, "Should detect credentials in URL"

@@ -54,7 +54,7 @@ class AdaptiveWLSWeightsV2:
         self,
         predictions_df: pd.DataFrame,
         model_names: list[str],
-        actual_col: str = 'actual',
+        actual_col: str = "actual",
         halflife_candidates: list[float] | None = None,
         min_observations: int = 10,
         weight_constraints: dict[str, tuple[float, float]] | None = None,
@@ -108,11 +108,7 @@ class AdaptiveWLSWeightsV2:
         logger.info(f"  Models: {len(model_names)}")
         logger.info(f"  Halflife candidates: {halflife_candidates}")
 
-    def _compute_exponential_weights(
-        self,
-        n: int,
-        halflife: float
-    ) -> np.ndarray:
+    def _compute_exponential_weights(self, n: int, halflife: float) -> np.ndarray:
         """
         Compute exponential decay weights for recency.
 
@@ -139,9 +135,7 @@ class AdaptiveWLSWeightsV2:
         return weights
 
     def _compute_ensemble_predictions(
-        self,
-        df: pd.DataFrame,
-        weights: dict[str, float]
+        self, df: pd.DataFrame, weights: dict[str, float]
     ) -> np.ndarray:
         """
         Compute weighted ensemble predictions.
@@ -164,8 +158,8 @@ class AdaptiveWLSWeightsV2:
         self,
         halflife: float,
         predictions_df: pd.DataFrame | None = None,
-        metric: str = 'mae',
-        solver: str = 'ECOS',
+        metric: str = "mae",
+        solver: str = "ECOS",
     ) -> dict[str, float]:
         """
         Optimize ensemble weights using WLS with specified halflife.
@@ -206,13 +200,13 @@ class AdaptiveWLSWeightsV2:
         y_pred_weighted = X_weighted @ w
 
         # Define objective based on metric
-        if metric == 'mae':
+        if metric == "mae":
             # Minimize weighted MAE: sum(W * |y - X @ w|)
             objective = cp.Minimize(cp.sum(cp.abs(y_pred_weighted - y_weighted)))
-        elif metric == 'mse':
+        elif metric == "mse":
             # Minimize weighted MSE: sum(W * (y - X @ w)^2)
             objective = cp.Minimize(cp.sum_squares(y_pred_weighted - y_weighted))
-        elif metric == 'huber':
+        elif metric == "huber":
             # Minimize Huber loss (robust to outliers)
             objective = cp.Minimize(cp.sum(cp.huber(y_pred_weighted - y_weighted, M=1.0)))
         else:
@@ -238,24 +232,21 @@ class AdaptiveWLSWeightsV2:
             problem.solve(solver=solver, verbose=False)
         except Exception as e:
             logger.warning(f"Solver {solver} failed: {e}. Trying SCS...")
-            problem.solve(solver='SCS', verbose=False)
+            problem.solve(solver="SCS", verbose=False)
 
-        if problem.status not in ['optimal', 'optimal_inaccurate']:
+        if problem.status not in ["optimal", "optimal_inaccurate"]:
             raise ValueError(f"Optimization failed: {problem.status}")
 
         # Extract optimal weights
-        optimal_weights = {
-            name: float(w.value[i])
-            for i, name in enumerate(self.model_names)
-        }
+        optimal_weights = {name: float(w.value[i]) for i, name in enumerate(self.model_names)}
 
         return optimal_weights
 
     def optimize_weights_with_grid_search(
         self,
         validation_split: float = 0.2,
-        metric: str = 'mae',
-        solver: str = 'ECOS',
+        metric: str = "mae",
+        solver: str = "ECOS",
     ) -> tuple[dict[str, float], float]:
         """
         Grid search over halflife candidates, select best on validation set.
@@ -295,7 +286,7 @@ class AdaptiveWLSWeightsV2:
         logger.info(f"  Validation: {len(val_df):,} observations")
 
         # Grid search over halflife candidates
-        best_metric_value = float('inf')
+        best_metric_value = float("inf")
         best_weights = None
         best_halflife = None
 
@@ -319,25 +310,23 @@ class AdaptiveWLSWeightsV2:
             val_actual = val_df[self.actual_col].values
 
             # Compute validation metric
-            if metric == 'mae':
+            if metric == "mae":
                 metric_value = np.mean(np.abs(val_preds - val_actual))
-            elif metric == 'mse':
+            elif metric == "mse":
                 metric_value = np.mean((val_preds - val_actual) ** 2)
-            elif metric == 'huber':
+            elif metric == "huber":
                 residuals = val_preds - val_actual
                 metric_value = np.mean(
-                    np.where(
-                        np.abs(residuals) <= 1.0,
-                        0.5 * residuals ** 2,
-                        np.abs(residuals) - 0.5
-                    )
+                    np.where(np.abs(residuals) <= 1.0, 0.5 * residuals**2, np.abs(residuals) - 0.5)
                 )
 
-            grid_results.append({
-                'halflife': halflife,
-                'metric': metric_value,
-                'weights': weights,
-            })
+            grid_results.append(
+                {
+                    "halflife": halflife,
+                    "metric": metric_value,
+                    "weights": weights,
+                }
+            )
 
             logger.info(f"  Halflife {halflife:>4.1f}: {metric.upper()} = {metric_value:.4f}")
 
@@ -379,7 +368,7 @@ class AdaptiveWLSWeightsV2:
         window_size: int = 6,
         step_size: int = 1,
         halflife: float | None = None,
-        metric: str = 'mae',
+        metric: str = "mae",
     ) -> pd.DataFrame:
         """
         Track weight evolution over time using rolling window optimization.
@@ -421,8 +410,8 @@ class AdaptiveWLSWeightsV2:
 
             # Record
             result = {
-                'window_start_idx': start_idx,
-                'window_end_idx': end_idx,
+                "window_start_idx": start_idx,
+                "window_end_idx": end_idx,
                 **weights,
             }
             results.append(result)
@@ -449,21 +438,21 @@ class AdaptiveWLSWeightsV2:
             raise ValueError("Must run optimization first")
 
         output_data = {
-            'weights': self.optimal_weights,
-            'metadata': {
-                'halflife': self.optimal_halflife,
-                'validation_metric': self.optimal_metric,
-                'n_observations': len(self.predictions_df),
-                'model_names': self.model_names,
-                'halflife_candidates': self.halflife_candidates,
+            "weights": self.optimal_weights,
+            "metadata": {
+                "halflife": self.optimal_halflife,
+                "validation_metric": self.optimal_metric,
+                "n_observations": len(self.predictions_df),
+                "model_names": self.model_names,
+                "halflife_candidates": self.halflife_candidates,
                 **(metadata or {}),
-            }
+            },
         }
 
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(output_data, f, indent=2)
 
         logger.info(f"✅ Saved WLS weights to: {output_path}")
@@ -482,8 +471,8 @@ class AdaptiveWLSWeightsV2:
         with open(weights_path) as f:
             data = json.load(f)
 
-        weights = data['weights']
-        metadata = data.get('metadata', {})
+        weights = data["weights"]
+        metadata = data.get("metadata", {})
 
         logger.info(f"Loaded WLS weights from: {weights_path}")
         logger.info(f"  Halflife: {metadata.get('halflife', 'unknown')}")
@@ -496,10 +485,11 @@ class AdaptiveWLSWeightsV2:
 # UTILITY FUNCTIONS
 # ============================================================================
 
+
 def compute_ensemble_performance_metrics(
     predictions_df: pd.DataFrame,
     weights: dict[str, float],
-    actual_col: str = 'actual',
+    actual_col: str = "actual",
 ) -> dict[str, float]:
     """
     Compute comprehensive performance metrics for ensemble.
@@ -523,11 +513,11 @@ def compute_ensemble_performance_metrics(
     residuals = ensemble_preds - actual
 
     mae = np.mean(np.abs(residuals))
-    rmse = np.sqrt(np.mean(residuals ** 2))
+    rmse = np.sqrt(np.mean(residuals**2))
     mape = np.mean(np.abs(residuals / (actual + 1e-8))) * 100  # Avoid div by 0
 
     # R^2
-    ss_res = np.sum(residuals ** 2)
+    ss_res = np.sum(residuals**2)
     ss_tot = np.sum((actual - actual.mean()) ** 2)
     r2 = 1 - (ss_res / ss_tot)
 
@@ -538,11 +528,11 @@ def compute_ensemble_performance_metrics(
     percentile_90_ae = np.percentile(np.abs(residuals), 90)
 
     return {
-        'mae': mae,
-        'rmse': rmse,
-        'mape': mape,
-        'r2': r2,
-        'median_ae': median_ae,
-        'percentile_90_ae': percentile_90_ae,
-        'n_observations': len(predictions_df),
+        "mae": mae,
+        "rmse": rmse,
+        "mape": mape,
+        "r2": r2,
+        "median_ae": median_ae,
+        "percentile_90_ae": percentile_90_ae,
+        "n_observations": len(predictions_df),
     }

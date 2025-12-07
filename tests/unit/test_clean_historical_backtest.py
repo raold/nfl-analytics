@@ -23,7 +23,6 @@ def test_kelly_criterion_basic():
     assert result is not None
 
 
-
 def test_kelly_criterion_edge_cases():
     """Test kelly_criterion: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_kelly_criterion_edge_cases():
     assert result is not None
 
 
-
 def test_kelly_criterion_error_handling():
     """Test kelly_criterion error handling."""
     with pytest.raises(ValueError):
         kelly_criterion(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_kelly_criterion_property_idempotent(self, p_win, odds, fraction):
 
     # Assert property
     assert kelly_criterion(p_win, odds, fraction) == result, "idempotent violated"
-
 
 
 def test_simulate_betting_basic():
@@ -67,7 +63,6 @@ def test_simulate_betting_basic():
     assert result is not None
 
 
-
 def test_simulate_betting_edge_cases():
     """Test simulate_betting: edge cases."""
     # Arrange
@@ -80,23 +75,24 @@ def test_simulate_betting_edge_cases():
     assert result is not None
 
 
-
 def test_simulate_betting_error_handling():
     """Test simulate_betting error handling."""
     with pytest.raises(ValueError):
         simulate_betting(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_simulate_betting_property_idempotent(self, predictions, actuals, spreads, min_edge, kelly_fraction):
+def test_simulate_betting_property_idempotent(
+    self, predictions, actuals, spreads, min_edge, kelly_fraction
+):
     """Property test: function is idempotent."""
     # Act
     result = simulate_betting(predictions, actuals, spreads, min_edge, kelly_fraction)
 
     # Assert property
-    assert simulate_betting(predictions, actuals, spreads, min_edge, kelly_fraction) == result, "idempotent violated"
-
+    assert (
+        simulate_betting(predictions, actuals, spreads, min_edge, kelly_fraction) == result
+    ), "idempotent violated"
 
 
 def test_calculate_max_drawdown_basic():
@@ -111,7 +107,6 @@ def test_calculate_max_drawdown_basic():
     assert result is not None
 
 
-
 def test_calculate_max_drawdown_edge_cases():
     """Test calculate_max_drawdown: edge cases."""
     # Arrange
@@ -124,12 +119,10 @@ def test_calculate_max_drawdown_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_max_drawdown_error_handling():
     """Test calculate_max_drawdown error handling."""
     with pytest.raises(ValueError):
         calculate_max_drawdown(invalid_input)
-
 
 
 @given(st.integers())
@@ -140,7 +133,6 @@ def test_calculate_max_drawdown_property_idempotent(self, history):
 
     # Assert property
     assert calculate_max_drawdown(history) == result, "idempotent violated"
-
 
 
 def test_calculate_sharpe_basic():
@@ -155,7 +147,6 @@ def test_calculate_sharpe_basic():
     assert result is not None
 
 
-
 def test_calculate_sharpe_edge_cases():
     """Test calculate_sharpe: edge cases."""
     # Arrange
@@ -168,12 +159,10 @@ def test_calculate_sharpe_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_sharpe_error_handling():
     """Test calculate_sharpe error handling."""
     with pytest.raises(ValueError):
         calculate_sharpe(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -184,4 +173,3 @@ def test_calculate_sharpe_property_idempotent(self, history, risk_free_rate):
 
     # Assert property
     assert calculate_sharpe(history, risk_free_rate) == result, "idempotent violated"
-

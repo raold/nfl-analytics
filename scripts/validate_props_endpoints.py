@@ -166,9 +166,7 @@ class PropsEndpointValidator:
 
             missing_fields = [f for f in required_fields if f not in data]
             if missing_fields:
-                logger.error(
-                    f"❌ {player_name} ({stat_type}): Missing fields: {missing_fields}"
-                )
+                logger.error(f"❌ {player_name} ({stat_type}): Missing fields: {missing_fields}")
                 self.results["failed"] += 1
                 return False
 

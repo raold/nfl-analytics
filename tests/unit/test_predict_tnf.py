@@ -23,7 +23,6 @@ def test_load_model_basic():
     assert result is not None
 
 
-
 def test_load_model_edge_cases():
     """Test load_model: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_load_model_edge_cases():
     assert result is not None
 
 
-
 def test_load_model_error_handling():
     """Test load_model error handling."""
     with pytest.raises(ValueError):
         load_model(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_load_model_property_idempotent(self, model_path):
 
     # Assert property
     assert load_model(model_path) == result, "idempotent violated"
-
 
 
 def test_load_game_data_basic():
@@ -67,7 +63,6 @@ def test_load_game_data_basic():
     assert result is not None
 
 
-
 def test_load_game_data_edge_cases():
     """Test load_game_data: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_load_game_data_edge_cases():
     assert result is not None
 
 
-
 def test_load_game_data_error_handling():
     """Test load_game_data error handling."""
     with pytest.raises(ValueError):
         load_game_data(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -95,8 +88,9 @@ def test_load_game_data_property_idempotent(self, features_csv, home_team, away_
     result = load_game_data(features_csv, home_team, away_team, season, week)
 
     # Assert property
-    assert load_game_data(features_csv, home_team, away_team, season, week) == result, "idempotent violated"
-
+    assert (
+        load_game_data(features_csv, home_team, away_team, season, week) == result
+    ), "idempotent violated"
 
 
 def test_predict_win_probability_basic():
@@ -111,7 +105,6 @@ def test_predict_win_probability_basic():
     assert result is not None
 
 
-
 def test_predict_win_probability_edge_cases():
     """Test predict_win_probability: edge cases."""
     # Arrange
@@ -124,12 +117,10 @@ def test_predict_win_probability_edge_cases():
     assert result is not None
 
 
-
 def test_predict_win_probability_error_handling():
     """Test predict_win_probability error handling."""
     with pytest.raises(ValueError):
         predict_win_probability(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +131,6 @@ def test_predict_win_probability_property_idempotent(self, model, game_data):
 
     # Assert property
     assert predict_win_probability(model, game_data) == result, "idempotent violated"
-
 
 
 def test_implied_probability_basic():
@@ -155,7 +145,6 @@ def test_implied_probability_basic():
     assert result is not None
 
 
-
 def test_implied_probability_edge_cases():
     """Test implied_probability: edge cases."""
     # Arrange
@@ -168,12 +157,10 @@ def test_implied_probability_edge_cases():
     assert result is not None
 
 
-
 def test_implied_probability_error_handling():
     """Test implied_probability error handling."""
     with pytest.raises(ValueError):
         implied_probability(invalid_input)
-
 
 
 @given(st.integers())
@@ -184,7 +171,6 @@ def test_implied_probability_property_idempotent(self, american_odds):
 
     # Assert property
     assert implied_probability(american_odds) == result, "idempotent violated"
-
 
 
 def test_american_to_decimal_basic():
@@ -199,7 +185,6 @@ def test_american_to_decimal_basic():
     assert result is not None
 
 
-
 def test_american_to_decimal_edge_cases():
     """Test american_to_decimal: edge cases."""
     # Arrange
@@ -212,12 +197,10 @@ def test_american_to_decimal_edge_cases():
     assert result is not None
 
 
-
 def test_american_to_decimal_error_handling():
     """Test american_to_decimal error handling."""
     with pytest.raises(ValueError):
         american_to_decimal(invalid_input)
-
 
 
 @given(st.integers())
@@ -228,7 +211,6 @@ def test_american_to_decimal_property_idempotent(self, american_odds):
 
     # Assert property
     assert american_to_decimal(american_odds) == result, "idempotent violated"
-
 
 
 def test_calculate_ev_basic():
@@ -243,7 +225,6 @@ def test_calculate_ev_basic():
     assert result is not None
 
 
-
 def test_calculate_ev_edge_cases():
     """Test calculate_ev: edge cases."""
     # Arrange
@@ -256,12 +237,10 @@ def test_calculate_ev_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_ev_error_handling():
     """Test calculate_ev error handling."""
     with pytest.raises(ValueError):
         calculate_ev(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -272,7 +251,6 @@ def test_calculate_ev_property_idempotent(self, true_prob, decimal_odds, stake):
 
     # Assert property
     assert calculate_ev(true_prob, decimal_odds, stake) == result, "idempotent violated"
-
 
 
 def test_kelly_criterion_basic():
@@ -287,7 +265,6 @@ def test_kelly_criterion_basic():
     assert result is not None
 
 
-
 def test_kelly_criterion_edge_cases():
     """Test kelly_criterion: edge cases."""
     # Arrange
@@ -300,12 +277,10 @@ def test_kelly_criterion_edge_cases():
     assert result is not None
 
 
-
 def test_kelly_criterion_error_handling():
     """Test kelly_criterion error handling."""
     with pytest.raises(ValueError):
         kelly_criterion(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -316,7 +291,6 @@ def test_kelly_criterion_property_idempotent(self, true_prob, decimal_odds, frac
 
     # Assert property
     assert kelly_criterion(true_prob, decimal_odds, fraction) == result, "idempotent violated"
-
 
 
 def test_generate_betting_recommendation_basic():
@@ -331,7 +305,6 @@ def test_generate_betting_recommendation_basic():
     assert result is not None
 
 
-
 def test_generate_betting_recommendation_edge_cases():
     """Test generate_betting_recommendation: edge cases."""
     # Arrange
@@ -344,23 +317,24 @@ def test_generate_betting_recommendation_edge_cases():
     assert result is not None
 
 
-
 def test_generate_betting_recommendation_error_handling():
     """Test generate_betting_recommendation error handling."""
     with pytest.raises(ValueError):
         generate_betting_recommendation(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers())
-def test_generate_betting_recommendation_property_idempotent(self, home_win_prob, away_win_prob, game_data):
+def test_generate_betting_recommendation_property_idempotent(
+    self, home_win_prob, away_win_prob, game_data
+):
     """Property test: function is idempotent."""
     # Act
     result = generate_betting_recommendation(home_win_prob, away_win_prob, game_data)
 
     # Assert property
-    assert generate_betting_recommendation(home_win_prob, away_win_prob, game_data) == result, "idempotent violated"
-
+    assert (
+        generate_betting_recommendation(home_win_prob, away_win_prob, game_data) == result
+    ), "idempotent violated"
 
 
 def test_main_basic():
@@ -375,7 +349,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -388,9 +361,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

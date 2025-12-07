@@ -24,7 +24,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -37,12 +36,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_fetch_espn_schedule_basic():
@@ -57,7 +54,6 @@ def test_fetch_espn_schedule_basic():
     assert result is not None
 
 
-
 def test_fetch_espn_schedule_edge_cases():
     """Test fetch_espn_schedule: edge cases."""
     # Arrange
@@ -70,12 +66,10 @@ def test_fetch_espn_schedule_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_espn_schedule_error_handling():
     """Test fetch_espn_schedule error handling."""
     with pytest.raises(ValueError):
         fetch_espn_schedule(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -86,7 +80,6 @@ def test_fetch_espn_schedule_property_idempotent(self, self, season, week):
 
     # Assert property
     assert fetch_espn_schedule(self, season, week) == result, "idempotent violated"
-
 
 
 def test_parse_kickoff_time_basic():
@@ -101,7 +94,6 @@ def test_parse_kickoff_time_basic():
     assert result is not None
 
 
-
 def test_parse_kickoff_time_edge_cases():
     """Test parse_kickoff_time: edge cases."""
     # Arrange
@@ -114,12 +106,10 @@ def test_parse_kickoff_time_edge_cases():
     assert result is not None
 
 
-
 def test_parse_kickoff_time_error_handling():
     """Test parse_kickoff_time error handling."""
     with pytest.raises(ValueError):
         parse_kickoff_time(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -132,25 +122,17 @@ def test_parse_kickoff_time_property_idempotent(self, self, game):
     assert parse_kickoff_time(self, game) == result, "idempotent violated"
 
 
-
 def test_parse_kickoff_time_no_temporal_leakage():
     """Ensure parse_kickoff_time doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = parse_kickoff_time(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"
 
 
 def test_update_database_basic():
@@ -165,7 +147,6 @@ def test_update_database_basic():
     assert result is not None
 
 
-
 def test_update_database_edge_cases():
     """Test update_database: edge cases."""
     # Arrange
@@ -178,12 +159,10 @@ def test_update_database_edge_cases():
     assert result is not None
 
 
-
 def test_update_database_error_handling():
     """Test update_database error handling."""
     with pytest.raises(ValueError):
         update_database(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -196,25 +175,17 @@ def test_update_database_property_idempotent(self, self, games, dry_run):
     assert update_database(self, games, dry_run) == result, "idempotent violated"
 
 
-
 def test_update_database_no_temporal_leakage():
     """Ensure update_database doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = update_database(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"
 
 
 def test_fix_week_basic():
@@ -229,7 +200,6 @@ def test_fix_week_basic():
     assert result is not None
 
 
-
 def test_fix_week_edge_cases():
     """Test fix_week: edge cases."""
     # Arrange
@@ -242,12 +212,10 @@ def test_fix_week_edge_cases():
     assert result is not None
 
 
-
 def test_fix_week_error_handling():
     """Test fix_week error handling."""
     with pytest.raises(ValueError):
         fix_week(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -258,4 +226,3 @@ def test_fix_week_property_idempotent(self, self, season, week, dry_run):
 
     # Assert property
     assert fix_week(self, season, week, dry_run) == result, "idempotent violated"
-

@@ -23,18 +23,15 @@ import numpy as np
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
 def test_model_availability():
     """Check which models are available."""
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("TEST 1: Model Availability Check")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     project_root = Path(__file__).parent
 
@@ -69,21 +66,21 @@ def test_model_availability():
 
 def test_variance_pooling():
     """Validate variance pooling math."""
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("TEST 2: Variance Pooling Validation")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Simulate 2 models with known means and stds
     means = np.array([250.0, 270.0])  # Model predictions
-    stds = np.array([50.0, 60.0])     # Model uncertainties
-    weights = np.array([0.6, 0.4])    # Ensemble weights
+    stds = np.array([50.0, 60.0])  # Model uncertainties
+    weights = np.array([0.6, 0.4])  # Ensemble weights
 
     # Ensemble mean
     ensemble_mean = np.sum(weights * means)
     logger.info(f"Ensemble mean: {ensemble_mean:.1f} yards")
 
     # Variance pooling
-    within_var = np.sum(weights * (stds ** 2))
+    within_var = np.sum(weights * (stds**2))
     between_var = np.sum(weights * ((means - ensemble_mean) ** 2))
     ensemble_var = within_var + between_var
     ensemble_std = np.sqrt(ensemble_var)
@@ -103,9 +100,9 @@ def test_variance_pooling():
 
 def test_single_prediction():
     """Test single prediction for Patrick Mahomes, Week 10, 2024."""
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("TEST 3: Single Prediction - Patrick Mahomes Week 10 2024")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     player_id = "00-0033873"  # Patrick Mahomes
     season = 2024
@@ -114,10 +111,7 @@ def test_single_prediction():
     try:
         ensemble = EnhancedEnsemble4Way()
         result = ensemble.predict(
-            player_id=player_id,
-            season=season,
-            week=week,
-            return_individual=True
+            player_id=player_id, season=season, week=week, return_individual=True
         )
 
         logger.info("\nPREDICTION RESULTS:")
@@ -129,16 +123,20 @@ def test_single_prediction():
         logger.info(f"Inference Time: {result['inference_time_ms']:.1f}ms")
         logger.info(f"Active Weights: {result['weights']}")
 
-        if 'predictions' in result:
+        if "predictions" in result:
             logger.info("\nIndividual Model Predictions:")
-            for model_name, (mean, std) in result['predictions'].items():
+            for model_name, (mean, std) in result["predictions"].items():
                 logger.info(f"  {model_name}: {mean:.1f} ± {std:.1f} yards")
 
         # Validate results
-        assert result['ensemble_mean'] is not None, "Ensemble mean is None"
-        assert result['ensemble_std'] is not None, "Ensemble std is None"
-        assert 100 <= result['ensemble_mean'] <= 400, f"Unrealistic prediction: {result['ensemble_mean']:.1f}"
-        assert result['inference_time_ms'] < 5000, f"Inference too slow: {result['inference_time_ms']:.1f}ms"
+        assert result["ensemble_mean"] is not None, "Ensemble mean is None"
+        assert result["ensemble_std"] is not None, "Ensemble std is None"
+        assert (
+            100 <= result["ensemble_mean"] <= 400
+        ), f"Unrealistic prediction: {result['ensemble_mean']:.1f}"
+        assert (
+            result["inference_time_ms"] < 5000
+        ), f"Inference too slow: {result['inference_time_ms']:.1f}ms"
 
         logger.info("\n✅ Single prediction successful")
         return result
@@ -150,9 +148,9 @@ def test_single_prediction():
 
 def main():
     """Run all ensemble tests."""
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("4-WAY ENSEMBLE TESTING SUITE")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("Testing: State-Space + Hierarchical + XGBoost + Informative Priors")
     logger.info("Date: November 9, 2025\n")
 
@@ -169,13 +167,13 @@ def main():
         result = test_single_prediction()
 
         elapsed = time.time() - start_time
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("✅ ALL TESTS PASSED")
-        logger.info("="*80)
+        logger.info("=" * 80)
         logger.info(f"Total time: {elapsed:.2f}s")
 
         # Determine ensemble configuration
-        num_models = len(result.get('weights', {}))
+        num_models = len(result.get("weights", {}))
         if num_models == 4:
             logger.info("\n🎯 FULL 4-WAY ENSEMBLE OPERATIONAL")
         elif num_models == 2:

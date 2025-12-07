@@ -14,11 +14,12 @@ import requests
 
 API_BASE = "http://localhost:8000"
 
+
 def test_health():
     """Test API health endpoint."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 1: Health Check")
-    print("="*70)
+    print("=" * 70)
 
     try:
         response = requests.get(f"{API_BASE}/health", timeout=5)
@@ -41,24 +42,20 @@ def test_health():
 
 def test_player_prediction():
     """Test player prediction endpoint."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 2: Player Prediction (PHI QB Week 11 2024)")
-    print("="*70)
+    print("=" * 70)
 
     payload = {
         "player_id": "00-0036389",
         "stat_type": "passing_yards",
         "week": 11,
         "season": 2024,
-        "confidence_level": 0.90
+        "confidence_level": 0.90,
     }
 
     try:
-        response = requests.post(
-            f"{API_BASE}/predict",
-            json=payload,
-            timeout=30
-        )
+        response = requests.post(f"{API_BASE}/predict", json=payload, timeout=30)
         print(f"Status Code: {response.status_code}")
 
         if response.status_code == 200:
@@ -66,19 +63,21 @@ def test_player_prediction():
             print("\n✅ PREDICTION SUCCESS")
             print(f"   Player: {data['player_id']}")
             print(f"   Prediction: {data['prediction']:.1f} ± {data['uncertainty']:.1f} yards")
-            print(f"   90% CI: [{data['confidence_interval']['lower']:.1f}, {data['confidence_interval']['upper']:.1f}]")
+            print(
+                f"   90% CI: [{data['confidence_interval']['lower']:.1f}, {data['confidence_interval']['upper']:.1f}]"
+            )
             print("   Actual: 221 yards")
             print(f"   Processing Time: {data['processing_ms']:.1f}ms")
             print(f"   Cache Hit: {data['cache_hit']}")
             print(f"   Ensemble Version: {data['model_versions']['ensemble']}")
             print("\n   Weights:")
-            for model, weight in data['ensemble_weights'].items():
+            for model, weight in data["ensemble_weights"].items():
                 print(f"      {model}: {weight:.1%}")
 
             # Check if actual value falls in CI
             actual = 221
-            ci_lower = data['confidence_interval']['lower']
-            ci_upper = data['confidence_interval']['upper']
+            ci_lower = data["confidence_interval"]["lower"]
+            ci_upper = data["confidence_interval"]["upper"]
 
             if ci_lower <= actual <= ci_upper:
                 print(f"\n   ✅ Actual value ({actual} yards) within 90% CI")
@@ -96,22 +95,14 @@ def test_player_prediction():
 
 def test_game_prediction():
     """Test game prediction endpoint."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 3: Game Prediction (WAS @ PHI Week 11 2024)")
-    print("="*70)
+    print("=" * 70)
 
-    payload = {
-        "game_id": "2024_11_WAS_PHI",
-        "season": 2024,
-        "week": 11
-    }
+    payload = {"game_id": "2024_11_WAS_PHI", "season": 2024, "week": 11}
 
     try:
-        response = requests.post(
-            f"{API_BASE}/predict/game",
-            json=payload,
-            timeout=60
-        )
+        response = requests.post(f"{API_BASE}/predict/game", json=payload, timeout=60)
         print(f"Status Code: {response.status_code}")
 
         if response.status_code == 200:
@@ -121,22 +112,26 @@ def test_game_prediction():
             print(f"   Season {data['season']}, Week {data['week']}")
 
             print(f"\n   Away ({data['away_team']}):")
-            if data['away_prediction']['predicted_passing_yards']:
+            if data["away_prediction"]["predicted_passing_yards"]:
                 print(f"      QB: {data['away_prediction']['qb_id']}")
-                print(f"      Prediction: {data['away_prediction']['predicted_passing_yards']:.1f} ± {data['away_prediction']['predicted_passing_yards_std']:.1f} yards")
+                print(
+                    f"      Prediction: {data['away_prediction']['predicted_passing_yards']:.1f} ± {data['away_prediction']['predicted_passing_yards_std']:.1f} yards"
+                )
                 print("      Actual: 191 yards")
             else:
                 print("      No prediction available")
 
             print(f"\n   Home ({data['home_team']}):")
-            if data['home_prediction']['predicted_passing_yards']:
+            if data["home_prediction"]["predicted_passing_yards"]:
                 print(f"      QB: {data['home_prediction']['qb_id']}")
-                print(f"      Prediction: {data['home_prediction']['predicted_passing_yards']:.1f} ± {data['home_prediction']['predicted_passing_yards_std']:.1f} yards")
+                print(
+                    f"      Prediction: {data['home_prediction']['predicted_passing_yards']:.1f} ± {data['home_prediction']['predicted_passing_yards_std']:.1f} yards"
+                )
                 print("      Actual: 221 yards")
             else:
                 print("      No prediction available")
 
-            if data['total_predicted_yards']:
+            if data["total_predicted_yards"]:
                 print(f"\n   Total Predicted: {data['total_predicted_yards']:.1f} yards")
                 print("   Total Actual: 412 yards")
                 print(f"   Error: {abs(data['total_predicted_yards'] - 412):.1f} yards")
@@ -154,9 +149,9 @@ def test_game_prediction():
 
 def main():
     """Run all tests."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("Enhanced Ensemble v5.1 FastAPI Integration Test")
-    print("="*70)
+    print("=" * 70)
 
     # Check if API is running
     try:
@@ -175,9 +170,9 @@ def main():
     results.append(("Game Prediction", test_game_prediction()))
 
     # Summary
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST SUMMARY")
-    print("="*70)
+    print("=" * 70)
 
     for test_name, passed in results:
         status = "✅ PASS" if passed else "❌ FAIL"

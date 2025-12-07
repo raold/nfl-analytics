@@ -23,7 +23,6 @@ def test_calculate_metrics_basic():
     assert result is not None
 
 
-
 def test_calculate_metrics_edge_cases():
     """Test calculate_metrics: edge cases."""
     # Arrange
@@ -36,23 +35,24 @@ def test_calculate_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_metrics_error_handling():
     """Test calculate_metrics error handling."""
     with pytest.raises(ValueError):
         calculate_metrics(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_calculate_metrics_property_idempotent(self, df, pred_col, actual_col, pred_q05_col, pred_q95_col):
+def test_calculate_metrics_property_idempotent(
+    self, df, pred_col, actual_col, pred_q05_col, pred_q95_col
+):
     """Property test: function is idempotent."""
     # Act
     result = calculate_metrics(df, pred_col, actual_col, pred_q05_col, pred_q95_col)
 
     # Assert property
-    assert calculate_metrics(df, pred_col, actual_col, pred_q05_col, pred_q95_col) == result, "idempotent violated"
-
+    assert (
+        calculate_metrics(df, pred_col, actual_col, pred_q05_col, pred_q95_col) == result
+    ), "idempotent violated"
 
 
 def test_load_v1_predictions_basic():
@@ -67,7 +67,6 @@ def test_load_v1_predictions_basic():
     assert result is not None
 
 
-
 def test_load_v1_predictions_edge_cases():
     """Test load_v1_predictions: edge cases."""
     # Arrange
@@ -80,12 +79,10 @@ def test_load_v1_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_load_v1_predictions_error_handling():
     """Test load_v1_predictions error handling."""
     with pytest.raises(ValueError):
         load_v1_predictions(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -96,7 +93,6 @@ def test_load_v1_predictions_property_idempotent(self, season, conn):
 
     # Assert property
     assert load_v1_predictions(season, conn) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -111,7 +107,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -124,9 +119,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class InvalidationResult:
     """Result of cache invalidation operation."""
+
     keys_matched: int
     keys_deleted: int
     patterns_used: list[str]
@@ -66,11 +67,7 @@ class CacheInvalidator:
         if not self._redis_cache or not self._redis_cache.is_connected():
             logger.warning("Redis cache unavailable - invalidation disabled")
 
-    def invalidate_pattern(
-        self,
-        pattern: str,
-        dry_run: bool = False
-    ) -> InvalidationResult:
+    def invalidate_pattern(self, pattern: str, dry_run: bool = False) -> InvalidationResult:
         """
         Invalidate all keys matching a pattern.
 
@@ -91,10 +88,11 @@ class CacheInvalidator:
                 keys_deleted=0,
                 patterns_used=[pattern],
                 execution_time_ms=0.0,
-                errors=["Redis cache unavailable"]
+                errors=["Redis cache unavailable"],
             )
 
         import time
+
         start_time = time.time()
 
         errors = []
@@ -111,11 +109,7 @@ class CacheInvalidator:
             matched_keys = []
 
             while True:
-                cursor, keys = redis_client.scan(
-                    cursor=cursor,
-                    match=pattern,
-                    count=100
-                )
+                cursor, keys = redis_client.scan(cursor=cursor, match=pattern, count=100)
                 matched_keys.extend(keys)
 
                 if cursor == 0:
@@ -136,9 +130,7 @@ class CacheInvalidator:
                     f"matching pattern: {pattern}"
                 )
             else:
-                logger.info(
-                    f"[DRY RUN] Found {keys_matched} keys matching pattern: {pattern}"
-                )
+                logger.info(f"[DRY RUN] Found {keys_matched} keys matching pattern: {pattern}")
 
         except Exception as e:
             error_msg = f"Pattern invalidation failed: {e}"
@@ -152,13 +144,11 @@ class CacheInvalidator:
             keys_deleted=keys_deleted,
             patterns_used=[pattern],
             execution_time_ms=execution_time_ms,
-            errors=errors
+            errors=errors,
         )
 
     def invalidate_model(
-        self,
-        model_name: str,
-        model_type: str | None = None
+        self, model_name: str, model_type: str | None = None
     ) -> InvalidationResult:
         """
         Invalidate cached model(s).
@@ -186,10 +176,7 @@ class CacheInvalidator:
         return self.invalidate_pattern(pattern)
 
     def invalidate_player(
-        self,
-        player_id: str,
-        season: int | None = None,
-        week: int | None = None
+        self, player_id: str, season: int | None = None, week: int | None = None
     ) -> InvalidationResult:
         """
         Invalidate player-specific caches.
@@ -250,7 +237,7 @@ class CacheInvalidator:
             keys_deleted=total_deleted,
             patterns_used=patterns,
             execution_time_ms=total_time,
-            errors=all_errors
+            errors=all_errors,
         )
 
     def invalidate_queries(self, query_keys: list[str]) -> InvalidationResult:
@@ -275,10 +262,11 @@ class CacheInvalidator:
                 keys_deleted=0,
                 patterns_used=[],
                 execution_time_ms=0.0,
-                errors=["Redis cache unavailable"]
+                errors=["Redis cache unavailable"],
             )
 
         import time
+
         start_time = time.time()
 
         errors = []
@@ -312,7 +300,7 @@ class CacheInvalidator:
             keys_deleted=keys_deleted,
             patterns_used=[f"query:{k}" for k in query_keys],
             execution_time_ms=execution_time_ms,
-            errors=errors
+            errors=errors,
         )
 
     def invalidate_streamlit(self) -> InvalidationResult:
@@ -347,19 +335,12 @@ class CacheInvalidator:
         """
         if not confirm:
             raise ValueError(
-                "invalidate_all() requires confirm=True. "
-                "This will clear the ENTIRE cache!"
+                "invalidate_all() requires confirm=True. " "This will clear the ENTIRE cache!"
             )
 
         logger.warning("⚠️  CLEARING ENTIRE CACHE (all patterns)")
 
-        patterns = [
-            "model:*",
-            "query:*",
-            "r_result:*",
-            "streamlit:*",
-            "player_features:*"
-        ]
+        patterns = ["model:*", "query:*", "r_result:*", "streamlit:*", "player_features:*"]
 
         results = []
         for pattern in patterns:
@@ -373,8 +354,7 @@ class CacheInvalidator:
         total_time = sum(r.execution_time_ms for r in results)
 
         logger.warning(
-            f"✅ Cleared entire cache: {total_deleted} keys deleted "
-            f"in {total_time:.2f}ms"
+            f"✅ Cleared entire cache: {total_deleted} keys deleted " f"in {total_time:.2f}ms"
         )
 
         return InvalidationResult(
@@ -382,7 +362,7 @@ class CacheInvalidator:
             keys_deleted=total_deleted,
             patterns_used=patterns,
             execution_time_ms=total_time,
-            errors=all_errors
+            errors=all_errors,
         )
 
     def stats(self) -> dict[str, Any]:
@@ -404,10 +384,9 @@ class CacheInvalidator:
 
 # Convenience functions for common invalidation patterns
 
+
 def invalidate_after_model_training(
-    model_name: str,
-    model_type: str,
-    player_ids: list[str] | None = None
+    model_name: str, model_type: str, player_ids: list[str] | None = None
 ) -> InvalidationResult:
     """
     Invalidate caches after model retraining.
@@ -444,15 +423,12 @@ def invalidate_after_model_training(
             result.execution_time_ms += player_result.execution_time_ms
             result.errors.extend(player_result.errors)
 
-    logger.info(
-        f"Post-training invalidation complete: {result.keys_deleted} keys cleared"
-    )
+    logger.info(f"Post-training invalidation complete: {result.keys_deleted} keys cleared")
     return result
 
 
 def invalidate_after_data_ingestion(
-    season: int | None = None,
-    week: int | None = None
+    season: int | None = None, week: int | None = None
 ) -> InvalidationResult:
     """
     Invalidate caches after new data ingestion.
@@ -497,29 +473,26 @@ def invalidate_after_data_ingestion(
     all_errors = [e for r in results for e in r.errors]
     total_time = sum(r.execution_time_ms for r in results)
 
-    logger.info(
-        f"Post-ingestion invalidation complete: {total_deleted} keys cleared"
-    )
+    logger.info(f"Post-ingestion invalidation complete: {total_deleted} keys cleared")
 
     return InvalidationResult(
         keys_matched=total_matched,
         keys_deleted=total_deleted,
         patterns_used=patterns,
         execution_time_ms=total_time,
-        errors=all_errors
+        errors=all_errors,
     )
 
 
 if __name__ == "__main__":
     """Test cache invalidator."""
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("CACHE INVALIDATOR TEST")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     invalidator = CacheInvalidator()
 
@@ -546,10 +519,7 @@ if __name__ == "__main__":
 
     # Test 4: Query invalidation
     print("TEST 4: Query Invalidation")
-    result = invalidator.invalidate_queries([
-        "games_season_2024",
-        "player_stats_2024_week_10"
-    ])
+    result = invalidator.invalidate_queries(["games_season_2024", "player_stats_2024_week_10"])
     print(f"  Deleted: {result.keys_deleted} keys")
     print()
 
@@ -565,6 +535,6 @@ if __name__ == "__main__":
     print(f"  Stats: {stats}")
     print()
 
-    print("="*60)
+    print("=" * 60)
     print("✅ ALL TESTS COMPLETE")
-    print("="*60)
+    print("=" * 60)

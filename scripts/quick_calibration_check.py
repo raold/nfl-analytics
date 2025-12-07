@@ -13,15 +13,15 @@ print("=" * 80)
 print()
 
 # Filter to rows with ensemble predictions
-ensemble_df = df[df['prediction_mean'].notna()].copy()
+ensemble_df = df[df["prediction_mean"].notna()].copy()
 
 print(f"Total predictions: {len(ensemble_df)}")
 print()
 
 # Calculate ensemble coverage
-actual = ensemble_df['actual_yards'].values
-q05 = ensemble_df['prediction_q05'].values
-q95 = ensemble_df['prediction_q95'].values
+actual = ensemble_df["actual_yards"].values
+q05 = ensemble_df["prediction_q05"].values
+q95 = ensemble_df["prediction_q95"].values
 
 in_interval = (actual >= q05) & (actual <= q95)
 coverage = in_interval.mean() * 100
@@ -40,7 +40,7 @@ print(f"Median Interval Width: {median_width:.1f} yards")
 print()
 
 # Std analysis
-stds = ensemble_df['prediction_std'].values
+stds = ensemble_df["prediction_std"].values
 mean_std = stds.mean()
 
 print(f"Mean Std: {mean_std:.1f} yards")
@@ -49,7 +49,7 @@ print(f"Observed vs Expected: {mean_width / (3.29 * mean_std):.2f}x")
 print()
 
 # MAE
-mae = np.abs(actual - ensemble_df['prediction_mean'].values).mean()
+mae = np.abs(actual - ensemble_df["prediction_mean"].values).mean()
 print(f"MAE: {mae:.1f} yards")
 print()
 
@@ -59,12 +59,12 @@ print("MODEL AVAILABILITY")
 print("=" * 80)
 print()
 
-for model in ['bayesian', 'xgboost', 'bnn', 'bnn_calibrated']:
+for model in ["bayesian", "xgboost", "bnn", "bnn_calibrated"]:
     col = f"{model}_mean"
     if col in df.columns:
         n = df[col].notna().sum()
         pct = n / len(df) * 100
-        model_mae = np.abs(df[col].values - df['actual_yards'].values).mean()
+        model_mae = np.abs(df[col].values - df["actual_yards"].values).mean()
         print(f"{model.upper():15s}: {n:5d} predictions ({pct:5.1f}%), MAE={model_mae:.1f} yards")
 
 print()

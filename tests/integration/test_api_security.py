@@ -29,7 +29,7 @@ from psycopg.rows import dict_row
 API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql://dro:sicillionbillions@localhost:5544/devdb01"  # pragma: allowlist secret
+    "postgresql://dro:sicillionbillions@localhost:5544/devdb01",  # pragma: allowlist secret
 )
 
 # Test API key (provisioned in migration 045)
@@ -49,10 +49,7 @@ def api_key(db_conn):
     """Create test API key for tests"""
     # Use existing test key from migration
     with db_conn.cursor() as cur:
-        cur.execute(
-            "SELECT * FROM auth.api_keys WHERE api_key = %s",
-            (TEST_API_KEY,)
-        )
+        cur.execute("SELECT * FROM auth.api_keys WHERE api_key = %s", (TEST_API_KEY,))
         key_record = cur.fetchone()
 
         if key_record:
@@ -74,8 +71,8 @@ def api_key(db_conn):
                 "dev_test",
                 "test@nfl-analytics.local",
                 1000,  # High limit for testing
-                10000
-            )
+                10000,
+            ),
         )
         db_conn.commit()
         return TEST_API_KEY
@@ -102,8 +99,8 @@ def expired_api_key(db_conn):
                 "Expired Test Key",
                 "expired_",
                 "test@nfl-analytics.local",
-                datetime.utcnow() - timedelta(days=1)
-            )
+                datetime.utcnow() - timedelta(days=1),
+            ),
         )
         db_conn.commit()
 
@@ -138,8 +135,8 @@ def revoked_api_key(db_conn):
                 "test@nfl-analytics.local",
                 True,
                 datetime.utcnow(),
-                "Testing revocation"
-            )
+                "Testing revocation",
+            ),
         )
         db_conn.commit()
 
@@ -173,8 +170,8 @@ class TestAuthentication:
             json={
                 "game_id": "2024_10_KC_LV",
                 "player_id": "00-0033873",
-                "stat_type": "passing_yards"
-            }
+                "stat_type": "passing_yards",
+            },
         )
 
         assert response.status_code == 401
@@ -188,8 +185,8 @@ class TestAuthentication:
             json={
                 "game_id": "2024_10_KC_LV",
                 "player_id": "00-0033873",
-                "stat_type": "passing_yards"
-            }
+                "stat_type": "passing_yards",
+            },
         )
 
         assert response.status_code == 401
@@ -203,8 +200,8 @@ class TestAuthentication:
             json={
                 "game_id": "2024_10_KC_LV",
                 "player_id": "00-0033873",
-                "stat_type": "passing_yards"
-            }
+                "stat_type": "passing_yards",
+            },
         )
 
         # Should succeed (200) or fail gracefully (503 if models not loaded)
@@ -222,10 +219,7 @@ class TestAuthentication:
         assert response.status_code == 401
 
         # With valid API key
-        response = requests.get(
-            f"{API_BASE_URL}/models",
-            headers={"X-API-Key": api_key}
-        )
+        response = requests.get(f"{API_BASE_URL}/models", headers={"X-API-Key": api_key})
         assert response.status_code in [200, 503]
 
     def test_expired_api_key(self, expired_api_key):
@@ -236,8 +230,8 @@ class TestAuthentication:
             json={
                 "game_id": "2024_10_KC_LV",
                 "player_id": "00-0033873",
-                "stat_type": "passing_yards"
-            }
+                "stat_type": "passing_yards",
+            },
         )
 
         assert response.status_code == 403
@@ -251,8 +245,8 @@ class TestAuthentication:
             json={
                 "game_id": "2024_10_KC_LV",
                 "player_id": "00-0033873",
-                "stat_type": "passing_yards"
-            }
+                "stat_type": "passing_yards",
+            },
         )
 
         assert response.status_code == 403
@@ -264,10 +258,7 @@ class TestRateLimiting:
 
     def test_rate_limit_headers(self, api_key):
         """Response should include rate limit headers"""
-        response = requests.get(
-            f"{API_BASE_URL}/models",
-            headers={"X-API-Key": api_key}
-        )
+        response = requests.get(f"{API_BASE_URL}/models", headers={"X-API-Key": api_key})
 
         # Check rate limit headers present
         assert "X-RateLimit-Limit" in response.headers
@@ -286,17 +277,11 @@ class TestRateLimiting:
     def test_rate_limit_decrement(self, api_key):
         """Rate limit remaining should decrement with requests"""
         # Make first request
-        response1 = requests.get(
-            f"{API_BASE_URL}/models",
-            headers={"X-API-Key": api_key}
-        )
+        response1 = requests.get(f"{API_BASE_URL}/models", headers={"X-API-Key": api_key})
         remaining1 = int(response1.headers["X-RateLimit-Remaining"])
 
         # Make second request
-        response2 = requests.get(
-            f"{API_BASE_URL}/models",
-            headers={"X-API-Key": api_key}
-        )
+        response2 = requests.get(f"{API_BASE_URL}/models", headers={"X-API-Key": api_key})
         remaining2 = int(response2.headers["X-RateLimit-Remaining"])
 
         # Remaining should decrease (or stay same if window reset)
@@ -324,8 +309,8 @@ class TestRateLimiting:
                     "low_limi",
                     "test@nfl-analytics.local",
                     5,  # Very low limit
-                    50
-                )
+                    50,
+                ),
             )
             db_conn.commit()
 
@@ -333,8 +318,7 @@ class TestRateLimiting:
             # Make requests until limit exceeded
             for i in range(10):
                 response = requests.get(
-                    f"{API_BASE_URL}/models",
-                    headers={"X-API-Key": low_limit_key}
+                    f"{API_BASE_URL}/models", headers={"X-API-Key": low_limit_key}
                 )
 
                 if response.status_code == 429:
@@ -368,7 +352,7 @@ class TestAPIKeyManagement:
                 owner_name="Test User",
                 rate_limit_per_hour=100,
                 rate_limit_per_day=1000,
-                expires_in_days=90
+                expires_in_days=90,
             )
 
             # Validate key created
@@ -380,10 +364,7 @@ class TestAPIKeyManagement:
 
             # Cleanup
             with db_conn.cursor() as cur:
-                cur.execute(
-                    "DELETE FROM auth.api_keys WHERE api_key = %s",
-                    (key_info["api_key"],)
-                )
+                cur.execute("DELETE FROM auth.api_keys WHERE api_key = %s", (key_info["api_key"],))
                 db_conn.commit()
 
         finally:
@@ -403,17 +384,14 @@ class TestAPIKeyManagement:
                 VALUES (%s, %s, %s, %s)
                 RETURNING api_key
                 """,
-                (temp_key, "Temp Key", "temp_key", "test@example.com")
+                (temp_key, "Temp Key", "temp_key", "test@example.com"),
             )
             db_conn.commit()
 
         try:
             # Revoke key
             with db_conn.cursor() as cur:
-                cur.execute(
-                    "SELECT auth.revoke_api_key(%s, %s)",
-                    (temp_key, "Testing revocation")
-                )
+                cur.execute("SELECT auth.revoke_api_key(%s, %s)", (temp_key, "Testing revocation"))
                 revoked = cur.fetchone()[0]
                 db_conn.commit()
 
@@ -423,7 +401,7 @@ class TestAPIKeyManagement:
             with db_conn.cursor() as cur:
                 cur.execute(
                     "SELECT is_revoked, revoked_reason FROM auth.api_keys WHERE api_key = %s",
-                    (temp_key,)
+                    (temp_key,),
                 )
                 result = cur.fetchone()
                 assert result["is_revoked"] is True
@@ -439,17 +417,11 @@ class TestAPIKeyManagement:
         """Test database rate limit check function"""
         # Get API key ID
         with db_conn.cursor() as cur:
-            cur.execute(
-                "SELECT id FROM auth.api_keys WHERE api_key = %s",
-                (api_key,)
-            )
+            cur.execute("SELECT id FROM auth.api_keys WHERE api_key = %s", (api_key,))
             key_id = cur.fetchone()["id"]
 
             # Check hourly rate limit
-            cur.execute(
-                "SELECT * FROM auth.check_rate_limit(%s, 1)",
-                (key_id,)
-            )
+            cur.execute("SELECT * FROM auth.check_rate_limit(%s, 1)", (key_id,))
             result = cur.fetchone()
 
             # Validate result structure
@@ -520,24 +492,15 @@ class TestUsageTracking:
         """API requests should be logged in database"""
         # Get API key ID
         with db_conn.cursor() as cur:
-            cur.execute(
-                "SELECT id FROM auth.api_keys WHERE api_key = %s",
-                (api_key,)
-            )
+            cur.execute("SELECT id FROM auth.api_keys WHERE api_key = %s", (api_key,))
             key_id = cur.fetchone()["id"]
 
             # Count usage before request
-            cur.execute(
-                "SELECT COUNT(*) FROM auth.api_key_usage WHERE api_key_id = %s",
-                (key_id,)
-            )
+            cur.execute("SELECT COUNT(*) FROM auth.api_key_usage WHERE api_key_id = %s", (key_id,))
             count_before = cur.fetchone()["count"]
 
         # Make API request
-        response = requests.get(
-            f"{API_BASE_URL}/models",
-            headers={"X-API-Key": api_key}
-        )
+        response = requests.get(f"{API_BASE_URL}/models", headers={"X-API-Key": api_key})
         assert response.status_code in [200, 503]
 
         # Allow time for async logging
@@ -545,10 +508,7 @@ class TestUsageTracking:
 
         # Count usage after request
         with db_conn.cursor() as cur:
-            cur.execute(
-                "SELECT COUNT(*) FROM auth.api_key_usage WHERE api_key_id = %s",
-                (key_id,)
-            )
+            cur.execute("SELECT COUNT(*) FROM auth.api_key_usage WHERE api_key_id = %s", (key_id,))
             count_after = cur.fetchone()["count"]
 
         # Usage should be incremented (or at least not decreased)
@@ -558,20 +518,14 @@ class TestUsageTracking:
         """last_used_at should be updated on API request"""
         # Get last_used_at before request
         with db_conn.cursor() as cur:
-            cur.execute(
-                "SELECT last_used_at FROM auth.api_keys WHERE api_key = %s",
-                (api_key,)
-            )
+            cur.execute("SELECT last_used_at FROM auth.api_keys WHERE api_key = %s", (api_key,))
             last_used_before = cur.fetchone()["last_used_at"]
 
         # Wait to ensure different timestamp
         time.sleep(2)
 
         # Make API request
-        response = requests.get(
-            f"{API_BASE_URL}/models",
-            headers={"X-API-Key": api_key}
-        )
+        response = requests.get(f"{API_BASE_URL}/models", headers={"X-API-Key": api_key})
         assert response.status_code in [200, 503]
 
         # Allow time for async update
@@ -579,10 +533,7 @@ class TestUsageTracking:
 
         # Get last_used_at after request
         with db_conn.cursor() as cur:
-            cur.execute(
-                "SELECT last_used_at FROM auth.api_keys WHERE api_key = %s",
-                (api_key,)
-            )
+            cur.execute("SELECT last_used_at FROM auth.api_keys WHERE api_key = %s", (api_key,))
             last_used_after = cur.fetchone()["last_used_at"]
 
         # last_used_at should be updated (or at least not earlier)

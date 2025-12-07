@@ -48,6 +48,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class BankrollState:
     """Current bankroll state for risk calculations"""
+
     total: float
     initial: float
     peak: float = 0.0
@@ -86,53 +87,40 @@ class MetricsRegistry:
 
         # ROI (Return on Investment) - Gauge updated after each bet
         self.roi = Gauge(
-            'props_roi_total',
-            'Current overall ROI percentage',
-            registry=self.registry
+            "props_roi_total", "Current overall ROI percentage", registry=self.registry
         )
 
         # Win rate - Gauge computed from counters
         self.win_rate = Gauge(
-            'props_win_rate',
-            'Current win rate (wins / total bets)',
-            registry=self.registry
+            "props_win_rate", "Current win rate (wins / total bets)", registry=self.registry
         )
 
         # Sharpe ratio - Gauge updated daily
         self.sharpe_ratio = Gauge(
-            'props_sharpe_ratio',
-            'Risk-adjusted return (Sharpe ratio)',
-            registry=self.registry
+            "props_sharpe_ratio", "Risk-adjusted return (Sharpe ratio)", registry=self.registry
         )
 
         # Total profit in dollars
         self.profit_total = Gauge(
-            'props_profit_total',
-            'Total profit/loss in dollars',
-            registry=self.registry
+            "props_profit_total", "Total profit/loss in dollars", registry=self.registry
         )
 
         # Bankroll value
         self.bankroll_gauge = Gauge(
-            'props_bankroll',
-            'Current bankroll value in dollars',
-            registry=self.registry
+            "props_bankroll", "Current bankroll value in dollars", registry=self.registry
         )
 
         # Bets placed counter (by stat type)
         self.bets_total = Counter(
-            'props_bets_total',
-            'Total number of bets placed',
-            ['stat_type'],
-            registry=self.registry
+            "props_bets_total", "Total number of bets placed", ["stat_type"], registry=self.registry
         )
 
         # Wins counter (by stat type)
         self.wins_total = Counter(
-            'props_wins_total',
-            'Total number of winning bets',
-            ['stat_type'],
-            registry=self.registry
+            "props_wins_total",
+            "Total number of winning bets",
+            ["stat_type"],
+            registry=self.registry,
         )
 
         # ================================================================
@@ -141,48 +129,46 @@ class MetricsRegistry:
 
         # Mean Absolute Error (by stat type)
         self.prediction_mae = Gauge(
-            'props_prediction_mae',
-            'Mean absolute error in yards/points',
-            ['stat_type'],
-            registry=self.registry
+            "props_prediction_mae",
+            "Mean absolute error in yards/points",
+            ["stat_type"],
+            registry=self.registry,
         )
 
         # Calibration coverage (90% CI)
         self.calibration_coverage = Gauge(
-            'props_calibration_coverage',
-            'Fraction of actuals within 90% prediction interval',
-            registry=self.registry
+            "props_calibration_coverage",
+            "Fraction of actuals within 90% prediction interval",
+            registry=self.registry,
         )
 
         # Prediction uncertainty (mean)
         self.uncertainty_mean = Gauge(
-            'props_uncertainty_mean',
-            'Average prediction uncertainty (interval width)',
-            ['stat_type'],
-            registry=self.registry
+            "props_uncertainty_mean",
+            "Average prediction uncertainty (interval width)",
+            ["stat_type"],
+            registry=self.registry,
         )
 
         # Predictions generated counter
         self.predictions_total = Counter(
-            'props_predictions_total',
-            'Total number of predictions generated',
-            ['stat_type'],
-            registry=self.registry
+            "props_predictions_total",
+            "Total number of predictions generated",
+            ["stat_type"],
+            registry=self.registry,
         )
 
         # Model version info
         self.model_version = Info(
-            'props_model_version',
-            'Current model version metadata',
-            registry=self.registry
+            "props_model_version", "Current model version metadata", registry=self.registry
         )
 
         # Feature drift detector
         self.feature_drift = Gauge(
-            'props_feature_drift',
-            'Feature distribution drift metric (KL divergence)',
-            ['feature_name'],
-            registry=self.registry
+            "props_feature_drift",
+            "Feature distribution drift metric (KL divergence)",
+            ["feature_name"],
+            registry=self.registry,
         )
 
         # ================================================================
@@ -191,44 +177,40 @@ class MetricsRegistry:
 
         # Current drawdown (from peak)
         self.drawdown_current = Gauge(
-            'props_drawdown_current',
-            'Current drawdown as percentage from peak',
-            registry=self.registry
+            "props_drawdown_current",
+            "Current drawdown as percentage from peak",
+            registry=self.registry,
         )
 
         # Maximum drawdown seen
         self.drawdown_max = Gauge(
-            'props_drawdown_max',
-            'Maximum drawdown percentage since inception',
-            registry=self.registry
+            "props_drawdown_max",
+            "Maximum drawdown percentage since inception",
+            registry=self.registry,
         )
 
         # Total exposure (dollars at risk)
         self.exposure_total = Gauge(
-            'props_exposure_total',
-            'Total dollar amount currently at risk',
-            registry=self.registry
+            "props_exposure_total", "Total dollar amount currently at risk", registry=self.registry
         )
 
         # Open positions count
         self.open_positions = Gauge(
-            'props_open_positions',
-            'Number of currently open bet positions',
-            registry=self.registry
+            "props_open_positions", "Number of currently open bet positions", registry=self.registry
         )
 
         # Largest single position size
         self.position_largest = Gauge(
-            'props_position_largest',
-            'Largest single bet position in dollars',
-            registry=self.registry
+            "props_position_largest",
+            "Largest single bet position in dollars",
+            registry=self.registry,
         )
 
         # Stop-loss trigger status
         self.stop_loss_triggered = Gauge(
-            'props_stop_loss_triggered',
-            'Stop-loss has been triggered (1=yes, 0=no)',
-            registry=self.registry
+            "props_stop_loss_triggered",
+            "Stop-loss has been triggered (1=yes, 0=no)",
+            registry=self.registry,
         )
 
         # ================================================================
@@ -237,58 +219,56 @@ class MetricsRegistry:
 
         # Prediction latency histogram
         self.prediction_latency = Histogram(
-            'props_prediction_latency_seconds',
-            'Time to generate a prediction',
+            "props_prediction_latency_seconds",
+            "Time to generate a prediction",
             buckets=[0.1, 0.25, 0.5, 1.0, 2.0, 5.0, 10.0],
-            registry=self.registry
+            registry=self.registry,
         )
 
         # Bet placement latency
         self.bet_placement_latency = Histogram(
-            'props_bet_placement_latency_seconds',
-            'Time to place a bet via API',
+            "props_bet_placement_latency_seconds",
+            "Time to place a bet via API",
             buckets=[0.5, 1.0, 2.0, 5.0, 10.0],
-            registry=self.registry
+            registry=self.registry,
         )
 
         # Database query latency
         self.database_query_latency = Histogram(
-            'props_database_query_seconds',
-            'Database query execution time',
-            ['query_type'],
+            "props_database_query_seconds",
+            "Database query execution time",
+            ["query_type"],
             buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 5.0],
-            registry=self.registry
+            registry=self.registry,
         )
 
         # Model loading time
         self.model_load_latency = Summary(
-            'props_model_load_seconds',
-            'Time to load model from disk',
-            registry=self.registry
+            "props_model_load_seconds", "Time to load model from disk", registry=self.registry
         )
 
         # API errors counter
         self.errors_total = Counter(
-            'props_errors_total',
-            'Total number of errors encountered',
-            ['error_type'],
-            registry=self.registry
+            "props_errors_total",
+            "Total number of errors encountered",
+            ["error_type"],
+            registry=self.registry,
         )
 
         # API requests counter
         self.requests_total = Counter(
-            'props_requests_total',
-            'Total number of API requests',
-            ['endpoint'],
-            registry=self.registry
+            "props_requests_total",
+            "Total number of API requests",
+            ["endpoint"],
+            registry=self.registry,
         )
 
         # Feature generation latency
         self.feature_latency = Histogram(
-            'props_feature_generation_seconds',
-            'Time to generate features for prediction',
+            "props_feature_generation_seconds",
+            "Time to generate features for prediction",
             buckets=[0.1, 0.5, 1.0, 2.0, 5.0],
-            registry=self.registry
+            registry=self.registry,
         )
 
         # ================================================================
@@ -297,59 +277,57 @@ class MetricsRegistry:
 
         # Cache hit rate (total across all cache types)
         self.cache_hit_rate = Gauge(
-            'redis_cache_hit_rate',
-            'Redis cache hit rate (0.0 to 1.0)',
-            registry=self.registry
+            "redis_cache_hit_rate", "Redis cache hit rate (0.0 to 1.0)", registry=self.registry
         )
 
         # Cache hits counter
         self.cache_hits_total = Counter(
-            'redis_cache_hits_total',
-            'Total number of cache hits',
-            ['cache_type'],
-            registry=self.registry
+            "redis_cache_hits_total",
+            "Total number of cache hits",
+            ["cache_type"],
+            registry=self.registry,
         )
 
         # Cache misses counter
         self.cache_misses_total = Counter(
-            'redis_cache_misses_total',
-            'Total number of cache misses',
-            ['cache_type'],
-            registry=self.registry
+            "redis_cache_misses_total",
+            "Total number of cache misses",
+            ["cache_type"],
+            registry=self.registry,
         )
 
         # Cache size (number of keys)
         self.cache_size_keys = Gauge(
-            'redis_cache_size_keys',
-            'Number of keys currently in cache',
-            ['cache_type'],
-            registry=self.registry
+            "redis_cache_size_keys",
+            "Number of keys currently in cache",
+            ["cache_type"],
+            registry=self.registry,
         )
 
         # Cache memory usage (bytes)
         self.cache_size_bytes = Gauge(
-            'redis_cache_size_bytes',
-            'Memory used by cache in bytes',
-            registry=self.registry
+            "redis_cache_size_bytes", "Memory used by cache in bytes", registry=self.registry
         )
 
         # Cache evictions (due to memory limits)
         self.cache_evictions_total = Counter(
-            'redis_cache_evictions_total',
-            'Total number of cache key evictions',
-            registry=self.registry
+            "redis_cache_evictions_total",
+            "Total number of cache key evictions",
+            registry=self.registry,
         )
 
         # Cache operation latency
         self.cache_operation_latency = Histogram(
-            'redis_cache_operation_seconds',
-            'Redis cache operation latency',
-            ['operation'],  # get, set, delete
+            "redis_cache_operation_seconds",
+            "Redis cache operation latency",
+            ["operation"],  # get, set, delete
             buckets=[0.001, 0.005, 0.01, 0.05, 0.1, 0.5],
-            registry=self.registry
+            registry=self.registry,
         )
 
-        logger.info("Metrics registry initialized with all production metrics (including Redis cache)")
+        logger.info(
+            "Metrics registry initialized with all production metrics (including Redis cache)"
+        )
 
     # ================================================================
     # PERFORMANCE TRACKING METHODS
@@ -361,9 +339,9 @@ class MetricsRegistry:
         profit: float,
         stake: float,
         odds: float,
-        stat_type: str = 'unknown',
+        stat_type: str = "unknown",
         predicted_value: float | None = None,
-        actual_value: float | None = None
+        actual_value: float | None = None,
     ):
         """
         Record a bet outcome and update performance metrics.
@@ -414,11 +392,11 @@ class MetricsRegistry:
         try:
             total_bets = sum(
                 self.bets_total.labels(stat_type=st)._value.get()
-                for st in ['passing_yards', 'rushing_yards', 'receiving_yards', 'unknown']
+                for st in ["passing_yards", "rushing_yards", "receiving_yards", "unknown"]
             )
             total_wins = sum(
                 self.wins_total.labels(stat_type=st)._value.get()
-                for st in ['passing_yards', 'rushing_yards', 'receiving_yards', 'unknown']
+                for st in ["passing_yards", "rushing_yards", "receiving_yards", "unknown"]
             )
             if total_bets > 0:
                 self.win_rate.set(total_wins / total_bets)
@@ -440,7 +418,7 @@ class MetricsRegistry:
         exposure: float,
         open_positions: int,
         largest_position: float,
-        stop_loss_triggered: bool = False
+        stop_loss_triggered: bool = False,
     ):
         """
         Update risk management metrics.
@@ -463,9 +441,7 @@ class MetricsRegistry:
     def initialize_bankroll(self, initial_amount: float):
         """Initialize bankroll at start of production"""
         self.bankroll = BankrollState(
-            total=initial_amount,
-            initial=initial_amount,
-            peak=initial_amount
+            total=initial_amount, initial=initial_amount, peak=initial_amount
         )
         self.bankroll_gauge.set(initial_amount)
         self.profit_total.set(0.0)
@@ -481,7 +457,7 @@ class MetricsRegistry:
         stat_type: str,
         predicted_value: float,
         uncertainty: float,
-        actual_value: float | None = None
+        actual_value: float | None = None,
     ):
         """
         Record a prediction and update model quality metrics.
@@ -517,7 +493,7 @@ class MetricsRegistry:
             version: Model version string (e.g., "v3.1")
             metadata: Additional metadata (training_date, mae, etc.)
         """
-        self.model_version.info({'version': version, **metadata})
+        self.model_version.info({"version": version, **metadata})
         logger.info(f"Model version updated: {version}")
 
     def record_feature_drift(self, feature_name: str, drift_score: float):
@@ -609,7 +585,7 @@ class MetricsRegistry:
         misses: int | None = None,
         size_keys: int | None = None,
         size_bytes: int | None = None,
-        evictions: int | None = None
+        evictions: int | None = None,
     ):
         """
         Update Redis cache metrics from cache statistics.
@@ -707,7 +683,8 @@ class MetricsRegistry:
                 elif isinstance(keyspace, str):
                     # Parse "keys=100,expires=50,avg_ttl=3600000"
                     import re
-                    match = re.search(r'keys=(\d+)', keyspace)
+
+                    match = re.search(r"keys=(\d+)", keyspace)
                     keys_count = int(match.group(1)) if match else 0
                 else:
                     keys_count = 0
@@ -760,9 +737,9 @@ if __name__ == "__main__":
         profit=45.50,
         stake=100.0,
         odds=-110,
-        stat_type='passing_yards',
+        stat_type="passing_yards",
         predicted_value=285.0,
-        actual_value=292.0
+        actual_value=292.0,
     )
 
     # Losing bet
@@ -771,17 +748,14 @@ if __name__ == "__main__":
         profit=-100.0,
         stake=100.0,
         odds=-110,
-        stat_type='rushing_yards',
+        stat_type="rushing_yards",
         predicted_value=95.0,
-        actual_value=78.0
+        actual_value=78.0,
     )
 
     # Update risk metrics
     metrics_registry.update_risk_metrics(
-        exposure=500.0,
-        open_positions=3,
-        largest_position=200.0,
-        stop_loss_triggered=False
+        exposure=500.0, open_positions=3, largest_position=200.0, stop_loss_triggered=False
     )
 
     # Update model quality metrics

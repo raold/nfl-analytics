@@ -24,7 +24,6 @@ def test_analytic_joint_exceedance_basic():
     assert result is not None
 
 
-
 def test_analytic_joint_exceedance_edge_cases():
     """Test analytic_joint_exceedance: edge cases."""
     # Arrange
@@ -37,12 +36,10 @@ def test_analytic_joint_exceedance_edge_cases():
     assert result is not None
 
 
-
 def test_analytic_joint_exceedance_error_handling():
     """Test analytic_joint_exceedance error handling."""
     with pytest.raises(ValueError):
         analytic_joint_exceedance(invalid_input)
-
 
 
 @given(st.integers())
@@ -55,25 +52,17 @@ def test_analytic_joint_exceedance_property_idempotent(self, rho):
     assert analytic_joint_exceedance(rho) == result, "idempotent violated"
 
 
-
 def test_analytic_joint_exceedance_no_temporal_leakage():
     """Ensure analytic_joint_exceedance doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = analytic_joint_exceedance(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"
 
 
 def test_empirical_joint_exceedance_basic():
@@ -88,7 +77,6 @@ def test_empirical_joint_exceedance_basic():
     assert result is not None
 
 
-
 def test_empirical_joint_exceedance_edge_cases():
     """Test empirical_joint_exceedance: edge cases."""
     # Arrange
@@ -101,12 +89,10 @@ def test_empirical_joint_exceedance_edge_cases():
     assert result is not None
 
 
-
 def test_empirical_joint_exceedance_error_handling():
     """Test empirical_joint_exceedance error handling."""
     with pytest.raises(ValueError):
         empirical_joint_exceedance(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -119,25 +105,17 @@ def test_empirical_joint_exceedance_property_idempotent(self, rho, n_samples, se
     assert empirical_joint_exceedance(rho, n_samples, seed) == result, "idempotent violated"
 
 
-
 def test_empirical_joint_exceedance_no_temporal_leakage():
     """Ensure empirical_joint_exceedance doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = empirical_joint_exceedance(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"
 
 
 def test_generate_copula_figure_basic():
@@ -152,7 +130,6 @@ def test_generate_copula_figure_basic():
     assert result is not None
 
 
-
 def test_generate_copula_figure_edge_cases():
     """Test generate_copula_figure: edge cases."""
     # Arrange
@@ -165,12 +142,10 @@ def test_generate_copula_figure_edge_cases():
     assert result is not None
 
 
-
 def test_generate_copula_figure_error_handling():
     """Test generate_copula_figure error handling."""
     with pytest.raises(ValueError):
         generate_copula_figure(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -181,7 +156,6 @@ def test_generate_copula_figure_property_idempotent(self, rho_range, n_samples, 
 
     # Assert property
     assert generate_copula_figure(rho_range, n_samples, seed) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -196,7 +170,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -209,9 +182,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

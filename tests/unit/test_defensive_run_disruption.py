@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_rushing_plays_basic():
@@ -56,7 +53,6 @@ def test_load_rushing_plays_basic():
     assert result is not None
 
 
-
 def test_load_rushing_plays_edge_cases():
     """Test load_rushing_plays: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_rushing_plays_edge_cases():
     assert result is not None
 
 
-
 def test_load_rushing_plays_error_handling():
     """Test load_rushing_plays error handling."""
     with pytest.raises(ValueError):
         load_rushing_plays(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_load_rushing_plays_property_idempotent(self, self, start_season, end_se
 
     # Assert property
     assert load_rushing_plays(self, start_season, end_season) == result, "idempotent violated"
-
 
 
 def test_calculate_team_run_defense_metrics_basic():
@@ -100,7 +93,6 @@ def test_calculate_team_run_defense_metrics_basic():
     assert result is not None
 
 
-
 def test_calculate_team_run_defense_metrics_edge_cases():
     """Test calculate_team_run_defense_metrics: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_calculate_team_run_defense_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_team_run_defense_metrics_error_handling():
     """Test calculate_team_run_defense_metrics error handling."""
     with pytest.raises(ValueError):
         calculate_team_run_defense_metrics(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_calculate_team_run_defense_metrics_property_idempotent(self, self, play
 
     # Assert property
     assert calculate_team_run_defense_metrics(self, plays) == result, "idempotent violated"
-
 
 
 def test_calculate_situational_run_defense_basic():
@@ -144,7 +133,6 @@ def test_calculate_situational_run_defense_basic():
     assert result is not None
 
 
-
 def test_calculate_situational_run_defense_edge_cases():
     """Test calculate_situational_run_defense: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_calculate_situational_run_defense_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_situational_run_defense_error_handling():
     """Test calculate_situational_run_defense error handling."""
     with pytest.raises(ValueError):
         calculate_situational_run_defense(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_calculate_situational_run_defense_property_idempotent(self, self, plays
 
     # Assert property
     assert calculate_situational_run_defense(self, plays) == result, "idempotent violated"
-
 
 
 def test_calculate_short_yardage_defense_basic():
@@ -188,7 +173,6 @@ def test_calculate_short_yardage_defense_basic():
     assert result is not None
 
 
-
 def test_calculate_short_yardage_defense_edge_cases():
     """Test calculate_short_yardage_defense: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_calculate_short_yardage_defense_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_short_yardage_defense_error_handling():
     """Test calculate_short_yardage_defense error handling."""
     with pytest.raises(ValueError):
         calculate_short_yardage_defense(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -217,7 +199,6 @@ def test_calculate_short_yardage_defense_property_idempotent(self, self, plays):
 
     # Assert property
     assert calculate_short_yardage_defense(self, plays) == result, "idempotent violated"
-
 
 
 def test_add_rolling_averages_basic():
@@ -232,7 +213,6 @@ def test_add_rolling_averages_basic():
     assert result is not None
 
 
-
 def test_add_rolling_averages_edge_cases():
     """Test add_rolling_averages: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_add_rolling_averages_edge_cases():
     assert result is not None
 
 
-
 def test_add_rolling_averages_error_handling():
     """Test add_rolling_averages error handling."""
     with pytest.raises(ValueError):
         add_rolling_averages(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -261,7 +239,6 @@ def test_add_rolling_averages_property_idempotent(self, self, metrics, window):
 
     # Assert property
     assert add_rolling_averages(self, metrics, window) == result, "idempotent violated"
-
 
 
 def test_add_percentile_ranks_basic():
@@ -276,7 +253,6 @@ def test_add_percentile_ranks_basic():
     assert result is not None
 
 
-
 def test_add_percentile_ranks_edge_cases():
     """Test add_percentile_ranks: edge cases."""
     # Arrange
@@ -289,12 +265,10 @@ def test_add_percentile_ranks_edge_cases():
     assert result is not None
 
 
-
 def test_add_percentile_ranks_error_handling():
     """Test add_percentile_ranks error handling."""
     with pytest.raises(ValueError):
         add_percentile_ranks(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -305,7 +279,6 @@ def test_add_percentile_ranks_property_idempotent(self, self, metrics):
 
     # Assert property
     assert add_percentile_ranks(self, metrics) == result, "idempotent violated"
-
 
 
 def test_generate_all_features_basic():
@@ -320,7 +293,6 @@ def test_generate_all_features_basic():
     assert result is not None
 
 
-
 def test_generate_all_features_edge_cases():
     """Test generate_all_features: edge cases."""
     # Arrange
@@ -333,12 +305,10 @@ def test_generate_all_features_edge_cases():
     assert result is not None
 
 
-
 def test_generate_all_features_error_handling():
     """Test generate_all_features error handling."""
     with pytest.raises(ValueError):
         generate_all_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -349,4 +319,3 @@ def test_generate_all_features_property_idempotent(self, self, start_season, end
 
     # Assert property
     assert generate_all_features(self, start_season, end_season) == result, "idempotent violated"
-

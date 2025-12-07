@@ -8,16 +8,16 @@ Runs essential validators only (no security, no A/B tests).
 Usage:
     # Before backtest
     python scripts/quick_validate.py --before-backtest
-    
+
     # Before model training
     python scripts/quick_validate.py --before-training
-    
+
     # Before dashboard update
     python scripts/quick_validate.py --before-dashboard
-    
+
     # Validate specific R model
     python scripts/quick_validate.py --r-model R/state_space_team_ratings.R
-    
+
     # Quick check (data leakage + SQL schema only)
     python scripts/quick_validate.py --quick
 
@@ -38,6 +38,7 @@ try:
     from rich.panel import Panel
     from rich.progress import Progress, SpinnerColumn, TextColumn
     from rich.table import Table
+
     RICH_AVAILABLE = True
 except ImportError:
     RICH_AVAILABLE = False
@@ -46,6 +47,7 @@ except ImportError:
 # Import validators (optional - they may not all exist yet)
 try:
     from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+
     HAS_SPORTS_VALIDATOR = True
 except (ImportError, NameError) as e:
     HAS_SPORTS_VALIDATOR = False
@@ -53,6 +55,7 @@ except (ImportError, NameError) as e:
 
 try:
     from py.utils.statistical_validator import StatisticalValidator
+
     HAS_STATISTICAL_VALIDATOR = True
 except (ImportError, NameError) as e:
     HAS_STATISTICAL_VALIDATOR = False
@@ -60,6 +63,7 @@ except (ImportError, NameError) as e:
 
 try:
     from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
+
     HAS_ENSEMBLE_MONITOR = True
 except (ImportError, NameError) as e:
     HAS_ENSEMBLE_MONITOR = False
@@ -67,6 +71,7 @@ except (ImportError, NameError) as e:
 
 try:
     from py.utils.betting_validator import BettingValidator
+
     HAS_BETTING_VALIDATOR = True
 except (ImportError, NameError) as e:
     HAS_BETTING_VALIDATOR = False
@@ -86,11 +91,11 @@ def print_colored(message: str, style: str = ""):
 def run_validator(name: str, validator_func) -> tuple[bool, str]:
     """
     Run a validator and return (success, message).
-    
+
     Args:
         name: Validator name
         validator_func: Function that returns (success: bool, message: str)
-        
+
     Returns:
         (success, message) tuple
     """
@@ -114,7 +119,7 @@ def run_validator(name: str, validator_func) -> tuple[bool, str]:
     status_icon = "✅" if success else "❌"
     print_colored(
         f"{status_icon} {name}: {'PASSED' if success else 'FAILED'} ({elapsed:.1f}s)",
-        "green" if success else "red"
+        "green" if success else "red",
     )
 
     if not success:
@@ -168,7 +173,9 @@ def validate_statistical_models() -> tuple[bool, str]:
 
     try:
         # Check recent .rds files
-        rds_files = list(Path("models/bayesian").glob("*.rds")) if Path("models/bayesian").exists() else []
+        rds_files = (
+            list(Path("models/bayesian").glob("*.rds")) if Path("models/bayesian").exists() else []
+        )
 
         if not rds_files:
             return True, "No Bayesian models to validate"
@@ -218,37 +225,25 @@ Examples:
   
   # Before model training
   python scripts/quick_validate.py --before-training
-        """
+        """,
     )
 
     parser.add_argument(
-        "--before-backtest",
-        action="store_true",
-        help="Run all validators before backtest"
+        "--before-backtest", action="store_true", help="Run all validators before backtest"
     )
 
     parser.add_argument(
-        "--before-training",
-        action="store_true",
-        help="Run validators before model training"
+        "--before-training", action="store_true", help="Run validators before model training"
     )
 
     parser.add_argument(
-        "--before-dashboard",
-        action="store_true",
-        help="Run validators before dashboard update"
+        "--before-dashboard", action="store_true", help="Run validators before dashboard update"
     )
 
-    parser.add_argument(
-        "--r-model",
-        type=str,
-        help="Validate specific R model file"
-    )
+    parser.add_argument("--r-model", type=str, help="Validate specific R model file")
 
     parser.add_argument(
-        "--quick",
-        action="store_true",
-        help="Quick check (data leakage + SQL schema only)"
+        "--quick", action="store_true", help="Quick check (data leakage + SQL schema only)"
     )
 
     args = parser.parse_args()
@@ -296,7 +291,7 @@ Examples:
             Panel.fit(
                 "[bold cyan]NFL Analytics Quick Validation[/bold cyan]\n"
                 "[dim]Single-user edition - no security checks[/dim]",
-                border_style="cyan"
+                border_style="cyan",
             )
         )
     else:

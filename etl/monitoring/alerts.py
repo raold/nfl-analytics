@@ -41,7 +41,7 @@ class Alert:
             AlertLevel.INFO: "ℹ️",
             AlertLevel.WARNING: "⚠️",
             AlertLevel.ERROR: "❌",
-            AlertLevel.CRITICAL: "🚨"
+            AlertLevel.CRITICAL: "🚨",
         }
         emoji = level_emoji.get(self.level, "")
         return f"{emoji} [{self.level.value.upper()}] {self.title}: {self.message}"
@@ -63,7 +63,7 @@ class AlertManager:
         self,
         alert_log_path: Path | None = None,
         email_config: dict | None = None,
-        min_level: AlertLevel = AlertLevel.WARNING
+        min_level: AlertLevel = AlertLevel.WARNING,
     ):
         """
         Initialize alert manager.
@@ -87,13 +87,7 @@ class AlertManager:
 
         logger.info(f"AlertManager initialized (min_level={min_level.value})")
 
-    def send(
-        self,
-        level: AlertLevel,
-        title: str,
-        message: str,
-        context: dict | None = None
-    ):
+    def send(self, level: AlertLevel, title: str, message: str, context: dict | None = None):
         """
         Send an alert.
 
@@ -107,11 +101,7 @@ class AlertManager:
             return
 
         alert = Alert(
-            level=level,
-            title=title,
-            message=message,
-            timestamp=datetime.now(),
-            context=context
+            level=level, title=title, message=message, timestamp=datetime.now(), context=context
         )
 
         # Add to history
@@ -132,7 +122,7 @@ class AlertManager:
             AlertLevel.INFO: logging.INFO,
             AlertLevel.WARNING: logging.WARNING,
             AlertLevel.ERROR: logging.ERROR,
-            AlertLevel.CRITICAL: logging.CRITICAL
+            AlertLevel.CRITICAL: logging.CRITICAL,
         }
         log_level = level_map.get(alert.level, logging.INFO)
         logger.log(log_level, str(alert))
@@ -140,9 +130,11 @@ class AlertManager:
     def _write_to_file(self, alert: Alert):
         """Write alert to file."""
         try:
-            with open(self.alert_log_path, 'a') as f:
+            with open(self.alert_log_path, "a") as f:
                 timestamp_str = alert.timestamp.isoformat()
-                f.write(f"{timestamp_str} | {alert.level.value.upper()} | {alert.title} | {alert.message}\n")
+                f.write(
+                    f"{timestamp_str} | {alert.level.value.upper()} | {alert.title} | {alert.message}\n"
+                )
         except Exception as e:
             logger.error(f"Failed to write alert to file: {e}")
 
@@ -152,22 +144,22 @@ class AlertManager:
             return
 
         try:
-            smtp_host = self.email_config.get('smtp_host')
-            smtp_port = self.email_config.get('smtp_port', 587)
-            from_addr = self.email_config.get('from_addr')
-            to_addrs = self.email_config.get('to_addrs', [])
-            username = self.email_config.get('username')
-            password = self.email_config.get('password')
+            smtp_host = self.email_config.get("smtp_host")
+            smtp_port = self.email_config.get("smtp_port", 587)
+            from_addr = self.email_config.get("from_addr")
+            to_addrs = self.email_config.get("to_addrs", [])
+            username = self.email_config.get("username")
+            password = self.email_config.get("password")
 
             if not all([smtp_host, from_addr, to_addrs]):
                 logger.warning("Email config incomplete, skipping email alert")
                 return
 
             # Create message
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = f"[{alert.level.value.upper()}] ETL Alert: {alert.title}"
-            msg['From'] = from_addr
-            msg['To'] = ', '.join(to_addrs)
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = f"[{alert.level.value.upper()}] ETL Alert: {alert.title}"
+            msg["From"] = from_addr
+            msg["To"] = ", ".join(to_addrs)
 
             # Create email body
             text_body = f"""
@@ -204,8 +196,8 @@ This is an automated alert from the NFL Analytics ETL system.
 </html>
             """
 
-            part1 = MIMEText(text_body, 'plain')
-            part2 = MIMEText(html_body, 'html')
+            part1 = MIMEText(text_body, "plain")
+            part2 = MIMEText(html_body, "html")
             msg.attach(part1)
             msg.attach(part2)
 
@@ -239,18 +231,15 @@ This is an automated alert from the NFL Analytics ETL system.
             level=AlertLevel.ERROR,
             title=f"Pipeline Failed: {pipeline_name}",
             message=f"Pipeline '{pipeline_name}' failed with error: {error_message}",
-            context=context
+            context=context,
         )
 
-    def data_quality_issue(self, table: str, issue: str, severity: str = "warning", context: dict | None = None):
+    def data_quality_issue(
+        self, table: str, issue: str, severity: str = "warning", context: dict | None = None
+    ):
         """Send data quality issue alert."""
         level = AlertLevel.WARNING if severity == "warning" else AlertLevel.ERROR
-        self.send(
-            level=level,
-            title=f"Data Quality Issue: {table}",
-            message=issue,
-            context=context
-        )
+        self.send(level=level, title=f"Data Quality Issue: {table}", message=issue, context=context)
 
     def api_rate_limit_warning(self, api_name: str, remaining: int, limit: int):
         """Send API rate limit warning."""
@@ -259,7 +248,7 @@ This is an automated alert from the NFL Analytics ETL system.
             level=AlertLevel.WARNING,
             title=f"API Rate Limit Warning: {api_name}",
             message=f"API usage at {pct_used:.1f}% ({remaining}/{limit} remaining)",
-            context={"api": api_name, "remaining": remaining, "limit": limit}
+            context={"api": api_name, "remaining": remaining, "limit": limit},
         )
 
     def pipeline_slow(self, pipeline_name: str, duration: float, expected: float):
@@ -269,7 +258,7 @@ This is an automated alert from the NFL Analytics ETL system.
             level=AlertLevel.WARNING,
             title=f"Slow Pipeline: {pipeline_name}",
             message=f"Pipeline took {duration:.1f}s (expected {expected:.1f}s, +{slowdown_pct:.0f}%)",
-            context={"pipeline": pipeline_name, "duration": duration, "expected": expected}
+            context={"pipeline": pipeline_name, "duration": duration, "expected": expected},
         )
 
 
@@ -279,30 +268,20 @@ if __name__ == "__main__":
     alert_manager = AlertManager(min_level=AlertLevel.INFO)
 
     # Send various alerts
-    alert_manager.send(
-        AlertLevel.INFO,
-        "Pipeline Started",
-        "Daily schedules pipeline started"
-    )
+    alert_manager.send(AlertLevel.INFO, "Pipeline Started", "Daily schedules pipeline started")
 
     alert_manager.pipeline_failed(
-        "odds_ingestion",
-        "API key invalid",
-        context={"api": "the-odds-api", "status_code": 401}
+        "odds_ingestion", "API key invalid", context={"api": "the-odds-api", "status_code": 401}
     )
 
     alert_manager.data_quality_issue(
         "games",
         "10 games missing scores",
         severity="warning",
-        context={"missing_count": 10, "total_games": 272}
+        context={"missing_count": 10, "total_games": 272},
     )
 
-    alert_manager.api_rate_limit_warning(
-        "the-odds-api",
-        remaining=50,
-        limit=500
-    )
+    alert_manager.api_rate_limit_warning("the-odds-api", remaining=50, limit=500)
 
     # Get summary
     print("\nAlert Summary:")

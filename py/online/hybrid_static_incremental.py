@@ -17,7 +17,7 @@ Date: November 12, 2025
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import logging
 import pickle
@@ -76,13 +76,13 @@ class HybridStaticIncrementalXGBoost:
 
         # Static model (trained once on historical data)
         self.static_params = static_params or {
-            'n_estimators': 100,
-            'max_depth': 6,
-            'learning_rate': 0.1,
-            'subsample': 0.8,
-            'colsample_bytree': 0.8,
-            'random_state': 42,
-            'objective': 'reg:squarederror',
+            "n_estimators": 100,
+            "max_depth": 6,
+            "learning_rate": 0.1,
+            "subsample": 0.8,
+            "colsample_bytree": 0.8,
+            "random_state": 42,
+            "objective": "reg:squarederror",
         }
         self.static_model = xgb.XGBRegressor(**self.static_params)
         self.static_scaler = StandardScaler()
@@ -91,11 +91,11 @@ class HybridStaticIncrementalXGBoost:
 
         # Incremental model (sliding window, frequent retraining)
         self.incremental_params = incremental_params or {
-            'window_size': 150,
-            'retrain_every': 20,
-            'n_estimators': 50,
-            'max_depth': 5,
-            'learning_rate': 0.1,
+            "window_size": 150,
+            "retrain_every": 20,
+            "n_estimators": 50,
+            "max_depth": 5,
+            "learning_rate": 0.1,
         }
         self.incremental_model = IncrementalXGBoost(**self.incremental_params)
 
@@ -118,10 +118,10 @@ class HybridStaticIncrementalXGBoost:
         logger.info(f"Training static model on {len(X_train)} historical samples")
 
         # Convert to numpy if needed
-        if hasattr(X_train, 'values'):
+        if hasattr(X_train, "values"):
             self.feature_names = list(X_train.columns)
             X_train = X_train.values
-        if hasattr(y_train, 'values'):
+        if hasattr(y_train, "values"):
             y_train = y_train.values
 
         # Standardize features
@@ -149,7 +149,7 @@ class HybridStaticIncrementalXGBoost:
             raise ValueError("Must call fit_static() before predict()")
 
         # Convert to numpy if needed
-        if hasattr(X, 'values'):
+        if hasattr(X, "values"):
             X = X.values
 
         # Static prediction
@@ -163,15 +163,12 @@ class HybridStaticIncrementalXGBoost:
             if self.feature_names:
                 x_dict = {name: X[i, j] for j, name in enumerate(self.feature_names)}
             else:
-                x_dict = {f'f{j}': X[i, j] for j in range(X.shape[1])}
+                x_dict = {f"f{j}": X[i, j] for j in range(X.shape[1])}
             incremental_preds.append(self.incremental_model.predict_one(x_dict))
         incremental_pred = np.array(incremental_preds)
 
         # Weighted blend
-        hybrid_pred = (
-            self.static_weight * static_pred +
-            self.incremental_weight * incremental_pred
-        )
+        hybrid_pred = self.static_weight * static_pred + self.incremental_weight * incremental_pred
 
         return hybrid_pred
 
@@ -210,14 +207,11 @@ class HybridStaticIncrementalXGBoost:
             if self.feature_names:
                 x_dict = {name: x_array[j] for j, name in enumerate(self.feature_names)}
             else:
-                x_dict = {f'f{j}': x_array[j] for j in range(len(x_array))}
+                x_dict = {f"f{j}": x_array[j] for j in range(len(x_array))}
         incremental_pred = self.incremental_model.predict_one(x_dict)
 
         # Weighted blend
-        hybrid_pred = (
-            self.static_weight * static_pred +
-            self.incremental_weight * incremental_pred
-        )
+        hybrid_pred = self.static_weight * static_pred + self.incremental_weight * incremental_pred
 
         return hybrid_pred
 
@@ -236,7 +230,7 @@ class HybridStaticIncrementalXGBoost:
             if self.feature_names:
                 x_dict = {name: x[j] for j, name in enumerate(self.feature_names)}
             else:
-                x_dict = {f'f{j}': x[j] for j in range(len(x))}
+                x_dict = {f"f{j}": x[j] for j in range(len(x))}
         else:
             x_dict = x
 
@@ -253,26 +247,26 @@ class HybridStaticIncrementalXGBoost:
         path.mkdir(parents=True, exist_ok=True)
 
         # Save static model
-        with open(path / 'static_model.pkl', 'wb') as f:
+        with open(path / "static_model.pkl", "wb") as f:
             pickle.dump(self.static_model, f)
 
         # Save static scaler
-        with open(path / 'static_scaler.pkl', 'wb') as f:
+        with open(path / "static_scaler.pkl", "wb") as f:
             pickle.dump(self.static_scaler, f)
 
         # Save incremental model
-        self.incremental_model.save(str(path / 'incremental_model.pkl'))
+        self.incremental_model.save(str(path / "incremental_model.pkl"))
 
         # Save metadata
         metadata = {
-            'static_weight': self.static_weight,
-            'incremental_weight': self.incremental_weight,
-            'static_params': self.static_params,
-            'incremental_params': self.incremental_params,
-            'feature_names': self.feature_names,
-            'static_trained': self.static_trained,
+            "static_weight": self.static_weight,
+            "incremental_weight": self.incremental_weight,
+            "static_params": self.static_params,
+            "incremental_params": self.incremental_params,
+            "feature_names": self.feature_names,
+            "static_trained": self.static_trained,
         }
-        with open(path / 'metadata.pkl', 'wb') as f:
+        with open(path / "metadata.pkl", "wb") as f:
             pickle.dump(metadata, f)
 
         logger.info(f"Hybrid model saved to {path}")
@@ -287,24 +281,24 @@ class HybridStaticIncrementalXGBoost:
         path = Path(path)
 
         # Load static model
-        with open(path / 'static_model.pkl', 'rb') as f:
+        with open(path / "static_model.pkl", "rb") as f:
             self.static_model = pickle.load(f)
 
         # Load static scaler
-        with open(path / 'static_scaler.pkl', 'rb') as f:
+        with open(path / "static_scaler.pkl", "rb") as f:
             self.static_scaler = pickle.load(f)
 
         # Load incremental model
-        self.incremental_model.load(str(path / 'incremental_model.pkl'))
+        self.incremental_model.load(str(path / "incremental_model.pkl"))
 
         # Load metadata
-        with open(path / 'metadata.pkl', 'rb') as f:
+        with open(path / "metadata.pkl", "rb") as f:
             metadata = pickle.load(f)
 
-        self.static_weight = metadata['static_weight']
-        self.incremental_weight = metadata['incremental_weight']
-        self.feature_names = metadata.get('feature_names')
-        self.static_trained = metadata.get('static_trained', True)
+        self.static_weight = metadata["static_weight"]
+        self.incremental_weight = metadata["incremental_weight"]
+        self.feature_names = metadata.get("feature_names")
+        self.static_trained = metadata.get("static_trained", True)
 
         logger.info(f"Hybrid model loaded from {path}")
 
@@ -318,12 +312,12 @@ class HybridStaticIncrementalXGBoost:
         incremental_metrics = self.incremental_model.get_metrics()
 
         return {
-            'static_weight': self.static_weight,
-            'incremental_weight': self.incremental_weight,
-            'static_trained': self.static_trained,
-            'incremental_window_size': incremental_metrics['window_size'],
-            'incremental_counter': incremental_metrics['counter'],
-            'incremental_retrains': incremental_metrics['retrains'],
+            "static_weight": self.static_weight,
+            "incremental_weight": self.incremental_weight,
+            "static_trained": self.static_trained,
+            "incremental_window_size": incremental_metrics["window_size"],
+            "incremental_counter": incremental_metrics["counter"],
+            "incremental_retrains": incremental_metrics["retrains"],
         }
 
 

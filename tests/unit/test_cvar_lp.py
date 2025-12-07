@@ -23,7 +23,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_load_matrix_basic():
@@ -56,7 +53,6 @@ def test_load_matrix_basic():
     assert result is not None
 
 
-
 def test_load_matrix_edge_cases():
     """Test load_matrix: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_matrix_edge_cases():
     assert result is not None
 
 
-
 def test_load_matrix_error_handling():
     """Test load_matrix error handling."""
     with pytest.raises(ValueError):
         load_matrix(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_load_matrix_property_idempotent(self, path):
 
     # Assert property
     assert load_matrix(path) == result, "idempotent violated"
-
 
 
 def test_solve_cvar_lp_basic():
@@ -100,7 +93,6 @@ def test_solve_cvar_lp_basic():
     assert result is not None
 
 
-
 def test_solve_cvar_lp_edge_cases():
     """Test solve_cvar_lp: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_solve_cvar_lp_edge_cases():
     assert result is not None
 
 
-
 def test_solve_cvar_lp_error_handling():
     """Test solve_cvar_lp error handling."""
     with pytest.raises(ValueError):
         solve_cvar_lp(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_solve_cvar_lp_property_idempotent(self, returns, alpha, cap, budget, so
 
     # Assert property
     assert solve_cvar_lp(returns, alpha, cap, budget, solver) == result, "idempotent violated"
-
 
 
 def test_heuristic_stakes_basic():
@@ -144,7 +133,6 @@ def test_heuristic_stakes_basic():
     assert result is not None
 
 
-
 def test_heuristic_stakes_edge_cases():
     """Test heuristic_stakes: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_heuristic_stakes_edge_cases():
     assert result is not None
 
 
-
 def test_heuristic_stakes_error_handling():
     """Test heuristic_stakes error handling."""
     with pytest.raises(ValueError):
         heuristic_stakes(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_heuristic_stakes_property_idempotent(self, mat, cap, budget):
 
     # Assert property
     assert heuristic_stakes(mat, cap, budget) == result, "idempotent violated"
-
 
 
 def test_cvar_of_stakes_basic():
@@ -188,7 +173,6 @@ def test_cvar_of_stakes_basic():
     assert result is not None
 
 
-
 def test_cvar_of_stakes_edge_cases():
     """Test cvar_of_stakes: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_cvar_of_stakes_edge_cases():
     assert result is not None
 
 
-
 def test_cvar_of_stakes_error_handling():
     """Test cvar_of_stakes error handling."""
     with pytest.raises(ValueError):
         cvar_of_stakes(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -217,7 +199,6 @@ def test_cvar_of_stakes_property_idempotent(self, mat, f, alpha):
 
     # Assert property
     assert cvar_of_stakes(mat, f, alpha) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -232,7 +213,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -245,9 +225,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

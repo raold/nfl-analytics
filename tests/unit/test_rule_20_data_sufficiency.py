@@ -52,15 +52,15 @@ def train_meta_learning_model(X, y):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
         assert result.failed
         assert result.status == ValidationStatus.FAILED
-        assert 'Meta-learning without data validation' in str(result.details['issues'])
-        assert result.details['issues'][0]['severity'] == 'CRITICAL'
-        assert result.details['issues'][0]['required_samples'] == 5000
+        assert "Meta-learning without data validation" in str(result.details["issues"])
+        assert result.details["issues"][0]["severity"] == "CRITICAL"
+        assert result.details["issues"][0]["required_samples"] == 5000
 
     def test_meta_learning_with_validation_passes(self, router, tmp_path):
         """Meta-learning with proper data validation should PASS."""
@@ -79,7 +79,7 @@ def train_meta_learning_model(X, y):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
@@ -100,12 +100,12 @@ def train_adaptive_weight_predictor(context_features, optimal_weights):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
         assert result.failed
-        assert 'Meta-learning without data validation' in str(result.details['issues'])
+        assert "Meta-learning without data validation" in str(result.details["issues"])
 
 
 class TestRule20OnlineLearning:
@@ -128,15 +128,15 @@ def train_online_learning_model(stream_data):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
         assert result.failed
-        issues = [i for i in result.details['issues'] if 'Online learning' in i['pattern']]
+        issues = [i for i in result.details["issues"] if "Online learning" in i["pattern"]]
         assert len(issues) == 1
-        assert issues[0]['severity'] == 'HIGH'
-        assert issues[0]['required_samples'] == 1000
+        assert issues[0]["severity"] == "HIGH"
+        assert issues[0]["required_samples"] == 1000
 
     def test_online_learning_with_warmstart_passes(self, router, tmp_path):
         """Online learning with proper initialization should PASS."""
@@ -164,7 +164,7 @@ def train_online_learning_model(stream_data):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
@@ -191,16 +191,16 @@ def train_lightgbm_model(X, y):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
         assert result.failed
-        issues = [i for i in result.details['issues'] if 'Complex tree model' in i['pattern']]
+        issues = [i for i in result.details["issues"] if "Complex tree model" in i["pattern"]]
         assert len(issues) == 1
-        assert issues[0]['severity'] == 'HIGH'
-        assert issues[0]['required_samples'] == 1500  # 15 features * 100
-        assert issues[0]['features_detected'] == 15
+        assert issues[0]["severity"] == "HIGH"
+        assert issues[0]["required_samples"] == 1500  # 15 features * 100
+        assert issues[0]["features_detected"] == 15
 
     def test_xgboost_with_validation_passes(self, router, tmp_path):
         """XGBoost with proper sample validation should PASS."""
@@ -221,7 +221,7 @@ def train_xgboost_model(X, y):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
@@ -253,15 +253,15 @@ def optimize_ensemble_weights(component_predictions, actuals):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
         assert result.failed
-        issues = [i for i in result.details['issues'] if 'Ensemble reweighting' in i['pattern']]
+        issues = [i for i in result.details["issues"] if "Ensemble reweighting" in i["pattern"]]
         assert len(issues) == 1
-        assert issues[0]['severity'] == 'MEDIUM'
-        assert issues[0]['required_samples'] == 100
+        assert issues[0]["severity"] == "MEDIUM"
+        assert issues[0]["required_samples"] == 100
 
     def test_ensemble_optimization_with_validation_passes(self, router, tmp_path):
         """Ensemble optimization with component validation should PASS."""
@@ -288,7 +288,7 @@ def optimize_ensemble_weights(component_predictions, actuals):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
@@ -312,15 +312,15 @@ def compare_models(model_a_errors, model_b_errors):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
         assert result.failed
-        issues = [i for i in result.details['issues'] if 'Statistical tests' in i['pattern']]
+        issues = [i for i in result.details["issues"] if "Statistical tests" in i["pattern"]]
         assert len(issues) == 1
-        assert issues[0]['severity'] == 'MEDIUM'
-        assert issues[0]['required_samples'] == 30
+        assert issues[0]["severity"] == "MEDIUM"
+        assert issues[0]["required_samples"] == 30
 
     def test_statistical_test_with_validation_passes(self, router, tmp_path):
         """Statistical test with proper sample validation should PASS."""
@@ -339,7 +339,7 @@ def compare_models(model_a_errors, model_b_errors):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
@@ -361,7 +361,7 @@ def test_meta_learning_insufficient_data():
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
@@ -376,7 +376,7 @@ python train_meta_learning.py
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         # Should not trigger (not Python file)
         assert len(rule_20_results) == 1
@@ -403,13 +403,13 @@ def train_and_test(meta_features, y, test_results_a, test_results_b):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
         assert result.failed
         # Should detect both tree model issue and statistical test issue
-        assert len(result.details['issues']) >= 2
+        assert len(result.details["issues"]) >= 2
 
     def test_v7_failure_prevented(self, router, tmp_path):
         """Ensure Rule 20 would have prevented v7.0 failure."""
@@ -438,15 +438,15 @@ def train_meta_weight_predictor(context_features, optimal_weights):
         file_path.write_text(content)
 
         results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
         assert result.failed
-        assert 'CRITICAL' in str(result.details['issues'])
-        assert '5000' in str(result.details['issues'])
+        assert "CRITICAL" in str(result.details["issues"])
+        assert "5000" in str(result.details["issues"])
         # Verify postmortem reference included
-        assert 'v7.0' in str(result.details)
+        assert "v7.0" in str(result.details)
 
 
 class TestRule20Decorator:
@@ -460,6 +460,7 @@ class TestRule20Decorator:
         def train_meta_model(X, y):
             # Missing data validation
             import lightgbm as lgb
+
             model = lgb.LGBMRegressor()
             model.fit(X, y)
             return model
@@ -505,26 +506,26 @@ def comprehensive_training_pipeline():
     file_path.write_text(content)
 
     results = router.validate_file(str(file_path), content)
-    rule_20_results = [r for r in results if r.agent_name == 'data_sufficiency_gate']
+    rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
 
     assert len(rule_20_results) == 1
     result = rule_20_results[0]
     assert result.failed
 
     # Should detect all patterns
-    issues = result.details['issues']
-    patterns_detected = [i['pattern'] for i in issues]
+    issues = result.details["issues"]
+    patterns_detected = [i["pattern"] for i in issues]
 
-    assert any('Meta-learning' in p for p in patterns_detected)
-    assert any('Online learning' in p for p in patterns_detected)
-    assert any('Complex tree model' in p for p in patterns_detected)
-    assert any('Ensemble reweighting' in p for p in patterns_detected)
-    assert any('Statistical tests' in p for p in patterns_detected)
+    assert any("Meta-learning" in p for p in patterns_detected)
+    assert any("Online learning" in p for p in patterns_detected)
+    assert any("Complex tree model" in p for p in patterns_detected)
+    assert any("Ensemble reweighting" in p for p in patterns_detected)
+    assert any("Statistical tests" in p for p in patterns_detected)
 
     # Verify severity classification
-    critical_count = result.details['critical_count']
+    critical_count = result.details["critical_count"]
     assert critical_count >= 1  # At least meta-learning
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

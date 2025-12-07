@@ -23,7 +23,6 @@ def test_run_single_ablation_basic():
     assert result is not None
 
 
-
 def test_run_single_ablation_edge_cases():
     """Test run_single_ablation: edge cases."""
     # Arrange
@@ -36,23 +35,31 @@ def test_run_single_ablation_edge_cases():
     assert result is not None
 
 
-
 def test_run_single_ablation_error_handling():
     """Test run_single_ablation error handling."""
     with pytest.raises(ValueError):
         run_single_ablation(invalid_input)
 
 
-
-@given(st.text(min_size=1, max_size=100), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_run_single_ablation_property_idempotent(self, config_name, config, seasons, epochs, device, output_dir):
+@given(
+    st.text(min_size=1, max_size=100),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_run_single_ablation_property_idempotent(
+    self, config_name, config, seasons, epochs, device, output_dir
+):
     """Property test: function is idempotent."""
     # Act
     result = run_single_ablation(config_name, config, seasons, epochs, device, output_dir)
 
     # Assert property
-    assert run_single_ablation(config_name, config, seasons, epochs, device, output_dir) == result, "idempotent violated"
-
+    assert (
+        run_single_ablation(config_name, config, seasons, epochs, device, output_dir) == result
+    ), "idempotent violated"
 
 
 def test_run_ablation_study_basic():
@@ -67,7 +74,6 @@ def test_run_ablation_study_basic():
     assert result is not None
 
 
-
 def test_run_ablation_study_edge_cases():
     """Test run_ablation_study: edge cases."""
     # Arrange
@@ -80,12 +86,10 @@ def test_run_ablation_study_edge_cases():
     assert result is not None
 
 
-
 def test_run_ablation_study_error_handling():
     """Test run_ablation_study error handling."""
     with pytest.raises(ValueError):
         run_ablation_study(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -95,8 +99,9 @@ def test_run_ablation_study_property_idempotent(self, configs, seasons, epochs, 
     result = run_ablation_study(configs, seasons, epochs, device, output_dir)
 
     # Assert property
-    assert run_ablation_study(configs, seasons, epochs, device, output_dir) == result, "idempotent violated"
-
+    assert (
+        run_ablation_study(configs, seasons, epochs, device, output_dir) == result
+    ), "idempotent violated"
 
 
 def test_generate_summary_table_basic():
@@ -111,7 +116,6 @@ def test_generate_summary_table_basic():
     assert result is not None
 
 
-
 def test_generate_summary_table_edge_cases():
     """Test generate_summary_table: edge cases."""
     # Arrange
@@ -124,12 +128,10 @@ def test_generate_summary_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_summary_table_error_handling():
     """Test generate_summary_table error handling."""
     with pytest.raises(ValueError):
         generate_summary_table(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +142,6 @@ def test_generate_summary_table_property_idempotent(self, results, output_dir):
 
     # Assert property
     assert generate_summary_table(results, output_dir) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -155,7 +156,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -168,9 +168,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

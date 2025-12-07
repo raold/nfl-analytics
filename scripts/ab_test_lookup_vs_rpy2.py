@@ -38,6 +38,7 @@ from py.ensemble.r_prediction_lookup import RModelPredictionLookup
 # Import rpy2 interface (for comparison)
 try:
     from py.ensemble.r_model_interface import RModelInterface
+
     RPY2_AVAILABLE = True
 except ImportError:
     print("⚠️  WARNING: rpy2 not available, skipping rpy2 comparison")
@@ -58,10 +59,10 @@ class ABTestRunner:
     # Success criteria thresholds
     MAE_TOLERANCE_YARDS = 0.5  # ±0.5 yards
     LATENCY_TARGET_MS = 100.0  # <100ms for lookup
-    MIN_SUCCESS_RATE = 0.99    # 99% success rate
+    MIN_SUCCESS_RATE = 0.99  # 99% success rate
 
     # R model names
-    R_MODELS = ['state_space_v2', 'hierarchical_v2', 'informative_priors_v2']
+    R_MODELS = ["state_space_v2", "hierarchical_v2", "informative_priors_v2"]
 
     def __init__(self, verbose: bool = True):
         """Initialize A/B test runner."""
@@ -81,11 +82,7 @@ class ABTestRunner:
         self.lookup_errors = []
         self.rpy2_errors = []
 
-    def get_test_games(
-        self,
-        season: int = 2024,
-        sample_size: int = None
-    ) -> pd.DataFrame:
+    def get_test_games(self, season: int = 2024, sample_size: int = None) -> pd.DataFrame:
         """
         Get player-games for testing.
 
@@ -97,11 +94,7 @@ class ABTestRunner:
             DataFrame with (player_id, season, week, actual_yards)
         """
         conn = psycopg2.connect(
-            host='localhost',
-            port=5544,
-            dbname='devdb01',
-            user='dro',
-            password='sicillionbillions'
+            host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
         )
 
         query = f"""
@@ -130,11 +123,7 @@ class ABTestRunner:
         return df
 
     def test_lookup_method(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        actual_yards: float
+        self, player_id: str, season: int, week: int, actual_yards: float
     ) -> dict:
         """
         Test PostgreSQL lookup method.
@@ -164,42 +153,36 @@ class ABTestRunner:
             for model in self.R_MODELS:
                 pred_dict = preds.get(model)
                 if pred_dict is not None:
-                    predictions[model] = pred_dict['mean']
+                    predictions[model] = pred_dict["mean"]
                 else:
                     predictions[model] = None
 
             return {
-                'player_id': player_id,
-                'season': season,
-                'week': week,
-                'actual_yards': actual_yards,
-                'predictions': predictions,
-                'latency_ms': elapsed_ms,
-                'success': True,
-                'error': None
+                "player_id": player_id,
+                "season": season,
+                "week": week,
+                "actual_yards": actual_yards,
+                "predictions": predictions,
+                "latency_ms": elapsed_ms,
+                "success": True,
+                "error": None,
             }
 
         except Exception as e:
             elapsed_ms = (time.time() - start_time) * 1000
 
             return {
-                'player_id': player_id,
-                'season': season,
-                'week': week,
-                'actual_yards': actual_yards,
-                'predictions': {model: None for model in self.R_MODELS},
-                'latency_ms': elapsed_ms,
-                'success': False,
-                'error': str(e)
+                "player_id": player_id,
+                "season": season,
+                "week": week,
+                "actual_yards": actual_yards,
+                "predictions": {model: None for model in self.R_MODELS},
+                "latency_ms": elapsed_ms,
+                "success": False,
+                "error": str(e),
             }
 
-    def test_rpy2_method(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        actual_yards: float
-    ) -> dict:
+    def test_rpy2_method(self, player_id: str, season: int, week: int, actual_yards: float) -> dict:
         """
         Test rpy2 real-time prediction method.
 
@@ -207,14 +190,14 @@ class ABTestRunner:
         """
         if not RPY2_AVAILABLE:
             return {
-                'player_id': player_id,
-                'season': season,
-                'week': week,
-                'actual_yards': actual_yards,
-                'predictions': {model: None for model in self.R_MODELS},
-                'latency_ms': 0.0,
-                'success': False,
-                'error': 'rpy2 not available'
+                "player_id": player_id,
+                "season": season,
+                "week": week,
+                "actual_yards": actual_yards,
+                "predictions": {model: None for model in self.R_MODELS},
+                "latency_ms": 0.0,
+                "success": False,
+                "error": "rpy2 not available",
             }
 
         start_time = time.time()
@@ -226,23 +209,23 @@ class ABTestRunner:
             # State-Space v2
             try:
                 pred = self.rpy2_interface.predict_state_space(player_id, season, week)
-                predictions['state_space_v2'] = pred.get('mean') if pred else None
+                predictions["state_space_v2"] = pred.get("mean") if pred else None
             except:
-                predictions['state_space_v2'] = None
+                predictions["state_space_v2"] = None
 
             # Hierarchical v2
             try:
                 pred = self.rpy2_interface.predict_hierarchical(player_id, season, week)
-                predictions['hierarchical_v2'] = pred.get('mean') if pred else None
+                predictions["hierarchical_v2"] = pred.get("mean") if pred else None
             except:
-                predictions['hierarchical_v2'] = None
+                predictions["hierarchical_v2"] = None
 
             # Informative Priors v2
             try:
                 pred = self.rpy2_interface.predict_informative_priors(player_id, season, week)
-                predictions['informative_priors_v2'] = pred.get('mean') if pred else None
+                predictions["informative_priors_v2"] = pred.get("mean") if pred else None
             except:
-                predictions['informative_priors_v2'] = None
+                predictions["informative_priors_v2"] = None
 
             elapsed_ms = (time.time() - start_time) * 1000
 
@@ -250,35 +233,31 @@ class ABTestRunner:
             success = any(p is not None for p in predictions.values())
 
             return {
-                'player_id': player_id,
-                'season': season,
-                'week': week,
-                'actual_yards': actual_yards,
-                'predictions': predictions,
-                'latency_ms': elapsed_ms,
-                'success': success,
-                'error': None if success else 'All models failed'
+                "player_id": player_id,
+                "season": season,
+                "week": week,
+                "actual_yards": actual_yards,
+                "predictions": predictions,
+                "latency_ms": elapsed_ms,
+                "success": success,
+                "error": None if success else "All models failed",
             }
 
         except Exception as e:
             elapsed_ms = (time.time() - start_time) * 1000
 
             return {
-                'player_id': player_id,
-                'season': season,
-                'week': week,
-                'actual_yards': actual_yards,
-                'predictions': {model: None for model in self.R_MODELS},
-                'latency_ms': elapsed_ms,
-                'success': False,
-                'error': str(e)
+                "player_id": player_id,
+                "season": season,
+                "week": week,
+                "actual_yards": actual_yards,
+                "predictions": {model: None for model in self.R_MODELS},
+                "latency_ms": elapsed_ms,
+                "success": False,
+                "error": str(e),
             }
 
-    def run_ab_test(
-        self,
-        season: int = 2024,
-        sample_size: int = None
-    ) -> dict:
+    def run_ab_test(self, season: int = 2024, sample_size: int = None) -> dict:
         """
         Run A/B test comparing lookup vs rpy2.
 
@@ -310,32 +289,26 @@ class ABTestRunner:
 
             # Test lookup method
             lookup_result = self.test_lookup_method(
-                row['player_id'],
-                int(row['season']),
-                int(row['week']),
-                row['actual_yards']
+                row["player_id"], int(row["season"]), int(row["week"]), row["actual_yards"]
             )
             self.lookup_results.append(lookup_result)
 
-            if lookup_result['success']:
-                self.lookup_latencies.append(lookup_result['latency_ms'])
+            if lookup_result["success"]:
+                self.lookup_latencies.append(lookup_result["latency_ms"])
             else:
-                self.lookup_errors.append(lookup_result['error'])
+                self.lookup_errors.append(lookup_result["error"])
 
             # Test rpy2 method (if available)
             if RPY2_AVAILABLE:
                 rpy2_result = self.test_rpy2_method(
-                    row['player_id'],
-                    int(row['season']),
-                    int(row['week']),
-                    row['actual_yards']
+                    row["player_id"], int(row["season"]), int(row["week"]), row["actual_yards"]
                 )
                 self.rpy2_results.append(rpy2_result)
 
-                if rpy2_result['success']:
-                    self.rpy2_latencies.append(rpy2_result['latency_ms'])
+                if rpy2_result["success"]:
+                    self.rpy2_latencies.append(rpy2_result["latency_ms"])
                 else:
-                    self.rpy2_errors.append(rpy2_result['error'])
+                    self.rpy2_errors.append(rpy2_result["error"])
 
         print()
         print("✅ A/B testing complete")
@@ -363,19 +336,13 @@ class ABTestRunner:
 
         # Lookup method analysis
         lookup_stats = self._analyze_method_results(
-            self.lookup_results,
-            self.lookup_latencies,
-            self.lookup_errors,
-            method_name='Lookup'
+            self.lookup_results, self.lookup_latencies, self.lookup_errors, method_name="Lookup"
         )
 
         # rpy2 method analysis (if available)
         if RPY2_AVAILABLE and len(self.rpy2_results) > 0:
             rpy2_stats = self._analyze_method_results(
-                self.rpy2_results,
-                self.rpy2_latencies,
-                self.rpy2_errors,
-                method_name='rpy2'
+                self.rpy2_results, self.rpy2_latencies, self.rpy2_errors, method_name="rpy2"
             )
         else:
             rpy2_stats = None
@@ -387,25 +354,21 @@ class ABTestRunner:
         success = self._evaluate_success_criteria(lookup_stats, comparison)
 
         return {
-            'lookup': lookup_stats,
-            'rpy2': rpy2_stats,
-            'comparison': comparison,
-            'success_criteria_met': success
+            "lookup": lookup_stats,
+            "rpy2": rpy2_stats,
+            "comparison": comparison,
+            "success_criteria_met": success,
         }
 
     def _analyze_method_results(
-        self,
-        results: list[dict],
-        latencies: list[float],
-        errors: list[str],
-        method_name: str
+        self, results: list[dict], latencies: list[float], errors: list[str], method_name: str
     ) -> dict:
         """Analyze results for a single method."""
         print(f"\n{method_name} Method Results:")
         print("-" * 80)
 
         n_tests = len(results)
-        n_success = sum(1 for r in results if r['success'])
+        n_success = sum(1 for r in results if r["success"])
         success_rate = (n_success / n_tests) * 100 if n_tests > 0 else 0.0
 
         print(f"Total tests: {n_tests}")
@@ -431,9 +394,9 @@ class ABTestRunner:
         for model in self.R_MODELS:
             errors = []
             for r in results:
-                if r['success'] and r['predictions'].get(model) is not None:
-                    pred = r['predictions'][model]
-                    actual = r['actual_yards']
+                if r["success"] and r["predictions"].get(model) is not None:
+                    pred = r["predictions"][model]
+                    actual = r["actual_yards"]
                     errors.append(abs(pred - actual))
 
             if len(errors) > 0:
@@ -459,23 +422,19 @@ class ABTestRunner:
                 print(f"  {err}: {count}")
 
         return {
-            'n_tests': n_tests,
-            'n_success': n_success,
-            'success_rate': success_rate,
-            'latencies': latencies,
-            'mean_latency_ms': np.mean(latencies) if latencies else None,
-            'p50_latency_ms': np.median(latencies) if latencies else None,
-            'p95_latency_ms': np.percentile(latencies, 95) if latencies else None,
-            'model_mae': model_mae,
-            'avg_mae': np.mean(list(model_mae.values())) if model_mae else None,
-            'errors': errors
+            "n_tests": n_tests,
+            "n_success": n_success,
+            "success_rate": success_rate,
+            "latencies": latencies,
+            "mean_latency_ms": np.mean(latencies) if latencies else None,
+            "p50_latency_ms": np.median(latencies) if latencies else None,
+            "p95_latency_ms": np.percentile(latencies, 95) if latencies else None,
+            "model_mae": model_mae,
+            "avg_mae": np.mean(list(model_mae.values())) if model_mae else None,
+            "errors": errors,
         }
 
-    def _compare_methods(
-        self,
-        lookup_stats: dict,
-        rpy2_stats: dict
-    ) -> dict:
+    def _compare_methods(self, lookup_stats: dict, rpy2_stats: dict) -> dict:
         """Compare lookup vs rpy2."""
         print("\n" + "=" * 80)
         print("METHOD COMPARISON")
@@ -487,8 +446,8 @@ class ABTestRunner:
             return {}
 
         # MAE comparison
-        lookup_mae = lookup_stats.get('avg_mae')
-        rpy2_mae = rpy2_stats.get('avg_mae')
+        lookup_mae = lookup_stats.get("avg_mae")
+        rpy2_mae = rpy2_stats.get("avg_mae")
 
         if lookup_mae is not None and rpy2_mae is not None:
             mae_diff = abs(lookup_mae - rpy2_mae)
@@ -498,15 +457,17 @@ class ABTestRunner:
             print(f"  Lookup: {lookup_mae:.2f} yards")
             print(f"  rpy2: {rpy2_mae:.2f} yards")
             print(f"  Difference: {mae_diff:.2f} yards")
-            print(f"  Within tolerance (±{self.MAE_TOLERANCE_YARDS} yards)? {'✅ YES' if mae_within_tolerance else '❌ NO'}")
+            print(
+                f"  Within tolerance (±{self.MAE_TOLERANCE_YARDS} yards)? {'✅ YES' if mae_within_tolerance else '❌ NO'}"
+            )
             print()
         else:
             mae_diff = None
             mae_within_tolerance = None
 
         # Latency comparison
-        lookup_latency = lookup_stats.get('mean_latency_ms')
-        rpy2_latency = rpy2_stats.get('mean_latency_ms')
+        lookup_latency = lookup_stats.get("mean_latency_ms")
+        rpy2_latency = rpy2_stats.get("mean_latency_ms")
 
         if lookup_latency is not None and rpy2_latency is not None:
             speedup = rpy2_latency / lookup_latency
@@ -515,34 +476,34 @@ class ABTestRunner:
             print(f"  Lookup: {lookup_latency:.2f} ms")
             print(f"  rpy2: {rpy2_latency:.2f} ms")
             print(f"  Speedup: {speedup:.1f}x faster")
-            print(f"  Lookup meets target (<{self.LATENCY_TARGET_MS}ms)? {'✅ YES' if lookup_latency < self.LATENCY_TARGET_MS else '❌ NO'}")
+            print(
+                f"  Lookup meets target (<{self.LATENCY_TARGET_MS}ms)? {'✅ YES' if lookup_latency < self.LATENCY_TARGET_MS else '❌ NO'}"
+            )
             print()
         else:
             speedup = None
 
         # Reliability comparison
-        lookup_success_rate = lookup_stats.get('success_rate', 0.0) / 100
-        rpy2_success_rate = rpy2_stats.get('success_rate', 0.0) / 100
+        lookup_success_rate = lookup_stats.get("success_rate", 0.0) / 100
+        rpy2_success_rate = rpy2_stats.get("success_rate", 0.0) / 100
 
         print("Reliability:")
         print(f"  Lookup success rate: {lookup_success_rate*100:.1f}%")
         print(f"  rpy2 success rate: {rpy2_success_rate*100:.1f}%")
-        print(f"  Lookup meets target (≥{self.MIN_SUCCESS_RATE*100:.0f}%)? {'✅ YES' if lookup_success_rate >= self.MIN_SUCCESS_RATE else '❌ NO'}")
+        print(
+            f"  Lookup meets target (≥{self.MIN_SUCCESS_RATE*100:.0f}%)? {'✅ YES' if lookup_success_rate >= self.MIN_SUCCESS_RATE else '❌ NO'}"
+        )
         print()
 
         return {
-            'mae_diff': mae_diff,
-            'mae_within_tolerance': mae_within_tolerance,
-            'speedup': speedup,
-            'lookup_success_rate': lookup_success_rate,
-            'rpy2_success_rate': rpy2_success_rate
+            "mae_diff": mae_diff,
+            "mae_within_tolerance": mae_within_tolerance,
+            "speedup": speedup,
+            "lookup_success_rate": lookup_success_rate,
+            "rpy2_success_rate": rpy2_success_rate,
         }
 
-    def _evaluate_success_criteria(
-        self,
-        lookup_stats: dict,
-        comparison: dict
-    ) -> bool:
+    def _evaluate_success_criteria(self, lookup_stats: dict, comparison: dict) -> bool:
         """
         Evaluate if success criteria are met.
 
@@ -559,24 +520,28 @@ class ABTestRunner:
         criteria_met = []
 
         # Criterion 1: MAE tolerance
-        mae_within_tolerance = comparison.get('mae_within_tolerance')
+        mae_within_tolerance = comparison.get("mae_within_tolerance")
         if mae_within_tolerance is not None:
             criteria_met.append(mae_within_tolerance)
-            print(f"1. MAE within ±{self.MAE_TOLERANCE_YARDS} yards: {'✅ PASS' if mae_within_tolerance else '❌ FAIL'}")
+            print(
+                f"1. MAE within ±{self.MAE_TOLERANCE_YARDS} yards: {'✅ PASS' if mae_within_tolerance else '❌ FAIL'}"
+            )
         else:
             print("1. MAE tolerance: ⚠️  SKIPPED (rpy2 not available)")
 
         # Criterion 2: Latency
-        lookup_latency = lookup_stats.get('mean_latency_ms')
+        lookup_latency = lookup_stats.get("mean_latency_ms")
         latency_met = lookup_latency is not None and lookup_latency < self.LATENCY_TARGET_MS
         criteria_met.append(latency_met)
         print(f"2. Latency <{self.LATENCY_TARGET_MS}ms: {'✅ PASS' if latency_met else '❌ FAIL'}")
 
         # Criterion 3: Reliability
-        lookup_success_rate = comparison.get('lookup_success_rate', 0.0)
+        lookup_success_rate = comparison.get("lookup_success_rate", 0.0)
         reliability_met = lookup_success_rate >= self.MIN_SUCCESS_RATE
         criteria_met.append(reliability_met)
-        print(f"3. Success rate ≥{self.MIN_SUCCESS_RATE*100:.0f}%: {'✅ PASS' if reliability_met else '❌ FAIL'}")
+        print(
+            f"3. Success rate ≥{self.MIN_SUCCESS_RATE*100:.0f}%: {'✅ PASS' if reliability_met else '❌ FAIL'}"
+        )
 
         print()
 
@@ -596,31 +561,15 @@ class ABTestRunner:
 
 def main():
     """Main execution."""
-    parser = argparse.ArgumentParser(
-        description='A/B test R prediction lookup vs rpy2'
+    parser = argparse.ArgumentParser(description="A/B test R prediction lookup vs rpy2")
+    parser.add_argument("--season", type=int, default=2024, help="Season to test (default: 2024)")
+    parser.add_argument(
+        "--sample-size", type=int, default=None, help="Number of games to test (default: all)"
     )
     parser.add_argument(
-        '--season',
-        type=int,
-        default=2024,
-        help='Season to test (default: 2024)'
+        "--full", action="store_true", help="Test full season (same as --sample-size None)"
     )
-    parser.add_argument(
-        '--sample-size',
-        type=int,
-        default=None,
-        help='Number of games to test (default: all)'
-    )
-    parser.add_argument(
-        '--full',
-        action='store_true',
-        help='Test full season (same as --sample-size None)'
-    )
-    parser.add_argument(
-        '--quiet',
-        action='store_true',
-        help='Minimal output'
-    )
+    parser.add_argument("--quiet", action="store_true", help="Minimal output")
 
     args = parser.parse_args()
 
@@ -630,10 +579,7 @@ def main():
 
     # Run A/B test
     runner = ABTestRunner(verbose=not args.quiet)
-    results = runner.run_ab_test(
-        season=args.season,
-        sample_size=args.sample_size
-    )
+    results = runner.run_ab_test(season=args.season, sample_size=args.sample_size)
 
     # Print cache stats
     print("\n" + "=" * 80)
@@ -646,7 +592,7 @@ def main():
     print()
 
     # Exit code based on success
-    sys.exit(0 if results['success_criteria_met'] else 1)
+    sys.exit(0 if results["success_criteria_met"] else 1)
 
 
 if __name__ == "__main__":

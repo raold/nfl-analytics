@@ -23,7 +23,6 @@ def test_get_connection_basic():
     assert result is not None
 
 
-
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_get_connection_edge_cases():
     assert result is not None
 
 
-
 def test_get_connection_error_handling():
     """Test get_connection error handling."""
     with pytest.raises(ValueError):
         get_connection(invalid_input)
-
 
 
 def test_get_margin_distribution_basic():
@@ -56,7 +53,6 @@ def test_get_margin_distribution_basic():
     assert result is not None
 
 
-
 def test_get_margin_distribution_edge_cases():
     """Test get_margin_distribution: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_get_margin_distribution_edge_cases():
     assert result is not None
 
 
-
 def test_get_margin_distribution_error_handling():
     """Test get_margin_distribution error handling."""
     with pytest.raises(ValueError):
         get_margin_distribution(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_get_margin_distribution_property_idempotent(self, conn, season_start, s
 
     # Assert property
     assert get_margin_distribution(conn, season_start, season_end) == result, "idempotent violated"
-
 
 
 def test_fit_discrete_normal_basic():
@@ -100,7 +93,6 @@ def test_fit_discrete_normal_basic():
     assert result is not None
 
 
-
 def test_fit_discrete_normal_edge_cases():
     """Test fit_discrete_normal: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_fit_discrete_normal_edge_cases():
     assert result is not None
 
 
-
 def test_fit_discrete_normal_error_handling():
     """Test fit_discrete_normal error handling."""
     with pytest.raises(ValueError):
         fit_discrete_normal(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_fit_discrete_normal_property_idempotent(self, margins, counts):
 
     # Assert property
     assert fit_discrete_normal(margins, counts) == result, "idempotent violated"
-
 
 
 def test_apply_ipf_reweighting_basic():
@@ -144,7 +133,6 @@ def test_apply_ipf_reweighting_basic():
     assert result is not None
 
 
-
 def test_apply_ipf_reweighting_edge_cases():
     """Test apply_ipf_reweighting: edge cases."""
     # Arrange
@@ -157,23 +145,27 @@ def test_apply_ipf_reweighting_edge_cases():
     assert result is not None
 
 
-
 def test_apply_ipf_reweighting_error_handling():
     """Test apply_ipf_reweighting error handling."""
     with pytest.raises(ValueError):
         apply_ipf_reweighting(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_apply_ipf_reweighting_property_idempotent(self, base_probs, key_numbers, target_masses, max_iterations, tolerance):
+def test_apply_ipf_reweighting_property_idempotent(
+    self, base_probs, key_numbers, target_masses, max_iterations, tolerance
+):
     """Property test: function is idempotent."""
     # Act
-    result = apply_ipf_reweighting(base_probs, key_numbers, target_masses, max_iterations, tolerance)
+    result = apply_ipf_reweighting(
+        base_probs, key_numbers, target_masses, max_iterations, tolerance
+    )
 
     # Assert property
-    assert apply_ipf_reweighting(base_probs, key_numbers, target_masses, max_iterations, tolerance) == result, "idempotent violated"
-
+    assert (
+        apply_ipf_reweighting(base_probs, key_numbers, target_masses, max_iterations, tolerance)
+        == result
+    ), "idempotent violated"
 
 
 def test_chi_square_test_basic():
@@ -188,7 +180,6 @@ def test_chi_square_test_basic():
     assert result is not None
 
 
-
 def test_chi_square_test_edge_cases():
     """Test chi_square_test: edge cases."""
     # Arrange
@@ -201,12 +192,10 @@ def test_chi_square_test_edge_cases():
     assert result is not None
 
 
-
 def test_chi_square_test_error_handling():
     """Test chi_square_test error handling."""
     with pytest.raises(ValueError):
         chi_square_test(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -217,7 +206,6 @@ def test_chi_square_test_property_idempotent(self, observed, expected, min_expec
 
     # Assert property
     assert chi_square_test(observed, expected, min_expected) == result, "idempotent violated"
-
 
 
 def test_generate_calibration_table_basic():
@@ -232,7 +220,6 @@ def test_generate_calibration_table_basic():
     assert result is not None
 
 
-
 def test_generate_calibration_table_edge_cases():
     """Test generate_calibration_table: edge cases."""
     # Arrange
@@ -245,23 +232,24 @@ def test_generate_calibration_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_calibration_table_error_handling():
     """Test generate_calibration_table error handling."""
     with pytest.raises(ValueError):
         generate_calibration_table(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_generate_calibration_table_property_idempotent(self, margins, counts, key_numbers, output_path):
+def test_generate_calibration_table_property_idempotent(
+    self, margins, counts, key_numbers, output_path
+):
     """Property test: function is idempotent."""
     # Act
     result = generate_calibration_table(margins, counts, key_numbers, output_path)
 
     # Assert property
-    assert generate_calibration_table(margins, counts, key_numbers, output_path) == result, "idempotent violated"
-
+    assert (
+        generate_calibration_table(margins, counts, key_numbers, output_path) == result
+    ), "idempotent violated"
 
 
 def test_generate_reweighting_ablation_table_basic():
@@ -276,7 +264,6 @@ def test_generate_reweighting_ablation_table_basic():
     assert result is not None
 
 
-
 def test_generate_reweighting_ablation_table_edge_cases():
     """Test generate_reweighting_ablation_table: edge cases."""
     # Arrange
@@ -289,23 +276,24 @@ def test_generate_reweighting_ablation_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_reweighting_ablation_table_error_handling():
     """Test generate_reweighting_ablation_table error handling."""
     with pytest.raises(ValueError):
         generate_reweighting_ablation_table(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_generate_reweighting_ablation_table_property_idempotent(self, margins, counts, key_numbers, output_path):
+def test_generate_reweighting_ablation_table_property_idempotent(
+    self, margins, counts, key_numbers, output_path
+):
     """Property test: function is idempotent."""
     # Act
     result = generate_reweighting_ablation_table(margins, counts, key_numbers, output_path)
 
     # Assert property
-    assert generate_reweighting_ablation_table(margins, counts, key_numbers, output_path) == result, "idempotent violated"
-
+    assert (
+        generate_reweighting_ablation_table(margins, counts, key_numbers, output_path) == result
+    ), "idempotent violated"
 
 
 def test_main_basic():
@@ -320,7 +308,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -333,9 +320,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

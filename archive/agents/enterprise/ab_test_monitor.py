@@ -48,8 +48,7 @@ from scipy import stats
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -58,8 +57,10 @@ logger = logging.getLogger(__name__)
 # Enums and Data Classes
 # ============================================================================
 
+
 class TestStatus(Enum):
     """A/B test status."""
+
     RUNNING = "running"
     STOPPED_GUARDRAIL = "stopped_guardrail"
     STOPPED_MANUAL = "stopped_manual"
@@ -69,6 +70,7 @@ class TestStatus(Enum):
 
 class Decision(Enum):
     """A/B test decision recommendation."""
+
     CONTINUE = "continue"
     STOP_DEGRADATION = "stop_degradation"
     STOP_NO_EFFECT = "stop_no_effect"
@@ -79,6 +81,7 @@ class Decision(Enum):
 @dataclass
 class GuardrailConfig:
     """A/B test guardrail configuration."""
+
     max_mae_degradation_pct: float = 10.0  # %
     max_roi_drop_pct: float = 2.0  # percentage points
     min_win_rate_drop_pct: float = 2.0  # percentage points
@@ -90,6 +93,7 @@ class GuardrailConfig:
 @dataclass
 class GuardrailStatus:
     """Guardrail violation status."""
+
     violated: bool
     violations: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
@@ -99,17 +103,18 @@ class GuardrailStatus:
     def to_dict(self) -> dict:
         """Convert to dictionary."""
         return {
-            'violated': self.violated,
-            'violations': self.violations,
-            'warnings': self.warnings,
-            'metrics': self.metrics,
-            'timestamp': self.timestamp.isoformat()
+            "violated": self.violated,
+            "violations": self.violations,
+            "warnings": self.warnings,
+            "metrics": self.metrics,
+            "timestamp": self.timestamp.isoformat(),
         }
 
 
 @dataclass
 class SignificanceReport:
     """Statistical significance test results."""
+
     metric: str
     control_mean: float
     treatment_mean: float
@@ -126,19 +131,19 @@ class SignificanceReport:
     def to_dict(self) -> dict:
         """Convert to dictionary."""
         return {
-            'metric': self.metric,
-            'control_mean': self.control_mean,
-            'treatment_mean': self.treatment_mean,
-            'difference': self.difference,
-            'difference_pct': self.difference_pct,
-            'p_value': self.p_value,
-            'significant': self.significant,
-            'ci_lower': self.confidence_interval_95[0],
-            'ci_upper': self.confidence_interval_95[1],
-            'test_type': self.test_type,
-            'n_control': self.sample_size_control,
-            'n_treatment': self.sample_size_treatment,
-            'effect_size': self.effect_size
+            "metric": self.metric,
+            "control_mean": self.control_mean,
+            "treatment_mean": self.treatment_mean,
+            "difference": self.difference,
+            "difference_pct": self.difference_pct,
+            "p_value": self.p_value,
+            "significant": self.significant,
+            "ci_lower": self.confidence_interval_95[0],
+            "ci_upper": self.confidence_interval_95[1],
+            "test_type": self.test_type,
+            "n_control": self.sample_size_control,
+            "n_treatment": self.sample_size_treatment,
+            "effect_size": self.effect_size,
         }
 
 
@@ -147,29 +152,34 @@ class SignificanceReport:
 # ============================================================================
 
 # Gauges for current values
-ab_test_mae_control = Gauge('ab_test_mae_control', 'MAE for control group')
-ab_test_mae_treatment = Gauge('ab_test_mae_treatment', 'MAE for treatment group')
-ab_test_win_rate_control = Gauge('ab_test_win_rate_control', 'Win rate for control group')
-ab_test_win_rate_treatment = Gauge('ab_test_win_rate_treatment', 'Win rate for treatment group')
-ab_test_roi_control = Gauge('ab_test_roi_control', 'ROI for control group')
-ab_test_roi_treatment = Gauge('ab_test_roi_treatment', 'ROI for treatment group')
-ab_test_sample_size = Gauge('ab_test_sample_size', 'Current sample size', ['group'])
+ab_test_mae_control = Gauge("ab_test_mae_control", "MAE for control group")
+ab_test_mae_treatment = Gauge("ab_test_mae_treatment", "MAE for treatment group")
+ab_test_win_rate_control = Gauge("ab_test_win_rate_control", "Win rate for control group")
+ab_test_win_rate_treatment = Gauge("ab_test_win_rate_treatment", "Win rate for treatment group")
+ab_test_roi_control = Gauge("ab_test_roi_control", "ROI for control group")
+ab_test_roi_treatment = Gauge("ab_test_roi_treatment", "ROI for treatment group")
+ab_test_sample_size = Gauge("ab_test_sample_size", "Current sample size", ["group"])
 
 # Counters for events
-ab_test_guardrail_violations = Counter('ab_test_guardrail_violations', 'Guardrail violations', ['violation_type'])
-ab_test_auto_stops = Counter('ab_test_auto_stops', 'Auto-stop events')
-ab_test_promotions = Counter('ab_test_promotions', 'Treatment promotions')
+ab_test_guardrail_violations = Counter(
+    "ab_test_guardrail_violations", "Guardrail violations", ["violation_type"]
+)
+ab_test_auto_stops = Counter("ab_test_auto_stops", "Auto-stop events")
+ab_test_promotions = Counter("ab_test_promotions", "Treatment promotions")
 
 # Histograms for distributions
-ab_test_p_value = Histogram('ab_test_p_value', 'P-values over time', buckets=[0.001, 0.01, 0.05, 0.1, 0.5, 1.0])
+ab_test_p_value = Histogram(
+    "ab_test_p_value", "P-values over time", buckets=[0.001, 0.01, 0.05, 0.1, 0.5, 1.0]
+)
 
 # Info for test metadata
-ab_test_info = Info('ab_test_info', 'A/B test metadata')
+ab_test_info = Info("ab_test_info", "A/B test metadata")
 
 
 # ============================================================================
 # A/B Test Monitor
 # ============================================================================
+
 
 class ABTestMonitor:
     """
@@ -183,7 +193,7 @@ class ABTestMonitor:
         self,
         config_path: str | None = None,
         db_url: str | None = None,
-        guardrails: GuardrailConfig | None = None
+        guardrails: GuardrailConfig | None = None,
     ):
         """
         Initialize A/B test monitor.
@@ -195,8 +205,8 @@ class ABTestMonitor:
         """
         self.config_path = config_path or "config/ab_test_config.yaml"
         self.db_url = db_url or os.getenv(
-            'DATABASE_URL',
-            'postgresql://dro:sicillionbillions@localhost:5544/devdb01'  # pragma: allowlist secret
+            "DATABASE_URL",
+            "postgresql://dro:sicillionbillions@localhost:5544/devdb01",  # pragma: allowlist secret
         )
 
         # Load configuration
@@ -204,16 +214,18 @@ class ABTestMonitor:
         self.guardrails = guardrails or self._load_guardrails()
 
         # Initialize state
-        self.test_start_date = datetime.fromisoformat(self.config['test_config']['start_date'])
-        self.test_end_date = datetime.fromisoformat(self.config['test_config']['end_date'])
+        self.test_start_date = datetime.fromisoformat(self.config["test_config"]["start_date"])
+        self.test_end_date = datetime.fromisoformat(self.config["test_config"]["end_date"])
 
         # Update Prometheus info
-        ab_test_info.info({
-            'test_name': self.config['test_config']['name'],
-            'start_date': self.config['test_config']['start_date'],
-            'end_date': self.config['test_config']['end_date'],
-            'traffic_split': str(self.config['test_config']['traffic_split'])
-        })
+        ab_test_info.info(
+            {
+                "test_name": self.config["test_config"]["name"],
+                "start_date": self.config["test_config"]["start_date"],
+                "end_date": self.config["test_config"]["end_date"],
+                "traffic_split": str(self.config["test_config"]["traffic_split"]),
+            }
+        )
 
         logger.info(f"A/B Test Monitor initialized for test: {self.config['test_config']['name']}")
 
@@ -233,14 +245,16 @@ class ABTestMonitor:
 
     def _load_guardrails(self) -> GuardrailConfig:
         """Load guardrail configuration from test config."""
-        guardrails_dict = self.config.get('guardrails', {})
+        guardrails_dict = self.config.get("guardrails", {})
         return GuardrailConfig(
-            max_mae_degradation_pct=guardrails_dict.get('max_mae_degradation_pct', 10.0),
-            max_roi_drop_pct=guardrails_dict.get('max_roi_drop_pct', 2.0),
-            min_win_rate_drop_pct=guardrails_dict.get('min_win_rate_drop_pct', 2.0),
-            max_calibration_drop_pct=guardrails_dict.get('max_calibration_drop_pct', 5.0),
-            min_sample_size=self.config['test_config'].get('min_sample_size', 50),
-            max_p_value=self.config['success_criteria'].get('statistical_significance', {}).get('p_value', 0.05)
+            max_mae_degradation_pct=guardrails_dict.get("max_mae_degradation_pct", 10.0),
+            max_roi_drop_pct=guardrails_dict.get("max_roi_drop_pct", 2.0),
+            min_win_rate_drop_pct=guardrails_dict.get("min_win_rate_drop_pct", 2.0),
+            max_calibration_drop_pct=guardrails_dict.get("max_calibration_drop_pct", 5.0),
+            min_sample_size=self.config["test_config"].get("min_sample_size", 50),
+            max_p_value=self.config["success_criteria"]
+            .get("statistical_significance", {})
+            .get("p_value", 0.05),
         )
 
     def _get_db_connection(self):
@@ -304,36 +318,36 @@ class ABTestMonitor:
 
         if len(df) == 0:
             logger.warning("No A/B test results available")
-            return {'control': {}, 'treatment': {}}
+            return {"control": {}, "treatment": {}}
 
         metrics = {}
-        for group in ['control', 'treatment']:
-            group_df = df[df['group'] == group]
+        for group in ["control", "treatment"]:
+            group_df = df[df["group"] == group]
 
             if len(group_df) == 0:
                 metrics[group] = {}
                 continue
 
             metrics[group] = {
-                'mae': group_df['error'].mean(),
-                'win_rate': (group_df['win'].sum() / len(group_df)) * 100,
-                'roi': group_df['roi'].sum() / len(group_df) * 100,
-                'calibration': self._calculate_calibration(group_df),
-                'sample_size': len(group_df)
+                "mae": group_df["error"].mean(),
+                "win_rate": (group_df["win"].sum() / len(group_df)) * 100,
+                "roi": group_df["roi"].sum() / len(group_df) * 100,
+                "calibration": self._calculate_calibration(group_df),
+                "sample_size": len(group_df),
             }
 
         # Update Prometheus metrics
-        if 'control' in metrics and metrics['control']:
-            ab_test_mae_control.set(metrics['control']['mae'])
-            ab_test_win_rate_control.set(metrics['control']['win_rate'])
-            ab_test_roi_control.set(metrics['control']['roi'])
-            ab_test_sample_size.labels(group='control').set(metrics['control']['sample_size'])
+        if "control" in metrics and metrics["control"]:
+            ab_test_mae_control.set(metrics["control"]["mae"])
+            ab_test_win_rate_control.set(metrics["control"]["win_rate"])
+            ab_test_roi_control.set(metrics["control"]["roi"])
+            ab_test_sample_size.labels(group="control").set(metrics["control"]["sample_size"])
 
-        if 'treatment' in metrics and metrics['treatment']:
-            ab_test_mae_treatment.set(metrics['treatment']['mae'])
-            ab_test_win_rate_treatment.set(metrics['treatment']['win_rate'])
-            ab_test_roi_treatment.set(metrics['treatment']['roi'])
-            ab_test_sample_size.labels(group='treatment').set(metrics['treatment']['sample_size'])
+        if "treatment" in metrics and metrics["treatment"]:
+            ab_test_mae_treatment.set(metrics["treatment"]["mae"])
+            ab_test_win_rate_treatment.set(metrics["treatment"]["win_rate"])
+            ab_test_roi_treatment.set(metrics["treatment"]["roi"])
+            ab_test_sample_size.labels(group="treatment").set(metrics["treatment"]["sample_size"])
 
         return metrics
 
@@ -367,72 +381,71 @@ class ABTestMonitor:
         """
         metrics = self.get_current_metrics()
 
-        if not metrics.get('control') or not metrics.get('treatment'):
+        if not metrics.get("control") or not metrics.get("treatment"):
             return GuardrailStatus(
-                violated=False,
-                warnings=["Insufficient data for guardrail checks"]
+                violated=False, warnings=["Insufficient data for guardrail checks"]
             )
 
-        control = metrics['control']
-        treatment = metrics['treatment']
+        control = metrics["control"]
+        treatment = metrics["treatment"]
 
         violations = []
         warnings = []
 
         # Check sample size
-        if treatment['sample_size'] < self.guardrails.min_sample_size:
+        if treatment["sample_size"] < self.guardrails.min_sample_size:
             warnings.append(
                 f"Sample size ({treatment['sample_size']}) below minimum "
                 f"({self.guardrails.min_sample_size})"
             )
 
         # Check MAE degradation
-        mae_degradation_pct = ((treatment['mae'] - control['mae']) / control['mae']) * 100
+        mae_degradation_pct = ((treatment["mae"] - control["mae"]) / control["mae"]) * 100
         if mae_degradation_pct > self.guardrails.max_mae_degradation_pct:
             violations.append(
                 f"MAE degradation {mae_degradation_pct:.1f}% exceeds limit "
                 f"{self.guardrails.max_mae_degradation_pct}%"
             )
-            ab_test_guardrail_violations.labels(violation_type='mae_degradation').inc()
+            ab_test_guardrail_violations.labels(violation_type="mae_degradation").inc()
 
         # Check ROI drop
-        roi_drop = control['roi'] - treatment['roi']
+        roi_drop = control["roi"] - treatment["roi"]
         if roi_drop > self.guardrails.max_roi_drop_pct:
             violations.append(
-                f"ROI drop {roi_drop:.1f}pp exceeds limit "
-                f"{self.guardrails.max_roi_drop_pct}pp"
+                f"ROI drop {roi_drop:.1f}pp exceeds limit " f"{self.guardrails.max_roi_drop_pct}pp"
             )
-            ab_test_guardrail_violations.labels(violation_type='roi_drop').inc()
+            ab_test_guardrail_violations.labels(violation_type="roi_drop").inc()
 
         # Check win rate drop
-        win_rate_drop = control['win_rate'] - treatment['win_rate']
+        win_rate_drop = control["win_rate"] - treatment["win_rate"]
         if win_rate_drop > self.guardrails.min_win_rate_drop_pct:
             violations.append(
                 f"Win rate drop {win_rate_drop:.1f}pp exceeds limit "
                 f"{self.guardrails.min_win_rate_drop_pct}pp"
             )
-            ab_test_guardrail_violations.labels(violation_type='win_rate_drop').inc()
+            ab_test_guardrail_violations.labels(violation_type="win_rate_drop").inc()
 
         # Check calibration drop
-        calibration_drop_pct = ((control['calibration'] - treatment['calibration']) /
-                                 control['calibration']) * 100
+        calibration_drop_pct = (
+            (control["calibration"] - treatment["calibration"]) / control["calibration"]
+        ) * 100
         if calibration_drop_pct > self.guardrails.max_calibration_drop_pct:
             violations.append(
                 f"Calibration drop {calibration_drop_pct:.1f}% exceeds limit "
                 f"{self.guardrails.max_calibration_drop_pct}%"
             )
-            ab_test_guardrail_violations.labels(violation_type='calibration_drop').inc()
+            ab_test_guardrail_violations.labels(violation_type="calibration_drop").inc()
 
         status = GuardrailStatus(
             violated=len(violations) > 0,
             violations=violations,
             warnings=warnings,
             metrics={
-                'mae_degradation_pct': mae_degradation_pct,
-                'roi_drop': roi_drop,
-                'win_rate_drop': win_rate_drop,
-                'calibration_drop_pct': calibration_drop_pct
-            }
+                "mae_degradation_pct": mae_degradation_pct,
+                "roi_drop": roi_drop,
+                "win_rate_drop": win_rate_drop,
+                "calibration_drop_pct": calibration_drop_pct,
+            },
         )
 
         if status.violated:
@@ -473,11 +486,11 @@ class ABTestMonitor:
                 cur.execute(
                     query,
                     (
-                        self.config['test_config']['name'],
+                        self.config["test_config"]["name"],
                         status.value,
-                        '; '.join(reason),
-                        datetime.now()
-                    )
+                        "; ".join(reason),
+                        datetime.now(),
+                    ),
                 )
                 conn.commit()
 
@@ -488,9 +501,7 @@ class ABTestMonitor:
     # ========================================================================
 
     def calculate_significance(
-        self,
-        metric: str = 'mae',
-        test_type: str = 't-test'
+        self, metric: str = "mae", test_type: str = "t-test"
     ) -> SignificanceReport:
         """
         Calculate statistical significance for a metric.
@@ -504,8 +515,8 @@ class ABTestMonitor:
         """
         df = self.get_ab_test_results()
 
-        control = df[df['group'] == 'control']
-        treatment = df[df['group'] == 'treatment']
+        control = df[df["group"] == "control"]
+        treatment = df[df["group"] == "treatment"]
 
         if len(control) == 0 or len(treatment) == 0:
             logger.warning("Insufficient data for significance testing")
@@ -521,19 +532,19 @@ class ABTestMonitor:
                 test_type=test_type,
                 sample_size_control=len(control),
                 sample_size_treatment=len(treatment),
-                effect_size=0.0
+                effect_size=0.0,
             )
 
         # Extract metric values
-        if metric == 'mae':
-            control_values = control['error'].values
-            treatment_values = treatment['error'].values
-        elif metric == 'win_rate':
-            control_values = control['win'].values
-            treatment_values = treatment['win'].values
-        elif metric == 'roi':
-            control_values = control['roi'].values
-            treatment_values = treatment['roi'].values
+        if metric == "mae":
+            control_values = control["error"].values
+            treatment_values = treatment["error"].values
+        elif metric == "win_rate":
+            control_values = control["win"].values
+            treatment_values = treatment["win"].values
+        elif metric == "roi":
+            control_values = control["roi"].values
+            treatment_values = treatment["roi"].values
         else:
             raise ValueError(f"Unknown metric: {metric}")
 
@@ -543,22 +554,24 @@ class ABTestMonitor:
         difference_pct = (difference / control_mean) * 100 if control_mean != 0 else 0.0
 
         # Perform statistical test
-        if test_type == 't-test':
+        if test_type == "t-test":
             t_stat, p_value = stats.ttest_ind(treatment_values, control_values)
             ci_lower, ci_upper = self._bootstrap_ci(treatment_values, control_values)
-        elif test_type == 'bootstrap':
+        elif test_type == "bootstrap":
             p_value = self._bootstrap_p_value(treatment_values, control_values)
             ci_lower, ci_upper = self._bootstrap_ci(treatment_values, control_values)
-        elif test_type == 'bayesian':
+        elif test_type == "bayesian":
             p_value, ci_lower, ci_upper = self._bayesian_test(treatment_values, control_values)
         else:
             raise ValueError(f"Unknown test type: {test_type}")
 
         # Calculate effect size (Cohen's d)
         pooled_std = np.sqrt(
-            ((len(control_values) - 1) * control_values.std()**2 +
-             (len(treatment_values) - 1) * treatment_values.std()**2) /
-            (len(control_values) + len(treatment_values) - 2)
+            (
+                (len(control_values) - 1) * control_values.std() ** 2
+                + (len(treatment_values) - 1) * treatment_values.std() ** 2
+            )
+            / (len(control_values) + len(treatment_values) - 2)
         )
         effect_size = difference / pooled_std if pooled_std != 0 else 0.0
 
@@ -577,19 +590,18 @@ class ABTestMonitor:
             test_type=test_type,
             sample_size_control=len(control_values),
             sample_size_treatment=len(treatment_values),
-            effect_size=effect_size
+            effect_size=effect_size,
         )
 
-        logger.info(f"Significance test ({test_type}): {metric}={difference:.2f} "
-                   f"({difference_pct:+.1f}%), p={p_value:.4f}")
+        logger.info(
+            f"Significance test ({test_type}): {metric}={difference:.2f} "
+            f"({difference_pct:+.1f}%), p={p_value:.4f}"
+        )
 
         return report
 
     def _bootstrap_p_value(
-        self,
-        treatment: np.ndarray,
-        control: np.ndarray,
-        n_iterations: int = 10000
+        self, treatment: np.ndarray, control: np.ndarray, n_iterations: int = 10000
     ) -> float:
         """Calculate p-value using bootstrap resampling."""
         observed_diff = treatment.mean() - control.mean()
@@ -616,7 +628,7 @@ class ABTestMonitor:
         treatment: np.ndarray,
         control: np.ndarray,
         n_iterations: int = 10000,
-        alpha: float = 0.05
+        alpha: float = 0.05,
     ) -> tuple[float, float]:
         """Calculate 95% confidence interval using bootstrap."""
         diffs = []
@@ -632,9 +644,7 @@ class ABTestMonitor:
         return ci_lower, ci_upper
 
     def _bayesian_test(
-        self,
-        treatment: np.ndarray,
-        control: np.ndarray
+        self, treatment: np.ndarray, control: np.ndarray
     ) -> tuple[float, float, float]:
         """
         Bayesian hypothesis test using normal-normal conjugate prior.
@@ -650,8 +660,7 @@ class ABTestMonitor:
 
         # Posterior for difference (simplified)
         diff_mean = treatment_mean - control_mean
-        diff_std = np.sqrt((treatment_std**2 / len(treatment)) +
-                          (control_std**2 / len(control)))
+        diff_std = np.sqrt((treatment_std**2 / len(treatment)) + (control_std**2 / len(control)))
 
         # Probability that treatment > control (one-tailed)
         # For two-tailed, calculate P(|diff| > 0)
@@ -676,13 +685,15 @@ class ABTestMonitor:
         """
         metrics = self.get_current_metrics()
 
-        if not metrics.get('control') or not metrics.get('treatment'):
+        if not metrics.get("control") or not metrics.get("treatment"):
             return Decision.INSUFFICIENT_DATA
 
         # Check sample size
-        if metrics['treatment']['sample_size'] < self.guardrails.min_sample_size:
-            logger.info(f"Insufficient sample size: {metrics['treatment']['sample_size']} < "
-                       f"{self.guardrails.min_sample_size}")
+        if metrics["treatment"]["sample_size"] < self.guardrails.min_sample_size:
+            logger.info(
+                f"Insufficient sample size: {metrics['treatment']['sample_size']} < "
+                f"{self.guardrails.min_sample_size}"
+            )
             return Decision.INSUFFICIENT_DATA
 
         # Check guardrails first
@@ -692,17 +703,19 @@ class ABTestMonitor:
             return Decision.STOP_DEGRADATION
 
         # Calculate significance for key metrics
-        mae_sig = self.calculate_significance('mae', test_type='t-test')
-        roi_sig = self.calculate_significance('roi', test_type='t-test')
+        mae_sig = self.calculate_significance("mae", test_type="t-test")
+        roi_sig = self.calculate_significance("roi", test_type="t-test")
 
         # Decision logic based on success criteria
-        success_criteria = self.config['success_criteria']
+        success_criteria = self.config["success_criteria"]
 
         # Check if treatment is significantly better
-        mae_improved = (mae_sig.difference < -success_criteria['mae_improvement_yards'] and
-                       mae_sig.significant)
-        roi_improved = (roi_sig.difference > success_criteria['roi_improvement_pct'] and
-                       roi_sig.significant)
+        mae_improved = (
+            mae_sig.difference < -success_criteria["mae_improvement_yards"] and mae_sig.significant
+        )
+        roi_improved = (
+            roi_sig.difference > success_criteria["roi_improvement_pct"] and roi_sig.significant
+        )
 
         if mae_improved and roi_improved:
             logger.info("Recommending PROMOTE: Treatment significantly better on MAE and ROI")
@@ -727,19 +740,24 @@ class ABTestMonitor:
             True if test should stop due to futility, False otherwise
         """
         # Simplified SPRT: check if 95% CI contains 0 and sample size > threshold
-        mae_sig = self.calculate_significance('mae', test_type='t-test')
-        roi_sig = self.calculate_significance('roi', test_type='t-test')
+        mae_sig = self.calculate_significance("mae", test_type="t-test")
+        roi_sig = self.calculate_significance("roi", test_type="t-test")
 
-        mae_contains_zero = (mae_sig.confidence_interval_95[0] <= 0 <=
-                            mae_sig.confidence_interval_95[1])
-        roi_contains_zero = (roi_sig.confidence_interval_95[0] <= 0 <=
-                            roi_sig.confidence_interval_95[1])
+        mae_contains_zero = (
+            mae_sig.confidence_interval_95[0] <= 0 <= mae_sig.confidence_interval_95[1]
+        )
+        roi_contains_zero = (
+            roi_sig.confidence_interval_95[0] <= 0 <= roi_sig.confidence_interval_95[1]
+        )
 
         # If both CIs contain 0 and we have enough data, recommend stopping
         min_futility_samples = self.guardrails.min_sample_size * 2
 
-        if (mae_contains_zero and roi_contains_zero and
-            mae_sig.sample_size_treatment >= min_futility_samples):
+        if (
+            mae_contains_zero
+            and roi_contains_zero
+            and mae_sig.sample_size_treatment >= min_futility_samples
+        ):
             return True
 
         return False
@@ -748,7 +766,7 @@ class ABTestMonitor:
     # Export and Reporting
     # ========================================================================
 
-    def export_results(self, format: str = 'dataframe') -> pd.DataFrame:
+    def export_results(self, format: str = "dataframe") -> pd.DataFrame:
         """
         Export A/B test results for analysis.
 
@@ -765,34 +783,39 @@ class ABTestMonitor:
         metrics = self.get_current_metrics()
 
         # Add significance tests
-        mae_sig = self.calculate_significance('mae')
-        roi_sig = self.calculate_significance('roi')
-        win_rate_sig = self.calculate_significance('win_rate')
+        mae_sig = self.calculate_significance("mae")
+        roi_sig = self.calculate_significance("roi")
+        win_rate_sig = self.calculate_significance("win_rate")
 
         # Create summary DataFrame
-        summary = pd.DataFrame({
-            'group': ['control', 'treatment'],
-            'mae': [metrics['control']['mae'], metrics['treatment']['mae']],
-            'win_rate': [metrics['control']['win_rate'], metrics['treatment']['win_rate']],
-            'roi': [metrics['control']['roi'], metrics['treatment']['roi']],
-            'sample_size': [metrics['control']['sample_size'], metrics['treatment']['sample_size']]
-        })
+        summary = pd.DataFrame(
+            {
+                "group": ["control", "treatment"],
+                "mae": [metrics["control"]["mae"], metrics["treatment"]["mae"]],
+                "win_rate": [metrics["control"]["win_rate"], metrics["treatment"]["win_rate"]],
+                "roi": [metrics["control"]["roi"], metrics["treatment"]["roi"]],
+                "sample_size": [
+                    metrics["control"]["sample_size"],
+                    metrics["treatment"]["sample_size"],
+                ],
+            }
+        )
 
         # Add significance test results as attributes
-        summary.attrs['mae_significance'] = mae_sig.to_dict()
-        summary.attrs['roi_significance'] = roi_sig.to_dict()
-        summary.attrs['win_rate_significance'] = win_rate_sig.to_dict()
-        summary.attrs['recommendation'] = self.recommend_decision().value
+        summary.attrs["mae_significance"] = mae_sig.to_dict()
+        summary.attrs["roi_significance"] = roi_sig.to_dict()
+        summary.attrs["win_rate_significance"] = win_rate_sig.to_dict()
+        summary.attrs["recommendation"] = self.recommend_decision().value
 
         logger.info(f"Exported {len(df)} test results with summary metrics")
 
-        if format == 'csv':
+        if format == "csv":
             output_path = f"results/ab_test_export_{datetime.now():%Y%m%d_%H%M%S}.csv"
             summary.to_csv(output_path, index=False)
             logger.info(f"Exported to {output_path}")
-        elif format == 'json':
+        elif format == "json":
             output_path = f"results/ab_test_export_{datetime.now():%Y%m%d_%H%M%S}.json"
-            summary.to_json(output_path, orient='records', indent=2)
+            summary.to_json(output_path, orient="records", indent=2)
             logger.info(f"Exported to {output_path}")
 
         return summary
@@ -808,8 +831,8 @@ class ABTestMonitor:
         guardrail_status = self.check_guardrails()
         decision = self.recommend_decision()
 
-        mae_sig = self.calculate_significance('mae')
-        roi_sig = self.calculate_significance('roi')
+        mae_sig = self.calculate_significance("mae")
+        roi_sig = self.calculate_significance("roi")
 
         report = f"""
 =============================================================================
@@ -877,6 +900,7 @@ RECOMMENDATION
 # CLI Wrapper Functions
 # ============================================================================
 
+
 def cli_status():
     """Print A/B test status."""
     monitor = ABTestMonitor()
@@ -889,7 +913,7 @@ def cli_metrics():
     metrics = monitor.get_current_metrics()
 
     print("\n=== Current Metrics ===")
-    for group in ['control', 'treatment']:
+    for group in ["control", "treatment"]:
         if group in metrics and metrics[group]:
             print(f"\n{group.upper()}:")
             for metric, value in metrics[group].items():
@@ -950,7 +974,7 @@ def cli_promote():
         print("\nRun 'monitor_ab_test.sh status' for details")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
 
     if len(sys.argv) < 2:
@@ -959,15 +983,15 @@ if __name__ == '__main__':
 
     command = sys.argv[1]
 
-    if command == 'status':
+    if command == "status":
         cli_status()
-    elif command == 'metrics':
+    elif command == "metrics":
         cli_metrics()
-    elif command == 'check':
+    elif command == "check":
         cli_check_guardrails()
-    elif command == 'stop':
+    elif command == "stop":
         cli_auto_stop()
-    elif command == 'promote':
+    elif command == "promote":
         cli_promote()
     else:
         print(f"Unknown command: {command}")

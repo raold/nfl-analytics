@@ -37,27 +37,25 @@ from psycopg2.extensions import connection as Connection
 
 # Known schema conventions (prevent common mistakes)
 COLUMN_NAMING_CONVENTIONS = {
-    'games': {
-        'game_date': 'kickoff',
-        'gameday': 'kickoff',
-        'spread_line': 'spread_close',
-        'total_line': 'total_close',
+    "games": {
+        "game_date": "kickoff",
+        "gameday": "kickoff",
+        "spread_line": "spread_close",
+        "total_line": "total_close",
     },
-    'mart.player_game_stats': {
-        'game_id': '(season, week)',  # Composite key, not a column
-    }
+    "mart.player_game_stats": {
+        "game_id": "(season, week)",  # Composite key, not a column
+    },
 }
 
 # Tables that definitely do NOT have game_id
 NO_GAME_ID_TABLES = {
-    'mart.player_game_stats',
-    'mart.player_hierarchy',
+    "mart.player_game_stats",
+    "mart.player_hierarchy",
 }
 
 # Team abbreviation corrections
-TEAM_ABBREV_CORRECTIONS = {
-    'LA': 'Use LAR (Rams) or LAC (Chargers) - LA is ambiguous'
-}
+TEAM_ABBREV_CORRECTIONS = {"LA": "Use LAR (Rams) or LAC (Chargers) - LA is ambiguous"}
 
 
 class SQLValidator:
@@ -72,11 +70,11 @@ class SQLValidator:
                       If None, uses default localhost:5544/devdb01
         """
         self.db_config = db_config or {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions'
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
         self._conn: Connection | None = None
         self._schema_cache: dict[str, set[str]] = {}
@@ -100,7 +98,7 @@ class SQLValidator:
         """Context manager exit."""
         self.close()
 
-    def get_table_columns(self, table_name: str, schema: str = 'public') -> set[str]:
+    def get_table_columns(self, table_name: str, schema: str = "public") -> set[str]:
         """
         Get all column names for a table or materialized view.
 
@@ -165,13 +163,13 @@ class SQLValidator:
         aliases = {}
 
         # Pattern: FROM table_name alias
-        from_pattern = r'\bFROM\s+([a-z_]+\.[a-z_]+|[a-z_]+)\s+([a-z_]+)\b'
+        from_pattern = r"\bFROM\s+([a-z_]+\.[a-z_]+|[a-z_]+)\s+([a-z_]+)\b"
         for match in re.finditer(from_pattern, query, re.IGNORECASE):
             table, alias = match.groups()
             aliases[alias.lower()] = table.lower()
 
         # Pattern: JOIN table_name alias
-        join_pattern = r'\bJOIN\s+([a-z_]+\.[a-z_]+|[a-z_]+)\s+([a-z_]+)\b'
+        join_pattern = r"\bJOIN\s+([a-z_]+\.[a-z_]+|[a-z_]+)\s+([a-z_]+)\b"
         for match in re.finditer(join_pattern, query, re.IGNORECASE):
             table, alias = match.groups()
             aliases[alias.lower()] = table.lower()
@@ -196,7 +194,7 @@ class SQLValidator:
         references = []
 
         # Pattern: alias.column_name
-        pattern = r'\b([a-z_]+)\.([a-z_][a-z0-9_]*)\b'
+        pattern = r"\b([a-z_]+)\.([a-z_][a-z0-9_]*)\b"
 
         for match in re.finditer(pattern, query, re.IGNORECASE):
             alias, column = match.groups()
@@ -205,7 +203,7 @@ class SQLValidator:
         return references
 
     def check_column_exists(
-        self, table_name: str, column_name: str, schema: str = 'public'
+        self, table_name: str, column_name: str, schema: str = "public"
     ) -> bool:
         """
         Check if a column exists in a table.
@@ -256,15 +254,15 @@ class SQLValidator:
             table_name = aliases[alias]
 
             # Parse schema.table
-            if '.' in table_name:
-                schema, table = table_name.split('.')
+            if "." in table_name:
+                schema, table = table_name.split(".")
             else:
-                schema = 'public'
+                schema = "public"
                 table = table_name
 
             # Check if column exists
             if not self.check_column_exists(table, column, schema):
-                full_table = f"{schema}.{table}" if schema != 'public' else table
+                full_table = f"{schema}.{table}" if schema != "public" else table
 
                 # Check for known naming conventions
                 if full_table in COLUMN_NAMING_CONVENTIONS:
@@ -278,7 +276,7 @@ class SQLValidator:
                         continue
 
                 # Check for game_id mistake
-                if column == 'game_id' and full_table in NO_GAME_ID_TABLES:
+                if column == "game_id" and full_table in NO_GAME_ID_TABLES:
                     errors.append(
                         f"ERROR: Column 'game_id' does not exist in '{full_table}'. "
                         f"Join via (season, week) composite key. "
@@ -286,9 +284,7 @@ class SQLValidator:
                     )
                     continue
 
-                errors.append(
-                    f"ERROR: Column '{column}' does not exist in '{full_table}'"
-                )
+                errors.append(f"ERROR: Column '{column}' does not exist in '{full_table}'")
 
         # Check for team abbreviation issues
         if re.search(r"['\"]LA['\"]", query):
@@ -298,7 +294,7 @@ class SQLValidator:
             )
 
         # Check for common anti-patterns
-        if 'SELECT *' in query.upper() and 'COUNT(*)' not in query.upper():
+        if "SELECT *" in query.upper() and "COUNT(*)" not in query.upper():
             errors.append(
                 "WARNING: Using 'SELECT *' in production queries. "
                 "Specify columns explicitly for better performance."
@@ -329,21 +325,21 @@ class SQLValidator:
         """
         all_messages = self.validate_query(query)
 
-        errors = [msg for msg in all_messages if msg.startswith('ERROR:')]
-        warnings = [msg for msg in all_messages if msg.startswith('WARNING:')]
+        errors = [msg for msg in all_messages if msg.startswith("ERROR:")]
+        warnings = [msg for msg in all_messages if msg.startswith("WARNING:")]
         recommendations = []
 
         # Check for recommended indexes
-        if 'mart.player_game_stats' in query.lower():
-            if 'where' in query.lower() and 'stat_category' not in query.lower():
+        if "mart.player_game_stats" in query.lower():
+            if "where" in query.lower() and "stat_category" not in query.lower():
                 recommendations.append(
                     "RECOMMENDATION: Add 'WHERE stat_category = ...' to use partial index "
                     "idx_player_game_stats_lookup"
                 )
 
         # Check for join optimization
-        if 'join games' in query.lower():
-            if 'season' not in query.lower() or 'week' not in query.lower():
+        if "join games" in query.lower():
+            if "season" not in query.lower() or "week" not in query.lower():
                 recommendations.append(
                     "RECOMMENDATION: Join games via (season, week) composite key "
                     "for optimal performance"
@@ -363,11 +359,11 @@ class SQLValidator:
             summary += "\n\n" + "\n".join(recommendations)
 
         return {
-            'valid': len(errors) == 0,
-            'errors': errors,
-            'warnings': warnings,
-            'recommendations': recommendations,
-            'summary': summary
+            "valid": len(errors) == 0,
+            "errors": errors,
+            "warnings": warnings,
+            "recommendations": recommendations,
+            "summary": summary,
         }
 
 
@@ -395,7 +391,7 @@ def validate_query(query: str, db_config: dict[str, str] | None = None) -> list[
 
 
 # CLI interface
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
 
     if len(sys.argv) < 2:
@@ -412,6 +408,6 @@ if __name__ == '__main__':
 
     with SQLValidator() as validator:
         report = validator.validate_query_full(query)
-        print(report['summary'])
+        print(report["summary"])
 
-    sys.exit(0 if report['valid'] else 1)
+    sys.exit(0 if report["valid"] else 1)

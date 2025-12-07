@@ -23,7 +23,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_generate_table_basic():
@@ -56,7 +53,6 @@ def test_generate_table_basic():
     assert result is not None
 
 
-
 def test_generate_table_edge_cases():
     """Test generate_table: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_generate_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_table_error_handling():
     """Test generate_table error handling."""
     with pytest.raises(ValueError):
         generate_table(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_generate_table_property_idempotent(self, log_path, output_path):
 
     # Assert property
     assert generate_table(log_path, output_path) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -100,7 +93,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -113,9 +105,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

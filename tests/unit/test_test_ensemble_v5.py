@@ -21,7 +21,6 @@ def test_test_ensemble_basic():
     assert result is not None
 
 
-
 def test_test_ensemble_edge_cases():
     """Test test_ensemble: edge cases."""
     # Arrange
@@ -34,9 +33,7 @@ def test_test_ensemble_edge_cases():
     assert result is not None
 
 
-
 def test_test_ensemble_error_handling():
     """Test test_ensemble error handling."""
     with pytest.raises(ValueError):
         test_ensemble(invalid_input)
-

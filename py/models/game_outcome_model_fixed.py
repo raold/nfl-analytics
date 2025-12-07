@@ -35,15 +35,43 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, roc_auc_sco
 from py.features.game_feature_extractor import GameFeatureExtractor
 
 # Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Constants
 VALID_TEAMS = {
-    'ARI', 'ATL', 'BAL', 'BUF', 'CAR', 'CHI', 'CIN', 'CLE',
-    'DAL', 'DEN', 'DET', 'GB', 'HOU', 'IND', 'JAX', 'KC',
-    'LAC', 'LAR', 'LV', 'MIA', 'MIN', 'NE', 'NO', 'NYG',
-    'NYJ', 'PHI', 'PIT', 'SF', 'SEA', 'TB', 'TEN', 'WAS'
+    "ARI",
+    "ATL",
+    "BAL",
+    "BUF",
+    "CAR",
+    "CHI",
+    "CIN",
+    "CLE",
+    "DAL",
+    "DEN",
+    "DET",
+    "GB",
+    "HOU",
+    "IND",
+    "JAX",
+    "KC",
+    "LAC",
+    "LAR",
+    "LV",
+    "MIA",
+    "MIN",
+    "NE",
+    "NO",
+    "NYG",
+    "NYJ",
+    "PHI",
+    "PIT",
+    "SF",
+    "SEA",
+    "TB",
+    "TEN",
+    "WAS",
 }
 
 
@@ -94,11 +122,11 @@ class GameOutcomeModel:
 
         # Model metadata
         self.metadata = {
-            'version': '2.0.0',
-            'created_at': None,
-            'training_seasons': None,
-            'feature_count': None,
-            'validation_metrics': {}
+            "version": "2.0.0",
+            "created_at": None,
+            "training_seasons": None,
+            "feature_count": None,
+            "validation_metrics": {},
         }
 
     def train(
@@ -106,7 +134,7 @@ class GameOutcomeModel:
         seasons: list[int],
         validation_split: float = 0.2,
         xgb_params: dict | None = None,
-        n_jobs: int = -1
+        n_jobs: int = -1,
     ) -> dict[str, float]:
         """
         Train game outcome models on historical data.
@@ -128,19 +156,19 @@ class GameOutcomeModel:
         # Default XGBoost parameters (optimized for NFL data)
         if xgb_params is None:
             xgb_params = {
-                'n_estimators': 500,
-                'max_depth': 8,
-                'learning_rate': 0.03,
-                'subsample': 0.8,
-                'colsample_bytree': 0.8,
-                'gamma': 1,
-                'reg_alpha': 0.1,
-                'reg_lambda': 1,
-                'min_child_weight': 5,
-                'random_state': 42,
-                'n_jobs': n_jobs,
-                'early_stopping_rounds': 50,
-                'eval_metric': 'mae'
+                "n_estimators": 500,
+                "max_depth": 8,
+                "learning_rate": 0.03,
+                "subsample": 0.8,
+                "colsample_bytree": 0.8,
+                "gamma": 1,
+                "reg_alpha": 0.1,
+                "reg_lambda": 1,
+                "min_child_weight": 5,
+                "random_state": 42,
+                "n_jobs": n_jobs,
+                "early_stopping_rounds": 50,
+                "eval_metric": "mae",
             }
 
         # 1. Load training data with batch extraction
@@ -149,18 +177,21 @@ class GameOutcomeModel:
         logger.info(f"Loaded {len(df)} games from seasons {seasons}")
 
         # 2. Prepare features and targets
-        feature_cols = [col for col in df.columns
-                       if col not in ['season', 'week', 'home_team', 'away_team',
-                                     'spread', 'total', 'home_win']]
+        feature_cols = [
+            col
+            for col in df.columns
+            if col
+            not in ["season", "week", "home_team", "away_team", "spread", "total", "home_win"]
+        ]
         self.feature_names = feature_cols
 
         # FIXED: Sort BEFORE extracting arrays to maintain alignment
-        df_sorted = df.sort_values(['season', 'week']).reset_index(drop=True)
+        df_sorted = df.sort_values(["season", "week"]).reset_index(drop=True)
 
         X = df_sorted[feature_cols].values
-        y_spread = df_sorted['spread'].values
-        y_total = df_sorted['total'].values
-        y_win_prob = df_sorted['home_win'].values
+        y_spread = df_sorted["spread"].values
+        y_total = df_sorted["total"].values
+        y_win_prob = df_sorted["home_win"].values
 
         logger.info(f"Feature matrix: {X.shape[0]} samples × {X.shape[1]} features")
 
@@ -180,7 +211,7 @@ class GameOutcomeModel:
         logger.info(f"Validation: {len(X_val)} samples")
 
         # Store validation data info for uncertainty estimation
-        val_info = df_sorted.iloc[split_idx:][['season', 'week']].describe()
+        val_info = df_sorted.iloc[split_idx:][["season", "week"]].describe()
         logger.info(f"Validation set: {val_info}")
 
         # 4. Train models in parallel on M4 Mac
@@ -195,54 +226,42 @@ class GameOutcomeModel:
         def train_spread_model():
             logger.info("  Starting spread model training...")
             model = xgb.XGBRegressor(**xgb_params)
-            model.fit(
-                X_train, y_spread_train,
-                eval_set=[(X_val, y_spread_val)],
-                verbose=False
-            )
+            model.fit(X_train, y_spread_train, eval_set=[(X_val, y_spread_val)], verbose=False)
             logger.info("  ✓ Spread model complete")
             return model
 
         def train_total_model():
             logger.info("  Starting total model training...")
             model = xgb.XGBRegressor(**xgb_params)
-            model.fit(
-                X_train, y_total_train,
-                eval_set=[(X_val, y_total_val)],
-                verbose=False
-            )
+            model.fit(X_train, y_total_train, eval_set=[(X_val, y_total_val)], verbose=False)
             logger.info("  ✓ Total model complete")
             return model
 
         def train_win_prob_model():
             logger.info("  Starting win probability model training...")
             clf_params = xgb_params.copy()
-            clf_params['eval_metric'] = 'logloss'
+            clf_params["eval_metric"] = "logloss"
             model = xgb.XGBClassifier(**clf_params)
-            model.fit(
-                X_train, y_win_train,
-                eval_set=[(X_val, y_win_val)],
-                verbose=False
-            )
+            model.fit(X_train, y_win_train, eval_set=[(X_val, y_win_val)], verbose=False)
             logger.info("  ✓ Win probability model complete")
             return model
 
         # Train all three models in parallel
         with ThreadPoolExecutor(max_workers=3) as executor:
             futures = {
-                executor.submit(train_spread_model): 'spread',
-                executor.submit(train_total_model): 'total',
-                executor.submit(train_win_prob_model): 'win_prob'
+                executor.submit(train_spread_model): "spread",
+                executor.submit(train_total_model): "total",
+                executor.submit(train_win_prob_model): "win_prob",
             }
 
             for future in as_completed(futures):
                 model_type = futures[future]
                 try:
-                    if model_type == 'spread':
+                    if model_type == "spread":
                         self.spread_model = future.result()
-                    elif model_type == 'total':
+                    elif model_type == "total":
                         self.total_model = future.result()
-                    elif model_type == 'win_prob':
+                    elif model_type == "win_prob":
                         self.win_prob_model = future.result()
                 except Exception as e:
                     logger.error(f"Training failed for {model_type} model: {e}")
@@ -251,26 +270,26 @@ class GameOutcomeModel:
         logger.info("All models trained successfully in parallel")
 
         # 5. Evaluate on validation set
-        metrics = self._evaluate_models(
-            X_val, y_spread_val, y_total_val, y_win_val
-        )
+        metrics = self._evaluate_models(X_val, y_spread_val, y_total_val, y_win_val)
 
         # FIXED: Store validation MAE as uncertainty estimates
-        self.spread_std = metrics['spread_mae'] * 0.5  # Conservative uncertainty
-        self.total_std = metrics['total_mae'] * 0.5
+        self.spread_std = metrics["spread_mae"] * 0.5  # Conservative uncertainty
+        self.total_std = metrics["total_mae"] * 0.5
 
         # 6. Compute SHAP values (FIXED: proper storage)
         self._compute_shap_values(X_val)
 
         # 7. Update metadata
-        self.metadata.update({
-            'created_at': datetime.now().isoformat(),
-            'training_seasons': seasons,
-            'feature_count': len(feature_cols),
-            'validation_metrics': metrics,
-            'spread_uncertainty': self.spread_std,
-            'total_uncertainty': self.total_std
-        })
+        self.metadata.update(
+            {
+                "created_at": datetime.now().isoformat(),
+                "training_seasons": seasons,
+                "feature_count": len(feature_cols),
+                "validation_metrics": metrics,
+                "spread_uncertainty": self.spread_std,
+                "total_uncertainty": self.total_std,
+            }
+        )
 
         self.models_trained = True
 
@@ -298,7 +317,9 @@ class GameOutcomeModel:
         all_games = []
 
         # Database connection for getting games
-        conn_str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"  # pragma: allowlist secret
+        conn_str = (
+            "postgresql://dro:sicillionbillions@localhost:5544/devdb01"  # pragma: allowlist secret
+        )
 
         for season in seasons:
             logger.info(f"Extracting features for season {season}...")
@@ -306,7 +327,8 @@ class GameOutcomeModel:
             # Get all games for the season
             with psycopg2.connect(conn_str) as conn:
                 with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                    cur.execute("""
+                    cur.execute(
+                        """
                         SELECT DISTINCT
                             g.season,
                             g.week,
@@ -320,7 +342,9 @@ class GameOutcomeModel:
                             AND g.game_type = 'REG'
                             AND g.home_score IS NOT NULL
                         ORDER BY g.week
-                    """, (season,))
+                    """,
+                        (season,),
+                    )
 
                     games = cur.fetchall()
 
@@ -328,46 +352,41 @@ class GameOutcomeModel:
             for game in games:
                 try:
                     features = self.feature_extractor.extract_game_features(
-                        game['home_team'],
-                        game['away_team'],
-                        game['season'],
-                        game['week']
+                        game["home_team"], game["away_team"], game["season"], game["week"]
                     )
 
                     # Add target variables
-                    features['spread'] = game['spread']
-                    features['total'] = game['total']
-                    features['home_win'] = game['home_win']
-                    features['season'] = game['season']
-                    features['week'] = game['week']
-                    features['home_team'] = game['home_team']
-                    features['away_team'] = game['away_team']
+                    features["spread"] = game["spread"]
+                    features["total"] = game["total"]
+                    features["home_win"] = game["home_win"]
+                    features["season"] = game["season"]
+                    features["week"] = game["week"]
+                    features["home_team"] = game["home_team"]
+                    features["away_team"] = game["away_team"]
 
                     all_games.append(features)
 
                 except Exception as e:
-                    logger.debug(f"Failed to extract features for {game['away_team']}@{game['home_team']} "
-                                f"Week {game['week']} Season {game['season']}: {e}")
+                    logger.debug(
+                        f"Failed to extract features for {game['away_team']}@{game['home_team']} "
+                        f"Week {game['week']} Season {game['season']}: {e}"
+                    )
                     continue
 
-            logger.info(f"  Extracted features for {len([g for g in all_games if g.get('season') == season])} games from season {season}")
+            logger.info(
+                f"  Extracted features for {len([g for g in all_games if g.get('season') == season])} games from season {season}"
+            )
 
         df = pd.DataFrame(all_games)
 
         # Remove games with missing features or targets
         initial_count = len(df)
-        df = df.dropna(subset=['spread', 'total', 'home_win'])
+        df = df.dropna(subset=["spread", "total", "home_win"])
         logger.info(f"Retained {len(df)}/{initial_count} games after removing missing data")
 
         return df
 
-    def predict(
-        self,
-        home_team: str,
-        away_team: str,
-        season: int,
-        week: int
-    ) -> dict[str, float]:
+    def predict(self, home_team: str, away_team: str, season: int, week: int) -> dict[str, float]:
         """
         Predict game outcome.
 
@@ -388,9 +407,7 @@ class GameOutcomeModel:
         """
         # FIXED: Input validation
         if not self.models_trained:
-            raise RuntimeError(
-                "Models not trained. Call train() or load_models() first."
-            )
+            raise RuntimeError("Models not trained. Call train() or load_models() first.")
 
         # Validate teams
         if home_team not in VALID_TEAMS:
@@ -416,7 +433,9 @@ class GameOutcomeModel:
             )
         except Exception as e:
             logger.error(f"Feature extraction failed: {e}")
-            raise ValueError(f"Could not extract features for {away_team}@{home_team} Week {week}: {e}")
+            raise ValueError(
+                f"Could not extract features for {away_team}@{home_team} Week {week}: {e}"
+            )
 
         # 2. Prepare feature vector (match training feature order)
         X = np.array([[features.get(col, 0.0) for col in self.feature_names]])
@@ -433,16 +452,16 @@ class GameOutcomeModel:
         elapsed_ms = (time.time() - start) * 1000
 
         result = {
-            'home_spread': float(round(home_spread, 1)),
-            'total_points': float(round(total_points, 1)),
-            'home_win_probability': float(round(home_win_probability, 3)),
-            'spread_std': float(round(spread_std, 2)),
-            'total_std': float(round(total_std, 2)),
-            'inference_time_ms': float(round(elapsed_ms, 1)),
-            'home_team': home_team,
-            'away_team': away_team,
-            'season': season,
-            'week': week
+            "home_spread": float(round(home_spread, 1)),
+            "total_points": float(round(total_points, 1)),
+            "home_win_probability": float(round(home_win_probability, 3)),
+            "spread_std": float(round(spread_std, 2)),
+            "total_std": float(round(total_std, 2)),
+            "inference_time_ms": float(round(elapsed_ms, 1)),
+            "home_team": home_team,
+            "away_team": away_team,
+            "season": season,
+            "week": week,
         }
 
         return result
@@ -452,7 +471,7 @@ class GameOutcomeModel:
         X_val: np.ndarray,
         y_spread_val: np.ndarray,
         y_total_val: np.ndarray,
-        y_win_val: np.ndarray
+        y_win_val: np.ndarray,
     ) -> dict[str, float]:
         """Evaluate models on validation data."""
         # Predictions
@@ -462,12 +481,12 @@ class GameOutcomeModel:
 
         # Metrics
         metrics = {
-            'spread_mae': float(mean_absolute_error(y_spread_val, spread_pred)),
-            'spread_rmse': float(np.sqrt(mean_squared_error(y_spread_val, spread_pred))),
-            'total_mae': float(mean_absolute_error(y_total_val, total_pred)),
-            'total_rmse': float(np.sqrt(mean_squared_error(y_total_val, total_pred))),
-            'win_prob_auc': float(roc_auc_score(y_win_val, win_prob_pred)),
-            'win_prob_accuracy': float(((win_prob_pred > 0.5) == y_win_val).mean())
+            "spread_mae": float(mean_absolute_error(y_spread_val, spread_pred)),
+            "spread_rmse": float(np.sqrt(mean_squared_error(y_spread_val, spread_pred))),
+            "total_mae": float(mean_absolute_error(y_total_val, total_pred)),
+            "total_rmse": float(np.sqrt(mean_squared_error(y_total_val, total_pred))),
+            "win_prob_auc": float(roc_auc_score(y_win_val, win_prob_pred)),
+            "win_prob_accuracy": float(((win_prob_pred > 0.5) == y_win_val).mean()),
         }
 
         return metrics
@@ -485,15 +504,15 @@ class GameOutcomeModel:
 
             # Spread model
             self.spread_explainer = shap.TreeExplainer(self.spread_model)
-            self.shap_values['spread'] = self.spread_explainer.shap_values(X_sample)
+            self.shap_values["spread"] = self.spread_explainer.shap_values(X_sample)
 
             # Total model
             self.total_explainer = shap.TreeExplainer(self.total_model)
-            self.shap_values['total'] = self.total_explainer.shap_values(X_sample)
+            self.shap_values["total"] = self.total_explainer.shap_values(X_sample)
 
             # Win probability model
             self.win_prob_explainer = shap.TreeExplainer(self.win_prob_model)
-            self.shap_values['win_prob'] = self.win_prob_explainer.shap_values(X_sample)
+            self.shap_values["win_prob"] = self.win_prob_explainer.shap_values(X_sample)
 
             logger.info("SHAP explainers computed successfully")
 
@@ -501,7 +520,7 @@ class GameOutcomeModel:
             logger.warning(f"SHAP computation failed: {e}")
             # Non-critical, continue without SHAP
 
-    def get_feature_importance(self, model_type: str = 'spread') -> pd.DataFrame:
+    def get_feature_importance(self, model_type: str = "spread") -> pd.DataFrame:
         """
         Get feature importance for specified model.
 
@@ -514,21 +533,20 @@ class GameOutcomeModel:
         if not self.models_trained:
             raise RuntimeError("Models not trained yet")
 
-        if model_type == 'spread':
+        if model_type == "spread":
             model = self.spread_model
-        elif model_type == 'total':
+        elif model_type == "total":
             model = self.total_model
-        elif model_type == 'win_prob':
+        elif model_type == "win_prob":
             model = self.win_prob_model
         else:
             raise ValueError(f"Invalid model_type: {model_type}")
 
         importance = model.feature_importances_
 
-        df = pd.DataFrame({
-            'feature': self.feature_names,
-            'importance': importance
-        }).sort_values('importance', ascending=False)
+        df = pd.DataFrame({"feature": self.feature_names, "importance": importance}).sort_values(
+            "importance", ascending=False
+        )
 
         return df
 
@@ -543,15 +561,15 @@ class GameOutcomeModel:
         self.win_prob_model.save_model(str(self.model_dir / "win_prob_model.json"))
 
         # Save metadata and feature names
-        with open(self.model_dir / "metadata.json", 'w') as f:
+        with open(self.model_dir / "metadata.json", "w") as f:
             json.dump(self.metadata, f, indent=2)
 
-        with open(self.model_dir / "feature_names.json", 'w') as f:
+        with open(self.model_dir / "feature_names.json", "w") as f:
             json.dump(self.feature_names, f)
 
         # Save SHAP values if available
         if self.shap_values:
-            with open(self.model_dir / "shap_values.pkl", 'wb') as f:
+            with open(self.model_dir / "shap_values.pkl", "wb") as f:
                 pickle.dump(self.shap_values, f)
 
         logger.info(f"Models saved to {self.model_dir}")
@@ -577,13 +595,13 @@ class GameOutcomeModel:
                 self.feature_names = json.load(f)
 
             # Load uncertainty estimates from metadata
-            self.spread_std = self.metadata.get('spread_uncertainty')
-            self.total_std = self.metadata.get('total_uncertainty')
+            self.spread_std = self.metadata.get("spread_uncertainty")
+            self.total_std = self.metadata.get("total_uncertainty")
 
             # Load SHAP values if available
             shap_path = self.model_dir / "shap_values.pkl"
             if shap_path.exists():
-                with open(shap_path, 'rb') as f:
+                with open(shap_path, "rb") as f:
                     self.shap_values = pickle.load(f)
 
             self.models_trained = True
@@ -599,10 +617,7 @@ def main():
     model = GameOutcomeModel()
 
     # Train on recent seasons
-    metrics = model.train(
-        seasons=[2022, 2023, 2024],
-        validation_split=0.2
-    )
+    metrics = model.train(seasons=[2022, 2023, 2024], validation_split=0.2)
 
     print("Validation Metrics:")
     print(f"  Spread MAE: {metrics['spread_mae']:.2f}")
@@ -614,19 +629,14 @@ def main():
 
     # Test prediction
     try:
-        prediction = model.predict(
-            home_team='KC',
-            away_team='BUF',
-            season=2024,
-            week=11
-        )
+        prediction = model.predict(home_team="KC", away_team="BUF", season=2024, week=11)
         print("\nSample Prediction:")
         print(json.dumps(prediction, indent=2))
     except Exception as e:
         print(f"Prediction failed: {e}")
 
     # Feature importance
-    importance = model.get_feature_importance('spread')
+    importance = model.get_feature_importance("spread")
     print("\nTop 10 Features for Spread Prediction:")
     print(importance.head(10))
 

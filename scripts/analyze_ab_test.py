@@ -46,8 +46,7 @@ import psycopg2
 from scipy import stats
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -196,10 +195,7 @@ class ABTestAnalyzer:
 
         return metrics
 
-    def statistical_tests(
-        self,
-        df: pd.DataFrame
-    ) -> dict:
+    def statistical_tests(self, df: pd.DataFrame) -> dict:
         """
         Perform statistical significance tests.
 
@@ -253,9 +249,8 @@ class ABTestAnalyzer:
 
         # 3. Effect size (Cohen's d)
         pooled_std = np.sqrt(
-            ((len(errors_a) - 1) * errors_a.std() ** 2 +
-             (len(errors_b) - 1) * errors_b.std() ** 2) /
-            (len(errors_a) + len(errors_b) - 2)
+            ((len(errors_a) - 1) * errors_a.std() ** 2 + (len(errors_b) - 1) * errors_b.std() ** 2)
+            / (len(errors_a) + len(errors_b) - 2)
         )
         cohens_d = (errors_a.mean() - errors_b.mean()) / pooled_std
 
@@ -272,10 +267,9 @@ class ABTestAnalyzer:
 
         # Test if calibration rates are different
         # Using chi-squared test for proportions
-        contingency_table = np.array([
-            [calibrated_a, n_a - calibrated_a],
-            [calibrated_b, n_b - calibrated_b]
-        ])
+        contingency_table = np.array(
+            [[calibrated_a, n_a - calibrated_a], [calibrated_b, n_b - calibrated_b]]
+        )
         chi2, p_cal, _, _ = stats.chi2_contingency(contingency_table)
 
         results["calibration_test"] = {
@@ -287,10 +281,7 @@ class ABTestAnalyzer:
         return results
 
     def _bootstrap_mae_difference(
-        self,
-        errors_a: np.ndarray,
-        errors_b: np.ndarray,
-        n_iterations: int = 10000
+        self, errors_a: np.ndarray, errors_b: np.ndarray, n_iterations: int = 10000
     ) -> np.ndarray:
         """
         Bootstrap confidence interval for MAE difference.
@@ -329,11 +320,7 @@ class ABTestAnalyzer:
         else:
             return "large"
 
-    def make_deployment_decision(
-        self,
-        metrics: dict,
-        statistical_tests: dict
-    ) -> dict:
+    def make_deployment_decision(self, metrics: dict, statistical_tests: dict) -> dict:
         """
         Make deployment decision based on metrics and tests.
 
@@ -454,7 +441,7 @@ class ABTestAnalyzer:
         metrics: dict,
         statistical_tests: dict,
         decision: dict,
-        output_format: str = "text"
+        output_format: str = "text",
     ) -> str:
         """
         Generate analysis report.
@@ -475,11 +462,7 @@ class ABTestAnalyzer:
             return self._generate_text_report(df, metrics, statistical_tests, decision)
 
     def _generate_text_report(
-        self,
-        df: pd.DataFrame,
-        metrics: dict,
-        statistical_tests: dict,
-        decision: dict
+        self, df: pd.DataFrame, metrics: dict, statistical_tests: dict, decision: dict
     ) -> str:
         """Generate plain text report."""
         lines = []
@@ -503,7 +486,9 @@ class ABTestAnalyzer:
         # Performance metrics
         lines.append("PERFORMANCE METRICS")
         lines.append("-" * 70)
-        lines.append(f"{'Metric':<20} {'Group A (v5.0)':>15} {'Group B (v5.1)':>15} {'Improvement':>15}")
+        lines.append(
+            f"{'Metric':<20} {'Group A (v5.0)':>15} {'Group B (v5.1)':>15} {'Improvement':>15}"
+        )
         lines.append("-" * 70)
 
         for metric_name, display_name in [
@@ -517,7 +502,7 @@ class ABTestAnalyzer:
 
             if val_a is not None and val_b is not None:
                 if metric_name == "calibration_90":
-                    improvement = (val_b - val_a)
+                    improvement = val_b - val_a
                     lines.append(
                         f"{display_name:<20} {val_a:>14.1%} {val_b:>14.1%} {improvement:>+14.1%}"
                     )
@@ -535,17 +520,23 @@ class ABTestAnalyzer:
 
         if "ttest" in statistical_tests:
             ttest = statistical_tests["ttest"]
-            lines.append(f"Welch's t-test:      t={ttest['t_statistic']:>6.3f}, p={ttest['p_value']:.4f}")
+            lines.append(
+                f"Welch's t-test:      t={ttest['t_statistic']:>6.3f}, p={ttest['p_value']:.4f}"
+            )
             lines.append(f"Significant:         {ttest['significant']} ({ttest['direction']})")
 
         if "bootstrap" in statistical_tests:
             boot = statistical_tests["bootstrap"]
-            lines.append(f"Bootstrap 95% CI:    [{boot['mae_diff_ci_lower']:.2f}, {boot['mae_diff_ci_upper']:.2f}]")
+            lines.append(
+                f"Bootstrap 95% CI:    [{boot['mae_diff_ci_lower']:.2f}, {boot['mae_diff_ci_upper']:.2f}]"
+            )
             lines.append(f"CI excludes zero:    {boot['ci_excludes_zero']}")
 
         if "effect_size" in statistical_tests:
             effect = statistical_tests["effect_size"]
-            lines.append(f"Cohen's d:           {effect['cohens_d']:.3f} ({effect['interpretation']})")
+            lines.append(
+                f"Cohen's d:           {effect['cohens_d']:.3f} ({effect['interpretation']})"
+            )
 
         lines.append("")
 
@@ -573,11 +564,7 @@ class ABTestAnalyzer:
         return "\n".join(lines)
 
     def _generate_html_report(
-        self,
-        df: pd.DataFrame,
-        metrics: dict,
-        statistical_tests: dict,
-        decision: dict
+        self, df: pd.DataFrame, metrics: dict, statistical_tests: dict, decision: dict
     ) -> str:
         """Generate HTML report (simplified version)."""
         # For brevity, using same text format wrapped in <pre>
@@ -599,11 +586,7 @@ class ABTestAnalyzer:
 """
         return html
 
-    def run_analysis(
-        self,
-        output_file: str | None = None,
-        output_format: str = "text"
-    ) -> dict:
+    def run_analysis(self, output_file: str | None = None, output_format: str = "text") -> dict:
         """
         Run complete A/B test analysis.
 
@@ -662,25 +645,17 @@ def main():
         description="Analyze A/B test results for ensemble v5.0 vs v5.1"
     )
     parser.add_argument(
-        "--output",
-        help="Output file for report (e.g., reports/ab_test_analysis.txt)"
+        "--output", help="Output file for report (e.g., reports/ab_test_analysis.txt)"
     )
     parser.add_argument(
-        "--format",
-        choices=["text", "html"],
-        default="text",
-        help="Report format (default: text)"
+        "--format", choices=["text", "html"], default="text", help="Report format (default: text)"
     )
     parser.add_argument(
         "--check-deployment",
         action="store_true",
-        help="Check if ready for deployment (exit code 0 if ready, 1 otherwise)"
+        help="Check if ready for deployment (exit code 0 if ready, 1 otherwise)",
     )
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        help="Verbose logging"
-    )
+    parser.add_argument("--verbose", action="store_true", help="Verbose logging")
 
     args = parser.parse_args()
 
@@ -689,10 +664,7 @@ def main():
 
     # Run analysis
     analyzer = ABTestAnalyzer()
-    results = analyzer.run_analysis(
-        output_file=args.output,
-        output_format=args.format
-    )
+    results = analyzer.run_analysis(output_file=args.output, output_format=args.format)
 
     # Check deployment readiness
     if args.check_deployment:

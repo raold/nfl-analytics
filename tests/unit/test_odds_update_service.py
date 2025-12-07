@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_from_env_basic():
@@ -56,7 +53,6 @@ def test_from_env_basic():
     assert result is not None
 
 
-
 def test_from_env_edge_cases():
     """Test from_env: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_from_env_edge_cases():
     assert result is not None
 
 
-
 def test_from_env_error_handling():
     """Test from_env error handling."""
     with pytest.raises(ValueError):
         from_env(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_from_env_property_idempotent(self, cls):
 
     # Assert property
     assert from_env(cls) == result, "idempotent violated"
-
 
 
 def test_to_dict_basic():
@@ -100,7 +93,6 @@ def test_to_dict_basic():
     assert result is not None
 
 
-
 def test_to_dict_edge_cases():
     """Test to_dict: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_to_dict_edge_cases():
     assert result is not None
 
 
-
 def test_to_dict_error_handling():
     """Test to_dict error handling."""
     with pytest.raises(ValueError):
         to_dict(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_to_dict_property_idempotent(val):
 
     # Assert property
     assert to_dict(val) == result, "idempotent violated"
-
 
 
 def test_log_summary_basic():
@@ -144,7 +133,6 @@ def test_log_summary_basic():
     assert result is not None
 
 
-
 def test_log_summary_edge_cases():
     """Test log_summary: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_log_summary_edge_cases():
     assert result is not None
 
 
-
 def test_log_summary_error_handling():
     """Test log_summary error handling."""
     with pytest.raises(ValueError):
         log_summary(invalid_input)
-
 
 
 @given(st.integers())
@@ -173,7 +159,6 @@ def test_log_summary_property_idempotent(val):
 
     # Assert property
     assert log_summary(val) == result, "idempotent violated"
-
 
 
 def test_poll_once_basic():
@@ -188,7 +173,6 @@ def test_poll_once_basic():
     assert result is not None
 
 
-
 def test_poll_once_edge_cases():
     """Test poll_once: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_poll_once_edge_cases():
     assert result is not None
 
 
-
 def test_poll_once_error_handling():
     """Test poll_once error handling."""
     with pytest.raises(ValueError):
         poll_once(invalid_input)
-
 
 
 @given(st.integers())
@@ -217,7 +199,6 @@ def test_poll_once_property_idempotent(val):
 
     # Assert property
     assert poll_once(val) == result, "idempotent violated"
-
 
 
 def test_run_basic():
@@ -232,7 +213,6 @@ def test_run_basic():
     assert result is not None
 
 
-
 def test_run_edge_cases():
     """Test run: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_run_edge_cases():
     assert result is not None
 
 
-
 def test_run_error_handling():
     """Test run error handling."""
     with pytest.raises(ValueError):
         run(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -261,4 +239,3 @@ def test_run_property_idempotent(self, self, once):
 
     # Assert property
     assert run(self, once) == result, "idempotent violated"
-

@@ -53,6 +53,7 @@ import numpy as np
 
 try:
     import pandas as pd
+
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -63,15 +64,17 @@ logger = logging.getLogger(__name__)
 
 class ValidationSeverity(Enum):
     """Validation issue severity levels."""
+
     CRITICAL = "CRITICAL"  # Model invalid
-    HIGH = "HIGH"          # Likely problematic
-    MEDIUM = "MEDIUM"      # Should investigate
-    LOW = "LOW"            # Minor concern
-    INFO = "INFO"          # Informational
+    HIGH = "HIGH"  # Likely problematic
+    MEDIUM = "MEDIUM"  # Should investigate
+    LOW = "LOW"  # Minor concern
+    INFO = "INFO"  # Informational
 
 
 class ValidationCategory(Enum):
     """Categories of validation checks."""
+
     MCMC_DIAGNOSTICS = "mcmc_diagnostics"
     CALIBRATION = "calibration"
     PRIOR_POSTERIOR = "prior_posterior"
@@ -82,6 +85,7 @@ class ValidationCategory(Enum):
 @dataclass
 class ValidationIssue:
     """Represents a model validation finding."""
+
     severity: ValidationSeverity
     category: ValidationCategory
     title: str
@@ -94,6 +98,7 @@ class ValidationIssue:
 @dataclass
 class ValidationReport:
     """Model validation report."""
+
     model_name: str
     validation_date: str = field(default_factory=lambda: datetime.now().isoformat())
     issues: list[ValidationIssue] = field(default_factory=list)
@@ -121,29 +126,32 @@ class ValidationReport:
 
     def to_json(self) -> str:
         """Export report to JSON."""
-        return json.dumps({
-            "model_name": self.model_name,
-            "validation_date": self.validation_date,
-            "passed": self.passed,
-            "summary": {
-                "critical": self.critical_count,
-                "high": self.high_count,
-                "medium": self.medium_count,
-                "low": self.low_count,
+        return json.dumps(
+            {
+                "model_name": self.model_name,
+                "validation_date": self.validation_date,
+                "passed": self.passed,
+                "summary": {
+                    "critical": self.critical_count,
+                    "high": self.high_count,
+                    "medium": self.medium_count,
+                    "low": self.low_count,
+                },
+                "issues": [
+                    {
+                        "severity": i.severity.value,
+                        "category": i.category.value,
+                        "title": i.title,
+                        "description": i.description,
+                        "metric_value": i.metric_value,
+                        "threshold": i.threshold,
+                        "recommendation": i.recommendation,
+                    }
+                    for i in self.issues
+                ],
             },
-            "issues": [
-                {
-                    "severity": i.severity.value,
-                    "category": i.category.value,
-                    "title": i.title,
-                    "description": i.description,
-                    "metric_value": i.metric_value,
-                    "threshold": i.threshold,
-                    "recommendation": i.recommendation,
-                }
-                for i in self.issues
-            ]
-        }, indent=2)
+            indent=2,
+        )
 
 
 class StatisticalValidator:
@@ -177,9 +185,7 @@ class StatisticalValidator:
         logger.info("StatisticalValidator initialized")
 
     def validate_rhat(
-        self,
-        rhat_values: np.ndarray,
-        param_names: list[str] | None = None
+        self, rhat_values: np.ndarray, param_names: list[str] | None = None
     ) -> list[ValidationIssue]:
         """
         Validate R-hat convergence diagnostic.
@@ -199,36 +205,37 @@ class StatisticalValidator:
         # Check each parameter
         for i, (rhat, name) in enumerate(zip(rhat_values, param_names)):
             if rhat > self.RHAT_THRESHOLD:
-                issues.append(ValidationIssue(
-                    severity=ValidationSeverity.CRITICAL,
-                    category=ValidationCategory.MCMC_DIAGNOSTICS,
-                    title=f"R-hat convergence failure: {name}",
-                    description=f"Parameter {name} has R-hat = {rhat:.4f}",
-                    metric_value=f"{rhat:.4f}",
-                    threshold=f"<{self.RHAT_THRESHOLD}",
-                    recommendation="Increase chains/draws or reparameterize model",
-                ))
+                issues.append(
+                    ValidationIssue(
+                        severity=ValidationSeverity.CRITICAL,
+                        category=ValidationCategory.MCMC_DIAGNOSTICS,
+                        title=f"R-hat convergence failure: {name}",
+                        description=f"Parameter {name} has R-hat = {rhat:.4f}",
+                        metric_value=f"{rhat:.4f}",
+                        threshold=f"<{self.RHAT_THRESHOLD}",
+                        recommendation="Increase chains/draws or reparameterize model",
+                    )
+                )
 
         # Check max R-hat
         max_rhat = np.max(rhat_values)
         if max_rhat > 1.05:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.CRITICAL,
-                category=ValidationCategory.MCMC_DIAGNOSTICS,
-                title="Severe convergence failure",
-                description=f"Max R-hat = {max_rhat:.4f} indicates non-convergence",
-                metric_value=f"{max_rhat:.4f}",
-                threshold=f"<{self.RHAT_THRESHOLD}",
-                recommendation="Model likely unidentifiable or misspecified",
-            ))
+            issues.append(
+                ValidationIssue(
+                    severity=ValidationSeverity.CRITICAL,
+                    category=ValidationCategory.MCMC_DIAGNOSTICS,
+                    title="Severe convergence failure",
+                    description=f"Max R-hat = {max_rhat:.4f} indicates non-convergence",
+                    metric_value=f"{max_rhat:.4f}",
+                    threshold=f"<{self.RHAT_THRESHOLD}",
+                    recommendation="Model likely unidentifiable or misspecified",
+                )
+            )
 
         return issues
 
     def validate_ess(
-        self,
-        ess_bulk: np.ndarray,
-        ess_tail: np.ndarray,
-        param_names: list[str] | None = None
+        self, ess_bulk: np.ndarray, ess_tail: np.ndarray, param_names: list[str] | None = None
     ) -> list[ValidationIssue]:
         """
         Validate Effective Sample Size diagnostics.
@@ -249,36 +256,36 @@ class StatisticalValidator:
         # Check bulk ESS
         for i, (ess, name) in enumerate(zip(ess_bulk, param_names)):
             if ess < self.ESS_BULK_THRESHOLD:
-                issues.append(ValidationIssue(
-                    severity=ValidationSeverity.HIGH,
-                    category=ValidationCategory.MCMC_DIAGNOSTICS,
-                    title=f"Low bulk ESS: {name}",
-                    description=f"Parameter {name} has bulk ESS = {ess:.0f}",
-                    metric_value=f"{ess:.0f}",
-                    threshold=f">{self.ESS_BULK_THRESHOLD}",
-                    recommendation="Increase draws or improve sampling efficiency",
-                ))
+                issues.append(
+                    ValidationIssue(
+                        severity=ValidationSeverity.HIGH,
+                        category=ValidationCategory.MCMC_DIAGNOSTICS,
+                        title=f"Low bulk ESS: {name}",
+                        description=f"Parameter {name} has bulk ESS = {ess:.0f}",
+                        metric_value=f"{ess:.0f}",
+                        threshold=f">{self.ESS_BULK_THRESHOLD}",
+                        recommendation="Increase draws or improve sampling efficiency",
+                    )
+                )
 
         # Check tail ESS
         for i, (ess, name) in enumerate(zip(ess_tail, param_names)):
             if ess < self.ESS_TAIL_THRESHOLD:
-                issues.append(ValidationIssue(
-                    severity=ValidationSeverity.HIGH,
-                    category=ValidationCategory.MCMC_DIAGNOSTICS,
-                    title=f"Low tail ESS: {name}",
-                    description=f"Parameter {name} has tail ESS = {ess:.0f}",
-                    metric_value=f"{ess:.0f}",
-                    threshold=f">{self.ESS_TAIL_THRESHOLD}",
-                    recommendation="Tails poorly explored - increase draws",
-                ))
+                issues.append(
+                    ValidationIssue(
+                        severity=ValidationSeverity.HIGH,
+                        category=ValidationCategory.MCMC_DIAGNOSTICS,
+                        title=f"Low tail ESS: {name}",
+                        description=f"Parameter {name} has tail ESS = {ess:.0f}",
+                        metric_value=f"{ess:.0f}",
+                        threshold=f">{self.ESS_TAIL_THRESHOLD}",
+                        recommendation="Tails poorly explored - increase draws",
+                    )
+                )
 
         return issues
 
-    def validate_divergences(
-        self,
-        num_divergences: int,
-        total_draws: int
-    ) -> list[ValidationIssue]:
+    def validate_divergences(self, num_divergences: int, total_draws: int) -> list[ValidationIssue]:
         """
         Validate divergent transitions.
 
@@ -295,25 +302,29 @@ class StatisticalValidator:
             divergence_rate = num_divergences / total_draws
 
             if num_divergences > self.DIVERGENCE_THRESHOLD:
-                issues.append(ValidationIssue(
-                    severity=ValidationSeverity.CRITICAL,
-                    category=ValidationCategory.MCMC_DIAGNOSTICS,
-                    title="Divergent transitions detected",
-                    description=f"{num_divergences} divergences ({divergence_rate:.2%})",
-                    metric_value=f"{num_divergences}",
-                    threshold="0",
-                    recommendation="Reparameterize model or increase adapt_delta",
-                ))
+                issues.append(
+                    ValidationIssue(
+                        severity=ValidationSeverity.CRITICAL,
+                        category=ValidationCategory.MCMC_DIAGNOSTICS,
+                        title="Divergent transitions detected",
+                        description=f"{num_divergences} divergences ({divergence_rate:.2%})",
+                        metric_value=f"{num_divergences}",
+                        threshold="0",
+                        recommendation="Reparameterize model or increase adapt_delta",
+                    )
+                )
             else:
-                issues.append(ValidationIssue(
-                    severity=ValidationSeverity.MEDIUM,
-                    category=ValidationCategory.MCMC_DIAGNOSTICS,
-                    title="Some divergences present",
-                    description=f"{num_divergences} divergences (small number)",
-                    metric_value=f"{num_divergences}",
-                    threshold="0",
-                    recommendation="Monitor - may indicate minor specification issues",
-                ))
+                issues.append(
+                    ValidationIssue(
+                        severity=ValidationSeverity.MEDIUM,
+                        category=ValidationCategory.MCMC_DIAGNOSTICS,
+                        title="Some divergences present",
+                        description=f"{num_divergences} divergences (small number)",
+                        metric_value=f"{num_divergences}",
+                        threshold="0",
+                        recommendation="Monitor - may indicate minor specification issues",
+                    )
+                )
 
         return issues
 
@@ -321,7 +332,7 @@ class StatisticalValidator:
         self,
         predictions: np.ndarray,
         actuals: np.ndarray,
-        confidence_levels: list[float] | None = None
+        confidence_levels: list[float] | None = None,
     ) -> tuple[float, list[ValidationIssue]]:
         """
         Validate model calibration via coverage tests.
@@ -352,25 +363,31 @@ class StatisticalValidator:
                 diff = abs(coverage - conf_level)
 
                 if diff > self.CALIBRATION_TOLERANCE:
-                    severity = ValidationSeverity.CRITICAL if diff > 0.15 else \
-                               ValidationSeverity.HIGH if diff > 0.10 else \
-                               ValidationSeverity.MEDIUM
+                    severity = (
+                        ValidationSeverity.CRITICAL
+                        if diff > 0.15
+                        else ValidationSeverity.HIGH if diff > 0.10 else ValidationSeverity.MEDIUM
+                    )
 
-                    issues.append(ValidationIssue(
-                        severity=severity,
-                        category=ValidationCategory.CALIBRATION,
-                        title=f"Miscalibration at {conf_level:.0%} level",
-                        description=f"Coverage {coverage:.1%} vs nominal {conf_level:.1%}",
-                        metric_value=f"{coverage:.1%}",
-                        threshold=f"{conf_level:.1%} ± {self.CALIBRATION_TOLERANCE:.1%}",
-                        recommendation="Adjust temperature scaling or retrain model",
-                    ))
+                    issues.append(
+                        ValidationIssue(
+                            severity=severity,
+                            category=ValidationCategory.CALIBRATION,
+                            title=f"Miscalibration at {conf_level:.0%} level",
+                            description=f"Coverage {coverage:.1%} vs nominal {conf_level:.1%}",
+                            metric_value=f"{coverage:.1%}",
+                            threshold=f"{conf_level:.1%} ± {self.CALIBRATION_TOLERANCE:.1%}",
+                            recommendation="Adjust temperature scaling or retrain model",
+                        )
+                    )
 
             # Overall calibration score (average over confidence levels)
-            calibration_score = 1.0 - np.mean([
-                abs(np.mean((actuals >= lower) & (actuals <= upper)) - conf_level)
-                for conf_level in confidence_levels
-            ])
+            calibration_score = 1.0 - np.mean(
+                [
+                    abs(np.mean((actuals >= lower) & (actuals <= upper)) - conf_level)
+                    for conf_level in confidence_levels
+                ]
+            )
 
         else:
             # Point predictions - use residual analysis
@@ -379,23 +396,22 @@ class StatisticalValidator:
 
         # Check minimum calibration
         if calibration_score < self.MIN_CALIBRATION:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.CRITICAL,
-                category=ValidationCategory.CALIBRATION,
-                title="Poor model calibration",
-                description=f"Calibration score {calibration_score:.1%} below minimum",
-                metric_value=f"{calibration_score:.1%}",
-                threshold=f">{self.MIN_CALIBRATION:.1%}",
-                recommendation="Retrain model with better calibration",
-            ))
+            issues.append(
+                ValidationIssue(
+                    severity=ValidationSeverity.CRITICAL,
+                    category=ValidationCategory.CALIBRATION,
+                    title="Poor model calibration",
+                    description=f"Calibration score {calibration_score:.1%} below minimum",
+                    metric_value=f"{calibration_score:.1%}",
+                    threshold=f">{self.MIN_CALIBRATION:.1%}",
+                    recommendation="Retrain model with better calibration",
+                )
+            )
 
         return calibration_score, issues
 
     def validate_priors(
-        self,
-        prior_samples: np.ndarray,
-        posterior_samples: np.ndarray,
-        param_name: str
+        self, prior_samples: np.ndarray, posterior_samples: np.ndarray, param_name: str
     ) -> list[ValidationIssue]:
         """
         Validate prior specification via prior/posterior comparison.
@@ -419,47 +435,51 @@ class StatisticalValidator:
         # Check if posterior is same as prior (data not informative)
         mean_diff = abs(post_mean - prior_mean) / prior_std
         if mean_diff < 0.1:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.MEDIUM,
-                category=ValidationCategory.PRIOR_POSTERIOR,
-                title=f"Posterior ≈ Prior: {param_name}",
-                description="Posterior unchanged from prior (data uninformative)",
-                metric_value=f"{mean_diff:.2f} std",
-                threshold=">0.1 std",
-                recommendation="Data may not inform this parameter - consider removing",
-            ))
+            issues.append(
+                ValidationIssue(
+                    severity=ValidationSeverity.MEDIUM,
+                    category=ValidationCategory.PRIOR_POSTERIOR,
+                    title=f"Posterior ≈ Prior: {param_name}",
+                    description="Posterior unchanged from prior (data uninformative)",
+                    metric_value=f"{mean_diff:.2f} std",
+                    threshold=">0.1 std",
+                    recommendation="Data may not inform this parameter - consider removing",
+                )
+            )
 
         # Check if prior is too wide (posterior >> prior precision)
         precision_ratio = prior_std / post_std
         if precision_ratio > 10:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.LOW,
-                category=ValidationCategory.PRIOR_POSTERIOR,
-                title=f"Prior too wide: {param_name}",
-                description=f"Prior {precision_ratio:.1f}x wider than posterior",
-                metric_value=f"{precision_ratio:.1f}x",
-                threshold="<10x",
-                recommendation="Consider more informative prior based on domain knowledge",
-            ))
+            issues.append(
+                ValidationIssue(
+                    severity=ValidationSeverity.LOW,
+                    category=ValidationCategory.PRIOR_POSTERIOR,
+                    title=f"Prior too wide: {param_name}",
+                    description=f"Prior {precision_ratio:.1f}x wider than posterior",
+                    metric_value=f"{precision_ratio:.1f}x",
+                    threshold="<10x",
+                    recommendation="Consider more informative prior based on domain knowledge",
+                )
+            )
 
         # Check if prior is too narrow (posterior ≈ prior width)
         if precision_ratio < 1.5:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.MEDIUM,
-                category=ValidationCategory.PRIOR_POSTERIOR,
-                title=f"Prior too narrow: {param_name}",
-                description="Prior constrains posterior too much",
-                metric_value=f"{precision_ratio:.2f}x",
-                threshold=">1.5x",
-                recommendation="Use wider prior to let data speak",
-            ))
+            issues.append(
+                ValidationIssue(
+                    severity=ValidationSeverity.MEDIUM,
+                    category=ValidationCategory.PRIOR_POSTERIOR,
+                    title=f"Prior too narrow: {param_name}",
+                    description="Prior constrains posterior too much",
+                    metric_value=f"{precision_ratio:.2f}x",
+                    threshold=">1.5x",
+                    recommendation="Use wider prior to let data speak",
+                )
+            )
 
         return issues
 
     def validate_model(
-        self,
-        model_data: dict[str, Any],
-        validation_type: str = "full"
+        self, model_data: dict[str, Any], validation_type: str = "full"
     ) -> ValidationReport:
         """
         Comprehensive model validation.
@@ -477,33 +497,25 @@ class StatisticalValidator:
         Returns:
             Complete validation report
         """
-        report = ValidationReport(
-            model_name=model_data.get("model_name", "unknown")
-        )
+        report = ValidationReport(model_name=model_data.get("model_name", "unknown"))
 
         # MCMC diagnostics
         if validation_type in ["full", "mcmc_only"]:
             if "rhat" in model_data:
-                issues = self.validate_rhat(
-                    model_data["rhat"],
-                    model_data.get("param_names")
-                )
+                issues = self.validate_rhat(model_data["rhat"], model_data.get("param_names"))
                 for issue in issues:
                     report.add_issue(issue)
 
             if "ess_bulk" in model_data and "ess_tail" in model_data:
                 issues = self.validate_ess(
-                    model_data["ess_bulk"],
-                    model_data["ess_tail"],
-                    model_data.get("param_names")
+                    model_data["ess_bulk"], model_data["ess_tail"], model_data.get("param_names")
                 )
                 for issue in issues:
                     report.add_issue(issue)
 
             if "divergences" in model_data:
                 issues = self.validate_divergences(
-                    model_data["divergences"],
-                    model_data.get("total_draws", 4000)
+                    model_data["divergences"], model_data.get("total_draws", 4000)
                 )
                 for issue in issues:
                     report.add_issue(issue)
@@ -512,8 +524,7 @@ class StatisticalValidator:
         if validation_type in ["full", "calibration_only"]:
             if "predictions" in model_data and "actuals" in model_data:
                 calibration_score, issues = self.validate_calibration(
-                    model_data["predictions"],
-                    model_data["actuals"]
+                    model_data["predictions"], model_data["actuals"]
                 )
                 for issue in issues:
                     report.add_issue(issue)
@@ -551,7 +562,9 @@ class StatisticalValidator:
             category_issues = [i for i in report.issues if i.category == category]
 
             if category_issues:
-                lines.append(f"\n{category.value.upper().replace('_', ' ')} ({len(category_issues)} issues):")
+                lines.append(
+                    f"\n{category.value.upper().replace('_', ' ')} ({len(category_issues)} issues):"
+                )
                 lines.append("-" * 80)
 
                 for issue in category_issues:

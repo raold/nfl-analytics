@@ -21,7 +21,6 @@ def test_test_temperature_scaling_basic():
     assert result is not None
 
 
-
 def test_test_temperature_scaling_edge_cases():
     """Test test_temperature_scaling: edge cases."""
     # Arrange
@@ -34,12 +33,10 @@ def test_test_temperature_scaling_edge_cases():
     assert result is not None
 
 
-
 def test_test_temperature_scaling_error_handling():
     """Test test_temperature_scaling error handling."""
     with pytest.raises(ValueError):
         test_temperature_scaling(invalid_input)
-
 
 
 def test_test_state_space_csv_lookup_basic():
@@ -54,7 +51,6 @@ def test_test_state_space_csv_lookup_basic():
     assert result is not None
 
 
-
 def test_test_state_space_csv_lookup_edge_cases():
     """Test test_state_space_csv_lookup: edge cases."""
     # Arrange
@@ -67,12 +63,10 @@ def test_test_state_space_csv_lookup_edge_cases():
     assert result is not None
 
 
-
 def test_test_state_space_csv_lookup_error_handling():
     """Test test_state_space_csv_lookup error handling."""
     with pytest.raises(ValueError):
         test_state_space_csv_lookup(invalid_input)
-
 
 
 def test_test_full_ensemble_prediction_basic():
@@ -87,7 +81,6 @@ def test_test_full_ensemble_prediction_basic():
     assert result is not None
 
 
-
 def test_test_full_ensemble_prediction_edge_cases():
     """Test test_full_ensemble_prediction: edge cases."""
     # Arrange
@@ -100,9 +93,7 @@ def test_test_full_ensemble_prediction_edge_cases():
     assert result is not None
 
 
-
 def test_test_full_ensemble_prediction_error_handling():
     """Test test_full_ensemble_prediction error handling."""
     with pytest.raises(ValueError):
         test_full_ensemble_prediction(invalid_input)
-

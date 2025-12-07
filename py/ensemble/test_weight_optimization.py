@@ -23,10 +23,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def generate_synthetic_predictions(
-    n_games: int = 148,
-    seed: int = 42
-) -> pd.DataFrame:
+def generate_synthetic_predictions(n_games: int = 148, seed: int = 42) -> pd.DataFrame:
     """
     Generate synthetic predictions for 5 models with realistic characteristics.
 
@@ -78,21 +75,23 @@ def generate_synthetic_predictions(
     std_informative = np.random.uniform(37, 57, n_games)
 
     # Create dataframe
-    df = pd.DataFrame({
-        'game_id': range(n_games),
-        'player_id': [f"player_{i % 50}" for i in range(n_games)],
-        'actual_yards': actual_yards,
-        'pred_state_space': pred_state_space,
-        'pred_bnn': pred_bnn,
-        'pred_hierarchical': pred_hierarchical,
-        'pred_xgboost': pred_xgboost,
-        'pred_informative': pred_informative,
-        'std_state_space': std_state_space,
-        'std_bnn': std_bnn,
-        'std_hierarchical': std_hierarchical,
-        'std_xgboost': std_xgboost,
-        'std_informative': std_informative,
-    })
+    df = pd.DataFrame(
+        {
+            "game_id": range(n_games),
+            "player_id": [f"player_{i % 50}" for i in range(n_games)],
+            "actual_yards": actual_yards,
+            "pred_state_space": pred_state_space,
+            "pred_bnn": pred_bnn,
+            "pred_hierarchical": pred_hierarchical,
+            "pred_xgboost": pred_xgboost,
+            "pred_informative": pred_informative,
+            "std_state_space": std_state_space,
+            "std_bnn": std_bnn,
+            "std_hierarchical": std_hierarchical,
+            "std_xgboost": std_xgboost,
+            "std_informative": std_informative,
+        }
+    )
 
     return df
 
@@ -120,7 +119,7 @@ def test_optimization():
         predictions_path=temp_predictions,
         output_path=temp_output,
         target_mae=45.2,
-        target_calibration=89.0
+        target_calibration=89.0,
     )
 
     # Validate results
@@ -137,7 +136,7 @@ def test_optimization():
         logger.info(f"✓ Highest weight: {best_model[0]} ({best_model[1]:.3f})")
 
     # Check ensemble improves over best single model
-    best_single_mae = result.metadata['best_single_mae']
+    best_single_mae = result.metadata["best_single_mae"]
     ensemble_mae = result.all_methods[0].ensemble_mae  # First method
 
     logger.info(f"✓ Best single MAE: {best_single_mae:.2f}")

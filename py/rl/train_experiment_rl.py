@@ -23,11 +23,9 @@ from experiment_augmented_env import ExperimentAugmentedBettingEnv
 from experiment_rl_agent import AblationStudyRunner, DQNAgent, PPOAgent
 
 
-def train_agent(env,
-                agent,
-                num_episodes: int = 1000,
-                eval_freq: int = 100,
-                verbose: bool = True) -> dict:
+def train_agent(
+    env, agent, num_episodes: int = 1000, eval_freq: int = 100, verbose: bool = True
+) -> dict:
     """
     Train RL agent on betting environment.
 
@@ -76,15 +74,12 @@ def train_agent(env,
 
         # Track metrics
         episode_returns.append(episode_return)
-        episode_rois.append(info['total_roi'])
+        episode_rois.append(info["total_roi"])
 
         # Periodic evaluation
         if (episode + 1) % eval_freq == 0:
             eval_result = evaluate_agent(env, agent, num_eval_episodes=10)
-            eval_results.append({
-                'episode': episode + 1,
-                **eval_result
-            })
+            eval_results.append({"episode": episode + 1, **eval_result})
 
             if verbose:
                 print(f"Episode {episode + 1}/{num_episodes}")
@@ -97,10 +92,10 @@ def train_agent(env,
                 print()
 
     return {
-        'episode_returns': episode_returns,
-        'episode_rois': episode_rois,
-        'eval_results': eval_results,
-        'final_feature_importance': agent.get_feature_importance().tolist()
+        "episode_returns": episode_returns,
+        "episode_rois": episode_rois,
+        "eval_results": eval_results,
+        "final_feature_importance": agent.get_feature_importance().tolist(),
     }
 
 
@@ -136,25 +131,24 @@ def evaluate_agent(env, agent, num_eval_episodes: int = 20) -> dict:
             episode_return += reward
 
         eval_returns.append(episode_return)
-        eval_rois.append(info['total_roi'])
+        eval_rois.append(info["total_roi"])
 
         stats = env.get_episode_stats()
-        eval_sharpes.append(stats['sharpe_ratio'])
+        eval_sharpes.append(stats["sharpe_ratio"])
 
     return {
-        'mean_return': np.mean(eval_returns),
-        'std_return': np.std(eval_returns),
-        'mean_roi': np.mean(eval_rois),
-        'std_roi': np.std(eval_rois),
-        'mean_sharpe': np.mean(eval_sharpes),
-        'final_bankroll': env.current_bankroll
+        "mean_return": np.mean(eval_returns),
+        "std_return": np.std(eval_returns),
+        "mean_roi": np.mean(eval_rois),
+        "std_roi": np.std(eval_rois),
+        "mean_sharpe": np.mean(eval_sharpes),
+        "final_bankroll": env.current_bankroll,
     }
 
 
-def run_ablation_studies(env,
-                        agent_class,
-                        agent_params: dict,
-                        num_episodes: int = 100) -> list[dict]:
+def run_ablation_studies(
+    env, agent_class, agent_params: dict, num_episodes: int = 100
+) -> list[dict]:
     """
     Run ablation studies to measure individual experiment contributions.
 
@@ -174,42 +168,39 @@ def run_ablation_studies(env,
     # Define ablation experiments
     ablations = [
         # Full model (baseline)
-        {
-            'name': 'Full Model (All 29 Experiments)',
-            'removed_indices': []
-        },
+        {"name": "Full Model (All 29 Experiments)", "removed_indices": []},
         # Remove cVAE features
         {
-            'name': 'No cVAE Features',
-            'removed_indices': list(range(0, 13))  # First 13 experiment features
+            "name": "No cVAE Features",
+            "removed_indices": list(range(0, 13)),  # First 13 experiment features
         },
         # Remove causal features
         {
-            'name': 'No Causal Features',
-            'removed_indices': list(range(13, 29))  # Last 16 experiment features
+            "name": "No Causal Features",
+            "removed_indices": list(range(13, 29)),  # Last 16 experiment features
         },
         # Remove top individual experiments
         {
-            'name': 'No CVAE-014 (Playoff Resting)',
-            'removed_indices': [6]  # playoff_resting_prob feature
+            "name": "No CVAE-014 (Playoff Resting)",
+            "removed_indices": [6],  # playoff_resting_prob feature
         },
         {
-            'name': 'No CVAE-010 (Injury Adjustment)',
-            'removed_indices': [2]  # injury_adjustment feature
+            "name": "No CVAE-010 (Injury Adjustment)",
+            "removed_indices": [2],  # injury_adjustment feature
         },
         {
-            'name': 'No CAUSAL-014 (4th Down)',
-            'removed_indices': [23]  # fourth_down_aggression feature
+            "name": "No CAUSAL-014 (4th Down)",
+            "removed_indices": [23],  # fourth_down_aggression feature
         },
         {
-            'name': 'No CAUSAL-008 (OL Quality)',
-            'removed_indices': [19, 20]  # ol_quality_rushing and ol_quality_passing
+            "name": "No CAUSAL-008 (OL Quality)",
+            "removed_indices": [19, 20],  # ol_quality_rushing and ol_quality_passing
         },
         # Remove base features (to show experiments matter)
         {
-            'name': 'Only Experiment Features (No Base)',
-            'removed_indices': []  # Special case handled separately
-        }
+            "name": "Only Experiment Features (No Base)",
+            "removed_indices": [],  # Special case handled separately
+        },
     ]
 
     results = []
@@ -219,9 +210,9 @@ def run_ablation_studies(env,
 
         result = runner.run_ablation(
             env=env,
-            experiment_indices=ablation['removed_indices'],
+            experiment_indices=ablation["removed_indices"],
             num_episodes=num_episodes,
-            experiment_name=ablation['name']
+            experiment_name=ablation["name"],
         )
 
         results.append(result)
@@ -233,8 +224,7 @@ def run_ablation_studies(env,
     return results
 
 
-def compare_baseline_vs_experiments(num_episodes: int = 500,
-                                   eval_freq: int = 50) -> dict:
+def compare_baseline_vs_experiments(num_episodes: int = 500, eval_freq: int = 50) -> dict:
     """
     Compare agent performance with vs without experiment features.
 
@@ -251,11 +241,11 @@ def compare_baseline_vs_experiments(num_episodes: int = 500,
     """
     # Database params
     db_params = {
-        'dbname': 'devdb01',
-        'user': 'dro',
-        'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
-        'host': 'localhost',
-        'port': 5544
+        "dbname": "devdb01",
+        "user": "dro",
+        "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
+        "host": "localhost",
+        "port": 5544,
     }
 
     print("=" * 80)
@@ -271,7 +261,7 @@ def compare_baseline_vs_experiments(num_episodes: int = 500,
         end_season=2023,
         initial_bankroll=10000.0,
         max_bet_fraction=0.10,
-        kelly_aggressiveness=0.25
+        kelly_aggressiveness=0.25,
     )
 
     # For baseline, we'd need a simpler environment (not implemented here)
@@ -288,7 +278,7 @@ def compare_baseline_vs_experiments(num_episodes: int = 500,
         gamma=0.99,
         epsilon_start=1.0,
         epsilon_end=0.01,
-        epsilon_decay=0.995
+        epsilon_decay=0.995,
     )
 
     results_experiment = train_agent(
@@ -296,17 +286,13 @@ def compare_baseline_vs_experiments(num_episodes: int = 500,
         agent=agent_experiment,
         num_episodes=num_episodes,
         eval_freq=eval_freq,
-        verbose=True
+        verbose=True,
     )
 
     print("\nTraining experiment-augmented PPO agent...")
 
     agent_ppo = PPOAgent(
-        state_dim=44,
-        action_dim=5,
-        hidden_dims=[128, 128],
-        learning_rate=3e-4,
-        gamma=0.99
+        state_dim=44, action_dim=5, hidden_dims=[128, 128], learning_rate=3e-4, gamma=0.99
     )
 
     results_ppo = train_agent(
@@ -314,7 +300,7 @@ def compare_baseline_vs_experiments(num_episodes: int = 500,
         agent=agent_ppo,
         num_episodes=num_episodes,
         eval_freq=eval_freq,
-        verbose=True
+        verbose=True,
     )
 
     # Final evaluation
@@ -326,24 +312,22 @@ def compare_baseline_vs_experiments(num_episodes: int = 500,
     final_eval_ppo = evaluate_agent(env_experiment, agent_ppo, num_eval_episodes=50)
 
     print("\nDQN Agent:")
-    print(f"  Mean Return: {final_eval_dqn['mean_return']:.4f} ± {final_eval_dqn['std_return']:.4f}")
+    print(
+        f"  Mean Return: {final_eval_dqn['mean_return']:.4f} ± {final_eval_dqn['std_return']:.4f}"
+    )
     print(f"  Mean ROI: {final_eval_dqn['mean_roi']:.4f} ± {final_eval_dqn['std_roi']:.4f}")
     print(f"  Mean Sharpe: {final_eval_dqn['mean_sharpe']:.4f}")
 
     print("\nPPO Agent:")
-    print(f"  Mean Return: {final_eval_ppo['mean_return']:.4f} ± {final_eval_ppo['std_return']:.4f}")
+    print(
+        f"  Mean Return: {final_eval_ppo['mean_return']:.4f} ± {final_eval_ppo['std_return']:.4f}"
+    )
     print(f"  Mean ROI: {final_eval_ppo['mean_roi']:.4f} ± {final_eval_ppo['std_roi']:.4f}")
     print(f"  Mean Sharpe: {final_eval_ppo['mean_sharpe']:.4f}")
 
     return {
-        'dqn': {
-            'training_results': results_experiment,
-            'final_eval': final_eval_dqn
-        },
-        'ppo': {
-            'training_results': results_ppo,
-            'final_eval': final_eval_ppo
-        }
+        "dqn": {"training_results": results_experiment, "final_eval": final_eval_dqn},
+        "ppo": {"training_results": results_ppo, "final_eval": final_eval_ppo},
     }
 
 
@@ -360,53 +344,52 @@ def analyze_feature_importance(agent, feature_names: list[str]) -> pd.DataFrame:
     """
     importance = agent.get_feature_importance()
 
-    df = pd.DataFrame({
-        'feature': feature_names,
-        'importance': importance,
-        'rank': np.argsort(-importance) + 1
-    })
+    df = pd.DataFrame(
+        {"feature": feature_names, "importance": importance, "rank": np.argsort(-importance) + 1}
+    )
 
-    df = df.sort_values('importance', ascending=False)
+    df = df.sort_values("importance", ascending=False)
 
     return df
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Train Experiment-Augmented RL Agents')
+    parser = argparse.ArgumentParser(description="Train Experiment-Augmented RL Agents")
 
-    parser.add_argument('--agent', type=str, default='dqn',
-                       choices=['dqn', 'ppo', 'both'],
-                       help='Agent type to train')
-    parser.add_argument('--episodes', type=int, default=1000,
-                       help='Number of training episodes')
-    parser.add_argument('--eval-freq', type=int, default=100,
-                       help='Evaluation frequency')
-    parser.add_argument('--ablation', action='store_true',
-                       help='Run ablation studies')
-    parser.add_argument('--ablation-episodes', type=int, default=100,
-                       help='Episodes per ablation study')
-    parser.add_argument('--output-dir', type=str, default='experiments/rl',
-                       help='Output directory for results')
-    parser.add_argument('--save-agents', action='store_true',
-                       help='Save trained agents')
+    parser.add_argument(
+        "--agent",
+        type=str,
+        default="dqn",
+        choices=["dqn", "ppo", "both"],
+        help="Agent type to train",
+    )
+    parser.add_argument("--episodes", type=int, default=1000, help="Number of training episodes")
+    parser.add_argument("--eval-freq", type=int, default=100, help="Evaluation frequency")
+    parser.add_argument("--ablation", action="store_true", help="Run ablation studies")
+    parser.add_argument(
+        "--ablation-episodes", type=int, default=100, help="Episodes per ablation study"
+    )
+    parser.add_argument(
+        "--output-dir", type=str, default="experiments/rl", help="Output directory for results"
+    )
+    parser.add_argument("--save-agents", action="store_true", help="Save trained agents")
 
     args = parser.parse_args()
 
     # Create output directory
     os.makedirs(args.output_dir, exist_ok=True)
 
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-    if args.agent == 'both':
+    if args.agent == "both":
         # Compare DQN and PPO
         results = compare_baseline_vs_experiments(
-            num_episodes=args.episodes,
-            eval_freq=args.eval_freq
+            num_episodes=args.episodes, eval_freq=args.eval_freq
         )
 
         # Save results
-        output_path = os.path.join(args.output_dir, f'comparison_{timestamp}.json')
-        with open(output_path, 'w') as f:
+        output_path = os.path.join(args.output_dir, f"comparison_{timestamp}.json")
+        with open(output_path, "w") as f:
             json.dump(results, f, indent=2)
 
         print(f"\nResults saved to: {output_path}")
@@ -414,20 +397,16 @@ def main():
     else:
         # Train single agent
         db_params = {
-            'dbname': 'devdb01',
-            'user': 'dro',
-            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
-            'host': 'localhost',
-            'port': 5544
+            "dbname": "devdb01",
+            "user": "dro",
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
+            "host": "localhost",
+            "port": 5544,
         }
 
-        env = ExperimentAugmentedBettingEnv(
-            db_params=db_params,
-            start_season=2020,
-            end_season=2023
-        )
+        env = ExperimentAugmentedBettingEnv(db_params=db_params, start_season=2020, end_season=2023)
 
-        if args.agent == 'dqn':
+        if args.agent == "dqn":
             agent = DQNAgent(state_dim=44, action_dim=5)
             print("Training DQN Agent...")
         else:
@@ -437,40 +416,72 @@ def main():
         results = train_agent(env, agent, args.episodes, args.eval_freq)
 
         # Save results
-        output_path = os.path.join(args.output_dir, f'{args.agent}_{timestamp}.json')
-        with open(output_path, 'w') as f:
+        output_path = os.path.join(args.output_dir, f"{args.agent}_{timestamp}.json")
+        with open(output_path, "w") as f:
             json.dump(results, f, indent=2)
 
         print(f"\nResults saved to: {output_path}")
 
         # Save agent
         if args.save_agents:
-            agent_path = os.path.join(args.output_dir, f'{args.agent}_{timestamp}.pt')
+            agent_path = os.path.join(args.output_dir, f"{args.agent}_{timestamp}.pt")
             agent.save(agent_path)
             print(f"Agent saved to: {agent_path}")
 
         # Feature importance analysis
         feature_names = [
             # Base features (15)
-            'home_win_prob', 'away_win_prob', 'spread', 'total', 'home_score',
-            'away_score', 'season', 'week', 'week_normalized', 'market_edge',
-            'abs_spread', 'total_normalized', 'actual_total', 'margin', 'signed_margin',
+            "home_win_prob",
+            "away_win_prob",
+            "spread",
+            "total",
+            "home_score",
+            "away_score",
+            "season",
+            "week",
+            "week_normalized",
+            "market_edge",
+            "abs_spread",
+            "total_normalized",
+            "actual_total",
+            "margin",
+            "signed_margin",
             # cVAE features (13)
-            'blowout_prob', 'multi_horizon_q1', 'multi_horizon_q2', 'multi_horizon_q3',
-            'multi_horizon_q4', 'injury_adjustment', 'home_advantage', 'rivalry_variance',
-            'playoff_resting_prob', 'rookie_qb_adjustment', 'two_minute_score',
-            'coordinator_change', 'season_trend',
+            "blowout_prob",
+            "multi_horizon_q1",
+            "multi_horizon_q2",
+            "multi_horizon_q3",
+            "multi_horizon_q4",
+            "injury_adjustment",
+            "home_advantage",
+            "rivalry_variance",
+            "playoff_resting_prob",
+            "rookie_qb_adjustment",
+            "two_minute_score",
+            "coordinator_change",
+            "season_trend",
             # Causal features (16)
-            'surface_effect', 'home_field_ate', 'altitude_effect', 'cross_country_travel',
-            'short_week_effect', 'ol_quality_rushing', 'ol_quality_passing',
-            'veteran_qb_effect', 'personnel_heavy', 'personnel_spread',
-            'fourth_down_aggression', 'conservative_bias', 'new_rules_effect',
-            'defensive_scheme', 'recency_bias', 'sunk_cost_effect'
+            "surface_effect",
+            "home_field_ate",
+            "altitude_effect",
+            "cross_country_travel",
+            "short_week_effect",
+            "ol_quality_rushing",
+            "ol_quality_passing",
+            "veteran_qb_effect",
+            "personnel_heavy",
+            "personnel_spread",
+            "fourth_down_aggression",
+            "conservative_bias",
+            "new_rules_effect",
+            "defensive_scheme",
+            "recency_bias",
+            "sunk_cost_effect",
         ]
 
         importance_df = analyze_feature_importance(agent, feature_names)
 
-        importance_path = os.path.join(args.output_dir, f'feature_importance_{timestamp}.csv')
+        importance_path = os.path.join(args.output_dir, f"feature_importance_{timestamp}.csv")
         importance_df.to_csv(importance_path, index=False)
 
         print("\nTop 10 Most Important Features:")
@@ -483,29 +494,25 @@ def main():
         print("Running Ablation Studies")
         print("=" * 80)
 
-        env = ExperimentAugmentedBettingEnv(
-            db_params=db_params,
-            start_season=2020,
-            end_season=2023
-        )
+        env = ExperimentAugmentedBettingEnv(db_params=db_params, start_season=2020, end_season=2023)
 
-        agent_class = DQNAgent if args.agent == 'dqn' else PPOAgent
-        agent_params = {'state_dim': 44, 'action_dim': 5}
+        agent_class = DQNAgent if args.agent == "dqn" else PPOAgent
+        agent_params = {"state_dim": 44, "action_dim": 5}
 
         ablation_results = run_ablation_studies(
             env=env,
             agent_class=agent_class,
             agent_params=agent_params,
-            num_episodes=args.ablation_episodes
+            num_episodes=args.ablation_episodes,
         )
 
         # Save ablation results
-        ablation_path = os.path.join(args.output_dir, f'ablation_{timestamp}.json')
-        with open(ablation_path, 'w') as f:
+        ablation_path = os.path.join(args.output_dir, f"ablation_{timestamp}.json")
+        with open(ablation_path, "w") as f:
             json.dump(ablation_results, f, indent=2)
 
         print(f"\nAblation results saved to: {ablation_path}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

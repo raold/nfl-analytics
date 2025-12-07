@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class StatType(str, Enum):
     """Available stat types for predictions"""
+
     PASSING_YARDS = "passing_yards"
     RUSHING_YARDS = "rushing_yards"
     RECEIVING_YARDS = "receiving_yards"
@@ -22,27 +23,19 @@ class StatType(str, Enum):
 
 class PredictionRequest(BaseModel):
     """Request for ensemble prediction"""
+
     game_id: str = Field(
-        ...,
-        description="Game identifier (e.g., '2024_10_KC_LV')",
-        examples=["2024_10_KC_LV"]
+        ..., description="Game identifier (e.g., '2024_10_KC_LV')", examples=["2024_10_KC_LV"]
     )
-    player_id: str = Field(
-        ...,
-        description="NFL player ID",
-        examples=["00-0033873"]
-    )
-    stat_type: StatType = Field(
-        ...,
-        description="Type of stat to predict"
-    )
+    player_id: str = Field(..., description="NFL player ID", examples=["00-0033873"])
+    stat_type: StatType = Field(..., description="Type of stat to predict")
 
     model_config = ConfigDict(
         json_schema_extra={
             "example": {
                 "game_id": "2024_10_KC_LV",
                 "player_id": "00-0033873",
-                "stat_type": "passing_yards"
+                "stat_type": "passing_yards",
             }
         }
     )
@@ -50,6 +43,7 @@ class PredictionRequest(BaseModel):
 
 class ModelContribution(BaseModel):
     """Individual model contribution to ensemble"""
+
     model_name: str = Field(..., description="Model identifier")
     prediction: float = Field(..., description="Model prediction value")
     uncertainty: float | None = Field(None, description="Prediction uncertainty (std)")
@@ -58,6 +52,7 @@ class ModelContribution(BaseModel):
 
 class PredictionResponse(BaseModel):
     """Ensemble prediction response"""
+
     game_id: str
     player_id: str
     stat_type: StatType
@@ -69,19 +64,14 @@ class PredictionResponse(BaseModel):
     upper_bound: float = Field(..., description="90% credible interval upper bound")
 
     # Model breakdown
-    models_used: list[ModelContribution] = Field(
-        ...,
-        description="Individual model contributions"
-    )
+    models_used: list[ModelContribution] = Field(..., description="Individual model contributions")
 
     # Metadata
     timestamp: datetime = Field(
-        default_factory=datetime.utcnow,
-        description="Prediction timestamp (UTC)"
+        default_factory=datetime.utcnow, description="Prediction timestamp (UTC)"
     )
     ensemble_method: str = Field(
-        default="inverse_variance_weighted",
-        description="Ensemble combination method"
+        default="inverse_variance_weighted", description="Ensemble combination method"
     )
 
     model_config = ConfigDict(
@@ -99,23 +89,23 @@ class PredictionResponse(BaseModel):
                         "model_name": "state_space_v2",
                         "prediction": 290.5,
                         "uncertainty": 47.8,
-                        "weight": 0.35
+                        "weight": 0.35,
                     },
                     {
                         "model_name": "hierarchical_v1",
                         "prediction": 275.2,
                         "uncertainty": 52.3,
-                        "weight": 0.30
+                        "weight": 0.30,
                     },
                     {
                         "model_name": "bnn_multioutput_v1",
                         "prediction": 288.7,
                         "uncertainty": 45.1,
-                        "weight": 0.35
-                    }
+                        "weight": 0.35,
+                    },
                 ],
                 "timestamp": "2025-11-08T12:00:00Z",
-                "ensemble_method": "inverse_variance_weighted"
+                "ensemble_method": "inverse_variance_weighted",
             }
         }
     )
@@ -123,8 +113,11 @@ class PredictionResponse(BaseModel):
 
 class ModelInfo(BaseModel):
     """Information about a loaded model"""
+
     model_name: str
-    model_type: str = Field(..., description="Model architecture (e.g., 'bayesian_hierarchical', 'bnn')")
+    model_type: str = Field(
+        ..., description="Model architecture (e.g., 'bayesian_hierarchical', 'bnn')"
+    )
     version: str
     file_path: str
     file_size_mb: float
@@ -135,6 +128,7 @@ class ModelInfo(BaseModel):
 
 class ModelsListResponse(BaseModel):
     """List of loaded models with metadata"""
+
     models: list[ModelInfo]
     total_models: int = Field(..., description="Total number of models")
     loaded_models: int = Field(..., description="Successfully loaded models")
@@ -143,6 +137,7 @@ class ModelsListResponse(BaseModel):
 
 class HealthResponse(BaseModel):
     """Health check response"""
+
     status: str = Field(..., description="'healthy', 'degraded', 'unhealthy'")
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     database_connected: bool
@@ -154,6 +149,7 @@ class HealthResponse(BaseModel):
 
 class ErrorResponse(BaseModel):
     """Error response"""
+
     error: str = Field(..., description="Error type")
     message: str = Field(..., description="Human-readable error message")
     details: dict | None = Field(default=None, description="Additional error details")

@@ -25,8 +25,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -40,18 +39,13 @@ class VegasLineBiasSafeEngine:
 
     KEY_NUMBERS = [3, 7, 10, 14]
 
-    def __init__(
-        self,
-        db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-    ):
+    def __init__(self, db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"):
         """Initialize the engine."""
         self.engine = create_engine(db_url)
         logger.info("Connected to database (SAFE mode - no implied probs)")
 
     def load_games_with_lines(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
+        self, start_season: int = 2024, end_season: int = 2025
     ) -> pd.DataFrame:
         """Load games with Vegas betting lines (raw lines only)."""
         logger.info(f"Loading games ({start_season}-{end_season})...")
@@ -112,16 +106,12 @@ class VegasLineBiasSafeEngine:
         df["total_bracket"] = pd.cut(
             df["total_close"],
             bins=[0, 42, 47, 52, 100],
-            labels=["low", "medium", "high", "very_high"]
+            labels=["low", "medium", "high", "very_high"],
         )
 
         logger.info("Added SAFE line features (no implied probabilities)")
 
-    def build_team_features(
-        self,
-        df: pd.DataFrame,
-        include_outcomes: bool = False
-    ) -> pd.DataFrame:
+    def build_team_features(self, df: pd.DataFrame, include_outcomes: bool = False) -> pd.DataFrame:
         """
         Build team-level features for modeling.
 
@@ -197,9 +187,7 @@ class VegasLineBiasSafeEngine:
         return team_df
 
     def compute_rolling_line_features(
-        self,
-        team_df: pd.DataFrame,
-        windows: list = [3, 5]
+        self, team_df: pd.DataFrame, windows: list = [3, 5]
     ) -> pd.DataFrame:
         """
         Compute rolling statistics on betting line features.
@@ -211,26 +199,17 @@ class VegasLineBiasSafeEngine:
         for window in windows:
             # Rolling average spread (is team usually favored?)
             team_df[f"avg_spread_L{window}"] = (
-                team_df.groupby("team")["spread"]
-                .shift(1)
-                .rolling(window, min_periods=1)
-                .mean()
+                team_df.groupby("team")["spread"].shift(1).rolling(window, min_periods=1).mean()
             )
 
             # Rolling frequency of being favored
             team_df[f"pct_favored_L{window}"] = (
-                team_df.groupby("team")["is_favored"]
-                .shift(1)
-                .rolling(window, min_periods=1)
-                .mean()
+                team_df.groupby("team")["is_favored"].shift(1).rolling(window, min_periods=1).mean()
             )
 
             # Rolling average total
             team_df[f"avg_total_L{window}"] = (
-                team_df.groupby("team")["total"]
-                .shift(1)
-                .rolling(window, min_periods=1)
-                .mean()
+                team_df.groupby("team")["total"].shift(1).rolling(window, min_periods=1).mean()
             )
 
         logger.info(f"Computed rolling line features (windows: {windows})")

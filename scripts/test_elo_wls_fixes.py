@@ -25,18 +25,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
 def test_ensemble_initialization():
     """Test Fix 1: Correct API parameter usage."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST 1: Ensemble Initialization (Fix 1)")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     try:
         from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
@@ -44,7 +41,7 @@ def test_ensemble_initialization():
         # Test with adaptive weights path (correct API)
         ensemble = EnhancedEnsemble6Way(
             db_password=os.getenv("DB_PASSWORD"),
-            adaptive_weights_path="models/ensemble/adaptive_wls_weights_demo.json"
+            adaptive_weights_path="models/ensemble/adaptive_wls_weights_demo.json",
         )
 
         logger.info("✅ PASS: Ensemble initialized without TypeError")
@@ -61,28 +58,30 @@ def test_ensemble_initialization():
 
 def test_prediction_structure():
     """Test Fix 2 & 4: None handling and minimum models check."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST 2: Prediction Structure (Fix 2 & 4)")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     try:
         from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
         ensemble = EnhancedEnsemble6Way(
             db_password=os.getenv("DB_PASSWORD"),
-            adaptive_weights_path="models/ensemble/adaptive_wls_weights_demo.json"
+            adaptive_weights_path="models/ensemble/adaptive_wls_weights_demo.json",
         )
 
         # Try a prediction (may fail if models not loaded)
-        result = ensemble.predict(
-            player_id="00-0033077",  # Patrick Mahomes
-            season=2024,
-            week=9
-        )
+        result = ensemble.predict(player_id="00-0033077", season=2024, week=9)  # Patrick Mahomes
 
         # Check structure
-        required_keys = ['ensemble_mean', 'ensemble_std', 'quantile_10',
-                        'quantile_90', 'weights', 'inference_time_ms']
+        required_keys = [
+            "ensemble_mean",
+            "ensemble_std",
+            "quantile_10",
+            "quantile_90",
+            "weights",
+            "inference_time_ms",
+        ]
 
         missing_keys = [k for k in required_keys if k not in result]
         if missing_keys:
@@ -90,27 +89,30 @@ def test_prediction_structure():
             return False
 
         # Check if prediction is None or valid
-        if result['ensemble_mean'] is None:
+        if result["ensemble_mean"] is None:
             logger.warning("⚠️  PARTIAL: Prediction is None (likely <3 models succeeded)")
             logger.info("   This is expected if R models or XGBoost failed to load")
             logger.info(f"   Available predictions: {result.get('predictions', {})}")
         else:
-            logger.info(f"✅ PASS: Valid prediction: {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards")
+            logger.info(
+                f"✅ PASS: Valid prediction: {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards"
+            )
 
         return True
 
     except Exception as e:
         logger.error(f"❌ FAIL: Prediction failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
 
 def test_nan_validation():
     """Test Fix 3: NaN validation in R models."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST 3: NaN Validation (Fix 3)")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # This is tested implicitly in prediction
     # We'd need to mock R model to return NaN
@@ -123,9 +125,9 @@ def test_nan_validation():
 
 def test_minimum_models_check():
     """Test Fix 4: Minimum 3/5 models check."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST 4: Minimum Models Check (Fix 4)")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     logger.info("ℹ️  Minimum models check tested implicitly in prediction flow")
     logger.info("   If <3 models succeed, ensemble_mean should be None")
@@ -136,9 +138,9 @@ def test_minimum_models_check():
 
 def test_elo_skill_factor_realistic():
     """Test Fix 5: ELO skill_factor produces realistic predictions."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST 5: ELO Skill Factor Realism (Fix 5)")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
@@ -146,24 +148,20 @@ def test_elo_skill_factor_realistic():
         ensemble = EnhancedEnsemble6Way(db_password=os.getenv("DB_PASSWORD"))
 
         # Test with known player (Patrick Mahomes)
-        result = ensemble.predict(
-            player_id="00-0033077",
-            season=2024,
-            week=9
-        )
+        result = ensemble.predict(player_id="00-0033077", season=2024, week=9)
 
-        if result is None or result.get('ensemble_mean') is None:
+        if result is None or result.get("ensemble_mean") is None:
             logger.warning("⚠️  SKIP: No prediction returned (models not loaded)")
             return True
 
         # Check ELO prediction specifically
-        elo_pred = result.get('predictions', {}).get('elo_wls', None)
+        elo_pred = result.get("predictions", {}).get("elo_wls", None)
         if elo_pred is None:
             logger.warning("⚠️  SKIP: ELO predictor failed (no data)")
             return True
 
         # Validate prediction is realistic (not capped at 500)
-        mean = elo_pred['mean']
+        mean = elo_pred["mean"]
         if mean < 100 or mean > 500:
             logger.error(f"❌ FAIL: Unrealistic prediction: {mean:.1f} yards")
             return False
@@ -181,15 +179,16 @@ def test_elo_skill_factor_realistic():
     except Exception as e:
         logger.error(f"❌ FAIL: Exception during ELO test: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
 
 def main():
     """Run all tests."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("ELO+WLS VALIDATION FIXES - QUICK TEST")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     tests = [
         ("Ensemble Initialization", test_ensemble_initialization),
@@ -209,9 +208,9 @@ def main():
             results.append((name, False))
 
     # Summary
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEST SUMMARY")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     passed = sum(1 for _, p in results if p)
     total = len(results)

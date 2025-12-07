@@ -47,8 +47,10 @@ logger = logging.getLogger(__name__)
 # TypedDict Response Definitions (Type-Safe, Self-Documenting)
 # ============================================================================
 
+
 class ModelContribution(TypedDict, total=False):
     """Individual model contribution to ensemble prediction"""
+
     model_name: str
     prediction: float
     uncertainty: float | None
@@ -57,6 +59,7 @@ class ModelContribution(TypedDict, total=False):
 
 class SinglePlayerPrediction(TypedDict, total=False):
     """Single player prediction (QB, RB, WR, etc.)"""
+
     player_id: str
     player_name: str
     stat_type: str
@@ -71,6 +74,7 @@ class SinglePlayerPrediction(TypedDict, total=False):
 
 class GamePrediction(TypedDict, total=False):
     """Game-level prediction with home/away player projections"""
+
     game_id: str
     season: int
     week: int
@@ -96,6 +100,7 @@ class GamePrediction(TypedDict, total=False):
 
 class PlayerPredictionRequest(TypedDict, total=False):
     """Request for single player prediction"""
+
     game_id: str
     player_id: str
     stat_type: str
@@ -103,6 +108,7 @@ class PlayerPredictionRequest(TypedDict, total=False):
 
 class HealthStatus(TypedDict, total=False):
     """API health check response"""
+
     status: str  # 'healthy', 'degraded', 'unhealthy'
     database_connected: bool
     redis_connected: bool
@@ -114,6 +120,7 @@ class HealthStatus(TypedDict, total=False):
 
 class ModelInfo(TypedDict, total=False):
     """Information about a loaded model"""
+
     model_name: str
     model_type: str
     version: str
@@ -126,6 +133,7 @@ class ModelInfo(TypedDict, total=False):
 
 class ModelsListResponse(TypedDict, total=False):
     """Response listing all loaded models"""
+
     models: list[ModelInfo]
     total_models: int
     loaded_models: int
@@ -134,6 +142,7 @@ class ModelsListResponse(TypedDict, total=False):
 
 class APIError(TypedDict, total=False):
     """API error response"""
+
     error: str
     message: str
     details: dict[str, Any] | None
@@ -143,6 +152,7 @@ class APIError(TypedDict, total=False):
 # ============================================================================
 # Validation Helpers
 # ============================================================================
+
 
 def validate_game_prediction(data: dict[str, Any]) -> GamePrediction | None:
     """
@@ -162,31 +172,35 @@ def validate_game_prediction(data: dict[str, Any]) -> GamePrediction | None:
         ValueError: If required fields are missing
     """
     # Handle nested API response format (v1.1+)
-    if 'home_prediction' in data and 'away_prediction' in data:
+    if "home_prediction" in data and "away_prediction" in data:
         # Extract nested values
-        home_pred = data['home_prediction']
-        away_pred = data['away_prediction']
+        home_pred = data["home_prediction"]
+        away_pred = data["away_prediction"]
 
-        home_yards = float(home_pred['predicted_passing_yards'])
-        home_std = float(home_pred['predicted_passing_yards_std'])
-        away_yards = float(away_pred['predicted_passing_yards'])
-        away_std = float(away_pred['predicted_passing_yards_std'])
+        home_yards = float(home_pred["predicted_passing_yards"])
+        home_std = float(home_pred["predicted_passing_yards_std"])
+        away_yards = float(away_pred["predicted_passing_yards"])
+        away_std = float(away_pred["predicted_passing_yards_std"])
     else:
         # Fall back to flat format (legacy)
         required_fields = [
-            'game_id', 'home_team', 'away_team',
-            'home_qb_yards', 'home_qb_yards_std',
-            'away_qb_yards', 'away_qb_yards_std'
+            "game_id",
+            "home_team",
+            "away_team",
+            "home_qb_yards",
+            "home_qb_yards_std",
+            "away_qb_yards",
+            "away_qb_yards_std",
         ]
 
         missing_fields = [f for f in required_fields if f not in data]
         if missing_fields:
             raise ValueError(f"Missing required fields: {missing_fields}")
 
-        home_yards = float(data['home_qb_yards'])
-        home_std = float(data['home_qb_yards_std'])
-        away_yards = float(data['away_qb_yards'])
-        away_std = float(data['away_qb_yards_std'])
+        home_yards = float(data["home_qb_yards"])
+        home_std = float(data["home_qb_yards_std"])
+        away_yards = float(data["away_qb_yards"])
+        away_std = float(data["away_qb_yards_std"])
 
     # Validate ranges (sanity check)
     if not (0 <= home_yards <= 600):
@@ -195,27 +209,27 @@ def validate_game_prediction(data: dict[str, Any]) -> GamePrediction | None:
         logger.warning(f"Away QB yards {away_yards} outside expected range [0, 600]")
 
     return GamePrediction(
-        game_id=str(data.get('game_id', '')),
-        season=int(data.get('season', 0)),
-        week=int(data.get('week', 0)),
-        home_team=str(data.get('home_team', '')),
-        away_team=str(data.get('away_team', '')),
-        home_qb_id=str(data.get('home_qb_id', '')),
-        home_qb_name=str(data.get('home_qb_name', '')),
-        away_qb_id=str(data.get('away_qb_id', '')),
-        away_qb_name=str(data.get('away_qb_name', '')),
+        game_id=str(data.get("game_id", "")),
+        season=int(data.get("season", 0)),
+        week=int(data.get("week", 0)),
+        home_team=str(data.get("home_team", "")),
+        away_team=str(data.get("away_team", "")),
+        home_qb_id=str(data.get("home_qb_id", "")),
+        home_qb_name=str(data.get("home_qb_name", "")),
+        away_qb_id=str(data.get("away_qb_id", "")),
+        away_qb_name=str(data.get("away_qb_name", "")),
         home_qb_yards=home_yards,
         home_qb_yards_std=home_std,
         away_qb_yards=away_yards,
         away_qb_yards_std=away_std,
-        total_yards=float(data.get('total_yards', 0.0)),
-        predicted_home_score=float(data.get('predicted_home_score', 0.0)),
-        predicted_away_score=float(data.get('predicted_away_score', 0.0)),
-        predicted_spread=float(data.get('predicted_spread', 0.0)),
-        predicted_total=float(data.get('predicted_total', 0.0)),
-        predicted_home_win_prob=float(data.get('predicted_home_win_prob', 0.5)),
-        processing_ms=float(data.get('processing_ms', 0.0)),
-        timestamp=str(data.get('timestamp', datetime.utcnow().isoformat()))
+        total_yards=float(data.get("total_yards", 0.0)),
+        predicted_home_score=float(data.get("predicted_home_score", 0.0)),
+        predicted_away_score=float(data.get("predicted_away_score", 0.0)),
+        predicted_spread=float(data.get("predicted_spread", 0.0)),
+        predicted_total=float(data.get("predicted_total", 0.0)),
+        predicted_home_win_prob=float(data.get("predicted_home_win_prob", 0.5)),
+        processing_ms=float(data.get("processing_ms", 0.0)),
+        timestamp=str(data.get("timestamp", datetime.utcnow().isoformat())),
     )
 
 
@@ -229,7 +243,7 @@ def validate_single_player_prediction(data: dict[str, Any]) -> SinglePlayerPredi
     Returns:
         Validated SinglePlayerPrediction TypedDict or None if validation fails
     """
-    required_fields = ['player_id', 'prediction', 'confidence']
+    required_fields = ["player_id", "prediction", "confidence"]
 
     missing_fields = [f for f in required_fields if f not in data]
     if missing_fields:
@@ -237,10 +251,10 @@ def validate_single_player_prediction(data: dict[str, Any]) -> SinglePlayerPredi
 
     # Validate numeric types
     try:
-        prediction = float(data['prediction'])
-        confidence = float(data['confidence'])
-        lower_bound = float(data.get('lower_bound', prediction * 0.8))
-        upper_bound = float(data.get('upper_bound', prediction * 1.2))
+        prediction = float(data["prediction"])
+        confidence = float(data["confidence"])
+        lower_bound = float(data.get("lower_bound", prediction * 0.8))
+        upper_bound = float(data.get("upper_bound", prediction * 1.2))
     except (ValueError, TypeError) as e:
         raise ValueError(f"Invalid numeric values: {e}")
 
@@ -254,41 +268,42 @@ def validate_single_player_prediction(data: dict[str, Any]) -> SinglePlayerPredi
         lower_bound, upper_bound = upper_bound, lower_bound
 
     return SinglePlayerPrediction(
-        player_id=str(data.get('player_id', '')),
-        player_name=str(data.get('player_name', '')),
-        stat_type=str(data.get('stat_type', '')),
+        player_id=str(data.get("player_id", "")),
+        player_name=str(data.get("player_name", "")),
+        stat_type=str(data.get("stat_type", "")),
         prediction=prediction,
         confidence=confidence,
         lower_bound=lower_bound,
         upper_bound=upper_bound,
-        models_used=data.get('models_used', []),
-        timestamp=str(data.get('timestamp', datetime.utcnow().isoformat())),
-        ensemble_method=str(data.get('ensemble_method', 'inverse_variance_weighted'))
+        models_used=data.get("models_used", []),
+        timestamp=str(data.get("timestamp", datetime.utcnow().isoformat())),
+        ensemble_method=str(data.get("ensemble_method", "inverse_variance_weighted")),
     )
 
 
 def validate_health_response(data: dict[str, Any]) -> HealthStatus | None:
     """Validate health check response"""
-    required_fields = ['status']
+    required_fields = ["status"]
 
     missing_fields = [f for f in required_fields if f not in data]
     if missing_fields:
         raise ValueError(f"Missing required fields: {missing_fields}")
 
     return HealthStatus(
-        status=str(data.get('status', 'unknown')),
-        database_connected=bool(data.get('database_connected', False)),
-        redis_connected=bool(data.get('redis_connected', False)),
-        models_loaded=int(data.get('models_loaded', 0)),
-        uptime_seconds=float(data.get('uptime_seconds', 0.0)),
-        version=str(data.get('version', 'unknown')),
-        timestamp=str(data.get('timestamp', datetime.utcnow().isoformat()))
+        status=str(data.get("status", "unknown")),
+        database_connected=bool(data.get("database_connected", False)),
+        redis_connected=bool(data.get("redis_connected", False)),
+        models_loaded=int(data.get("models_loaded", 0)),
+        uptime_seconds=float(data.get("uptime_seconds", 0.0)),
+        version=str(data.get("version", "unknown")),
+        timestamp=str(data.get("timestamp", datetime.utcnow().isoformat())),
     )
 
 
 # ============================================================================
 # APIClient Class
 # ============================================================================
+
 
 class APIClient:
     """
@@ -337,7 +352,7 @@ class APIClient:
         base_url: str = None,
         timeout: int = 10,
         api_key: str = None,
-        enable_cache: bool = False
+        enable_cache: bool = False,
     ):
         """
         Initialize API client.
@@ -366,9 +381,9 @@ class APIClient:
         if enable_cache:
             try:
                 from redis import Redis
+
                 self._redis_cache = Redis.from_url(
-                    os.getenv("REDIS_URL", "redis://localhost:6379"),
-                    decode_responses=True
+                    os.getenv("REDIS_URL", "redis://localhost:6379"), decode_responses=True
                 )
                 self._redis_cache.ping()
                 logger.info("Redis cache enabled for API client")
@@ -383,6 +398,7 @@ class APIClient:
 
         try:
             import json
+
             cached = self._redis_cache.get(f"api_client:{key}")
             if cached:
                 return json.loads(cached)
@@ -398,11 +414,8 @@ class APIClient:
 
         try:
             import json
-            self._redis_cache.setex(
-                f"api_client:{key}",
-                ttl,
-                json.dumps(value)
-            )
+
+            self._redis_cache.setex(f"api_client:{key}", ttl, json.dumps(value))
         except Exception as e:
             logger.debug(f"Cache set error: {e}")
 
@@ -414,10 +427,7 @@ class APIClient:
             HealthStatus TypedDict if successful, None on failure
         """
         try:
-            response = self.session.get(
-                f"{self.base_url}/health",
-                timeout=self.timeout
-            )
+            response = self.session.get(f"{self.base_url}/health", timeout=self.timeout)
             response.raise_for_status()
 
             data = response.json()
@@ -441,23 +451,20 @@ class APIClient:
             ModelsListResponse TypedDict if successful, None on failure
         """
         try:
-            response = self.session.get(
-                f"{self.base_url}/models",
-                timeout=self.timeout
-            )
+            response = self.session.get(f"{self.base_url}/models", timeout=self.timeout)
             response.raise_for_status()
 
             data = response.json()
 
             # Validate response structure
-            if 'models' not in data or 'total_models' not in data:
+            if "models" not in data or "total_models" not in data:
                 raise ValueError("Missing required fields: models, total_models")
 
             models: ModelsListResponse = ModelsListResponse(
-                models=data.get('models', []),
-                total_models=int(data.get('total_models', 0)),
-                loaded_models=int(data.get('loaded_models', 0)),
-                ensemble_ready=bool(data.get('ensemble_ready', False))
+                models=data.get("models", []),
+                total_models=int(data.get("total_models", 0)),
+                loaded_models=int(data.get("loaded_models", 0)),
+                ensemble_ready=bool(data.get("ensemble_ready", False)),
             )
 
             logger.debug(f"Models list: {models['loaded_models']}/{models['total_models']} loaded")
@@ -471,11 +478,7 @@ class APIClient:
             return None
 
     def get_player_prediction(
-        self,
-        game_id: str,
-        player_id: str,
-        stat_type: str,
-        use_cache: bool = True
+        self, game_id: str, player_id: str, stat_type: str, use_cache: bool = True
     ) -> SinglePlayerPrediction | None:
         """
         Get single player prediction.
@@ -504,9 +507,9 @@ class APIClient:
                 json={
                     "game_id": str(game_id),
                     "player_id": str(player_id),
-                    "stat_type": str(stat_type)
+                    "stat_type": str(stat_type),
                 },
-                timeout=self.timeout
+                timeout=self.timeout,
             )
             response.raise_for_status()
 
@@ -517,7 +520,9 @@ class APIClient:
             if use_cache and self.enable_cache:
                 self._set_cached(cache_key, prediction, ttl=3600)  # Cache 1 hour
 
-            logger.debug(f"Player prediction: {player_id} {stat_type} = {prediction['prediction']:.1f}")
+            logger.debug(
+                f"Player prediction: {player_id} {stat_type} = {prediction['prediction']:.1f}"
+            )
             return prediction
 
         except requests.RequestException as e:
@@ -528,11 +533,7 @@ class APIClient:
             return None
 
     def get_game_prediction(
-        self,
-        game_id: str,
-        season: int,
-        week: int,
-        use_cache: bool = True
+        self, game_id: str, season: int, week: int, use_cache: bool = True
     ) -> GamePrediction | None:
         """
         Get game-level prediction with QB passing yards.
@@ -574,12 +575,8 @@ class APIClient:
         try:
             response = self.session.post(
                 f"{self.base_url}/api/v1/predict/game",
-                json={
-                    "game_id": str(game_id),
-                    "season": int(season),
-                    "week": int(week)
-                },
-                timeout=self.timeout
+                json={"game_id": str(game_id), "season": int(season), "week": int(week)},
+                timeout=self.timeout,
             )
             response.raise_for_status()
 
@@ -623,11 +620,9 @@ class APIClient:
 # Factory Function for Streamlit Integration
 # ============================================================================
 
+
 @staticmethod
-def get_api_client(
-    base_url: str = None,
-    enable_cache: bool = False
-) -> APIClient:
+def get_api_client(base_url: str = None, enable_cache: bool = False) -> APIClient:
     """
     Factory function to create API client, optimized for Streamlit.
 
@@ -655,7 +650,4 @@ def get_api_client(
         prediction = api.get_game_prediction(f"{current_season}_12_KC_LV", season=current_season, week=12)
         ```
     """
-    return APIClient(
-        base_url=base_url,
-        enable_cache=enable_cache
-    )
+    return APIClient(base_url=base_url, enable_cache=enable_cache)

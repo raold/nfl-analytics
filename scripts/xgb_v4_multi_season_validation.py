@@ -66,6 +66,8 @@ def convert_numpy_types(obj: Any) -> Any:
         return [convert_numpy_types(item) for item in obj]
     else:
         return obj
+
+
 import os
 
 import psycopg2
@@ -82,11 +84,10 @@ from py.analysis.statistical_tests import DieboldMarianoTest
 load_dotenv()
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class XGBoostV4MultiSeasonValidator:
@@ -97,16 +98,11 @@ class XGBoostV4MultiSeasonValidator:
         db_password = os.getenv("DB_PASSWORD")
         if not db_password:
             raise ValueError(
-                "DB_PASSWORD environment variable not set. "
-                "Set DB_PASSWORD in .env file."
+                "DB_PASSWORD environment variable not set. " "Set DB_PASSWORD in .env file."
             )
 
         self.conn = psycopg2.connect(
-            host="localhost",
-            port=5544,
-            database="devdb01",
-            user="dro",
-            password=db_password
+            host="localhost", port=5544, database="devdb01", user="dro", password=db_password
         )
 
         # Results tracking
@@ -215,15 +211,13 @@ class XGBoostV4MultiSeasonValidator:
         ORDER BY season, week, player_id
         """
 
-        df = pd.read_sql_query(query, self.conn, params={'max_season': test_season})
+        df = pd.read_sql_query(query, self.conn, params={"max_season": test_season})
         logger.info(f"Loaded {len(df):,} player-game records")
 
         return df
 
     def prepare_features(
-        self,
-        df: pd.DataFrame,
-        test_season: int
+        self, df: pd.DataFrame, test_season: int
     ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Prepare features and split data.
@@ -238,63 +232,64 @@ class XGBoostV4MultiSeasonValidator:
         logger.info(f"Preparing features for {test_season} validation...")
 
         # Add rolling averages for each player
-        df = df.sort_values(['player_id', 'season', 'week']).copy()
-        df['pass_yards_l3'] = df.groupby('player_id')['passing_yards'].shift(1).rolling(3, min_periods=1).mean()
-        df['pass_attempts_l3'] = df.groupby('player_id')['pass_attempts'].shift(1).rolling(3, min_periods=1).mean()
-        df['completions_l3'] = df.groupby('player_id')['completions'].shift(1).rolling(3, min_periods=1).mean()
-        df['completions_pct_l3'] = (df['completions_l3'] / df['pass_attempts_l3']).fillna(0.5)
+        df = df.sort_values(["player_id", "season", "week"]).copy()
+        df["pass_yards_l3"] = (
+            df.groupby("player_id")["passing_yards"].shift(1).rolling(3, min_periods=1).mean()
+        )
+        df["pass_attempts_l3"] = (
+            df.groupby("player_id")["pass_attempts"].shift(1).rolling(3, min_periods=1).mean()
+        )
+        df["completions_l3"] = (
+            df.groupby("player_id")["completions"].shift(1).rolling(3, min_periods=1).mean()
+        )
+        df["completions_pct_l3"] = (df["completions_l3"] / df["pass_attempts_l3"]).fillna(0.5)
 
         # Split: train on 2018-(test_season-1), test on test_season
         train_df = df[df.season < test_season].copy()
         test_df = df[df.season == test_season].copy()
 
-        logger.info(f"  Train: {len(train_df):,} records ({train_df.season.min()}-{train_df.season.max()})")
+        logger.info(
+            f"  Train: {len(train_df):,} records ({train_df.season.min()}-{train_df.season.max()})"
+        )
         logger.info(f"  Test: {len(test_df):,} records ({test_season})")
 
         # Define feature sets
-        ridge_features = [
-            'opp_def_epa_exp',
-            'opp_points_allowed_avg',
-            'matchup_difficulty'
-        ]
+        ridge_features = ["opp_def_epa_exp", "opp_points_allowed_avg", "matchup_difficulty"]
 
         baseline_features = [
-            'pass_yards_l3',
-            'pass_attempts_l3',
-            'completions_l3',
-            'completions_pct_l3',
-            'home_away_encoded'
+            "pass_yards_l3",
+            "pass_attempts_l3",
+            "completions_l3",
+            "completions_pct_l3",
+            "home_away_encoded",
         ]
 
         # Encode home/away
-        train_df['home_away_encoded'] = (train_df['home_away'] == 'home').astype(int)
-        test_df['home_away_encoded'] = (test_df['home_away'] == 'home').astype(int)
+        train_df["home_away_encoded"] = (train_df["home_away"] == "home").astype(int)
+        test_df["home_away_encoded"] = (test_df["home_away"] == "home").astype(int)
 
         # Handle missing values
-        for col in ['pass_yards_l3', 'pass_attempts_l3', 'completions_l3', 'completions_pct_l3']:
+        for col in ["pass_yards_l3", "pass_attempts_l3", "completions_l3", "completions_pct_l3"]:
             train_df[col] = train_df[col].fillna(train_df[col].mean())
             test_df[col] = test_df[col].fillna(test_df[col].mean())
 
-        for col in ['opp_def_epa_exp', 'opp_points_allowed_avg', 'matchup_difficulty']:
+        for col in ["opp_def_epa_exp", "opp_points_allowed_avg", "matchup_difficulty"]:
             train_df[col] = train_df[col].fillna(0.0)
             test_df[col] = test_df[col].fillna(0.0)
 
         # Store feature lists
-        train_df.attrs['ridge_features'] = ridge_features
-        train_df.attrs['baseline_features'] = baseline_features
-        test_df.attrs['ridge_features'] = ridge_features
-        test_df.attrs['baseline_features'] = baseline_features
+        train_df.attrs["ridge_features"] = ridge_features
+        train_df.attrs["baseline_features"] = baseline_features
+        test_df.attrs["ridge_features"] = ridge_features
+        test_df.attrs["baseline_features"] = baseline_features
 
         # Target variable
-        train_df['target'] = train_df['passing_yards']
-        test_df['target'] = test_df['passing_yards']
+        train_df["target"] = train_df["passing_yards"]
+        test_df["target"] = test_df["passing_yards"]
 
         return train_df, test_df
 
-    def train_and_evaluate_season(
-        self,
-        test_season: int
-    ) -> dict:
+    def train_and_evaluate_season(self, test_season: int) -> dict:
         """
         Train and evaluate for a single season.
 
@@ -312,8 +307,8 @@ class XGBoostV4MultiSeasonValidator:
         df = self.fetch_data_for_season(test_season)
         train_df, test_df = self.prepare_features(df, test_season)
 
-        ridge_features = train_df.attrs['ridge_features']
-        baseline_features = train_df.attrs['baseline_features']
+        ridge_features = train_df.attrs["ridge_features"]
+        baseline_features = train_df.attrs["baseline_features"]
 
         # 1. Train Ridge on opponent features
         logger.info("\n[1/4] Training Ridge on opponent features...")
@@ -322,7 +317,7 @@ class XGBoostV4MultiSeasonValidator:
         X_ridge_train_scaled = ridge_scaler.fit_transform(X_ridge_train)
 
         ridge = RidgeCV(alphas=[0.001, 0.01, 0.1, 1.0, 10.0, 100.0], cv=5)
-        ridge.fit(X_ridge_train_scaled, train_df['target'])
+        ridge.fit(X_ridge_train_scaled, train_df["target"])
 
         logger.info(f"  Ridge alpha: {ridge.alpha_:.4f}")
         logger.info(f"  Ridge R²: {ridge.score(X_ridge_train_scaled, train_df['target']):.4f}")
@@ -335,19 +330,23 @@ class XGBoostV4MultiSeasonValidator:
         ridge_pred_train = ridge.predict(X_ridge_train_scaled)
         ridge_pred_test = ridge.predict(X_ridge_test_scaled)
 
-        residuals_train = train_df['target'].values - ridge_pred_train
-        residuals_test = test_df['target'].values - ridge_pred_test
+        residuals_train = train_df["target"].values - ridge_pred_train
+        residuals_test = test_df["target"].values - ridge_pred_test
 
-        logger.info(f"  Train residuals: mean={residuals_train.mean():.2f}, std={residuals_train.std():.2f}")
-        logger.info(f"  Test residuals: mean={residuals_test.mean():.2f}, std={residuals_test.std():.2f}")
+        logger.info(
+            f"  Train residuals: mean={residuals_train.mean():.2f}, std={residuals_train.std():.2f}"
+        )
+        logger.info(
+            f"  Test residuals: mean={residuals_test.mean():.2f}, std={residuals_test.std():.2f}"
+        )
 
         # 3. Train XGBoost on baseline + residuals
         logger.info("\n[3/4] Training XGBoost on baseline features + residuals...")
         X_train_xgb = train_df[baseline_features].copy()
-        X_train_xgb['residual_feature'] = residuals_train
+        X_train_xgb["residual_feature"] = residuals_train
 
         X_test_xgb = test_df[baseline_features].copy()
-        X_test_xgb['residual_feature'] = residuals_test
+        X_test_xgb["residual_feature"] = residuals_test
 
         xgb_scaler = StandardScaler()
         X_train_xgb_scaled = xgb_scaler.fit_transform(X_train_xgb)
@@ -360,70 +359,69 @@ class XGBoostV4MultiSeasonValidator:
             subsample=0.8,
             colsample_bytree=0.8,
             random_state=42,
-            verbosity=0
+            verbosity=0,
         )
 
         xgb_model.fit(
             X_train_xgb_scaled,
-            train_df['target'],
-            eval_set=[(X_test_xgb_scaled, test_df['target'])],
-            verbose=False
+            train_df["target"],
+            eval_set=[(X_test_xgb_scaled, test_df["target"])],
+            verbose=False,
         )
 
         # 4. Evaluate
         logger.info("\n[4/4] Evaluating performance...")
         test_preds = xgb_model.predict(X_test_xgb_scaled)
 
-        mae = mean_absolute_error(test_df['target'], test_preds)
-        rmse = np.sqrt(mean_squared_error(test_df['target'], test_preds))
+        mae = mean_absolute_error(test_df["target"], test_preds)
+        rmse = np.sqrt(mean_squared_error(test_df["target"], test_preds))
         improvement = self.baseline_mae - mae
         improvement_pct = (improvement / self.baseline_mae) * 100
 
         logger.info(f"  MAE: {mae:.2f} yards")
         logger.info(f"  RMSE: {rmse:.2f} yards")
-        logger.info(f"  Improvement vs baseline: {improvement:+.2f} yards ({improvement_pct:+.2f}%)")
+        logger.info(
+            f"  Improvement vs baseline: {improvement:+.2f} yards ({improvement_pct:+.2f}%)"
+        )
 
         # Run Diebold-Mariano test
         # Create baseline predictions (mean predictor from v2)
-        baseline_preds = np.full_like(test_df['target'].values, self.baseline_mae, dtype=float)
+        baseline_preds = np.full_like(test_df["target"].values, self.baseline_mae, dtype=float)
 
         dm_test = DieboldMarianoTest(loss_fn="absolute", h=1)
-        dm_result = dm_test.test(
-            test_df['target'].values,
-            test_preds,
-            baseline_preds
-        )
+        dm_result = dm_test.test(test_df["target"].values, test_preds, baseline_preds)
 
         logger.info("\nDiebold-Mariano Test:")
         logger.info(f"  DM Statistic: {dm_result['statistic']:.4f}")
         logger.info(f"  P-value (one-sided): {dm_result['p_value_one_sided']:.6f}")
         logger.info(f"  P-value (two-sided): {dm_result['p_value_two_sided']:.6f}")
-        logger.info(f"  Significant at α=0.05: {'✅ YES' if dm_result['p_value_one_sided'] < 0.05 else '❌ NO'}")
+        logger.info(
+            f"  Significant at α=0.05: {'✅ YES' if dm_result['p_value_one_sided'] < 0.05 else '❌ NO'}"
+        )
 
         # Feature importance
-        importance_df = pd.DataFrame({
-            'feature': list(X_train_xgb.columns),
-            'importance': xgb_model.feature_importances_
-        }).sort_values('importance', ascending=False)
+        importance_df = pd.DataFrame(
+            {"feature": list(X_train_xgb.columns), "importance": xgb_model.feature_importances_}
+        ).sort_values("importance", ascending=False)
 
         return {
-            'season': test_season,
-            'n_train': len(train_df),
-            'n_test': len(test_df),
-            'mae': mae,
-            'rmse': rmse,
-            'baseline_mae': self.baseline_mae,
-            'improvement': improvement,
-            'improvement_pct': improvement_pct,
-            'dm_statistic': dm_result['statistic'],
-            'dm_p_value_one_sided': dm_result['p_value_one_sided'],
-            'dm_p_value_two_sided': dm_result['p_value_two_sided'],
-            'dm_significant': dm_result['p_value_one_sided'] < 0.05,
-            'ridge_alpha': ridge.alpha_,
-            'ridge_r2': ridge.score(X_ridge_train_scaled, train_df['target']),
-            'feature_importance': importance_df.to_dict('records'),
-            'predictions': test_preds.tolist(),
-            'actuals': test_df['target'].values.tolist()
+            "season": test_season,
+            "n_train": len(train_df),
+            "n_test": len(test_df),
+            "mae": mae,
+            "rmse": rmse,
+            "baseline_mae": self.baseline_mae,
+            "improvement": improvement,
+            "improvement_pct": improvement_pct,
+            "dm_statistic": dm_result["statistic"],
+            "dm_p_value_one_sided": dm_result["p_value_one_sided"],
+            "dm_p_value_two_sided": dm_result["p_value_two_sided"],
+            "dm_significant": dm_result["p_value_one_sided"] < 0.05,
+            "ridge_alpha": ridge.alpha_,
+            "ridge_r2": ridge.score(X_ridge_train_scaled, train_df["target"]),
+            "feature_importance": importance_df.to_dict("records"),
+            "predictions": test_preds.tolist(),
+            "actuals": test_df["target"].values.tolist(),
         }
 
     def validate_consistency(self) -> dict:
@@ -437,9 +435,9 @@ class XGBoostV4MultiSeasonValidator:
         logger.info("CONSISTENCY VALIDATION")
         logger.info(f"{'='*80}")
 
-        maes = [self.season_results[s]['mae'] for s in self.test_seasons]
-        improvements = [self.season_results[s]['improvement_pct'] for s in self.test_seasons]
-        p_values = [self.season_results[s]['dm_p_value_one_sided'] for s in self.test_seasons]
+        maes = [self.season_results[s]["mae"] for s in self.test_seasons]
+        improvements = [self.season_results[s]["improvement_pct"] for s in self.test_seasons]
+        p_values = [self.season_results[s]["dm_p_value_one_sided"] for s in self.test_seasons]
 
         mae_mean = np.mean(maes)
         mae_std = np.std(maes, ddof=1)
@@ -477,26 +475,23 @@ class XGBoostV4MultiSeasonValidator:
         logger.info(f"  Gate 4 (MAE std dev < 2 yards): {'✅ PASS' if gate4 else '❌ FAIL'}")
 
         return {
-            'mae_mean': mae_mean,
-            'mae_std': mae_std,
-            'mae_min': min(maes),
-            'mae_max': max(maes),
-            'improvement_mean': improvement_mean,
-            'improvement_std': improvement_std,
-            'improvement_min': min(improvements),
-            'improvement_max': max(improvements),
-            'all_significant': bool(all_significant),
-            'gate1_mae': bool(gate1),
-            'gate2_improvement': bool(gate2),
-            'gate3_significance': bool(gate3),
-            'gate4_consistency': bool(gate4),
-            'all_gates_pass': bool(gate1 and gate2 and gate3 and gate4)
+            "mae_mean": mae_mean,
+            "mae_std": mae_std,
+            "mae_min": min(maes),
+            "mae_max": max(maes),
+            "improvement_mean": improvement_mean,
+            "improvement_std": improvement_std,
+            "improvement_min": min(improvements),
+            "improvement_max": max(improvements),
+            "all_significant": bool(all_significant),
+            "gate1_mae": bool(gate1),
+            "gate2_improvement": bool(gate2),
+            "gate3_significance": bool(gate3),
+            "gate4_consistency": bool(gate4),
+            "all_gates_pass": bool(gate1 and gate2 and gate3 and gate4),
         }
 
-    def generate_production_recommendation(
-        self,
-        consistency: dict
-    ) -> str:
+    def generate_production_recommendation(self, consistency: dict) -> str:
         """
         Generate production readiness recommendation.
 
@@ -510,7 +505,7 @@ class XGBoostV4MultiSeasonValidator:
         logger.info("PRODUCTION READINESS RECOMMENDATION")
         logger.info(f"{'='*80}")
 
-        if consistency['all_gates_pass']:
+        if consistency["all_gates_pass"]:
             recommendation = "PASS"
             logger.info("\n✅ PRODUCTION READY: All validation gates passed")
             logger.info("\nRecommendation:")
@@ -518,30 +513,36 @@ class XGBoostV4MultiSeasonValidator:
             logger.info("  2. A/B test on 2025 season (first 50 games)")
             logger.info("  3. Full production deployment if A/B test succeeds")
             logger.info("\nKey Strengths:")
-            logger.info(f"  - Consistent performance: {consistency['mae_mean']:.2f} ± {consistency['mae_std']:.2f} MAE")
-            logger.info(f"  - Strong improvement: {consistency['improvement_mean']:.2f}% vs baseline")
+            logger.info(
+                f"  - Consistent performance: {consistency['mae_mean']:.2f} ± {consistency['mae_std']:.2f} MAE"
+            )
+            logger.info(
+                f"  - Strong improvement: {consistency['improvement_mean']:.2f}% vs baseline"
+            )
             logger.info("  - Statistically significant across all seasons")
         else:
             recommendation = "FAIL"
-            gates_passed = sum([
-                consistency['gate1_mae'],
-                consistency['gate2_improvement'],
-                consistency['gate3_significance'],
-                consistency['gate4_consistency']
-            ])
+            gates_passed = sum(
+                [
+                    consistency["gate1_mae"],
+                    consistency["gate2_improvement"],
+                    consistency["gate3_significance"],
+                    consistency["gate4_consistency"],
+                ]
+            )
             logger.info(f"\n❌ NOT PRODUCTION READY: {gates_passed}/4 gates passed")
             logger.info("\nRecommendation:")
             logger.info("  - Further investigation required")
             logger.info("  - Do NOT integrate into production ensemble")
 
             logger.info("\nFailed Gates:")
-            if not consistency['gate1_mae']:
+            if not consistency["gate1_mae"]:
                 logger.info("  - MAE threshold: Some seasons MAE ≥ 8 yards")
-            if not consistency['gate2_improvement']:
+            if not consistency["gate2_improvement"]:
                 logger.info("  - Improvement threshold: Some seasons < 80% improvement")
-            if not consistency['gate3_significance']:
+            if not consistency["gate3_significance"]:
                 logger.info("  - Statistical significance: Some seasons p ≥ 0.05")
-            if not consistency['gate4_consistency']:
+            if not consistency["gate4_consistency"]:
                 logger.info("  - Consistency: MAE std dev ≥ 2 yards")
 
         return recommendation
@@ -558,22 +559,23 @@ class XGBoostV4MultiSeasonValidator:
 
         # Summary JSON
         summary = {
-            'validation_timestamp': timestamp,
-            'baseline_mae': self.baseline_mae,
-            'test_seasons': self.test_seasons,
-            'per_season_results': {
+            "validation_timestamp": timestamp,
+            "baseline_mae": self.baseline_mae,
+            "test_seasons": self.test_seasons,
+            "per_season_results": {
                 str(season): {
-                    k: v for k, v in self.season_results[season].items()
-                    if k not in ['predictions', 'actuals', 'feature_importance']
+                    k: v
+                    for k, v in self.season_results[season].items()
+                    if k not in ["predictions", "actuals", "feature_importance"]
                 }
                 for season in self.test_seasons
             },
-            'consistency_metrics': consistency,
-            'production_recommendation': recommendation
+            "consistency_metrics": consistency,
+            "production_recommendation": recommendation,
         }
 
         summary_path = results_dir / f"xgb_v4_multi_season_validation_summary_{timestamp}.json"
-        with open(summary_path, 'w') as f:
+        with open(summary_path, "w") as f:
             # Convert numpy types to Python natives for JSON serialization
             json.dump(convert_numpy_types(summary), f, indent=2)
         logger.info(f"✅ Saved summary: {summary_path}")
@@ -582,17 +584,19 @@ class XGBoostV4MultiSeasonValidator:
         sig_data = []
         for season in self.test_seasons:
             result = self.season_results[season]
-            sig_data.append({
-                'season': season,
-                'mae': result['mae'],
-                'baseline_mae': self.baseline_mae,
-                'improvement_yards': result['improvement'],
-                'improvement_pct': result['improvement_pct'],
-                'dm_statistic': result['dm_statistic'],
-                'dm_p_value_one_sided': result['dm_p_value_one_sided'],
-                'dm_p_value_two_sided': result['dm_p_value_two_sided'],
-                'significant_at_0.05': result['dm_significant']
-            })
+            sig_data.append(
+                {
+                    "season": season,
+                    "mae": result["mae"],
+                    "baseline_mae": self.baseline_mae,
+                    "improvement_yards": result["improvement"],
+                    "improvement_pct": result["improvement_pct"],
+                    "dm_statistic": result["dm_statistic"],
+                    "dm_p_value_one_sided": result["dm_p_value_one_sided"],
+                    "dm_p_value_two_sided": result["dm_p_value_two_sided"],
+                    "significant_at_0.05": result["dm_significant"],
+                }
+            )
 
         sig_df = pd.DataFrame(sig_data)
         sig_path = results_dir / f"xgb_v4_statistical_significance_{timestamp}.csv"
@@ -602,13 +606,15 @@ class XGBoostV4MultiSeasonValidator:
         # Full results (with predictions) for each season
         for season in self.test_seasons:
             season_path = results_dir / f"xgb_v4_season_{season}_full_{timestamp}.json"
-            with open(season_path, 'w') as f:
+            with open(season_path, "w") as f:
                 json.dump(convert_numpy_types(self.season_results[season]), f, indent=2)
             logger.info(f"✅ Saved {season} full results: {season_path}")
 
         logger.info("\n📊 Validation Summary:")
         logger.info(f"  Seasons tested: {self.test_seasons}")
-        logger.info(f"  Mean MAE: {consistency['mae_mean']:.2f} ± {consistency['mae_std']:.2f} yards")
+        logger.info(
+            f"  Mean MAE: {consistency['mae_mean']:.2f} ± {consistency['mae_std']:.2f} yards"
+        )
         logger.info(f"  Mean improvement: {consistency['improvement_mean']:.2f}%")
         logger.info(f"  Production ready: {recommendation}")
 

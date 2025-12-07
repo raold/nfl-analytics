@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_american_odds_to_implied_prob_basic():
@@ -56,7 +53,6 @@ def test_american_odds_to_implied_prob_basic():
     assert result is not None
 
 
-
 def test_american_odds_to_implied_prob_edge_cases():
     """Test american_odds_to_implied_prob: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_american_odds_to_implied_prob_edge_cases():
     assert result is not None
 
 
-
 def test_american_odds_to_implied_prob_error_handling():
     """Test american_odds_to_implied_prob error handling."""
     with pytest.raises(ValueError):
         american_odds_to_implied_prob(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_american_odds_to_implied_prob_property_idempotent(self, self, odds):
 
     # Assert property
     assert american_odds_to_implied_prob(self, odds) == result, "idempotent violated"
-
 
 
 def test_calculate_hold_basic():
@@ -100,7 +93,6 @@ def test_calculate_hold_basic():
     assert result is not None
 
 
-
 def test_calculate_hold_edge_cases():
     """Test calculate_hold: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_calculate_hold_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_hold_error_handling():
     """Test calculate_hold error handling."""
     with pytest.raises(ValueError):
         calculate_hold(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_calculate_hold_property_idempotent(self, self, over_odds, under_odds):
 
     # Assert property
     assert calculate_hold(self, over_odds, under_odds) == result, "idempotent violated"
-
 
 
 def test_get_events_basic():
@@ -144,7 +133,6 @@ def test_get_events_basic():
     assert result is not None
 
 
-
 def test_get_events_edge_cases():
     """Test get_events: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_get_events_edge_cases():
     assert result is not None
 
 
-
 def test_get_events_error_handling():
     """Test get_events error handling."""
     with pytest.raises(ValueError):
         get_events(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_get_events_property_idempotent(self, self, bookmakers):
 
     # Assert property
     assert get_events(self, bookmakers) == result, "idempotent violated"
-
 
 
 def test_get_player_props_basic():
@@ -188,7 +173,6 @@ def test_get_player_props_basic():
     assert result is not None
 
 
-
 def test_get_player_props_edge_cases():
     """Test get_player_props: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_get_player_props_edge_cases():
     assert result is not None
 
 
-
 def test_get_player_props_error_handling():
     """Test get_player_props error handling."""
     with pytest.raises(ValueError):
         get_player_props(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers())
@@ -217,7 +199,6 @@ def test_get_player_props_property_idempotent(self, self, event_id, markets, boo
 
     # Assert property
     assert get_player_props(self, event_id, markets, bookmakers) == result, "idempotent violated"
-
 
 
 def test_parse_prop_data_basic():
@@ -232,7 +213,6 @@ def test_parse_prop_data_basic():
     assert result is not None
 
 
-
 def test_parse_prop_data_edge_cases():
     """Test parse_prop_data: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_parse_prop_data_edge_cases():
     assert result is not None
 
 
-
 def test_parse_prop_data_error_handling():
     """Test parse_prop_data error handling."""
     with pytest.raises(ValueError):
         parse_prop_data(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.datetimes())
@@ -261,7 +239,6 @@ def test_parse_prop_data_property_idempotent(self, self, event_data, snapshot_ti
 
     # Assert property
     assert parse_prop_data(self, event_data, snapshot_time) == result, "idempotent violated"
-
 
 
 def test_enrich_with_player_ids_basic():
@@ -276,7 +253,6 @@ def test_enrich_with_player_ids_basic():
     assert result is not None
 
 
-
 def test_enrich_with_player_ids_edge_cases():
     """Test enrich_with_player_ids: edge cases."""
     # Arrange
@@ -289,12 +265,10 @@ def test_enrich_with_player_ids_edge_cases():
     assert result is not None
 
 
-
 def test_enrich_with_player_ids_error_handling():
     """Test enrich_with_player_ids error handling."""
     with pytest.raises(ValueError):
         enrich_with_player_ids(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -305,7 +279,6 @@ def test_enrich_with_player_ids_property_idempotent(self, self, records):
 
     # Assert property
     assert enrich_with_player_ids(self, records) == result, "idempotent violated"
-
 
 
 def test_match_to_games_basic():
@@ -320,7 +293,6 @@ def test_match_to_games_basic():
     assert result is not None
 
 
-
 def test_match_to_games_edge_cases():
     """Test match_to_games: edge cases."""
     # Arrange
@@ -333,12 +305,10 @@ def test_match_to_games_edge_cases():
     assert result is not None
 
 
-
 def test_match_to_games_error_handling():
     """Test match_to_games error handling."""
     with pytest.raises(ValueError):
         match_to_games(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -349,7 +319,6 @@ def test_match_to_games_property_idempotent(self, self, records):
 
     # Assert property
     assert match_to_games(self, records) == result, "idempotent violated"
-
 
 
 def test_insert_prop_lines_basic():
@@ -364,7 +333,6 @@ def test_insert_prop_lines_basic():
     assert result is not None
 
 
-
 def test_insert_prop_lines_edge_cases():
     """Test insert_prop_lines: edge cases."""
     # Arrange
@@ -377,12 +345,10 @@ def test_insert_prop_lines_edge_cases():
     assert result is not None
 
 
-
 def test_insert_prop_lines_error_handling():
     """Test insert_prop_lines error handling."""
     with pytest.raises(ValueError):
         insert_prop_lines(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -393,7 +359,6 @@ def test_insert_prop_lines_property_idempotent(self, self, records):
 
     # Assert property
     assert insert_prop_lines(self, records) == result, "idempotent violated"
-
 
 
 def test_fetch_and_store_all_props_basic():
@@ -408,7 +373,6 @@ def test_fetch_and_store_all_props_basic():
     assert result is not None
 
 
-
 def test_fetch_and_store_all_props_edge_cases():
     """Test fetch_and_store_all_props: edge cases."""
     # Arrange
@@ -421,12 +385,10 @@ def test_fetch_and_store_all_props_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_and_store_all_props_error_handling():
     """Test fetch_and_store_all_props error handling."""
     with pytest.raises(ValueError):
         fetch_and_store_all_props(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -436,5 +398,6 @@ def test_fetch_and_store_all_props_property_idempotent(self, self, markets, book
     result = fetch_and_store_all_props(self, markets, bookmakers, max_events)
 
     # Assert property
-    assert fetch_and_store_all_props(self, markets, bookmakers, max_events) == result, "idempotent violated"
-
+    assert (
+        fetch_and_store_all_props(self, markets, bookmakers, max_events) == result
+    ), "idempotent violated"

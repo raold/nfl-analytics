@@ -20,6 +20,7 @@ from mcp_server.config import DATABASE_URL, MAX_QUERY_ROWS, MAX_QUERY_TIME_SECON
 
 try:
     from mcp_server.tools.cache_wrapper import cache_database_query
+
     CACHE_AVAILABLE = True
 except ImportError:
     CACHE_AVAILABLE = False
@@ -36,11 +37,7 @@ def _get_connection_pool() -> pool.SimpleConnectionPool:
 
     if _connection_pool is None:
         logger.info("Initializing database connection pool")
-        _connection_pool = pool.SimpleConnectionPool(
-            minconn=1,
-            maxconn=10,
-            dsn=DATABASE_URL
-        )
+        _connection_pool = pool.SimpleConnectionPool(minconn=1, maxconn=10, dsn=DATABASE_URL)
         logger.info("Connection pool initialized")
 
     return _connection_pool
@@ -70,9 +67,7 @@ def _query_database_uncached(sql: str, params: tuple | None = None) -> dict[str,
         with get_db_connection() as conn:
             # Set statement timeout
             with conn.cursor() as timeout_cursor:
-                timeout_cursor.execute(
-                    f"SET statement_timeout = {MAX_QUERY_TIME_SECONDS * 1000}"
-                )
+                timeout_cursor.execute(f"SET statement_timeout = {MAX_QUERY_TIME_SECONDS * 1000}")
 
             # Execute query with RealDictCursor for dict results
             with conn.cursor(cursor_factory=RealDictCursor) as cursor:
@@ -89,8 +84,7 @@ def _query_database_uncached(sql: str, params: tuple | None = None) -> dict[str,
                 if truncated:
                     rows = rows[:MAX_QUERY_ROWS]
                     logger.warning(
-                        f"Query returned more than {MAX_QUERY_ROWS} rows, "
-                        f"truncated to limit"
+                        f"Query returned more than {MAX_QUERY_ROWS} rows, " f"truncated to limit"
                     )
 
                 # Convert to list of dicts
@@ -102,44 +96,27 @@ def _query_database_uncached(sql: str, params: tuple | None = None) -> dict[str,
                     "success": True,
                     "rows": result_rows,
                     "row_count": len(result_rows),
-                    "truncated": truncated
+                    "truncated": truncated,
                 }
 
     except psycopg2.errors.QueryCanceled:
         error_msg = f"Query exceeded timeout of {MAX_QUERY_TIME_SECONDS} seconds"
         logger.error(error_msg)
-        return {
-            "success": False,
-            "error": error_msg,
-            "rows": [],
-            "row_count": 0
-        }
+        return {"success": False, "error": error_msg, "rows": [], "row_count": 0}
 
     except psycopg2.Error as e:
         error_msg = f"Database error: {str(e)}"
         logger.error(error_msg)
-        return {
-            "success": False,
-            "error": error_msg,
-            "rows": [],
-            "row_count": 0
-        }
+        return {"success": False, "error": error_msg, "rows": [], "row_count": 0}
 
     except Exception as e:
         error_msg = f"Unexpected error: {str(e)}"
         logger.error(error_msg, exc_info=True)
-        return {
-            "success": False,
-            "error": error_msg,
-            "rows": [],
-            "row_count": 0
-        }
+        return {"success": False, "error": error_msg, "rows": [], "row_count": 0}
 
 
 def get_recent_games(
-    team: str | None = None,
-    limit: int = 10,
-    season: int | None = None
+    team: str | None = None, limit: int = 10, season: int | None = None
 ) -> dict[str, Any]:
     """
     Convenience function to get recent games.

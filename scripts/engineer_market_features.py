@@ -204,9 +204,7 @@ class MarketFeatureEngineer:
         ][["event_id", "market_key"]]
 
         df = df.merge(valid_events, on=["event_id", "market_key"], how="inner")
-        logger.info(
-            f"After filtering: {len(df):,} records, {df['event_id'].nunique():,} events"
-        )
+        logger.info(f"After filtering: {len(df):,} records, {df['event_id'].nunique():,} events")
 
         return df
 
@@ -245,9 +243,7 @@ class MarketFeatureEngineer:
         ].diff()
 
         # Calculate velocity (points per hour)
-        df["line_velocity"] = np.where(
-            df["time_delta"] > 0, df["line_delta"] / df["time_delta"], 0
-        )
+        df["line_velocity"] = np.where(df["time_delta"] > 0, df["line_delta"] / df["time_delta"], 0)
 
         # Calculate absolute velocity
         df["line_velocity_abs"] = df["line_velocity"].abs()
@@ -307,9 +303,7 @@ class MarketFeatureEngineer:
 
         # Group by event, market, outcome, and snapshot time
         dispersion = (
-            df.groupby(["event_id", "market_key", "outcome_name", "snapshot_at"])[
-                "outcome_point"
-            ]
+            df.groupby(["event_id", "market_key", "outcome_name", "snapshot_at"])["outcome_point"]
             .agg(
                 cross_book_std=("std"),
                 cross_book_median=("median"),
@@ -322,9 +316,7 @@ class MarketFeatureEngineer:
         )
 
         # Calculate range
-        dispersion["cross_book_range"] = (
-            dispersion["cross_book_max"] - dispersion["cross_book_min"]
-        )
+        dispersion["cross_book_range"] = dispersion["cross_book_max"] - dispersion["cross_book_min"]
 
         # Merge back to main dataframe
         df = df.merge(
@@ -354,9 +346,7 @@ class MarketFeatureEngineer:
         logger.info("Calculating time-to-kickoff features")
 
         # Calculate hours to kickoff
-        df["hours_to_kickoff"] = (
-            (df["commence_time"] - df["snapshot_at"]).dt.total_seconds() / 3600
-        )
+        df["hours_to_kickoff"] = (df["commence_time"] - df["snapshot_at"]).dt.total_seconds() / 3600
 
         # Create time buckets (e.g., <1h, 1-6h, 6-24h, 24-48h, >48h)
         df["time_bucket"] = pd.cut(
@@ -398,8 +388,7 @@ class MarketFeatureEngineer:
         # Flag sharp moves based on velocity and time window
         window_hours = window_minutes / 60
         df["sharp_move"] = (
-            (df["line_velocity_abs"] >= velocity_threshold)
-            & (df["time_delta"] <= window_hours)
+            (df["line_velocity_abs"] >= velocity_threshold) & (df["time_delta"] <= window_hours)
         ).astype(int)
 
         # Count sharp moves per event
@@ -618,15 +607,9 @@ def validate_features(df: pd.DataFrame) -> dict:
         }
 
     # Quality flags
-    validation["quality_flags"]["high_dispersion_events"] = int(
-        df["high_dispersion"].sum()
-    )
-    validation["quality_flags"]["sharp_move_events"] = int(
-        (df["sharp_move_count"] > 0).sum()
-    )
-    validation["quality_flags"]["multiple_sharp_moves"] = int(
-        df["multiple_sharp_moves"].sum()
-    )
+    validation["quality_flags"]["high_dispersion_events"] = int(df["high_dispersion"].sum())
+    validation["quality_flags"]["sharp_move_events"] = int((df["sharp_move_count"] > 0).sum())
+    validation["quality_flags"]["multiple_sharp_moves"] = int(df["multiple_sharp_moves"].sum())
 
     # Overall quality score (% complete data)
     total_cells = df.shape[0] * df.shape[1]
@@ -742,9 +725,13 @@ def main():
 
         logger.info(f"\nValidation report saved to {validation_file}")
         logger.info(f"Data quality: {validation['data_quality_pct']:.2f}%")
-        logger.info(f"Events with high dispersion: {validation['quality_flags']['high_dispersion_events']}")
+        logger.info(
+            f"Events with high dispersion: {validation['quality_flags']['high_dispersion_events']}"
+        )
         logger.info(f"Events with sharp moves: {validation['quality_flags']['sharp_move_events']}")
-        logger.info(f"Events with multiple sharp moves: {validation['quality_flags']['multiple_sharp_moves']}")
+        logger.info(
+            f"Events with multiple sharp moves: {validation['quality_flags']['multiple_sharp_moves']}"
+        )
 
     logger.info("\n" + "=" * 80)
     logger.info("SUCCESS: Market feature engineering complete")

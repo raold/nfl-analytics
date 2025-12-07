@@ -21,7 +21,6 @@ def test_create_scaler_basic():
     assert result is not None
 
 
-
 def test_create_scaler_edge_cases():
     """Test create_scaler: edge cases."""
     # Arrange
@@ -34,9 +33,7 @@ def test_create_scaler_edge_cases():
     assert result is not None
 
 
-
 def test_create_scaler_error_handling():
     """Test create_scaler error handling."""
     with pytest.raises(ValueError):
         create_scaler(invalid_input)
-

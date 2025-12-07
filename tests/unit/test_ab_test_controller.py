@@ -23,7 +23,6 @@ def test_demo_basic():
     assert result is not None
 
 
-
 def test_demo_edge_cases():
     """Test demo: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_demo_edge_cases():
     assert result is not None
 
 
-
 def test_demo_error_handling():
     """Test demo error handling."""
     with pytest.raises(ValueError):
         demo(invalid_input)
-
 
 
 def test_get_model_assignment_basic():
@@ -56,7 +53,6 @@ def test_get_model_assignment_basic():
     assert result is not None
 
 
-
 def test_get_model_assignment_edge_cases():
     """Test get_model_assignment: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_get_model_assignment_edge_cases():
     assert result is not None
 
 
-
 def test_get_model_assignment_error_handling():
     """Test get_model_assignment error handling."""
     with pytest.raises(ValueError):
         get_model_assignment(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers())
@@ -85,7 +79,6 @@ def test_get_model_assignment_property_idempotent(self, self, player_id, week):
 
     # Assert property
     assert get_model_assignment(self, player_id, week) == result, "idempotent violated"
-
 
 
 def test_get_predictions_basic():
@@ -100,7 +93,6 @@ def test_get_predictions_basic():
     assert result is not None
 
 
-
 def test_get_predictions_edge_cases():
     """Test get_predictions: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_get_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_get_predictions_error_handling():
     """Test get_predictions error handling."""
     with pytest.raises(ValueError):
         get_predictions(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_get_predictions_property_idempotent(self, self, player_ids, week, seaso
 
     # Assert property
     assert get_predictions(self, player_ids, week, season) == result, "idempotent violated"
-
 
 
 def test_record_outcome_basic():
@@ -144,7 +133,6 @@ def test_record_outcome_basic():
     assert result is not None
 
 
-
 def test_record_outcome_edge_cases():
     """Test record_outcome: edge cases."""
     # Arrange
@@ -157,23 +145,32 @@ def test_record_outcome_edge_cases():
     assert result is not None
 
 
-
 def test_record_outcome_error_handling():
     """Test record_outcome error handling."""
     with pytest.raises(ValueError):
         record_outcome(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers(), st.integers())
-def test_record_outcome_property_idempotent(self, self, player_id, week, actual_value, predicted_value, model_version):
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_record_outcome_property_idempotent(
+    self, self, player_id, week, actual_value, predicted_value, model_version
+):
     """Property test: function is idempotent."""
     # Act
     result = record_outcome(self, player_id, week, actual_value, predicted_value, model_version)
 
     # Assert property
-    assert record_outcome(self, player_id, week, actual_value, predicted_value, model_version) == result, "idempotent violated"
-
+    assert (
+        record_outcome(self, player_id, week, actual_value, predicted_value, model_version)
+        == result
+    ), "idempotent violated"
 
 
 def test_get_current_metrics_basic():
@@ -188,7 +185,6 @@ def test_get_current_metrics_basic():
     assert result is not None
 
 
-
 def test_get_current_metrics_edge_cases():
     """Test get_current_metrics: edge cases."""
     # Arrange
@@ -201,12 +197,10 @@ def test_get_current_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_get_current_metrics_error_handling():
     """Test get_current_metrics error handling."""
     with pytest.raises(ValueError):
         get_current_metrics(invalid_input)
-
 
 
 @given(st.integers())
@@ -217,7 +211,6 @@ def test_get_current_metrics_property_idempotent(val):
 
     # Assert property
     assert get_current_metrics(val) == result, "idempotent violated"
-
 
 
 def test_rollback_basic():
@@ -232,7 +225,6 @@ def test_rollback_basic():
     assert result is not None
 
 
-
 def test_rollback_edge_cases():
     """Test rollback: edge cases."""
     # Arrange
@@ -245,12 +237,10 @@ def test_rollback_edge_cases():
     assert result is not None
 
 
-
 def test_rollback_error_handling():
     """Test rollback error handling."""
     with pytest.raises(ValueError):
         rollback(invalid_input)
-
 
 
 @given(st.integers())
@@ -261,7 +251,6 @@ def test_rollback_property_idempotent(val):
 
     # Assert property
     assert rollback(val) == result, "idempotent violated"
-
 
 
 def test_promote_treatment_basic():
@@ -276,7 +265,6 @@ def test_promote_treatment_basic():
     assert result is not None
 
 
-
 def test_promote_treatment_edge_cases():
     """Test promote_treatment: edge cases."""
     # Arrange
@@ -289,12 +277,10 @@ def test_promote_treatment_edge_cases():
     assert result is not None
 
 
-
 def test_promote_treatment_error_handling():
     """Test promote_treatment error handling."""
     with pytest.raises(ValueError):
         promote_treatment(invalid_input)
-
 
 
 @given(st.integers())
@@ -305,4 +291,3 @@ def test_promote_treatment_property_idempotent(val):
 
     # Assert property
     assert promote_treatment(val) == result, "idempotent violated"
-

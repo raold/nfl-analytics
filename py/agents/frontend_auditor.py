@@ -41,15 +41,15 @@ class AuditIssue:
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
         return {
-            'severity': self.severity,
-            'category': self.category,
-            'title': self.title,
-            'description': self.description,
-            'location': self.location,
-            'fix_suggestion': self.fix_suggestion,
-            'auto_fixable': self.auto_fixable,
-            'wcag_violation': self.wcag_violation,
-            'screenshot_path': self.screenshot_path
+            "severity": self.severity,
+            "category": self.category,
+            "title": self.title,
+            "description": self.description,
+            "location": self.location,
+            "fix_suggestion": self.fix_suggestion,
+            "auto_fixable": self.auto_fixable,
+            "wcag_violation": self.wcag_violation,
+            "screenshot_path": self.screenshot_path,
         }
 
 
@@ -63,19 +63,19 @@ class AuditReport:
 
     @property
     def critical_count(self) -> int:
-        return len([i for i in self.issues if i.severity == 'critical'])
+        return len([i for i in self.issues if i.severity == "critical"])
 
     @property
     def high_count(self) -> int:
-        return len([i for i in self.issues if i.severity == 'high'])
+        return len([i for i in self.issues if i.severity == "high"])
 
     @property
     def medium_count(self) -> int:
-        return len([i for i in self.issues if i.severity == 'medium'])
+        return len([i for i in self.issues if i.severity == "medium"])
 
     @property
     def low_count(self) -> int:
-        return len([i for i in self.issues if i.severity == 'low'])
+        return len([i for i in self.issues if i.severity == "low"])
 
     def filter_by_severity(self, *severities: str) -> list[AuditIssue]:
         """Filter issues by severity level(s)."""
@@ -88,14 +88,14 @@ class AuditReport:
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
         return {
-            'timestamp': self.timestamp.isoformat(),
-            'pages_audited': self.pages_audited,
-            'total_issues': len(self.issues),
-            'critical': self.critical_count,
-            'high': self.high_count,
-            'medium': self.medium_count,
-            'low': self.low_count,
-            'issues': [issue.to_dict() for issue in self.issues]
+            "timestamp": self.timestamp.isoformat(),
+            "pages_audited": self.pages_audited,
+            "total_issues": len(self.issues),
+            "critical": self.critical_count,
+            "high": self.high_count,
+            "medium": self.medium_count,
+            "low": self.low_count,
+            "issues": [issue.to_dict() for issue in self.issues],
         }
 
 
@@ -104,13 +104,13 @@ class UIUXAnalyzer:
 
     # WCAG 2.1 AA requirements
     CONTRAST_RATIO_NORMAL = 4.5  # Normal text
-    CONTRAST_RATIO_LARGE = 3.0   # Large text (18pt+ or 14pt+ bold)
+    CONTRAST_RATIO_LARGE = 3.0  # Large text (18pt+ or 14pt+ bold)
 
     # Common color palette issues
     PROBLEMATIC_COMBINATIONS = [
-        ('#ffffff', '#f8f9fa'),  # White on very light gray
-        ('#000000', '#212529'),  # Black on very dark gray
-        ('#fff3cd', '#ffffff'),  # Light yellow on white
+        ("#ffffff", "#f8f9fa"),  # White on very light gray
+        ("#000000", "#212529"),  # Black on very dark gray
+        ("#fff3cd", "#ffffff"),  # Light yellow on white
     ]
 
     def __init__(self, dashboard_path: Path):
@@ -138,11 +138,11 @@ class UIUXAnalyzer:
 
         for line_num, line in enumerate(lines, 1):
             # Check for color declarations
-            if 'color:' in line or 'background' in line:
+            if "color:" in line or "background" in line:
                 self._check_contrast(line, file_path, line_num)
 
             # Check for hardcoded sizing
-            if re.search(r'font-size:\s*\d+px', line):
+            if re.search(r"font-size:\s*\d+px", line):
                 self._check_font_size(line, file_path, line_num)
 
             # Check for inline styles (should use CSS classes)
@@ -152,50 +152,56 @@ class UIUXAnalyzer:
     def _check_contrast(self, line: str, file_path: Path, line_num: int):
         """Check color contrast ratios."""
         # Extract color values from line
-        colors = re.findall(r'#[0-9a-fA-F]{3,6}', line)
+        colors = re.findall(r"#[0-9a-fA-F]{3,6}", line)
 
         if len(colors) >= 2:
             # Check if it's a problematic combination
             for fg, bg in self.PROBLEMATIC_COMBINATIONS:
                 if fg.lower() in line.lower() and bg.lower() in line.lower():
-                    self.issues.append(AuditIssue(
-                        severity='high',
-                        category='ui_ux',
-                        title='Low contrast color combination detected',
-                        description=f'Foreground {fg} on background {bg} may not meet WCAG AA contrast ratio',
-                        location=f'{file_path}:{line_num}',
-                        fix_suggestion='Increase contrast by darkening text or lightening background',
-                        auto_fixable=False,
-                        wcag_violation='1.4.3 Contrast (Minimum)'
-                    ))
+                    self.issues.append(
+                        AuditIssue(
+                            severity="high",
+                            category="ui_ux",
+                            title="Low contrast color combination detected",
+                            description=f"Foreground {fg} on background {bg} may not meet WCAG AA contrast ratio",
+                            location=f"{file_path}:{line_num}",
+                            fix_suggestion="Increase contrast by darkening text or lightening background",
+                            auto_fixable=False,
+                            wcag_violation="1.4.3 Contrast (Minimum)",
+                        )
+                    )
 
     def _check_font_size(self, line: str, file_path: Path, line_num: int):
         """Check for font sizes below minimum."""
-        match = re.search(r'font-size:\s*(\d+)px', line)
+        match = re.search(r"font-size:\s*(\d+)px", line)
         if match:
             size = int(match.group(1))
             if size < 12:
-                self.issues.append(AuditIssue(
-                    severity='medium',
-                    category='ui_ux',
-                    title=f'Font size too small ({size}px)',
-                    description='Minimum recommended font size is 12px for readability',
-                    location=f'{file_path}:{line_num}',
-                    fix_suggestion='Increase font-size to at least 12px',
-                    auto_fixable=True
-                ))
+                self.issues.append(
+                    AuditIssue(
+                        severity="medium",
+                        category="ui_ux",
+                        title=f"Font size too small ({size}px)",
+                        description="Minimum recommended font size is 12px for readability",
+                        location=f"{file_path}:{line_num}",
+                        fix_suggestion="Increase font-size to at least 12px",
+                        auto_fixable=True,
+                    )
+                )
 
     def _flag_inline_styles(self, line: str, file_path: Path, line_num: int):
         """Flag excessive inline styles (should use CSS classes)."""
-        self.issues.append(AuditIssue(
-            severity='low',
-            category='ui_ux',
-            title='Excessive inline styles detected',
-            description='Long inline style declarations reduce maintainability',
-            location=f'{file_path}:{line_num}',
-            fix_suggestion='Extract to CSS class or Streamlit component',
-            auto_fixable=False
-        ))
+        self.issues.append(
+            AuditIssue(
+                severity="low",
+                category="ui_ux",
+                title="Excessive inline styles detected",
+                description="Long inline style declarations reduce maintainability",
+                location=f"{file_path}:{line_num}",
+                fix_suggestion="Extract to CSS class or Streamlit component",
+                auto_fixable=False,
+            )
+        )
 
 
 class DataValidator:
@@ -223,7 +229,8 @@ class DataValidator:
         with psycopg2.connect(**self.db_config) as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 # Check for unrealistic predictions
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT game_id, ensemble_version,
                            predicted_home_score, predicted_away_score,
                            predicted_total
@@ -232,21 +239,24 @@ class DataValidator:
                       AND ensemble_version = 'v6.1'
                       AND (predicted_total < 35 OR predicted_total > 65)
                     LIMIT 10;
-                """)
+                """
+                )
 
                 unrealistic = cur.fetchall()
 
                 if unrealistic:
                     for game in unrealistic:
-                        self.issues.append(AuditIssue(
-                            severity='critical' if game['predicted_total'] < 20 else 'high',
-                            category='data',
-                            title=f'Unrealistic game prediction for {game["game_id"]}',
-                            description=f'Total: {game["predicted_total"]:.1f} (expected 40-55)',
-                            location='ml.game_predictions',
-                            fix_suggestion='Investigate ensemble component weights and R model predictions',
-                            auto_fixable=False
-                        ))
+                        self.issues.append(
+                            AuditIssue(
+                                severity="critical" if game["predicted_total"] < 20 else "high",
+                                category="data",
+                                title=f'Unrealistic game prediction for {game["game_id"]}',
+                                description=f'Total: {game["predicted_total"]:.1f} (expected 40-55)',
+                                location="ml.game_predictions",
+                                fix_suggestion="Investigate ensemble component weights and R model predictions",
+                                auto_fixable=False,
+                            )
+                        )
 
     def _validate_player_stats(self):
         """Validate player statistics are up-to-date."""
@@ -266,7 +276,7 @@ class FrontendAuditor:
         self,
         dashboard_path: str = "dashboard",
         db_config: dict | None = None,
-        output_dir: str = "docs/audits"
+        output_dir: str = "docs/audits",
     ):
         """
         Initialize frontend auditor.
@@ -292,11 +302,11 @@ class FrontendAuditor:
     def _get_default_db_config(self) -> dict:
         """Get default database configuration from environment."""
         return {
-            'host': os.getenv('DB_HOST', 'localhost'),
-            'port': int(os.getenv('DB_PORT', '5544')),
-            'dbname': os.getenv('DB_NAME', 'devdb01'),
-            'user': os.getenv('DB_USER', 'dro'),
-            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
+            "host": os.getenv("DB_HOST", "localhost"),
+            "port": int(os.getenv("DB_PORT", "5544")),
+            "dbname": os.getenv("DB_NAME", "devdb01"),
+            "user": os.getenv("DB_USER", "dro"),
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
         }
 
     def audit_all_pages(self) -> AuditReport:
@@ -316,11 +326,7 @@ class FrontendAuditor:
         pages_count = len(list(self.dashboard_path.glob("**/*.py")))
 
         # Create report
-        report = AuditReport(
-            timestamp=start_time,
-            pages_audited=pages_count,
-            issues=all_issues
-        )
+        report = AuditReport(timestamp=start_time, pages_audited=pages_count, issues=all_issues)
 
         # Save report
         self._save_report(report)
@@ -346,7 +352,7 @@ class FrontendAuditor:
 
         # Save JSON
         json_path = self.output_dir / f"audit_{timestamp_str}.json"
-        with open(json_path, 'w') as f:
+        with open(json_path, "w") as f:
             json.dump(report.to_dict(), f, indent=2)
         logger.info(f"Saved JSON report: {json_path}")
 
@@ -357,7 +363,7 @@ class FrontendAuditor:
 
     def _generate_markdown_report(self, report: AuditReport, output_path: Path):
         """Generate human-readable markdown report."""
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             f.write("# Frontend Audit Report\n\n")
             f.write(f"**Date**: {report.timestamp.strftime('%B %d, %Y %H:%M:%S')}\n")
             f.write(f"**Pages Audited**: {report.pages_audited}\n")
@@ -372,12 +378,12 @@ class FrontendAuditor:
             f.write("---\n\n")
 
             # Group by severity
-            for severity in ['critical', 'high', 'medium', 'low']:
+            for severity in ["critical", "high", "medium", "low"]:
                 issues = report.filter_by_severity(severity)
                 if not issues:
                     continue
 
-                icon = {'critical': '❌', 'high': '⚠️', 'medium': 'ℹ️', 'low': '💡'}[severity]
+                icon = {"critical": "❌", "high": "⚠️", "medium": "ℹ️", "low": "💡"}[severity]
                 f.write(f"## {icon} {severity.upper()} Issues ({len(issues)})\n\n")
 
                 for i, issue in enumerate(issues, 1):
@@ -401,8 +407,7 @@ class FrontendAuditor:
 if __name__ == "__main__":
     # Quick test
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     auditor = FrontendAuditor()

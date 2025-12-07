@@ -23,9 +23,9 @@ def test_wrong_game_id_in_player_stats(validator):
     errors = validator.validate_query(query)
 
     assert len(errors) == 1
-    assert 'game_id' in errors[0]
-    assert 'mart.player_game_stats' in errors[0]
-    assert '(season, week)' in errors[0]
+    assert "game_id" in errors[0]
+    assert "mart.player_game_stats" in errors[0]
+    assert "(season, week)" in errors[0]
 
 
 def test_correct_join_pattern(validator):
@@ -47,8 +47,8 @@ def test_wrong_column_names_in_games(validator):
     errors = validator.validate_query(query)
 
     assert len(errors) == 2
-    assert any('game_date' in e and 'kickoff' in e for e in errors)
-    assert any('spread_line' in e and 'spread_close' in e for e in errors)
+    assert any("game_date" in e and "kickoff" in e for e in errors)
+    assert any("spread_line" in e and "spread_close" in e for e in errors)
 
 
 def test_la_team_abbreviation_warning(validator):
@@ -57,8 +57,8 @@ def test_la_team_abbreviation_warning(validator):
     errors = validator.validate_query(query)
 
     assert len(errors) == 1
-    assert 'LA' in errors[0]
-    assert 'LAR' in errors[0] or 'LAC' in errors[0]
+    assert "LA" in errors[0]
+    assert "LAR" in errors[0] or "LAC" in errors[0]
 
 
 def test_select_star_warning(validator):
@@ -67,7 +67,7 @@ def test_select_star_warning(validator):
     errors = validator.validate_query(query)
 
     assert len(errors) == 1
-    assert 'SELECT *' in errors[0]
+    assert "SELECT *" in errors[0]
 
 
 def test_convenience_function():
@@ -76,7 +76,7 @@ def test_convenience_function():
     errors = validate_query(query)
 
     assert len(errors) == 1
-    assert 'game_id' in errors[0]
+    assert "game_id" in errors[0]
 
 
 def test_full_validation_report(validator):
@@ -84,9 +84,9 @@ def test_full_validation_report(validator):
     query = "SELECT pgs.game_id FROM mart.player_game_stats pgs"
     report = validator.validate_query_full(query)
 
-    assert report['valid'] is False
-    assert len(report['errors']) == 1
-    assert 'game_id' in report['summary']
+    assert report["valid"] is False
+    assert len(report["errors"]) == 1
+    assert "game_id" in report["summary"]
 
 
 def test_canonical_pattern_validation(validator):
@@ -113,5 +113,5 @@ def test_canonical_pattern_validation(validator):
     assert len(errors) == 0
 
 
-if __name__ == '__main__':
-    pytest.main([__file__, '-v'])
+if __name__ == "__main__":
+    pytest.main([__file__, "-v"])

@@ -23,7 +23,6 @@ def test_generate_bankroll_histogram_basic():
     assert result is not None
 
 
-
 def test_generate_bankroll_histogram_edge_cases():
     """Test generate_bankroll_histogram: edge cases."""
     # Arrange
@@ -36,23 +35,29 @@ def test_generate_bankroll_histogram_edge_cases():
     assert result is not None
 
 
-
 def test_generate_bankroll_histogram_error_handling():
     """Test generate_bankroll_histogram error handling."""
     with pytest.raises(ValueError):
         generate_bankroll_histogram(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_generate_bankroll_histogram_property_idempotent(self, n_sims, initial_bankroll, n_bets, base_edge, kelly_fraction, seed):
+def test_generate_bankroll_histogram_property_idempotent(
+    self, n_sims, initial_bankroll, n_bets, base_edge, kelly_fraction, seed
+):
     """Property test: function is idempotent."""
     # Act
-    result = generate_bankroll_histogram(n_sims, initial_bankroll, n_bets, base_edge, kelly_fraction, seed)
+    result = generate_bankroll_histogram(
+        n_sims, initial_bankroll, n_bets, base_edge, kelly_fraction, seed
+    )
 
     # Assert property
-    assert generate_bankroll_histogram(n_sims, initial_bankroll, n_bets, base_edge, kelly_fraction, seed) == result, "idempotent violated"
-
+    assert (
+        generate_bankroll_histogram(
+            n_sims, initial_bankroll, n_bets, base_edge, kelly_fraction, seed
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_main_basic():
@@ -67,7 +72,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -80,9 +84,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

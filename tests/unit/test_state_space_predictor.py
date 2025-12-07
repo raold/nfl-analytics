@@ -23,7 +23,6 @@ def test_demo_basic():
     assert result is not None
 
 
-
 def test_demo_edge_cases():
     """Test demo: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_demo_edge_cases():
     assert result is not None
 
 
-
 def test_demo_error_handling():
     """Test demo error handling."""
     with pytest.raises(ValueError):
         demo(invalid_input)
-
 
 
 def test_get_player_skill_basic():
@@ -56,7 +53,6 @@ def test_get_player_skill_basic():
     assert result is not None
 
 
-
 def test_get_player_skill_edge_cases():
     """Test get_player_skill: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_get_player_skill_edge_cases():
     assert result is not None
 
 
-
 def test_get_player_skill_error_handling():
     """Test get_player_skill error handling."""
     with pytest.raises(ValueError):
         get_player_skill(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers())
@@ -85,7 +79,6 @@ def test_get_player_skill_property_idempotent(self, self, player_id, game_number
 
     # Assert property
     assert get_player_skill(self, player_id, game_number) == result, "idempotent violated"
-
 
 
 def test_predict_basic():
@@ -100,7 +93,6 @@ def test_predict_basic():
     assert result is not None
 
 
-
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
@@ -113,23 +105,33 @@ def test_predict_edge_cases():
     assert result is not None
 
 
-
 def test_predict_error_handling():
     """Test predict error handling."""
     with pytest.raises(ValueError):
         predict(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_predict_property_idempotent(self, self, player_id, season, week, attempts, is_home, game_number, n_samples):
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_predict_property_idempotent(
+    self, self, player_id, season, week, attempts, is_home, game_number, n_samples
+):
     """Property test: function is idempotent."""
     # Act
     result = predict(self, player_id, season, week, attempts, is_home, game_number, n_samples)
 
     # Assert property
-    assert predict(self, player_id, season, week, attempts, is_home, game_number, n_samples) == result, "idempotent violated"
-
+    assert (
+        predict(self, player_id, season, week, attempts, is_home, game_number, n_samples) == result
+    ), "idempotent violated"
 
 
 def test_predict_batch_basic():
@@ -144,7 +146,6 @@ def test_predict_batch_basic():
     assert result is not None
 
 
-
 def test_predict_batch_edge_cases():
     """Test predict_batch: edge cases."""
     # Arrange
@@ -157,20 +158,29 @@ def test_predict_batch_edge_cases():
     assert result is not None
 
 
-
 def test_predict_batch_error_handling():
     """Test predict_batch error handling."""
     with pytest.raises(ValueError):
         predict_batch(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_predict_batch_property_idempotent(self, self, player_ids, seasons, weeks, attempts, is_home, n_samples):
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_predict_batch_property_idempotent(
+    self, self, player_ids, seasons, weeks, attempts, is_home, n_samples
+):
     """Property test: function is idempotent."""
     # Act
     result = predict_batch(self, player_ids, seasons, weeks, attempts, is_home, n_samples)
 
     # Assert property
-    assert predict_batch(self, player_ids, seasons, weeks, attempts, is_home, n_samples) == result, "idempotent violated"
-
+    assert (
+        predict_batch(self, player_ids, seasons, weeks, attempts, is_home, n_samples) == result
+    ), "idempotent violated"

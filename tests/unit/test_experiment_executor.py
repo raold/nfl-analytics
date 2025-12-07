@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_execute_all_experiments_basic():
@@ -56,7 +53,6 @@ def test_execute_all_experiments_basic():
     assert result is not None
 
 
-
 def test_execute_all_experiments_edge_cases():
     """Test execute_all_experiments: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_execute_all_experiments_edge_cases():
     assert result is not None
 
 
-
 def test_execute_all_experiments_error_handling():
     """Test execute_all_experiments error handling."""
     with pytest.raises(ValueError):
         execute_all_experiments(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_execute_all_experiments_property_idempotent(val):
 
     # Assert property
     assert execute_all_experiments(val) == result, "idempotent violated"
-
 
 
 def test_export_results_basic():
@@ -100,7 +93,6 @@ def test_export_results_basic():
     assert result is not None
 
 
-
 def test_export_results_edge_cases():
     """Test export_results: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_export_results_edge_cases():
     assert result is not None
 
 
-
 def test_export_results_error_handling():
     """Test export_results error handling."""
     with pytest.raises(ValueError):
         export_results(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,4 +119,3 @@ def test_export_results_property_idempotent(self, self, output_dir):
 
     # Assert property
     assert export_results(self, output_dir) == result, "idempotent violated"
-

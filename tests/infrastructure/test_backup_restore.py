@@ -41,7 +41,7 @@ class TestBackupScript:
             port=int(os.environ.get("POSTGRES_PORT", "5544")),
             dbname=os.environ.get("POSTGRES_DB", "devdb01"),
             user=os.environ.get("POSTGRES_USER", "dro"),
-            password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions")
+            password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions"),
         )
         yield conn
         conn.close()
@@ -63,7 +63,7 @@ class TestBackupScript:
             env=env,
             capture_output=True,
             text=True,
-            timeout=120
+            timeout=120,
         )
 
         assert result.returncode == 0, f"Backup script failed: {result.stderr}"
@@ -117,10 +117,7 @@ class TestBackupScript:
 
         # Use pg_restore --list to verify backup
         result = subprocess.run(
-            ["pg_restore", "--list", str(backup_file)],
-            capture_output=True,
-            text=True,
-            timeout=30
+            ["pg_restore", "--list", str(backup_file)], capture_output=True, text=True, timeout=30
         )
 
         assert result.returncode == 0, f"Backup verification failed: {result.stderr}"
@@ -137,10 +134,7 @@ class TestBackupScript:
             env["MAX_BACKUPS"] = "2"  # Only keep 2
 
             subprocess.run(
-                ["bash", "scripts/maintenance/backup.sh"],
-                env=env,
-                capture_output=True,
-                timeout=120
+                ["bash", "scripts/maintenance/backup.sh"], env=env, capture_output=True, timeout=120
             )
             time.sleep(2)  # Ensure different timestamps
 
@@ -171,7 +165,7 @@ class TestRestoreScript:
                 env=env,
                 capture_output=True,
                 text=True,
-                timeout=120
+                timeout=120,
             )
 
             if result.returncode != 0:
@@ -201,12 +195,12 @@ class TestRestoreScript:
         backup_file = backup_files[0]
 
         # Get original counts from metadata
-        meta_file = backup_file.with_suffix('.meta')
+        meta_file = backup_file.with_suffix(".meta")
         with open(meta_file) as f:
             original_meta = json.load(f)
 
-        original_games = original_meta['data_counts']['games']
-        original_plays = original_meta['data_counts']['plays']
+        original_games = original_meta["data_counts"]["games"]
+        original_plays = original_meta["data_counts"]["plays"]
 
         # Restore using pg_restore directly (safer for tests than running restore.sh)
         db_url = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
@@ -218,16 +212,25 @@ class TestRestoreScript:
         try:
             # Restore
             result = subprocess.run(
-                ["pg_restore", "--dbname", db_url, "--clean", "--if-exists",
-                 "--no-owner", "--verbose", str(backup_file)],
+                [
+                    "pg_restore",
+                    "--dbname",
+                    db_url,
+                    "--clean",
+                    "--if-exists",
+                    "--no-owner",
+                    "--verbose",
+                    str(backup_file),
+                ],
                 capture_output=True,
                 text=True,
-                timeout=300
+                timeout=300,
             )
 
             # pg_restore may have warnings but should complete
-            assert "error" not in result.stderr.lower() or result.returncode == 0, \
-                f"Restore had errors: {result.stderr}"
+            assert (
+                "error" not in result.stderr.lower() or result.returncode == 0
+            ), f"Restore had errors: {result.stderr}"
 
             # Verify restored data
             conn = psycopg.connect(db_url)
@@ -240,10 +243,12 @@ class TestRestoreScript:
                     restored_plays = cur.fetchone()[0]
 
                 # Allow some variance (new data may have been added)
-                assert restored_games >= original_games * 0.9, \
-                    f"Restored games mismatch: {restored_games} vs {original_games}"
-                assert restored_plays >= original_plays * 0.9, \
-                    f"Restored plays mismatch: {restored_plays} vs {original_plays}"
+                assert (
+                    restored_games >= original_games * 0.9
+                ), f"Restored games mismatch: {restored_games} vs {original_games}"
+                assert (
+                    restored_plays >= original_plays * 0.9
+                ), f"Restored plays mismatch: {restored_plays} vs {original_plays}"
 
                 print(f"✅ Restore successful: {restored_games} games, {restored_plays} plays")
 
@@ -277,7 +282,9 @@ class TestBackupRestoreRoundTrip:
 
     def test_latest_backup_is_most_recent(self):
         """Test that latest.backup symlink points to newest backup."""
-        backup_dir = Path(os.environ.get("BACKUP_DIR", f"{os.environ['HOME']}/nfl-analytics-backups"))
+        backup_dir = Path(
+            os.environ.get("BACKUP_DIR", f"{os.environ['HOME']}/nfl-analytics-backups")
+        )
 
         if not backup_dir.exists():
             pytest.skip("Backup directory doesn't exist")
@@ -296,8 +303,9 @@ class TestBackupRestoreRoundTrip:
         actual_target = latest_link.resolve()
         expected_target = backups[0].resolve()
 
-        assert actual_target == expected_target, \
-            f"latest.backup points to {actual_target}, expected {expected_target}"
+        assert (
+            actual_target == expected_target
+        ), f"latest.backup points to {actual_target}, expected {expected_target}"
 
         print(f"✅ Latest backup: {backups[0].name}")
 
@@ -307,7 +315,9 @@ class TestBackupMonitoring:
 
     def test_backup_age_not_too_old(self):
         """Test that most recent backup is < 48 hours old."""
-        backup_dir = Path(os.environ.get("BACKUP_DIR", f"{os.environ['HOME']}/nfl-analytics-backups"))
+        backup_dir = Path(
+            os.environ.get("BACKUP_DIR", f"{os.environ['HOME']}/nfl-analytics-backups")
+        )
 
         if not backup_dir.exists():
             pytest.skip("Backup directory doesn't exist")
@@ -321,14 +331,17 @@ class TestBackupMonitoring:
         newest = max(backups, key=lambda p: p.stat().st_mtime)
         backup_age_hours = (time.time() - newest.stat().st_mtime) / 3600
 
-        assert backup_age_hours < 48, \
-            f"Most recent backup is {backup_age_hours:.1f} hours old (> 48 hours)"
+        assert (
+            backup_age_hours < 48
+        ), f"Most recent backup is {backup_age_hours:.1f} hours old (> 48 hours)"
 
         print(f"✅ Most recent backup: {backup_age_hours:.1f} hours old")
 
     def test_backup_size_reasonable(self):
         """Test that backup size is within expected range."""
-        backup_dir = Path(os.environ.get("BACKUP_DIR", f"{os.environ['HOME']}/nfl-analytics-backups"))
+        backup_dir = Path(
+            os.environ.get("BACKUP_DIR", f"{os.environ['HOME']}/nfl-analytics-backups")
+        )
 
         if not backup_dir.exists():
             pytest.skip("Backup directory doesn't exist")
@@ -342,8 +355,9 @@ class TestBackupMonitoring:
         size_mb = newest.stat().st_size / (1024 * 1024)
 
         # NFL analytics DB should be 100 MB - 2 GB compressed
-        assert 50 < size_mb < 5000, \
-            f"Backup size {size_mb:.1f} MB is outside expected range (50-5000 MB)"
+        assert (
+            50 < size_mb < 5000
+        ), f"Backup size {size_mb:.1f} MB is outside expected range (50-5000 MB)"
 
         print(f"✅ Backup size: {size_mb:.1f} MB")
 
@@ -352,12 +366,11 @@ class TestBackupMonitoring:
 def create_test_backup():
     """Utility to create a test backup."""
     import sys
+
     print("Creating test backup...")
 
     result = subprocess.run(
-        ["bash", "scripts/maintenance/backup.sh"],
-        capture_output=False,
-        timeout=120
+        ["bash", "scripts/maintenance/backup.sh"], capture_output=False, timeout=120
     )
 
     if result.returncode == 0:

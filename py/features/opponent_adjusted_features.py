@@ -76,11 +76,10 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class OpponentAdjustedFeatures:
@@ -196,10 +195,7 @@ class OpponentAdjustedFeatures:
         return weights
 
     def compute_dvoa_approximation(
-        self,
-        team_epa_adj: float,
-        league_avg_epa: float,
-        league_std_epa: float
+        self, team_epa_adj: float, league_avg_epa: float, league_std_epa: float
     ) -> float:
         """
         Convert opponent-adjusted EPA to DVOA-like percentage.
@@ -234,19 +230,13 @@ class OpponentAdjustedFeatures:
             0.0  # 0% DVOA (perfectly average)
         """
         if league_std_epa == 0:
-            logger.warning(
-                "League std EPA is 0.0, cannot compute DVOA. Returning 0.0."
-            )
+            logger.warning("League std EPA is 0.0, cannot compute DVOA. Returning 0.0.")
             return 0.0
 
         dvoa_approx = (team_epa_adj - league_avg_epa) / league_std_epa * 100
         return round(dvoa_approx, 1)
 
-    def get_league_epa_stats(
-        self,
-        season: int,
-        week: int
-    ) -> dict[str, float]:
+    def get_league_epa_stats(self, season: int, week: int) -> dict[str, float]:
         """
         Get league-wide EPA statistics for DVOA normalization.
 
@@ -297,27 +287,29 @@ class OpponentAdjustedFeatures:
         cursor.close()
         conn.close()
 
-        if result and result['league_avg_epa'] is not None:
+        if result and result["league_avg_epa"] is not None:
             return {
-                'league_avg_epa': float(result['league_avg_epa']),
-                'league_std_epa': float(result['league_std_epa'] or 0.10),  # Default std if null
-                'league_avg_pass_epa': float(result['league_avg_pass_epa'] or self.DEFAULT_LEAGUE_AVG_PASS_EPA),
-                'league_std_pass_epa': float(result['league_std_pass_epa'] or 0.15),
-                'league_avg_rush_epa': float(result['league_avg_rush_epa'] or self.DEFAULT_LEAGUE_AVG_RUSH_EPA),
-                'league_std_rush_epa': float(result['league_std_rush_epa'] or 0.15),
+                "league_avg_epa": float(result["league_avg_epa"]),
+                "league_std_epa": float(result["league_std_epa"] or 0.10),  # Default std if null
+                "league_avg_pass_epa": float(
+                    result["league_avg_pass_epa"] or self.DEFAULT_LEAGUE_AVG_PASS_EPA
+                ),
+                "league_std_pass_epa": float(result["league_std_pass_epa"] or 0.15),
+                "league_avg_rush_epa": float(
+                    result["league_avg_rush_epa"] or self.DEFAULT_LEAGUE_AVG_RUSH_EPA
+                ),
+                "league_std_rush_epa": float(result["league_std_rush_epa"] or 0.15),
             }
         else:
             # Fallback to defaults if no data (early season)
-            logger.warning(
-                f"No league data available before {season} Week {week}. Using defaults."
-            )
+            logger.warning(f"No league data available before {season} Week {week}. Using defaults.")
             return {
-                'league_avg_epa': self.DEFAULT_LEAGUE_AVG_EPA,
-                'league_std_epa': 0.10,
-                'league_avg_pass_epa': self.DEFAULT_LEAGUE_AVG_PASS_EPA,
-                'league_std_pass_epa': 0.15,
-                'league_avg_rush_epa': self.DEFAULT_LEAGUE_AVG_RUSH_EPA,
-                'league_std_rush_epa': 0.15,
+                "league_avg_epa": self.DEFAULT_LEAGUE_AVG_EPA,
+                "league_std_epa": 0.10,
+                "league_avg_pass_epa": self.DEFAULT_LEAGUE_AVG_PASS_EPA,
+                "league_std_pass_epa": 0.15,
+                "league_avg_rush_epa": self.DEFAULT_LEAGUE_AVG_RUSH_EPA,
+                "league_std_rush_epa": 0.15,
             }
 
     def _get_league_average_epa(self, season: int) -> dict[str, float]:
@@ -364,24 +356,24 @@ class OpponentAdjustedFeatures:
 
         if result:
             return {
-                'league_avg_epa': float(result['league_avg_epa'] or self.DEFAULT_LEAGUE_AVG_EPA),
-                'league_avg_pass_epa': float(result['league_avg_pass_epa'] or self.DEFAULT_LEAGUE_AVG_PASS_EPA),
-                'league_avg_rush_epa': float(result['league_avg_rush_epa'] or self.DEFAULT_LEAGUE_AVG_RUSH_EPA),
+                "league_avg_epa": float(result["league_avg_epa"] or self.DEFAULT_LEAGUE_AVG_EPA),
+                "league_avg_pass_epa": float(
+                    result["league_avg_pass_epa"] or self.DEFAULT_LEAGUE_AVG_PASS_EPA
+                ),
+                "league_avg_rush_epa": float(
+                    result["league_avg_rush_epa"] or self.DEFAULT_LEAGUE_AVG_RUSH_EPA
+                ),
             }
         else:
             # Fallback to defaults if no data
             return {
-                'league_avg_epa': self.DEFAULT_LEAGUE_AVG_EPA,
-                'league_avg_pass_epa': self.DEFAULT_LEAGUE_AVG_PASS_EPA,
-                'league_avg_rush_epa': self.DEFAULT_LEAGUE_AVG_RUSH_EPA,
+                "league_avg_epa": self.DEFAULT_LEAGUE_AVG_EPA,
+                "league_avg_pass_epa": self.DEFAULT_LEAGUE_AVG_PASS_EPA,
+                "league_avg_rush_epa": self.DEFAULT_LEAGUE_AVG_RUSH_EPA,
             }
 
     def _get_recent_games(
-        self,
-        team: str,
-        target_season: int,
-        target_week: int,
-        lookback: int = None
+        self, team: str, target_season: int, target_week: int, lookback: int = None
     ) -> list[tuple[str, int, int]]:
         """
         Get last N games before target week (TEMPORAL SAFETY).
@@ -419,10 +411,7 @@ class OpponentAdjustedFeatures:
         LIMIT %s;
         """
 
-        cursor.execute(
-            query,
-            (team, team, target_season, target_season, target_week, lookback)
-        )
+        cursor.execute(query, (team, team, target_season, target_season, target_week, lookback))
         recent_games = cursor.fetchall()
 
         cursor.close()
@@ -431,10 +420,7 @@ class OpponentAdjustedFeatures:
         return recent_games
 
     def _compute_opponent_defensive_epa(
-        self,
-        opponent_team: str,
-        target_season: int,
-        target_week: int
+        self, opponent_team: str, target_season: int, target_week: int
     ) -> dict[str, float]:
         """
         Calculate opponent's defensive EPA allowed (rolling 8-game average).
@@ -454,10 +440,7 @@ class OpponentAdjustedFeatures:
         """
         # Get opponent's recent games (rolling 8-game window)
         recent_games = self._get_recent_games(
-            opponent_team,
-            target_season,
-            target_week,
-            lookback=self.LOOKBACK_WINDOW
+            opponent_team, target_season, target_week, lookback=self.LOOKBACK_WINDOW
         )
 
         if not recent_games:
@@ -466,9 +449,9 @@ class OpponentAdjustedFeatures:
                 f"{target_season} Week {target_week}. Using league average."
             )
             return {
-                'opp_def_epa_allowed': self.DEFAULT_OPP_DEF_EPA,
-                'opp_def_pass_epa_allowed': self.DEFAULT_OPP_DEF_PASS_EPA,
-                'opp_def_rush_epa_allowed': self.DEFAULT_OPP_DEF_RUSH_EPA,
+                "opp_def_epa_allowed": self.DEFAULT_OPP_DEF_EPA,
+                "opp_def_pass_epa_allowed": self.DEFAULT_OPP_DEF_PASS_EPA,
+                "opp_def_rush_epa_allowed": self.DEFAULT_OPP_DEF_RUSH_EPA,
             }
 
         conn = self._connect_db()
@@ -500,16 +483,16 @@ class OpponentAdjustedFeatures:
 
         if not results:
             return {
-                'opp_def_epa_allowed': self.DEFAULT_OPP_DEF_EPA,
-                'opp_def_pass_epa_allowed': self.DEFAULT_OPP_DEF_PASS_EPA,
-                'opp_def_rush_epa_allowed': self.DEFAULT_OPP_DEF_RUSH_EPA,
+                "opp_def_epa_allowed": self.DEFAULT_OPP_DEF_EPA,
+                "opp_def_pass_epa_allowed": self.DEFAULT_OPP_DEF_PASS_EPA,
+                "opp_def_rush_epa_allowed": self.DEFAULT_OPP_DEF_RUSH_EPA,
             }
 
         # Create DataFrame ordered by game recency
         df = pd.DataFrame(results)
         game_id_to_idx = {gid: idx for idx, (gid, _, _) in enumerate(recent_games)}
-        df['game_order'] = df['game_id'].map(game_id_to_idx)
-        df = df.sort_values('game_order')
+        df["game_order"] = df["game_id"].map(game_id_to_idx)
+        df = df.sort_values("game_order")
 
         # Compute exponential decay weights
         n_results = len(df)
@@ -517,29 +500,25 @@ class OpponentAdjustedFeatures:
 
         # Apply weighted averages
         opp_def_epa = np.average(
-            df['avg_epa_allowed'].fillna(self.DEFAULT_OPP_DEF_EPA).astype(float),
-            weights=weights
+            df["avg_epa_allowed"].fillna(self.DEFAULT_OPP_DEF_EPA).astype(float), weights=weights
         )
         opp_def_pass_epa = np.average(
-            df['avg_pass_epa_allowed'].fillna(self.DEFAULT_OPP_DEF_PASS_EPA).astype(float),
-            weights=weights
+            df["avg_pass_epa_allowed"].fillna(self.DEFAULT_OPP_DEF_PASS_EPA).astype(float),
+            weights=weights,
         )
         opp_def_rush_epa = np.average(
-            df['avg_rush_epa_allowed'].fillna(self.DEFAULT_OPP_DEF_RUSH_EPA).astype(float),
-            weights=weights
+            df["avg_rush_epa_allowed"].fillna(self.DEFAULT_OPP_DEF_RUSH_EPA).astype(float),
+            weights=weights,
         )
 
         return {
-            'opp_def_epa_allowed': float(opp_def_epa),
-            'opp_def_pass_epa_allowed': float(opp_def_pass_epa),
-            'opp_def_rush_epa_allowed': float(opp_def_rush_epa),
+            "opp_def_epa_allowed": float(opp_def_epa),
+            "opp_def_pass_epa_allowed": float(opp_def_pass_epa),
+            "opp_def_rush_epa_allowed": float(opp_def_rush_epa),
         }
 
     def _compute_team_raw_epa(
-        self,
-        team: str,
-        target_season: int,
-        target_week: int
+        self, team: str, target_season: int, target_week: int
     ) -> dict[str, float]:
         """
         Calculate team's raw offensive EPA (rolling 8-game average).
@@ -559,10 +538,7 @@ class OpponentAdjustedFeatures:
         """
         # Get team's recent games (rolling 8-game window)
         recent_games = self._get_recent_games(
-            team,
-            target_season,
-            target_week,
-            lookback=self.LOOKBACK_WINDOW
+            team, target_season, target_week, lookback=self.LOOKBACK_WINDOW
         )
 
         if not recent_games:
@@ -571,9 +547,9 @@ class OpponentAdjustedFeatures:
                 f"{target_season} Week {target_week}. Using league average."
             )
             return {
-                'raw_off_epa': self.DEFAULT_LEAGUE_AVG_EPA,
-                'raw_pass_epa': self.DEFAULT_LEAGUE_AVG_PASS_EPA,
-                'raw_rush_epa': self.DEFAULT_LEAGUE_AVG_RUSH_EPA,
+                "raw_off_epa": self.DEFAULT_LEAGUE_AVG_EPA,
+                "raw_pass_epa": self.DEFAULT_LEAGUE_AVG_PASS_EPA,
+                "raw_rush_epa": self.DEFAULT_LEAGUE_AVG_RUSH_EPA,
             }
 
         conn = self._connect_db()
@@ -605,16 +581,16 @@ class OpponentAdjustedFeatures:
 
         if not results:
             return {
-                'raw_off_epa': self.DEFAULT_LEAGUE_AVG_EPA,
-                'raw_pass_epa': self.DEFAULT_LEAGUE_AVG_PASS_EPA,
-                'raw_rush_epa': self.DEFAULT_LEAGUE_AVG_RUSH_EPA,
+                "raw_off_epa": self.DEFAULT_LEAGUE_AVG_EPA,
+                "raw_pass_epa": self.DEFAULT_LEAGUE_AVG_PASS_EPA,
+                "raw_rush_epa": self.DEFAULT_LEAGUE_AVG_RUSH_EPA,
             }
 
         # Create DataFrame ordered by game recency
         df = pd.DataFrame(results)
         game_id_to_idx = {gid: idx for idx, (gid, _, _) in enumerate(recent_games)}
-        df['game_order'] = df['game_id'].map(game_id_to_idx)
-        df = df.sort_values('game_order')
+        df["game_order"] = df["game_id"].map(game_id_to_idx)
+        df = df.sort_values("game_order")
 
         # Compute exponential decay weights
         n_results = len(df)
@@ -622,30 +598,25 @@ class OpponentAdjustedFeatures:
 
         # Apply weighted averages
         raw_off_epa = np.average(
-            df['avg_off_epa'].fillna(self.DEFAULT_LEAGUE_AVG_EPA).astype(float),
-            weights=weights
+            df["avg_off_epa"].fillna(self.DEFAULT_LEAGUE_AVG_EPA).astype(float), weights=weights
         )
         raw_pass_epa = np.average(
-            df['avg_pass_epa'].fillna(self.DEFAULT_LEAGUE_AVG_PASS_EPA).astype(float),
-            weights=weights
+            df["avg_pass_epa"].fillna(self.DEFAULT_LEAGUE_AVG_PASS_EPA).astype(float),
+            weights=weights,
         )
         raw_rush_epa = np.average(
-            df['avg_rush_epa'].fillna(self.DEFAULT_LEAGUE_AVG_RUSH_EPA).astype(float),
-            weights=weights
+            df["avg_rush_epa"].fillna(self.DEFAULT_LEAGUE_AVG_RUSH_EPA).astype(float),
+            weights=weights,
         )
 
         return {
-            'raw_off_epa': float(raw_off_epa),
-            'raw_pass_epa': float(raw_pass_epa),
-            'raw_rush_epa': float(raw_rush_epa),
+            "raw_off_epa": float(raw_off_epa),
+            "raw_pass_epa": float(raw_pass_epa),
+            "raw_rush_epa": float(raw_rush_epa),
         }
 
     def extract_features(
-        self,
-        team: str,
-        opponent: str,
-        season: int,
-        week: int
+        self, team: str, opponent: str, season: int, week: int
     ) -> dict[str, float]:
         """
         Extract all 7 opponent-adjusted EPA features for a team-game matchup.
@@ -700,67 +671,54 @@ class OpponentAdjustedFeatures:
 
         # Step 4: Compute opponent-adjusted EPA
         # Formula: adjusted = raw - (league_avg + opp_def_allowed)
-        off_epa_adjusted = (
-            team_raw['raw_off_epa']
-            - (league_stats['league_avg_epa'] + opp_def['opp_def_epa_allowed'])
+        off_epa_adjusted = team_raw["raw_off_epa"] - (
+            league_stats["league_avg_epa"] + opp_def["opp_def_epa_allowed"]
         )
 
-        pass_epa_adjusted = (
-            team_raw['raw_pass_epa']
-            - (league_stats['league_avg_pass_epa'] + opp_def['opp_def_pass_epa_allowed'])
+        pass_epa_adjusted = team_raw["raw_pass_epa"] - (
+            league_stats["league_avg_pass_epa"] + opp_def["opp_def_pass_epa_allowed"]
         )
 
-        rush_epa_adjusted = (
-            team_raw['raw_rush_epa']
-            - (league_stats['league_avg_rush_epa'] + opp_def['opp_def_rush_epa_allowed'])
+        rush_epa_adjusted = team_raw["raw_rush_epa"] - (
+            league_stats["league_avg_rush_epa"] + opp_def["opp_def_rush_epa_allowed"]
         )
 
         # Step 5: Compute DVOA approximations (percentage above/below league average)
         dvoa_off = self.compute_dvoa_approximation(
-            off_epa_adjusted,
-            league_stats['league_avg_epa'],
-            league_stats['league_std_epa']
+            off_epa_adjusted, league_stats["league_avg_epa"], league_stats["league_std_epa"]
         )
 
         dvoa_pass = self.compute_dvoa_approximation(
             pass_epa_adjusted,
-            league_stats['league_avg_pass_epa'],
-            league_stats['league_std_pass_epa']
+            league_stats["league_avg_pass_epa"],
+            league_stats["league_std_pass_epa"],
         )
 
         dvoa_rush = self.compute_dvoa_approximation(
             rush_epa_adjusted,
-            league_stats['league_avg_rush_epa'],
-            league_stats['league_std_rush_epa']
+            league_stats["league_avg_rush_epa"],
+            league_stats["league_std_rush_epa"],
         )
 
         # Step 6: Compute defensive DVOA approximation (opponent perspective)
         # Opponent's defensive EPA allowed (negative = good defense)
         # Flip sign so positive DVOA = good defense
-        opp_def_epa_adjusted = -opp_def['opp_def_epa_allowed']
+        opp_def_epa_adjusted = -opp_def["opp_def_epa_allowed"]
         dvoa_def = self.compute_dvoa_approximation(
-            opp_def_epa_adjusted,
-            league_stats['league_avg_epa'],
-            league_stats['league_std_epa']
+            opp_def_epa_adjusted, league_stats["league_avg_epa"], league_stats["league_std_epa"]
         )
 
         return {
-            'off_epa_opponent_adjusted': float(off_epa_adjusted),
-            'pass_epa_opponent_adjusted': float(pass_epa_adjusted),
-            'rush_epa_opponent_adjusted': float(rush_epa_adjusted),
-            'dvoa_off_approx': float(dvoa_off),
-            'dvoa_pass_approx': float(dvoa_pass),
-            'dvoa_rush_approx': float(dvoa_rush),
-            'dvoa_def_approx': float(dvoa_def),
+            "off_epa_opponent_adjusted": float(off_epa_adjusted),
+            "pass_epa_opponent_adjusted": float(pass_epa_adjusted),
+            "rush_epa_opponent_adjusted": float(rush_epa_adjusted),
+            "dvoa_off_approx": float(dvoa_off),
+            "dvoa_pass_approx": float(dvoa_pass),
+            "dvoa_rush_approx": float(dvoa_rush),
+            "dvoa_def_approx": float(dvoa_def),
         }
 
-    def validate_no_leakage(
-        self,
-        team: str,
-        opponent: str,
-        season: int,
-        week: int
-    ) -> bool:
+    def validate_no_leakage(self, team: str, opponent: str, season: int, week: int) -> bool:
         """
         Validate temporal ordering: all games used are BEFORE target week.
 
@@ -796,8 +754,7 @@ class OpponentAdjustedFeatures:
                 return False
 
         logger.info(
-            f"✓ No temporal leakage detected for {team} vs {opponent} "
-            f"({season} Week {week})"
+            f"✓ No temporal leakage detected for {team} vs {opponent} " f"({season} Week {week})"
         )
         return True
 
@@ -814,27 +771,13 @@ def main():
         description="Generate opponent-adjusted EPA features for game predictions"
     )
     parser.add_argument(
-        "--team",
-        default="KC",
-        help="Team abbreviation (default: KC for Kansas City Chiefs)"
+        "--team", default="KC", help="Team abbreviation (default: KC for Kansas City Chiefs)"
     )
     parser.add_argument(
-        "--opponent",
-        default="DEN",
-        help="Opponent abbreviation (default: DEN for Denver Broncos)"
+        "--opponent", default="DEN", help="Opponent abbreviation (default: DEN for Denver Broncos)"
     )
-    parser.add_argument(
-        "--season",
-        type=int,
-        default=2024,
-        help="Season year (default: 2024)"
-    )
-    parser.add_argument(
-        "--week",
-        type=int,
-        default=10,
-        help="Week number (default: 10)"
-    )
+    parser.add_argument("--season", type=int, default=2024, help="Season year (default: 2024)")
+    parser.add_argument("--week", type=int, default=10, help="Week number (default: 10)")
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
 
     args = parser.parse_args()
@@ -854,10 +797,7 @@ def main():
 
     # Extract features
     features = engine.extract_features(
-        team=args.team,
-        opponent=args.opponent,
-        season=args.season,
-        week=args.week
+        team=args.team, opponent=args.opponent, season=args.season, week=args.week
     )
 
     print("Opponent-Adjusted EPA Features (7 total):")
@@ -879,10 +819,7 @@ def main():
     print("=" * 80)
 
     is_valid = engine.validate_no_leakage(
-        team=args.team,
-        opponent=args.opponent,
-        season=args.season,
-        week=args.week
+        team=args.team, opponent=args.opponent, season=args.season, week=args.week
     )
 
     if is_valid:

@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_recommend_bet_basic():
@@ -56,7 +53,6 @@ def test_recommend_bet_basic():
     assert result is not None
 
 
-
 def test_recommend_bet_edge_cases():
     """Test recommend_bet: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_recommend_bet_edge_cases():
     assert result is not None
 
 
-
 def test_recommend_bet_error_handling():
     """Test recommend_bet error handling."""
     with pytest.raises(ValueError):
         recommend_bet(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_recommend_bet_property_idempotent(self, self, opportunity, bankroll):
 
     # Assert property
     assert recommend_bet(self, opportunity, bankroll) == result, "idempotent violated"
-
 
 
 def test_recommend_portfolio_basic():
@@ -100,7 +93,6 @@ def test_recommend_portfolio_basic():
     assert result is not None
 
 
-
 def test_recommend_portfolio_edge_cases():
     """Test recommend_portfolio: edge cases."""
     # Arrange
@@ -113,20 +105,21 @@ def test_recommend_portfolio_edge_cases():
     assert result is not None
 
 
-
 def test_recommend_portfolio_error_handling():
     """Test recommend_portfolio error handling."""
     with pytest.raises(ValueError):
         recommend_portfolio(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_recommend_portfolio_property_idempotent(self, self, opportunities, bankroll, max_positions):
+def test_recommend_portfolio_property_idempotent(
+    self, self, opportunities, bankroll, max_positions
+):
     """Property test: function is idempotent."""
     # Act
     result = recommend_portfolio(self, opportunities, bankroll, max_positions)
 
     # Assert property
-    assert recommend_portfolio(self, opportunities, bankroll, max_positions) == result, "idempotent violated"
-
+    assert (
+        recommend_portfolio(self, opportunities, bankroll, max_positions) == result
+    ), "idempotent violated"

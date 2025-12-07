@@ -23,7 +23,6 @@ def test_calculate_implied_odds_basic():
     assert result is not None
 
 
-
 def test_calculate_implied_odds_edge_cases():
     """Test calculate_implied_odds: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_calculate_implied_odds_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_implied_odds_error_handling():
     """Test calculate_implied_odds error handling."""
     with pytest.raises(ValueError):
         calculate_implied_odds(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_calculate_implied_odds_property_idempotent(self, win_prob, vig_pct):
 
     # Assert property
     assert calculate_implied_odds(win_prob, vig_pct) == result, "idempotent violated"
-
 
 
 def test_simulate_bet_outcome_basic():
@@ -67,7 +63,6 @@ def test_simulate_bet_outcome_basic():
     assert result is not None
 
 
-
 def test_simulate_bet_outcome_edge_cases():
     """Test simulate_bet_outcome: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_simulate_bet_outcome_edge_cases():
     assert result is not None
 
 
-
 def test_simulate_bet_outcome_error_handling():
     """Test simulate_bet_outcome error handling."""
     with pytest.raises(ValueError):
         simulate_bet_outcome(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -95,8 +88,9 @@ def test_simulate_bet_outcome_property_idempotent(self, win_prob, actual_won, st
     result = simulate_bet_outcome(win_prob, actual_won, stake, vig_pct)
 
     # Assert property
-    assert simulate_bet_outcome(win_prob, actual_won, stake, vig_pct) == result, "idempotent violated"
-
+    assert (
+        simulate_bet_outcome(win_prob, actual_won, stake, vig_pct) == result
+    ), "idempotent violated"
 
 
 def test_load_test_predictions_basic():
@@ -111,7 +105,6 @@ def test_load_test_predictions_basic():
     assert result is not None
 
 
-
 def test_load_test_predictions_edge_cases():
     """Test load_test_predictions: edge cases."""
     # Arrange
@@ -124,23 +117,24 @@ def test_load_test_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_load_test_predictions_error_handling():
     """Test load_test_predictions error handling."""
     with pytest.raises(ValueError):
         load_test_predictions(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_load_test_predictions_property_idempotent(self, model_path, features_path, test_seasons, feature_cols):
+def test_load_test_predictions_property_idempotent(
+    self, model_path, features_path, test_seasons, feature_cols
+):
     """Property test: function is idempotent."""
     # Act
     result = load_test_predictions(model_path, features_path, test_seasons, feature_cols)
 
     # Assert property
-    assert load_test_predictions(model_path, features_path, test_seasons, feature_cols) == result, "idempotent violated"
-
+    assert (
+        load_test_predictions(model_path, features_path, test_seasons, feature_cols) == result
+    ), "idempotent violated"
 
 
 def test_run_exchange_simulation_basic():
@@ -155,7 +149,6 @@ def test_run_exchange_simulation_basic():
     assert result is not None
 
 
-
 def test_run_exchange_simulation_edge_cases():
     """Test run_exchange_simulation: edge cases."""
     # Arrange
@@ -168,23 +161,24 @@ def test_run_exchange_simulation_edge_cases():
     assert result is not None
 
 
-
 def test_run_exchange_simulation_error_handling():
     """Test run_exchange_simulation error handling."""
     with pytest.raises(ValueError):
         run_exchange_simulation(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_run_exchange_simulation_property_idempotent(self, predictions, vig_pct, bet_threshold, stake_per_bet):
+def test_run_exchange_simulation_property_idempotent(
+    self, predictions, vig_pct, bet_threshold, stake_per_bet
+):
     """Property test: function is idempotent."""
     # Act
     result = run_exchange_simulation(predictions, vig_pct, bet_threshold, stake_per_bet)
 
     # Assert property
-    assert run_exchange_simulation(predictions, vig_pct, bet_threshold, stake_per_bet) == result, "idempotent violated"
-
+    assert (
+        run_exchange_simulation(predictions, vig_pct, bet_threshold, stake_per_bet) == result
+    ), "idempotent violated"
 
 
 def test_compare_vig_scenarios_basic():
@@ -199,7 +193,6 @@ def test_compare_vig_scenarios_basic():
     assert result is not None
 
 
-
 def test_compare_vig_scenarios_edge_cases():
     """Test compare_vig_scenarios: edge cases."""
     # Arrange
@@ -212,12 +205,10 @@ def test_compare_vig_scenarios_edge_cases():
     assert result is not None
 
 
-
 def test_compare_vig_scenarios_error_handling():
     """Test compare_vig_scenarios error handling."""
     with pytest.raises(ValueError):
         compare_vig_scenarios(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -228,7 +219,6 @@ def test_compare_vig_scenarios_property_idempotent(self, predictions, vig_scenar
 
     # Assert property
     assert compare_vig_scenarios(predictions, vig_scenarios) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -243,7 +233,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -256,9 +245,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

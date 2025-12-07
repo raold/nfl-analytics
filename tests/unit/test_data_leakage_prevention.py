@@ -56,14 +56,16 @@ def sample_clean_data():
     np.random.seed(42)
     dates = pd.date_range("2024-01-01", periods=100, freq="D")
 
-    return pd.DataFrame({
-        "date": dates,
-        "player_id": np.repeat(["P1", "P2", "P3", "P4", "P5"], 20),
-        "passing_yards": np.random.normal(280, 40, 100),
-        "passing_attempts": np.random.randint(25, 45, 100),
-        "opponent": np.random.choice(["KC", "BUF", "MIA", "NYJ"], 100),
-        "week": np.tile(range(1, 21), 5)
-    })
+    return pd.DataFrame(
+        {
+            "date": dates,
+            "player_id": np.repeat(["P1", "P2", "P3", "P4", "P5"], 20),
+            "passing_yards": np.random.normal(280, 40, 100),
+            "passing_attempts": np.random.randint(25, 45, 100),
+            "opponent": np.random.choice(["KC", "BUF", "MIA", "NYJ"], 100),
+            "week": np.tile(range(1, 21), 5),
+        }
+    )
 
 
 @pytest.fixture
@@ -72,14 +74,16 @@ def sample_leaky_data():
     np.random.seed(42)
     dates = pd.date_range("2024-01-01", periods=100, freq="D")
 
-    df = pd.DataFrame({
-        "date": dates,
-        "player_id": np.repeat(["P1", "P2", "P3", "P4", "P5"], 20),
-        "passing_yards": np.random.normal(280, 40, 100),
-        "passing_attempts": np.random.randint(25, 45, 100),
-        "opponent": np.random.choice(["KC", "BUF", "MIA", "NYJ"], 100),
-        "week": np.tile(range(1, 21), 5)
-    })
+    df = pd.DataFrame(
+        {
+            "date": dates,
+            "player_id": np.repeat(["P1", "P2", "P3", "P4", "P5"], 20),
+            "passing_yards": np.random.normal(280, 40, 100),
+            "passing_attempts": np.random.randint(25, 45, 100),
+            "opponent": np.random.choice(["KC", "BUF", "MIA", "NYJ"], 100),
+            "week": np.tile(range(1, 21), 5),
+        }
+    )
 
     # Add leaky feature: future data
     df["next_week_yards"] = df.groupby("player_id")["passing_yards"].shift(-1)
@@ -93,6 +97,7 @@ def sample_leaky_data():
 # ============================================================================
 # 1. Temporal Split Enforcement Tests
 # ============================================================================
+
 
 @pytest.mark.unit
 @pytest.mark.critical
@@ -168,14 +173,12 @@ class TestTemporalSplitEnforcement:
     def test_minimum_time_gap_validation(self, detector):
         """Verify minimum time gap between train/test (e.g., 1 day)."""
         # Adjacent dates (no gap)
-        train = pd.DataFrame({
-            "date": pd.date_range("2024-01-01", "2024-01-31", freq="D"),
-            "yards": 100
-        })
-        test = pd.DataFrame({
-            "date": pd.date_range("2024-02-01", "2024-02-28", freq="D"),
-            "yards": 100
-        })
+        train = pd.DataFrame(
+            {"date": pd.date_range("2024-01-01", "2024-01-31", freq="D"), "yards": 100}
+        )
+        test = pd.DataFrame(
+            {"date": pd.date_range("2024-02-01", "2024-02-28", freq="D"), "yards": 100}
+        )
 
         report = detector.validate_split(train, test, date_col="date")
 
@@ -187,6 +190,7 @@ class TestTemporalSplitEnforcement:
 # ============================================================================
 # 2. ASOF Join Validation Tests
 # ============================================================================
+
 
 @pytest.mark.unit
 @pytest.mark.critical
@@ -242,12 +246,15 @@ class TestASOFJoinValidation:
         issues_incorrect = detector.check_code_patterns(code_incorrect)
 
         # Forward direction should have more issues
-        logger.info(f"✅ ASOF direction validation: correct={len(issues_correct)}, incorrect={len(issues_incorrect)}")
+        logger.info(
+            f"✅ ASOF direction validation: correct={len(issues_correct)}, incorrect={len(issues_incorrect)}"
+        )
 
 
 # ============================================================================
 # 3. Rolling Feature Window Tests
 # ============================================================================
+
 
 @pytest.mark.unit
 @pytest.mark.critical
@@ -256,11 +263,13 @@ class TestRollingFeatureWindows:
 
     def test_rolling_mean_uses_past_only(self):
         """Verify rolling mean uses only historical data."""
-        data = pd.DataFrame({
-            "player_id": ["P1"] * 10,
-            "week": range(1, 11),
-            "yards": [280, 290, 275, 265, 285, 295, 270, 280, 285, 275]
-        })
+        data = pd.DataFrame(
+            {
+                "player_id": ["P1"] * 10,
+                "week": range(1, 11),
+                "yards": [280, 290, 275, 265, 285, 295, 270, 280, 285, 275],
+            }
+        )
 
         # Correct: rolling mean of previous 3 weeks
         data["yards_L3_mean"] = data["yards"].shift(1).rolling(window=3, min_periods=1).mean()
@@ -273,9 +282,7 @@ class TestRollingFeatureWindows:
 
     def test_rolling_std_lag_validation(self):
         """Verify rolling std is calculated on lagged data."""
-        data = pd.DataFrame({
-            "yards": [280, 290, 275, 265, 285, 295, 270, 280, 285, 275]
-        })
+        data = pd.DataFrame({"yards": [280, 290, 275, 265, 285, 295, 270, 280, 285, 275]})
 
         # Correct: lag first, then rolling
         data["yards_L3_std"] = data["yards"].shift(1).rolling(window=3).std()
@@ -285,18 +292,14 @@ class TestRollingFeatureWindows:
 
         # These should differ
         assert not np.allclose(
-            data["yards_L3_std"].dropna(),
-            data["yards_wrong"].dropna(),
-            equal_nan=True
+            data["yards_L3_std"].dropna(), data["yards_wrong"].dropna(), equal_nan=True
         ), "Lag order matters"
 
         logger.info("✅ Rolling std lag order validated")
 
     def test_expanding_window_safety(self):
         """Verify expanding window doesn't include current row."""
-        data = pd.DataFrame({
-            "yards": [280, 290, 275, 265, 285]
-        })
+        data = pd.DataFrame({"yards": [280, 290, 275, 265, 285]})
 
         # Correct: expanding mean of past data
         data["cumulative_mean"] = data["yards"].shift(1).expanding().mean()
@@ -313,6 +316,7 @@ class TestRollingFeatureWindows:
 # 4. Future Data Detection Tests
 # ============================================================================
 
+
 @pytest.mark.unit
 @pytest.mark.critical
 class TestFutureDataDetection:
@@ -328,7 +332,9 @@ class TestFutureDataDetection:
         issues = detector.check_code_patterns(code)
 
         # Should detect future data pattern
-        future_issues = [i for i in issues if "shift(-" in str(i) or "future" in i.description.lower()]
+        future_issues = [
+            i for i in issues if "shift(-" in str(i) or "future" in i.description.lower()
+        ]
         assert len(future_issues) > 0, "Failed to detect negative shift"
 
         logger.info("✅ Negative shift detected")
@@ -350,11 +356,13 @@ class TestFutureDataDetection:
 
     def test_future_keyword_detection(self, detector):
         """Verify feature names with 'next' or 'future' are flagged."""
-        df = pd.DataFrame({
-            "player_id": ["P1", "P1", "P1"],
-            "yards": [280, 290, 275],
-            "next_week_result": [290, 275, 265]  # LEAKAGE!
-        })
+        df = pd.DataFrame(
+            {
+                "player_id": ["P1", "P1", "P1"],
+                "yards": [280, 290, 275],
+                "next_week_result": [290, 275, 265],  # LEAKAGE!
+            }
+        )
 
         report = detector.check_dataframe(df, target_col="yards")
 
@@ -369,6 +377,7 @@ class TestFutureDataDetection:
 # 5. Player Contamination Tests
 # ============================================================================
 
+
 @pytest.mark.unit
 @pytest.mark.critical
 class TestPlayerContamination:
@@ -376,15 +385,11 @@ class TestPlayerContamination:
 
     def test_same_player_in_train_test_detected(self, detector):
         """Verify same player appearing in both train/test is detected."""
-        train = pd.DataFrame({
-            "player_id": ["P1", "P2", "P3"],
-            "yards": [280, 290, 275]
-        })
+        train = pd.DataFrame({"player_id": ["P1", "P2", "P3"], "yards": [280, 290, 275]})
 
-        test = pd.DataFrame({
-            "player_id": ["P2", "P4", "P5"],  # P2 appears in both!
-            "yards": [290, 280, 270]
-        })
+        test = pd.DataFrame(
+            {"player_id": ["P2", "P4", "P5"], "yards": [290, 280, 270]}  # P2 appears in both!
+        )
 
         report = detector.validate_split(train, test, player_col="player_id")
 
@@ -395,17 +400,17 @@ class TestPlayerContamination:
 
     def test_player_group_leakage(self, detector):
         """Verify same game (both teams) in train/test is flagged."""
-        train = pd.DataFrame({
-            "game_id": ["G1", "G2", "G3"],
-            "team": ["KC", "BUF", "MIA"],
-            "yards": [280, 290, 275]
-        })
+        train = pd.DataFrame(
+            {"game_id": ["G1", "G2", "G3"], "team": ["KC", "BUF", "MIA"], "yards": [280, 290, 275]}
+        )
 
-        test = pd.DataFrame({
-            "game_id": ["G2", "G4", "G5"],  # G2 appears in both!
-            "team": ["NYJ", "KC", "BUF"],
-            "yards": [290, 280, 270]
-        })
+        test = pd.DataFrame(
+            {
+                "game_id": ["G2", "G4", "G5"],  # G2 appears in both!
+                "team": ["NYJ", "KC", "BUF"],
+                "yards": [290, 280, 270],
+            }
+        )
 
         # Check for game_id overlap
         game_overlap = set(train["game_id"]) & set(test["game_id"])
@@ -418,16 +423,19 @@ class TestPlayerContamination:
 # 6. Statistical Anomaly Tests
 # ============================================================================
 
+
 @pytest.mark.unit
 class TestStatisticalAnomalies:
     """Test detection of too-good-to-be-true metrics."""
 
     def test_perfect_correlation_detected(self, detector):
         """Verify perfect correlation (R²=1.0) is flagged."""
-        df = pd.DataFrame({
-            "yards": [280, 290, 275, 265, 285],
-            "perfect_feature": [280, 290, 275, 265, 285]  # Exact copy!
-        })
+        df = pd.DataFrame(
+            {
+                "yards": [280, 290, 275, 265, 285],
+                "perfect_feature": [280, 290, 275, 265, 285],  # Exact copy!
+            }
+        )
 
         report = detector.check_dataframe(df, target_col="yards")
 
@@ -439,10 +447,12 @@ class TestStatisticalAnomalies:
 
     def test_zero_variance_detected(self, detector):
         """Verify zero-variance features are flagged."""
-        df = pd.DataFrame({
-            "yards": [280, 290, 275, 265, 285],
-            "constant_feature": [100, 100, 100, 100, 100]  # No variance!
-        })
+        df = pd.DataFrame(
+            {
+                "yards": [280, 290, 275, 265, 285],
+                "constant_feature": [100, 100, 100, 100, 100],  # No variance!
+            }
+        )
 
         report = detector.check_dataframe(df, target_col="yards")
 
@@ -458,7 +468,9 @@ class TestStatisticalAnomalies:
         predictions = np.array([280, 290, 275, 265, 285])
         actuals = predictions + np.random.normal(0, 1, 5)  # Nearly perfect
 
-        r_squared = 1 - np.sum((actuals - predictions)**2) / np.sum((actuals - np.mean(actuals))**2)
+        r_squared = 1 - np.sum((actuals - predictions) ** 2) / np.sum(
+            (actuals - np.mean(actuals)) ** 2
+        )
 
         # For NFL, R²>0.6 is suspicious
         if r_squared > 0.6:
@@ -472,6 +484,7 @@ class TestStatisticalAnomalies:
 # 7. Target Leakage Detection Tests
 # ============================================================================
 
+
 @pytest.mark.unit
 @pytest.mark.critical
 class TestTargetLeakageDetection:
@@ -479,11 +492,13 @@ class TestTargetLeakageDetection:
 
     def test_target_in_feature_name_detected(self, detector):
         """Verify target variable in feature name is flagged."""
-        df = pd.DataFrame({
-            "player_id": ["P1", "P2", "P3"],
-            "passing_yards": [280, 290, 275],  # Target
-            "avg_passing_yards": [285, 285, 285]  # LEAKAGE - contains target!
-        })
+        df = pd.DataFrame(
+            {
+                "player_id": ["P1", "P2", "P3"],
+                "passing_yards": [280, 290, 275],  # Target
+                "avg_passing_yards": [285, 285, 285],  # LEAKAGE - contains target!
+            }
+        )
 
         report = detector.check_dataframe(df, target_col="passing_yards")
 
@@ -495,10 +510,12 @@ class TestTargetLeakageDetection:
 
     def test_exact_target_copy_detected(self, detector):
         """Verify exact copy of target is detected (perfect correlation)."""
-        df = pd.DataFrame({
-            "yards": [280, 290, 275, 265, 285],
-            "yards_copy": [280, 290, 275, 265, 285]  # Exact copy!
-        })
+        df = pd.DataFrame(
+            {
+                "yards": [280, 290, 275, 265, 285],
+                "yards_copy": [280, 290, 275, 265, 285],  # Exact copy!
+            }
+        )
 
         report = detector.check_dataframe(df, target_col="yards")
 
@@ -508,10 +525,12 @@ class TestTargetLeakageDetection:
 
     def test_transformed_target_detected(self, detector):
         """Verify transformed target (log, sqrt) is detected."""
-        df = pd.DataFrame({
-            "yards": [280, 290, 275, 265, 285],
-            "log_yards": np.log([280, 290, 275, 265, 285])  # Transformed target!
-        })
+        df = pd.DataFrame(
+            {
+                "yards": [280, 290, 275, 265, 285],
+                "log_yards": np.log([280, 290, 275, 265, 285]),  # Transformed target!
+            }
+        )
 
         report = detector.check_dataframe(df, target_col="yards")
 
@@ -525,6 +544,7 @@ class TestTargetLeakageDetection:
 # ============================================================================
 # 8. Code Pattern Analysis Tests
 # ============================================================================
+
 
 @pytest.mark.unit
 class TestCodePatternAnalysis:
@@ -578,6 +598,7 @@ class TestCodePatternAnalysis:
 # ============================================================================
 # 9. Pre-Training Validation Gates
 # ============================================================================
+
 
 @pytest.mark.unit
 @pytest.mark.critical
@@ -635,6 +656,7 @@ class TestPreTrainingValidation:
 # 10. Integration with Enforcement Framework
 # ============================================================================
 
+
 @pytest.mark.unit
 class TestEnforcementIntegration:
     """Test integration with Unified Enforcement Framework."""
@@ -651,10 +673,9 @@ class TestEnforcementIntegration:
     def test_blocking_severity_for_critical_leakage(self, detector):
         """Verify CRITICAL severity maps to BLOCKING enforcement."""
         # Create data with critical leakage
-        df = pd.DataFrame({
-            "yards": [280, 290, 275],
-            "yards_exact_copy": [280, 290, 275]  # CRITICAL
-        })
+        df = pd.DataFrame(
+            {"yards": [280, 290, 275], "yards_exact_copy": [280, 290, 275]}  # CRITICAL
+        )
 
         report = detector.check_dataframe(df, target_col="yards")
 

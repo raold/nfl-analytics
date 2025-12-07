@@ -32,12 +32,14 @@ from pathlib import Path
 try:
     import psycopg2
     from psycopg2 import sql
+
     PSYCOPG2_AVAILABLE = True
 except ImportError:
     PSYCOPG2_AVAILABLE = False
 
 try:
     import docker
+
     DOCKER_AVAILABLE = True
 except ImportError:
     DOCKER_AVAILABLE = False
@@ -47,9 +49,11 @@ except ImportError:
 # DATA CLASSES
 # ============================================================================
 
+
 @dataclass
 class ValidationResult:
     """Result of a single validation check."""
+
     category: str
     check_name: str
     passed: bool
@@ -61,6 +65,7 @@ class ValidationResult:
 @dataclass
 class ValidationReport:
     """Complete validation report."""
+
     timestamp: str
     claude_md_path: str
     results: list[ValidationResult] = field(default_factory=list)
@@ -99,6 +104,7 @@ class ValidationReport:
 # ============================================================================
 # VALIDATORS
 # ============================================================================
+
 
 class CLAUDEMDValidator:
     """Main validator for CLAUDE.md accuracy."""
@@ -144,9 +150,9 @@ class CLAUDEMDValidator:
         # Extract file references from CLAUDE.md
         file_patterns = [
             r"`([^`]+\.py)`",  # Python files
-            r"`([^`]+\.R)`",   # R files
-            r"`([^`]+\.sql)`", # SQL files
-            r"`([^`]+\.tex)`", # LaTeX files
+            r"`([^`]+\.R)`",  # R files
+            r"`([^`]+\.sql)`",  # SQL files
+            r"`([^`]+\.tex)`",  # LaTeX files
             r"`([^`]+\.md)`",  # Markdown files
         ]
 
@@ -166,21 +172,24 @@ class CLAUDEMDValidator:
                 self._vprint(f"❌ Missing: {file_ref}")
 
         passed = len(missing_files) == 0
-        self.report.add_result(ValidationResult(
-            category="Architecture References",
-            check_name="File Existence",
-            passed=passed,
-            message=f"Checked {len(referenced_files)} file references",
-            details={
-                "total_referenced": len(referenced_files),
-                "missing_count": len(missing_files),
-                "missing_files": missing_files[:10],  # Limit to first 10
-            },
-            suggestion=(
-                f"Update {len(missing_files)} missing file references in CLAUDE.md "
-                if missing_files else None
-            ),
-        ))
+        self.report.add_result(
+            ValidationResult(
+                category="Architecture References",
+                check_name="File Existence",
+                passed=passed,
+                message=f"Checked {len(referenced_files)} file references",
+                details={
+                    "total_referenced": len(referenced_files),
+                    "missing_count": len(missing_files),
+                    "missing_files": missing_files[:10],  # Limit to first 10
+                },
+                suggestion=(
+                    f"Update {len(missing_files)} missing file references in CLAUDE.md "
+                    if missing_files
+                    else None
+                ),
+            )
+        )
 
     def validate_directory_structure(self) -> None:
         """Validate key directory structures match documentation."""
@@ -206,21 +215,24 @@ class CLAUDEMDValidator:
                 self._vprint(f"❌ Missing directory: {dir_name}")
 
         passed = len(missing_dirs) == 0
-        self.report.add_result(ValidationResult(
-            category="Architecture References",
-            check_name="Directory Structure",
-            passed=passed,
-            message=f"Checked {len(expected_dirs)} key directories",
-            details={
-                "total_expected": len(expected_dirs),
-                "missing_count": len(missing_dirs),
-                "missing_dirs": missing_dirs,
-            },
-            suggestion=(
-                "Create missing directories or update CLAUDE.md documentation"
-                if missing_dirs else None
-            ),
-        ))
+        self.report.add_result(
+            ValidationResult(
+                category="Architecture References",
+                check_name="Directory Structure",
+                passed=passed,
+                message=f"Checked {len(expected_dirs)} key directories",
+                details={
+                    "total_expected": len(expected_dirs),
+                    "missing_count": len(missing_dirs),
+                    "missing_dirs": missing_dirs,
+                },
+                suggestion=(
+                    "Create missing directories or update CLAUDE.md documentation"
+                    if missing_dirs
+                    else None
+                ),
+            )
+        )
 
     def validate_docker_services(self) -> None:
         """Validate Docker service configuration."""
@@ -232,13 +244,15 @@ class CLAUDEMDValidator:
 
         if not DOCKER_AVAILABLE:
             self._vprint("⚠️  Docker client not available, skipping live service check")
-            self.report.add_result(ValidationResult(
-                category="Architecture References",
-                check_name="Docker Services",
-                passed=True,
-                message="Docker validation skipped (docker client not available)",
-                details={"claimed_services": claimed_services},
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Architecture References",
+                    check_name="Docker Services",
+                    passed=True,
+                    message="Docker validation skipped (docker client not available)",
+                    details={"claimed_services": claimed_services},
+                )
+            )
             return
 
         try:
@@ -262,50 +276,54 @@ class CLAUDEMDValidator:
                 )
 
             passed = len(missing_services) == 0
-            self.report.add_result(ValidationResult(
-                category="Architecture References",
-                check_name="Docker Services",
-                passed=passed,
-                message=f"Found {len(found_services)}/{len(required_services)} required services",
-                details={
-                    "claimed_services": claimed_services,
-                    "actual_running": len(running_containers),
-                    "found_services": found_services,
-                    "missing_services": missing_services,
-                },
-                suggestion=(
-                    f"Start missing Docker services: {', '.join(missing_services)}"
-                    if missing_services else None
-                ),
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Architecture References",
+                    check_name="Docker Services",
+                    passed=passed,
+                    message=f"Found {len(found_services)}/{len(required_services)} required services",
+                    details={
+                        "claimed_services": claimed_services,
+                        "actual_running": len(running_containers),
+                        "found_services": found_services,
+                        "missing_services": missing_services,
+                    },
+                    suggestion=(
+                        f"Start missing Docker services: {', '.join(missing_services)}"
+                        if missing_services
+                        else None
+                    ),
+                )
+            )
         except Exception as e:
             self._vprint(f"⚠️  Docker error: {e}")
-            self.report.add_result(ValidationResult(
-                category="Architecture References",
-                check_name="Docker Services",
-                passed=False,
-                message=f"Docker validation failed: {str(e)}",
-                details={"error": str(e)},
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Architecture References",
+                    check_name="Docker Services",
+                    passed=False,
+                    message=f"Docker validation failed: {str(e)}",
+                    details={"error": str(e)},
+                )
+            )
 
     def validate_database_connection(self) -> None:
         """Validate database connection string and accessibility."""
         self._vprint("Validating database connection...")
 
         # Extract connection string from CLAUDE.md
-        match = re.search(
-            r"postgresql://[^\s`]+",
-            self.content
-        )
+        match = re.search(r"postgresql://[^\s`]+", self.content)
         if not match:
-            self.report.add_result(ValidationResult(
-                category="Architecture References",
-                check_name="Database Connection",
-                passed=False,
-                message="Database connection string not found in CLAUDE.md",
-                details={},
-                suggestion="Add database connection string to CLAUDE.md documentation",
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Architecture References",
+                    check_name="Database Connection",
+                    passed=False,
+                    message="Database connection string not found in CLAUDE.md",
+                    details={},
+                    suggestion="Add database connection string to CLAUDE.md documentation",
+                )
+            )
             return
 
         connection_string = match.group(0).rstrip("`")
@@ -313,13 +331,15 @@ class CLAUDEMDValidator:
 
         if not PSYCOPG2_AVAILABLE:
             self._vprint("⚠️  psycopg2 not available, skipping live database check")
-            self.report.add_result(ValidationResult(
-                category="Architecture References",
-                check_name="Database Connection",
-                passed=True,
-                message="Database validation skipped (psycopg2 not available)",
-                details={"connection_string": connection_string},
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Architecture References",
+                    check_name="Database Connection",
+                    passed=True,
+                    message="Database validation skipped (psycopg2 not available)",
+                    details={"connection_string": connection_string},
+                )
+            )
             return
 
         try:
@@ -342,28 +362,34 @@ class CLAUDEMDValidator:
             conn.close()
 
             # Extract claimed metrics from CLAUDE.md
-            matches = re.findall(r"(\d+)\s*(?:games|plays|columns|models)", self.content, re.IGNORECASE)
+            matches = re.findall(
+                r"(\d+)\s*(?:games|plays|columns|models)", self.content, re.IGNORECASE
+            )
 
-            self.report.add_result(ValidationResult(
-                category="Architecture References",
-                check_name="Database Connection",
-                passed=True,
-                message=f"Database connection successful, {table_count} tables, {games_count} games",
-                details={
-                    "connection_string": connection_string,
-                    "table_count": table_count,
-                    "games_count": games_count,
-                },
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Architecture References",
+                    check_name="Database Connection",
+                    passed=True,
+                    message=f"Database connection successful, {table_count} tables, {games_count} games",
+                    details={
+                        "connection_string": connection_string,
+                        "table_count": table_count,
+                        "games_count": games_count,
+                    },
+                )
+            )
         except Exception as e:
-            self.report.add_result(ValidationResult(
-                category="Architecture References",
-                check_name="Database Connection",
-                passed=False,
-                message=f"Database connection failed: {str(e)}",
-                details={"error": str(e), "connection_string": connection_string},
-                suggestion="Check database is running and credentials are correct",
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Architecture References",
+                    check_name="Database Connection",
+                    passed=False,
+                    message=f"Database connection failed: {str(e)}",
+                    details={"error": str(e), "connection_string": connection_string},
+                    suggestion="Check database is running and credentials are correct",
+                )
+            )
 
     # ========================================================================
     # CATEGORY 2: CROSS-REFERENCES
@@ -395,22 +421,23 @@ class CLAUDEMDValidator:
                 self._vprint(f"❌ Broken link: {link}")
 
         passed = len(broken_links) == 0
-        self.report.add_result(ValidationResult(
-            category="Cross-References",
-            check_name="Documentation Links",
-            passed=passed,
-            message=f"Checked {len(matches)} links, {len(valid_links)} valid",
-            details={
-                "total_links": len(matches),
-                "valid_links": len(valid_links),
-                "broken_links": len(broken_links),
-                "broken": [{"text": t, "link": l} for t, l in broken_links[:5]],
-            },
-            suggestion=(
-                f"Fix {len(broken_links)} broken documentation links"
-                if broken_links else None
-            ),
-        ))
+        self.report.add_result(
+            ValidationResult(
+                category="Cross-References",
+                check_name="Documentation Links",
+                passed=passed,
+                message=f"Checked {len(matches)} links, {len(valid_links)} valid",
+                details={
+                    "total_links": len(matches),
+                    "valid_links": len(valid_links),
+                    "broken_links": len(broken_links),
+                    "broken": [{"text": t, "link": l} for t, l in broken_links[:5]],
+                },
+                suggestion=(
+                    f"Fix {len(broken_links)} broken documentation links" if broken_links else None
+                ),
+            )
+        )
 
     def validate_code_file_references(self) -> None:
         """Validate code file references are correct."""
@@ -433,22 +460,23 @@ class CLAUDEMDValidator:
                 self._vprint(f"❌ Invalid: {ref}")
 
         passed = len(invalid_refs) == 0
-        self.report.add_result(ValidationResult(
-            category="Cross-References",
-            check_name="Code File References",
-            passed=passed,
-            message=f"Checked {len(references)} code references, {len(valid_refs)} valid",
-            details={
-                "total_references": len(references),
-                "valid": len(valid_refs),
-                "invalid": len(invalid_refs),
-                "invalid_files": invalid_refs[:10],
-            },
-            suggestion=(
-                f"Update {len(invalid_refs)} invalid code references"
-                if invalid_refs else None
-            ),
-        ))
+        self.report.add_result(
+            ValidationResult(
+                category="Cross-References",
+                check_name="Code File References",
+                passed=passed,
+                message=f"Checked {len(references)} code references, {len(valid_refs)} valid",
+                details={
+                    "total_references": len(references),
+                    "valid": len(valid_refs),
+                    "invalid": len(invalid_refs),
+                    "invalid_files": invalid_refs[:10],
+                },
+                suggestion=(
+                    f"Update {len(invalid_refs)} invalid code references" if invalid_refs else None
+                ),
+            )
+        )
 
     # ========================================================================
     # CATEGORY 3: FRESHNESS
@@ -461,28 +489,32 @@ class CLAUDEMDValidator:
         # Extract last updated date
         match = re.search(r"\*\*Last Updated:\*\*\s*([A-Za-z]+\s+\d{1,2},\s+\d{4})", self.content)
         if not match:
-            self.report.add_result(ValidationResult(
-                category="Freshness",
-                check_name="Last Updated Date",
-                passed=False,
-                message="Last Updated date not found in CLAUDE.md",
-                details={},
-                suggestion="Add 'Last Updated: Month DD, YYYY' to top of CLAUDE.md",
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Freshness",
+                    check_name="Last Updated Date",
+                    passed=False,
+                    message="Last Updated date not found in CLAUDE.md",
+                    details={},
+                    suggestion="Add 'Last Updated: Month DD, YYYY' to top of CLAUDE.md",
+                )
+            )
             return
 
         date_str = match.group(1)
         try:
             claimed_date = datetime.strptime(date_str, "%B %d, %Y")
         except ValueError:
-            self.report.add_result(ValidationResult(
-                category="Freshness",
-                check_name="Last Updated Date",
-                passed=False,
-                message=f"Cannot parse date format: {date_str}",
-                details={"date_string": date_str},
-                suggestion="Use format 'Month DD, YYYY' e.g., 'November 15, 2025'",
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Freshness",
+                    check_name="Last Updated Date",
+                    passed=False,
+                    message=f"Cannot parse date format: {date_str}",
+                    details={"date_string": date_str},
+                    suggestion="Use format 'Month DD, YYYY' e.g., 'November 15, 2025'",
+                )
+            )
             return
 
         # Get latest commit date
@@ -499,38 +531,45 @@ class CLAUDEMDValidator:
                 days_old = (datetime.now() - claimed_date).days
 
                 passed = days_old <= 1  # Allow 1 day lag
-                self.report.add_result(ValidationResult(
-                    category="Freshness",
-                    check_name="Last Updated Date",
-                    passed=passed,
-                    message=f"Last Updated date: {date_str} ({days_old} days old)",
-                    details={
-                        "claimed_date": date_str,
-                        "days_old": days_old,
-                        "latest_commit": latest_commit.isoformat(),
-                    },
-                    suggestion=(
-                        f"Update 'Last Updated' to today ({datetime.now().strftime('%B %d, %Y')})"
-                        if days_old > 1 else None
-                    ),
-                ))
+                self.report.add_result(
+                    ValidationResult(
+                        category="Freshness",
+                        check_name="Last Updated Date",
+                        passed=passed,
+                        message=f"Last Updated date: {date_str} ({days_old} days old)",
+                        details={
+                            "claimed_date": date_str,
+                            "days_old": days_old,
+                            "latest_commit": latest_commit.isoformat(),
+                        },
+                        suggestion=(
+                            f"Update 'Last Updated' to today ({datetime.now().strftime('%B %d, %Y')})"
+                            if days_old > 1
+                            else None
+                        ),
+                    )
+                )
             else:
-                self.report.add_result(ValidationResult(
+                self.report.add_result(
+                    ValidationResult(
+                        category="Freshness",
+                        check_name="Last Updated Date",
+                        passed=True,
+                        message=f"Date found: {date_str}",
+                        details={"date_string": date_str},
+                    )
+                )
+        except Exception as e:
+            self._vprint(f"⚠️  Git check failed: {e}")
+            self.report.add_result(
+                ValidationResult(
                     category="Freshness",
                     check_name="Last Updated Date",
                     passed=True,
-                    message=f"Date found: {date_str}",
+                    message=f"Date found: {date_str} (git check skipped)",
                     details={"date_string": date_str},
-                ))
-        except Exception as e:
-            self._vprint(f"⚠️  Git check failed: {e}")
-            self.report.add_result(ValidationResult(
-                category="Freshness",
-                check_name="Last Updated Date",
-                passed=True,
-                message=f"Date found: {date_str} (git check skipped)",
-                details={"date_string": date_str},
-            ))
+                )
+            )
 
     def validate_version_number(self) -> None:
         """Validate version number follows semantic versioning."""
@@ -538,14 +577,16 @@ class CLAUDEMDValidator:
 
         match = re.search(r"\*\*Version:\*\*\s*([0-9]+\.[0-9]+)", self.content)
         if not match:
-            self.report.add_result(ValidationResult(
-                category="Freshness",
-                check_name="Version Number",
-                passed=False,
-                message="Version number not found in CLAUDE.md",
-                details={},
-                suggestion="Add 'Version: X.Y' to top of CLAUDE.md",
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Freshness",
+                    check_name="Version Number",
+                    passed=False,
+                    message="Version number not found in CLAUDE.md",
+                    details={},
+                    suggestion="Add 'Version: X.Y' to top of CLAUDE.md",
+                )
+            )
             return
 
         version = match.group(1)
@@ -553,17 +594,18 @@ class CLAUDEMDValidator:
         parts = version.split(".")
         is_semantic = len(parts) >= 2 and all(p.isdigit() for p in parts)
 
-        self.report.add_result(ValidationResult(
-            category="Freshness",
-            check_name="Version Number",
-            passed=is_semantic,
-            message=f"Version: {version}",
-            details={"version": version, "is_semantic": is_semantic},
-            suggestion=(
-                "Use semantic versioning (e.g., 4.9, 5.0, 5.1)"
-                if not is_semantic else None
-            ),
-        ))
+        self.report.add_result(
+            ValidationResult(
+                category="Freshness",
+                check_name="Version Number",
+                passed=is_semantic,
+                message=f"Version: {version}",
+                details={"version": version, "is_semantic": is_semantic},
+                suggestion=(
+                    "Use semantic versioning (e.g., 4.9, 5.0, 5.1)" if not is_semantic else None
+                ),
+            )
+        )
 
     def validate_recent_work_section(self) -> None:
         """Validate Recent Work section references recent commits."""
@@ -571,19 +613,25 @@ class CLAUDEMDValidator:
 
         # Check if recent work section exists
         if "## Recent Work" not in self.content:
-            self.report.add_result(ValidationResult(
-                category="Freshness",
-                check_name="Recent Work Section",
-                passed=False,
-                message="Recent Work section not found in CLAUDE.md",
-                details={},
-                suggestion="Add '## Recent Work' section with recent commits",
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Freshness",
+                    check_name="Recent Work Section",
+                    passed=False,
+                    message="Recent Work section not found in CLAUDE.md",
+                    details={},
+                    suggestion="Add '## Recent Work' section with recent commits",
+                )
+            )
             return
 
         # Extract work items from Recent Work section
-        recent_section = self.content[self.content.find("## Recent Work"):]
-        recent_section = recent_section[:recent_section.find("---")] if "---" in recent_section else recent_section
+        recent_section = self.content[self.content.find("## Recent Work") :]
+        recent_section = (
+            recent_section[: recent_section.find("---")]
+            if "---" in recent_section
+            else recent_section
+        )
 
         # Try to get recent commits
         try:
@@ -595,39 +643,48 @@ class CLAUDEMDValidator:
                 timeout=5,
             )
             if result.returncode == 0:
-                commits = [line.split(None, 1)[1] for line in result.stdout.strip().split("\n") if line]
+                commits = [
+                    line.split(None, 1)[1] for line in result.stdout.strip().split("\n") if line
+                ]
                 # Check if any recent commit message appears in Recent Work
                 found_commits = sum(1 for commit in commits if commit in recent_section)
                 passed = found_commits >= 1
 
-                self.report.add_result(ValidationResult(
-                    category="Freshness",
-                    check_name="Recent Work Section",
-                    passed=passed,
-                    message=f"Found {found_commits}/{len(commits)} recent commits in Recent Work",
-                    details={"recent_commits": commits[:5]},
-                    suggestion=(
-                        "Update Recent Work section with latest commits"
-                        if found_commits == 0 else None
-                    ),
-                ))
+                self.report.add_result(
+                    ValidationResult(
+                        category="Freshness",
+                        check_name="Recent Work Section",
+                        passed=passed,
+                        message=f"Found {found_commits}/{len(commits)} recent commits in Recent Work",
+                        details={"recent_commits": commits[:5]},
+                        suggestion=(
+                            "Update Recent Work section with latest commits"
+                            if found_commits == 0
+                            else None
+                        ),
+                    )
+                )
             else:
-                self.report.add_result(ValidationResult(
+                self.report.add_result(
+                    ValidationResult(
+                        category="Freshness",
+                        check_name="Recent Work Section",
+                        passed=True,
+                        message="Recent Work section found",
+                        details={},
+                    )
+                )
+        except Exception as e:
+            self._vprint(f"⚠️  Cannot validate commits: {e}")
+            self.report.add_result(
+                ValidationResult(
                     category="Freshness",
                     check_name="Recent Work Section",
                     passed=True,
-                    message="Recent Work section found",
-                    details={},
-                ))
-        except Exception as e:
-            self._vprint(f"⚠️  Cannot validate commits: {e}")
-            self.report.add_result(ValidationResult(
-                category="Freshness",
-                check_name="Recent Work Section",
-                passed=True,
-                message="Recent Work section found (git check skipped)",
-                details={"error": str(e)},
-            ))
+                    message="Recent Work section found (git check skipped)",
+                    details={"error": str(e)},
+                )
+            )
 
     # ========================================================================
     # CATEGORY 4: METRICS
@@ -658,13 +715,15 @@ class CLAUDEMDValidator:
 
         if not PSYCOPG2_AVAILABLE:
             self._vprint("⚠️  psycopg2 not available, skipping database metrics")
-            self.report.add_result(ValidationResult(
-                category="Metrics",
-                check_name="Database Metrics",
-                passed=True,
-                message="Database metrics validation skipped (psycopg2 not available)",
-                details={"claimed_metrics": claimed_metrics},
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Metrics",
+                    check_name="Database Metrics",
+                    passed=True,
+                    message="Database metrics validation skipped (psycopg2 not available)",
+                    details={"claimed_metrics": claimed_metrics},
+                )
+            )
             return
 
         try:
@@ -673,7 +732,9 @@ class CLAUDEMDValidator:
             if not match:
                 return
 
-            connection_string = match.group(0).rstrip("`").replace("<!--", "").replace("-->", "").strip()
+            connection_string = (
+                match.group(0).rstrip("`").replace("<!--", "").replace("-->", "").strip()
+            )
             conn = psycopg2.connect(connection_string)
             cursor = conn.cursor()
 
@@ -699,7 +760,9 @@ class CLAUDEMDValidator:
                     "claimed": claimed_games,
                     "actual": actual_games,
                     "difference": diff,
-                    "percent_error": f"{100 * diff / actual_games:.1f}%" if actual_games > 0 else "N/A",
+                    "percent_error": (
+                        f"{100 * diff / actual_games:.1f}%" if actual_games > 0 else "N/A"
+                    ),
                 }
 
             # Consider metrics valid if within 5% or showing recent data
@@ -707,43 +770,56 @@ class CLAUDEMDValidator:
             games_ok = True
             if claimed_metrics.get("games"):
                 claimed = int(claimed_metrics["games"])
-                games_ok = abs(claimed - actual_games) / actual_games < tolerance if actual_games > 0 else True
+                games_ok = (
+                    abs(claimed - actual_games) / actual_games < tolerance
+                    if actual_games > 0
+                    else True
+                )
 
-            self.report.add_result(ValidationResult(
-                category="Metrics",
-                check_name="Database Metrics",
-                passed=games_ok,
-                message=f"Actual: {actual_games} games, Plays: {actual_plays if actual_plays else 'unknown'}",
-                details=differences,
-                suggestion=(
-                    f"Update metrics in CLAUDE.md: {actual_games} games"
-                    if not games_ok else None
-                ),
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Metrics",
+                    check_name="Database Metrics",
+                    passed=games_ok,
+                    message=f"Actual: {actual_games} games, Plays: {actual_plays if actual_plays else 'unknown'}",
+                    details=differences,
+                    suggestion=(
+                        f"Update metrics in CLAUDE.md: {actual_games} games"
+                        if not games_ok
+                        else None
+                    ),
+                )
+            )
         except Exception as e:
             self._vprint(f"⚠️  Metrics validation failed: {e}")
-            self.report.add_result(ValidationResult(
-                category="Metrics",
-                check_name="Database Metrics",
-                passed=False,
-                message=f"Could not validate metrics: {str(e)}",
-                details={"error": str(e)},
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Metrics",
+                    check_name="Database Metrics",
+                    passed=False,
+                    message=f"Could not validate metrics: {str(e)}",
+                    details={"error": str(e)},
+                )
+            )
 
     def validate_model_registry_sync(self) -> None:
         """Validate model registry synchronization status."""
         self._vprint("Validating model registry sync...")
 
         # Extract model registry status from CLAUDE.md
-        match = re.search(r"(\d+)\s*models?\s*(?:synced|in sync|registered)", self.content, re.IGNORECASE)
+        match = re.search(
+            r"(\d+)\s*models?\s*(?:synced|in sync|registered)", self.content, re.IGNORECASE
+        )
         if not match:
-            self.report.add_result(ValidationResult(
-                category="Metrics",
-                check_name="Model Registry Sync",
-                passed=True,
-                message="Model registry sync status not specified in CLAUDE.md",
-                details={},
-            ))
+            self.report.add_result(
+                ValidationResult(
+                    category="Metrics",
+                    check_name="Model Registry Sync",
+                    passed=True,
+                    message="Model registry sync status not specified in CLAUDE.md",
+                    details={},
+                )
+            )
             return
 
         claimed_synced = int(match.group(1))
@@ -757,16 +833,18 @@ class CLAUDEMDValidator:
                     content = f.read()
                     # Count models in YAML (simplified)
                     model_count = content.count("- name:")
-                    self.report.add_result(ValidationResult(
-                        category="Metrics",
-                        check_name="Model Registry Sync",
-                        passed=True,
-                        message=f"Found {model_count} models in registry",
-                        details={
-                            "claimed_synced": claimed_synced,
-                            "actual_in_registry": model_count,
-                        },
-                    ))
+                    self.report.add_result(
+                        ValidationResult(
+                            category="Metrics",
+                            check_name="Model Registry Sync",
+                            passed=True,
+                            message=f"Found {model_count} models in registry",
+                            details={
+                                "claimed_synced": claimed_synced,
+                                "actual_in_registry": model_count,
+                            },
+                        )
+                    )
             except Exception as e:
                 self._vprint(f"⚠️  Cannot read MODEL_REGISTRY.yaml: {e}")
         else:
@@ -861,6 +939,7 @@ class CLAUDEMDValidator:
 # ============================================================================
 # CLI INTERFACE
 # ============================================================================
+
 
 def main():
     """Main entry point."""

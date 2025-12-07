@@ -38,7 +38,7 @@ class PlayerFeatureExtractor:
         db_port: int = 5544,
         db_name: str = "devdb01",
         db_user: str = "dro",
-        db_password: str = "sicillionbillions"
+        db_password: str = "sicillionbillions",
     ):
         """Initialize feature extractor with database connection."""
         self.db_url = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
@@ -50,7 +50,7 @@ class PlayerFeatureExtractor:
         opponent: str,
         is_home: bool,
         season: int = 2025,
-        week: int = 10
+        week: int = 10,
     ) -> dict[str, float] | None:
         """
         Extract features for a player prop prediction.
@@ -81,7 +81,9 @@ class PlayerFeatureExtractor:
             # Get player's historical stats
             player_stats = self._get_player_stats(player_id, stat_category, season, week)
             if player_stats is None or len(player_stats) < 3:
-                logger.warning(f"Insufficient data for {player_id} ({len(player_stats) if player_stats is not None else 0} games)")
+                logger.warning(
+                    f"Insufficient data for {player_id} ({len(player_stats) if player_stats is not None else 0} games)"
+                )
                 return None
 
             # Get opponent defensive stats
@@ -98,7 +100,9 @@ class PlayerFeatureExtractor:
                 features.update(opp_defense)
             else:
                 # Fallback: league average
-                features[f"opponent_{stat_category}_yards_allowed_avg"] = 250.0 if stat_category == "passing" else 120.0
+                features[f"opponent_{stat_category}_yards_allowed_avg"] = (
+                    250.0 if stat_category == "passing" else 120.0
+                )
 
             # Add game context
             if game_context is not None:
@@ -124,11 +128,7 @@ class PlayerFeatureExtractor:
             return None
 
     def _get_player_stats(
-        self,
-        player_id: str,
-        stat_category: str,
-        season: int,
-        week: int
+        self, player_id: str, stat_category: str, season: int, week: int
     ) -> pd.DataFrame | None:
         """
         Get player's recent game stats (before prediction week).
@@ -168,10 +168,19 @@ class PlayerFeatureExtractor:
             if not rows:
                 return None
 
-            df = pd.DataFrame(rows, columns=[
-                "season", "week", "yards", "attempts", "completions",
-                "touchdowns", "negative_stat", "cpoe"
-            ])
+            df = pd.DataFrame(
+                rows,
+                columns=[
+                    "season",
+                    "week",
+                    "yards",
+                    "attempts",
+                    "completions",
+                    "touchdowns",
+                    "negative_stat",
+                    "cpoe",
+                ],
+            )
 
             return df
 
@@ -180,11 +189,7 @@ class PlayerFeatureExtractor:
             return None
 
     def _get_opponent_defense(
-        self,
-        opponent: str,
-        stat_category: str,
-        season: int,
-        week: int
+        self, opponent: str, stat_category: str, season: int, week: int
     ) -> dict[str, float] | None:
         """
         Get opponent defensive strength (yards allowed per game).
@@ -231,9 +236,7 @@ class PlayerFeatureExtractor:
             conn.close()
 
             if row and row[0]:
-                return {
-                    f"opponent_{stat_category}_yards_allowed_avg": float(row[0])
-                }
+                return {f"opponent_{stat_category}_yards_allowed_avg": float(row[0])}
             else:
                 return None
 
@@ -242,11 +245,7 @@ class PlayerFeatureExtractor:
             return None
 
     def _get_game_context(
-        self,
-        opponent: str,
-        is_home: bool,
-        season: int,
-        week: int
+        self, opponent: str, is_home: bool, season: int, week: int
     ) -> dict[str, float] | None:
         """
         Get game context (spread, total) from games table.
@@ -258,9 +257,7 @@ class PlayerFeatureExtractor:
         return None
 
     def _compute_rolling_features(
-        self,
-        player_stats: pd.DataFrame,
-        prop_type: str
+        self, player_stats: pd.DataFrame, prop_type: str
     ) -> dict[str, float]:
         """
         Compute rolling average features from player's game log.
@@ -286,7 +283,9 @@ class PlayerFeatureExtractor:
         if len(player_stats) >= 3:
             last3 = player_stats.head(3)
             features[f"{stat_prefix}_yards_last3"] = last3["yards"].mean()
-            features[f"{'pass' if stat_prefix == 'passing' else stat_prefix}_attempts_last3"] = last3["attempts"].mean()
+            features[f"{'pass' if stat_prefix == 'passing' else stat_prefix}_attempts_last3"] = (
+                last3["attempts"].mean()
+            )
 
             if "completions" in last3.columns and stat_prefix == "passing":
                 features["completions_last3"] = last3["completions"].mean()
@@ -302,7 +301,9 @@ class PlayerFeatureExtractor:
         if len(player_stats) >= 5:
             last5 = player_stats.head(5)
             features[f"{stat_prefix}_yards_last5"] = last5["yards"].mean()
-            features[f"{'pass' if stat_prefix == 'passing' else stat_prefix}_attempts_last5"] = last5["attempts"].mean()
+            features[f"{'pass' if stat_prefix == 'passing' else stat_prefix}_attempts_last5"] = (
+                last5["attempts"].mean()
+            )
 
             if "completions" in last5.columns and stat_prefix == "passing":
                 features["completions_last5"] = last5["completions"].mean()
@@ -333,7 +334,9 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Extract player features for prop prediction")
     parser.add_argument("--player-id", required=True, help="Player ID (e.g., 00-0033873)")
-    parser.add_argument("--prop-type", required=True, choices=["passing_yards", "rushing_yards", "receiving_yards"])
+    parser.add_argument(
+        "--prop-type", required=True, choices=["passing_yards", "rushing_yards", "receiving_yards"]
+    )
     parser.add_argument("--opponent", required=True, help="Opponent team (e.g., KC)")
     parser.add_argument("--is-home", action="store_true", help="Player's team is at home")
     parser.add_argument("--season", type=int, default=2025, help="Season year")
@@ -348,7 +351,7 @@ if __name__ == "__main__":
         opponent=args.opponent,
         is_home=args.is_home,
         season=args.season,
-        week=args.week
+        week=args.week,
     )
 
     if features:

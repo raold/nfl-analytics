@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_predictions_basic():
@@ -56,7 +53,6 @@ def test_load_predictions_basic():
     assert result is not None
 
 
-
 def test_load_predictions_edge_cases():
     """Test load_predictions: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_load_predictions_error_handling():
     """Test load_predictions error handling."""
     with pytest.raises(ValueError):
         load_predictions(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_load_predictions_property_idempotent(val):
 
     # Assert property
     assert load_predictions(val) == result, "idempotent violated"
-
 
 
 def test_split_validation_test_basic():
@@ -100,7 +93,6 @@ def test_split_validation_test_basic():
     assert result is not None
 
 
-
 def test_split_validation_test_edge_cases():
     """Test split_validation_test: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_split_validation_test_edge_cases():
     assert result is not None
 
 
-
 def test_split_validation_test_error_handling():
     """Test split_validation_test error handling."""
     with pytest.raises(ValueError):
         split_validation_test(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_split_validation_test_property_idempotent(val):
 
     # Assert property
     assert split_validation_test(val) == result, "idempotent violated"
-
 
 
 def test_calculate_calibration_basic():
@@ -144,7 +133,6 @@ def test_calculate_calibration_basic():
     assert result is not None
 
 
-
 def test_calculate_calibration_edge_cases():
     """Test calculate_calibration: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_calculate_calibration_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_calibration_error_handling():
     """Test calculate_calibration error handling."""
     with pytest.raises(ValueError):
         calculate_calibration(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_calculate_calibration_property_idempotent(self, self, y_true, y_pred, n
 
     # Assert property
     assert calculate_calibration(self, y_true, y_pred, n_bins) == result, "idempotent violated"
-
 
 
 def test_generate_calibration_figure_basic():
@@ -188,7 +173,6 @@ def test_generate_calibration_figure_basic():
     assert result is not None
 
 
-
 def test_generate_calibration_figure_edge_cases():
     """Test generate_calibration_figure: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_generate_calibration_figure_edge_cases():
     assert result is not None
 
 
-
 def test_generate_calibration_figure_error_handling():
     """Test generate_calibration_figure error handling."""
     with pytest.raises(ValueError):
         generate_calibration_figure(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -217,7 +199,6 @@ def test_generate_calibration_figure_property_idempotent(self, self, output_path
 
     # Assert property
     assert generate_calibration_figure(self, output_path) == result, "idempotent violated"
-
 
 
 def test_generate_latex_figure_basic():
@@ -232,7 +213,6 @@ def test_generate_latex_figure_basic():
     assert result is not None
 
 
-
 def test_generate_latex_figure_edge_cases():
     """Test generate_latex_figure: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_generate_latex_figure_edge_cases():
     assert result is not None
 
 
-
 def test_generate_latex_figure_error_handling():
     """Test generate_latex_figure error handling."""
     with pytest.raises(ValueError):
         generate_latex_figure(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -261,7 +239,6 @@ def test_generate_latex_figure_property_idempotent(self, self, output_path):
 
     # Assert property
     assert generate_latex_figure(self, output_path) == result, "idempotent violated"
-
 
 
 def test_print_summary_basic():
@@ -276,7 +253,6 @@ def test_print_summary_basic():
     assert result is not None
 
 
-
 def test_print_summary_edge_cases():
     """Test print_summary: edge cases."""
     # Arrange
@@ -289,12 +265,10 @@ def test_print_summary_edge_cases():
     assert result is not None
 
 
-
 def test_print_summary_error_handling():
     """Test print_summary error handling."""
     with pytest.raises(ValueError):
         print_summary(invalid_input)
-
 
 
 @given(st.integers())
@@ -305,4 +279,3 @@ def test_print_summary_property_idempotent(val):
 
     # Assert property
     assert print_summary(val) == result, "idempotent violated"
-

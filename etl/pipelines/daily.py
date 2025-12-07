@@ -45,7 +45,7 @@ class DailyPipeline(BasePipeline):
         db_conn: psycopg.Connection,
         collector=None,
         alert_manager=None,
-        config: dict | None = None
+        config: dict | None = None,
     ):
         """
         Initialize daily pipeline.
@@ -64,26 +64,26 @@ class DailyPipeline(BasePipeline):
             db_conn=db_conn,
             collector=collector,
             alert_manager=alert_manager,
-            config=config or {}
+            config=config or {},
         )
 
         # Configuration
-        self.lookback_days = self.config.get('lookback_days', 7)
-        self.fetch_odds = self.config.get('fetch_odds', True)
+        self.lookback_days = self.config.get("lookback_days", 7)
+        self.fetch_odds = self.config.get("fetch_odds", True)
 
         # Initialize extractors
-        self.nflverse_extractor = NFLVerseExtractor(config={
-            'r_scripts_path': 'R/ingestion',
-            'rscript_bin': 'Rscript',
-            'timeout': 600
-        })
+        self.nflverse_extractor = NFLVerseExtractor(
+            config={"r_scripts_path": "R/ingestion", "rscript_bin": "Rscript", "timeout": 600}
+        )
 
         if self.fetch_odds:
-            self.odds_extractor = OddsAPIExtractor(config={
-                'api_key': self.config.get('odds_api_key'),
-                'markets': 'h2h,spreads,totals',
-                'regions': 'us'
-            })
+            self.odds_extractor = OddsAPIExtractor(
+                config={
+                    "api_key": self.config.get("odds_api_key"),
+                    "markets": "h2h,spreads,totals",
+                    "regions": "us",
+                }
+            )
 
         # Team name standardizer
         self.team_standardizer = TeamNameStandardizer()
@@ -109,7 +109,7 @@ class DailyPipeline(BasePipeline):
             # Note: R script loads directly to DB, so we query it back
             # For a more pure implementation, we'd modify R scripts to return CSV
             schedules_df = self._query_recent_games()
-            all_data['schedules'] = schedules_df
+            all_data["schedules"] = schedules_df
 
             self.logger.info(f"Extracted {len(schedules_df)} recent games")
 
@@ -120,16 +120,15 @@ class DailyPipeline(BasePipeline):
                 start_date = today - timedelta(days=self.lookback_days)
 
                 odds_result = self.odds_extractor.extract_historical(
-                    start_date=start_date,
-                    end_date=today
+                    start_date=start_date, end_date=today
                 )
 
                 if odds_result.success:
-                    all_data['odds'] = odds_result.data
+                    all_data["odds"] = odds_result.data
                     self.logger.info(f"Extracted {odds_result.row_count} odds rows")
                 else:
                     self.logger.warning(f"Odds extraction failed: {odds_result.error}")
-                    all_data['odds'] = pd.DataFrame()
+                    all_data["odds"] = pd.DataFrame()
 
             duration = (datetime.now() - start_time).total_seconds()
 
@@ -142,7 +141,7 @@ class DailyPipeline(BasePipeline):
                 duration_seconds=duration,
                 source="nflverse+odds_api",
                 endpoint="daily_incremental",
-                metadata={'odds_rows': len(all_data.get('odds', []))}
+                metadata={"odds_rows": len(all_data.get("odds", []))},
             )
 
         except Exception as e:
@@ -155,7 +154,7 @@ class DailyPipeline(BasePipeline):
                 duration_seconds=duration,
                 source="nflverse+odds_api",
                 endpoint="daily_incremental",
-                error=str(e)
+                error=str(e),
             )
 
     def _query_recent_games(self) -> pd.DataFrame:
@@ -190,30 +189,31 @@ class DailyPipeline(BasePipeline):
         df = data.copy()
 
         # 1. Handle column aliases (qtr vs quarter for 2025 data)
-        df = self.cleaner.handle_column_aliases(df, {
-            'quarter': ['qtr', 'quarter'],
-            'time_seconds': ['game_seconds_remaining', 'time_seconds']
-        })
+        df = self.cleaner.handle_column_aliases(
+            df,
+            {
+                "quarter": ["qtr", "quarter"],
+                "time_seconds": ["game_seconds_remaining", "time_seconds"],
+            },
+        )
 
         # 2. Standardize team names
         df = self.team_standardizer.standardize_dataframe(
-            df,
-            team_columns=['home_team', 'away_team'],
-            season_column='season'
+            df, team_columns=["home_team", "away_team"], season_column="season"
         )
 
         # 3. Remove duplicates
-        df = self.cleaner.remove_duplicates(df, subset=['game_id'], keep='last')
+        df = self.cleaner.remove_duplicates(df, subset=["game_id"], keep="last")
 
         # 4. Standardize datetimes to UTC
-        datetime_cols = [col for col in ['kickoff'] if col in df.columns]
+        datetime_cols = [col for col in ["kickoff"] if col in df.columns]
         if datetime_cols:
-            df = self.cleaner.standardize_datetimes(df, datetime_cols, target_tz='UTC')
+            df = self.cleaner.standardize_datetimes(df, datetime_cols, target_tz="UTC")
 
         # 5. Drop any rows with null game_id (critical column)
-        if 'game_id' in df.columns:
+        if "game_id" in df.columns:
             before = len(df)
-            df = df.dropna(subset=['game_id'])
+            df = df.dropna(subset=["game_id"])
             if len(df) < before:
                 self.logger.warning(f"Dropped {before - len(df)} rows with null game_id")
 
@@ -239,15 +239,15 @@ class DailyPipeline(BasePipeline):
                 rows_failed=0,
                 load_time=datetime.now(),
                 duration_seconds=0.0,
-                table_name="games"
+                table_name="games",
             )
 
         # Upsert to games table
         return self.loader.upsert(
             data,
-            table_name='games',
-            conflict_columns=['game_id'],
-            update_columns=None  # Update all columns on conflict
+            table_name="games",
+            conflict_columns=["game_id"],
+            update_columns=None,  # Update all columns on conflict
         )
 
 
@@ -263,7 +263,7 @@ if __name__ == "__main__":
         port=os.environ.get("POSTGRES_PORT", "5544"),
         dbname=os.environ.get("POSTGRES_DB", "devdb01"),
         user=os.environ.get("POSTGRES_USER", "dro"),
-        password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions")
+        password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions"),
     )
 
     collector = MetricsCollector(db_conn=conn)
@@ -276,9 +276,9 @@ if __name__ == "__main__":
             collector=collector,
             alert_manager=alerts,
             config={
-                'lookback_days': 7,
-                'fetch_odds': False,  # Set to True if you have API key
-            }
+                "lookback_days": 7,
+                "fetch_odds": False,  # Set to True if you have API key
+            },
         ) as pipeline:
             result = pipeline.run()
             print(result.summary())

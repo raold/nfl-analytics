@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_connect_db_basic():
@@ -56,7 +53,6 @@ def test_connect_db_basic():
     assert result is not None
 
 
-
 def test_connect_db_edge_cases():
     """Test connect_db: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_connect_db_edge_cases():
     assert result is not None
 
 
-
 def test_connect_db_error_handling():
     """Test connect_db error handling."""
     with pytest.raises(ValueError):
         connect_db(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_connect_db_property_idempotent(val):
 
     # Assert property
     assert connect_db(val) == result, "idempotent violated"
-
 
 
 def test_get_injuries_for_week_basic():
@@ -100,7 +93,6 @@ def test_get_injuries_for_week_basic():
     assert result is not None
 
 
-
 def test_get_injuries_for_week_edge_cases():
     """Test get_injuries_for_week: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_get_injuries_for_week_edge_cases():
     assert result is not None
 
 
-
 def test_get_injuries_for_week_error_handling():
     """Test get_injuries_for_week error handling."""
     with pytest.raises(ValueError):
         get_injuries_for_week(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_get_injuries_for_week_property_idempotent(self, self, season, week):
 
     # Assert property
     assert get_injuries_for_week(self, season, week) == result, "idempotent violated"
-
 
 
 def test_get_depth_chart_position_basic():
@@ -144,7 +133,6 @@ def test_get_depth_chart_position_basic():
     assert result is not None
 
 
-
 def test_get_depth_chart_position_edge_cases():
     """Test get_depth_chart_position: edge cases."""
     # Arrange
@@ -157,23 +145,28 @@ def test_get_depth_chart_position_edge_cases():
     assert result is not None
 
 
-
 def test_get_depth_chart_position_error_handling():
     """Test get_depth_chart_position error handling."""
     with pytest.raises(ValueError):
         get_depth_chart_position(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers())
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
 def test_get_depth_chart_position_property_idempotent(self, self, gsis_id, team, season, week):
     """Property test: function is idempotent."""
     # Act
     result = get_depth_chart_position(self, gsis_id, team, season, week)
 
     # Assert property
-    assert get_depth_chart_position(self, gsis_id, team, season, week) == result, "idempotent violated"
-
+    assert (
+        get_depth_chart_position(self, gsis_id, team, season, week) == result
+    ), "idempotent violated"
 
 
 def test_calculate_team_impact_basic():
@@ -188,7 +181,6 @@ def test_calculate_team_impact_basic():
     assert result is not None
 
 
-
 def test_calculate_team_impact_edge_cases():
     """Test calculate_team_impact: edge cases."""
     # Arrange
@@ -201,12 +193,10 @@ def test_calculate_team_impact_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_team_impact_error_handling():
     """Test calculate_team_impact error handling."""
     with pytest.raises(ValueError):
         calculate_team_impact(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -216,8 +206,9 @@ def test_calculate_team_impact_property_idempotent(self, self, injuries, team, s
     result = calculate_team_impact(self, injuries, team, season, week)
 
     # Assert property
-    assert calculate_team_impact(self, injuries, team, season, week) == result, "idempotent violated"
-
+    assert (
+        calculate_team_impact(self, injuries, team, season, week) == result
+    ), "idempotent violated"
 
 
 def test_adjust_predictions_basic():
@@ -232,7 +223,6 @@ def test_adjust_predictions_basic():
     assert result is not None
 
 
-
 def test_adjust_predictions_edge_cases():
     """Test adjust_predictions: edge cases."""
     # Arrange
@@ -245,12 +235,10 @@ def test_adjust_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_adjust_predictions_error_handling():
     """Test adjust_predictions error handling."""
     with pytest.raises(ValueError):
         adjust_predictions(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -261,7 +249,6 @@ def test_adjust_predictions_property_idempotent(self, self, predictions, season,
 
     # Assert property
     assert adjust_predictions(self, predictions, season, week) == result, "idempotent violated"
-
 
 
 def test_adjust_from_csv_basic():
@@ -276,7 +263,6 @@ def test_adjust_from_csv_basic():
     assert result is not None
 
 
-
 def test_adjust_from_csv_edge_cases():
     """Test adjust_from_csv: edge cases."""
     # Arrange
@@ -289,12 +275,10 @@ def test_adjust_from_csv_edge_cases():
     assert result is not None
 
 
-
 def test_adjust_from_csv_error_handling():
     """Test adjust_from_csv error handling."""
     with pytest.raises(ValueError):
         adjust_from_csv(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -304,5 +288,6 @@ def test_adjust_from_csv_property_idempotent(self, self, predictions_csv, season
     result = adjust_from_csv(self, predictions_csv, season, week, output_csv)
 
     # Assert property
-    assert adjust_from_csv(self, predictions_csv, season, week, output_csv) == result, "idempotent violated"
-
+    assert (
+        adjust_from_csv(self, predictions_csv, season, week, output_csv) == result
+    ), "idempotent violated"

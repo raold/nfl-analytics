@@ -23,7 +23,6 @@ def test_fit_latency_basic():
     assert result is not None
 
 
-
 def test_fit_latency_edge_cases():
     """Test fit_latency: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_fit_latency_edge_cases():
     assert result is not None
 
 
-
 def test_fit_latency_error_handling():
     """Test fit_latency error handling."""
     with pytest.raises(ValueError):
         fit_latency(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_fit_latency_property_idempotent(self, rows):
 
     # Assert property
     assert fit_latency(rows) == result, "idempotent violated"
-
 
 
 def test_sample_latency_basic():
@@ -67,7 +63,6 @@ def test_sample_latency_basic():
     assert result is not None
 
 
-
 def test_sample_latency_edge_cases():
     """Test sample_latency: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_sample_latency_edge_cases():
     assert result is not None
 
 
-
 def test_sample_latency_error_handling():
     """Test sample_latency error handling."""
     with pytest.raises(ValueError):
         sample_latency(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -96,4 +89,3 @@ def test_sample_latency_property_idempotent(self, mu_log, sigma_log):
 
     # Assert property
     assert sample_latency(mu_log, sigma_log) == result, "idempotent violated"
-

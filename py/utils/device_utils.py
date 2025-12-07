@@ -71,13 +71,15 @@ def _log_device_info(device: torch.device):
     """
     logger.info(f"Using device: {device}")
 
-    if device.type == 'cuda':
+    if device.type == "cuda":
         logger.info(f"  GPU: {torch.cuda.get_device_name(0)}")
-        logger.info(f"  Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
+        logger.info(
+            f"  Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB"
+        )
         logger.info(f"  Compute Capability: {torch.cuda.get_device_capability(0)}")
         logger.info(f"  CUDA Version: {torch.version.cuda}")
 
-    elif device.type == 'mps':
+    elif device.type == "mps":
         logger.info("  GPU: Apple Silicon (Metal Performance Shaders)")
         logger.info("  Architecture: Unified Memory (shared with system RAM)")
         logger.info("  PyTorch MPS Backend: Enabled")
@@ -91,7 +93,7 @@ def _log_device_info(device: torch.device):
         else:
             logger.info(f"  CPU Cores: {cpu_count}")
 
-    elif device.type == 'cpu':
+    elif device.type == "cpu":
         cpu_count = multiprocessing.cpu_count()
         logger.info(f"  CPU Cores: {cpu_count}")
         logger.info("  Note: No GPU acceleration available")
@@ -158,37 +160,37 @@ def get_device_info() -> dict:
     device = get_best_device()
 
     info = {
-        'device': device,
-        'device_type': device.type,
-        'has_cuda': torch.cuda.is_available(),
-        'has_mps': torch.backends.mps.is_available(),
-        'cpu_count': multiprocessing.cpu_count(),
-        'pytorch_version': torch.__version__,
+        "device": device,
+        "device_type": device.type,
+        "has_cuda": torch.cuda.is_available(),
+        "has_mps": torch.backends.mps.is_available(),
+        "cpu_count": multiprocessing.cpu_count(),
+        "pytorch_version": torch.__version__,
     }
 
-    if device.type == 'cuda':
-        info['device_name'] = torch.cuda.get_device_name(0)
-        info['cuda_version'] = torch.version.cuda
-        info['gpu_memory_gb'] = torch.cuda.get_device_properties(0).total_memory / 1024**3
+    if device.type == "cuda":
+        info["device_name"] = torch.cuda.get_device_name(0)
+        info["cuda_version"] = torch.version.cuda
+        info["gpu_memory_gb"] = torch.cuda.get_device_properties(0).total_memory / 1024**3
 
-    elif device.type == 'mps':
+    elif device.type == "mps":
         cpu_count = multiprocessing.cpu_count()
         if cpu_count == 10:
-            info['device_name'] = "Apple M3/M4"
+            info["device_name"] = "Apple M3/M4"
         elif cpu_count == 8:
-            info['device_name'] = "Apple M1/M2"
+            info["device_name"] = "Apple M1/M2"
         else:
-            info['device_name'] = "Apple Silicon"
+            info["device_name"] = "Apple Silicon"
 
     else:
-        info['device_name'] = "CPU"
+        info["device_name"] = "CPU"
 
     return info
 
 
 # Export public API
 __all__ = [
-    'get_best_device',
-    'validate_device_support',
-    'get_device_info',
+    "get_best_device",
+    "validate_device_support",
+    "get_device_info",
 ]

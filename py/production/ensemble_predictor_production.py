@@ -39,10 +39,7 @@ from py.ensemble.strategy import (
     UnifiedEnsemblePredictor,
 )
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
 # Production model paths (canonical training window: 2018-2024 + H=4 decay)
@@ -57,11 +54,11 @@ PRODUCTION_MODEL_PATHS = {
 # Production weights (optimized via backtest on 2022-2024 data)
 # Source: py/ensemble/optimize_ensemble_weights.py
 PRODUCTION_WEIGHTS = {
-    "state_space_v2": 0.30,        # Best MAE (47.77 yards)
-    "hierarchical_v2": 0.25,       # Strong Bayesian priors
-    "informative_priors_v2": 0.20, # Enhanced priors
-    "bnn_v1": 0.15,                # Well-calibrated uncertainty
-    "xgboost_v1": 0.10,            # Non-linear feature interactions
+    "state_space_v2": 0.30,  # Best MAE (47.77 yards)
+    "hierarchical_v2": 0.25,  # Strong Bayesian priors
+    "informative_priors_v2": 0.20,  # Enhanced priors
+    "bnn_v1": 0.15,  # Well-calibrated uncertainty
+    "xgboost_v1": 0.10,  # Non-linear feature interactions
 }
 
 
@@ -164,10 +161,7 @@ class ProductionEnsemblePredictor:
 
         # Get ensemble prediction
         result = self.predictor.predict(
-            player_id=player_id,
-            season=season,
-            week=week,
-            features=features
+            player_id=player_id, season=season, week=week, features=features
         )
 
         # Get 95% confidence interval
@@ -263,7 +257,7 @@ def main():
         "--strategy",
         default="weighted_average",
         choices=["simple_average", "weighted_average", "thompson_sampling", "stacking"],
-        help="Ensemble strategy"
+        help="Ensemble strategy",
     )
     parser.add_argument("--benchmark", action="store_true", help="Compare all strategies")
     parser.add_argument("--output", help="Save predictions to JSON file")
@@ -276,59 +270,59 @@ def main():
         # Benchmark all strategies
         logger.info("Benchmarking all strategies...")
         results = predictor.benchmark_strategies(
-            player_id=args.player_id,
-            season=args.season,
-            week=args.week
+            player_id=args.player_id, season=args.season, week=args.week
         )
 
         # Print comparison
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("STRATEGY COMPARISON")
-        print("="*80)
+        print("=" * 80)
 
         for strategy, result in results.items():
             if "error" in result:
                 print(f"\n{strategy.upper()}: ERROR - {result['error']}")
             else:
                 print(f"\n{strategy.upper()}:")
-                print(f"  Prediction: {result['prediction_mean']:.1f} ± {result['prediction_std']:.1f} yards")
-                print(f"  95% CI: [{result['prediction_lower']:.1f}, {result['prediction_upper']:.1f}]")
+                print(
+                    f"  Prediction: {result['prediction_mean']:.1f} ± {result['prediction_std']:.1f} yards"
+                )
+                print(
+                    f"  95% CI: [{result['prediction_lower']:.1f}, {result['prediction_upper']:.1f}]"
+                )
                 print(f"  Models: {result['num_models']}")
                 print(f"  Confidence: {result['confidence']:.3f}")
 
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         # Save to file if requested
         if args.output:
-            with open(args.output, 'w') as f:
+            with open(args.output, "w") as f:
                 json.dump(results, f, indent=2)
             logger.info(f"Saved benchmark results to {args.output}")
 
     else:
         # Single prediction
-        result = predictor.predict(
-            player_id=args.player_id,
-            season=args.season,
-            week=args.week
-        )
+        result = predictor.predict(player_id=args.player_id, season=args.season, week=args.week)
 
         # Print result
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("ENSEMBLE PREDICTION")
-        print("="*80)
+        print("=" * 80)
         print(f"Player: {result['player_id']}")
         print(f"Season: {result['season']}, Week: {result['week']}")
         print(f"Strategy: {result['strategy']}")
-        print(f"\nPrediction: {result['prediction_mean']:.1f} ± {result['prediction_std']:.1f} yards")
+        print(
+            f"\nPrediction: {result['prediction_mean']:.1f} ± {result['prediction_std']:.1f} yards"
+        )
         print(f"95% CI: [{result['prediction_lower']:.1f}, {result['prediction_upper']:.1f}]")
         print(f"\nModels: {result['num_models']}")
         print(f"Weights: {json.dumps(result['weights'], indent=2)}")
         print(f"Confidence: {result['confidence']:.3f}")
-        print("="*80 + "\n")
+        print("=" * 80 + "\n")
 
         # Save to file if requested
         if args.output:
-            with open(args.output, 'w') as f:
+            with open(args.output, "w") as f:
                 json.dump(result, f, indent=2)
             logger.info(f"Saved prediction to {args.output}")
 

@@ -96,6 +96,7 @@ from psycopg2.extras import RealDictCursor
 # Optional imports
 try:
     import requests
+
     REQUESTS_AVAILABLE = True
 except ImportError:
     REQUESTS_AVAILABLE = False
@@ -103,53 +104,57 @@ except ImportError:
 try:
     import numpy as np
     import pandas as pd
+
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 
 class InjurySeverity(Enum):
     """Injury severity classification."""
-    OUT = "OUT"                      # Definitely out (100% miss rate)
-    DOUBTFUL = "DOUBTFUL"            # Unlikely to play (75% miss rate)
-    QUESTIONABLE = "QUESTIONABLE"    # Game-time decision (50% miss rate)
-    PROBABLE = "PROBABLE"            # Likely to play (10% miss rate)
-    HEALTHY = "HEALTHY"              # No injury designation
+
+    OUT = "OUT"  # Definitely out (100% miss rate)
+    DOUBTFUL = "DOUBTFUL"  # Unlikely to play (75% miss rate)
+    QUESTIONABLE = "QUESTIONABLE"  # Game-time decision (50% miss rate)
+    PROBABLE = "PROBABLE"  # Likely to play (10% miss rate)
+    HEALTHY = "HEALTHY"  # No injury designation
 
 
 class InjuryType(Enum):
     """Common NFL injury types with typical recovery times."""
-    CONCUSSION = "concussion"                    # 1-4 weeks (protocol dependent)
-    ANKLE_SPRAIN = "ankle_sprain"                # 1-3 weeks
-    HAMSTRING_STRAIN = "hamstring_strain"        # 2-6 weeks
-    KNEE_MCL = "knee_mcl"                        # 2-6 weeks
-    KNEE_ACL = "knee_acl"                        # 6-12 months (season ending)
-    SHOULDER_SEPARATION = "shoulder_separation"   # 2-6 weeks
-    RIB_INJURY = "rib_injury"                    # 2-4 weeks
-    HAND_FRACTURE = "hand_fracture"              # 4-8 weeks
-    QUAD_STRAIN = "quad_strain"                  # 1-3 weeks
-    CALF_STRAIN = "calf_strain"                  # 1-3 weeks
-    BACK_INJURY = "back_injury"                  # Variable (1-6 weeks)
+
+    CONCUSSION = "concussion"  # 1-4 weeks (protocol dependent)
+    ANKLE_SPRAIN = "ankle_sprain"  # 1-3 weeks
+    HAMSTRING_STRAIN = "hamstring_strain"  # 2-6 weeks
+    KNEE_MCL = "knee_mcl"  # 2-6 weeks
+    KNEE_ACL = "knee_acl"  # 6-12 months (season ending)
+    SHOULDER_SEPARATION = "shoulder_separation"  # 2-6 weeks
+    RIB_INJURY = "rib_injury"  # 2-4 weeks
+    HAND_FRACTURE = "hand_fracture"  # 4-8 weeks
+    QUAD_STRAIN = "quad_strain"  # 1-3 weeks
+    CALF_STRAIN = "calf_strain"  # 1-3 weeks
+    BACK_INJURY = "back_injury"  # Variable (1-6 weeks)
 
 
 class CoachingStyle(Enum):
     """Coaching decision-making styles."""
-    AGGRESSIVE = "aggressive"        # Goes for it on 4th down, takes risks
-    CONSERVATIVE = "conservative"    # Punts/kicks FG, plays safe
-    BALANCED = "balanced"            # Situational decision-making
-    ANALYTICS_DRIVEN = "analytics"   # Follows expected value calculations
+
+    AGGRESSIVE = "aggressive"  # Goes for it on 4th down, takes risks
+    CONSERVATIVE = "conservative"  # Punts/kicks FG, plays safe
+    BALANCED = "balanced"  # Situational decision-making
+    ANALYTICS_DRIVEN = "analytics"  # Follows expected value calculations
 
 
 @dataclass
 class InjuryReport:
     """Detailed injury impact report."""
+
     player_id: str
     player_name: str
     injury_type: InjuryType
@@ -175,13 +180,14 @@ class InjuryReport:
             "replacement_quality_pct": self.replacement_quality_pct,
             "historical_recovery_days": self.historical_recovery_days,
             "report_date": self.report_date,
-            "details": self.details
+            "details": self.details,
         }
 
 
 @dataclass
 class CoachingProfile:
     """Coaching tendency profile."""
+
     coach_id: str
     coach_name: str
     coaching_style: CoachingStyle
@@ -203,13 +209,14 @@ class CoachingProfile:
             "halftime_adjustment_rating": self.halftime_adjustment_rating,
             "play_calling_tendencies": self.play_calling_tendencies,
             "strategic_patterns": self.strategic_patterns,
-            "details": self.details
+            "details": self.details,
         }
 
 
 @dataclass
 class ChemistryScore:
     """Player chemistry assessment."""
+
     player1_id: str
     player2_id: str
     player1_name: str
@@ -217,7 +224,7 @@ class ChemistryScore:
     chemistry_score: float  # 0-100 (100 = elite chemistry)
     games_together: int
     completion_rate: float | None  # For QB-WR pairs
-    target_share: float | None      # For QB-WR pairs
+    target_share: float | None  # For QB-WR pairs
     trend: str  # "improving", "stable", "declining"
     details: dict[str, Any] = field(default_factory=dict)
 
@@ -233,13 +240,14 @@ class ChemistryScore:
             "completion_rate": self.completion_rate,
             "target_share": self.target_share,
             "trend": self.trend,
-            "details": self.details
+            "details": self.details,
         }
 
 
 @dataclass
 class NewsSummary:
     """Sports news summary."""
+
     headline: str
     source: str
     published_at: str
@@ -259,7 +267,7 @@ class NewsSummary:
             "relevance_score": self.relevance_score,
             "key_points": self.key_points,
             "url": self.url,
-            "details": self.details
+            "details": self.details,
         }
 
 
@@ -275,7 +283,7 @@ class NFLDomainExpert:
         self,
         db_config: dict[str, str] | None = None,
         enable_news_scraping: bool = False,  # Requires API keys
-        cache_ttl_hours: int = 24
+        cache_ttl_hours: int = 24,
     ):
         """
         Initialize NFL Domain Expert.
@@ -294,7 +302,7 @@ class NFLDomainExpert:
             "port": int(os.getenv("DB_PORT", "5544")),
             "database": os.getenv("DB_NAME", "devdb01"),
             "user": os.getenv("DB_USER", "dro"),
-            "password": os.getenv("DB_PASSWORD", "sicillionbillions")
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
         }
 
         # Injury impact lookup tables (based on historical data)
@@ -302,47 +310,44 @@ class NFLDomainExpert:
             InjuryType.CONCUSSION: {
                 "avg_miss_games": 1.5,
                 "performance_impact": 0.15,  # 15% reduction if plays
-                "recovery_days": 10
+                "recovery_days": 10,
             },
             InjuryType.ANKLE_SPRAIN: {
                 "avg_miss_games": 2.0,
                 "performance_impact": 0.20,
-                "recovery_days": 14
+                "recovery_days": 14,
             },
             InjuryType.HAMSTRING_STRAIN: {
                 "avg_miss_games": 3.5,
                 "performance_impact": 0.25,
-                "recovery_days": 25
+                "recovery_days": 25,
             },
             InjuryType.KNEE_MCL: {
                 "avg_miss_games": 4.0,
                 "performance_impact": 0.30,
-                "recovery_days": 28
+                "recovery_days": 28,
             },
             InjuryType.KNEE_ACL: {
                 "avg_miss_games": 18.0,  # Season ending
                 "performance_impact": 1.0,  # 100% reduction (out)
-                "recovery_days": 270
+                "recovery_days": 270,
             },
             # Add more injury types as needed
         }
 
         # Severity multipliers
         self.severity_multipliers = {
-            InjurySeverity.OUT: 1.0,           # 100% miss probability
-            InjurySeverity.DOUBTFUL: 0.75,     # 75% miss probability
-            InjurySeverity.QUESTIONABLE: 0.50, # 50% miss probability
-            InjurySeverity.PROBABLE: 0.10,     # 10% miss probability
-            InjurySeverity.HEALTHY: 0.0        # 0% miss probability
+            InjurySeverity.OUT: 1.0,  # 100% miss probability
+            InjurySeverity.DOUBTFUL: 0.75,  # 75% miss probability
+            InjurySeverity.QUESTIONABLE: 0.50,  # 50% miss probability
+            InjurySeverity.PROBABLE: 0.10,  # 10% miss probability
+            InjurySeverity.HEALTHY: 0.0,  # 0% miss probability
         }
 
         logger.info("NFLDomainExpert initialized")
 
     def analyze_injury_impact(
-        self,
-        player_id: str,
-        injury_type: str,
-        severity: str = "QUESTIONABLE"
+        self, player_id: str, injury_type: str, severity: str = "QUESTIONABLE"
     ) -> InjuryReport:
         """
         Analyze injury impact on player performance.
@@ -361,11 +366,10 @@ class NFLDomainExpert:
             severity_enum = InjurySeverity(severity.upper())
 
             # Get baseline impact from lookup table
-            baseline = self.injury_impact_table.get(injury_enum, {
-                "avg_miss_games": 2.0,
-                "performance_impact": 0.20,
-                "recovery_days": 14
-            })
+            baseline = self.injury_impact_table.get(
+                injury_enum,
+                {"avg_miss_games": 2.0, "performance_impact": 0.20, "recovery_days": 14},
+            )
 
             # Adjust for severity
             severity_mult = self.severity_multipliers[severity_enum]
@@ -376,17 +380,20 @@ class NFLDomainExpert:
             conn = psycopg2.connect(**self.db_config)
             cursor = conn.cursor(cursor_factory=RealDictCursor)
 
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     player_id,
                     player_display_name,
                     position
                 FROM public.players
                 WHERE player_id = %s
-            """, (player_id,))
+            """,
+                (player_id,),
+            )
 
             player = cursor.fetchone()
-            player_name = player['player_display_name'] if player else "Unknown"
+            player_name = player["player_display_name"] if player else "Unknown"
 
             # TODO: Query for replacement player quality
             replacement_quality_pct = 70.0  # Placeholder: 70% as good as starter
@@ -406,8 +413,8 @@ class NFLDomainExpert:
                 historical_recovery_days=baseline["recovery_days"],
                 details={
                     "baseline_miss_games": baseline["avg_miss_games"],
-                    "severity_multiplier": severity_mult
-                }
+                    "severity_multiplier": severity_mult,
+                },
             )
 
         except Exception as e:
@@ -415,9 +422,7 @@ class NFLDomainExpert:
             raise
 
     def get_coaching_tendencies(
-        self,
-        coach_name: str,
-        situation: str = "4th_down"
+        self, coach_name: str, situation: str = "4th_down"
     ) -> CoachingProfile:
         """
         Analyze coaching tendencies and decision-making patterns.
@@ -444,13 +449,13 @@ class NFLDomainExpert:
                 play_calling_tendencies={
                     "pass_pct": 0.62,
                     "run_pct": 0.38,
-                    "trick_play_frequency": 0.05
+                    "trick_play_frequency": 0.05,
                 },
                 strategic_patterns=[
                     "Aggressive on 4th down in opponent territory",
                     "High pre-snap motion usage",
-                    "Elite halftime adjustments"
-                ]
+                    "Elite halftime adjustments",
+                ],
             ),
             "bill_belichick": CoachingProfile(
                 coach_id="belichick_bill",
@@ -462,14 +467,14 @@ class NFLDomainExpert:
                 play_calling_tendencies={
                     "pass_pct": 0.55,
                     "run_pct": 0.45,
-                    "situational_variance": 0.90  # Highly adaptive
+                    "situational_variance": 0.90,  # Highly adaptive
                 },
                 strategic_patterns=[
                     "Exploits opponent weaknesses",
                     "Excellent situational football",
-                    "Takes away opponent's best weapon"
-                ]
-            )
+                    "Takes away opponent's best weapon",
+                ],
+            ),
         }
 
         # Normalize coach name for lookup
@@ -486,16 +491,12 @@ class NFLDomainExpert:
                 timeout_management_score=70.0,
                 halftime_adjustment_rating=70.0,
                 play_calling_tendencies={"pass_pct": 0.58, "run_pct": 0.42},
-                strategic_patterns=["Standard NFL coaching approach"]
+                strategic_patterns=["Standard NFL coaching approach"],
             )
 
         return profile
 
-    def assess_player_chemistry(
-        self,
-        qb_id: str,
-        wr_id: str
-    ) -> ChemistryScore:
+    def assess_player_chemistry(self, qb_id: str, wr_id: str) -> ChemistryScore:
         """
         Assess QB-WR chemistry based on historical performance.
 
@@ -511,7 +512,8 @@ class NFLDomainExpert:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
 
             # Query games played together
-            cursor.execute("""
+            cursor.execute(
+                """
                 WITH qb_games AS (
                     SELECT DISTINCT season, week
                     FROM mart.player_game_stats
@@ -527,10 +529,12 @@ class NFLDomainExpert:
                 SELECT COUNT(*) as games_together
                 FROM qb_games
                 INNER JOIN wr_games USING (season, week)
-            """, (qb_id, wr_id))
+            """,
+                (qb_id, wr_id),
+            )
 
             result = cursor.fetchone()
-            games_together = result['games_together'] if result else 0
+            games_together = result["games_together"] if result else 0
 
             # TODO: Calculate actual chemistry metrics from targets/receptions
             # For now, use heuristic: more games together = better chemistry
@@ -555,7 +559,7 @@ class NFLDomainExpert:
                 games_together=games_together,
                 completion_rate=None,  # TODO: Calculate from database
                 target_share=None,
-                trend=trend
+                trend=trend,
             )
 
         except Exception as e:
@@ -563,10 +567,7 @@ class NFLDomainExpert:
             raise
 
     def fetch_recent_news(
-        self,
-        team: str | None = None,
-        player_id: str | None = None,
-        days: int = 7
+        self, team: str | None = None, player_id: str | None = None, days: int = 7
     ) -> list[NewsSummary]:
         """
         Fetch recent sports news relevant to team/player.
@@ -597,17 +598,14 @@ class NFLDomainExpert:
                 key_points=[
                     "Full participant in Wednesday practice",
                     "Ankle injury appears healed",
-                    "Expected to start Sunday"
+                    "Expected to start Sunday",
                 ],
-                url="https://espn.com/..."
+                url="https://espn.com/...",
             )
         ]
 
     def explain_prediction_context(
-        self,
-        player_id: str,
-        prediction_yards: float,
-        actual_context: dict[str, Any]
+        self, player_id: str, prediction_yards: float, actual_context: dict[str, Any]
     ) -> str:
         """
         Generate human-readable explanation of prediction in context.
@@ -625,9 +623,7 @@ class NFLDomainExpert:
         is_playoff = actual_context.get("is_playoff_game", False)
         temperature = actual_context.get("temperature")
 
-        explanation_parts = [
-            f"Predicted {prediction_yards:.1f} yards for player {player_id}."
-        ]
+        explanation_parts = [f"Predicted {prediction_yards:.1f} yards for player {player_id}."]
 
         # Add contextual factors
         if is_playoff:
@@ -636,9 +632,7 @@ class NFLDomainExpert:
             )
 
         if is_primetime:
-            explanation_parts.append(
-                "Primetime game - star players often perform above average."
-            )
+            explanation_parts.append("Primetime game - star players often perform above average.")
 
         if temperature and temperature < 40:
             explanation_parts.append(
@@ -646,9 +640,7 @@ class NFLDomainExpert:
             )
 
         if opponent:
-            explanation_parts.append(
-                f"Opponent: {opponent}. Check defensive rankings for context."
-            )
+            explanation_parts.append(f"Opponent: {opponent}. Check defensive rankings for context.")
 
         return " ".join(explanation_parts)
 
@@ -664,38 +656,38 @@ class NFLDomainExpert:
                 "feature": "days_since_injury",
                 "description": "Days since player's last injury designation",
                 "expected_impact": "Players <7 days from injury perform 15-20% below baseline",
-                "implementation": "Track injury report dates, calculate delta"
+                "implementation": "Track injury report dates, calculate delta",
             },
             {
                 "feature": "qb_wr_games_together",
                 "description": "Number of games QB-WR pair has played together",
                 "expected_impact": "Chemistry improves 2-3% per 5 games together (plateaus at 20 games)",
-                "implementation": "Join player_game_stats on (season, week) for both players"
+                "implementation": "Join player_game_stats on (season, week) for both players",
             },
             {
                 "feature": "coaching_aggression_score",
                 "description": "Coach's 4th down aggression rating (0-100)",
                 "expected_impact": "Aggressive coaches = 5-8% more offensive opportunities",
-                "implementation": "Calculate from 4th down decision history"
+                "implementation": "Calculate from 4th down decision history",
             },
             {
                 "feature": "primetime_game_flag",
                 "description": "Binary flag for SNF/MNF/TNF games",
                 "expected_impact": "Star players perform 3-5% better in primetime",
-                "implementation": "Check game start time (8:20 PM ET typical for primetime)"
+                "implementation": "Check game start time (8:20 PM ET typical for primetime)",
             },
             {
                 "feature": "division_rivalry_flag",
                 "description": "Binary flag for division opponent games",
                 "expected_impact": "Division games 8-10% lower scoring (familiarity, intensity)",
-                "implementation": "Check if both teams in same division"
+                "implementation": "Check if both teams in same division",
             },
             {
                 "feature": "travel_distance_miles",
                 "description": "Distance traveled for away game",
                 "expected_impact": ">2000 miles = 5-7% performance reduction (West→East worse)",
-                "implementation": "Calculate great circle distance between stadiums"
-            }
+                "implementation": "Calculate great circle distance between stadiums",
+            },
         ]
 
 
@@ -705,9 +697,7 @@ if __name__ == "__main__":
 
     # Test injury analysis
     injury_report = expert.analyze_injury_impact(
-        player_id="00-0036355",
-        injury_type="ankle_sprain",
-        severity="QUESTIONABLE"
+        player_id="00-0036355", injury_type="ankle_sprain", severity="QUESTIONABLE"
     )
     print("\nInjury Report:")
     print(f"  Player: {injury_report.player_name}")

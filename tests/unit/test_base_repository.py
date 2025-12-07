@@ -131,7 +131,9 @@ class TestTemporalLeakageProtection:
         sql = "SELECT * FROM games"  # No WHERE clause with temporal filter
 
         # Mock successful execution
-        mock_pool.getconn.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = []
+        mock_pool.getconn.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = (
+            []
+        )
         mock_pool.getconn.return_value.cursor.return_value.__enter__.return_value.description = [
             ("id",)
         ]
@@ -152,7 +154,9 @@ class TestTemporalLeakageProtection:
         ASOF JOIN player_stats ps ON g.kickoff >= ps.stat_date
         """
 
-        mock_pool.getconn.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = []
+        mock_pool.getconn.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = (
+            []
+        )
         mock_pool.getconn.return_value.cursor.return_value.__enter__.return_value.description = [
             ("id",)
         ]
@@ -160,9 +164,7 @@ class TestTemporalLeakageProtection:
         repository.query(sql)
 
         # Should not log warning (ASOF join indicates temporal awareness)
-        assert not any(
-            "TEMPORAL SAFETY WARNING" in record.message for record in caplog.records
-        )
+        assert not any("TEMPORAL SAFETY WARNING" in record.message for record in caplog.records)
 
     def test_no_warning_with_lag_window_function(self, repository, mock_pool, caplog):
         """Test no warning when LAG window function is used."""
@@ -175,7 +177,9 @@ class TestTemporalLeakageProtection:
         FROM player_stats
         """
 
-        mock_pool.getconn.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = []
+        mock_pool.getconn.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = (
+            []
+        )
         mock_pool.getconn.return_value.cursor.return_value.__enter__.return_value.description = [
             ("player_id",)
         ]
@@ -183,16 +187,16 @@ class TestTemporalLeakageProtection:
         repository.query(sql)
 
         # LAG indicates temporal awareness
-        assert not any(
-            "TEMPORAL SAFETY WARNING" in record.message for record in caplog.records
-        )
+        assert not any("TEMPORAL SAFETY WARNING" in record.message for record in caplog.records)
 
     def test_validation_can_be_disabled(self, repository, mock_pool):
         """Test that temporal validation can be disabled if needed."""
         sql = "SELECT * FROM games WHERE game_date > '2024-01-01'"
 
         # Mock execution
-        mock_pool.getconn.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = []
+        mock_pool.getconn.return_value.cursor.return_value.__enter__.return_value.fetchall.return_value = (
+            []
+        )
         mock_pool.getconn.return_value.cursor.return_value.__enter__.return_value.description = [
             ("id",)
         ]
@@ -262,9 +266,7 @@ class TestConnectionRetryLogic:
         """Test that retry stops after max attempts (3)."""
         with patch.object(repository, "_pool") as mock_pool:
             # Always fail
-            mock_pool.getconn.side_effect = psycopg2.OperationalError(
-                "Connection refused"
-            )
+            mock_pool.getconn.side_effect = psycopg2.OperationalError("Connection refused")
 
             # Should raise after 3 attempts
             with pytest.raises(RepositoryError):
@@ -338,14 +340,10 @@ class TestQueryCaching:
         mock_cursor.description = [("id",), ("name",)]
 
         # First query
-        result1 = repository.query(
-            "SELECT * FROM test", cache_key="test_query", cache_ttl=60
-        )
+        result1 = repository.query("SELECT * FROM test", cache_key="test_query", cache_ttl=60)
 
         # Second query with same cache key
-        result2 = repository.query(
-            "SELECT * FROM test", cache_key="test_query", cache_ttl=60
-        )
+        result2 = repository.query("SELECT * FROM test", cache_key="test_query", cache_ttl=60)
 
         # Should only execute query once (cached on second call)
         assert mock_cursor.execute.call_count == 1

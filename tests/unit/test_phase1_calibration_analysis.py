@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_results_basic():
@@ -56,7 +53,6 @@ def test_load_results_basic():
     assert result is not None
 
 
-
 def test_load_results_edge_cases():
     """Test load_results: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_results_edge_cases():
     assert result is not None
 
 
-
 def test_load_results_error_handling():
     """Test load_results error handling."""
     with pytest.raises(ValueError):
         load_results(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_load_results_property_idempotent(val):
 
     # Assert property
     assert load_results(val) == result, "idempotent violated"
-
 
 
 def test_create_summary_table_basic():
@@ -100,7 +93,6 @@ def test_create_summary_table_basic():
     assert result is not None
 
 
-
 def test_create_summary_table_edge_cases():
     """Test create_summary_table: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_create_summary_table_edge_cases():
     assert result is not None
 
 
-
 def test_create_summary_table_error_handling():
     """Test create_summary_table error handling."""
     with pytest.raises(ValueError):
         create_summary_table(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_create_summary_table_property_idempotent(val):
 
     # Assert property
     assert create_summary_table(val) == result, "idempotent violated"
-
 
 
 def test_print_summary_basic():
@@ -144,7 +133,6 @@ def test_print_summary_basic():
     assert result is not None
 
 
-
 def test_print_summary_edge_cases():
     """Test print_summary: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_print_summary_edge_cases():
     assert result is not None
 
 
-
 def test_print_summary_error_handling():
     """Test print_summary error handling."""
     with pytest.raises(ValueError):
         print_summary(invalid_input)
-
 
 
 @given(st.integers())
@@ -173,7 +159,6 @@ def test_print_summary_property_idempotent(val):
 
     # Assert property
     assert print_summary(val) == result, "idempotent violated"
-
 
 
 def test_create_visualization_basic():
@@ -188,7 +173,6 @@ def test_create_visualization_basic():
     assert result is not None
 
 
-
 def test_create_visualization_edge_cases():
     """Test create_visualization: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_create_visualization_edge_cases():
     assert result is not None
 
 
-
 def test_create_visualization_error_handling():
     """Test create_visualization error handling."""
     with pytest.raises(ValueError):
         create_visualization(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -217,7 +199,6 @@ def test_create_visualization_property_idempotent(self, self, output_path):
 
     # Assert property
     assert create_visualization(self, output_path) == result, "idempotent violated"
-
 
 
 def test_save_latex_table_basic():
@@ -232,7 +213,6 @@ def test_save_latex_table_basic():
     assert result is not None
 
 
-
 def test_save_latex_table_edge_cases():
     """Test save_latex_table: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_save_latex_table_edge_cases():
     assert result is not None
 
 
-
 def test_save_latex_table_error_handling():
     """Test save_latex_table error handling."""
     with pytest.raises(ValueError):
         save_latex_table(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -261,4 +239,3 @@ def test_save_latex_table_property_idempotent(self, self, output_path):
 
     # Assert property
     assert save_latex_table(self, output_path) == result, "idempotent violated"
-

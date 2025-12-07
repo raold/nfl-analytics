@@ -23,7 +23,6 @@ def test_extract_features_basic():
     assert result is not None
 
 
-
 def test_extract_features_edge_cases():
     """Test extract_features: edge cases."""
     # Arrange
@@ -36,20 +35,29 @@ def test_extract_features_edge_cases():
     assert result is not None
 
 
-
 def test_extract_features_error_handling():
     """Test extract_features error handling."""
     with pytest.raises(ValueError):
         extract_features(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_extract_features_property_idempotent(self, self, player_id, prop_type, opponent, is_home, season, week):
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_extract_features_property_idempotent(
+    self, self, player_id, prop_type, opponent, is_home, season, week
+):
     """Property test: function is idempotent."""
     # Act
     result = extract_features(self, player_id, prop_type, opponent, is_home, season, week)
 
     # Assert property
-    assert extract_features(self, player_id, prop_type, opponent, is_home, season, week) == result, "idempotent violated"
-
+    assert (
+        extract_features(self, player_id, prop_type, opponent, is_home, season, week) == result
+    ), "idempotent violated"

@@ -45,8 +45,7 @@ from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 # Configure logging for clean output
 logging.basicConfig(
-    level=logging.WARNING,  # Suppress INFO logs for clean test output
-    format="%(message)s"
+    level=logging.WARNING, format="%(message)s"  # Suppress INFO logs for clean test output
 )
 logger = logging.getLogger(__name__)
 
@@ -58,14 +57,14 @@ NUM_RUNS = 10
 
 # Expected performance targets
 BASELINE_TIME = 4.0  # v5.1 average (seconds)
-TARGET_TIME = 1.5    # v6.0 target (seconds)
+TARGET_TIME = 1.5  # v6.0 target (seconds)
 TARGET_SPEEDUP = 2.6  # Expected improvement
 
 # Validation criteria
 MIN_PREDICTION = 150.0  # Minimum reasonable prediction (yards)
 MAX_PREDICTION = 400.0  # Maximum reasonable prediction (yards)
-MIN_STD = 1.0          # Minimum uncertainty (too low = suspicious)
-MAX_STD = 100.0        # Maximum uncertainty (too high = wrong)
+MIN_STD = 1.0  # Minimum uncertainty (too low = suspicious)
+MAX_STD = 100.0  # Maximum uncertainty (too high = wrong)
 PLACEHOLDER_VALUE = 250.0  # Detect placeholder predictions
 
 
@@ -112,7 +111,9 @@ def validate_prediction(result: dict) -> bool:
 
     # Check 3: Reasonable range
     if not (MIN_PREDICTION <= mean <= MAX_PREDICTION):
-        logger.error(f"❌ Prediction out of range: {mean:.1f} yards (expected {MIN_PREDICTION}-{MAX_PREDICTION})")
+        logger.error(
+            f"❌ Prediction out of range: {mean:.1f} yards (expected {MIN_PREDICTION}-{MAX_PREDICTION})"
+        )
         return False
 
     # Check 4: Reasonable uncertainty
@@ -137,9 +138,7 @@ def run_performance_test() -> dict:
     """
     # Initialize ensemble (will log optimization details)
     print("Initializing ensemble...")
-    ensemble = EnhancedEnsemble5Way(
-        db_password=os.getenv("DB_PASSWORD")
-    )
+    ensemble = EnhancedEnsemble5Way(db_password=os.getenv("DB_PASSWORD"))
     print()
 
     # Warm-up run (load models into memory)
@@ -147,10 +146,7 @@ def run_performance_test() -> dict:
     try:
         warmup_start = time.perf_counter()
         warmup_result = ensemble.predict(
-            player_id=TEST_PLAYER_ID,
-            season=TEST_SEASON,
-            week=TEST_WEEK,
-            return_components=True
+            player_id=TEST_PLAYER_ID, season=TEST_SEASON, week=TEST_WEEK, return_components=True
         )
         warmup_time = time.perf_counter() - warmup_start
         print(f"  Warm-up time: {warmup_time:.2f}s")
@@ -159,7 +155,9 @@ def run_performance_test() -> dict:
         if not validate_prediction(warmup_result):
             raise ValueError("Warm-up prediction validation failed")
 
-        print(f"  Prediction: {warmup_result['ensemble_mean']:.1f} ± {warmup_result['ensemble_std']:.1f} yards")
+        print(
+            f"  Prediction: {warmup_result['ensemble_mean']:.1f} ± {warmup_result['ensemble_std']:.1f} yards"
+        )
         print(f"  Components: {len(warmup_result['valid_components'])}/5")
         print()
     except Exception as e:
@@ -175,10 +173,7 @@ def run_performance_test() -> dict:
         try:
             start = time.perf_counter()
             result = ensemble.predict(
-                player_id=TEST_PLAYER_ID,
-                season=TEST_SEASON,
-                week=TEST_WEEK,
-                return_components=True
+                player_id=TEST_PLAYER_ID, season=TEST_SEASON, week=TEST_WEEK, return_components=True
             )
             elapsed = time.perf_counter() - start
             times.append(elapsed)
@@ -188,7 +183,9 @@ def run_performance_test() -> dict:
             if not validate_prediction(result):
                 raise ValueError(f"Prediction {i+1} validation failed")
 
-            print(f"  Run {i+1:2d}: {elapsed:.3f}s - {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards")
+            print(
+                f"  Run {i+1:2d}: {elapsed:.3f}s - {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards"
+            )
 
         except Exception as e:
             print(f"❌ Run {i+1} failed: {e}")
@@ -237,7 +234,9 @@ def print_results(results: dict):
     print()
 
     # Timing results
-    print(f"Average inference time: {results['avg_time']:.3f}s ± {results['std_time']:.3f}s ({NUM_RUNS} runs)")
+    print(
+        f"Average inference time: {results['avg_time']:.3f}s ± {results['std_time']:.3f}s ({NUM_RUNS} runs)"
+    )
     print(f"  Min: {results['min_time']:.3f}s")
     print(f"  Max: {results['max_time']:.3f}s")
     print()
@@ -250,11 +249,13 @@ def print_results(results: dict):
     print(f"Actual speedup: {results['speedup']:.2f}x")
 
     # Target achievement
-    if results['target_achieved']:
+    if results["target_achieved"]:
         print(f"✅ Target achieved: {results['speedup']:.2f}x >= {TARGET_SPEEDUP:.1f}x")
     else:
-        shortfall = TARGET_SPEEDUP - results['speedup']
-        print(f"⚠️  Target NOT achieved: {results['speedup']:.2f}x < {TARGET_SPEEDUP:.1f}x (shortfall: {shortfall:.2f}x)")
+        shortfall = TARGET_SPEEDUP - results["speedup"]
+        print(
+            f"⚠️  Target NOT achieved: {results['speedup']:.2f}x < {TARGET_SPEEDUP:.1f}x (shortfall: {shortfall:.2f}x)"
+        )
 
     print()
 
@@ -266,9 +267,9 @@ def print_results(results: dict):
 
     print("✅ Predictions are real (not placeholders)")
     print(f"✅ All {len(results['valid_components'])} components available:")
-    for component in results['valid_components']:
-        if component in results['components']:
-            comp_data = results['components'][component]
+    for component in results["valid_components"]:
+        if component in results["components"]:
+            comp_data = results["components"][component]
             print(f"     - {component}: {comp_data['mean']:.1f} ± {comp_data['std']:.1f} yards")
         else:
             print(f"     - {component}: (mean/std not available)")
@@ -276,17 +277,19 @@ def print_results(results: dict):
     print()
     print(f"✅ Ensemble mean: {results['ensemble_mean']:.1f} yards")
     print(f"✅ Ensemble std: {results['ensemble_std']:.1f} yards")
-    print(f"✅ Calibrated std: {results['calibrated_std']:.1f} yards (T={results['temperature']:.4f})")
+    print(
+        f"✅ Calibrated std: {results['calibrated_std']:.1f} yards (T={results['temperature']:.4f})"
+    )
     print()
 
     # Component breakdown (if available)
-    if results['components']:
+    if results["components"]:
         print("=" * 70)
         print("COMPONENT BREAKDOWN")
         print("=" * 70)
         print()
 
-        for component_name, component_data in results['components'].items():
+        for component_name, component_data in results["components"].items():
             print(f"{component_name}:")
             print(f"  Mean: {component_data['mean']:.1f} yards")
             print(f"  Std:  {component_data['std']:.1f} yards")
@@ -295,7 +298,7 @@ def print_results(results: dict):
     # Summary
     print("=" * 70)
 
-    if results['target_achieved']:
+    if results["target_achieved"]:
         print("✅ ALL CHECKS PASSED - v6.0 performance validated!")
     else:
         print("⚠️  PERFORMANCE TARGET NOT MET - further optimization needed")
@@ -316,7 +319,7 @@ def main():
         print_results(results)
 
         # Exit code based on target achievement
-        if results['target_achieved']:
+        if results["target_achieved"]:
             sys.exit(0)
         else:
             sys.exit(1)
@@ -328,6 +331,7 @@ def main():
         print("=" * 70)
 
         import traceback
+
         traceback.print_exc()
 
         sys.exit(1)

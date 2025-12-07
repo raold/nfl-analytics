@@ -120,12 +120,11 @@ logger = logging.getLogger(__name__)
 
 try:
     from prometheus_client import Counter, Gauge, Histogram, generate_latest
+
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
-    logger.warning(
-        "Prometheus not available. Install with: pip install prometheus-client"
-    )
+    logger.warning("Prometheus not available. Install with: pip install prometheus-client")
 
 if PROMETHEUS_AVAILABLE:
     # Request metrics
@@ -191,18 +190,14 @@ if PROMETHEUS_AVAILABLE:
 class PredictionRequest(BaseModel):
     """NFL player prop prediction request."""
 
-    player_id: str = Field(
-        ..., description="Player ID (e.g., '00-0036355' for Patrick Mahomes)"
-    )
+    player_id: str = Field(..., description="Player ID (e.g., '00-0036355' for Patrick Mahomes)")
     stat_type: str = Field(
         ...,
         description="Statistic type",
         pattern="^(passing_yards|passing_tds|interceptions|rushing_yards|rushing_tds|receiving_yards|receptions|receiving_tds|field_goals|extra_points)$",
     )
     week: int = Field(..., ge=1, le=18, description="NFL week (1-18)")
-    season: int = Field(
-        ..., ge=1999, le=2099, description="NFL season year"
-    )
+    season: int = Field(..., ge=1999, le=2099, description="NFL season year")
     confidence_level: float = Field(
         default=0.90,
         ge=0.50,
@@ -284,18 +279,12 @@ class PredictionResponse(BaseModel):
     season: int
     prediction: float = Field(..., description="Point prediction (yards/count)")
     prediction_unit: str = Field(default="yards", description="Unit of prediction")
-    uncertainty: float = Field(
-        ..., description="Prediction standard deviation (yards/count)"
-    )
+    uncertainty: float = Field(..., description="Prediction standard deviation (yards/count)")
     confidence_level: float = Field(ge=0.5, le=0.99)
-    confidence_interval: ConfidenceInterval = Field(
-        ..., description="Confidence interval bounds"
-    )
+    confidence_interval: ConfidenceInterval = Field(..., description="Confidence interval bounds")
     model_versions: ModelVersions
     ensemble_weights: EnsembleWeights
-    timestamp: str = Field(
-        default_factory=lambda: datetime.utcnow().isoformat() + "Z"
-    )
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
     cache_hit: bool = Field(default=False, description="Whether result was cached")
     processing_ms: float = Field(..., description="Processing time in milliseconds")
 
@@ -318,10 +307,7 @@ class PredictionResponse(BaseModel):
     @property
     def models_used(self) -> list:
         """Convert ensemble_weights to models_used format (dashboard compatibility)."""
-        return [
-            {"model_name": k, "weight": v}
-            for k, v in self.ensemble_weights.dict().items()
-        ]
+        return [{"model_name": k, "weight": v} for k, v in self.ensemble_weights.dict().items()]
 
     class Config:
         schema_extra = {
@@ -442,9 +428,7 @@ class GamePredictionResponse(BaseModel):
     home_prediction: TeamPrediction
     away_prediction: TeamPrediction
     total_predicted_yards: float | None = None
-    timestamp: str = Field(
-        default_factory=lambda: datetime.utcnow().isoformat() + "Z"
-    )
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
     processing_ms: float
 
 
@@ -530,7 +514,6 @@ class ModelManager:
                 MODEL_LOAD_STATUS.labels(model_name="ensemble_v6_1").set(0)
             return False
 
-
     def predict(
         self,
         player_id: str,
@@ -575,10 +558,7 @@ class ModelManager:
                 logger.debug("Using DEFAULT weights")
             # Get ensemble prediction
             result = self.ensemble.predict(
-                player_id=player_id,
-                season=season,
-                week=week,
-                return_individual=True
+                player_id=player_id, season=season, week=week, return_individual=True
             )
 
             # Check if prediction succeeded
@@ -589,7 +569,8 @@ class ModelManager:
             # Validate minimum ensemble components (Nov 15 bug: only 2/4 models loaded)
             individual_predictions = result.get("predictions", {})
             valid_predictions = {
-                k: v for k, v in individual_predictions.items()
+                k: v
+                for k, v in individual_predictions.items()
                 if v is not None and not (isinstance(v, float) and np.isnan(v))
             }
             if len(valid_predictions) < 3:
@@ -678,14 +659,19 @@ async def lifespan(app: FastAPI):
         try:
             logger.info("Pre-warming ensemble with test prediction...")
             import pandas as pd
-            test_features = pd.DataFrame([{
-                'yards_per_attempt_l3': 7.5,
-                'completions_l3': 25,
-                'attempts_l3': 35,
-                'passing_yards_l3': 260,
-                'opponent_def_rank': 15,
-                'is_home': 1,
-            }])
+
+            test_features = pd.DataFrame(
+                [
+                    {
+                        "yards_per_attempt_l3": 7.5,
+                        "completions_l3": 25,
+                        "attempts_l3": 35,
+                        "passing_yards_l3": 260,
+                        "opponent_def_rank": 15,
+                        "is_home": 1,
+                    }
+                ]
+            )
             _ = model_manager.ensemble.predict(test_features)
             logger.info("✅ Ensemble pre-warmed successfully (cold start eliminated)")
         except Exception as e:
@@ -709,12 +695,15 @@ async def lifespan(app: FastAPI):
     # This reduces cold start from 8-12s to 5-8s on container restarts
     if redis_cache:
         import asyncio
-        asyncio.create_task(warm_cache_on_startup(
-            warm_models=True,      # Pre-load BNN + XGBoost models
-            warm_features=True,    # Pre-load top 50 players
-            warm_queries=False,    # Skip dashboard queries (lower priority)
-            top_players=50
-        ))
+
+        asyncio.create_task(
+            warm_cache_on_startup(
+                warm_models=True,  # Pre-load BNN + XGBoost models
+                warm_features=True,  # Pre-load top 50 players
+                warm_queries=False,  # Skip dashboard queries (lower priority)
+                top_players=50,
+            )
+        )
         logger.info("Cache warming started in background")
     else:
         logger.warning("Skipping cache warming - Redis unavailable")
@@ -762,7 +751,9 @@ app.add_middleware(
 )
 
 # Include routers
-print(f"[DEBUG main.py:{735}] About to register game_predictions router")  # Direct output for debugging
+print(
+    f"[DEBUG main.py:{735}] About to register game_predictions router"
+)  # Direct output for debugging
 try:
     print(f"[DEBUG main.py:{737}] game_predictions.router = {game_predictions.router}")
     app.include_router(game_predictions.router, prefix="/api/v1", tags=["game_predictions"])
@@ -775,6 +766,7 @@ except Exception as e:
 # Import and include props predictions router
 try:
     from py.api.routes import props_predictions
+
     app.include_router(props_predictions.router, prefix="/api/v1", tags=["props_predictions"])
     logger.info("Props predictions router loaded successfully")
 except Exception as e:
@@ -872,8 +864,7 @@ async def get_models() -> ModelsListResponse:
     """
     if not model_manager:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Model manager not initialized"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Model manager not initialized"
         )
 
     # Build model information list
@@ -890,29 +881,29 @@ async def get_models() -> ModelsListResponse:
             "type": "bayesian",
             "version": "v2",
             "path": "models/bayesian/simplified_random_walk_v2.rds",
-            "metadata": {"mae": 47.77, "training_window": "2018-2024", "method": "Stan"}
+            "metadata": {"mae": 47.77, "training_window": "2018-2024", "method": "Stan"},
         },
         {
             "name": "hierarchical_v2",
             "type": "bayesian",
             "version": "v2",
             "path": "models/bayesian/passing_yards_hierarchical_v2.rds",
-            "metadata": {"training_window": "2018-2024", "method": "brms"}
+            "metadata": {"training_window": "2018-2024", "method": "brms"},
         },
         {
             "name": "hybrid_xgboost_v1",
             "type": "xgboost",
             "version": "v1",
             "path": "models/xgboost/hybrid_static_incremental_v1",
-            "metadata": {"mae": 38.03, "blend": "70% static + 30% incremental"}
+            "metadata": {"mae": 38.03, "blend": "70% static + 30% incremental"},
         },
         {
             "name": "informative_priors_v2",
             "type": "bayesian",
             "version": "v2",
             "path": "models/bayesian/passing_informative_priors_v2.rds",
-            "metadata": {"training_window": "2018-2024", "method": "brms"}
-        }
+            "metadata": {"training_window": "2018-2024", "method": "brms"},
+        },
     ]
 
     for config in model_configs:
@@ -926,16 +917,18 @@ async def get_models() -> ModelsListResponse:
         if status_str == "loaded":
             loaded_count += 1
 
-        models_info.append(ModelInfo(
-            model_name=config["name"],
-            model_type=config["type"],
-            version=config["version"],
-            file_path=config["path"],
-            file_size_mb=round(file_size_mb, 2),
-            loaded_at=datetime.utcnow().isoformat() + "Z",
-            status=status_str,
-            metadata=config.get("metadata")
-        ))
+        models_info.append(
+            ModelInfo(
+                model_name=config["name"],
+                model_type=config["type"],
+                version=config["version"],
+                file_path=config["path"],
+                file_size_mb=round(file_size_mb, 2),
+                loaded_at=datetime.utcnow().isoformat() + "Z",
+                status=status_str,
+                metadata=config.get("metadata"),
+            )
+        )
 
     ensemble_ready = model_manager.ensemble is not None and loaded_count >= 3
 
@@ -943,7 +936,7 @@ async def get_models() -> ModelsListResponse:
         models=models_info,
         total_models=len(model_configs),
         loaded_models=loaded_count,
-        ensemble_ready=ensemble_ready
+        ensemble_ready=ensemble_ready,
     )
 
 
@@ -1026,25 +1019,25 @@ async def predict(request: PredictionRequest) -> PredictionResponse:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Failed to generate prediction for {request.player_id} "
-                       f"(stat_type={request.stat_type}, week={request.week}, season={request.season}). "
-                       f"Player may not exist in database or stat_type not supported.",
+                f"(stat_type={request.stat_type}, week={request.week}, season={request.season}). "
+                f"Player may not exist in database or stat_type not supported.",
             )
 
         # Get player name from database
         player_name = f"Player-{request.player_id[-6:]}"  # Default fallback
         try:
             import psycopg2
+
             conn = psycopg2.connect(
                 host="localhost",
                 port=5544,
                 dbname="devdb01",
                 user="dro",
-                password="sicillionbillions"
+                password="sicillionbillions",
             )
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT player_name FROM players WHERE player_id = %s",
-                (request.player_id,)
+                "SELECT player_name FROM players WHERE player_id = %s", (request.player_id,)
             )
             result = cursor.fetchone()
             if result:
@@ -1097,15 +1090,11 @@ async def predict(request: PredictionRequest) -> PredictionResponse:
 
         # Record metrics
         if PROMETHEUS_AVAILABLE:
-            PREDICTIONS_MADE.labels(
-                stat_type=request.stat_type, cache_hit=cache_hit
-            ).inc()
+            PREDICTIONS_MADE.labels(stat_type=request.stat_type, cache_hit=cache_hit).inc()
             PREDICTION_DURATION.labels(stat_type=request.stat_type).observe(
                 response.processing_ms / 1000
             )
-            PREDICTION_UNCERTAINTY.labels(stat_type=request.stat_type).observe(
-                response.uncertainty
-            )
+            PREDICTION_UNCERTAINTY.labels(stat_type=request.stat_type).observe(response.uncertainty)
 
         logger.info(
             f"Prediction generated for {request.player_id} ({request.stat_type}, "
@@ -1164,11 +1153,7 @@ async def predict_game(request: GamePredictionRequest) -> GamePredictionResponse
 
         # Get game details and QBs from database
         conn = psycopg2.connect(
-            host="localhost",
-            port=5544,
-            dbname="devdb01",
-            user="dro",
-            password="sicillionbillions"
+            host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
         )
 
         # Query to get game info and starting QBs
@@ -1221,7 +1206,7 @@ async def predict_game(request: GamePredictionRequest) -> GamePredictionResponse
         if not game_data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Game not found: {request.game_id} (season={request.season}, week={request.week})"
+                detail=f"Game not found: {request.game_id} (season={request.season}, week={request.week})",
             )
 
         # Get predictions for both QBs
@@ -1281,7 +1266,9 @@ async def predict_game(request: GamePredictionRequest) -> GamePredictionResponse
         logger.info(
             f"Game prediction generated for {request.game_id}: "
             f"{game_data['away_team']}@{game_data['home_team']} "
-            f"(total: {total_yards:.1f} yards)" if total_yards else "incomplete"
+            f"(total: {total_yards:.1f} yards)"
+            if total_yards
+            else "incomplete"
         )
 
         return response

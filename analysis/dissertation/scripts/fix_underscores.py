@@ -20,15 +20,16 @@ def fix_underscores_in_line(line, in_lstlisting, in_verbatim, in_algorithm):
         return line
 
     # Don't touch comment lines
-    if line.strip().startswith('%'):
+    if line.strip().startswith("%"):
         return line
 
     # Split on % to handle inline comments
-    if '%' in line:
-        code_part, comment_part = line.split('%', 1)
-        return fix_underscores_in_text(code_part) + '%' + comment_part
+    if "%" in line:
+        code_part, comment_part = line.split("%", 1)
+        return fix_underscores_in_text(code_part) + "%" + comment_part
 
     return fix_underscores_in_text(line)
+
 
 def fix_underscores_in_text(text):
     """Fix underscores in text, preserving math mode and \texttt{}."""
@@ -41,11 +42,11 @@ def fix_underscores_in_text(text):
     i = 0
     while i < len(text):
         # Check for start of math mode
-        if text[i] == '$':
+        if text[i] == "$":
             # Find matching closing $
             j = i + 1
-            while j < len(text) and text[j] != '$':
-                if text[j] == '\\':
+            while j < len(text) and text[j] != "$":
+                if text[j] == "\\":
                     j += 2  # Skip escaped character
                 else:
                     j += 1
@@ -56,16 +57,16 @@ def fix_underscores_in_text(text):
             continue
 
         # Check for \texttt{
-        if i < len(text) - 7 and text[i:i+7] == '\\texttt{':
+        if i < len(text) - 7 and text[i : i + 7] == "\\texttt{":
             # Find matching closing }
             j = i + 7
             brace_count = 1
             while j < len(text) and brace_count > 0:
-                if text[j] == '{':
+                if text[j] == "{":
                     brace_count += 1
-                elif text[j] == '}':
+                elif text[j] == "}":
                     brace_count -= 1
-                elif text[j] == '\\':
+                elif text[j] == "\\":
                     j += 1  # Skip next char
                 j += 1
             result.append(text[i:j])
@@ -73,8 +74,8 @@ def fix_underscores_in_text(text):
             continue
 
         # Check for \[ or \(
-        if i < len(text) - 1 and text[i:i+2] in ['\\[', '\\(']:
-            end_marker = '\\]' if text[i:i+2] == '\\[' else '\\)'
+        if i < len(text) - 1 and text[i : i + 2] in ["\\[", "\\("]:
+            end_marker = "\\]" if text[i : i + 2] == "\\[" else "\\)"
             j = text.find(end_marker, i + 2)
             if j != -1:
                 j += 2
@@ -83,14 +84,14 @@ def fix_underscores_in_text(text):
                 continue
 
         # Check for already escaped underscore
-        if i < len(text) - 1 and text[i:i+2] == '\\_':
-            result.append('\\_')
+        if i < len(text) - 1 and text[i : i + 2] == "\\_":
+            result.append("\\_")
             i += 2
             continue
 
         # Check for unescaped underscore in plain text
-        if text[i] == '_':
-            result.append('\\_')
+        if text[i] == "_":
+            result.append("\\_")
             i += 1
             continue
 
@@ -98,12 +99,13 @@ def fix_underscores_in_text(text):
         result.append(text[i])
         i += 1
 
-    return ''.join(result)
+    return "".join(result)
+
 
 def process_file(filepath):
     """Process a LaTeX file to fix underscores."""
 
-    with open(filepath, encoding='utf-8') as f:
+    with open(filepath, encoding="utf-8") as f:
         lines = f.readlines()
 
     output_lines = []
@@ -116,17 +118,17 @@ def process_file(filepath):
         original_line = line
 
         # Track environment state
-        if '\\begin{lstlisting}' in line:
+        if "\\begin{lstlisting}" in line:
             in_lstlisting = True
-        elif '\\end{lstlisting}' in line:
+        elif "\\end{lstlisting}" in line:
             in_lstlisting = False
-        elif '\\begin{verbatim}' in line:
+        elif "\\begin{verbatim}" in line:
             in_verbatim = True
-        elif '\\end{verbatim}' in line:
+        elif "\\end{verbatim}" in line:
             in_verbatim = False
-        elif '\\begin{algorithm}' in line or '\\begin{algorithmic}' in line:
+        elif "\\begin{algorithm}" in line or "\\begin{algorithmic}" in line:
             in_algorithm = True
-        elif '\\end{algorithm}' in line or '\\end{algorithmic}' in line:
+        elif "\\end{algorithm}" in line or "\\end{algorithmic}" in line:
             in_algorithm = False
 
         # Fix underscores in this line
@@ -139,12 +141,13 @@ def process_file(filepath):
         output_lines.append(fixed_line)
 
     # Write back
-    with open(filepath, 'w', encoding='utf-8') as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         f.writelines(output_lines)
 
     return changes_made
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python fix_underscores.py <file1.tex> [file2.tex ...]")
         sys.exit(1)

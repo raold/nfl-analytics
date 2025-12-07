@@ -104,11 +104,11 @@ class TestBottleneckClassification:
 class TestDatabaseProfiling:
     """Test database query profiling."""
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_profile_database_queries_no_extension(self, mock_connect, agent):
         """Test profiling when pg_stat_statements is not enabled."""
         mock_cursor = MagicMock()
-        mock_cursor.fetchone.return_value = {'enabled': False}
+        mock_cursor.fetchone.return_value = {"enabled": False}
         mock_connect.return_value.cursor.return_value = mock_cursor
 
         report = agent.profile_database_queries()
@@ -116,22 +116,22 @@ class TestDatabaseProfiling:
         assert isinstance(report, QueryReport)
         assert len(report.slow_queries) == 0
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_profile_database_queries_with_slow_queries(self, mock_connect, agent):
         """Test profiling with slow queries detected."""
         mock_cursor = MagicMock()
         mock_cursor.fetchone.side_effect = [
-            {'enabled': True},  # Extension enabled
+            {"enabled": True},  # Extension enabled
         ]
         mock_cursor.fetchall.side_effect = [
             [  # Slow queries
                 {
-                    'query': 'SELECT * FROM games',
-                    'calls': 100,
-                    'avg_time_ms': 500.0,
-                    'total_time_ms': 50000.0,
-                    'rows': 1000,
-                    'cache_hit_ratio': 95.0,
+                    "query": "SELECT * FROM games",
+                    "calls": 100,
+                    "avg_time_ms": 500.0,
+                    "total_time_ms": 50000.0,
+                    "rows": 1000,
+                    "cache_hit_ratio": 95.0,
                 },
             ],
             [],  # N+1 queries
@@ -142,22 +142,22 @@ class TestDatabaseProfiling:
         report = agent.profile_database_queries(min_duration_ms=100)
 
         assert len(report.slow_queries) == 1
-        assert report.slow_queries[0]['query'] == 'SELECT * FROM games'
+        assert report.slow_queries[0]["query"] == "SELECT * FROM games"
         assert report.avg_query_time_ms == 500.0
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_profile_database_queries_n_plus_one(self, mock_connect, agent):
         """Test N+1 query pattern detection."""
         mock_cursor = MagicMock()
-        mock_cursor.fetchone.return_value = {'enabled': True}
+        mock_cursor.fetchone.return_value = {"enabled": True}
         mock_cursor.fetchall.side_effect = [
             [],  # Slow queries
             [  # N+1 queries
                 {
-                    'query': 'SELECT * FROM stats WHERE player_id = ?',
-                    'calls': 500,
-                    'avg_time_ms': 5.0,
-                    'total_time_ms': 2500.0,
+                    "query": "SELECT * FROM stats WHERE player_id = ?",
+                    "calls": 500,
+                    "avg_time_ms": 5.0,
+                    "total_time_ms": 2500.0,
                 },
             ],
             [],  # Missing indexes
@@ -167,18 +167,18 @@ class TestDatabaseProfiling:
         report = agent.profile_database_queries()
 
         assert len(report.n_plus_one_queries) == 1
-        assert report.n_plus_one_queries[0]['calls'] == 500
+        assert report.n_plus_one_queries[0]["calls"] == 500
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_explain_query(self, mock_connect, agent):
         """Test EXPLAIN ANALYZE query execution."""
         mock_cursor = MagicMock()
         mock_cursor.fetchone.return_value = {
-            'QUERY PLAN': [
+            "QUERY PLAN": [
                 {
-                    'Plan': {
-                        'Node Type': 'Seq Scan',
-                        'Total Cost': 100.0,
+                    "Plan": {
+                        "Node Type": "Seq Scan",
+                        "Total Cost": 100.0,
                     }
                 }
             ]
@@ -188,7 +188,7 @@ class TestDatabaseProfiling:
         result = agent.explain_query("SELECT * FROM games")
 
         assert result is not None
-        assert 'QUERY PLAN' in result
+        assert "QUERY PLAN" in result
 
 
 class TestPythonProfiling:
@@ -205,7 +205,8 @@ class TestPythonProfiling:
         """Test profiling simple Python code."""
         # Create test file
         test_file = tmp_path / "test.py"
-        test_file.write_text("""
+        test_file.write_text(
+            """
 def slow_function():
     total = 0
     for i in range(1000):
@@ -213,7 +214,8 @@ def slow_function():
     return total
 
 result = slow_function()
-""")
+"""
+        )
 
         report = agent.profile_python_code(str(test_file), track_memory=True)
 
@@ -224,9 +226,11 @@ result = slow_function()
         """Test memory tracking during profiling."""
         # Create test file with memory usage
         test_file = tmp_path / "test.py"
-        test_file.write_text("""
+        test_file.write_text(
+            """
 data = [i for i in range(1000)]
-""")
+"""
+        )
 
         report = agent.profile_python_code(str(test_file), track_memory=True)
 
@@ -235,6 +239,7 @@ data = [i for i in range(1000)]
 
     def test_profile_function(self, agent):
         """Test profiling specific function."""
+
         def test_function(n):
             return sum(range(n))
 
@@ -245,6 +250,7 @@ data = [i for i in range(1000)]
 
     def test_profile_function_slow_computation(self, agent):
         """Test profiling slow function creates bottleneck."""
+
         def slow_function():
             time.sleep(0.1)  # Simulate slow operation
             return 42
@@ -259,7 +265,7 @@ data = [i for i in range(1000)]
 class TestRProfiling:
     """Test R code profiling."""
 
-    @patch('subprocess.run')
+    @patch("subprocess.run")
     def test_profile_r_code_success(self, mock_run, agent, tmp_path):
         """Test successful R code profiling."""
         # Create test R script
@@ -274,10 +280,10 @@ class TestRProfiling:
 
         result = agent.profile_r_code(str(r_script))
 
-        assert result['script'] == str(r_script)
-        assert 'output_file' in result
+        assert result["script"] == str(r_script)
+        assert "output_file" in result
 
-    @patch('subprocess.run')
+    @patch("subprocess.run")
     def test_profile_r_code_timeout(self, mock_run, agent, tmp_path):
         """Test R profiling timeout."""
         r_script = tmp_path / "test.R"
@@ -287,7 +293,7 @@ class TestRProfiling:
 
         result = agent.profile_r_code(str(r_script))
 
-        assert result['error'] == "Timeout"
+        assert result["error"] == "Timeout"
 
     def test_profile_r_code_nonexistent(self, agent):
         """Test R profiling with nonexistent file."""
@@ -299,7 +305,7 @@ class TestRProfiling:
 class TestAPIEndpointProfiling:
     """Test API endpoint profiling."""
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_profile_api_endpoints_success(self, mock_get, agent):
         """Test successful API endpoint profiling."""
         mock_response = MagicMock()
@@ -323,9 +329,9 @@ class TestAPIEndpointProfiling:
 
         assert isinstance(report, EndpointReport)
         assert len(report.endpoints) == 1
-        assert report.endpoints[0]['endpoint'] == '/predict'
+        assert report.endpoints[0]["endpoint"] == "/predict"
 
-    @patch('requests.get')
+    @patch("requests.get")
     def test_profile_api_endpoints_slow(self, mock_get, agent):
         """Test slow endpoint detection."""
         mock_response = MagicMock()
@@ -348,26 +354,26 @@ class TestAPIEndpointProfiling:
         report = agent.profile_api_endpoints(min_latency_ms=1000)
 
         assert len(report.slow_endpoints) == 1
-        assert report.slow_endpoints[0]['avg_latency_ms'] == 2000.0
+        assert report.slow_endpoints[0]["avg_latency_ms"] == 2000.0
 
 
 class TestBottleneckDetection:
     """Test bottleneck detection."""
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_detect_bottlenecks_database_only(self, mock_connect, agent):
         """Test detecting database bottlenecks only."""
         mock_cursor = MagicMock()
-        mock_cursor.fetchone.return_value = {'enabled': True}
+        mock_cursor.fetchone.return_value = {"enabled": True}
         mock_cursor.fetchall.side_effect = [
             [  # Slow queries
                 {
-                    'query': 'SELECT * FROM games',
-                    'calls': 100,
-                    'avg_time_ms': 5000.0,
-                    'total_time_ms': 500000.0,
-                    'rows': 1000,
-                    'cache_hit_ratio': 95.0,
+                    "query": "SELECT * FROM games",
+                    "calls": 100,
+                    "avg_time_ms": 5000.0,
+                    "total_time_ms": 500000.0,
+                    "rows": 1000,
+                    "cache_hit_ratio": 95.0,
                 },
             ],
             [],  # N+1 queries
@@ -453,7 +459,10 @@ class TestRecommendationGeneration:
         recommendations = agent.generate_recommendations([bottleneck])
 
         assert len(recommendations) == 1
-        assert "JOIN" in recommendations[0].recommendation or "batch" in recommendations[0].recommendation
+        assert (
+            "JOIN" in recommendations[0].recommendation
+            or "batch" in recommendations[0].recommendation
+        )
 
     def test_generate_recommendations_memory_leak(self, agent):
         """Test recommendation for memory leak."""
@@ -515,9 +524,9 @@ class TestReportExport:
 
         # Validate JSON structure
         data = json.loads(output_file.read_text())
-        assert 'generated_at' in data
-        assert 'bottlenecks' in data
-        assert len(data['bottlenecks']) == 1
+        assert "generated_at" in data
+        assert "bottlenecks" in data
+        assert len(data["bottlenecks"]) == 1
 
     def test_export_timeline_html(self, agent, tmp_path, sample_bottleneck):
         """Test HTML timeline export."""
@@ -530,8 +539,8 @@ class TestReportExport:
 
         # Validate HTML content
         html = output_file.read_text()
-        assert '<html>' in html
-        assert 'Performance Timeline' in html
+        assert "<html>" in html
+        assert "Performance Timeline" in html
         assert sample_bottleneck.title in html
 
     def test_generate_summary_report(self, agent, sample_bottleneck):
@@ -576,21 +585,21 @@ class TestEdgeCases:
 class TestIntegration:
     """Integration tests for full workflows."""
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_full_profiling_workflow(self, mock_connect, agent, tmp_path):
         """Test complete profiling workflow."""
         # Mock database
         mock_cursor = MagicMock()
-        mock_cursor.fetchone.return_value = {'enabled': True}
+        mock_cursor.fetchone.return_value = {"enabled": True}
         mock_cursor.fetchall.side_effect = [
             [  # Slow queries
                 {
-                    'query': 'SELECT * FROM games',
-                    'calls': 100,
-                    'avg_time_ms': 2000.0,
-                    'total_time_ms': 200000.0,
-                    'rows': 1000,
-                    'cache_hit_ratio': 95.0,
+                    "query": "SELECT * FROM games",
+                    "calls": 100,
+                    "avg_time_ms": 2000.0,
+                    "total_time_ms": 200000.0,
+                    "rows": 1000,
+                    "cache_hit_ratio": 95.0,
                 },
             ],
             [],  # N+1 queries

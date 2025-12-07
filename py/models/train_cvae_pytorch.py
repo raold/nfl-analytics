@@ -23,13 +23,12 @@ print(" CONDITIONAL VAE TRAINING (PYTORCH) ".center(70))
 print("=" * 70)
 
 # Device configuration
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"\n[*] Using device: {device}")
 
 # Database connection
 conn = psycopg2.connect(
-    host='localhost', port=5544, dbname='devdb01',
-    user='dro', password='sicillionbillions'
+    host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
 )
 
 # Load aggregated play data
@@ -76,6 +75,7 @@ print(f"[+] Years: {df.season.min()}-{df.season.max()}")
 for col in df.select_dtypes(include=[np.float64, np.int64]).columns:
     df[col] = df[col].fillna(df[col].median())
 
+
 class ConditionalVAE(nn.Module):
     """
     Proper CVAE architecture:
@@ -114,7 +114,7 @@ class ConditionalVAE(nn.Module):
             nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
             nn.BatchNorm1d(hidden_dim),
-            nn.Linear(hidden_dim, 1)  # Predict final score
+            nn.Linear(hidden_dim, 1),  # Predict final score
         )
 
     def encode(self, x, c):
@@ -149,7 +149,7 @@ class ConditionalVAE(nn.Module):
         beta: weight for KL term (beta-VAE for better disentanglement)
         """
         # Reconstruction loss (MSE)
-        recon_loss = nn.functional.mse_loss(x_recon, x_true, reduction='mean')
+        recon_loss = nn.functional.mse_loss(x_recon, x_true, reduction="mean")
 
         # KL divergence: -0.5 * sum(1 + log(var) - mu^2 - var)
         kl_div = -0.5 * torch.sum(1 + log_var - mu.pow(2) - log_var.exp())
@@ -177,21 +177,30 @@ class GameDataset(Dataset):
 print("\n2. Preparing features...")
 
 # Features (stats)
-feature_cols = ['avg_epa', 'std_epa', 'avg_yards', 'std_yards',
-                'avg_wp', 'std_wp', 'pass_rate', 'td_rate', 'first_down_rate']
+feature_cols = [
+    "avg_epa",
+    "std_epa",
+    "avg_yards",
+    "std_yards",
+    "avg_wp",
+    "std_wp",
+    "pass_rate",
+    "td_rate",
+    "first_down_rate",
+]
 
 # Conditions (context)
-condition_cols = ['season', 'plays']
+condition_cols = ["season", "plays"]
 
 # Target
-target_col = 'final_score'
+target_col = "final_score"
 
 X = df[feature_cols].values
 conditions = df[condition_cols].values
 y = df[target_col].values
 
 # Split data
-train_mask = df['season'] < 2022
+train_mask = df["season"] < 2022
 X_train = X[train_mask]
 X_test = X[~train_mask]
 conditions_train = conditions[train_mask]
@@ -224,21 +233,18 @@ test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
 # Initialize model
 print("\n3. Initializing CVAE...")
 model = ConditionalVAE(
-    input_dim=len(feature_cols),
-    condition_dim=len(condition_cols),
-    latent_dim=16,
-    hidden_dim=64
+    input_dim=len(feature_cols), condition_dim=len(condition_cols), latent_dim=16, hidden_dim=64
 ).to(device)
 
 optimizer = optim.Adam(model.parameters(), lr=0.001)
-scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=10)
+scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=10)
 
 print(f"[+] Model parameters: {sum(p.numel() for p in model.parameters()):,}")
 
 # Training loop
 print("\n4. Training CVAE...")
 n_epochs = 200
-best_test_loss = float('inf')
+best_test_loss = float("inf")
 patience_counter = 0
 max_patience = 30
 
@@ -289,7 +295,9 @@ for epoch in range(n_epochs):
             y_batch = y_batch.to(device)
 
             y_recon, mu, log_var = model(X_batch, c_batch)
-            loss, recon_loss, kl_loss = model.loss_function(y_recon, y_batch, mu, log_var, beta=0.01)
+            loss, recon_loss, kl_loss = model.loss_function(
+                y_recon, y_batch, mu, log_var, beta=0.01
+            )
 
             test_loss += loss.item()
             test_recon_loss += recon_loss.item()
@@ -306,14 +314,16 @@ for epoch in range(n_epochs):
         best_test_loss = test_loss
         patience_counter = 0
         # Save best model
-        torch.save(model.state_dict(), 'models/cvae/best_model.pt')
+        torch.save(model.state_dict(), "models/cvae/best_model.pt")
     else:
         patience_counter += 1
 
     if (epoch + 1) % 20 == 0:
-        print(f"Epoch [{epoch+1}/{n_epochs}] "
-              f"Train Loss: {train_loss:.4f} (Recon: {train_recon_loss:.4f}, KL: {train_kl_loss:.4f}) | "
-              f"Test Loss: {test_loss:.4f} (Recon: {test_recon_loss:.4f}, KL: {test_kl_loss:.4f})")
+        print(
+            f"Epoch [{epoch+1}/{n_epochs}] "
+            f"Train Loss: {train_loss:.4f} (Recon: {train_recon_loss:.4f}, KL: {train_kl_loss:.4f}) | "
+            f"Test Loss: {test_loss:.4f} (Recon: {test_recon_loss:.4f}, KL: {test_kl_loss:.4f})"
+        )
 
     if patience_counter >= max_patience:
         print(f"[*] Early stopping at epoch {epoch+1}")
@@ -323,11 +333,12 @@ training_time = time.time() - start_time
 print(f"[+] Training completed in {training_time:.1f} seconds")
 
 # Load best model
-model.load_state_dict(torch.load('models/cvae/best_model.pt'))
+model.load_state_dict(torch.load("models/cvae/best_model.pt"))
 model.eval()
 
 # Evaluate with uncertainty quantification
 print("\n5. Evaluating with uncertainty quantification...")
+
 
 def predict_with_uncertainty(model, X, conditions, n_samples=100):
     """Generate predictions with uncertainty using multiple samples."""
@@ -350,20 +361,18 @@ def predict_with_uncertainty(model, X, conditions, n_samples=100):
     lower_90 = np.percentile(predictions, 5, axis=0)
     upper_90 = np.percentile(predictions, 95, axis=0)
 
-    return {
-        'mean': mean_pred,
-        'std': std_pred,
-        'lower_90': lower_90,
-        'upper_90': upper_90
-    }
+    return {"mean": mean_pred, "std": std_pred, "lower_90": lower_90, "upper_90": upper_90}
+
 
 # Get predictions
-train_preds = predict_with_uncertainty(model, X_train_scaled, conditions_train_scaled, n_samples=100)
+train_preds = predict_with_uncertainty(
+    model, X_train_scaled, conditions_train_scaled, n_samples=100
+)
 test_preds = predict_with_uncertainty(model, X_test_scaled, conditions_test_scaled, n_samples=100)
 
 # Inverse transform predictions
-train_preds_original = scaler_output.inverse_transform(train_preds['mean'].reshape(-1, 1)).ravel()
-test_preds_original = scaler_output.inverse_transform(test_preds['mean'].reshape(-1, 1)).ravel()
+train_preds_original = scaler_output.inverse_transform(train_preds["mean"].reshape(-1, 1)).ravel()
+test_preds_original = scaler_output.inverse_transform(test_preds["mean"].reshape(-1, 1)).ravel()
 
 # Calculate metrics
 train_mse = mean_squared_error(y_train, train_preds_original)
@@ -372,10 +381,10 @@ train_r2 = r2_score(y_train, train_preds_original)
 test_r2 = r2_score(y_test, test_preds_original)
 
 # Calculate coverage
-train_lower = scaler_output.inverse_transform(train_preds['lower_90'].reshape(-1, 1)).ravel()
-train_upper = scaler_output.inverse_transform(train_preds['upper_90'].reshape(-1, 1)).ravel()
-test_lower = scaler_output.inverse_transform(test_preds['lower_90'].reshape(-1, 1)).ravel()
-test_upper = scaler_output.inverse_transform(test_preds['upper_90'].reshape(-1, 1)).ravel()
+train_lower = scaler_output.inverse_transform(train_preds["lower_90"].reshape(-1, 1)).ravel()
+train_upper = scaler_output.inverse_transform(train_preds["upper_90"].reshape(-1, 1)).ravel()
+test_lower = scaler_output.inverse_transform(test_preds["lower_90"].reshape(-1, 1)).ravel()
+test_upper = scaler_output.inverse_transform(test_preds["upper_90"].reshape(-1, 1)).ravel()
 
 train_coverage = np.mean((y_train >= train_lower) & (y_train <= train_upper))
 test_coverage = np.mean((y_test >= test_lower) & (y_test <= test_upper))
@@ -407,23 +416,23 @@ joblib.dump(scaler_output, output_dir / "scaler_output_pytorch.pkl")
 
 # Save metrics
 metrics = {
-    'train_mse': float(train_mse),
-    'test_mse': float(test_mse),
-    'train_r2': float(train_r2),
-    'test_r2': float(test_r2),
-    'train_coverage': float(train_coverage),
-    'test_coverage': float(test_coverage),
-    'train_uncertainty': float(train_uncertainty),
-    'test_uncertainty': float(test_uncertainty),
-    'training_time': float(training_time),
-    'latent_dim': model.latent_dim,
-    'hidden_dim': 64,
-    'features': feature_cols,
-    'conditions': condition_cols,
-    'architecture': 'proper_pytorch_vae'
+    "train_mse": float(train_mse),
+    "test_mse": float(test_mse),
+    "train_r2": float(train_r2),
+    "test_r2": float(test_r2),
+    "train_coverage": float(train_coverage),
+    "test_coverage": float(test_coverage),
+    "train_uncertainty": float(train_uncertainty),
+    "test_uncertainty": float(test_uncertainty),
+    "training_time": float(training_time),
+    "latent_dim": model.latent_dim,
+    "hidden_dim": 64,
+    "features": feature_cols,
+    "conditions": condition_cols,
+    "architecture": "proper_pytorch_vae",
 }
 
-with open(output_dir / "cvae_pytorch_metrics.json", 'w') as f:
+with open(output_dir / "cvae_pytorch_metrics.json", "w") as f:
     json.dump(metrics, f, indent=2)
 
 print(f"\n[+] Model saved to {output_dir}/best_model.pt")

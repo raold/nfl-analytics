@@ -45,8 +45,7 @@ from collections import OrderedDict
 from typing import Any
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -95,9 +94,7 @@ class FeatureCache:
             "ttl_expirations": 0,
         }
 
-        logger.info(
-            f"FeatureCache initialized: max_size={max_size:,}, ttl={ttl_seconds}s"
-        )
+        logger.info(f"FeatureCache initialized: max_size={max_size:,}, ttl={ttl_seconds}s")
 
     @staticmethod
     def _make_key(player_id: str, season: int, week: int, query_type: str = "features") -> str:
@@ -114,14 +111,10 @@ class FeatureCache:
             SHA256 hash of key components
         """
         key_str = f"{player_id}:{season}:{week}:{query_type}"
-        return hashlib.sha256(key_str.encode('utf-8')).hexdigest()
+        return hashlib.sha256(key_str.encode("utf-8")).hexdigest()
 
     def get(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        query_type: str = "features"
+        self, player_id: str, season: int, week: int, query_type: str = "features"
     ) -> Any | None:
         """
         Get cached features.
@@ -161,14 +154,7 @@ class FeatureCache:
 
             return value
 
-    def set(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        value: Any,
-        query_type: str = "features"
-    ):
+    def set(self, player_id: str, season: int, week: int, value: Any, query_type: str = "features"):
         """
         Cache features.
 
@@ -192,13 +178,7 @@ class FeatureCache:
             # Store with timestamp
             self.cache[key] = (value, time.time())
 
-    def exists(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        query_type: str = "features"
-    ) -> bool:
+    def exists(self, player_id: str, season: int, week: int, query_type: str = "features") -> bool:
         """
         Check if key exists in cache (without retrieving value).
 
@@ -312,9 +292,9 @@ def get_default_cache(max_size: int = 10000, ttl_seconds: int = 3600) -> Feature
 if __name__ == "__main__":
     # Test feature cache
 
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("FEATURE CACHE TEST")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     cache = FeatureCache(max_size=100, ttl_seconds=10)
 

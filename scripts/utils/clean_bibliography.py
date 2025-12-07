@@ -15,22 +15,23 @@ def get_cited_keys(tex_dir):
 
     for tex_file in tex_files:
         try:
-            with open(tex_file, encoding='utf-8') as f:
+            with open(tex_file, encoding="utf-8") as f:
                 content = f.read()
 
             # Find all citations
-            citations = re.findall(r'\\cite[pt]?\{([^}]+)\}', content)
+            citations = re.findall(r"\\cite[pt]?\{([^}]+)\}", content)
             for citation_list in citations:
-                for key in citation_list.split(','):
+                for key in citation_list.split(","):
                     cited_keys.add(key.strip())
         except:
             pass
 
     return cited_keys
 
+
 def parse_bib_entries(bib_path):
     """Parse BibTeX file into individual entries."""
-    with open(bib_path, encoding='utf-8') as f:
+    with open(bib_path, encoding="utf-8") as f:
         content = f.read()
 
     # Split into entries
@@ -39,34 +40,37 @@ def parse_bib_entries(bib_path):
     in_entry = False
     brace_count = 0
 
-    for line in content.split('\n'):
-        if line.strip().startswith('@'):
+    for line in content.split("\n"):
+        if line.strip().startswith("@"):
             if current_entry:
-                entries.append('\n'.join(current_entry))
+                entries.append("\n".join(current_entry))
             current_entry = [line]
             in_entry = True
-            brace_count = line.count('{') - line.count('}')
+            brace_count = line.count("{") - line.count("}")
         elif in_entry:
             current_entry.append(line)
-            brace_count += line.count('{') - line.count('}')
-            if brace_count == 0 and line.strip().endswith('}'):
-                entries.append('\n'.join(current_entry))
+            brace_count += line.count("{") - line.count("}")
+            if brace_count == 0 and line.strip().endswith("}"):
+                entries.append("\n".join(current_entry))
                 current_entry = []
                 in_entry = False
 
     if current_entry:
-        entries.append('\n'.join(current_entry))
+        entries.append("\n".join(current_entry))
 
     return entries
 
+
 def extract_entry_key(entry):
     """Extract the citation key from a BibTeX entry."""
-    match = re.search(r'@\w+\{([^,]+),', entry)
+    match = re.search(r"@\w+\{([^,]+),", entry)
     return match.group(1) if match else None
+
 
 def has_doi(entry):
     """Check if entry has DOI field."""
-    return bool(re.search(r'^\s*doi\s*=', entry, re.MULTILINE | re.IGNORECASE))
+    return bool(re.search(r"^\s*doi\s*=", entry, re.MULTILINE | re.IGNORECASE))
+
 
 def main():
     bib_path = Path("analysis/dissertation/references.bib")
@@ -112,17 +116,17 @@ def main():
             print(f"  - {key}")
 
     # Create cleaned bibliography
-    cleaned_bib = '\n\n'.join(used_entries)
+    cleaned_bib = "\n\n".join(used_entries)
 
     # Backup original
-    backup_path = bib_path.with_suffix('.bib.backup')
+    backup_path = bib_path.with_suffix(".bib.backup")
     with open(bib_path) as f:
-        with open(backup_path, 'w') as f_backup:
+        with open(backup_path, "w") as f_backup:
             f_backup.write(f.read())
     print(f"\n✓ Backed up original to {backup_path}")
 
     # Write cleaned bibliography
-    with open(bib_path, 'w', encoding='utf-8') as f:
+    with open(bib_path, "w", encoding="utf-8") as f:
         f.write(cleaned_bib)
 
     print(f"✓ Wrote cleaned bibliography ({len(used_entries)} entries)")
@@ -136,6 +140,7 @@ def main():
             print(f"  ... and {len(entries_without_doi) - 10} more")
 
     return entries_without_doi
+
 
 if __name__ == "__main__":
     main()

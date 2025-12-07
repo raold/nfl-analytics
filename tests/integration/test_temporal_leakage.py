@@ -29,7 +29,7 @@ DB_CONFIG = {
     "port": 5544,
     "dbname": "devdb01",
     "user": "dro",
-    "password": "sicillionbillions"
+    "password": "sicillionbillions",
 }
 
 # Feature engineering modules to check
@@ -75,17 +75,17 @@ class TestTemporalLeakage:
             df = pd.read_sql_query(query, conn)
 
         # Target: home team covers spread
-        df['home_margin'] = df['home_score'] - df['away_score']
-        df['home_covers'] = df['home_margin'] > df['spread_close']
+        df["home_margin"] = df["home_score"] - df["away_score"]
+        df["home_covers"] = df["home_margin"] > df["spread_close"]
 
         # Train/test split
-        train_mask = df['season'] <= 2023
-        test_mask = df['season'] == 2024
+        train_mask = df["season"] <= 2023
+        test_mask = df["season"] == 2024
 
-        X_train = df.loc[train_mask, ['spread_close']].values
-        y_train = df.loc[train_mask, 'home_covers'].values
-        X_test = df.loc[test_mask, ['spread_close']].values
-        y_test = df.loc[test_mask, 'home_covers'].values
+        X_train = df.loc[train_mask, ["spread_close"]].values
+        y_train = df.loc[train_mask, "home_covers"].values
+        X_test = df.loc[test_mask, ["spread_close"]].values
+        y_test = df.loc[test_mask, "home_covers"].values
 
         # Train simple logistic regression
         model = LogisticRegression(random_state=42)
@@ -127,13 +127,17 @@ class TestTemporalLeakage:
             df = pd.read_sql_query(query, conn)
 
         forbidden_patterns = [
-            'implied_prob', 'implied_probability',
-            'market_vig', 'market_efficiency',
-            'closing_line_value', 'clv',
-            'sharp_money', 'line_value'
+            "implied_prob",
+            "implied_probability",
+            "market_vig",
+            "market_efficiency",
+            "closing_line_value",
+            "clv",
+            "sharp_money",
+            "line_value",
         ]
 
-        for col in df['column_name']:
+        for col in df["column_name"]:
             for pattern in forbidden_patterns:
                 assert pattern not in col.lower(), (
                     f"Found suspicious vegas-derived feature: '{col}'. "
@@ -156,8 +160,8 @@ class TestTemporalLeakage:
                 content = f.read()
 
             # Find all rolling operations
-            rolling_pattern = r'\.rolling\('
-            expanding_pattern = r'\.expanding\('
+            rolling_pattern = r"\.rolling\("
+            expanding_pattern = r"\.expanding\("
 
             rolling_matches = list(re.finditer(rolling_pattern, content))
             expanding_matches = list(re.finditer(expanding_pattern, content))
@@ -165,12 +169,12 @@ class TestTemporalLeakage:
             for match in rolling_matches + expanding_matches:
                 # Get context (150 chars before to capture lambda patterns)
                 start = max(0, match.start() - 150)
-                context = content[start:match.end()]
+                context = content[start : match.end()]
 
                 # Check if .shift(1) appears before the rolling/expanding
                 # OR if it's inside a lambda (which applies shift inside)
-                has_shift = '.shift(1)' in context or '.shift(1, fill_value=' in context
-                is_lambda_pattern = 'lambda' in context and '.shift(' in context
+                has_shift = ".shift(1)" in context or ".shift(1, fill_value=" in context
+                is_lambda_pattern = "lambda" in context and ".shift(" in context
 
                 assert has_shift or is_lambda_pattern, (
                     f"Found rolling/expanding operation without .shift(1) in {module_path}:\n"
@@ -197,16 +201,20 @@ class TestTemporalLeakage:
             df = pd.read_sql_query(query, conn)
 
         forbidden_patterns = [
-            'score', 'winner', 'result',
-            'actual_', 'outcome',
-            'game_result', 'final_score'
+            "score",
+            "winner",
+            "result",
+            "actual_",
+            "outcome",
+            "game_result",
+            "final_score",
         ]
 
-        for col in df['column_name']:
+        for col in df["column_name"]:
             for pattern in forbidden_patterns:
                 if pattern in col.lower():
                     # Exception: historical aggregates are OK (avg_, prev_, rolling_)
-                    historical_prefixes = ['avg_', 'prev_', 'rolling_', 'l3_', 'l5_', 'last_']
+                    historical_prefixes = ["avg_", "prev_", "rolling_", "l3_", "l5_", "last_"]
                     if any(prefix in col.lower() for prefix in historical_prefixes):
                         continue
 
@@ -232,7 +240,7 @@ class TestTemporalLeakage:
         with psycopg.connect(**DB_CONFIG) as conn:
             result = pd.read_sql_query(query, conn)
 
-        null_count = result['null_count'].iloc[0]
+        null_count = result["null_count"].iloc[0]
         assert null_count == 0, (
             f"Found {null_count} games with NULL kickoff times. "
             f"This breaks temporal ordering for rolling features."
@@ -255,13 +263,13 @@ class TestTemporalLeakage:
         with psycopg.connect(**DB_CONFIG) as conn:
             df = pd.read_sql_query(query, conn)
 
-        for season in df['season'].unique():
-            season_df = df[df['season'] == season]
-            weeks = sorted(season_df['week'].unique())
+        for season in df["season"].unique():
+            season_df = df[df["season"] == season]
+            weeks = sorted(season_df["week"].unique())
 
             # Check weeks are sequential (allowing for gaps like bye weeks)
             for i in range(len(weeks) - 1):
-                week_gap = weeks[i+1] - weeks[i]
+                week_gap = weeks[i + 1] - weeks[i]
                 assert week_gap <= 2, (
                     f"Season {season} has non-sequential weeks: {weeks[i]} -> {weeks[i+1]}. "
                     f"Gap of {week_gap} weeks detected."
@@ -287,9 +295,9 @@ class TestTemporalLeakage:
         # Pattern 1: Dangerous direct outcome references in ASSIGNMENTS (df['feature'] = ...)
         # SQL queries can SELECT scores for label creation (that's OK)
         dangerous_patterns = [
-            r'df\[.*\]\s*=\s*.*score',  # Assignment with score
-            r'df\[.*\]\s*=\s*.*winner',  # Assignment with winner
-            r'df\[.*\]\s*=\s*.*\.game_result',  # Assignment with game_result
+            r"df\[.*\]\s*=\s*.*score",  # Assignment with score
+            r"df\[.*\]\s*=\s*.*winner",  # Assignment with winner
+            r"df\[.*\]\s*=\s*.*\.game_result",  # Assignment with game_result
         ]
 
         for pattern in dangerous_patterns:
@@ -305,14 +313,14 @@ class TestTemporalLeakage:
                 # 2. outcome/label calculation
                 # 3. SQL query (not an assignment)
                 safe_indicators = [
-                    '.shift(',
-                    'outcome',
-                    'label',
-                    'target',
-                    'margin',  # Score difference is OK for labels
-                    'SELECT',  # SQL queries are OK
-                    'g.home_score',  # SQL column reference
-                    'g.away_score'  # SQL column reference
+                    ".shift(",
+                    "outcome",
+                    "label",
+                    "target",
+                    "margin",  # Score difference is OK for labels
+                    "SELECT",  # SQL queries are OK
+                    "g.home_score",  # SQL column reference
+                    "g.away_score",  # SQL column reference
                 ]
 
                 if not any(indicator in context for indicator in safe_indicators):
@@ -366,7 +374,7 @@ class TestFeatureIntegrity:
             with psycopg.connect(**DB_CONFIG) as conn:
                 result = pd.read_sql_query(query, conn)
 
-            prior_count = result['prior_game_count'].iloc[0]
+            prior_count = result["prior_game_count"].iloc[0]
 
             # Should have at least 1 prior game for rolling features
             assert prior_count >= 1, (
@@ -397,11 +405,11 @@ class TestFeatureIntegrity:
             df = pd.read_sql_query(query, conn)
 
         # Calculate covers using correct convention
-        df['home_margin'] = df['home_score'] - df['away_score']
-        df['home_covers'] = df['home_margin'] > df['spread_close']
+        df["home_margin"] = df["home_score"] - df["away_score"]
+        df["home_covers"] = df["home_margin"] > df["spread_close"]
 
         # Sanity check: roughly 50% should cover (efficient market)
-        cover_pct = df['home_covers'].mean()
+        cover_pct = df["home_covers"].mean()
 
         assert 0.40 <= cover_pct <= 0.60, (
             f"Home cover rate is {cover_pct:.1%}, which is outside expected range (40-60%). "

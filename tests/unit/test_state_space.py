@@ -25,7 +25,6 @@ def test_get_connection_basic():
     assert result is not None
 
 
-
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
@@ -38,12 +37,10 @@ def test_get_connection_edge_cases():
     assert result is not None
 
 
-
 def test_get_connection_error_handling():
     """Test get_connection error handling."""
     with pytest.raises(ValueError):
         get_connection(invalid_input)
-
 
 
 def test_fetch_games_basic():
@@ -58,7 +55,6 @@ def test_fetch_games_basic():
     assert result is not None
 
 
-
 def test_fetch_games_edge_cases():
     """Test fetch_games: edge cases."""
     # Arrange
@@ -71,12 +67,10 @@ def test_fetch_games_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_games_error_handling():
     """Test fetch_games error handling."""
     with pytest.raises(ValueError):
         fetch_games(invalid_input)
-
 
 
 @given(st.integers())
@@ -87,7 +81,6 @@ def test_fetch_games_property_idempotent(self, seasons):
 
     # Assert property
     assert fetch_games(seasons) == result, "idempotent violated"
-
 
 
 def test_evaluate_model_basic():
@@ -102,7 +95,6 @@ def test_evaluate_model_basic():
     assert result is not None
 
 
-
 def test_evaluate_model_edge_cases():
     """Test evaluate_model: edge cases."""
     # Arrange
@@ -115,12 +107,10 @@ def test_evaluate_model_edge_cases():
     assert result is not None
 
 
-
 def test_evaluate_model_error_handling():
     """Test evaluate_model error handling."""
     with pytest.raises(ValueError):
         evaluate_model(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -131,7 +121,6 @@ def test_evaluate_model_property_idempotent(self, model, df):
 
     # Assert property
     assert evaluate_model(model, df) == result, "idempotent violated"
-
 
 
 def test_parse_args_basic():
@@ -146,7 +135,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -159,12 +147,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_main_basic():
@@ -179,7 +165,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -192,12 +177,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_initialize_team_basic():
@@ -212,7 +195,6 @@ def test_initialize_team_basic():
     assert result is not None
 
 
-
 def test_initialize_team_edge_cases():
     """Test initialize_team: edge cases."""
     # Arrange
@@ -225,12 +207,10 @@ def test_initialize_team_edge_cases():
     assert result is not None
 
 
-
 def test_initialize_team_error_handling():
     """Test initialize_team error handling."""
     with pytest.raises(ValueError):
         initialize_team(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -241,7 +221,6 @@ def test_initialize_team_property_idempotent(self, self, team):
 
     # Assert property
     assert initialize_team(self, team) == result, "idempotent violated"
-
 
 
 def test_predict_step_basic():
@@ -256,7 +235,6 @@ def test_predict_step_basic():
     assert result is not None
 
 
-
 def test_predict_step_edge_cases():
     """Test predict_step: edge cases."""
     # Arrange
@@ -269,12 +247,10 @@ def test_predict_step_edge_cases():
     assert result is not None
 
 
-
 def test_predict_step_error_handling():
     """Test predict_step error handling."""
     with pytest.raises(ValueError):
         predict_step(invalid_input)
-
 
 
 @given(st.integers())
@@ -285,7 +261,6 @@ def test_predict_step_property_idempotent(val):
 
     # Assert property
     assert predict_step(val) == result, "idempotent violated"
-
 
 
 def test_update_game_basic():
@@ -300,7 +275,6 @@ def test_update_game_basic():
     assert result is not None
 
 
-
 def test_update_game_edge_cases():
     """Test update_game: edge cases."""
     # Arrange
@@ -313,12 +287,10 @@ def test_update_game_edge_cases():
     assert result is not None
 
 
-
 def test_update_game_error_handling():
     """Test update_game error handling."""
     with pytest.raises(ValueError):
         update_game(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -331,25 +303,17 @@ def test_update_game_property_idempotent(self, self, home_team, away_team, margi
     assert update_game(self, home_team, away_team, margin) == result, "idempotent violated"
 
 
-
 def test_update_game_no_temporal_leakage():
     """Ensure update_game doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = update_game(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"
 
 
 def test_fit_basic():
@@ -364,7 +328,6 @@ def test_fit_basic():
     assert result is not None
 
 
-
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
@@ -377,12 +340,10 @@ def test_fit_edge_cases():
     assert result is not None
 
 
-
 def test_fit_error_handling():
     """Test fit error handling."""
     with pytest.raises(ValueError):
         fit(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -393,7 +354,6 @@ def test_fit_property_idempotent(self, self, df):
 
     # Assert property
     assert fit(self, df) == result, "idempotent violated"
-
 
 
 def test_predict_margin_basic():
@@ -408,7 +368,6 @@ def test_predict_margin_basic():
     assert result is not None
 
 
-
 def test_predict_margin_edge_cases():
     """Test predict_margin: edge cases."""
     # Arrange
@@ -421,12 +380,10 @@ def test_predict_margin_edge_cases():
     assert result is not None
 
 
-
 def test_predict_margin_error_handling():
     """Test predict_margin error handling."""
     with pytest.raises(ValueError):
         predict_margin(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -437,7 +394,6 @@ def test_predict_margin_property_idempotent(self, self, home_team, away_team):
 
     # Assert property
     assert predict_margin(self, home_team, away_team) == result, "idempotent violated"
-
 
 
 def test_predict_prob_home_win_basic():
@@ -452,7 +408,6 @@ def test_predict_prob_home_win_basic():
     assert result is not None
 
 
-
 def test_predict_prob_home_win_edge_cases():
     """Test predict_prob_home_win: edge cases."""
     # Arrange
@@ -465,12 +420,10 @@ def test_predict_prob_home_win_edge_cases():
     assert result is not None
 
 
-
 def test_predict_prob_home_win_error_handling():
     """Test predict_prob_home_win error handling."""
     with pytest.raises(ValueError):
         predict_prob_home_win(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -481,7 +434,6 @@ def test_predict_prob_home_win_property_idempotent(self, self, home_team, away_t
 
     # Assert property
     assert predict_prob_home_win(self, home_team, away_team) == result, "idempotent violated"
-
 
 
 def test_predict_prob_ats_basic():
@@ -496,7 +448,6 @@ def test_predict_prob_ats_basic():
     assert result is not None
 
 
-
 def test_predict_prob_ats_edge_cases():
     """Test predict_prob_ats: edge cases."""
     # Arrange
@@ -509,12 +460,10 @@ def test_predict_prob_ats_edge_cases():
     assert result is not None
 
 
-
 def test_predict_prob_ats_error_handling():
     """Test predict_prob_ats error handling."""
     with pytest.raises(ValueError):
         predict_prob_ats(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -525,7 +474,6 @@ def test_predict_prob_ats_property_idempotent(self, self, home_team, away_team, 
 
     # Assert property
     assert predict_prob_ats(self, home_team, away_team, spread) == result, "idempotent violated"
-
 
 
 def test_get_ratings_df_basic():
@@ -540,7 +488,6 @@ def test_get_ratings_df_basic():
     assert result is not None
 
 
-
 def test_get_ratings_df_edge_cases():
     """Test get_ratings_df: edge cases."""
     # Arrange
@@ -553,12 +500,10 @@ def test_get_ratings_df_edge_cases():
     assert result is not None
 
 
-
 def test_get_ratings_df_error_handling():
     """Test get_ratings_df error handling."""
     with pytest.raises(ValueError):
         get_ratings_df(invalid_input)
-
 
 
 @given(st.integers())
@@ -569,4 +514,3 @@ def test_get_ratings_df_property_idempotent(val):
 
     # Assert property
     assert get_ratings_df(val) == result, "idempotent violated"
-

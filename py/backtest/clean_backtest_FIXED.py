@@ -13,7 +13,7 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 print("=" * 70)
 print(" FIXED HISTORICAL BACKTEST (NULL KICKOFF FIX APPLIED) ".center(70))
@@ -25,7 +25,9 @@ features_path = Path("data/processed/features/asof_FIXED_v2.csv")
 
 if not features_path.exists():
     print(f"[FAIL] Features not found at {features_path}")
-    print("Run: bash -c 'source .venv/Scripts/activate && export PYTHONPATH=. && python py/features/asof_features.py --output data/processed/features/asof_FIXED_v2.csv --season-start 1999 --season-end 2024 --validate'")
+    print(
+        "Run: bash -c 'source .venv/Scripts/activate && export PYTHONPATH=. && python py/features/asof_features.py --output data/processed/features/asof_FIXED_v2.csv --season-start 1999 --season-end 2024 --validate'"
+    )
     exit(1)
 
 df = pd.read_csv(features_path)
@@ -33,20 +35,20 @@ print(f"[OK] Loaded {len(df):,} games with FIXED features")
 print(f"[OK] Years: {df.season.min()}-{df.season.max()}")
 
 # Filter to games with betting lines and outcomes
-df = df[df['spread_close'].notna() & df['home_cover'].notna()].copy()
+df = df[df["spread_close"].notna() & df["home_cover"].notna()].copy()
 print(f"[OK] Games with spreads: {len(df):,}")
 
 # Select CLEAN pre-game features only
 clean_feature_cols = [
-    'spread_close',
-    'total_close',
-    'prior_epa_mean_diff',
-    'epa_pp_last3_diff',
-    'margin_last3_diff',
-    'prior_win_pct_diff',
-    'rest_diff',
-    'qb_change_diff',
-    'coach_change_diff',
+    "spread_close",
+    "total_close",
+    "prior_epa_mean_diff",
+    "epa_pp_last3_diff",
+    "margin_last3_diff",
+    "prior_win_pct_diff",
+    "rest_diff",
+    "qb_change_diff",
+    "coach_change_diff",
 ]
 
 available_cols = [c for c in clean_feature_cols if c in df.columns]
@@ -55,12 +57,12 @@ print(f"[OK] Features: {', '.join(available_cols)}")
 
 # Prepare data
 X = df[available_cols].fillna(0).values
-y_cover = df['home_cover'].astype(int).values
+y_cover = df["home_cover"].astype(int).values
 
 # Train/test split
 test_start_season = 2020
-train_mask = df['season'] < test_start_season
-test_mask = df['season'] >= test_start_season
+train_mask = df["season"] < test_start_season
+test_mask = df["season"] >= test_start_season
 
 print(f"\n[OK] Train: {train_mask.sum():,} games (pre-{test_start_season})")
 print(f"[OK] Test:  {test_mask.sum():,} games ({test_start_season}+)")
@@ -116,18 +118,18 @@ else:
 
 # Save results
 results = {
-    'test_accuracy': float(test_acc),
-    'train_accuracy': float(train_acc),
-    'original_accuracy': 0.624,
-    'improvement_pp': float(test_acc - 0.624),
-    'test_games': int(test_mask.sum()),
-    'features_used': available_cols,
+    "test_accuracy": float(test_acc),
+    "train_accuracy": float(train_acc),
+    "original_accuracy": 0.624,
+    "improvement_pp": float(test_acc - 0.624),
+    "test_games": int(test_mask.sum()),
+    "features_used": available_cols,
 }
 
 output_dir = Path("analysis/backtest")
 output_dir.mkdir(parents=True, exist_ok=True)
 
-with open(output_dir / "fixed_backtest_results.json", 'w') as f:
+with open(output_dir / "fixed_backtest_results.json", "w") as f:
     json.dump(results, f, indent=2)
 
 print(f"\n[DONE] Results saved to {output_dir}/fixed_backtest_results.json")

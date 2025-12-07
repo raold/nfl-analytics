@@ -39,16 +39,16 @@ logger = logging.getLogger(__name__)
 
 def demo_basic_usage():
     """Demonstrate basic feature extraction for a single game."""
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("DEMO 1: Basic Usage - Single Game Feature Extraction")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     # Initialize extractor
     extractor = GameFeatureExtractor()
 
     # Extract features for 2025 Week 12: HOU @ BUF
-    home_team = 'BUF'
-    away_team = 'HOU'
+    home_team = "BUF"
+    away_team = "HOU"
     season = 2025
     week = 12
 
@@ -71,14 +71,24 @@ def demo_basic_usage():
 
     # Defensive strength
     logger.info("\nDEFENSIVE STRENGTH:")
-    logger.info(f"  Home (BUF) EPA allowed/play: {features['home_def_def_epa_allowed_per_play']:.4f}")
-    logger.info(f"  Away (HOU) EPA allowed/play: {features['away_def_def_epa_allowed_per_play']:.4f}")
+    logger.info(
+        f"  Home (BUF) EPA allowed/play: {features['home_def_def_epa_allowed_per_play']:.4f}"
+    )
+    logger.info(
+        f"  Away (HOU) EPA allowed/play: {features['away_def_def_epa_allowed_per_play']:.4f}"
+    )
 
     # Matchup dynamics
     logger.info("\nMATCHUP DYNAMICS:")
-    logger.info(f"  Offensive mismatch: {features['offensive_mismatch']:.4f} (positive = home advantage)")
-    logger.info(f"  Defensive mismatch: {features['defensive_mismatch']:.4f} (positive = away advantage)")
-    logger.info(f"  Pace difference: {features['pace_difference']:.1f} plays/game (positive = home faster)")
+    logger.info(
+        f"  Offensive mismatch: {features['offensive_mismatch']:.4f} (positive = home advantage)"
+    )
+    logger.info(
+        f"  Defensive mismatch: {features['defensive_mismatch']:.4f} (positive = away advantage)"
+    )
+    logger.info(
+        f"  Pace difference: {features['pace_difference']:.1f} plays/game (positive = home faster)"
+    )
 
     return features
 
@@ -89,9 +99,9 @@ def demo_integration_with_predictor(features: dict):
 
     Shows the replacement logic for _get_defensive_epa() method.
     """
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("DEMO 2: Integration with GameOutcomePredictor")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     # OLD approach (GameOutcomePredictor v1.0.0)
     logger.info("OLD APPROACH (v1.0.0):")
@@ -101,8 +111,8 @@ def demo_integration_with_predictor(features: dict):
     logger.info("3. Manual SQL queries in predictor\n")
 
     # Simulate old approach
-    away_def_epa_old = features['away_def_def_epa_allowed_per_play']
-    home_def_epa_old = features['home_def_def_epa_allowed_per_play']
+    away_def_epa_old = features["away_def_def_epa_allowed_per_play"]
+    home_def_epa_old = features["home_def_def_epa_allowed_per_play"]
 
     logger.info(f"  away_def_epa = {away_def_epa_old:.4f}")
     logger.info(f"  home_def_epa = {home_def_epa_old:.4f}\n")
@@ -131,8 +141,12 @@ def demo_integration_with_predictor(features: dict):
     home_score_old = 10 + (home_qb_yards / 20) + (-5 * away_def_epa_old)
     away_score_old = 10 + (away_qb_yards / 20) + (-5 * home_def_epa_old)
 
-    logger.info(f"Home (BUF) Score: 10 + ({home_qb_yards}/20) + (-5 * {away_def_epa_old:.4f}) = {home_score_old:.1f}")
-    logger.info(f"Away (HOU) Score: 10 + ({away_qb_yards}/20) + (-5 * {home_def_epa_old:.4f}) = {away_score_old:.1f}")
+    logger.info(
+        f"Home (BUF) Score: 10 + ({home_qb_yards}/20) + (-5 * {away_def_epa_old:.4f}) = {home_score_old:.1f}"
+    )
+    logger.info(
+        f"Away (HOU) Score: 10 + ({away_qb_yards}/20) + (-5 * {home_def_epa_old:.4f}) = {away_score_old:.1f}"
+    )
 
     # NEW: Enhanced adjustment with multiple defensive features
     logger.info("\nNEW FORMULA (enhanced with GameFeatureExtractor):")
@@ -145,15 +159,15 @@ def demo_integration_with_predictor(features: dict):
     # Home score with enhanced features
     home_base = 10 + (home_qb_yards / 20)
     home_def_adj = -5 * away_def_epa_old
-    home_pressure_pen = -2 * features['away_def_def_pressure_rate']
-    home_redzone_bonus = 3 * (1 - features['away_def_def_red_zone_td_rate_allowed'])
+    home_pressure_pen = -2 * features["away_def_def_pressure_rate"]
+    home_redzone_bonus = 3 * (1 - features["away_def_def_red_zone_td_rate_allowed"])
     home_score_new = home_base + home_def_adj + home_pressure_pen + home_redzone_bonus
 
     # Away score with enhanced features
     away_base = 10 + (away_qb_yards / 20)
     away_def_adj = -5 * home_def_epa_old
-    away_pressure_pen = -2 * features['home_def_def_pressure_rate']
-    away_redzone_bonus = 3 * (1 - features['home_def_def_red_zone_td_rate_allowed'])
+    away_pressure_pen = -2 * features["home_def_def_pressure_rate"]
+    away_redzone_bonus = 3 * (1 - features["home_def_def_red_zone_td_rate_allowed"])
     away_score_new = away_base + away_def_adj + away_pressure_pen + away_redzone_bonus
 
     logger.info("Home (BUF) Score:")
@@ -172,29 +186,40 @@ def demo_integration_with_predictor(features: dict):
 
     # Comparison
     logger.info("COMPARISON:")
-    logger.info(f"  Old Home Score: {home_score_old:.1f} → New: {home_score_new:.1f} (Δ {home_score_new - home_score_old:+.1f})")
-    logger.info(f"  Old Away Score: {away_score_old:.1f} → New: {away_score_new:.1f} (Δ {away_score_new - away_score_old:+.1f})")
-    logger.info(f"  Old Spread: {home_score_old - away_score_old:+.1f} → New: {home_score_new - away_score_new:+.1f}")
-    logger.info(f"  Old Total: {home_score_old + away_score_old:.1f} → New: {home_score_new + away_score_new:.1f}\n")
+    logger.info(
+        f"  Old Home Score: {home_score_old:.1f} → New: {home_score_new:.1f} (Δ {home_score_new - home_score_old:+.1f})"
+    )
+    logger.info(
+        f"  Old Away Score: {away_score_old:.1f} → New: {away_score_new:.1f} (Δ {away_score_new - away_score_old:+.1f})"
+    )
+    logger.info(
+        f"  Old Spread: {home_score_old - away_score_old:+.1f} → New: {home_score_new - away_score_new:+.1f}"
+    )
+    logger.info(
+        f"  Old Total: {home_score_old + away_score_old:.1f} → New: {home_score_new + away_score_new:.1f}\n"
+    )
 
 
 def demo_code_replacement():
     """Show exact code replacement for GameOutcomePredictor."""
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("DEMO 3: Code Replacement Example")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     logger.info("STEP 1: Add GameFeatureExtractor to __init__")
     logger.info("-" * 80)
-    print("""
+    print(
+        """
 def __init__(self):
     self.ensemble = EnhancedEnsemble5Way()
     self.feature_extractor = GameFeatureExtractor()  # ADD THIS LINE
-""")
+"""
+    )
 
     logger.info("\nSTEP 2: Replace _get_defensive_epa() with extract_game_features()")
     logger.info("-" * 80)
-    print("""
+    print(
+        """
 # OLD CODE (REMOVE):
 away_def_epa = self._get_defensive_epa(away_team, season, week, conn)
 home_def_epa = self._get_defensive_epa(home_team, season, week, conn)
@@ -214,11 +239,13 @@ home_def_pressure_rate = game_features['home_def_def_pressure_rate']
 offensive_mismatch = game_features['offensive_mismatch']
 defensive_mismatch = game_features['defensive_mismatch']
 pace_difference = game_features['pace_difference']
-""")
+"""
+    )
 
     logger.info("\nSTEP 3: Update _yards_to_score() to use additional features")
     logger.info("-" * 80)
-    print("""
+    print(
+        """
 def _yards_to_score(self, qb_yards: float, opponent_features: dict) -> float:
     '''Convert QB yards to team score with enhanced defensive features.'''
 
@@ -232,18 +259,19 @@ def _yards_to_score(self, qb_yards: float, opponent_features: dict) -> float:
 
     team_score = base_score + def_epa_adj + pressure_penalty + redzone_bonus
     return team_score
-""")
+"""
+    )
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("✓ Integration Complete")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
 
 def main():
     """Run all demos."""
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("GameFeatureExtractor Integration Demo")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Demo 1: Basic usage
     features = demo_basic_usage()
@@ -254,9 +282,9 @@ def main():
     # Demo 3: Code replacement
     demo_code_replacement()
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("All Demos Complete")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
 
 if __name__ == "__main__":

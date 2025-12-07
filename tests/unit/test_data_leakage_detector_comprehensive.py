@@ -45,19 +45,21 @@ def clean_dataframe() -> pd.DataFrame:
     np.random.seed(42)
     n = 1000
 
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=n, freq='D'),
-        'player_id': np.random.randint(1, 100, n),
-        'passing_yards': np.random.randint(100, 400, n),
-        'completions': np.random.randint(10, 30, n),
-        'attempts': np.random.randint(20, 50, n),
-        'defense_rank': np.random.randint(1, 32, n),
-        'weather_temp': np.random.randint(30, 90, n),
-    })
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=n, freq="D"),
+            "player_id": np.random.randint(1, 100, n),
+            "passing_yards": np.random.randint(100, 400, n),
+            "completions": np.random.randint(10, 30, n),
+            "attempts": np.random.randint(20, 50, n),
+            "defense_rank": np.random.randint(1, 32, n),
+            "weather_temp": np.random.randint(30, 90, n),
+        }
+    )
 
     # Add legitimate features
-    df['completion_pct'] = df['completions'] / df['attempts']
-    df['yards_per_attempt'] = df['passing_yards'] / df['attempts']
+    df["completion_pct"] = df["completions"] / df["attempts"]
+    df["yards_per_attempt"] = df["passing_yards"] / df["attempts"]
 
     return df
 
@@ -68,26 +70,28 @@ def leaky_dataframe() -> pd.DataFrame:
     np.random.seed(42)
     n = 1000
 
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=n, freq='D'),
-        'player_id': np.random.randint(1, 100, n),
-        'passing_yards': np.random.randint(100, 400, n),
-    })
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=n, freq="D"),
+            "player_id": np.random.randint(1, 100, n),
+            "passing_yards": np.random.randint(100, 400, n),
+        }
+    )
 
     # LEAKAGE 1: Perfect correlation (target leakage)
-    df['actual_passing_yards_shifted'] = df['passing_yards']
+    df["actual_passing_yards_shifted"] = df["passing_yards"]
 
     # LEAKAGE 2: Near-perfect correlation
-    df['yards_plus_noise'] = df['passing_yards'] * 0.98 + np.random.randn(n)
+    df["yards_plus_noise"] = df["passing_yards"] * 0.98 + np.random.randn(n)
 
     # LEAKAGE 3: Suspicious column name
-    df['final_result'] = np.random.choice(['W', 'L'], n)
+    df["final_result"] = np.random.choice(["W", "L"], n)
 
     # LEAKAGE 4: Future dates
-    df.loc[df.index[-10:], 'kickoff'] = datetime.now() + timedelta(days=30)
+    df.loc[df.index[-10:], "kickoff"] = datetime.now() + timedelta(days=30)
 
     # LEAKAGE 5: Zero variance column
-    df['constant_feature'] = 42
+    df["constant_feature"] = 42
 
     return df
 
@@ -97,17 +101,21 @@ def temporal_split_clean():
     """Create clean temporal train/test split."""
     np.random.seed(42)
 
-    train_df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=500, freq='D'),
-        'player_id': np.random.randint(1, 50, 500),
-        'passing_yards': np.random.randint(100, 400, 500),
-    })
+    train_df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=500, freq="D"),
+            "player_id": np.random.randint(1, 50, 500),
+            "passing_yards": np.random.randint(100, 400, 500),
+        }
+    )
 
-    test_df = pd.DataFrame({
-        'kickoff': pd.date_range('2021-06-15', periods=200, freq='D'),
-        'player_id': np.random.randint(1, 50, 200),
-        'passing_yards': np.random.randint(100, 400, 200),
-    })
+    test_df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2021-06-15", periods=200, freq="D"),
+            "player_id": np.random.randint(1, 50, 200),
+            "passing_yards": np.random.randint(100, 400, 200),
+        }
+    )
 
     return train_df, test_df
 
@@ -118,17 +126,21 @@ def temporal_split_leaky():
     np.random.seed(42)
 
     # LEAKAGE: Test dates overlap with training dates
-    train_df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=500, freq='D'),
-        'player_id': np.random.randint(1, 50, 500),
-        'passing_yards': np.random.randint(100, 400, 500),
-    })
+    train_df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=500, freq="D"),
+            "player_id": np.random.randint(1, 50, 500),
+            "passing_yards": np.random.randint(100, 400, 500),
+        }
+    )
 
-    test_df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-06-01', periods=200, freq='D'),  # Overlaps!
-        'player_id': np.random.randint(1, 50, 200),
-        'passing_yards': np.random.randint(100, 400, 200),
-    })
+    test_df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-06-01", periods=200, freq="D"),  # Overlaps!
+            "player_id": np.random.randint(1, 50, 200),
+            "passing_yards": np.random.randint(100, 400, 200),
+        }
+    )
 
     return train_df, test_df
 
@@ -155,10 +167,7 @@ def test_detector_initialization(detector):
 def test_clean_dataframe_no_issues(detector, clean_dataframe):
     """Test clean DataFrame produces no critical issues."""
     report = detector.check_dataframe(
-        clean_dataframe,
-        target_col='passing_yards',
-        date_col='kickoff',
-        player_col='player_id'
+        clean_dataframe, target_col="passing_yards", date_col="kickoff", player_col="player_id"
     )
 
     # Should have no critical issues
@@ -167,15 +176,17 @@ def test_clean_dataframe_no_issues(detector, clean_dataframe):
 
 def test_suspicious_column_detection(detector):
     """Test detection of suspicious column names."""
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=100),
-        'passing_yards': np.random.randint(100, 400, 100),
-        'actual_margin': np.random.randint(-20, 20, 100),  # Suspicious!
-        'winner': np.random.choice(['W', 'L'], 100),       # Suspicious!
-        'final_score': np.random.randint(0, 50, 100),      # Suspicious!
-    })
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=100),
+            "passing_yards": np.random.randint(100, 400, 100),
+            "actual_margin": np.random.randint(-20, 20, 100),  # Suspicious!
+            "winner": np.random.choice(["W", "L"], 100),  # Suspicious!
+            "final_score": np.random.randint(0, 50, 100),  # Suspicious!
+        }
+    )
 
-    report = detector.check_dataframe(df, target_col='passing_yards')
+    report = detector.check_dataframe(df, target_col="passing_yards")
 
     # Should detect at least 3 suspicious columns
     high_severity_issues = [i for i in report.issues if i.severity == LeakageSeverity.HIGH]
@@ -189,50 +200,56 @@ def test_suspicious_column_detection(detector):
 
 def test_perfect_correlation_detection(detector):
     """Test detection of perfect target correlation."""
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=100),
-        'passing_yards': np.random.randint(100, 400, 100),
-    })
-    df['leaked_target'] = df['passing_yards']  # Perfect correlation!
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=100),
+            "passing_yards": np.random.randint(100, 400, 100),
+        }
+    )
+    df["leaked_target"] = df["passing_yards"]  # Perfect correlation!
 
-    report = detector.check_dataframe(df, target_col='passing_yards')
+    report = detector.check_dataframe(df, target_col="passing_yards")
 
     # Should detect critical leakage
     assert report.has_critical_leakage(), "Failed to detect perfect correlation"
 
     critical_issues = [i for i in report.issues if i.severity == LeakageSeverity.CRITICAL]
-    assert any('perfect' in i.title.lower() or 'correlation' in i.title.lower()
-               for i in critical_issues), "Wrong issue type detected"
+    assert any(
+        "perfect" in i.title.lower() or "correlation" in i.title.lower() for i in critical_issues
+    ), "Wrong issue type detected"
 
 
 def test_near_perfect_correlation_detection(detector):
     """Test detection of near-perfect target correlation (> 0.95)."""
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=100),
-        'passing_yards': np.random.randint(100, 400, 100),
-    })
-    df['suspicious_feature'] = df['passing_yards'] * 0.97 + np.random.randn(100)
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=100),
+            "passing_yards": np.random.randint(100, 400, 100),
+        }
+    )
+    df["suspicious_feature"] = df["passing_yards"] * 0.97 + np.random.randn(100)
 
-    report = detector.check_dataframe(df, target_col='passing_yards')
+    report = detector.check_dataframe(df, target_col="passing_yards")
 
     # Should detect high or critical severity leakage (correlation might be > 0.99)
-    high_or_critical = [i for i in report.issues
-                        if i.severity in [LeakageSeverity.HIGH, LeakageSeverity.CRITICAL]]
+    high_or_critical = [
+        i for i in report.issues if i.severity in [LeakageSeverity.HIGH, LeakageSeverity.CRITICAL]
+    ]
     assert len(high_or_critical) > 0, "Failed to detect near-perfect correlation"
 
 
 def test_legitimate_moderate_correlation_allowed(detector, clean_dataframe):
     """Test that legitimate moderate correlations don't trigger false positives."""
     # yards_per_attempt should have moderate correlation (~0.5-0.7) but not be flagged
-    report = detector.check_dataframe(
-        clean_dataframe,
-        target_col='passing_yards'
-    )
+    report = detector.check_dataframe(clean_dataframe, target_col="passing_yards")
 
     # Should not have critical or high issues for legitimate features
-    high_or_critical = [i for i in report.issues
-                       if i.severity in [LeakageSeverity.CRITICAL, LeakageSeverity.HIGH]
-                       and 'yards_per_attempt' in i.title.lower()]
+    high_or_critical = [
+        i
+        for i in report.issues
+        if i.severity in [LeakageSeverity.CRITICAL, LeakageSeverity.HIGH]
+        and "yards_per_attempt" in i.title.lower()
+    ]
     assert len(high_or_critical) == 0, "False positive on legitimate feature"
 
 
@@ -243,38 +260,51 @@ def test_legitimate_moderate_correlation_allowed(detector, clean_dataframe):
 
 def test_future_dates_detection(detector):
     """Test detection of future dates in dataset."""
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=100),
-        'passing_yards': np.random.randint(100, 400, 100),
-    })
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=100),
+            "passing_yards": np.random.randint(100, 400, 100),
+        }
+    )
     # Add future dates
-    df.loc[df.index[-10:], 'kickoff'] = datetime.now() + timedelta(days=365)
+    df.loc[df.index[-10:], "kickoff"] = datetime.now() + timedelta(days=365)
 
-    report = detector.check_dataframe(df, target_col='passing_yards', date_col='kickoff')
+    report = detector.check_dataframe(df, target_col="passing_yards", date_col="kickoff")
 
     # Should detect high severity temporal leakage
-    temporal_issues = [i for i in report.issues
-                      if i.leakage_type == LeakageType.TEMPORAL
-                      and i.severity == LeakageSeverity.HIGH]
+    temporal_issues = [
+        i
+        for i in report.issues
+        if i.leakage_type == LeakageType.TEMPORAL and i.severity == LeakageSeverity.HIGH
+    ]
     assert len(temporal_issues) > 0, "Failed to detect future dates"
 
 
 def test_unsorted_temporal_data_detection(detector):
     """Test detection of unsorted temporal data."""
-    df = pd.DataFrame({
-        'kickoff': pd.to_datetime([
-            '2020-01-01', '2020-01-05', '2020-01-03',  # Out of order!
-            '2020-01-02', '2020-01-04'
-        ]),
-        'passing_yards': [250, 300, 275, 225, 310],
-    })
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.to_datetime(
+                [
+                    "2020-01-01",
+                    "2020-01-05",
+                    "2020-01-03",  # Out of order!
+                    "2020-01-02",
+                    "2020-01-04",
+                ]
+            ),
+            "passing_yards": [250, 300, 275, 225, 310],
+        }
+    )
 
-    report = detector.check_dataframe(df, date_col='kickoff')
+    report = detector.check_dataframe(df, date_col="kickoff")
 
     # Should detect medium severity temporal issue
-    temporal_issues = [i for i in report.issues
-                      if i.leakage_type == LeakageType.TEMPORAL
-                      and 'sorted' in i.title.lower()]
+    temporal_issues = [
+        i
+        for i in report.issues
+        if i.leakage_type == LeakageType.TEMPORAL and "sorted" in i.title.lower()
+    ]
     assert len(temporal_issues) > 0, "Failed to detect unsorted data"
 
 
@@ -282,16 +312,14 @@ def test_temporal_split_validation_clean(detector, temporal_split_clean):
     """Test that clean temporal split passes validation."""
     train_df, test_df = temporal_split_clean
 
-    report = detector.validate_split(
-        train_df, test_df,
-        date_col='kickoff',
-        player_col='player_id'
-    )
+    report = detector.validate_split(train_df, test_df, date_col="kickoff", player_col="player_id")
 
     # Should have no critical temporal leakage
-    critical_temporal = [i for i in report.issues
-                        if i.severity == LeakageSeverity.CRITICAL
-                        and i.leakage_type == LeakageType.TEMPORAL]
+    critical_temporal = [
+        i
+        for i in report.issues
+        if i.severity == LeakageSeverity.CRITICAL and i.leakage_type == LeakageType.TEMPORAL
+    ]
     assert len(critical_temporal) == 0, "False positive on clean split"
 
 
@@ -299,18 +327,16 @@ def test_temporal_split_validation_leaky(detector, temporal_split_leaky):
     """Test detection of temporal leakage in train/test split."""
     train_df, test_df = temporal_split_leaky
 
-    report = detector.validate_split(
-        train_df, test_df,
-        date_col='kickoff',
-        player_col='player_id'
-    )
+    report = detector.validate_split(train_df, test_df, date_col="kickoff", player_col="player_id")
 
     # Should detect CRITICAL temporal leakage
     assert report.has_critical_leakage(), "Failed to detect temporal split leakage"
 
-    critical_temporal = [i for i in report.issues
-                        if i.severity == LeakageSeverity.CRITICAL
-                        and i.leakage_type == LeakageType.TEMPORAL]
+    critical_temporal = [
+        i
+        for i in report.issues
+        if i.severity == LeakageSeverity.CRITICAL and i.leakage_type == LeakageType.TEMPORAL
+    ]
     assert len(critical_temporal) > 0, "Wrong issue type for temporal split leakage"
 
 
@@ -322,48 +348,47 @@ def test_temporal_split_validation_leaky(detector, temporal_split_leaky):
 def test_player_overlap_detection(detector):
     """Test detection of player overlap in train/test split."""
     # Same players in both splits (common in temporal splits)
-    train_df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=100),
-        'player_id': [1, 2, 3, 4, 5] * 20,  # Players 1-5
-        'passing_yards': np.random.randint(100, 400, 100),
-    })
-
-    test_df = pd.DataFrame({
-        'kickoff': pd.date_range('2021-01-01', periods=50),
-        'player_id': [1, 2, 3, 4, 5] * 10,  # Same players!
-        'passing_yards': np.random.randint(100, 400, 50),
-    })
-
-    report = detector.validate_split(
-        train_df, test_df,
-        date_col='kickoff',
-        player_col='player_id'
+    train_df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=100),
+            "player_id": [1, 2, 3, 4, 5] * 20,  # Players 1-5
+            "passing_yards": np.random.randint(100, 400, 100),
+        }
     )
 
+    test_df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2021-01-01", periods=50),
+            "player_id": [1, 2, 3, 4, 5] * 10,  # Same players!
+            "passing_yards": np.random.randint(100, 400, 50),
+        }
+    )
+
+    report = detector.validate_split(train_df, test_df, date_col="kickoff", player_col="player_id")
+
     # Should detect medium severity player contamination
-    player_issues = [i for i in report.issues
-                    if i.leakage_type == LeakageType.PLAYER]
+    player_issues = [i for i in report.issues if i.leakage_type == LeakageType.PLAYER]
     assert len(player_issues) > 0, "Failed to detect player overlap"
 
 
 def test_duplicate_player_date_records(detector):
     """Test detection of duplicate player-date records."""
-    df = pd.DataFrame({
-        'kickoff': pd.to_datetime(['2020-01-01', '2020-01-01', '2020-01-02']),
-        'player_id': [1, 1, 2],  # Player 1 has duplicate on 2020-01-01
-        'passing_yards': [250, 260, 300],
-    })
-
-    report = detector.check_dataframe(
-        df,
-        date_col='kickoff',
-        player_col='player_id'
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.to_datetime(["2020-01-01", "2020-01-01", "2020-01-02"]),
+            "player_id": [1, 1, 2],  # Player 1 has duplicate on 2020-01-01
+            "passing_yards": [250, 260, 300],
+        }
     )
 
+    report = detector.check_dataframe(df, date_col="kickoff", player_col="player_id")
+
     # Should detect duplicate records
-    group_issues = [i for i in report.issues
-                   if i.leakage_type == LeakageType.GROUP
-                   and 'duplicate' in i.title.lower()]
+    group_issues = [
+        i
+        for i in report.issues
+        if i.leakage_type == LeakageType.GROUP and "duplicate" in i.title.lower()
+    ]
     assert len(group_issues) > 0, "Failed to detect duplicate player-date records"
 
 
@@ -374,37 +399,45 @@ def test_duplicate_player_date_records(detector):
 
 def test_zero_variance_detection(detector):
     """Test detection of zero variance columns."""
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=100),
-        'passing_yards': np.random.randint(100, 400, 100),
-        'constant_feature': 42,  # Zero variance!
-    })
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=100),
+            "passing_yards": np.random.randint(100, 400, 100),
+            "constant_feature": 42,  # Zero variance!
+        }
+    )
 
     report = detector.check_dataframe(df)
 
     # Should detect low severity statistical anomaly
-    stat_issues = [i for i in report.issues
-                  if i.leakage_type == LeakageType.STATISTICAL
-                  and 'variance' in i.title.lower()]
+    stat_issues = [
+        i
+        for i in report.issues
+        if i.leakage_type == LeakageType.STATISTICAL and "variance" in i.title.lower()
+    ]
     assert len(stat_issues) > 0, "Failed to detect zero variance"
 
 
 def test_extreme_skewness_detection(detector):
     """Test detection of extreme skewness."""
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=100),
-        'passing_yards': np.random.randint(100, 400, 100),
-    })
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=100),
+            "passing_yards": np.random.randint(100, 400, 100),
+        }
+    )
 
     # Create extremely skewed feature (99 zeros, 1 huge value)
-    df['extreme_skew'] = [0] * 99 + [1000000]
+    df["extreme_skew"] = [0] * 99 + [1000000]
 
     report = detector.check_dataframe(df)
 
     # Should detect low severity statistical anomaly
-    stat_issues = [i for i in report.issues
-                  if i.leakage_type == LeakageType.STATISTICAL
-                  and 'skew' in i.title.lower()]
+    stat_issues = [
+        i
+        for i in report.issues
+        if i.leakage_type == LeakageType.STATISTICAL and "skew" in i.title.lower()
+    ]
     assert len(stat_issues) > 0, "Failed to detect extreme skewness"
 
 
@@ -421,12 +454,14 @@ def test_feature_engineering_target_leakage(detector):
     df['feature_2'] = df['attempts'] / df['completions']
     """
 
-    report = detector.check_feature_engineering(code, file_path='test_feature.py')
+    report = detector.check_feature_engineering(code, file_path="test_feature.py")
 
     # Should detect critical target leakage
-    critical_issues = [i for i in report.issues
-                      if i.severity == LeakageSeverity.CRITICAL
-                      and i.leakage_type == LeakageType.TARGET]
+    critical_issues = [
+        i
+        for i in report.issues
+        if i.severity == LeakageSeverity.CRITICAL and i.leakage_type == LeakageType.TARGET
+    ]
     assert len(critical_issues) > 0, "Failed to detect target in feature code"
 
 
@@ -438,12 +473,14 @@ def test_feature_engineering_future_data(detector):
     df['feature_2'] = df['yards'].rolling(3).mean()  # OK
     """
 
-    report = detector.check_feature_engineering(code, file_path='test_feature.py')
+    report = detector.check_feature_engineering(code, file_path="test_feature.py")
 
     # Should detect high severity temporal leakage
-    temporal_issues = [i for i in report.issues
-                      if i.leakage_type == LeakageType.TEMPORAL
-                      and 'future' in i.title.lower()]
+    temporal_issues = [
+        i
+        for i in report.issues
+        if i.leakage_type == LeakageType.TEMPORAL and "future" in i.title.lower()
+    ]
     assert len(temporal_issues) > 0, "Failed to detect negative shift"
 
 
@@ -454,12 +491,14 @@ def test_feature_engineering_unsafe_merge(detector):
     result = pd.merge(df1, df2, on='date', how='outer')  # LEAKAGE: should use asof!
     """
 
-    report = detector.check_feature_engineering(code, file_path='test_feature.py')
+    report = detector.check_feature_engineering(code, file_path="test_feature.py")
 
     # Should detect high severity temporal leakage
-    temporal_issues = [i for i in report.issues
-                      if i.leakage_type == LeakageType.TEMPORAL
-                      and 'merge' in i.title.lower()]
+    temporal_issues = [
+        i
+        for i in report.issues
+        if i.leakage_type == LeakageType.TEMPORAL and "merge" in i.title.lower()
+    ]
     assert len(temporal_issues) > 0, "Failed to detect unsafe merge"
 
 
@@ -470,12 +509,15 @@ def test_feature_engineering_safe_asof_merge(detector):
     result = pd.merge_asof(df1, df2, on='date', direction='backward')
     """
 
-    report = detector.check_feature_engineering(code, file_path='test_feature.py')
+    report = detector.check_feature_engineering(code, file_path="test_feature.py")
 
     # Should NOT detect leakage for asof merge
-    temporal_issues = [i for i in report.issues
-                      if 'merge' in i.title.lower()
-                      and i.severity in [LeakageSeverity.CRITICAL, LeakageSeverity.HIGH]]
+    temporal_issues = [
+        i
+        for i in report.issues
+        if "merge" in i.title.lower()
+        and i.severity in [LeakageSeverity.CRITICAL, LeakageSeverity.HIGH]
+    ]
     assert len(temporal_issues) == 0, "False positive on safe asof merge"
 
 
@@ -490,18 +532,21 @@ def test_property_clean_data_no_critical_issues(n_rows):
     """Property: Clean data should never have critical issues."""
     detector = DataLeakageDetector()
 
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=n_rows, freq='H'),
-        'player_id': np.random.randint(1, 100, n_rows),
-        'passing_yards': np.random.randint(100, 400, n_rows),
-        'feature_1': np.random.randn(n_rows),
-    })
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=n_rows, freq="H"),
+            "player_id": np.random.randint(1, 100, n_rows),
+            "passing_yards": np.random.randint(100, 400, n_rows),
+            "feature_1": np.random.randn(n_rows),
+        }
+    )
 
-    report = detector.check_dataframe(df, target_col='passing_yards')
+    report = detector.check_dataframe(df, target_col="passing_yards")
 
     # INVARIANT: Clean data should have no critical leakage
-    assert not report.has_critical_leakage(), \
-        f"Clean data incorrectly flagged as critical (n={n_rows})"
+    assert (
+        not report.has_critical_leakage()
+    ), f"Clean data incorrectly flagged as critical (n={n_rows})"
 
 
 @given(st.integers(min_value=10, max_value=1000))
@@ -510,17 +555,20 @@ def test_property_perfect_correlation_always_critical(n_rows):
     """Property: Perfect correlation should always be detected as critical."""
     detector = DataLeakageDetector()
 
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=n_rows, freq='H'),
-        'passing_yards': np.random.randint(100, 400, n_rows),
-    })
-    df['leaked'] = df['passing_yards']  # Perfect correlation
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=n_rows, freq="H"),
+            "passing_yards": np.random.randint(100, 400, n_rows),
+        }
+    )
+    df["leaked"] = df["passing_yards"]  # Perfect correlation
 
-    report = detector.check_dataframe(df, target_col='passing_yards')
+    report = detector.check_dataframe(df, target_col="passing_yards")
 
     # INVARIANT: Perfect correlation must always be critical
-    assert report.has_critical_leakage(), \
-        f"Perfect correlation not detected as critical (n={n_rows})"
+    assert (
+        report.has_critical_leakage()
+    ), f"Perfect correlation not detected as critical (n={n_rows})"
 
 
 # ============================================================================
@@ -533,17 +581,19 @@ def test_performance_large_dataframe(detector):
     import time
 
     n = 10000
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=n, freq='H'),
-        'player_id': np.random.randint(1, 500, n),
-        'passing_yards': np.random.randint(100, 400, n),
-        'feature_1': np.random.randn(n),
-        'feature_2': np.random.randn(n),
-        'feature_3': np.random.randn(n),
-    })
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=n, freq="H"),
+            "player_id": np.random.randint(1, 500, n),
+            "passing_yards": np.random.randint(100, 400, n),
+            "feature_1": np.random.randn(n),
+            "feature_2": np.random.randn(n),
+            "feature_3": np.random.randn(n),
+        }
+    )
 
     start = time.time()
-    report = detector.check_dataframe(df, target_col='passing_yards')
+    report = detector.check_dataframe(df, target_col="passing_yards")
     elapsed = time.time() - start
 
     # Should complete in < 1 second
@@ -555,17 +605,21 @@ def test_performance_split_validation(detector):
     """Test that split validation completes in < 0.5s for 5k rows."""
     import time
 
-    train_df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=5000, freq='H'),
-        'player_id': np.random.randint(1, 500, 5000),
-        'passing_yards': np.random.randint(100, 400, 5000),
-    })
+    train_df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=5000, freq="H"),
+            "player_id": np.random.randint(1, 500, 5000),
+            "passing_yards": np.random.randint(100, 400, 5000),
+        }
+    )
 
-    test_df = pd.DataFrame({
-        'kickoff': pd.date_range('2021-01-01', periods=2000, freq='H'),
-        'player_id': np.random.randint(1, 500, 2000),
-        'passing_yards': np.random.randint(100, 400, 2000),
-    })
+    test_df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2021-01-01", periods=2000, freq="H"),
+            "player_id": np.random.randint(1, 500, 2000),
+            "passing_yards": np.random.randint(100, 400, 2000),
+        }
+    )
 
     start = time.time()
     report = detector.validate_split(train_df, test_df)
@@ -587,13 +641,13 @@ def test_pre_training_gate_blocks_leaky_data(detector, leaky_dataframe):
     test_df = leaky_dataframe.iloc[800:]
 
     # Check DataFrame
-    df_report = detector.check_dataframe(train_df, target_col='passing_yards')
+    df_report = detector.check_dataframe(train_df, target_col="passing_yards")
 
     # Validate split
     split_report = detector.validate_split(train_df, test_df)
 
     # PRE-TRAINING GATE: Block if critical leakage detected
-    has_leakage = (df_report.has_critical_leakage() or split_report.has_critical_leakage())
+    has_leakage = df_report.has_critical_leakage() or split_report.has_critical_leakage()
 
     assert has_leakage, "Pre-training gate failed to block leaky data"
 
@@ -606,13 +660,13 @@ def test_pre_training_gate_allows_clean_data(detector, clean_dataframe):
     test_df = clean_dataframe.iloc[800:]
 
     # Check DataFrame
-    df_report = detector.check_dataframe(train_df, target_col='passing_yards')
+    df_report = detector.check_dataframe(train_df, target_col="passing_yards")
 
     # Validate split
     split_report = detector.validate_split(train_df, test_df)
 
     # PRE-TRAINING GATE: Should allow clean data
-    has_leakage = (df_report.has_critical_leakage() or split_report.has_critical_leakage())
+    has_leakage = df_report.has_critical_leakage() or split_report.has_critical_leakage()
 
     assert not has_leakage, "Pre-training gate incorrectly blocked clean data"
 
@@ -633,55 +687,63 @@ def test_empty_dataframe(detector):
 
 def test_missing_date_column(detector):
     """Test handling of missing date column."""
-    df = pd.DataFrame({
-        'player_id': [1, 2, 3],
-        'passing_yards': [250, 300, 275],
-    })
+    df = pd.DataFrame(
+        {
+            "player_id": [1, 2, 3],
+            "passing_yards": [250, 300, 275],
+        }
+    )
 
     # Should not crash when date column is missing
-    report = detector.check_dataframe(df, date_col='kickoff')
+    report = detector.check_dataframe(df, date_col="kickoff")
     assert report is not None
 
 
 def test_missing_target_column(detector):
     """Test handling of missing target column."""
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=10),
-        'player_id': range(10),
-    })
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=10),
+            "player_id": range(10),
+        }
+    )
 
     # Should not crash when target column is missing
-    report = detector.check_dataframe(df, target_col='passing_yards')
+    report = detector.check_dataframe(df, target_col="passing_yards")
     assert report is not None
 
 
 def test_non_numeric_target(detector):
     """Test handling of non-numeric target column."""
-    df = pd.DataFrame({
-        'kickoff': pd.date_range('2020-01-01', periods=10),
-        'passing_yards': ['high', 'low'] * 5,  # Non-numeric!
-    })
+    df = pd.DataFrame(
+        {
+            "kickoff": pd.date_range("2020-01-01", periods=10),
+            "passing_yards": ["high", "low"] * 5,  # Non-numeric!
+        }
+    )
 
     # Should not crash with non-numeric target
-    report = detector.check_dataframe(df, target_col='passing_yards')
+    report = detector.check_dataframe(df, target_col="passing_yards")
     assert report is not None
 
 
 def test_malformed_dates(detector):
     """Test handling of malformed dates."""
-    df = pd.DataFrame({
-        'kickoff': ['2020-01-01', 'invalid_date', '2020-01-03'],
-        'passing_yards': [250, 300, 275],
-    })
+    df = pd.DataFrame(
+        {
+            "kickoff": ["2020-01-01", "invalid_date", "2020-01-03"],
+            "passing_yards": [250, 300, 275],
+        }
+    )
 
     # Should handle malformed dates gracefully
-    report = detector.check_dataframe(df, date_col='kickoff')
+    report = detector.check_dataframe(df, date_col="kickoff")
     assert report is not None
 
 
 def test_report_generation(detector, leaky_dataframe):
     """Test that report generation produces readable output."""
-    report = detector.check_dataframe(leaky_dataframe, target_col='passing_yards')
+    report = detector.check_dataframe(leaky_dataframe, target_col="passing_yards")
 
     # Generate formatted report
     report_text = detector.generate_report()
@@ -699,7 +761,7 @@ def test_issue_location_tracking(detector):
     df['leak'] = df['passing_yards']  # Line 2
     """
 
-    report = detector.check_feature_engineering(code, file_path='test.py')
+    report = detector.check_feature_engineering(code, file_path="test.py")
 
     # Should track location
     issues_with_location = [i for i in report.issues if i.location is not None]

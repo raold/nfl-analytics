@@ -19,6 +19,7 @@ from py.utils.agent_coordinator import AgentCoordinator
 try:
     from rich.console import Console
     from rich.panel import Panel
+
     console = Console()
     RICH = True
 except ImportError:
@@ -27,9 +28,9 @@ except ImportError:
 
 def example_1_pre_backtest_workflow():
     """Example 1: Full pre-backtest validation."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXAMPLE 1: Pre-Backtest Workflow")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     coordinator = AgentCoordinator()
 
@@ -40,8 +41,8 @@ def example_1_pre_backtest_workflow():
     print(f"✓ Started: {results['started_at']}")
     print(f"✓ Steps completed: {len(results['steps'])}")
 
-    for step in results['steps']:
-        icon = "✅" if step['success'] else "❌"
+    for step in results["steps"]:
+        icon = "✅" if step["success"] else "❌"
         print(f"  {icon} {step['description']}")
 
     print(f"✓ Completed: {results['completed_at']}")
@@ -52,9 +53,9 @@ def example_1_pre_backtest_workflow():
 
 def example_2_pre_training_workflow():
     """Example 2: Pre-training validation."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXAMPLE 2: Pre-Training Workflow")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     coordinator = AgentCoordinator()
 
@@ -69,9 +70,9 @@ def example_2_pre_training_workflow():
 
 def example_3_research_workflow():
     """Example 3: Research workflow (R model validation)."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXAMPLE 3: Research Workflow (R Models)")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     coordinator = AgentCoordinator()
 
@@ -86,24 +87,23 @@ def example_3_research_workflow():
 
 def example_4_task_execution():
     """Example 4: Execute specific task with routing."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXAMPLE 4: Task Execution with Auto-Routing")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     coordinator = AgentCoordinator()
 
     # Execute a specific task (coordinator will route to correct agents)
     results = coordinator.execute_task(
-        "Validate R models before ensemble backtest",
-        files=["R/state_space_team_ratings.R"]
+        "Validate R models before ensemble backtest", files=["R/state_space_team_ratings.R"]
     )
 
     print(f"✓ Task: {results['task']}")
     print(f"✓ Agents used: {results['agents']}")
     print(f"✓ Outputs: {len(results['outputs'])}")
 
-    for output in results['outputs']:
-        icon = "✅" if output['success'] else "❌"
+    for output in results["outputs"]:
+        icon = "✅" if output["success"] else "❌"
         print(f"  {icon} {output['agent_name']}: {output['message']}")
 
     return results
@@ -111,9 +111,9 @@ def example_4_task_execution():
 
 def example_5_full_pipeline():
     """Example 5: Complete dissertation → dashboard pipeline."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXAMPLE 5: Full Research Pipeline")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     coordinator = AgentCoordinator()
 
@@ -133,7 +133,7 @@ def example_5_full_pipeline():
         results = coordinator.execute_workflow(workflow_name)
         all_results.append(results)
 
-        if results['success']:
+        if results["success"]:
             print(f"  ✅ {workflow_name}: PASSED ({len(results['steps'])} steps)")
         else:
             print(f"  ❌ {workflow_name}: FAILED")
@@ -146,13 +146,13 @@ def example_5_full_pipeline():
 
 def example_6_integration_in_training():
     """Example 6: How to integrate into your training script."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXAMPLE 6: Integration in Training Script")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     print("Copy this code into your training script:\n")
 
-    code = '''
+    code = """
 # At top of your training script
 from py.utils.agent_coordinator import AgentCoordinator
 
@@ -175,20 +175,20 @@ model_validation = coordinator.execute_task(
     "Validate trained model",
     files=["models/xgboost/my_model.json"]
 )
-'''
+"""
 
     print(code)
 
 
 def example_7_integration_in_backtest():
     """Example 7: How to integrate into backtest script."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("EXAMPLE 7: Integration in Backtest Script")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     print("Copy this code into your backtest script:\n")
 
-    code = '''
+    code = """
 # At top of your backtest script
 from py.utils.agent_coordinator import AgentCoordinator
 
@@ -208,7 +208,7 @@ print(f"   Validated: {len(validation['steps'])} checks")
 
 # Your backtest code here
 results = run_backtest()
-'''
+"""
 
     print(code)
 
@@ -216,16 +216,18 @@ results = run_backtest()
 def main():
     """Run all examples."""
     if RICH:
-        console.print(Panel.fit(
-            "[bold cyan]Workflow Automation Examples[/bold cyan]\n"
-            "[dim]Single-User Edition - NFL Analytics[/dim]",
-            border_style="cyan"
-        ))
+        console.print(
+            Panel.fit(
+                "[bold cyan]Workflow Automation Examples[/bold cyan]\n"
+                "[dim]Single-User Edition - NFL Analytics[/dim]",
+                border_style="cyan",
+            )
+        )
     else:
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("Workflow Automation Examples")
         print("Single-User Edition - NFL Analytics")
-        print("="*60)
+        print("=" * 60)
 
     examples = [
         example_1_pre_backtest_workflow,
@@ -247,11 +249,12 @@ def main():
         except Exception as e:
             print(f"\n❌ Error in example: {e}")
             import traceback
+
             traceback.print_exc()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("Examples completed!")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     print("Next steps:")
     print("  1. Try: python scripts/quick_validate.py --quick")

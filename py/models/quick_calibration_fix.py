@@ -86,14 +86,16 @@ def test_temperature_values(y_true, base_predictions, temperature_values):
         interval_width_90 = (scaled_preds["q95"] - scaled_preds["q05"]).mean()
         mae = np.abs(y_true - scaled_preds["mean"]).mean()
 
-        results.append({
-            "temperature": temp,
-            "coverage_90": coverage_90,
-            "coverage_68": coverage_68,
-            "interval_width_90": interval_width_90,
-            "mae": mae,
-            "status": "✓ PASS" if 0.85 <= coverage_90 <= 0.95 else "✗ FAIL"
-        })
+        results.append(
+            {
+                "temperature": temp,
+                "coverage_90": coverage_90,
+                "coverage_68": coverage_68,
+                "interval_width_90": interval_width_90,
+                "mae": mae,
+                "status": "✓ PASS" if 0.85 <= coverage_90 <= 0.95 else "✗ FAIL",
+            }
+        )
 
         logger.info(
             f"T={temp:.1f}: Coverage 90%={coverage_90:.1%}, "
@@ -107,9 +109,9 @@ def test_temperature_values(y_true, base_predictions, temperature_values):
 def main():
     """Quick calibration fix using temperature scaling"""
 
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("QUICK BNN CALIBRATION FIX - TEMPERATURE SCALING")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # Load existing BNN model
     model_path = Path("models/bayesian/bnn_passing_v1.pkl")
@@ -158,16 +160,13 @@ def main():
     results = test_temperature_values(y_true, base_predictions, temperature_values)
 
     # Find optimal temperature (closest to 90% coverage)
-    optimal_idx = min(
-        range(len(results)),
-        key=lambda i: abs(results[i]["coverage_90"] - 0.90)
-    )
+    optimal_idx = min(range(len(results)), key=lambda i: abs(results[i]["coverage_90"] - 0.90))
 
     optimal_result = results[optimal_idx]
 
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("OPTIMAL TEMPERATURE")
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info(f"T = {optimal_result['temperature']:.1f}")
     logger.info(f"Coverage 90%: {optimal_result['coverage_90']:.1%} (target: 90%)")
     logger.info(f"Coverage 68%: {optimal_result['coverage_68']:.1%} (target: 68%)")
@@ -181,21 +180,23 @@ def main():
 
     output_file = output_dir / "temperature_scaling_results.json"
     with open(output_file, "w") as f:
-        json.dump({
-            "optimal_temperature": optimal_result["temperature"],
-            "results": results,
-            "recommendation": f"Use T={optimal_result['temperature']:.1f} for calibrated predictions"
-        }, f, indent=2)
+        json.dump(
+            {
+                "optimal_temperature": optimal_result["temperature"],
+                "results": results,
+                "recommendation": f"Use T={optimal_result['temperature']:.1f} for calibrated predictions",
+            },
+            f,
+            indent=2,
+        )
 
     logger.info(f"\n✓ Results saved to: {output_file}")
 
     # Save recommendation
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("PRODUCTION RECOMMENDATION")
-    logger.info("="*70)
-    logger.info(
-        f"1. Update BNN model to use temperature={optimal_result['temperature']:.1f}"
-    )
+    logger.info("=" * 70)
+    logger.info(f"1. Update BNN model to use temperature={optimal_result['temperature']:.1f}")
     logger.info("2. Retrain or apply post-hoc scaling to existing model")
     logger.info("3. Validate on 2024 holdout data")
     logger.info("4. Deploy to production with monitoring")

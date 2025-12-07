@@ -10,15 +10,16 @@ import sys
 
 # Permitted files in root directory
 PERMITTED = [
-    'README.md',
-    'CLAUDE.md',
-    'SETUP.md',
-    'CONTRIBUTING.md',
-    'FILE_ORGANIZATION.md',
-    'LICENSE',
-    '.gitignore',
-    '.env.example'
+    "README.md",
+    "CLAUDE.md",
+    "SETUP.md",
+    "CONTRIBUTING.md",
+    "FILE_ORGANIZATION.md",
+    "LICENSE",
+    ".gitignore",
+    ".env.example",
 ]
+
 
 def main():
     # Get files from command line arguments
@@ -26,16 +27,13 @@ def main():
 
     # Filter to only .md and .txt files in root directory
     root_docs = [
-        f for f in files_to_check
-        if os.path.dirname(f) in ('', '.')
-        and (f.endswith('.md') or f.endswith('.txt'))
+        f
+        for f in files_to_check
+        if os.path.dirname(f) in ("", ".") and (f.endswith(".md") or f.endswith(".txt"))
     ]
 
     # Check if any are not permitted
-    bad_files = [
-        f for f in root_docs
-        if os.path.basename(f) not in PERMITTED
-    ]
+    bad_files = [f for f in root_docs if os.path.basename(f) not in PERMITTED]
 
     if bad_files:
         print("\n⛔ Files in wrong location (must go in docs/ subdirectories):")
@@ -47,5 +45,6 @@ def main():
 
     sys.exit(0)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

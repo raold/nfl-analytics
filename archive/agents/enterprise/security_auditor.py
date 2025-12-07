@@ -45,15 +45,17 @@ logger = logging.getLogger(__name__)
 
 class SecuritySeverity(Enum):
     """Security issue severity levels."""
+
     CRITICAL = "CRITICAL"  # Immediate fix required
-    HIGH = "HIGH"          # Fix before production
-    MEDIUM = "MEDIUM"      # Fix soon
-    LOW = "LOW"            # Address eventually
-    INFO = "INFO"          # Informational
+    HIGH = "HIGH"  # Fix before production
+    MEDIUM = "MEDIUM"  # Fix soon
+    LOW = "LOW"  # Address eventually
+    INFO = "INFO"  # Informational
 
 
 class SecurityCategory(Enum):
     """Categories of security issues."""
+
     CREDENTIALS = "credentials"
     DOCKER = "docker"
     API_SECURITY = "api_security"
@@ -66,6 +68,7 @@ class SecurityCategory(Enum):
 @dataclass
 class SecurityIssue:
     """Represents a security finding."""
+
     file_path: str
     line_number: int
     severity: SecuritySeverity
@@ -80,6 +83,7 @@ class SecurityIssue:
 @dataclass
 class SecurityReport:
     """Comprehensive security audit report."""
+
     scan_date: str = field(default_factory=lambda: datetime.now().isoformat())
     issues: list[SecurityIssue] = field(default_factory=list)
     files_scanned: int = 0
@@ -106,29 +110,32 @@ class SecurityReport:
 
     def to_json(self) -> str:
         """Export report to JSON."""
-        return json.dumps({
-            "scan_date": self.scan_date,
-            "summary": {
-                "files_scanned": self.files_scanned,
-                "critical": self.critical_count,
-                "high": self.high_count,
-                "medium": self.medium_count,
-                "low": self.low_count,
+        return json.dumps(
+            {
+                "scan_date": self.scan_date,
+                "summary": {
+                    "files_scanned": self.files_scanned,
+                    "critical": self.critical_count,
+                    "high": self.high_count,
+                    "medium": self.medium_count,
+                    "low": self.low_count,
+                },
+                "issues": [
+                    {
+                        "file": i.file_path,
+                        "line": i.line_number,
+                        "severity": i.severity.value,
+                        "category": i.category.value,
+                        "title": i.title,
+                        "description": i.description,
+                        "remediation": i.remediation,
+                        "cve_id": i.cve_id,
+                    }
+                    for i in self.issues
+                ],
             },
-            "issues": [
-                {
-                    "file": i.file_path,
-                    "line": i.line_number,
-                    "severity": i.severity.value,
-                    "category": i.category.value,
-                    "title": i.title,
-                    "description": i.description,
-                    "remediation": i.remediation,
-                    "cve_id": i.cve_id,
-                }
-                for i in self.issues
-            ]
-        }, indent=2)
+            indent=2,
+        )
 
 
 class SecurityAuditor:
@@ -253,16 +260,27 @@ class SecurityAuditor:
         logger.info("Scanning for exposed credentials...")
 
         # Scan all Python, R, Shell, YAML, JSON files
-        patterns = ["**/*.py", "**/*.R", "**/*.sh", "**/*.yml", "**/*.yaml", "**/*.json", "**/*.env*"]
+        patterns = [
+            "**/*.py",
+            "**/*.R",
+            "**/*.sh",
+            "**/*.yml",
+            "**/*.yaml",
+            "**/*.json",
+            "**/*.env*",
+        ]
 
         for pattern in patterns:
             for file_path in self.project_root.glob(pattern):
                 # Skip certain directories
-                if any(skip in str(file_path) for skip in [".venv", "venv", "node_modules", ".git", "pgdata"]):
+                if any(
+                    skip in str(file_path)
+                    for skip in [".venv", "venv", "node_modules", ".git", "pgdata"]
+                ):
                     continue
 
                 try:
-                    content = file_path.read_text(errors='ignore')
+                    content = file_path.read_text(errors="ignore")
                     lines = content.split("\n")
 
                     self.report.files_scanned += 1
@@ -270,17 +288,27 @@ class SecurityAuditor:
                     for i, line in enumerate(lines, 1):
                         # Check for project-specific credentials
                         for cred in self.PROJECT_CREDENTIALS:
-                            if cred in line and "example" not in line.lower() and "#" not in line[:line.find(cred) if cred in line else 0]:
-                                self.report.add_issue(SecurityIssue(
-                                    file_path=str(file_path.relative_to(self.project_root)),
-                                    line_number=i,
-                                    severity=SecuritySeverity.CRITICAL,
-                                    category=SecurityCategory.CREDENTIALS,
-                                    title="Hardcoded credential detected",
-                                    description=f"Credential '{cred[:20]}...' found in code",
-                                    remediation="Move credentials to .env file and use os.getenv()",
-                                    code_snippet=line.strip()[:100] + "..." if len(line.strip()) > 100 else line.strip(),
-                                ))
+                            if (
+                                cred in line
+                                and "example" not in line.lower()
+                                and "#" not in line[: line.find(cred) if cred in line else 0]
+                            ):
+                                self.report.add_issue(
+                                    SecurityIssue(
+                                        file_path=str(file_path.relative_to(self.project_root)),
+                                        line_number=i,
+                                        severity=SecuritySeverity.CRITICAL,
+                                        category=SecurityCategory.CREDENTIALS,
+                                        title="Hardcoded credential detected",
+                                        description=f"Credential '{cred[:20]}...' found in code",
+                                        remediation="Move credentials to .env file and use os.getenv()",
+                                        code_snippet=(
+                                            line.strip()[:100] + "..."
+                                            if len(line.strip()) > 100
+                                            else line.strip()
+                                        ),
+                                    )
+                                )
 
                         # Check for API key patterns
                         api_key_patterns = [
@@ -292,16 +320,18 @@ class SecurityAuditor:
                         for pattern in api_key_patterns:
                             match = re.search(pattern, line, re.IGNORECASE)
                             if match and "env" not in line.lower() and "getenv" not in line.lower():
-                                self.report.add_issue(SecurityIssue(
-                                    file_path=str(file_path.relative_to(self.project_root)),
-                                    line_number=i,
-                                    severity=SecuritySeverity.CRITICAL,
-                                    category=SecurityCategory.CREDENTIALS,
-                                    title="API key or password in code",
-                                    description="Sensitive credential hardcoded in source",
-                                    remediation="Use environment variables or secrets management",
-                                    code_snippet=line.strip()[:100],
-                                ))
+                                self.report.add_issue(
+                                    SecurityIssue(
+                                        file_path=str(file_path.relative_to(self.project_root)),
+                                        line_number=i,
+                                        severity=SecuritySeverity.CRITICAL,
+                                        category=SecurityCategory.CREDENTIALS,
+                                        title="API key or password in code",
+                                        description="Sensitive credential hardcoded in source",
+                                        remediation="Use environment variables or secrets management",
+                                        code_snippet=line.strip()[:100],
+                                    )
+                                )
 
                 except Exception as e:
                     logger.debug(f"Error scanning {file_path}: {e}")
@@ -310,8 +340,9 @@ class SecurityAuditor:
         """Scan Docker configurations for security issues."""
         logger.info("Scanning Docker security...")
 
-        docker_files = list(self.project_root.glob("**/Dockerfile*")) + \
-                      list(self.project_root.glob("**/docker-compose*.yml"))
+        docker_files = list(self.project_root.glob("**/Dockerfile*")) + list(
+            self.project_root.glob("**/docker-compose*.yml")
+        )
 
         for file_path in docker_files:
             try:
@@ -322,58 +353,66 @@ class SecurityAuditor:
                 for i, line in enumerate(lines, 1):
                     for pattern in self.DOCKER_INSECURE_PATTERNS["privileged_mode"]:
                         if re.search(pattern, line):
-                            self.report.add_issue(SecurityIssue(
-                                file_path=str(file_path.relative_to(self.project_root)),
-                                line_number=i,
-                                severity=SecuritySeverity.HIGH,
-                                category=SecurityCategory.DOCKER,
-                                title="Privileged mode enabled",
-                                description="Container running in privileged mode has full host access",
-                                remediation="Remove privileged mode unless absolutely necessary",
-                                code_snippet=line.strip(),
-                            ))
+                            self.report.add_issue(
+                                SecurityIssue(
+                                    file_path=str(file_path.relative_to(self.project_root)),
+                                    line_number=i,
+                                    severity=SecuritySeverity.HIGH,
+                                    category=SecurityCategory.DOCKER,
+                                    title="Privileged mode enabled",
+                                    description="Container running in privileged mode has full host access",
+                                    remediation="Remove privileged mode unless absolutely necessary",
+                                    code_snippet=line.strip(),
+                                )
+                            )
 
                     # Check for hardcoded secrets in ENV
                     for pattern in self.DOCKER_INSECURE_PATTERNS["hardcoded_secrets"]:
                         if re.search(pattern, line, re.IGNORECASE) and "FROM" not in line:
-                            self.report.add_issue(SecurityIssue(
-                                file_path=str(file_path.relative_to(self.project_root)),
-                                line_number=i,
-                                severity=SecuritySeverity.HIGH,
-                                category=SecurityCategory.DOCKER,
-                                title="Hardcoded secret in Dockerfile",
-                                description="Secret in ENV directive should use build args",
-                                remediation="Use ARG + docker secrets or .env file",
-                                code_snippet=line.strip(),
-                            ))
+                            self.report.add_issue(
+                                SecurityIssue(
+                                    file_path=str(file_path.relative_to(self.project_root)),
+                                    line_number=i,
+                                    severity=SecuritySeverity.HIGH,
+                                    category=SecurityCategory.DOCKER,
+                                    title="Hardcoded secret in Dockerfile",
+                                    description="Secret in ENV directive should use build args",
+                                    remediation="Use ARG + docker secrets or .env file",
+                                    code_snippet=line.strip(),
+                                )
+                            )
 
                     # Check for exposed database ports
                     if "docker-compose" in file_path.name:
                         for pattern in self.DOCKER_INSECURE_PATTERNS["exposed_ports"]:
                             if re.search(pattern, line):
                                 port = line.split(":")[0].strip() if ":" in line else "unknown"
-                                self.report.add_issue(SecurityIssue(
-                                    file_path=str(file_path.relative_to(self.project_root)),
-                                    line_number=i,
-                                    severity=SecuritySeverity.MEDIUM,
-                                    category=SecurityCategory.DOCKER,
-                                    title="Database port exposed to host",
-                                    description=f"Port {port} exposed can be accessed from outside",
-                                    remediation="Remove port mapping if only inter-container access needed",
-                                    code_snippet=line.strip(),
-                                ))
+                                self.report.add_issue(
+                                    SecurityIssue(
+                                        file_path=str(file_path.relative_to(self.project_root)),
+                                        line_number=i,
+                                        severity=SecuritySeverity.MEDIUM,
+                                        category=SecurityCategory.DOCKER,
+                                        title="Database port exposed to host",
+                                        description=f"Port {port} exposed can be accessed from outside",
+                                        remediation="Remove port mapping if only inter-container access needed",
+                                        code_snippet=line.strip(),
+                                    )
+                                )
 
                 # Check for missing USER directive in Dockerfile
                 if "Dockerfile" in file_path.name and "USER" not in content:
-                    self.report.add_issue(SecurityIssue(
-                        file_path=str(file_path.relative_to(self.project_root)),
-                        line_number=0,
-                        severity=SecuritySeverity.MEDIUM,
-                        category=SecurityCategory.DOCKER,
-                        title="Container runs as root",
-                        description="Missing USER directive means container runs as root",
-                        remediation="Add USER directive after installing dependencies",
-                    ))
+                    self.report.add_issue(
+                        SecurityIssue(
+                            file_path=str(file_path.relative_to(self.project_root)),
+                            line_number=0,
+                            severity=SecuritySeverity.MEDIUM,
+                            category=SecurityCategory.DOCKER,
+                            title="Container runs as root",
+                            description="Missing USER directive means container runs as root",
+                            remediation="Add USER directive after installing dependencies",
+                        )
+                    )
 
             except Exception as e:
                 logger.debug(f"Error scanning Docker file {file_path}: {e}")
@@ -382,8 +421,9 @@ class SecurityAuditor:
         """Scan API code for security issues."""
         logger.info("Scanning API security...")
 
-        api_files = list(self.project_root.glob("**/api/**/*.py")) + \
-                   list(self.project_root.glob("**/app.py"))
+        api_files = list(self.project_root.glob("**/api/**/*.py")) + list(
+            self.project_root.glob("**/app.py")
+        )
 
         for file_path in api_files:
             try:
@@ -397,32 +437,36 @@ class SecurityAuditor:
                     # Check for POST routes without authentication
                     if re.search(r"@(app\.route|router\.post)", line) and not has_auth:
                         # Check if auth is in next few lines
-                        next_lines = "\n".join(lines[i:min(i+5, len(lines))])
+                        next_lines = "\n".join(lines[i : min(i + 5, len(lines))])
                         if "auth" not in next_lines.lower() and "depends" not in next_lines.lower():
-                            self.report.add_issue(SecurityIssue(
-                                file_path=str(file_path.relative_to(self.project_root)),
-                                line_number=i,
-                                severity=SecuritySeverity.HIGH,
-                                category=SecurityCategory.API_SECURITY,
-                                title="API endpoint without authentication",
-                                description="POST endpoint lacks authentication",
-                                remediation="Add authentication dependency or decorator",
-                                code_snippet=line.strip(),
-                            ))
+                            self.report.add_issue(
+                                SecurityIssue(
+                                    file_path=str(file_path.relative_to(self.project_root)),
+                                    line_number=i,
+                                    severity=SecuritySeverity.HIGH,
+                                    category=SecurityCategory.API_SECURITY,
+                                    title="API endpoint without authentication",
+                                    description="POST endpoint lacks authentication",
+                                    remediation="Add authentication dependency or decorator",
+                                    code_snippet=line.strip(),
+                                )
+                            )
 
                     # Check for CORS with wildcard
                     for pattern in self.API_INSECURE_PATTERNS["weak_cors"]:
                         if re.search(pattern, line):
-                            self.report.add_issue(SecurityIssue(
-                                file_path=str(file_path.relative_to(self.project_root)),
-                                line_number=i,
-                                severity=SecuritySeverity.MEDIUM,
-                                category=SecurityCategory.API_SECURITY,
-                                title="Weak CORS policy",
-                                description="CORS allows all origins (*)",
-                                remediation="Specify allowed origins explicitly",
-                                code_snippet=line.strip(),
-                            ))
+                            self.report.add_issue(
+                                SecurityIssue(
+                                    file_path=str(file_path.relative_to(self.project_root)),
+                                    line_number=i,
+                                    severity=SecuritySeverity.MEDIUM,
+                                    category=SecurityCategory.API_SECURITY,
+                                    title="Weak CORS policy",
+                                    description="CORS allows all origins (*)",
+                                    remediation="Specify allowed origins explicitly",
+                                    code_snippet=line.strip(),
+                                )
+                            )
 
             except Exception as e:
                 logger.debug(f"Error scanning API file {file_path}: {e}")
@@ -439,37 +483,43 @@ class SecurityAuditor:
                     mode = oct(stat_info.st_mode)[-3:]
 
                     # Check if file is world-readable (others have read permission)
-                    if mode[2] != '0':
-                        self.report.add_issue(SecurityIssue(
-                            file_path=str(file_path.relative_to(self.project_root)),
-                            line_number=0,
-                            severity=SecuritySeverity.HIGH,
-                            category=SecurityCategory.FILE_PERMISSIONS,
-                            title="Sensitive file is world-readable",
-                            description=f"File has permissions {mode}, readable by others",
-                            remediation="chmod 600 to restrict access to owner only",
-                        ))
+                    if mode[2] != "0":
+                        self.report.add_issue(
+                            SecurityIssue(
+                                file_path=str(file_path.relative_to(self.project_root)),
+                                line_number=0,
+                                severity=SecuritySeverity.HIGH,
+                                category=SecurityCategory.FILE_PERMISSIONS,
+                                title="Sensitive file is world-readable",
+                                description=f"File has permissions {mode}, readable by others",
+                                remediation="chmod 600 to restrict access to owner only",
+                            )
+                        )
 
                 except Exception as e:
                     logger.debug(f"Error checking permissions for {file_path}: {e}")
 
         # Check script files for executable permissions
-        for script_path in list(self.project_root.glob("**/*.sh")) + list(self.project_root.glob("**/scripts/*.py")):
+        for script_path in list(self.project_root.glob("**/*.sh")) + list(
+            self.project_root.glob("**/scripts/*.py")
+        ):
             try:
                 stat_info = script_path.stat()
                 mode = oct(stat_info.st_mode)[-3:]
 
                 # Check if owner doesn't have execute permission
-                if mode[0] not in ['7', '5']:
-                    self.report.add_issue(SecurityIssue(
-                        file_path=str(script_path.relative_to(self.project_root)),
-                        line_number=0,
-                        severity=SecuritySeverity.LOW,
-                        category=SecurityCategory.FILE_PERMISSIONS,
-                        title="Script file not executable",
-                        description=f"Script has permissions {mode}, not executable",
-                        remediation="chmod +x to make executable",
-                    ))
+                if mode[0] not in ["7", "5"]:
+                    self.report.add_issue(
+                        SecurityIssue(
+                            file_path=str(script_path.relative_to(self.project_root)),
+                            line_number=0,
+                            severity=SecuritySeverity.LOW,
+                            category=SecurityCategory.FILE_PERMISSIONS,
+                            title="Script file not executable",
+                            description=f"Script has permissions {mode}, not executable",
+                            remediation="chmod +x to make executable",
+                        )
+                    )
 
             except Exception as e:
                 logger.debug(f"Error checking script permissions: {e}")
@@ -492,15 +542,17 @@ class SecurityAuditor:
                 )
 
                 if result.returncode != 0 and "vulnerability" in result.stdout.lower():
-                    self.report.add_issue(SecurityIssue(
-                        file_path=str(req_file.relative_to(self.project_root)),
-                        line_number=0,
-                        severity=SecuritySeverity.HIGH,
-                        category=SecurityCategory.DEPENDENCIES,
-                        title="Vulnerable dependencies detected",
-                        description="pip-audit found vulnerabilities",
-                        remediation="Run 'pip-audit -r requirements.txt' and update packages",
-                    ))
+                    self.report.add_issue(
+                        SecurityIssue(
+                            file_path=str(req_file.relative_to(self.project_root)),
+                            line_number=0,
+                            severity=SecuritySeverity.HIGH,
+                            category=SecurityCategory.DEPENDENCIES,
+                            title="Vulnerable dependencies detected",
+                            description="pip-audit found vulnerabilities",
+                            remediation="Run 'pip-audit -r requirements.txt' and update packages",
+                        )
+                    )
 
             except FileNotFoundError:
                 logger.debug("pip-audit not installed, skipping dependency scan")
@@ -528,8 +580,12 @@ class SecurityAuditor:
             lines.append("   IMMEDIATE ACTION REQUIRED")
 
         # Group by severity
-        for severity in [SecuritySeverity.CRITICAL, SecuritySeverity.HIGH,
-                        SecuritySeverity.MEDIUM, SecuritySeverity.LOW]:
+        for severity in [
+            SecuritySeverity.CRITICAL,
+            SecuritySeverity.HIGH,
+            SecuritySeverity.MEDIUM,
+            SecuritySeverity.LOW,
+        ]:
             severity_issues = [i for i in self.report.issues if i.severity == severity]
 
             if severity_issues:

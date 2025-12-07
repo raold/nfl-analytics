@@ -20,7 +20,7 @@ class CausalModelIntegrator:
         baseline_std: float,
         treatment_effect: float,
         treatment_effect_se: float,
-        is_treated: bool
+        is_treated: bool,
     ) -> dict[str, float]:
         """
         Adjust BNN prior based on causal treatment effect.
@@ -44,18 +44,14 @@ class CausalModelIntegrator:
             adjusted_mean = baseline_mean
             adjusted_std = baseline_std
 
-        return {
-            'mean': adjusted_mean,
-            'std': adjusted_std,
-            'treatment_adjusted': is_treated
-        }
+        return {"mean": adjusted_mean, "std": adjusted_std, "treatment_adjusted": is_treated}
 
     def incorporate_live_treatment(
         self,
         player_id: str,
         game_id: str,
         baseline_prediction: float,
-        treatment_effects: dict[str, float]
+        treatment_effects: dict[str, float],
     ) -> dict:
         """
         Adjust live game prediction for observed treatments.
@@ -81,14 +77,16 @@ class CausalModelIntegrator:
             adjustments.append(f"{treatment}: {ate:+.2f}")
 
         result = {
-            'player_id': player_id,
-            'game_id': game_id,
-            'baseline_prediction': baseline_prediction,
-            'adjusted_prediction': adjusted_prediction,
-            'total_adjustment': adjusted_prediction - baseline_prediction,
-            'adjustments': adjustments
+            "player_id": player_id,
+            "game_id": game_id,
+            "baseline_prediction": baseline_prediction,
+            "adjusted_prediction": adjusted_prediction,
+            "total_adjustment": adjusted_prediction - baseline_prediction,
+            "adjustments": adjustments,
         }
 
-        logger.info(f"Adjusted prediction for {player_id}: {baseline_prediction:.1f} → {adjusted_prediction:.1f}")
+        logger.info(
+            f"Adjusted prediction for {player_id}: {baseline_prediction:.1f} → {adjusted_prediction:.1f}"
+        )
 
         return result

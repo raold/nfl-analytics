@@ -117,8 +117,8 @@ class TestABTestRouter:
             assert group == "A"
             assert version == "v5.0"
 
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV5_1')
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV5_1")
     def test_predict_routes_to_correct_ensemble(self, mock_v5_1, mock_v5):
         """Test that predictions are routed to correct ensemble."""
         # Mock ensemble predictions
@@ -148,12 +148,7 @@ class TestABTestRouter:
 
         # Predict for player that should go to group A
         # (deterministic based on hash)
-        result = router.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10,
-            log_to_db=False
-        )
+        result = router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=False)
 
         # Check that result has A/B metadata
         assert "ab_group" in result
@@ -190,7 +185,7 @@ class TestABTestRouter:
 
     def test_get_test_summary_no_data(self):
         """Test get_test_summary when no predictions exist."""
-        with patch('psycopg2.connect') as mock_connect:
+        with patch("psycopg2.connect") as mock_connect:
             mock_cursor = Mock()
             mock_cursor.fetchall.return_value = []
             mock_conn = Mock()
@@ -214,26 +209,30 @@ class TestABTestAnalyzer:
         np.random.seed(42)
 
         # Group A (control) - MAE ~45 yards
-        group_a = pd.DataFrame({
-            "ab_group": ["A"] * 150,
-            "model_version": ["v5.0"] * 150,
-            "player_id": [f"player_{i:04d}" for i in range(150)],
-            "prediction_mean": np.random.normal(250, 30, 150),
-            "prediction_std": np.random.normal(45, 5, 150),
-            "prediction_q10": np.random.normal(205, 30, 150),
-            "prediction_q90": np.random.normal(295, 30, 150),
-        })
+        group_a = pd.DataFrame(
+            {
+                "ab_group": ["A"] * 150,
+                "model_version": ["v5.0"] * 150,
+                "player_id": [f"player_{i:04d}" for i in range(150)],
+                "prediction_mean": np.random.normal(250, 30, 150),
+                "prediction_std": np.random.normal(45, 5, 150),
+                "prediction_q10": np.random.normal(205, 30, 150),
+                "prediction_q90": np.random.normal(295, 30, 150),
+            }
+        )
 
         # Group B (treatment) - MAE ~43 yards (4.4% improvement)
-        group_b = pd.DataFrame({
-            "ab_group": ["B"] * 150,
-            "model_version": ["v5.1"] * 150,
-            "player_id": [f"player_{i:04d}" for i in range(150, 300)],
-            "prediction_mean": np.random.normal(252, 28, 150),
-            "prediction_std": np.random.normal(42, 5, 150),
-            "prediction_q10": np.random.normal(210, 28, 150),
-            "prediction_q90": np.random.normal(294, 28, 150),
-        })
+        group_b = pd.DataFrame(
+            {
+                "ab_group": ["B"] * 150,
+                "model_version": ["v5.1"] * 150,
+                "player_id": [f"player_{i:04d}" for i in range(150, 300)],
+                "prediction_mean": np.random.normal(252, 28, 150),
+                "prediction_std": np.random.normal(42, 5, 150),
+                "prediction_q10": np.random.normal(210, 28, 150),
+                "prediction_q90": np.random.normal(294, 28, 150),
+            }
+        )
 
         df = pd.concat([group_a, group_b], ignore_index=True)
 
@@ -243,9 +242,8 @@ class TestABTestAnalyzer:
         df["abs_prediction_error"] = df["prediction_error"].abs()
 
         # Compute calibration
-        df["calibrated"] = (
-            (df["actual_value"] >= df["prediction_q10"]) &
-            (df["actual_value"] <= df["prediction_q90"])
+        df["calibrated"] = (df["actual_value"] >= df["prediction_q10"]) & (
+            df["actual_value"] <= df["prediction_q90"]
         )
 
         return df
@@ -356,9 +354,11 @@ class TestIntegration:
 
     def test_end_to_end_workflow(self):
         """Test complete A/B test workflow (mocked)."""
-        with patch('py.production.ab_test_router.EnsembleV5'), \
-             patch('py.production.ab_test_router.EnsembleV5_1'), \
-             patch('psycopg2.connect'):
+        with (
+            patch("py.production.ab_test_router.EnsembleV5"),
+            patch("py.production.ab_test_router.EnsembleV5_1"),
+            patch("psycopg2.connect"),
+        ):
 
             # 1. Initialize router
             router = ABTestRouter(split_ratio=0.5)

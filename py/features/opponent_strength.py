@@ -45,11 +45,10 @@ import pandas as pd
 import psycopg2
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class OpponentStrengthEngine:
@@ -120,7 +119,7 @@ class OpponentStrengthEngine:
             # Oldest (0) should get highest weight (for reversed ordering)
             decay_factors = time_indices / self.HALFLIFE
 
-        weights = 0.5 ** decay_factors
+        weights = 0.5**decay_factors
 
         # Normalize to sum to 1.0
         return weights / weights.sum()
@@ -240,17 +239,14 @@ class OpponentStrengthEngine:
         logger.info(f"Loaded {len(df):,} team-game defensive records")
 
         # Compute exponentially-weighted rolling defensive EPA
-        df = self._compute_exponential_rolling_epa(df, 'def_epa_allowed')
-        df = self._compute_exponential_rolling_epa(df, 'pass_def_epa_allowed', suffix='pass')
-        df = self._compute_exponential_rolling_epa(df, 'rush_def_epa_allowed', suffix='rush')
+        df = self._compute_exponential_rolling_epa(df, "def_epa_allowed")
+        df = self._compute_exponential_rolling_epa(df, "pass_def_epa_allowed", suffix="pass")
+        df = self._compute_exponential_rolling_epa(df, "rush_def_epa_allowed", suffix="rush")
 
         return df
 
     def _compute_exponential_rolling_epa(
-        self,
-        df: pd.DataFrame,
-        epa_col: str,
-        suffix: str = ''
+        self, df: pd.DataFrame, epa_col: str, suffix: str = ""
     ) -> pd.DataFrame:
         """
         Compute exponentially-weighted rolling EPA for each team.
@@ -271,7 +267,7 @@ class OpponentStrengthEngine:
         n_games_col = f"{suffix}_n_games" if suffix else "n_games_used"
 
         # Sort by team and time
-        df = df.sort_values(['team', 'season', 'week', 'kickoff'])
+        df = df.sort_values(["team", "season", "week", "kickoff"])
 
         # Initialize output columns
         df[exp_col] = np.nan
@@ -279,8 +275,8 @@ class OpponentStrengthEngine:
         df[n_games_col] = 0
 
         # Group by team and compute rolling exponential EPA
-        for team in df['team'].unique():
-            team_mask = df['team'] == team
+        for team in df["team"].unique():
+            team_mask = df["team"] == team
             team_indices = df[team_mask].index
 
             # Get EPA values for this team
@@ -296,7 +292,7 @@ class OpponentStrengthEngine:
                     continue
 
                 # Use prior games only (exclude current game)
-                prior_epa = epa_values[max(0, i - 12):i]  # Last 12 games (approx 3/4 season)
+                prior_epa = epa_values[max(0, i - 12) : i]  # Last 12 games (approx 3/4 season)
 
                 if len(prior_epa) >= self.MIN_GAMES:
                     # Compute exponential weights
@@ -310,17 +306,20 @@ class OpponentStrengthEngine:
 
         # Compute defensive rank within each week (lower EPA allowed = better defense = higher rank)
         # Rank by week-season to compare teams at similar points in season
-        for (season, week) in df[['season', 'week']].drop_duplicates().values:
-            mask = (df['season'] == season) & (df['week'] == week) & (df[exp_col].notna())
+        for season, week in df[["season", "week"]].drop_duplicates().values:
+            mask = (df["season"] == season) & (df["week"] == week) & (df[exp_col].notna())
 
             if mask.sum() > 0:
                 # Lower defensive EPA allowed = better defense = rank 1
                 # Use pct=True to get percentile rank (0-100 scale)
-                df.loc[mask, rank_col] = df.loc[mask, exp_col].rank(
-                    method='average',
-                    ascending=True,  # Lower EPA = better = higher rank
-                    pct=True  # 0-1 scale
-                ) * 100  # Convert to 0-100 scale
+                df.loc[mask, rank_col] = (
+                    df.loc[mask, exp_col].rank(
+                        method="average",
+                        ascending=True,  # Lower EPA = better = higher rank
+                        pct=True,  # 0-1 scale
+                    )
+                    * 100
+                )  # Convert to 0-100 scale
 
         return df
 
@@ -373,85 +372,83 @@ class OpponentStrengthEngine:
         results = []
 
         for _, game in games_df.iterrows():
-            game_id = game['game_id']
-            season = game['season']
-            week = game['week']
-            kickoff = game['kickoff']
-            home_team = game['home_team']
-            away_team = game['away_team']
+            game_id = game["game_id"]
+            season = game["season"]
+            week = game["week"]
+            kickoff = game["kickoff"]
+            home_team = game["home_team"]
+            away_team = game["away_team"]
 
             # HOME TEAM perspective (opponent = away_team defense)
             # Get away team's defensive strength as of this game
             away_def = def_epa_df[
-                (def_epa_df['team'] == away_team) &
-                (def_epa_df['game_id'] == game_id)
+                (def_epa_df["team"] == away_team) & (def_epa_df["game_id"] == game_id)
             ]
 
             if len(away_def) > 0:
                 away_def = away_def.iloc[0]
 
                 home_features = {
-                    'game_id': game_id,
-                    'season': season,
-                    'week': week,
-                    'team': home_team,
-                    'opponent': away_team,
-                    'opp_def_epa_exp': away_def.get('def_epa_exp', np.nan),
-                    'opp_def_rank': away_def.get('def_rank', np.nan),
-                    'opp_pass_def_rank': away_def.get('pass_def_rank', np.nan),
-                    'opp_rush_def_rank': away_def.get('rush_def_rank', np.nan),
-                    'opp_n_games': away_def.get('n_games_used', 0),
+                    "game_id": game_id,
+                    "season": season,
+                    "week": week,
+                    "team": home_team,
+                    "opponent": away_team,
+                    "opp_def_epa_exp": away_def.get("def_epa_exp", np.nan),
+                    "opp_def_rank": away_def.get("def_rank", np.nan),
+                    "opp_pass_def_rank": away_def.get("pass_def_rank", np.nan),
+                    "opp_rush_def_rank": away_def.get("rush_def_rank", np.nan),
+                    "opp_n_games": away_def.get("n_games_used", 0),
                 }
             else:
                 # No defensive data for opponent (early season)
                 home_features = {
-                    'game_id': game_id,
-                    'season': season,
-                    'week': week,
-                    'team': home_team,
-                    'opponent': away_team,
-                    'opp_def_epa_exp': np.nan,
-                    'opp_def_rank': 50.0,  # Neutral (50th percentile)
-                    'opp_pass_def_rank': 50.0,
-                    'opp_rush_def_rank': 50.0,
-                    'opp_n_games': 0,
+                    "game_id": game_id,
+                    "season": season,
+                    "week": week,
+                    "team": home_team,
+                    "opponent": away_team,
+                    "opp_def_epa_exp": np.nan,
+                    "opp_def_rank": 50.0,  # Neutral (50th percentile)
+                    "opp_pass_def_rank": 50.0,
+                    "opp_rush_def_rank": 50.0,
+                    "opp_n_games": 0,
                 }
 
             results.append(home_features)
 
             # AWAY TEAM perspective (opponent = home_team defense)
             home_def = def_epa_df[
-                (def_epa_df['team'] == home_team) &
-                (def_epa_df['game_id'] == game_id)
+                (def_epa_df["team"] == home_team) & (def_epa_df["game_id"] == game_id)
             ]
 
             if len(home_def) > 0:
                 home_def = home_def.iloc[0]
 
                 away_features = {
-                    'game_id': game_id,
-                    'season': season,
-                    'week': week,
-                    'team': away_team,
-                    'opponent': home_team,
-                    'opp_def_epa_exp': home_def.get('def_epa_exp', np.nan),
-                    'opp_def_rank': home_def.get('def_rank', np.nan),
-                    'opp_pass_def_rank': home_def.get('pass_def_rank', np.nan),
-                    'opp_rush_def_rank': home_def.get('rush_def_rank', np.nan),
-                    'opp_n_games': home_def.get('n_games_used', 0),
+                    "game_id": game_id,
+                    "season": season,
+                    "week": week,
+                    "team": away_team,
+                    "opponent": home_team,
+                    "opp_def_epa_exp": home_def.get("def_epa_exp", np.nan),
+                    "opp_def_rank": home_def.get("def_rank", np.nan),
+                    "opp_pass_def_rank": home_def.get("pass_def_rank", np.nan),
+                    "opp_rush_def_rank": home_def.get("rush_def_rank", np.nan),
+                    "opp_n_games": home_def.get("n_games_used", 0),
                 }
             else:
                 away_features = {
-                    'game_id': game_id,
-                    'season': season,
-                    'week': week,
-                    'team': away_team,
-                    'opponent': home_team,
-                    'opp_def_epa_exp': np.nan,
-                    'opp_def_rank': 50.0,
-                    'opp_pass_def_rank': 50.0,
-                    'opp_rush_def_rank': 50.0,
-                    'opp_n_games': 0,
+                    "game_id": game_id,
+                    "season": season,
+                    "week": week,
+                    "team": away_team,
+                    "opponent": home_team,
+                    "opp_def_epa_exp": np.nan,
+                    "opp_def_rank": 50.0,
+                    "opp_pass_def_rank": 50.0,
+                    "opp_rush_def_rank": 50.0,
+                    "opp_n_games": 0,
                 }
 
             results.append(away_features)
@@ -461,23 +458,21 @@ class OpponentStrengthEngine:
         # Compute matchup difficulty index (0-100 scale)
         # Lower opponent def rank = easier matchup = lower difficulty
         # Higher opponent def rank = tougher matchup = higher difficulty
-        df['matchup_difficulty'] = 100 - df['opp_def_rank']
+        df["matchup_difficulty"] = 100 - df["opp_def_rank"]
 
         logger.info(f"Generated {len(df):,} opponent strength records")
         logger.info("\nOpponent Strength Statistics:")
         logger.info(f"  Mean def EPA allowed: {df['opp_def_epa_exp'].mean():.4f}")
         logger.info(f"  Mean def rank: {df['opp_def_rank'].mean():.1f} (50 = neutral)")
         logger.info(f"  Mean matchup difficulty: {df['matchup_difficulty'].mean():.1f}")
-        logger.info(f"  Missing data: {df['opp_def_epa_exp'].isna().sum():,} ({df['opp_def_epa_exp'].isna().mean():.1%})")
+        logger.info(
+            f"  Missing data: {df['opp_def_epa_exp'].isna().sum():,} ({df['opp_def_epa_exp'].isna().mean():.1%})"
+        )
 
         return df
 
     def compute_strength_of_victory(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        lookback_games: int = 6
+        self, team: str, season: int, week: int, lookback_games: int = 6
     ) -> dict:
         """
         Compute Strength of Victory (SoV) for a team.
@@ -583,19 +578,21 @@ class OpponentStrengthEngine:
                         "season": season,
                         "week": week,
                         "min_season": season - 1,
-                        "lookback": lookback_games
-                    }
+                        "lookback": lookback_games,
+                    },
                 )
 
-            if len(result) == 0 or result.iloc[0]['games_played'] == 0:
+            if len(result) == 0 or result.iloc[0]["games_played"] == 0:
                 return self._neutral_sov_features()
 
             row = result.iloc[0]
-            games_played = int(row['games_played']) if pd.notna(row['games_played']) else 0
-            wins = int(row['wins']) if pd.notna(row['wins']) else 0
-            sov = float(row['strength_of_victory']) if pd.notna(row['strength_of_victory']) else 0.0
-            sos = float(row['strength_of_schedule']) if pd.notna(row['strength_of_schedule']) else 0.0
-            avg_margin = float(row['avg_margin']) if pd.notna(row['avg_margin']) else 0.0
+            games_played = int(row["games_played"]) if pd.notna(row["games_played"]) else 0
+            wins = int(row["wins"]) if pd.notna(row["wins"]) else 0
+            sov = float(row["strength_of_victory"]) if pd.notna(row["strength_of_victory"]) else 0.0
+            sos = (
+                float(row["strength_of_schedule"]) if pd.notna(row["strength_of_schedule"]) else 0.0
+            )
+            avg_margin = float(row["avg_margin"]) if pd.notna(row["avg_margin"]) else 0.0
 
             # Win rate
             win_rate = wins / games_played if games_played > 0 else 0.5
@@ -605,12 +602,12 @@ class OpponentStrengthEngine:
             sov_indicator = 1 if sov > 0.05 else (-1 if sov < -0.05 else 0)
 
             return {
-                'strength_of_victory': round(sov, 4),
-                'strength_of_schedule': round(sos, 4),
-                'win_rate_l6': round(win_rate, 3),
-                'avg_margin_l6': round(avg_margin, 2),
-                'sov_indicator': sov_indicator,
-                'games_played': games_played,
+                "strength_of_victory": round(sov, 4),
+                "strength_of_schedule": round(sos, 4),
+                "win_rate_l6": round(win_rate, 3),
+                "avg_margin_l6": round(avg_margin, 2),
+                "sov_indicator": sov_indicator,
+                "games_played": games_played,
             }
 
         except Exception as e:
@@ -620,20 +617,16 @@ class OpponentStrengthEngine:
     def _neutral_sov_features(self) -> dict:
         """Return neutral SoV features when data unavailable."""
         return {
-            'strength_of_victory': 0.0,
-            'strength_of_schedule': 0.0,
-            'win_rate_l6': 0.5,
-            'avg_margin_l6': 0.0,
-            'sov_indicator': 0,
-            'games_played': 0,
+            "strength_of_victory": 0.0,
+            "strength_of_schedule": 0.0,
+            "win_rate_l6": 0.5,
+            "avg_margin_l6": 0.0,
+            "sov_indicator": 0,
+            "games_played": 0,
         }
 
     def compute_game_sov_features(
-        self,
-        home_team: str,
-        away_team: str,
-        season: int,
-        week: int
+        self, home_team: str, away_team: str, season: int, week: int
     ) -> dict:
         """
         Compute SoV features for a game matchup.
@@ -647,16 +640,16 @@ class OpponentStrengthEngine:
 
         # Home team SoV features
         for key, value in home_sov.items():
-            result[f'home_{key}'] = value
+            result[f"home_{key}"] = value
 
         # Away team SoV features
         for key, value in away_sov.items():
-            result[f'away_{key}'] = value
+            result[f"away_{key}"] = value
 
         # Differential features
-        result['sov_diff'] = home_sov['strength_of_victory'] - away_sov['strength_of_victory']
-        result['sos_diff'] = home_sov['strength_of_schedule'] - away_sov['strength_of_schedule']
-        result['win_rate_diff'] = home_sov['win_rate_l6'] - away_sov['win_rate_l6']
+        result["sov_diff"] = home_sov["strength_of_victory"] - away_sov["strength_of_victory"]
+        result["sos_diff"] = home_sov["strength_of_schedule"] - away_sov["strength_of_schedule"]
+        result["win_rate_diff"] = home_sov["win_rate_l6"] - away_sov["win_rate_l6"]
 
         return result
 
@@ -681,20 +674,15 @@ def main():
     parser.add_argument(
         "--output",
         default="data/processed/features/opponent_strength_features.csv",
-        help="Output CSV path"
+        help="Output CSV path",
     )
     parser.add_argument(
         "--start-season",
         type=int,
         default=2018,
-        help="Start season (default: 2018 for canonical window)"
+        help="Start season (default: 2018 for canonical window)",
     )
-    parser.add_argument(
-        "--end-season",
-        type=int,
-        default=2024,
-        help="End season (default: 2024)"
-    )
+    parser.add_argument("--end-season", type=int, default=2024, help="End season (default: 2024)")
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
 
     args = parser.parse_args()
@@ -707,8 +695,7 @@ def main():
 
     # Generate features
     df = engine.compute_opponent_strength_features(
-        start_season=args.start_season,
-        end_season=args.end_season
+        start_season=args.start_season, end_season=args.end_season
     )
 
     # Save output
@@ -723,13 +710,17 @@ def main():
     print(f"Season Range: {args.start_season}-{args.end_season}")
     print(f"Exponential Weighting: halflife={engine.HALFLIFE} games")
     print("\nTop 5 Toughest Matchups:")
-    print(df.nlargest(5, 'matchup_difficulty')[
-        ['game_id', 'team', 'opponent', 'matchup_difficulty', 'opp_def_rank']
-    ].to_string(index=False))
+    print(
+        df.nlargest(5, "matchup_difficulty")[
+            ["game_id", "team", "opponent", "matchup_difficulty", "opp_def_rank"]
+        ].to_string(index=False)
+    )
     print("\nTop 5 Easiest Matchups:")
-    print(df.nsmallest(5, 'matchup_difficulty')[
-        ['game_id', 'team', 'opponent', 'matchup_difficulty', 'opp_def_rank']
-    ].to_string(index=False))
+    print(
+        df.nsmallest(5, "matchup_difficulty")[
+            ["game_id", "team", "opponent", "matchup_difficulty", "opp_def_rank"]
+        ].to_string(index=False)
+    )
 
 
 if __name__ == "__main__":

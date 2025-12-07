@@ -21,7 +21,6 @@ def test_generate_weather_comparison_table_basic():
     assert result is not None
 
 
-
 def test_generate_weather_comparison_table_edge_cases():
     """Test generate_weather_comparison_table: edge cases."""
     # Arrange
@@ -34,12 +33,10 @@ def test_generate_weather_comparison_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_weather_comparison_table_error_handling():
     """Test generate_weather_comparison_table error handling."""
     with pytest.raises(ValueError):
         generate_weather_comparison_table(invalid_input)
-
 
 
 def test_generate_extreme_conditions_table_basic():
@@ -54,7 +51,6 @@ def test_generate_extreme_conditions_table_basic():
     assert result is not None
 
 
-
 def test_generate_extreme_conditions_table_edge_cases():
     """Test generate_extreme_conditions_table: edge cases."""
     # Arrange
@@ -67,12 +63,10 @@ def test_generate_extreme_conditions_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_extreme_conditions_table_error_handling():
     """Test generate_extreme_conditions_table error handling."""
     with pytest.raises(ValueError):
         generate_extreme_conditions_table(invalid_input)
-
 
 
 def test_generate_precipitation_interaction_table_basic():
@@ -87,7 +81,6 @@ def test_generate_precipitation_interaction_table_basic():
     assert result is not None
 
 
-
 def test_generate_precipitation_interaction_table_edge_cases():
     """Test generate_precipitation_interaction_table: edge cases."""
     # Arrange
@@ -100,12 +93,10 @@ def test_generate_precipitation_interaction_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_precipitation_interaction_table_error_handling():
     """Test generate_precipitation_interaction_table error handling."""
     with pytest.raises(ValueError):
         generate_precipitation_interaction_table(invalid_input)
-
 
 
 def test_generate_weather_coverage_table_basic():
@@ -120,7 +111,6 @@ def test_generate_weather_coverage_table_basic():
     assert result is not None
 
 
-
 def test_generate_weather_coverage_table_edge_cases():
     """Test generate_weather_coverage_table: edge cases."""
     # Arrange
@@ -133,12 +123,10 @@ def test_generate_weather_coverage_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_weather_coverage_table_error_handling():
     """Test generate_weather_coverage_table error handling."""
     with pytest.raises(ValueError):
         generate_weather_coverage_table(invalid_input)
-
 
 
 def test_generate_weather_summary_stats_basic():
@@ -153,7 +141,6 @@ def test_generate_weather_summary_stats_basic():
     assert result is not None
 
 
-
 def test_generate_weather_summary_stats_edge_cases():
     """Test generate_weather_summary_stats: edge cases."""
     # Arrange
@@ -166,12 +153,10 @@ def test_generate_weather_summary_stats_edge_cases():
     assert result is not None
 
 
-
 def test_generate_weather_summary_stats_error_handling():
     """Test generate_weather_summary_stats error handling."""
     with pytest.raises(ValueError):
         generate_weather_summary_stats(invalid_input)
-
 
 
 def test_main_basic():
@@ -186,7 +171,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -199,9 +183,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

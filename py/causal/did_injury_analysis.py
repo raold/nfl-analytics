@@ -48,7 +48,7 @@ from scipy import stats
 
 # Set style
 sns.set_style("whitegrid")
-plt.rcParams['figure.figsize'] = (12, 6)
+plt.rcParams["figure.figsize"] = (12, 6)
 
 logger = logging.getLogger(__name__)
 
@@ -57,9 +57,11 @@ logger = logging.getLogger(__name__)
 # DATA CLASSES
 # =============================================================================
 
+
 @dataclass
 class InjuryEvent:
     """Represents a star player injury event"""
+
     player_id: str
     player_name: str
     position: str
@@ -79,6 +81,7 @@ class InjuryEvent:
 @dataclass
 class DIDResults:
     """Container for DiD estimation results"""
+
     # Point estimates
     att_overall: float
     se_overall: float
@@ -112,6 +115,7 @@ class DIDResults:
 # INJURY SHOCK DATABASE
 # =============================================================================
 
+
 class InjuryShockDatabase:
     """
     Data preparation for injury-based DiD analysis.
@@ -128,11 +132,11 @@ class InjuryShockDatabase:
             db_params: Database connection parameters. If None, uses defaults.
         """
         self.db_params = db_params or {
-            'dbname': 'devdb01',
-            'user': 'dro',
-            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
-            'host': 'localhost',
-            'port': 5544
+            "dbname": "devdb01",
+            "user": "dro",
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
+            "host": "localhost",
+            "port": 5544,
         }
         self.conn = None
 
@@ -164,7 +168,7 @@ class InjuryShockDatabase:
         start_season: int = 2018,
         end_season: int = 2024,
         positions: list[str] = None,
-        severity: list[str] = None
+        severity: list[str] = None,
     ) -> list[InjuryEvent]:
         """
         Load injury events from database.
@@ -180,8 +184,8 @@ class InjuryShockDatabase:
         """
         self.connect()
 
-        positions = positions or ['QB', 'RB', 'WR', 'TE']
-        severity = severity or ['Out', 'Doubtful']
+        positions = positions or ["QB", "RB", "WR", "TE"]
+        severity = severity or ["Out", "Doubtful"]
 
         query = """
         SELECT
@@ -203,10 +207,10 @@ class InjuryShockDatabase:
         """
 
         params = {
-            'start_season': start_season,
-            'end_season': end_season,
-            'positions': positions,
-            'severity': severity
+            "start_season": start_season,
+            "end_season": end_season,
+            "positions": positions,
+            "severity": severity,
         }
 
         try:
@@ -216,14 +220,14 @@ class InjuryShockDatabase:
             events = []
             for _, row in df.iterrows():
                 event = InjuryEvent(
-                    player_id=row['player_id'],
-                    player_name=row['player_name'],
-                    position=row['position'],
-                    team=row['team'],
-                    season=row['season'],
-                    week=row['week'],
-                    injury_type=row['injury_type'] or 'Unknown',
-                    injury_status=row['injury_status']
+                    player_id=row["player_id"],
+                    player_name=row["player_name"],
+                    position=row["position"],
+                    team=row["team"],
+                    season=row["season"],
+                    week=row["week"],
+                    injury_type=row["injury_type"] or "Unknown",
+                    injury_status=row["injury_status"],
                 )
                 events.append(event)
 
@@ -236,9 +240,7 @@ class InjuryShockDatabase:
             return self._create_synthetic_injuries(start_season, end_season)
 
     def identify_star_injuries(
-        self,
-        events: list[InjuryEvent],
-        usage_threshold: float = 0.6  # Top 60% usage = star
+        self, events: list[InjuryEvent], usage_threshold: float = 0.6  # Top 60% usage = star
     ) -> list[InjuryEvent]:
         """
         Identify star player injuries (QB1, RB1, WR1) based on usage.
@@ -289,23 +291,19 @@ class InjuryShockDatabase:
         """
 
         try:
-            df_usage = pd.read_sql_query(
-                query,
-                self.conn,
-                params={'player_ids': player_ids}
-            )
+            df_usage = pd.read_sql_query(query, self.conn, params={"player_ids": player_ids})
 
             # Mark star players in events
             star_events = []
             for event in events:
                 usage_match = df_usage[
-                    (df_usage['player_id'] == event.player_id) &
-                    (df_usage['season'] == event.season) &
-                    (df_usage['week'] == event.week)
+                    (df_usage["player_id"] == event.player_id)
+                    & (df_usage["season"] == event.season)
+                    & (df_usage["week"] == event.week)
                 ]
 
                 if not usage_match.empty:
-                    event.is_star = bool(usage_match.iloc[0]['is_star'])
+                    event.is_star = bool(usage_match.iloc[0]["is_star"])
                     if event.is_star:
                         star_events.append(event)
 
@@ -322,9 +320,9 @@ class InjuryShockDatabase:
     def create_panel_data(
         self,
         injury_events: list[InjuryEvent],
-        outcome_type: str = 'backup_rushing_yards',
+        outcome_type: str = "backup_rushing_yards",
         pre_periods: int = 4,
-        post_periods: int = 4
+        post_periods: int = 4,
     ) -> pd.DataFrame:
         """
         Create panel dataset for DiD estimation.
@@ -400,30 +398,32 @@ class InjuryShockDatabase:
 
                     # Get backup RBs for this team-week
                     team_week_data = df[
-                        (df['team'] == event.team) &
-                        (df['season'] == season) &
-                        (df['week'] == week)
-                    ].sort_values('carries', ascending=False)
+                        (df["team"] == event.team) & (df["season"] == season) & (df["week"] == week)
+                    ].sort_values("carries", ascending=False)
 
                     # Backup RBs = rank 2-3
-                    backups = team_week_data.iloc[1:3] if len(team_week_data) > 1 else team_week_data
+                    backups = (
+                        team_week_data.iloc[1:3] if len(team_week_data) > 1 else team_week_data
+                    )
 
                     for _, backup in backups.iterrows():
-                        panel_rows.append({
-                            'player_id': backup['player_id'],
-                            'player_name': backup['player_name'],
-                            'team': event.team,
-                            'season': season,
-                            'week': week,
-                            'game_date': backup['game_date'],
-                            'outcome': backup['rush_yards'],
-                            'carries': backup['carries'],
-                            'treated': 1 if rel_week >= 0 else 0,
-                            'time_to_treatment': rel_week,
-                            'cohort': event.cohort,
-                            'injured_star': event.player_name,
-                            'injury_type': event.injury_type
-                        })
+                        panel_rows.append(
+                            {
+                                "player_id": backup["player_id"],
+                                "player_name": backup["player_name"],
+                                "team": event.team,
+                                "season": season,
+                                "week": week,
+                                "game_date": backup["game_date"],
+                                "outcome": backup["rush_yards"],
+                                "carries": backup["carries"],
+                                "treated": 1 if rel_week >= 0 else 0,
+                                "time_to_treatment": rel_week,
+                                "cohort": event.cohort,
+                                "injured_star": event.player_name,
+                                "injury_type": event.injury_type,
+                            }
+                        )
 
             panel_df = pd.DataFrame(panel_rows)
 
@@ -432,21 +432,23 @@ class InjuryShockDatabase:
                 return self._create_synthetic_panel(pre_periods, post_periods)
 
             # Add never-treated control group (teams without star injuries)
-            control_teams = set(df['team'].unique()) - set(e.team for e in injury_events)
+            control_teams = set(df["team"].unique()) - set(e.team for e in injury_events)
 
             for team in control_teams:
-                team_data = df[df['team'] == team].copy()
-                team_data['treated'] = 0
-                team_data['time_to_treatment'] = np.nan
-                team_data['cohort'] = 'never_treated'
-                team_data['injured_star'] = None
-                team_data['injury_type'] = None
-                team_data['outcome'] = team_data['rush_yards']
+                team_data = df[df["team"] == team].copy()
+                team_data["treated"] = 0
+                team_data["time_to_treatment"] = np.nan
+                team_data["cohort"] = "never_treated"
+                team_data["injured_star"] = None
+                team_data["injury_type"] = None
+                team_data["outcome"] = team_data["rush_yards"]
 
                 panel_df = pd.concat([panel_df, team_data], ignore_index=True)
 
-            logger.info(f"Created panel: {len(panel_df)} observations, "
-                       f"{panel_df['cohort'].nunique()} cohorts")
+            logger.info(
+                f"Created panel: {len(panel_df)} observations, "
+                f"{panel_df['cohort'].nunique()} cohorts"
+            )
 
             return panel_df
 
@@ -454,14 +456,10 @@ class InjuryShockDatabase:
             logger.error(f"Failed to create panel data: {e}")
             return self._create_synthetic_panel(pre_periods, post_periods)
 
-    def _create_synthetic_injuries(
-        self,
-        start_season: int,
-        end_season: int
-    ) -> list[InjuryEvent]:
+    def _create_synthetic_injuries(self, start_season: int, end_season: int) -> list[InjuryEvent]:
         """Create synthetic injury events for testing"""
         events = []
-        teams = ['KC', 'BUF', 'BAL', 'SF', 'DAL', 'PHI']
+        teams = ["KC", "BUF", "BAL", "SF", "DAL", "PHI"]
 
         for season in range(start_season, end_season + 1):
             for week in [4, 8, 12]:
@@ -469,29 +467,25 @@ class InjuryShockDatabase:
                     event = InjuryEvent(
                         player_id=f"SYNTH_{team}_{season}_{week}",
                         player_name=f"Star RB {team}",
-                        position='RB',
+                        position="RB",
                         team=team,
                         season=season,
                         week=week,
-                        injury_type='Knee',
-                        injury_status='Out',
-                        is_star=True
+                        injury_type="Knee",
+                        injury_status="Out",
+                        is_star=True,
                     )
                     events.append(event)
 
         logger.info(f"Created {len(events)} synthetic injury events")
         return events
 
-    def _create_synthetic_panel(
-        self,
-        pre_periods: int,
-        post_periods: int
-    ) -> pd.DataFrame:
+    def _create_synthetic_panel(self, pre_periods: int, post_periods: int) -> pd.DataFrame:
         """Create synthetic panel data for testing"""
         np.random.seed(42)
 
         # Treatment cohorts
-        cohorts = ['2020W4', '2020W8', '2021W4', '2021W8']
+        cohorts = ["2020W4", "2020W8", "2021W4", "2021W8"]
         n_treated_per_cohort = 5
         n_control = 20
 
@@ -499,7 +493,7 @@ class InjuryShockDatabase:
 
         # Treated units
         for cohort in cohorts:
-            season, week = cohort.split('W')
+            season, week = cohort.split("W")
             season = int(season)
             treatment_week = int(week)
 
@@ -510,33 +504,37 @@ class InjuryShockDatabase:
                 pre_mean = 50 + np.random.randn() * 5
                 for rel_week in range(-pre_periods, 0):
                     week = treatment_week + rel_week
-                    panel_rows.append({
-                        'player_id': player_id,
-                        'player_name': f"Backup RB {unit_id}",
-                        'team': f'TEAM_{cohort}',
-                        'season': season,
-                        'week': week,
-                        'outcome': pre_mean + np.random.randn() * 10,
-                        'treated': 0,
-                        'time_to_treatment': rel_week,
-                        'cohort': cohort
-                    })
+                    panel_rows.append(
+                        {
+                            "player_id": player_id,
+                            "player_name": f"Backup RB {unit_id}",
+                            "team": f"TEAM_{cohort}",
+                            "season": season,
+                            "week": week,
+                            "outcome": pre_mean + np.random.randn() * 10,
+                            "treated": 0,
+                            "time_to_treatment": rel_week,
+                            "cohort": cohort,
+                        }
+                    )
 
                 # Post-treatment (with treatment effect = +15 yards)
                 treatment_effect = 15
                 for rel_week in range(0, post_periods + 1):
                     week = treatment_week + rel_week
-                    panel_rows.append({
-                        'player_id': player_id,
-                        'player_name': f"Backup RB {unit_id}",
-                        'team': f'TEAM_{cohort}',
-                        'season': season,
-                        'week': week,
-                        'outcome': pre_mean + treatment_effect + np.random.randn() * 10,
-                        'treated': 1,
-                        'time_to_treatment': rel_week,
-                        'cohort': cohort
-                    })
+                    panel_rows.append(
+                        {
+                            "player_id": player_id,
+                            "player_name": f"Backup RB {unit_id}",
+                            "team": f"TEAM_{cohort}",
+                            "season": season,
+                            "week": week,
+                            "outcome": pre_mean + treatment_effect + np.random.randn() * 10,
+                            "treated": 1,
+                            "time_to_treatment": rel_week,
+                            "cohort": cohort,
+                        }
+                    )
 
         # Never-treated control units
         for unit_id in range(n_control):
@@ -544,17 +542,19 @@ class InjuryShockDatabase:
             control_mean = 50 + np.random.randn() * 5
 
             for week in range(1, 18):
-                panel_rows.append({
-                    'player_id': player_id,
-                    'player_name': f"Control RB {unit_id}",
-                    'team': f'CONTROL_TEAM_{unit_id}',
-                    'season': 2020,
-                    'week': week,
-                    'outcome': control_mean + np.random.randn() * 10,
-                    'treated': 0,
-                    'time_to_treatment': np.nan,
-                    'cohort': 'never_treated'
-                })
+                panel_rows.append(
+                    {
+                        "player_id": player_id,
+                        "player_name": f"Control RB {unit_id}",
+                        "team": f"CONTROL_TEAM_{unit_id}",
+                        "season": 2020,
+                        "week": week,
+                        "outcome": control_mean + np.random.randn() * 10,
+                        "treated": 0,
+                        "time_to_treatment": np.nan,
+                        "cohort": "never_treated",
+                    }
+                )
 
         df = pd.DataFrame(panel_rows)
         logger.info(f"Created synthetic panel: {len(df)} observations")
@@ -564,6 +564,7 @@ class InjuryShockDatabase:
 # =============================================================================
 # DIFFERENCE-IN-DIFFERENCES ESTIMATOR
 # =============================================================================
+
 
 class DifferenceInDifferencesEstimator:
     """
@@ -580,12 +581,12 @@ class DifferenceInDifferencesEstimator:
     def estimate_group_time_att(
         self,
         df: pd.DataFrame,
-        outcome: str = 'outcome',
-        cohort_var: str = 'cohort',
-        time_var: str = 'time_to_treatment',
-        unit_var: str = 'player_id',
+        outcome: str = "outcome",
+        cohort_var: str = "cohort",
+        time_var: str = "time_to_treatment",
+        unit_var: str = "player_id",
         controls: list[str] | None = None,
-        bootstrap_reps: int = 100
+        bootstrap_reps: int = 100,
     ) -> pd.DataFrame:
         """
         Estimate group-time average treatment effects (Callaway & Sant'Anna).
@@ -613,8 +614,8 @@ class DifferenceInDifferencesEstimator:
         self.panel_data = df.copy()
 
         # Get treatment cohorts (exclude never-treated)
-        cohorts = [c for c in df[cohort_var].unique() if c != 'never_treated']
-        control_df = df[df[cohort_var] == 'never_treated'].copy()
+        cohorts = [c for c in df[cohort_var].unique() if c != "never_treated"]
+        control_df = df[df[cohort_var] == "never_treated"].copy()
 
         if control_df.empty:
             raise ValueError("No never-treated control group found")
@@ -653,7 +654,9 @@ class DifferenceInDifferencesEstimator:
                 for _ in range(bootstrap_reps):
                     # Resample with replacement
                     cohort_t_boot = np.random.choice(cohort_t, size=len(cohort_t), replace=True)
-                    cohort_base_boot = np.random.choice(cohort_baseline, size=len(cohort_baseline), replace=True)
+                    cohort_base_boot = np.random.choice(
+                        cohort_baseline, size=len(cohort_baseline), replace=True
+                    )
 
                     att_boot = np.mean(cohort_t_boot) - np.mean(cohort_base_boot)
                     boot_atts.append(att_boot)
@@ -661,17 +664,19 @@ class DifferenceInDifferencesEstimator:
                 se = np.std(boot_atts)
                 pvalue = 2 * (1 - stats.norm.cdf(np.abs(att) / se))
 
-                group_time_results.append({
-                    'cohort': cohort,
-                    'rel_time': t,
-                    'att': att,
-                    'se': se,
-                    'pvalue': pvalue,
-                    'ci_lower': att - 1.96 * se,
-                    'ci_upper': att + 1.96 * se,
-                    'n_treated': len(cohort_t),
-                    'n_control': len(control_baseline)
-                })
+                group_time_results.append(
+                    {
+                        "cohort": cohort,
+                        "rel_time": t,
+                        "att": att,
+                        "se": se,
+                        "pvalue": pvalue,
+                        "ci_lower": att - 1.96 * se,
+                        "ci_upper": att + 1.96 * se,
+                        "n_treated": len(cohort_t),
+                        "n_control": len(control_baseline),
+                    }
+                )
 
         results_df = pd.DataFrame(group_time_results)
         logger.info(f"Computed {len(results_df)} group-time ATTs")
@@ -679,9 +684,7 @@ class DifferenceInDifferencesEstimator:
         return results_df
 
     def aggregate_effects(
-        self,
-        group_time_atts: pd.DataFrame,
-        aggregation: str = 'event_study'
+        self, group_time_atts: pd.DataFrame, aggregation: str = "event_study"
     ) -> pd.DataFrame:
         """
         Aggregate group-time ATTs across cohorts.
@@ -696,65 +699,83 @@ class DifferenceInDifferencesEstimator:
         Returns:
             Aggregated results DataFrame
         """
-        if aggregation == 'event_study':
+        if aggregation == "event_study":
             # Average ATT by relative time (weighted by group size)
-            agg = group_time_atts.groupby('rel_time').apply(
-                lambda x: pd.Series({
-                    'att': np.average(x['att'], weights=x['n_treated']),
-                    'se': np.sqrt(np.sum(x['se'] ** 2 * x['n_treated']) / np.sum(x['n_treated'])),
-                    'n_treated': x['n_treated'].sum(),
-                    'n_cohorts': len(x)
-                })
-            ).reset_index()
-
-        elif aggregation == 'cohort':
-            # Average post-treatment ATT by cohort
-            post_treatment = group_time_atts[group_time_atts['rel_time'] >= 0]
-            agg = post_treatment.groupby('cohort').apply(
-                lambda x: pd.Series({
-                    'att': x['att'].mean(),
-                    'se': np.sqrt((x['se'] ** 2).mean()),
-                    'n_treated': x['n_treated'].sum()
-                })
-            ).reset_index()
-
-        elif aggregation == 'overall':
-            # Overall ATT (all post-treatment periods, all cohorts)
-            post_treatment = group_time_atts[group_time_atts['rel_time'] >= 0]
-            att_overall = np.average(post_treatment['att'], weights=post_treatment['n_treated'])
-            se_overall = np.sqrt(
-                np.sum(post_treatment['se'] ** 2 * post_treatment['n_treated']) /
-                np.sum(post_treatment['n_treated'])
+            agg = (
+                group_time_atts.groupby("rel_time")
+                .apply(
+                    lambda x: pd.Series(
+                        {
+                            "att": np.average(x["att"], weights=x["n_treated"]),
+                            "se": np.sqrt(
+                                np.sum(x["se"] ** 2 * x["n_treated"]) / np.sum(x["n_treated"])
+                            ),
+                            "n_treated": x["n_treated"].sum(),
+                            "n_cohorts": len(x),
+                        }
+                    )
+                )
+                .reset_index()
             )
 
-            agg = pd.DataFrame([{
-                'att': att_overall,
-                'se': se_overall,
-                'pvalue': 2 * (1 - stats.norm.cdf(np.abs(att_overall) / se_overall)),
-                'ci_lower': att_overall - 1.96 * se_overall,
-                'ci_upper': att_overall + 1.96 * se_overall,
-                'n_treated': post_treatment['n_treated'].sum()
-            }])
+        elif aggregation == "cohort":
+            # Average post-treatment ATT by cohort
+            post_treatment = group_time_atts[group_time_atts["rel_time"] >= 0]
+            agg = (
+                post_treatment.groupby("cohort")
+                .apply(
+                    lambda x: pd.Series(
+                        {
+                            "att": x["att"].mean(),
+                            "se": np.sqrt((x["se"] ** 2).mean()),
+                            "n_treated": x["n_treated"].sum(),
+                        }
+                    )
+                )
+                .reset_index()
+            )
+
+        elif aggregation == "overall":
+            # Overall ATT (all post-treatment periods, all cohorts)
+            post_treatment = group_time_atts[group_time_atts["rel_time"] >= 0]
+            att_overall = np.average(post_treatment["att"], weights=post_treatment["n_treated"])
+            se_overall = np.sqrt(
+                np.sum(post_treatment["se"] ** 2 * post_treatment["n_treated"])
+                / np.sum(post_treatment["n_treated"])
+            )
+
+            agg = pd.DataFrame(
+                [
+                    {
+                        "att": att_overall,
+                        "se": se_overall,
+                        "pvalue": 2 * (1 - stats.norm.cdf(np.abs(att_overall) / se_overall)),
+                        "ci_lower": att_overall - 1.96 * se_overall,
+                        "ci_upper": att_overall + 1.96 * se_overall,
+                        "n_treated": post_treatment["n_treated"].sum(),
+                    }
+                ]
+            )
 
         else:
             raise ValueError(f"Unknown aggregation: {aggregation}")
 
         # Add p-values and CIs if not present
-        if 'pvalue' not in agg.columns:
-            agg['pvalue'] = 2 * (1 - stats.norm.cdf(np.abs(agg['att']) / agg['se']))
-        if 'ci_lower' not in agg.columns:
-            agg['ci_lower'] = agg['att'] - 1.96 * agg['se']
-            agg['ci_upper'] = agg['att'] + 1.96 * agg['se']
+        if "pvalue" not in agg.columns:
+            agg["pvalue"] = 2 * (1 - stats.norm.cdf(np.abs(agg["att"]) / agg["se"]))
+        if "ci_lower" not in agg.columns:
+            agg["ci_lower"] = agg["att"] - 1.96 * agg["se"]
+            agg["ci_upper"] = agg["att"] + 1.96 * agg["se"]
 
         return agg
 
     def test_parallel_trends(
         self,
         df: pd.DataFrame,
-        outcome: str = 'outcome',
-        cohort_var: str = 'cohort',
-        time_var: str = 'time_to_treatment',
-        pre_periods: int = 4
+        outcome: str = "outcome",
+        cohort_var: str = "cohort",
+        time_var: str = "time_to_treatment",
+        pre_periods: int = 4,
     ) -> dict:
         """
         Test parallel trends assumption using pre-treatment periods.
@@ -779,15 +800,12 @@ class DifferenceInDifferencesEstimator:
         pre_df = df[df[time_var] < 0].copy()
 
         if pre_df.empty:
-            return {
-                'error': 'No pre-treatment periods available',
-                'parallel_trends': False
-            }
+            return {"error": "No pre-treatment periods available", "parallel_trends": False}
 
         # Estimate "placebo" ATTs for pre-treatment periods
         # These should be close to zero if parallel trends holds
-        cohorts = [c for c in pre_df[cohort_var].unique() if c != 'never_treated']
-        control_df = df[df[cohort_var] == 'never_treated']
+        cohorts = [c for c in pre_df[cohort_var].unique() if c != "never_treated"]
+        control_df = df[df[cohort_var] == "never_treated"]
 
         pre_atts = []
         pre_ses = []
@@ -811,16 +829,15 @@ class DifferenceInDifferencesEstimator:
 
                 if len(cohort_t) > 0 and len(baseline) > 0:
                     att = (np.mean(cohort_t) - np.mean(baseline)) - 0
-                    se = np.sqrt(np.var(cohort_t) / len(cohort_t) + np.var(baseline) / len(baseline))
+                    se = np.sqrt(
+                        np.var(cohort_t) / len(cohort_t) + np.var(baseline) / len(baseline)
+                    )
 
                     pre_atts.append(att)
                     pre_ses.append(se)
 
         if len(pre_atts) == 0:
-            return {
-                'error': 'Could not compute pre-treatment ATTs',
-                'parallel_trends': False
-            }
+            return {"error": "Could not compute pre-treatment ATTs", "parallel_trends": False}
 
         # Joint F-test: H0: all pre-treatment ATTs = 0
         pre_atts = np.array(pre_atts)
@@ -833,29 +850,26 @@ class DifferenceInDifferencesEstimator:
         # Parallel trends holds if we fail to reject (p > 0.05)
         parallel_trends = pvalue > 0.05
 
-        logger.info(f"Parallel trends test: χ²={chi2_stat:.2f}, p={pvalue:.4f}, "
-                   f"parallel={parallel_trends}")
+        logger.info(
+            f"Parallel trends test: χ²={chi2_stat:.2f}, p={pvalue:.4f}, "
+            f"parallel={parallel_trends}"
+        )
 
         return {
-            'chi2_stat': chi2_stat,
-            'df': df_chi2,
-            'pvalue': pvalue,
-            'parallel_trends': parallel_trends,
-            'pre_treatment_atts': pre_atts.tolist(),
-            'pre_treatment_ses': pre_ses.tolist(),
-            'interpretation': (
+            "chi2_stat": chi2_stat,
+            "df": df_chi2,
+            "pvalue": pvalue,
+            "parallel_trends": parallel_trends,
+            "pre_treatment_atts": pre_atts.tolist(),
+            "pre_treatment_ses": pre_ses.tolist(),
+            "interpretation": (
                 "Parallel trends assumption is satisfied (cannot reject H0)"
                 if parallel_trends
                 else "⚠️ Parallel trends assumption may be violated"
-            )
+            ),
         }
 
-    def placebo_test(
-        self,
-        df: pd.DataFrame,
-        outcome: str = 'outcome',
-        n_placebo: int = 50
-    ) -> dict:
+    def placebo_test(self, df: pd.DataFrame, outcome: str = "outcome", n_placebo: int = 50) -> dict:
         """
         Placebo test with random treatment assignment.
 
@@ -870,7 +884,7 @@ class DifferenceInDifferencesEstimator:
         Returns:
             Dictionary with placebo test results
         """
-        original_treated = df[df['treated'] == 1]['player_id'].unique()
+        original_treated = df[df["treated"] == 1]["player_id"].unique()
         n_treated = len(original_treated)
 
         placebo_atts = []
@@ -878,15 +892,15 @@ class DifferenceInDifferencesEstimator:
         for i in range(n_placebo):
             # Randomly assign treatment
             df_placebo = df.copy()
-            all_units = df_placebo['player_id'].unique()
+            all_units = df_placebo["player_id"].unique()
             placebo_treated = np.random.choice(all_units, size=n_treated, replace=False)
 
-            df_placebo['treated'] = 0
-            df_placebo.loc[df_placebo['player_id'].isin(placebo_treated), 'treated'] = 1
+            df_placebo["treated"] = 0
+            df_placebo.loc[df_placebo["player_id"].isin(placebo_treated), "treated"] = 1
 
             # Compute placebo ATT
-            treated_mean = df_placebo[df_placebo['treated'] == 1][outcome].mean()
-            control_mean = df_placebo[df_placebo['treated'] == 0][outcome].mean()
+            treated_mean = df_placebo[df_placebo["treated"] == 1][outcome].mean()
+            control_mean = df_placebo[df_placebo["treated"] == 0][outcome].mean()
 
             placebo_att = treated_mean - control_mean
             placebo_atts.append(placebo_att)
@@ -895,29 +909,26 @@ class DifferenceInDifferencesEstimator:
 
         # Compare actual ATT to placebo distribution
         # (This is simplified; real analysis would use group-time ATTs)
-        actual_att = (
-            df[df['treated'] == 1][outcome].mean() -
-            df[df['treated'] == 0][outcome].mean()
-        )
+        actual_att = df[df["treated"] == 1][outcome].mean() - df[df["treated"] == 0][outcome].mean()
 
         p_value = np.mean(np.abs(placebo_atts) >= np.abs(actual_att))
 
         return {
-            'actual_att': actual_att,
-            'placebo_mean': np.mean(placebo_atts),
-            'placebo_std': np.std(placebo_atts),
-            'pvalue': p_value,
-            'significant': p_value < 0.05,
-            'placebo_atts': placebo_atts.tolist()
+            "actual_att": actual_att,
+            "placebo_mean": np.mean(placebo_atts),
+            "placebo_std": np.std(placebo_atts),
+            "pvalue": p_value,
+            "significant": p_value < 0.05,
+            "placebo_atts": placebo_atts.tolist(),
         }
 
     def bootstrap_inference(
         self,
         df: pd.DataFrame,
-        outcome: str = 'outcome',
-        cohort_var: str = 'cohort',
-        time_var: str = 'time_to_treatment',
-        n_boot: int = 500
+        outcome: str = "outcome",
+        cohort_var: str = "cohort",
+        time_var: str = "time_to_treatment",
+        n_boot: int = 500,
     ) -> dict:
         """
         Bootstrap standard errors for ATT estimates.
@@ -938,17 +949,16 @@ class DifferenceInDifferencesEstimator:
         # Bootstrap
         boot_atts_list = []
 
-        units = df['player_id'].unique()
+        units = df["player_id"].unique()
 
         for b in range(n_boot):
             # Resample units with replacement
             boot_units = np.random.choice(units, size=len(units), replace=True)
 
             # Create bootstrap sample
-            df_boot = pd.concat([
-                df[df['player_id'] == u].copy()
-                for u in boot_units
-            ], ignore_index=True)
+            df_boot = pd.concat(
+                [df[df["player_id"] == u].copy() for u in boot_units], ignore_index=True
+            )
 
             # Estimate ATTs
             try:
@@ -960,21 +970,19 @@ class DifferenceInDifferencesEstimator:
                 continue
 
         if len(boot_atts_list) == 0:
-            return {'error': 'Bootstrap failed'}
+            return {"error": "Bootstrap failed"}
 
         # Aggregate bootstrap results
         # (Simplified - would typically track all group-time ATTs)
         logger.info(f"Completed {len(boot_atts_list)} successful bootstrap replications")
 
-        return {
-            'n_successful': len(boot_atts_list),
-            'n_attempted': n_boot
-        }
+        return {"n_successful": len(boot_atts_list), "n_attempted": n_boot}
 
 
 # =============================================================================
 # INJURY SHOCK MODELER (HIGH-LEVEL INTERFACE)
 # =============================================================================
+
 
 class InjuryShockModeler:
     """
@@ -993,11 +1001,11 @@ class InjuryShockModeler:
         self,
         start_season: int = 2018,
         end_season: int = 2024,
-        outcome_type: str = 'backup_rushing_yards',
+        outcome_type: str = "backup_rushing_yards",
         positions: list[str] = None,
         pre_periods: int = 4,
         post_periods: int = 4,
-        run_placebo: bool = False
+        run_placebo: bool = False,
     ) -> DIDResults:
         """
         Complete injury shock analysis pipeline.
@@ -1018,9 +1026,9 @@ class InjuryShockModeler:
 
         # Step 1: Load injury data
         logger.info("\n[1/5] Loading injury events...")
-        positions = positions or ['RB', 'QB', 'WR']
+        positions = positions or ["RB", "QB", "WR"]
         injury_events = self.db.load_injury_events(
-            start_season, end_season, positions, severity=['Out']
+            start_season, end_season, positions, severity=["Out"]
         )
 
         # Step 2: Identify star injuries
@@ -1033,9 +1041,7 @@ class InjuryShockModeler:
 
         # Step 3: Create panel data
         logger.info("\n[3/5] Creating panel dataset...")
-        panel_df = self.db.create_panel_data(
-            star_injuries, outcome_type, pre_periods, post_periods
-        )
+        panel_df = self.db.create_panel_data(star_injuries, outcome_type, pre_periods, post_periods)
 
         # Step 4: Estimate group-time ATTs
         logger.info("\n[4/5] Estimating group-time ATTs...")
@@ -1045,13 +1051,13 @@ class InjuryShockModeler:
         logger.info("\n[5/5] Aggregating results and running diagnostics...")
 
         # Event study (by relative time)
-        att_by_period = self.estimator.aggregate_effects(group_time_atts, 'event_study')
+        att_by_period = self.estimator.aggregate_effects(group_time_atts, "event_study")
 
         # Overall ATT
-        overall_agg = self.estimator.aggregate_effects(group_time_atts, 'overall')
-        att_overall = overall_agg.iloc[0]['att']
-        se_overall = overall_agg.iloc[0]['se']
-        pvalue_overall = overall_agg.iloc[0]['pvalue']
+        overall_agg = self.estimator.aggregate_effects(group_time_atts, "overall")
+        att_overall = overall_agg.iloc[0]["att"]
+        se_overall = overall_agg.iloc[0]["se"]
+        pvalue_overall = overall_agg.iloc[0]["pvalue"]
 
         # Parallel trends test
         parallel_trends = self.estimator.test_parallel_trends(panel_df)
@@ -1073,13 +1079,13 @@ class InjuryShockModeler:
             att_by_period=att_by_period,
             parallel_trends_test=parallel_trends,
             placebo_test=placebo_test,
-            n_treated=panel_df[panel_df['treated'] == 1].shape[0],
-            n_control=panel_df[panel_df['treated'] == 0].shape[0],
+            n_treated=panel_df[panel_df["treated"] == 1].shape[0],
+            n_control=panel_df[panel_df["treated"] == 0].shape[0],
             n_cohorts=len(star_injuries),
             n_periods=len(att_by_period),
             outcome_var=outcome_type,
             treatment_definition=f"Star {positions} injury (Out status)",
-            estimation_method="Callaway-SantAnna (2021) group-time ATT"
+            estimation_method="Callaway-SantAnna (2021) group-time ATT",
         )
 
         logger.info("\n" + "=" * 70)
@@ -1093,9 +1099,7 @@ class InjuryShockModeler:
         return self.results
 
     def visualize_results(
-        self,
-        results: DIDResults | None = None,
-        save_path: str | None = None
+        self, results: DIDResults | None = None, save_path: str | None = None
     ) -> plt.Figure:
         """
         Create event study plot and diagnostic visualizations.
@@ -1120,22 +1124,24 @@ class InjuryShockModeler:
         att_by_period = results.att_by_period
 
         ax.errorbar(
-            att_by_period['rel_time'],
-            att_by_period['att'],
-            yerr=1.96 * att_by_period['se'],
-            fmt='o-',
+            att_by_period["rel_time"],
+            att_by_period["att"],
+            yerr=1.96 * att_by_period["se"],
+            fmt="o-",
             capsize=5,
             capthick=2,
-            color='steelblue',
-            label='ATT ± 95% CI'
+            color="steelblue",
+            label="ATT ± 95% CI",
         )
-        ax.axhline(0, color='black', linestyle='--', linewidth=1, alpha=0.5)
-        ax.axvline(0, color='red', linestyle='--', linewidth=1.5, alpha=0.7,
-                  label='Treatment (Injury)')
-        ax.set_xlabel('Weeks Relative to Injury', fontsize=12)
-        ax.set_ylabel('Average Treatment Effect (Yards)', fontsize=12)
-        ax.set_title('Event Study: Backup RB Performance After Star Injury',
-                    fontsize=14, fontweight='bold')
+        ax.axhline(0, color="black", linestyle="--", linewidth=1, alpha=0.5)
+        ax.axvline(
+            0, color="red", linestyle="--", linewidth=1.5, alpha=0.7, label="Treatment (Injury)"
+        )
+        ax.set_xlabel("Weeks Relative to Injury", fontsize=12)
+        ax.set_ylabel("Average Treatment Effect (Yards)", fontsize=12)
+        ax.set_title(
+            "Event Study: Backup RB Performance After Star Injury", fontsize=14, fontweight="bold"
+        )
         ax.legend()
         ax.grid(True, alpha=0.3)
 
@@ -1144,80 +1150,98 @@ class InjuryShockModeler:
         group_time = results.group_time_atts
 
         if not group_time.empty:
-            pivot = group_time.pivot(index='cohort', columns='rel_time', values='att')
-            sns.heatmap(pivot, annot=True, fmt='.1f', cmap='RdYlGn', center=0,
-                       cbar_kws={'label': 'ATT (Yards)'}, ax=ax)
-            ax.set_title('Group-Time ATTs by Cohort', fontsize=14, fontweight='bold')
-            ax.set_xlabel('Weeks Relative to Injury', fontsize=12)
-            ax.set_ylabel('Treatment Cohort', fontsize=12)
+            pivot = group_time.pivot(index="cohort", columns="rel_time", values="att")
+            sns.heatmap(
+                pivot,
+                annot=True,
+                fmt=".1f",
+                cmap="RdYlGn",
+                center=0,
+                cbar_kws={"label": "ATT (Yards)"},
+                ax=ax,
+            )
+            ax.set_title("Group-Time ATTs by Cohort", fontsize=14, fontweight="bold")
+            ax.set_xlabel("Weeks Relative to Injury", fontsize=12)
+            ax.set_ylabel("Treatment Cohort", fontsize=12)
 
         # (3) Parallel trends diagnostic
         ax = axes[1, 0]
-        pre_atts = results.parallel_trends_test.get('pre_treatment_atts', [])
-        pre_ses = results.parallel_trends_test.get('pre_treatment_ses', [])
+        pre_atts = results.parallel_trends_test.get("pre_treatment_atts", [])
+        pre_ses = results.parallel_trends_test.get("pre_treatment_ses", [])
 
         if pre_atts and pre_ses:
             pre_times = list(range(-len(pre_atts), 0))
-            ax.errorbar(pre_times, pre_atts, yerr=np.array(pre_ses) * 1.96,
-                       fmt='o-', capsize=5, color='coral', label='Pre-treatment ATTs')
-            ax.axhline(0, color='black', linestyle='--', linewidth=1)
-            ax.set_xlabel('Weeks Before Treatment', fontsize=12)
-            ax.set_ylabel('Placebo ATT', fontsize=12)
-            ax.set_title('Parallel Trends Test (Pre-Treatment Period)',
-                        fontsize=14, fontweight='bold')
+            ax.errorbar(
+                pre_times,
+                pre_atts,
+                yerr=np.array(pre_ses) * 1.96,
+                fmt="o-",
+                capsize=5,
+                color="coral",
+                label="Pre-treatment ATTs",
+            )
+            ax.axhline(0, color="black", linestyle="--", linewidth=1)
+            ax.set_xlabel("Weeks Before Treatment", fontsize=12)
+            ax.set_ylabel("Placebo ATT", fontsize=12)
+            ax.set_title(
+                "Parallel Trends Test (Pre-Treatment Period)", fontsize=14, fontweight="bold"
+            )
 
             # Add test result
-            parallel = results.parallel_trends_test['parallel_trends']
-            pval = results.parallel_trends_test['pvalue']
+            parallel = results.parallel_trends_test["parallel_trends"]
+            pval = results.parallel_trends_test["pvalue"]
             result_text = f"χ² test: p={pval:.4f}\n{'✓ Parallel' if parallel else '✗ Not parallel'}"
-            ax.text(0.05, 0.95, result_text, transform=ax.transAxes,
-                   verticalalignment='top', bbox=dict(boxstyle='round', facecolor='wheat'))
+            ax.text(
+                0.05,
+                0.95,
+                result_text,
+                transform=ax.transAxes,
+                verticalalignment="top",
+                bbox=dict(boxstyle="round", facecolor="wheat"),
+            )
             ax.legend()
             ax.grid(True, alpha=0.3)
 
         # (4) Summary statistics table
         ax = axes[1, 1]
-        ax.axis('off')
+        ax.axis("off")
 
         summary_data = [
-            ['Metric', 'Value'],
-            ['Overall ATT', f"{results.att_overall:.2f} ± {results.se_overall:.2f}"],
-            ['P-value', f"{results.pvalue_overall:.4f}"],
-            ['95% CI', f"[{results.ci_lower:.2f}, {results.ci_upper:.2f}]"],
-            ['', ''],
-            ['N (Treated)', f"{results.n_treated:,}"],
-            ['N (Control)', f"{results.n_control:,}"],
-            ['N (Cohorts)', f"{results.n_cohorts}"],
-            ['', ''],
-            ['Parallel Trends', '✓' if results.parallel_trends_test['parallel_trends'] else '✗'],
-            ['Method', results.estimation_method]
+            ["Metric", "Value"],
+            ["Overall ATT", f"{results.att_overall:.2f} ± {results.se_overall:.2f}"],
+            ["P-value", f"{results.pvalue_overall:.4f}"],
+            ["95% CI", f"[{results.ci_lower:.2f}, {results.ci_upper:.2f}]"],
+            ["", ""],
+            ["N (Treated)", f"{results.n_treated:,}"],
+            ["N (Control)", f"{results.n_control:,}"],
+            ["N (Cohorts)", f"{results.n_cohorts}"],
+            ["", ""],
+            ["Parallel Trends", "✓" if results.parallel_trends_test["parallel_trends"] else "✗"],
+            ["Method", results.estimation_method],
         ]
 
-        table = ax.table(cellText=summary_data, cellLoc='left', loc='center',
-                        colWidths=[0.5, 0.5])
+        table = ax.table(cellText=summary_data, cellLoc="left", loc="center", colWidths=[0.5, 0.5])
         table.auto_set_font_size(False)
         table.set_fontsize(10)
         table.scale(1, 2)
 
         # Style header row
         for i in range(2):
-            table[(0, i)].set_facecolor('#4CAF50')
-            table[(0, i)].set_text_props(weight='bold', color='white')
+            table[(0, i)].set_facecolor("#4CAF50")
+            table[(0, i)].set_text_props(weight="bold", color="white")
 
-        ax.set_title('Summary Statistics', fontsize=14, fontweight='bold', pad=20)
+        ax.set_title("Summary Statistics", fontsize=14, fontweight="bold", pad=20)
 
         plt.tight_layout()
 
         if save_path:
-            plt.savefig(save_path, dpi=300, bbox_inches='tight')
+            plt.savefig(save_path, dpi=300, bbox_inches="tight")
             logger.info(f"Figure saved to {save_path}")
 
         return fig
 
     def generate_report(
-        self,
-        results: DIDResults | None = None,
-        output_path: str | None = None
+        self, results: DIDResults | None = None, output_path: str | None = None
     ) -> str:
         """
         Generate markdown report with interpretation.
@@ -1302,7 +1326,7 @@ The parallel trends assumption is **{'satisfied' if pt['parallel_trends'] else '
 
 """
 
-        if not pt['parallel_trends']:
+        if not pt["parallel_trends"]:
             report += """
 ⚠️ **Warning**: The parallel trends test suggests that treated and control groups may have
 had different pre-treatment trends. This could bias the ATT estimates. Consider:
@@ -1360,7 +1384,7 @@ doi:10.1016/j.jeconom.2020.09.006
 """
 
         if output_path:
-            with open(output_path, 'w') as f:
+            with open(output_path, "w") as f:
                 f.write(report)
             logger.info(f"Report saved to {output_path}")
 
@@ -1371,13 +1395,13 @@ doi:10.1016/j.jeconom.2020.09.006
 # EXAMPLE USAGE
 # =============================================================================
 
+
 def main():
     """Example usage of the DiD injury analysis module"""
 
     # Configure logging
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     # Initialize modeler
@@ -1387,24 +1411,24 @@ def main():
     results = modeler.analyze_injury_shock(
         start_season=2020,
         end_season=2024,
-        outcome_type='backup_rushing_yards',
-        positions=['RB'],
+        outcome_type="backup_rushing_yards",
+        positions=["RB"],
         pre_periods=4,
         post_periods=4,
-        run_placebo=False  # Set to True for full diagnostics
+        run_placebo=False,  # Set to True for full diagnostics
     )
 
     # Visualize
-    fig = modeler.visualize_results(save_path='injury_shock_analysis.pdf')
+    fig = modeler.visualize_results(save_path="injury_shock_analysis.pdf")
     plt.show()
 
     # Generate report
-    report = modeler.generate_report(output_path='injury_shock_report.md')
+    report = modeler.generate_report(output_path="injury_shock_report.md")
     print("\n" + "=" * 70)
     print("MARKDOWN REPORT")
     print("=" * 70)
     print(report)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

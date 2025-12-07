@@ -40,13 +40,13 @@ from contextlib import contextmanager
 try:
     import psycopg
     from psycopg import pool
+
     PSYCOPG_VERSION = 3
 except ImportError:
     PSYCOPG_VERSION = None
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -290,9 +290,9 @@ if __name__ == "__main__":
     # Test connection pooling
     import os
 
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("PSYCOPG3 CONNECTION POOL TEST")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     password = os.getenv("DB_PASSWORD", "sicillionbillions")
 
@@ -324,4 +324,5 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"Test failed: {e}")
         import traceback
+
         traceback.print_exc()

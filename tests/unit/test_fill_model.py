@@ -23,7 +23,6 @@ def test_fit_fill_basic():
     assert result is not None
 
 
-
 def test_fit_fill_edge_cases():
     """Test fit_fill: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_fit_fill_edge_cases():
     assert result is not None
 
 
-
 def test_fit_fill_error_handling():
     """Test fit_fill error handling."""
     with pytest.raises(ValueError):
         fit_fill(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_fit_fill_property_idempotent(self, rows):
 
     # Assert property
     assert fit_fill(rows) == result, "idempotent violated"
-
 
 
 def test_prob_fill_basic():
@@ -67,7 +63,6 @@ def test_prob_fill_basic():
     assert result is not None
 
 
-
 def test_prob_fill_edge_cases():
     """Test prob_fill: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_prob_fill_edge_cases():
     assert result is not None
 
 
-
 def test_prob_fill_error_handling():
     """Test prob_fill error handling."""
     with pytest.raises(ValueError):
         prob_fill(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(min_value=1, max_value=1000))
@@ -96,4 +89,3 @@ def test_prob_fill_property_idempotent(self, theta, q, vel, side):
 
     # Assert property
     assert prob_fill(theta, q, vel, side) == result, "idempotent violated"
-

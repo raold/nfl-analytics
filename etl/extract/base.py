@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 
 class SourceType(Enum):
     """Data source types."""
+
     REST_API = "rest_api"
     R_PACKAGE = "r_package"
     PYTHON_LIBRARY = "python_library"
@@ -35,6 +36,7 @@ class SourceType(Enum):
 @dataclass
 class ExtractionResult:
     """Result of data extraction operation."""
+
     success: bool
     data: pd.DataFrame | None
     row_count: int
@@ -95,7 +97,7 @@ class RetryConfig:
     def get_delay(self, attempt: int) -> float:
         """Calculate delay for given attempt number."""
         if self.backoff_type == "exponential":
-            delay = self.initial_delay * (2 ** attempt)
+            delay = self.initial_delay * (2**attempt)
         elif self.backoff_type == "linear":
             delay = self.initial_delay * attempt
         else:
@@ -107,7 +109,7 @@ class RetryConfig:
 class BaseExtractor(ABC):
     """
     Base class for all data extractors.
-    
+
     Subclasses must implement:
     - extract(): Main extraction logic
     - validate_response(): Validate extracted data
@@ -148,11 +150,11 @@ class BaseExtractor(ABC):
     ) -> ExtractionResult:
         """
         Extract data with automatic retry logic.
-        
+
         Args:
             endpoint: Endpoint/function name to extract from
             params: Parameters for extraction
-        
+
         Returns:
             ExtractionResult with data or error
         """
@@ -191,9 +193,7 @@ class BaseExtractor(ABC):
                 )
 
             except Exception as e:
-                self.logger.warning(
-                    f"Extraction failed (attempt {attempt + 1}): {str(e)}"
-                )
+                self.logger.warning(f"Extraction failed (attempt {attempt + 1}): {str(e)}")
 
                 # Check if we should retry
                 if attempt < self.retry_config.max_attempts - 1:
@@ -224,13 +224,13 @@ class BaseExtractor(ABC):
     ) -> pd.DataFrame:
         """
         Extract data from source.
-        
+
         Must be implemented by subclasses.
-        
+
         Args:
             endpoint: Endpoint/function to call
             params: Parameters for extraction
-        
+
         Returns:
             DataFrame with extracted data
         """
@@ -240,12 +240,12 @@ class BaseExtractor(ABC):
     def validate_response(self, data: pd.DataFrame) -> bool:
         """
         Validate extracted data.
-        
+
         Must be implemented by subclasses.
-        
+
         Args:
             data: Extracted data
-        
+
         Returns:
             True if valid, False otherwise
         """
@@ -260,6 +260,5 @@ class BaseExtractor(ABC):
             )
         else:
             self.logger.error(
-                f"✗ Extraction failed for {result.source}.{result.endpoint}: "
-                f"{result.error}"
+                f"✗ Extraction failed for {result.source}.{result.endpoint}: " f"{result.error}"
             )

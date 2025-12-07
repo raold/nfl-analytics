@@ -74,14 +74,14 @@ from typing import Any
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 
 class WidgetType(Enum):
     """Streamlit widget types."""
+
     TEXT_INPUT = "text_input"
     NUMBER_INPUT = "number_input"
     SELECTBOX = "selectbox"
@@ -96,6 +96,7 @@ class WidgetType(Enum):
 @dataclass
 class ArgumentSpec:
     """CLI argument specification."""
+
     name: str
     arg_type: str  # "str", "int", "float", "bool", "list"
     default: Any | None
@@ -113,13 +114,14 @@ class ArgumentSpec:
             "help_text": self.help_text,
             "choices": self.choices,
             "required": self.required,
-            "widget_type": self.widget_type.value
+            "widget_type": self.widget_type.value,
         }
 
 
 @dataclass
 class DashboardPageSpec:
     """Specification for generated dashboard page."""
+
     page_title: str
     page_description: str
     arguments: list[ArgumentSpec]
@@ -134,7 +136,7 @@ class DashboardPageSpec:
             "page_description": self.page_description,
             "arguments": [arg.to_dict() for arg in self.arguments],
             "function_call": self.function_call,
-            "result_display": self.result_display
+            "result_display": self.result_display,
         }
 
 
@@ -150,7 +152,7 @@ class DashboardFeatureGenerator:
         self,
         scripts_dir: str = "scripts/",
         dashboard_dir: str = "dashboard/",
-        db_config: dict[str, str] | None = None
+        db_config: dict[str, str] | None = None,
     ):
         """
         Initialize Dashboard Feature Generator.
@@ -169,7 +171,7 @@ class DashboardFeatureGenerator:
             "port": 5544,
             "database": "devdb01",
             "user": "dro",
-            "password": "sicillionbillions"
+            "password": "sicillionbillions",
         }
 
         logger.info("DashboardFeatureGenerator initialized")
@@ -197,13 +199,12 @@ class DashboardFeatureGenerator:
             for node in ast.walk(tree):
                 # Look for parser.add_argument() calls
                 if isinstance(node, ast.Call):
-                    if (isinstance(node.func, ast.Attribute) and
-                        node.func.attr == 'add_argument'):
+                    if isinstance(node.func, ast.Attribute) and node.func.attr == "add_argument":
 
                         # Extract argument name
                         if node.args:
                             arg_name = ast.literal_eval(node.args[0])
-                            arg_name = arg_name.lstrip('-').replace('-', '_')
+                            arg_name = arg_name.lstrip("-").replace("-", "_")
 
                             # Extract argument properties from keywords
                             arg_type = "str"
@@ -213,44 +214,44 @@ class DashboardFeatureGenerator:
                             required = False
 
                             for keyword in node.keywords:
-                                if keyword.arg == 'type':
-                                    if hasattr(keyword.value, 'id'):
+                                if keyword.arg == "type":
+                                    if hasattr(keyword.value, "id"):
                                         arg_type = keyword.value.id
-                                elif keyword.arg == 'default':
+                                elif keyword.arg == "default":
                                     try:
                                         default = ast.literal_eval(keyword.value)
                                     except:
                                         default = None
-                                elif keyword.arg == 'help':
+                                elif keyword.arg == "help":
                                     try:
                                         help_text = ast.literal_eval(keyword.value)
                                     except:
                                         help_text = None
-                                elif keyword.arg == 'choices':
+                                elif keyword.arg == "choices":
                                     try:
                                         choices = ast.literal_eval(keyword.value)
                                     except:
                                         choices = None
-                                elif keyword.arg == 'required':
+                                elif keyword.arg == "required":
                                     try:
                                         required = ast.literal_eval(keyword.value)
                                     except:
                                         required = False
 
                             # Determine widget type
-                            widget_type = self._infer_widget_type(
-                                arg_type, choices, arg_name
-                            )
+                            widget_type = self._infer_widget_type(arg_type, choices, arg_name)
 
-                            arguments.append(ArgumentSpec(
-                                name=arg_name,
-                                arg_type=arg_type,
-                                default=default,
-                                help_text=help_text,
-                                choices=choices,
-                                required=required,
-                                widget_type=widget_type
-                            ))
+                            arguments.append(
+                                ArgumentSpec(
+                                    name=arg_name,
+                                    arg_type=arg_type,
+                                    default=default,
+                                    help_text=help_text,
+                                    choices=choices,
+                                    required=required,
+                                    widget_type=widget_type,
+                                )
+                            )
 
             return arguments
 
@@ -259,10 +260,7 @@ class DashboardFeatureGenerator:
             return []
 
     def generate_page_from_cli_script(
-        self,
-        script_path: str,
-        page_title: str,
-        page_description: str | None = None
+        self, script_path: str, page_title: str, page_description: str | None = None
     ) -> DashboardPageSpec:
         """
         Generate complete Streamlit page from CLI script.
@@ -284,27 +282,27 @@ class DashboardFeatureGenerator:
         # Generate Streamlit code
         code_parts = [
             '"""',
-            f'{page_title}',
-            '=' * len(page_title),
-            '',
+            f"{page_title}",
+            "=" * len(page_title),
+            "",
             page_description,
-            '',
-            'Auto-generated by DashboardFeatureGenerator',
-            f'Source: {script_path}',
+            "",
+            "Auto-generated by DashboardFeatureGenerator",
+            f"Source: {script_path}",
             '"""',
-            '',
-            'import streamlit as st',
-            'import sys',
-            'from pathlib import Path',
-            '',
-            '# Add project root to path',
-            'sys.path.insert(0, str(Path(__file__).parent.parent))',
-            '',
+            "",
+            "import streamlit as st",
+            "import sys",
+            "from pathlib import Path",
+            "",
+            "# Add project root to path",
+            "sys.path.insert(0, str(Path(__file__).parent.parent))",
+            "",
             f'st.title("{page_title}")',
             f'st.markdown("{page_description}")',
-            'st.divider()',
-            '',
-            '# Input form',
+            "st.divider()",
+            "",
+            "# Input form",
             'with st.form("parameters_form"):',
         ]
 
@@ -314,30 +312,36 @@ class DashboardFeatureGenerator:
             code_parts.append(widget_code)
 
         # Add submit button
-        code_parts.extend([
-            '',
-            '    submitted = st.form_submit_button("Run")',
-            '',
-            'if submitted:',
-            '    with st.spinner("Running..."):'
-        ])
+        code_parts.extend(
+            [
+                "",
+                '    submitted = st.form_submit_button("Run")',
+                "",
+                "if submitted:",
+                '    with st.spinner("Running..."):',
+            ]
+        )
 
         # Generate function call
         script_name = Path(script_path).stem
-        arg_names = ', '.join([f'{arg.name}={arg.name}' for arg in arguments])
-        function_call = f'from scripts import {script_name}\nresult = {script_name}.main({arg_names})'
+        arg_names = ", ".join([f"{arg.name}={arg.name}" for arg in arguments])
+        function_call = (
+            f"from scripts import {script_name}\nresult = {script_name}.main({arg_names})"
+        )
 
-        code_parts.extend([
-            '        try:',
-            '            # Import and run script',
-            f'            {function_call}',
-            '            st.success("✅ Completed successfully!")',
-            '            st.json(result)',
-            '        except Exception as e:',
-            '            st.error(f"❌ Error: {e}")',
-        ])
+        code_parts.extend(
+            [
+                "        try:",
+                "            # Import and run script",
+                f"            {function_call}",
+                '            st.success("✅ Completed successfully!")',
+                "            st.json(result)",
+                "        except Exception as e:",
+                '            st.error(f"❌ Error: {e}")',
+            ]
+        )
 
-        generated_code = '\n'.join(code_parts)
+        generated_code = "\n".join(code_parts)
 
         return DashboardPageSpec(
             page_title=page_title,
@@ -345,7 +349,7 @@ class DashboardFeatureGenerator:
             arguments=arguments,
             function_call=function_call,
             result_display="st.json(result)",
-            generated_code=generated_code
+            generated_code=generated_code,
         )
 
     def generate_query_builder(self) -> str:
@@ -493,8 +497,7 @@ if st.button("🔍 Execute Query", type="primary"):
         return code
 
     def generate_training_form(
-        self,
-        model_types: list[str] = ["xgboost", "bayesian", "lstm"]
+        self, model_types: list[str] = ["xgboost", "bayesian", "lstm"]
     ) -> str:
         """
         Generate model training submission form.
@@ -766,11 +769,7 @@ if selected_schema:
 '''
         return code
 
-    def write_dashboard_page(
-        self,
-        code: str,
-        output_path: str
-    ):
+    def write_dashboard_page(self, code: str, output_path: str):
         """
         Write generated code to dashboard page file.
 
@@ -781,7 +780,7 @@ if selected_schema:
         try:
             Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
-            with open(output_path, 'w') as f:
+            with open(output_path, "w") as f:
                 f.write(code)
 
             logger.info(f"Dashboard page written to {output_path}")
@@ -790,12 +789,7 @@ if selected_schema:
             logger.error(f"Failed to write dashboard page: {e}")
             raise
 
-    def _infer_widget_type(
-        self,
-        arg_type: str,
-        choices: list | None,
-        arg_name: str
-    ) -> WidgetType:
+    def _infer_widget_type(self, arg_type: str, choices: list | None, arg_name: str) -> WidgetType:
         """Infer appropriate Streamlit widget type from argument properties."""
         if choices:
             return WidgetType.SELECTBOX
@@ -812,13 +806,9 @@ if selected_schema:
         else:
             return WidgetType.TEXT_INPUT
 
-    def _generate_widget_code(
-        self,
-        arg: ArgumentSpec,
-        indent: int = 0
-    ) -> str:
+    def _generate_widget_code(self, arg: ArgumentSpec, indent: int = 0) -> str:
         """Generate Streamlit widget code for argument."""
-        spaces = ' ' * indent
+        spaces = " " * indent
         widget_code = f"{spaces}{arg.name} = "
 
         if arg.widget_type == WidgetType.TEXT_INPUT:
@@ -837,7 +827,7 @@ if selected_schema:
         if arg.help_text:
             widget_code += f', help="{arg.help_text}"'
 
-        widget_code += ')'
+        widget_code += ")"
 
         return widget_code
 
@@ -849,26 +839,17 @@ if __name__ == "__main__":
     # Generate query builder
     print("Generating visual query builder...")
     query_builder_code = generator.generate_query_builder()
-    generator.write_dashboard_page(
-        code=query_builder_code,
-        output_path="/tmp/query_builder.py"
-    )
+    generator.write_dashboard_page(code=query_builder_code, output_path="/tmp/query_builder.py")
     print("✅ Query builder generated: /tmp/query_builder.py")
 
     # Generate schema browser
     print("\nGenerating schema browser...")
     schema_browser_code = generator.generate_schema_browser()
-    generator.write_dashboard_page(
-        code=schema_browser_code,
-        output_path="/tmp/schema_browser.py"
-    )
+    generator.write_dashboard_page(code=schema_browser_code, output_path="/tmp/schema_browser.py")
     print("✅ Schema browser generated: /tmp/schema_browser.py")
 
     # Generate training form
     print("\nGenerating training form...")
     training_form_code = generator.generate_training_form()
-    generator.write_dashboard_page(
-        code=training_form_code,
-        output_path="/tmp/train_model.py"
-    )
+    generator.write_dashboard_page(code=training_form_code, output_path="/tmp/train_model.py")
     print("✅ Training form generated: /tmp/train_model.py")

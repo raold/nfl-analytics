@@ -31,6 +31,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ExperimentResult:
     """Results from a single experiment execution"""
+
     experiment_id: str
     category: str
     status: str  # 'success', 'failed', 'partial'
@@ -49,11 +50,11 @@ class ExperimentExecutor:
 
         # Database connection parameters
         self.db_params = {
-            'dbname': 'devdb01',
-            'user': 'dro',
-            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
-            'host': 'localhost',
-            'port': 5544
+            "dbname": "devdb01",
+            "user": "dro",
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
+            "host": "localhost",
+            "port": 5544,
         }
         self.conn = None
         self.results: list[ExperimentResult] = []
@@ -77,9 +78,9 @@ class ExperimentExecutor:
     def execute_all_experiments(self) -> list[ExperimentResult]:
         """Execute all 40 experiments"""
 
-        logger.info("="*80)
+        logger.info("=" * 80)
         logger.info("EXECUTING ALL 40 EXPERIMENTS WITH REAL DATA")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         # Execute cVAE experiments (1-20)
         for exp_id in range(1, 21):
@@ -92,15 +93,17 @@ class ExperimentExecutor:
                 logger.info(f"✓ {exp_id_str} completed: {result.status}")
             except Exception as e:
                 logger.error(f"✗ {exp_id_str} failed: {e}")
-                self.results.append(ExperimentResult(
-                    experiment_id=exp_id_str,
-                    category='cvae',
-                    status='failed',
-                    metrics={},
-                    execution_time=0.0,
-                    sample_size=0,
-                    error_message=str(e)
-                ))
+                self.results.append(
+                    ExperimentResult(
+                        experiment_id=exp_id_str,
+                        category="cvae",
+                        status="failed",
+                        metrics={},
+                        execution_time=0.0,
+                        sample_size=0,
+                        error_message=str(e),
+                    )
+                )
 
         # Execute Causal experiments (1-20)
         for exp_id in range(1, 21):
@@ -113,19 +116,21 @@ class ExperimentExecutor:
                 logger.info(f"✓ {exp_id_str} completed: {result.status}")
             except Exception as e:
                 logger.error(f"✗ {exp_id_str} failed: {e}")
-                self.results.append(ExperimentResult(
-                    experiment_id=exp_id_str,
-                    category='causal',
-                    status='failed',
-                    metrics={},
-                    execution_time=0.0,
-                    sample_size=0,
-                    error_message=str(e)
-                ))
+                self.results.append(
+                    ExperimentResult(
+                        experiment_id=exp_id_str,
+                        category="causal",
+                        status="failed",
+                        metrics={},
+                        execution_time=0.0,
+                        sample_size=0,
+                        error_message=str(e),
+                    )
+                )
 
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info(f"COMPLETED: {len(self.results)} experiments executed")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         return self.results
 
@@ -182,11 +187,11 @@ class ExperimentExecutor:
 
         return ExperimentResult(
             experiment_id=exp_id,
-            category='cvae',
-            status='success',
+            category="cvae",
+            status="success",
             metrics=metrics,
             execution_time=execution_time,
-            sample_size=sample_size
+            sample_size=sample_size,
         )
 
     def _execute_causal_experiment(self, exp_id: str) -> ExperimentResult:
@@ -242,11 +247,11 @@ class ExperimentExecutor:
 
         return ExperimentResult(
             experiment_id=exp_id,
-            category='causal',
-            status='success',
+            category="causal",
+            status="success",
             metrics=metrics,
             execution_time=execution_time,
-            sample_size=sample_size
+            sample_size=sample_size,
         )
 
     # ==================== cVAE EXPERIMENT IMPLEMENTATIONS ====================
@@ -264,14 +269,20 @@ class ExperimentExecutor:
         df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
         # Calculate baseline metrics
-        margin_mae = df['home_score'].sub(df['away_score']).abs().mean()
-        total_mae = df['home_score'].add(df['away_score']).sub(df['home_score'].add(df['away_score']).mean()).abs().mean()
+        margin_mae = df["home_score"].sub(df["away_score"]).abs().mean()
+        total_mae = (
+            df["home_score"]
+            .add(df["away_score"])
+            .sub(df["home_score"].add(df["away_score"]).mean())
+            .abs()
+            .mean()
+        )
 
         metrics = {
-            'margin_mae': float(margin_mae),
-            'total_points_mae': float(total_mae),
-            'kl_divergence': 0.15,  # Placeholder - would calculate from cVAE samples
-            'trajectory_realism_score': 0.82
+            "margin_mae": float(margin_mae),
+            "total_points_mae": float(total_mae),
+            "kl_divergence": 0.15,  # Placeholder - would calculate from cVAE samples
+            "trajectory_realism_score": 0.82,
         }
 
         return metrics, len(df)
@@ -291,15 +302,15 @@ class ExperimentExecutor:
         df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
         # Calculate predictive metrics
-        baseline_mae = df['rushing_yards'].std() * 0.8  # Naive baseline
+        baseline_mae = df["rushing_yards"].std() * 0.8  # Naive baseline
         model_mae = baseline_mae * 0.75  # 25% improvement assumption
 
         metrics = {
-            'rushing_yards_mae': float(model_mae),
-            'baseline_mae': float(baseline_mae),
-            'improvement_pct': 25.0,
-            'sharpe_ratio': 0.65,
-            'over_under_accuracy': 0.58
+            "rushing_yards_mae": float(model_mae),
+            "baseline_mae": float(baseline_mae),
+            "improvement_pct": 25.0,
+            "sharpe_ratio": 0.65,
+            "over_under_accuracy": 0.58,
         }
 
         return metrics, len(df)
@@ -318,15 +329,15 @@ class ExperimentExecutor:
 
         df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
-        baseline_mae = df['passing_yards'].std() * 0.75
+        baseline_mae = df["passing_yards"].std() * 0.75
         model_mae = baseline_mae * 0.72
 
         metrics = {
-            'passing_yards_mae': float(model_mae),
-            'baseline_mae': float(baseline_mae),
-            'improvement_pct': 28.0,
-            'sharpe_ratio': 0.68,
-            'over_under_accuracy': 0.60
+            "passing_yards_mae": float(model_mae),
+            "baseline_mae": float(baseline_mae),
+            "improvement_pct": 28.0,
+            "sharpe_ratio": 0.68,
+            "over_under_accuracy": 0.60,
         }
 
         return metrics, len(df)
@@ -346,10 +357,10 @@ class ExperimentExecutor:
         df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
         metrics = {
-            'reception_mae': 1.8,
-            'ppr_points_mae': 4.2,
-            'improvement_pct': 18.0,
-            'over_under_accuracy': 0.56
+            "reception_mae": 1.8,
+            "ppr_points_mae": 4.2,
+            "improvement_pct": 18.0,
+            "over_under_accuracy": 0.56,
         }
 
         return metrics, len(df)
@@ -364,15 +375,17 @@ class ExperimentExecutor:
           AND touchdown = TRUE
         """
 
-        result = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
+        result = pd.read_sql(
+            query, self._get_connection(), params=(self.start_season, self.end_season)
+        )
 
         metrics = {
-            'td_timing_accuracy': 0.42,
-            'anytime_td_accuracy': 0.65,
-            'quarter_prediction_accuracy': 0.38
+            "td_timing_accuracy": 0.42,
+            "anytime_td_accuracy": 0.65,
+            "quarter_prediction_accuracy": 0.38,
         }
 
-        return metrics, int(result['td_count'].iloc[0])
+        return metrics, int(result["td_count"].iloc[0])
 
     def _cvae_006_game_script(self) -> tuple[dict[str, float], int]:
         """CVAE-006: Game Script Emergence"""
@@ -387,9 +400,9 @@ class ExperimentExecutor:
         df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
         metrics = {
-            'game_script_classification_acc': 0.72,
-            'play_distribution_kl': 0.28,
-            'early_detection_accuracy': 0.65
+            "game_script_classification_acc": 0.72,
+            "play_distribution_kl": 0.28,
+            "early_detection_accuracy": 0.65,
         }
 
         return metrics, len(df)
@@ -406,13 +419,13 @@ class ExperimentExecutor:
         df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
         # Blowout = margin >= 14
-        df['is_blowout'] = df['margin'] >= 14
+        df["is_blowout"] = df["margin"] >= 14
 
         metrics = {
-            'blowout_detection_auc': 0.78,
-            'early_detection_auc': 0.71,
-            'live_betting_edge': 0.045,
-            'sharpe_ratio': 0.72
+            "blowout_detection_auc": 0.78,
+            "early_detection_auc": 0.71,
+            "live_betting_edge": 0.045,
+            "sharpe_ratio": 0.72,
         }
 
         return metrics, len(df)
@@ -422,12 +435,12 @@ class ExperimentExecutor:
 
         # Simplified - would need play-by-play for real implementation
         metrics = {
-            'q1_mae': 3.2,
-            'q2_mae': 2.8,
-            'q3_mae': 2.5,
-            'q4_mae': 3.1,
-            'cumulative_error': 11.6,
-            'live_bet_roi': 0.062
+            "q1_mae": 3.2,
+            "q2_mae": 2.8,
+            "q3_mae": 2.5,
+            "q4_mae": 3.1,
+            "cumulative_error": 11.6,
+            "live_bet_roi": 0.062,
         }
 
         return metrics, 1343  # Approximate games 2020-2024
@@ -446,10 +459,10 @@ class ExperimentExecutor:
         df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
         metrics = {
-            'weather_adjustment_mae': 4.5,
-            'outdoor_game_edge': 0.038,
-            'temperature_coefficient': -0.12,
-            'wind_coefficient': -0.08
+            "weather_adjustment_mae": 4.5,
+            "outdoor_game_edge": 0.038,
+            "temperature_coefficient": -0.12,
+            "wind_coefficient": -0.08,
         }
 
         return metrics, len(df)
@@ -459,10 +472,10 @@ class ExperimentExecutor:
 
         # Would need injury data - simplified
         metrics = {
-            'injury_impact_mae': 5.8,
-            'qb_injury_impact': -8.2,
-            'live_adjustment_roi': 0.085,
-            'regime_shift_detection': 0.68
+            "injury_impact_mae": 5.8,
+            "qb_injury_impact": -8.2,
+            "live_adjustment_roi": 0.085,
+            "regime_shift_detection": 0.68,
         }
 
         return metrics, 250  # Estimated injury events
@@ -479,26 +492,28 @@ class ExperimentExecutor:
         WHERE season BETWEEN %s AND %s
         """
 
-        result = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
+        result = pd.read_sql(
+            query, self._get_connection(), params=(self.start_season, self.end_season)
+        )
 
         metrics = {
-            'home_away_variance_ratio': 0.88,
-            'location_adjusted_mae': 3.2,
-            'home_win_rate': float(result['home_wins'].iloc[0] / result['total_games'].iloc[0]),
-            'home_advantage_points': float(result['home_advantage'].iloc[0])
+            "home_away_variance_ratio": 0.88,
+            "location_adjusted_mae": 3.2,
+            "home_win_rate": float(result["home_wins"].iloc[0] / result["total_games"].iloc[0]),
+            "home_advantage_points": float(result["home_advantage"].iloc[0]),
         }
 
-        return metrics, int(result['total_games'].iloc[0])
+        return metrics, int(result["total_games"].iloc[0])
 
     def _cvae_012_divisional(self) -> tuple[dict[str, float], int]:
         """CVAE-012: Divisional Rivalry Trajectories"""
 
         # Simplified - would check division matchups
         metrics = {
-            'divisional_game_mae': 9.8,
-            'non_divisional_mae': 8.5,
-            'rivalry_variance_increase': 1.15,
-            'rivalry_edge': 0.022
+            "divisional_game_mae": 9.8,
+            "non_divisional_mae": 8.5,
+            "rivalry_variance_increase": 1.15,
+            "rivalry_edge": 0.022,
         }
 
         return metrics, 384  # ~96 divisional games per season × 4 seasons
@@ -516,10 +531,10 @@ class ExperimentExecutor:
         df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
         metrics = {
-            'primetime_mae': 8.2,
-            'daytime_mae': 7.8,
-            'rest_adjustment_accuracy': 0.61,
-            'tnf_penalty': -1.8
+            "primetime_mae": 8.2,
+            "daytime_mae": 7.8,
+            "rest_adjustment_accuracy": 0.61,
+            "tnf_penalty": -1.8,
         }
 
         return metrics, len(df)
@@ -538,10 +553,10 @@ class ExperimentExecutor:
         df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
         metrics = {
-            'week17_18_mae': 11.2,
-            'regular_season_mae': 8.5,
-            'resting_starters_edge': 0.095,
-            'detection_accuracy': 0.74
+            "week17_18_mae": 11.2,
+            "regular_season_mae": 8.5,
+            "resting_starters_edge": 0.095,
+            "detection_accuracy": 0.74,
         }
 
         return metrics, len(df)
@@ -551,10 +566,10 @@ class ExperimentExecutor:
 
         # Simplified - would need QB experience data
         metrics = {
-            'rookie_qb_mae': 42.0,
-            'veteran_qb_mae': 35.0,
-            'experience_adjustment': -0.8,
-            'learning_curve_coefficient': 0.15
+            "rookie_qb_mae": 42.0,
+            "veteran_qb_mae": 35.0,
+            "experience_adjustment": -0.8,
+            "learning_curve_coefficient": 0.15,
         }
 
         return metrics, 180  # Estimated rookie QB games
@@ -563,11 +578,7 @@ class ExperimentExecutor:
         """CVAE-016: Two-Minute Drill Trajectories"""
 
         # Would need play-by-play data
-        metrics = {
-            'two_minute_accuracy': 0.58,
-            'end_of_half_roi': 0.035,
-            'timeout_impact': 2.1
-        }
+        metrics = {"two_minute_accuracy": 0.58, "end_of_half_roi": 0.035, "timeout_impact": 2.1}
 
         return metrics, 2686  # 2 per game × 1343 games
 
@@ -576,10 +587,10 @@ class ExperimentExecutor:
 
         # Rare events - simplified
         metrics = {
-            'regime_change_detection': 0.68,
-            'post_change_mae': 12.5,
-            'pre_change_mae': 9.2,
-            'adjustment_period_weeks': 4.2
+            "regime_change_detection": 0.68,
+            "post_change_mae": 12.5,
+            "pre_change_mae": 9.2,
+            "adjustment_period_weeks": 4.2,
         }
 
         return metrics, 25  # Estimated OC changes
@@ -605,17 +616,19 @@ class ExperimentExecutor:
 
         # Calculate correlation
         if len(df) > 0:
-            correlation = df.groupby(['qb_id', 'wr_id']).apply(
-                lambda x: x['passing_yards'].corr(x['receiving_yards']) if len(x) > 2 else 0
-            ).mean()
+            correlation = (
+                df.groupby(["qb_id", "wr_id"])
+                .apply(lambda x: x["passing_yards"].corr(x["receiving_yards"]) if len(x) > 2 else 0)
+                .mean()
+            )
         else:
             correlation = 0.45
 
         metrics = {
-            'stack_correlation': float(correlation),
-            'stack_correlation_mae': 0.12,
-            'dfs_lineup_roi': 0.078,
-            'optimal_stack_rate': 0.68
+            "stack_correlation": float(correlation),
+            "stack_correlation_mae": 0.12,
+            "dfs_lineup_roi": 0.078,
+            "optimal_stack_rate": 0.68,
         }
 
         return metrics, len(df)
@@ -644,13 +657,17 @@ class ExperimentExecutor:
         GROUP BY defensive_team_id
         """
 
-        df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season, self.start_season, self.end_season))
+        df = pd.read_sql(
+            query,
+            self._get_connection(),
+            params=(self.start_season, self.end_season, self.start_season, self.end_season),
+        )
 
         metrics = {
-            'defense_adjusted_mae': 7.2,
-            'baseline_mae': 8.8,
-            'variance_prediction_r2': 0.64,
-            'elite_defense_variance_reduction': 0.78
+            "defense_adjusted_mae": 7.2,
+            "baseline_mae": 8.8,
+            "variance_prediction_r2": 0.64,
+            "elite_defense_variance_reduction": 0.78,
         }
 
         return metrics, len(df) * 17  # Teams × games per season
@@ -669,10 +686,10 @@ class ExperimentExecutor:
         df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
         metrics = {
-            'temporal_mae': 6.8,
-            'trend_capture_r2': 0.58,
-            'season_long_roi': 0.068,
-            'week_adjustment_accuracy': 0.63
+            "temporal_mae": 6.8,
+            "trend_capture_r2": 0.58,
+            "season_long_roi": 0.068,
+            "week_adjustment_accuracy": 0.63,
         }
 
         return metrics, 1343
@@ -684,37 +701,34 @@ class ExperimentExecutor:
 
         # Build panel data
         panel_df = self.panel_constructor.build_player_game_panel(
-            start_season=self.start_season,
-            end_season=self.end_season,
-            position='RB'
+            start_season=self.start_season, end_season=self.end_season, position="RB"
         )
 
         # Define treatment: bad weather (wind > 15mph or temp < 32F)
-        panel_df['bad_weather'] = (
-            (panel_df['weather_wind_mph'] > 15) |
-            (panel_df['weather_temperature'] < 32)
+        panel_df["bad_weather"] = (
+            (panel_df["weather_wind_mph"] > 15) | (panel_df["weather_temperature"] < 32)
         ).astype(int)
 
         # DiD estimation
         estimator = DiffInDiffEstimator()
         ate, se, pval, summary = estimator.estimate(
             panel_df,
-            outcome='rushing_yards',
-            treatment='bad_weather',
-            unit_fe='player_id',
-            time_fe='week'
+            outcome="rushing_yards",
+            treatment="bad_weather",
+            unit_fe="player_id",
+            time_fe="week",
         )
 
         metrics = {
-            'ate': float(ate),
-            'se': float(se),
-            'pvalue': float(pval),
-            'confidence_interval_lower': float(ate - 1.96 * se),
-            'confidence_interval_upper': float(ate + 1.96 * se),
-            'n_obs': summary['n_obs']
+            "ate": float(ate),
+            "se": float(se),
+            "pvalue": float(pval),
+            "confidence_interval_lower": float(ate - 1.96 * se),
+            "confidence_interval_upper": float(ate + 1.96 * se),
+            "n_obs": summary["n_obs"],
         }
 
-        return metrics, summary['n_obs']
+        return metrics, summary["n_obs"]
 
     def _causal_002_injury_causation(self) -> tuple[dict[str, float], int]:
         """CAUSAL-002: Injury Causation on Team Performance"""
@@ -722,11 +736,11 @@ class ExperimentExecutor:
         # Synthetic control for QB injuries
         # Simplified implementation
         metrics = {
-            'ate': -5.2,
-            'rmspe_pre': 2.8,
-            'post_treatment_effect': -6.1,
-            'confidence_interval_lower': -8.5,
-            'confidence_interval_upper': -1.9
+            "ate": -5.2,
+            "rmspe_pre": 2.8,
+            "post_treatment_effect": -6.1,
+            "confidence_interval_lower": -8.5,
+            "confidence_interval_upper": -1.9,
         }
 
         return metrics, 45  # Estimated QB injury events
@@ -748,18 +762,19 @@ class ExperimentExecutor:
 
         # Temporal trend
         from scipy import stats as scipy_stats
+
         slope, intercept, r_value, p_value, std_err = scipy_stats.linregress(
-            df['season'], df['home_advantage']
+            df["season"], df["home_advantage"]
         )
 
         metrics = {
-            'ate': float(df['home_advantage'].mean()),
-            'temporal_trend_slope': float(slope),
-            'temporal_trend_pvalue': float(p_value),
-            'r_squared': float(r_value**2)
+            "ate": float(df["home_advantage"].mean()),
+            "temporal_trend_slope": float(slope),
+            "temporal_trend_pvalue": float(p_value),
+            "r_squared": float(r_value**2),
         }
 
-        return metrics, df['season'].count() * 256  # Games per season
+        return metrics, df["season"].count() * 256  # Games per season
 
     def _causal_004_rest_days(self) -> tuple[dict[str, float], int]:
         """CAUSAL-004: Rest Days Impact on Performance"""
@@ -777,18 +792,20 @@ class ExperimentExecutor:
 
         df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
-        df['short_rest'] = (df['day_of_week'] == 'Thursday').astype(int)
+        df["short_rest"] = (df["day_of_week"] == "Thursday").astype(int)
 
         # Simple treatment effect
-        short_rest_avg = df[df['short_rest'] == 1]['total_points'].mean()
-        normal_rest_avg = df[df['short_rest'] == 0]['total_points'].mean()
+        short_rest_avg = df[df["short_rest"] == 1]["total_points"].mean()
+        normal_rest_avg = df[df["short_rest"] == 0]["total_points"].mean()
         ate = short_rest_avg - normal_rest_avg
 
         metrics = {
-            'ate': float(ate),
-            'short_rest_avg': float(short_rest_avg),
-            'normal_rest_avg': float(normal_rest_avg),
-            'competitiveness_effect': float(df.groupby('short_rest')['competitiveness'].mean().diff().iloc[-1])
+            "ate": float(ate),
+            "short_rest_avg": float(short_rest_avg),
+            "normal_rest_avg": float(normal_rest_avg),
+            "competitiveness_effect": float(
+                df.groupby("short_rest")["competitiveness"].mean().diff().iloc[-1]
+            ),
         }
 
         return metrics, len(df)
@@ -798,12 +815,12 @@ class ExperimentExecutor:
 
         # Simplified - would need QB change events
         metrics = {
-            'ate': 2.8,
-            'se': 1.2,
-            'pvalue': 0.019,
-            'parallel_trends_test_pvalue': 0.28,
-            'veteran_qb_effect': 4.5,
-            'rookie_qb_effect': -1.8
+            "ate": 2.8,
+            "se": 1.2,
+            "pvalue": 0.019,
+            "parallel_trends_test_pvalue": 0.28,
+            "veteran_qb_effect": 4.5,
+            "rookie_qb_effect": -1.8,
         }
 
         return metrics, 85  # Estimated QB change events
@@ -813,9 +830,9 @@ class ExperimentExecutor:
 
         # Would need play-by-play data
         metrics = {
-            'ate': 0.15,  # Success rate increase from passing on 1st down
-            'balance_diagnostic': 0.82,
-            'sensitivity_rosenbaum_gamma': 1.5
+            "ate": 0.15,  # Success rate increase from passing on 1st down
+            "balance_diagnostic": 0.82,
+            "sensitivity_rosenbaum_gamma": 1.5,
         }
 
         return metrics, 50000  # Estimated play-by-play observations
@@ -825,11 +842,11 @@ class ExperimentExecutor:
 
         # Rare events
         metrics = {
-            'ate': 0.02,  # Win rate change
-            'rmspe': 0.08,
-            'placebo_test_pvalue': 0.42,
-            'short_term_effect': -0.05,
-            'long_term_effect': 0.08
+            "ate": 0.02,  # Win rate change
+            "rmspe": 0.08,
+            "placebo_test_pvalue": 0.42,
+            "short_term_effect": -0.05,
+            "long_term_effect": 0.08,
         }
 
         return metrics, 18  # Estimated coaching changes
@@ -839,10 +856,10 @@ class ExperimentExecutor:
 
         # Simplified
         metrics = {
-            'ate_rushing': 12.5,
-            'ate_passing': 18.2,
-            'pressure_mediation_effect': 0.65,
-            'pvalue': 0.003
+            "ate_rushing": 12.5,
+            "ate_passing": 18.2,
+            "pressure_mediation_effect": 0.65,
+            "pvalue": 0.003,
         }
 
         return metrics, 320  # Estimated OL injury events
@@ -851,44 +868,42 @@ class ExperimentExecutor:
         """CAUSAL-009: Target Share Causal Effect on WR Production"""
 
         panel_df = self.panel_constructor.build_player_game_panel(
-            start_season=self.start_season,
-            end_season=self.end_season,
-            position='WR'
+            start_season=self.start_season, end_season=self.end_season, position="WR"
         )
 
         # Calculate target share
-        panel_df['targets'] = panel_df.get('targets', 0)
-        team_targets = panel_df.groupby(['game_id', 'team_id'])['targets'].transform('sum')
-        panel_df['target_share'] = panel_df['targets'] / team_targets
-        panel_df['high_target_share'] = (panel_df['target_share'] > 0.25).astype(int)
+        panel_df["targets"] = panel_df.get("targets", 0)
+        team_targets = panel_df.groupby(["game_id", "team_id"])["targets"].transform("sum")
+        panel_df["target_share"] = panel_df["targets"] / team_targets
+        panel_df["high_target_share"] = (panel_df["target_share"] > 0.25).astype(int)
 
         estimator = DiffInDiffEstimator()
         ate, se, pval, summary = estimator.estimate(
             panel_df,
-            outcome='receiving_yards',
-            treatment='high_target_share',
-            unit_fe='player_id',
-            time_fe='week'
+            outcome="receiving_yards",
+            treatment="high_target_share",
+            unit_fe="player_id",
+            time_fe="week",
         )
 
         metrics = {
-            'ate': float(ate),
-            'se': float(se),
-            'pvalue': float(pval),
-            'non_linearity_test_pvalue': 0.012,
-            'optimal_target_share': 0.28
+            "ate": float(ate),
+            "se": float(se),
+            "pvalue": float(pval),
+            "non_linearity_test_pvalue": 0.012,
+            "optimal_target_share": 0.28,
         }
 
-        return metrics, summary['n_obs']
+        return metrics, summary["n_obs"]
 
     def _causal_010_defensive_scheme(self) -> tuple[dict[str, float], int]:
         """CAUSAL-010: Defensive Scheme Change Causal Effect"""
 
         metrics = {
-            'ate': -1.2,  # Points allowed reduction
-            'immediate_effect': -0.5,
-            'delayed_effect': -1.8,
-            'learning_curve_weeks': 6.5
+            "ate": -1.2,  # Points allowed reduction
+            "immediate_effect": -0.5,
+            "delayed_effect": -1.8,
+            "learning_curve_weeks": 6.5,
         }
 
         return metrics, 12  # Estimated DC changes
@@ -911,16 +926,16 @@ class ExperimentExecutor:
 
         df = pd.read_sql(query, self._get_connection(), params=(self.start_season, self.end_season))
 
-        df['high_altitude'] = (df['elevation'] > 4000).astype(int)
+        df["high_altitude"] = (df["elevation"] > 4000).astype(int)
 
-        high_alt = df[df['high_altitude'] == 1]['passing_yards'].mean()
-        low_alt = df[df['high_altitude'] == 0]['passing_yards'].mean()
+        high_alt = df[df["high_altitude"] == 1]["passing_yards"].mean()
+        low_alt = df[df["high_altitude"] == 0]["passing_yards"].mean()
         ate = high_alt - low_alt
 
         metrics = {
-            'ate': float(ate),
-            'yards_per_attempt_effect': 0.35,
-            'completion_pct_effect': -0.02
+            "ate": float(ate),
+            "yards_per_attempt_effect": 0.35,
+            "completion_pct_effect": -0.02,
         }
 
         return metrics, len(df)
@@ -930,10 +945,10 @@ class ExperimentExecutor:
 
         # Simplified - would need travel distance calculations
         metrics = {
-            'ate': -2.1,  # Point differential impact
-            'cross_country_effect': -3.5,
-            'time_zone_effect': -1.8,
-            'recovery_time_days': 3.2
+            "ate": -2.1,  # Point differential impact
+            "cross_country_effect": -3.5,
+            "time_zone_effect": -1.8,
+            "recovery_time_days": 3.2,
         }
 
         return metrics, 400  # Cross-country games
@@ -943,9 +958,9 @@ class ExperimentExecutor:
 
         # Would need play-by-play
         metrics = {
-            'ate': 1.2,  # Yards per attempt increase
-            'balance_check': 0.88,
-            'sensitivity_gamma': 1.3
+            "ate": 1.2,  # Yards per attempt increase
+            "balance_check": 0.88,
+            "sensitivity_gamma": 1.3,
         }
 
         return metrics, 15000  # Play-action plays
@@ -955,10 +970,10 @@ class ExperimentExecutor:
 
         # Would need 4th down decision data
         metrics = {
-            'ate': 0.035,  # Win probability increase
-            'wp_lift': 3.5,
-            'iv_first_stage_f': 42.5,
-            'iv_validity_pvalue': 0.18
+            "ate": 0.035,  # Win probability increase
+            "wp_lift": 3.5,
+            "iv_first_stage_f": 42.5,
+            "iv_validity_pvalue": 0.18,
         }
 
         return metrics, 2500  # 4th down attempts
@@ -968,9 +983,9 @@ class ExperimentExecutor:
 
         # Would need personnel data
         metrics = {
-            'ate': 0.08,  # TD conversion rate increase
-            'heavy_personnel_effect': 0.12,
-            'spread_personnel_effect': 0.05
+            "ate": 0.08,  # TD conversion rate increase
+            "heavy_personnel_effect": 0.12,
+            "spread_personnel_effect": 0.05,
         }
 
         return metrics, 8000  # Red zone plays
@@ -992,14 +1007,16 @@ class ExperimentExecutor:
         df = pd.read_sql(query, self._get_connection(), params=())
 
         # 2020 = COVID season
-        covid_effect = df[df['season'] == 2020]['avg_home_penalties'].iloc[0] - \
-                       df[df['season'] == 2019]['avg_home_penalties'].iloc[0]
+        covid_effect = (
+            df[df["season"] == 2020]["avg_home_penalties"].iloc[0]
+            - df[df["season"] == 2019]["avg_home_penalties"].iloc[0]
+        )
 
         metrics = {
-            'ate': float(covid_effect),
-            'false_start_effect': -0.45,
-            'delay_of_game_effect': -0.22,
-            'natural_experiment_validity': 0.92
+            "ate": float(covid_effect),
+            "false_start_effect": -0.45,
+            "delay_of_game_effect": -0.22,
+            "natural_experiment_validity": 0.92,
         }
 
         return metrics, 256 * 3  # 3 seasons
@@ -1009,9 +1026,9 @@ class ExperimentExecutor:
 
         # Simplified
         metrics = {
-            'ate': 0.18,  # Pass rate increase per score differential
-            'non_linearity_coefficient': 0.035,
-            'iv_relevance_f': 68.5
+            "ate": 0.18,  # Pass rate increase per score differential
+            "non_linearity_coefficient": 0.035,
+            "iv_relevance_f": 68.5,
         }
 
         return metrics, 1343  # Games
@@ -1021,9 +1038,9 @@ class ExperimentExecutor:
 
         # Would need injury and turf data
         metrics = {
-            'ate': 0.15,  # Injury rate increase on turf
-            'lower_body_injury_effect': 0.22,
-            'upper_body_injury_effect': 0.08
+            "ate": 0.15,  # Injury rate increase on turf
+            "lower_body_injury_effect": 0.22,
+            "upper_body_injury_effect": 0.08,
         }
 
         return metrics, 1343
@@ -1033,9 +1050,9 @@ class ExperimentExecutor:
 
         # Would need timeout usage data
         metrics = {
-            'ate': -0.02,  # Drive success rate
-            'spillover_effect': -0.05,
-            'late_game_management_penalty': -0.08
+            "ate": -0.02,  # Drive success rate
+            "spillover_effect": -0.05,
+            "late_game_management_penalty": -0.08,
         }
 
         return metrics, 10000  # Drives
@@ -1045,9 +1062,9 @@ class ExperimentExecutor:
 
         # Regression discontinuity
         metrics = {
-            'ate': 4.2,  # Additional snaps per game
-            'sunk_cost_bias_estimate': 3.1,
-            'discontinuity_validity_pvalue': 0.08
+            "ate": 4.2,  # Additional snaps per game
+            "sunk_cost_bias_estimate": 3.1,
+            "discontinuity_validity_pvalue": 0.08,
         }
 
         return metrics, 1200  # Drafted players
@@ -1061,16 +1078,16 @@ class ExperimentExecutor:
         results_data = []
         for result in self.results:
             row = {
-                'experiment_id': result.experiment_id,
-                'category': result.category,
-                'status': result.status,
-                'execution_time': result.execution_time,
-                'sample_size': result.sample_size,
-                'error_message': result.error_message
+                "experiment_id": result.experiment_id,
+                "category": result.category,
+                "status": result.status,
+                "execution_time": result.execution_time,
+                "sample_size": result.sample_size,
+                "error_message": result.error_message,
             }
             # Add all metrics as columns
             for metric_name, metric_value in result.metrics.items():
-                row[f'metric_{metric_name}'] = metric_value
+                row[f"metric_{metric_name}"] = metric_value
 
             results_data.append(row)
 
@@ -1081,29 +1098,29 @@ class ExperimentExecutor:
 
         # Export JSON with full details
         json_output = {
-            'metadata': {
-                'execution_date': datetime.now().isoformat(),
-                'start_season': self.start_season,
-                'end_season': self.end_season,
-                'total_experiments': len(self.results),
-                'successful': sum(1 for r in self.results if r.status == 'success'),
-                'failed': sum(1 for r in self.results if r.status == 'failed')
+            "metadata": {
+                "execution_date": datetime.now().isoformat(),
+                "start_season": self.start_season,
+                "end_season": self.end_season,
+                "total_experiments": len(self.results),
+                "successful": sum(1 for r in self.results if r.status == "success"),
+                "failed": sum(1 for r in self.results if r.status == "failed"),
             },
-            'results': [
+            "results": [
                 {
-                    'experiment_id': r.experiment_id,
-                    'category': r.category,
-                    'status': r.status,
-                    'execution_time': r.execution_time,
-                    'sample_size': r.sample_size,
-                    'metrics': r.metrics,
-                    'error_message': r.error_message
+                    "experiment_id": r.experiment_id,
+                    "category": r.category,
+                    "status": r.status,
+                    "execution_time": r.execution_time,
+                    "sample_size": r.sample_size,
+                    "metrics": r.metrics,
+                    "error_message": r.error_message,
                 }
                 for r in self.results
-            ]
+            ],
         }
 
-        with open(f"{output_dir}/all_experiments_results.json", 'w') as f:
+        with open(f"{output_dir}/all_experiments_results.json", "w") as f:
             json.dump(json_output, f, indent=2)
 
         logger.info(f"Exported results to {output_dir}/")
@@ -1115,8 +1132,7 @@ def main():
     """Execute all 40 experiments"""
 
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     executor = ExperimentExecutor(start_season=2020, end_season=2024)
@@ -1128,19 +1144,19 @@ def main():
     results_df = executor.export_results()
 
     # Print summary
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("EXPERIMENT EXECUTION SUMMARY")
-    print("="*80)
+    print("=" * 80)
 
-    successful = sum(1 for r in results if r.status == 'success')
-    failed = sum(1 for r in results if r.status == 'failed')
+    successful = sum(1 for r in results if r.status == "success")
+    failed = sum(1 for r in results if r.status == "failed")
 
     print(f"\n✅ Successful: {successful}/{len(results)}")
     print(f"❌ Failed: {failed}/{len(results)}")
     print(f"\nTotal execution time: {results_df['execution_time'].sum():.1f}s")
     print(f"Total sample size: {results_df['sample_size'].sum():,}")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
 
 
 if __name__ == "__main__":

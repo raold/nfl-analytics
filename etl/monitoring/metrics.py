@@ -85,18 +85,13 @@ class PipelineMetrics:
         """Convert to dictionary for JSON serialization."""
         data = asdict(self)
         # Convert datetime to ISO format
-        data['start_time'] = self.start_time.isoformat()
-        data['end_time'] = self.end_time.isoformat() if self.end_time else None
+        data["start_time"] = self.start_time.isoformat()
+        data["end_time"] = self.end_time.isoformat() if self.end_time else None
         return data
 
     def summary(self) -> str:
         """Human-readable summary."""
-        status_emoji = {
-            "success": "✅",
-            "failed": "❌",
-            "partial": "⚠️",
-            "running": "🔄"
-        }
+        status_emoji = {"success": "✅", "failed": "❌", "partial": "⚠️", "running": "🔄"}
         emoji = status_emoji.get(self.status, "")
 
         return (
@@ -117,11 +112,7 @@ class MetricsCollector:
     - Memory (for real-time monitoring)
     """
 
-    def __init__(
-        self,
-        db_conn: psycopg.Connection | None = None,
-        metrics_dir: Path | None = None
-    ):
+    def __init__(self, db_conn: psycopg.Connection | None = None, metrics_dir: Path | None = None):
         """
         Initialize metrics collector.
 
@@ -164,14 +155,14 @@ class MetricsCollector:
         """Save metrics to JSON file."""
         try:
             # Organize by date
-            date_str = metrics.start_time.strftime('%Y-%m-%d')
+            date_str = metrics.start_time.strftime("%Y-%m-%d")
             date_dir = self.metrics_dir / date_str
             date_dir.mkdir(exist_ok=True)
 
             filename = f"{metrics.pipeline_name}_{metrics.run_id}.json"
             filepath = date_dir / filename
 
-            with open(filepath, 'w') as f:
+            with open(filepath, "w") as f:
                 json.dump(metrics.to_dict(), f, indent=2)
 
         except Exception as e:
@@ -181,19 +172,11 @@ class MetricsCollector:
         """Save metrics to data_quality_log table."""
         try:
             # Determine issue type based on status
-            issue_type_map = {
-                "success": "info",
-                "partial": "warning",
-                "failed": "error"
-            }
+            issue_type_map = {"success": "info", "partial": "warning", "failed": "error"}
             issue_type = issue_type_map.get(metrics.status, "info")
 
             # Determine severity
-            severity_map = {
-                "success": "info",
-                "partial": "warning",
-                "failed": "error"
-            }
+            severity_map = {"success": "info", "partial": "warning", "failed": "error"}
             severity = severity_map.get(metrics.status, "info")
 
             # Insert into data_quality_log
@@ -247,8 +230,8 @@ class MetricsCollector:
                         description,
                         metrics.rows_failed,
                         json.dumps(context),
-                        status
-                    )
+                        status,
+                    ),
                 )
             self.db_conn.commit()
 
@@ -259,11 +242,7 @@ class MetricsCollector:
         """Get most recent metrics."""
         return self.recent_metrics[-limit:]
 
-    def get_pipeline_stats(
-        self,
-        pipeline_name: str,
-        lookback_hours: int = 24
-    ) -> dict[str, Any]:
+    def get_pipeline_stats(self, pipeline_name: str, lookback_hours: int = 24) -> dict[str, Any]:
         """
         Get statistics for a pipeline.
 
@@ -276,7 +255,8 @@ class MetricsCollector:
         """
         cutoff = datetime.now() - timedelta(hours=lookback_hours)
         recent = [
-            m for m in self.recent_metrics
+            m
+            for m in self.recent_metrics
             if m.pipeline_name == pipeline_name and m.start_time >= cutoff
         ]
 
@@ -286,7 +266,7 @@ class MetricsCollector:
                 "count": 0,
                 "success_rate": None,
                 "avg_duration": None,
-                "total_rows_loaded": 0
+                "total_rows_loaded": 0,
             }
 
         success_count = sum(1 for m in recent if m.is_success)
@@ -316,29 +296,21 @@ class MetricsCollector:
         recent = [m for m in self.recent_metrics if m.start_time >= cutoff]
 
         if not recent:
-            return {
-                "total_runs": 0,
-                "success_rate": None,
-                "total_rows_loaded": 0,
-                "pipelines": []
-            }
+            return {"total_runs": 0, "success_rate": None, "total_rows_loaded": 0, "pipelines": []}
 
         success_count = sum(1 for m in recent if m.is_success)
         total_rows = sum(m.rows_loaded for m in recent)
 
         # Get unique pipeline names
         pipeline_names = set(m.pipeline_name for m in recent)
-        pipeline_stats = [
-            self.get_pipeline_stats(name, lookback_hours)
-            for name in pipeline_names
-        ]
+        pipeline_stats = [self.get_pipeline_stats(name, lookback_hours) for name in pipeline_names]
 
         return {
             "total_runs": len(recent),
             "success_rate": success_count / len(recent),
             "total_rows_loaded": total_rows,
             "lookback_hours": lookback_hours,
-            "pipelines": pipeline_stats
+            "pipelines": pipeline_stats,
         }
 
 
@@ -355,7 +327,7 @@ if __name__ == "__main__":
         run_id=str(uuid.uuid4()),
         start_time=datetime.now(),
         source="nflverse",
-        target_table="games"
+        target_table="games",
     )
 
     # Simulate pipeline stages

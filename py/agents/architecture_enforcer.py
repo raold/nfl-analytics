@@ -143,7 +143,7 @@ class ArchitectureEnforcer:
         max_module_lines: int = 2000,
         max_class_methods: int = 10,
         max_method_lines: int = 50,
-        max_coupling: int = 30
+        max_coupling: int = 30,
     ):
         self.codebase_path = Path(codebase_path)
         self.max_module_lines = max_module_lines
@@ -177,18 +177,20 @@ class ArchitectureEnforcer:
             if lines > self.max_module_lines:
                 severity = "CRITICAL" if lines > 5000 else "WARNING"
 
-                violations.append(ArchitecturalViolation(
-                    violation_type=ViolationType.MODULE_SIZE,
-                    severity=severity,
-                    file_path=str(path),
-                    line_number=None,
-                    metric_value=lines,
-                    threshold=self.max_module_lines,
-                    message=(
-                        f"Module has {lines} lines (limit: {self.max_module_lines}). "
-                        f"Consider splitting into smaller components."
+                violations.append(
+                    ArchitecturalViolation(
+                        violation_type=ViolationType.MODULE_SIZE,
+                        severity=severity,
+                        file_path=str(path),
+                        line_number=None,
+                        metric_value=lines,
+                        threshold=self.max_module_lines,
+                        message=(
+                            f"Module has {lines} lines (limit: {self.max_module_lines}). "
+                            f"Consider splitting into smaller components."
+                        ),
                     )
-                ))
+                )
 
         except Exception as e:
             logger.warning(f"Error checking {file_path}: {e}")
@@ -220,8 +222,7 @@ class ArchitectureEnforcer:
             num_classes = sum(1 for node in ast.walk(tree) if isinstance(node, ast.ClassDef))
             num_functions = sum(1 for node in ast.walk(tree) if isinstance(node, ast.FunctionDef))
             num_imports = sum(
-                1 for node in ast.walk(tree)
-                if isinstance(node, (ast.Import, ast.ImportFrom))
+                1 for node in ast.walk(tree) if isinstance(node, (ast.Import, ast.ImportFrom))
             )
 
             # Extract dependencies
@@ -242,36 +243,40 @@ class ArchitectureEnforcer:
             # Coupling violation
             total_coupling = afferent + efferent
             if total_coupling > self.max_coupling:
-                violations.append(ArchitecturalViolation(
-                    violation_type=ViolationType.HIGH_COUPLING,
-                    severity="WARNING",
-                    file_path=str(path),
-                    line_number=None,
-                    metric_value=total_coupling,
-                    threshold=self.max_coupling,
-                    message=(
-                        f"High coupling detected (Ca={afferent}, Ce={efferent}). "
-                        f"Consider reducing dependencies."
+                violations.append(
+                    ArchitecturalViolation(
+                        violation_type=ViolationType.HIGH_COUPLING,
+                        severity="WARNING",
+                        file_path=str(path),
+                        line_number=None,
+                        metric_value=total_coupling,
+                        threshold=self.max_coupling,
+                        message=(
+                            f"High coupling detected (Ca={afferent}, Ce={efferent}). "
+                            f"Consider reducing dependencies."
+                        ),
                     )
-                ))
+                )
 
             # God class violation
             for node in ast.walk(tree):
                 if isinstance(node, ast.ClassDef):
                     methods = [n for n in node.body if isinstance(n, ast.FunctionDef)]
                     if len(methods) > self.max_class_methods:
-                        violations.append(ArchitecturalViolation(
-                            violation_type=ViolationType.GOD_CLASS,
-                            severity="WARNING",
-                            file_path=str(path),
-                            line_number=node.lineno,
-                            metric_value=len(methods),
-                            threshold=self.max_class_methods,
-                            message=(
-                                f"Class '{node.name}' has {len(methods)} methods "
-                                f"(limit: {self.max_class_methods})"
+                        violations.append(
+                            ArchitecturalViolation(
+                                violation_type=ViolationType.GOD_CLASS,
+                                severity="WARNING",
+                                file_path=str(path),
+                                line_number=node.lineno,
+                                metric_value=len(methods),
+                                threshold=self.max_class_methods,
+                                message=(
+                                    f"Class '{node.name}' has {len(methods)} methods "
+                                    f"(limit: {self.max_class_methods})"
+                                ),
                             )
-                        ))
+                        )
 
             return ModuleMetrics(
                 file_path=str(path),
@@ -282,7 +287,7 @@ class ArchitectureEnforcer:
                 afferent_coupling=afferent,
                 efferent_coupling=efferent,
                 instability=instability,
-                violations=violations
+                violations=violations,
             )
 
         except Exception as e:
@@ -290,8 +295,7 @@ class ArchitectureEnforcer:
             raise
 
     def detect_circular_dependencies(
-        self,
-        directory: str | None = None
+        self, directory: str | None = None
     ) -> list[CircularDependency]:
         """
         Detect circular dependencies in codebase.
@@ -321,11 +325,7 @@ class ArchitectureEnforcer:
             for cycle in simple_cycles:
                 severity = "CRITICAL" if len(cycle) > 2 else "WARNING"
 
-                cycles.append(CircularDependency(
-                    cycle=cycle,
-                    length=len(cycle),
-                    severity=severity
-                ))
+                cycles.append(CircularDependency(cycle=cycle, length=len(cycle), severity=severity))
 
         except Exception as e:
             logger.warning(f"Error detecting cycles: {e}")
@@ -352,7 +352,7 @@ class ArchitectureEnforcer:
                 num_extractions=0,
                 extractions=[],
                 estimated_effort_hours=0.0,
-                priority="LOW"
+                priority="LOW",
             )
 
         # Analyze structure to suggest extractions
@@ -380,13 +380,10 @@ class ArchitectureEnforcer:
             num_extractions=len(extractions),
             extractions=extractions,
             estimated_effort_hours=estimated_effort_hours,
-            priority=priority
+            priority=priority,
         )
 
-    def check_all_modules(
-        self,
-        directory: str | None = None
-    ) -> dict[str, ModuleMetrics]:
+    def check_all_modules(self, directory: str | None = None) -> dict[str, ModuleMetrics]:
         """
         Analyze all Python modules in directory.
 
@@ -412,9 +409,7 @@ class ArchitectureEnforcer:
         return metrics
 
     def get_top_violations(
-        self,
-        limit: int = 10,
-        violation_type: ViolationType | None = None
+        self, limit: int = 10, violation_type: ViolationType | None = None
     ) -> list[ArchitecturalViolation]:
         """
         Get top architectural violations across codebase.
@@ -436,9 +431,7 @@ class ArchitectureEnforcer:
 
         # Sort by severity and metric value
         severity_order = {"CRITICAL": 0, "WARNING": 1, "INFO": 2}
-        all_violations.sort(
-            key=lambda v: (severity_order[v.severity], -v.metric_value)
-        )
+        all_violations.sort(key=lambda v: (severity_order[v.severity], -v.metric_value))
 
         return all_violations[:limit]
 
@@ -487,9 +480,7 @@ class ArchitectureEnforcer:
         return afferent
 
     def _suggest_extractions(
-        self,
-        file_path: str,
-        metrics: ModuleMetrics
+        self, file_path: str, metrics: ModuleMetrics
     ) -> list[ComponentExtractionPlan]:
         """Suggest component extractions for large module."""
         extractions = []
@@ -501,20 +492,24 @@ class ArchitectureEnforcer:
             # Strategy 1: Extract large classes
             for node in ast.walk(tree):
                 if isinstance(node, ast.ClassDef):
-                    class_lines = node.end_lineno - node.lineno if hasattr(node, 'end_lineno') else 100
+                    class_lines = (
+                        node.end_lineno - node.lineno if hasattr(node, "end_lineno") else 100
+                    )
 
                     if class_lines > 200:  # Large class
                         target_file = f"{Path(file_path).parent}/{node.name.lower()}.py"
 
-                        extractions.append(ComponentExtractionPlan(
-                            source_file=file_path,
-                            target_file=target_file,
-                            strategy=RefactoringStrategy.EXTRACT_CLASS,
-                            lines_to_move=[(node.lineno, node.end_lineno)],
-                            estimated_reduction=class_lines,
-                            dependencies=[],
-                            code_example=f"# Extract {node.name} to {target_file}"
-                        ))
+                        extractions.append(
+                            ComponentExtractionPlan(
+                                source_file=file_path,
+                                target_file=target_file,
+                                strategy=RefactoringStrategy.EXTRACT_CLASS,
+                                lines_to_move=[(node.lineno, node.end_lineno)],
+                                estimated_reduction=class_lines,
+                                dependencies=[],
+                                code_example=f"# Extract {node.name} to {target_file}",
+                            )
+                        )
 
         except Exception as e:
             logger.warning(f"Error suggesting extractions for {file_path}: {e}")

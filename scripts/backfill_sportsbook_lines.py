@@ -354,9 +354,7 @@ def main():
     """Main entry point."""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Backfill missing sportsbook betting lines"
-    )
+    parser = argparse.ArgumentParser(description="Backfill missing sportsbook betting lines")
     parser.add_argument("--season", type=int, help="Filter to specific season")
     parser.add_argument("--week", type=int, help="Filter to specific week")
     parser.add_argument(
@@ -367,9 +365,7 @@ def main():
 
     args = parser.parse_args()
 
-    backfill_sportsbook_lines(
-        season=args.season, week=args.week, dry_run=args.dry_run
-    )
+    backfill_sportsbook_lines(season=args.season, week=args.week, dry_run=args.dry_run)
 
 
 if __name__ == "__main__":

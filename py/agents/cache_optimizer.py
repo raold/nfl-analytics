@@ -154,18 +154,14 @@ class CacheOptimizer:
 
         # TTL recommendations based on data update frequency
         self.ttl_mapping = {
-            CacheStrategy.SHORT_TTL: 120,      # 2 minutes
-            CacheStrategy.MEDIUM_TTL: 900,     # 15 minutes
-            CacheStrategy.LONG_TTL: 3600,      # 1 hour
-            CacheStrategy.PERSISTENT: None,    # No expiration
+            CacheStrategy.SHORT_TTL: 120,  # 2 minutes
+            CacheStrategy.MEDIUM_TTL: 900,  # 15 minutes
+            CacheStrategy.LONG_TTL: 3600,  # 1 hour
+            CacheStrategy.PERSISTENT: None,  # No expiration
         }
 
     def track_call(
-        self,
-        function_name: str,
-        args: tuple[Any, ...],
-        kwargs: dict[str, Any],
-        duration_ms: float
+        self, function_name: str, args: tuple[Any, ...], kwargs: dict[str, Any], duration_ms: float
     ) -> None:
         """
         Track a function call for analysis.
@@ -181,7 +177,7 @@ class CacheOptimizer:
             args=args,
             kwargs=kwargs,
             timestamp=datetime.now(),
-            duration_ms=duration_ms
+            duration_ms=duration_ms,
         )
         self.call_log.append(call)
 
@@ -194,19 +190,18 @@ class CacheOptimizer:
             def expensive_query(season: int):
                 ...
         """
+
         def wrapper(*args, **kwargs):
             start = time.time()
             result = func(*args, **kwargs)
             duration_ms = (time.time() - start) * 1000
 
             self.track_call(
-                function_name=func.__name__,
-                args=args,
-                kwargs=kwargs,
-                duration_ms=duration_ms
+                function_name=func.__name__, args=args, kwargs=kwargs, duration_ms=duration_ms
             )
 
             return result
+
         return wrapper
 
     def analyze_call_patterns(self) -> dict[str, CacheOpportunity]:
@@ -269,7 +264,7 @@ class CacheOptimizer:
                 potential_savings_ms=potential_savings_ms,
                 recommended_strategy=strategy,
                 recommended_ttl_seconds=self.ttl_mapping.get(strategy),
-                confidence=confidence
+                confidence=confidence,
             )
 
         return opportunities
@@ -290,9 +285,7 @@ class CacheOptimizer:
 
         # Generate recommendations
         recommendations = self._generate_recommendations(
-            cached_functions,
-            uncached_functions,
-            opportunities
+            cached_functions, uncached_functions, opportunities
         )
 
         # Calculate aggregate stats
@@ -319,7 +312,7 @@ class CacheOptimizer:
             total_time_saved_ms=total_time_saved_ms,
             cache_stats=cache_stats,
             opportunities=list(opportunities.values()),
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
     def suggest_cache_optimizations(self) -> list[CacheRecommendation]:
@@ -332,10 +325,7 @@ class CacheOptimizer:
         report = self.analyze_cache_performance()
         return report.recommendations
 
-    def generate_cache_decorators(
-        self,
-        output_path: str | None = None
-    ) -> dict[str, str]:
+    def generate_cache_decorators(self, output_path: str | None = None) -> dict[str, str]:
         """
         Auto-generate cache decorator code for recommended functions.
 
@@ -412,7 +402,7 @@ class CacheOptimizer:
         estimates = {
             "total_cached_functions": len(cached_functions),
             "estimated_memory_mb": len(cached_functions) * 10,  # ~10MB per function
-            "recommendations": []
+            "recommendations": [],
         }
 
         if estimates["estimated_memory_mb"] > 500:
@@ -457,12 +447,14 @@ class CacheOptimizer:
                         for decorator in node.decorator_list:
                             if isinstance(decorator, ast.Name):
                                 if "cache" in decorator.id.lower():
-                                    cached.append({
-                                        "function": node.name,
-                                        "file": str(py_file),
-                                        "line": node.lineno,
-                                        "decorator": decorator.id
-                                    })
+                                    cached.append(
+                                        {
+                                            "function": node.name,
+                                            "file": str(py_file),
+                                            "line": node.lineno,
+                                            "decorator": decorator.id,
+                                        }
+                                    )
             except Exception as e:
                 logger.warning(f"Error parsing {py_file}: {e}")
 
@@ -484,13 +476,22 @@ class CacheOptimizer:
                             # Heuristic: functions that query data or transform it
                             if any(
                                 keyword in node.name.lower()
-                                for keyword in ["get", "load", "fetch", "query", "compute", "calculate"]
+                                for keyword in [
+                                    "get",
+                                    "load",
+                                    "fetch",
+                                    "query",
+                                    "compute",
+                                    "calculate",
+                                ]
                             ):
-                                uncached.append({
-                                    "function": node.name,
-                                    "file": str(py_file),
-                                    "line": node.lineno
-                                })
+                                uncached.append(
+                                    {
+                                        "function": node.name,
+                                        "file": str(py_file),
+                                        "line": node.lineno,
+                                    }
+                                )
             except Exception as e:
                 logger.warning(f"Error parsing {py_file}: {e}")
 
@@ -500,7 +501,7 @@ class CacheOptimizer:
         self,
         cached_functions: list[dict[str, Any]],
         uncached_functions: list[dict[str, Any]],
-        opportunities: dict[str, CacheOpportunity]
+        opportunities: dict[str, CacheOpportunity],
     ) -> list[CacheRecommendation]:
         """Generate specific caching recommendations."""
         recommendations = []
@@ -526,34 +527,29 @@ class CacheOptimizer:
 
                 speedup = opp.potential_savings_ms / opp.avg_duration_ms
 
-                recommendations.append(CacheRecommendation(
-                    function_name=func_name,
-                    file_path=func_info["file"],
-                    line_number=func_info["line"],
-                    current_decorator=None,
-                    recommended_decorator=decorator,
-                    recommended_ttl=opp.recommended_ttl_seconds,
-                    rationale=(
-                        f"Function called {opp.call_count} times with "
-                        f"{opp.repeat_rate:.0%} repeat rate. "
-                        f"Average duration: {opp.avg_duration_ms:.1f}ms"
-                    ),
-                    estimated_speedup=f"{speedup:.0f}x faster",
-                    code_example=self._generate_code_example(
-                        func_name,
-                        decorator,
-                        opp.recommended_ttl_seconds
+                recommendations.append(
+                    CacheRecommendation(
+                        function_name=func_name,
+                        file_path=func_info["file"],
+                        line_number=func_info["line"],
+                        current_decorator=None,
+                        recommended_decorator=decorator,
+                        recommended_ttl=opp.recommended_ttl_seconds,
+                        rationale=(
+                            f"Function called {opp.call_count} times with "
+                            f"{opp.repeat_rate:.0%} repeat rate. "
+                            f"Average duration: {opp.avg_duration_ms:.1f}ms"
+                        ),
+                        estimated_speedup=f"{speedup:.0f}x faster",
+                        code_example=self._generate_code_example(
+                            func_name, decorator, opp.recommended_ttl_seconds
+                        ),
                     )
-                ))
+                )
 
         return recommendations
 
-    def _generate_code_example(
-        self,
-        func_name: str,
-        decorator: str,
-        ttl: int | None
-    ) -> str:
+    def _generate_code_example(self, func_name: str, decorator: str, ttl: int | None) -> str:
         """Generate example code with cache decorator."""
         if ttl:
             decorator_line = f"{decorator}(ttl={ttl})"

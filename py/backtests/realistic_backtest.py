@@ -105,9 +105,7 @@ class RealisticBacktest(GameOutcomeBacktest):
         # Check win rate
         win_rate = summary.get("win_rate", 0.0)
         if win_rate > 0.60:
-            warnings.append(
-                f"⚠️  Win rate {win_rate:.1%} > 60% - May indicate data leakage!"
-            )
+            warnings.append(f"⚠️  Win rate {win_rate:.1%} > 60% - May indicate data leakage!")
             print(f"⚠️  Win rate: {win_rate:.1%} (UNREALISTIC - professionals achieve 54-56%)")
         else:
             print(f"✓ Win rate: {win_rate:.1%} (REALISTIC - professionals achieve 54-56%)")
@@ -128,9 +126,7 @@ class RealisticBacktest(GameOutcomeBacktest):
         # Check Sharpe ratio
         sharpe = summary.get("sharpe_ratio", 0.0)
         if sharpe > 2.0:
-            warnings.append(
-                f"⚠️  Sharpe ratio {sharpe:.2f} > 2.0 - May indicate overfitting!"
-            )
+            warnings.append(f"⚠️  Sharpe ratio {sharpe:.2f} > 2.0 - May indicate overfitting!")
             print(f"⚠️  Sharpe ratio: {sharpe:.2f} (UNREALISTIC - professionals achieve ~1.0-1.5)")
         else:
             print(f"✓ Sharpe ratio: {sharpe:.2f} (REALISTIC - professionals achieve ~1.0-1.5)")
@@ -138,9 +134,7 @@ class RealisticBacktest(GameOutcomeBacktest):
         # Check max drawdown
         max_dd = summary.get("max_drawdown", 0.0)
         if abs(max_dd) < 0.05:
-            warnings.append(
-                f"⚠️  Max drawdown {max_dd:.1%} < 5% - Unusually low volatility!"
-            )
+            warnings.append(f"⚠️  Max drawdown {max_dd:.1%} < 5% - Unusually low volatility!")
             print(f"⚠️  Max drawdown: {max_dd:.1%} (SUSPICIOUSLY LOW - expect 10-20%)")
         else:
             print(f"✓ Max drawdown: {max_dd:.1%} (REALISTIC - expect 10-20%)")
@@ -187,7 +181,9 @@ class RealisticBacktest(GameOutcomeBacktest):
         print("\nSTRICT CONSTRAINTS:")
         print(f"  Max bet fraction: {self.max_bet_frac:.1%} (vs 10% standard)")
         print(f"  Max bet absolute: ${self.max_bet_absolute:,.0f}")
-        print(f"  Probability clipping: [{self.prob_clip_min:.2f}, {self.prob_clip_max:.2f}] (vs [0.05, 0.95] standard)")
+        print(
+            f"  Probability clipping: [{self.prob_clip_min:.2f}, {self.prob_clip_max:.2f}] (vs [0.05, 0.95] standard)"
+        )
         print(f"  Min edge threshold: {self.edge_threshold:.1%} (vs 5% standard)")
         print(f"  Kelly multiplier: {self.kelly_multiplier} (quarter Kelly)")
 
@@ -278,22 +274,24 @@ class RealisticBacktest(GameOutcomeBacktest):
                     self.bankroll += profit
 
                 # Record trade
-                self.trades.append({
-                    "game_id": game_id,
-                    "season": season,
-                    "week": week,
-                    "home_team": home_team,
-                    "away_team": away_team,
-                    "bet_side": bet_side,
-                    "bet_prob": bet_prob,
-                    "market_prob": market_prob_home if bet_side == "home" else market_prob_away,
-                    "edge": abs(edge),
-                    "kelly_frac": kelly_frac,
-                    "bet_size": bet_size,
-                    "outcome": outcome,
-                    "profit": profit,
-                    "bankroll": self.bankroll,
-                })
+                self.trades.append(
+                    {
+                        "game_id": game_id,
+                        "season": season,
+                        "week": week,
+                        "home_team": home_team,
+                        "away_team": away_team,
+                        "bet_side": bet_side,
+                        "bet_prob": bet_prob,
+                        "market_prob": market_prob_home if bet_side == "home" else market_prob_away,
+                        "edge": abs(edge),
+                        "kelly_frac": kelly_frac,
+                        "bet_size": bet_size,
+                        "outcome": outcome,
+                        "profit": profit,
+                        "bankroll": self.bankroll,
+                    }
+                )
 
                 self.cumulative_returns.append(self.bankroll / self.initial_bankroll - 1)
 
@@ -324,7 +322,11 @@ class RealisticBacktest(GameOutcomeBacktest):
         if len(self.cumulative_returns) > 1:
             returns_series = pd.Series(self.cumulative_returns)
             returns_diff = returns_series.diff().dropna()
-            sharpe_ratio = (returns_diff.mean() / returns_diff.std()) * np.sqrt(16) if returns_diff.std() > 0 else 0.0
+            sharpe_ratio = (
+                (returns_diff.mean() / returns_diff.std()) * np.sqrt(16)
+                if returns_diff.std() > 0
+                else 0.0
+            )
         else:
             sharpe_ratio = 0.0
 
@@ -351,7 +353,9 @@ class RealisticBacktest(GameOutcomeBacktest):
             season_trades = trades_df[trades_df["season"] == season]
             season_profit = season_trades["profit"].sum()
             season_win_rate = season_trades["outcome"].mean()
-            print(f"{season}: {len(season_trades)} trades, Win rate: {season_win_rate:.1%}, P&L: ${season_profit:+,.2f}")
+            print(
+                f"{season}: {len(season_trades)} trades, Win rate: {season_win_rate:.1%}, P&L: ${season_profit:+,.2f}"
+            )
 
         summary = {
             "n_trades": int(n_trades),

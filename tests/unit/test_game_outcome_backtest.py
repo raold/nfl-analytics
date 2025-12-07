@@ -23,7 +23,6 @@ def test_kelly_fraction_basic():
     assert result is not None
 
 
-
 def test_kelly_fraction_edge_cases():
     """Test kelly_fraction: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_kelly_fraction_edge_cases():
     assert result is not None
 
 
-
 def test_kelly_fraction_error_handling():
     """Test kelly_fraction error handling."""
     with pytest.raises(ValueError):
         kelly_fraction(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -51,8 +48,9 @@ def test_kelly_fraction_property_idempotent(self, prob, odds, kelly_multiplier, 
     result = kelly_fraction(prob, odds, kelly_multiplier, max_bet_frac)
 
     # Assert property
-    assert kelly_fraction(prob, odds, kelly_multiplier, max_bet_frac) == result, "idempotent violated"
-
+    assert (
+        kelly_fraction(prob, odds, kelly_multiplier, max_bet_frac) == result
+    ), "idempotent violated"
 
 
 def test_american_to_decimal_basic():
@@ -67,7 +65,6 @@ def test_american_to_decimal_basic():
     assert result is not None
 
 
-
 def test_american_to_decimal_edge_cases():
     """Test american_to_decimal: edge cases."""
     # Arrange
@@ -80,12 +77,10 @@ def test_american_to_decimal_edge_cases():
     assert result is not None
 
 
-
 def test_american_to_decimal_error_handling():
     """Test american_to_decimal error handling."""
     with pytest.raises(ValueError):
         american_to_decimal(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +91,6 @@ def test_american_to_decimal_property_idempotent(self, american_odds):
 
     # Assert property
     assert american_to_decimal(american_odds) == result, "idempotent violated"
-
 
 
 def test_get_implied_prob_basic():
@@ -111,7 +105,6 @@ def test_get_implied_prob_basic():
     assert result is not None
 
 
-
 def test_get_implied_prob_edge_cases():
     """Test get_implied_prob: edge cases."""
     # Arrange
@@ -124,12 +117,10 @@ def test_get_implied_prob_edge_cases():
     assert result is not None
 
 
-
 def test_get_implied_prob_error_handling():
     """Test get_implied_prob error handling."""
     with pytest.raises(ValueError):
         get_implied_prob(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +131,6 @@ def test_get_implied_prob_property_idempotent(self, spread, vig):
 
     # Assert property
     assert get_implied_prob(spread, vig) == result, "idempotent violated"
-
 
 
 def test_parse_args_basic():
@@ -155,7 +145,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -168,12 +157,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_main_basic():
@@ -188,7 +175,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -201,12 +187,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_backtest_basic():
@@ -221,7 +205,6 @@ def test_backtest_basic():
     assert result is not None
 
 
-
 def test_backtest_edge_cases():
     """Test backtest: edge cases."""
     # Arrange
@@ -234,12 +217,10 @@ def test_backtest_edge_cases():
     assert result is not None
 
 
-
 def test_backtest_error_handling():
     """Test backtest error handling."""
     with pytest.raises(ValueError):
         backtest(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -250,7 +231,6 @@ def test_backtest_property_idempotent(self, self, ensemble, df, train_df):
 
     # Assert property
     assert backtest(self, ensemble, df, train_df) == result, "idempotent violated"
-
 
 
 def test_save_results_basic():
@@ -265,7 +245,6 @@ def test_save_results_basic():
     assert result is not None
 
 
-
 def test_save_results_edge_cases():
     """Test save_results: edge cases."""
     # Arrange
@@ -278,12 +257,10 @@ def test_save_results_edge_cases():
     assert result is not None
 
 
-
 def test_save_results_error_handling():
     """Test save_results error handling."""
     with pytest.raises(ValueError):
         save_results(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -294,4 +271,3 @@ def test_save_results_property_idempotent(self, self, output_dir):
 
     # Assert property
     assert save_results(self, output_dir) == result, "idempotent violated"
-

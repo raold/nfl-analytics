@@ -188,11 +188,10 @@ import os
 import psycopg2
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class GameFeatureExtractor:
@@ -264,11 +263,15 @@ class GameFeatureExtractor:
         # Quick Wins feature extractors (Nov 27, 2025)
         if TurnoverLuckEngine:
             self.turnover_luck_extractor = TurnoverLuckEngine(
-                db_host=db_config.get('host', 'localhost') if db_config else 'localhost',
-                db_port=db_config.get('port', 5544) if db_config else 5544,
-                db_name=db_config.get('dbname', 'devdb01') if db_config else 'devdb01',
-                db_user=db_config.get('user', 'dro') if db_config else 'dro',
-                db_password=db_config.get('password', 'sicillionbillions') if db_config else 'sicillionbillions'
+                db_host=db_config.get("host", "localhost") if db_config else "localhost",
+                db_port=db_config.get("port", 5544) if db_config else 5544,
+                db_name=db_config.get("dbname", "devdb01") if db_config else "devdb01",
+                db_user=db_config.get("user", "dro") if db_config else "dro",
+                db_password=(
+                    db_config.get("password", "sicillionbillions")
+                    if db_config
+                    else "sicillionbillions"
+                ),
             )
             logger.info("Turnover Luck extractor initialized")
         else:
@@ -277,11 +280,15 @@ class GameFeatureExtractor:
 
         if PrimetimeFeaturesEngine:
             self.primetime_extractor = PrimetimeFeaturesEngine(
-                db_host=db_config.get('host', 'localhost') if db_config else 'localhost',
-                db_port=db_config.get('port', 5544) if db_config else 5544,
-                db_name=db_config.get('dbname', 'devdb01') if db_config else 'devdb01',
-                db_user=db_config.get('user', 'dro') if db_config else 'dro',
-                db_password=db_config.get('password', 'sicillionbillions') if db_config else 'sicillionbillions'
+                db_host=db_config.get("host", "localhost") if db_config else "localhost",
+                db_port=db_config.get("port", 5544) if db_config else 5544,
+                db_name=db_config.get("dbname", "devdb01") if db_config else "devdb01",
+                db_user=db_config.get("user", "dro") if db_config else "dro",
+                db_password=(
+                    db_config.get("password", "sicillionbillions")
+                    if db_config
+                    else "sicillionbillions"
+                ),
             )
             logger.info("Primetime Features extractor initialized")
         else:
@@ -290,11 +297,15 @@ class GameFeatureExtractor:
 
         if OpponentStrengthEngine:
             self.opponent_strength_extractor = OpponentStrengthEngine(
-                db_host=db_config.get('host', 'localhost') if db_config else 'localhost',
-                db_port=db_config.get('port', 5544) if db_config else 5544,
-                db_name=db_config.get('dbname', 'devdb01') if db_config else 'devdb01',
-                db_user=db_config.get('user', 'dro') if db_config else 'dro',
-                db_password=db_config.get('password', 'sicillionbillions') if db_config else 'sicillionbillions'
+                db_host=db_config.get("host", "localhost") if db_config else "localhost",
+                db_port=db_config.get("port", 5544) if db_config else 5544,
+                db_name=db_config.get("dbname", "devdb01") if db_config else "devdb01",
+                db_user=db_config.get("user", "dro") if db_config else "dro",
+                db_password=(
+                    db_config.get("password", "sicillionbillions")
+                    if db_config
+                    else "sicillionbillions"
+                ),
             )
             logger.info("Opponent Strength (SoV) extractor initialized")
         else:
@@ -303,11 +314,11 @@ class GameFeatureExtractor:
 
         # Database connection for function-based extractors
         self.db_config = db_config or {
-            'host': 'localhost',
-            'port': 5544,
-            'dbname': 'devdb01',
-            'user': 'dro',
-            'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
+            "host": "localhost",
+            "port": 5544,
+            "dbname": "devdb01",
+            "user": "dro",
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
         }
 
         # Feature cache: {(team, season, week, feature_type): (features, timestamp)}
@@ -316,12 +327,7 @@ class GameFeatureExtractor:
         logger.info("GameFeatureExtractor initialized successfully")
 
     def extract_game_features(
-        self,
-        home_team: str,
-        away_team: str,
-        season: int,
-        week: int,
-        use_cache: bool = True
+        self, home_team: str, away_team: str, season: int, week: int, use_cache: bool = True
     ) -> dict[str, float]:
         """
         Extract all 232 features for a game matchup (includes injury and advanced features).
@@ -414,23 +420,23 @@ class GameFeatureExtractor:
         self._validate_inputs(home_team, away_team, season, week)
 
         # Extract base features (with caching)
-        home_off = self._get_features(home_team, season, week, 'offensive', use_cache)
-        home_def = self._get_features(home_team, season, week, 'defensive', use_cache)
-        away_off = self._get_features(away_team, season, week, 'offensive', use_cache)
-        away_def = self._get_features(away_team, season, week, 'defensive', use_cache)
+        home_off = self._get_features(home_team, season, week, "offensive", use_cache)
+        home_def = self._get_features(home_team, season, week, "defensive", use_cache)
+        away_off = self._get_features(away_team, season, week, "offensive", use_cache)
+        away_def = self._get_features(away_team, season, week, "defensive", use_cache)
 
         # Combine with prefixes
         features = {}
-        features.update({f'home_off_{k}': v for k, v in home_off.items()})
-        features.update({f'home_def_{k}': v for k, v in home_def.items()})
-        features.update({f'away_off_{k}': v for k, v in away_off.items()})
-        features.update({f'away_def_{k}': v for k, v in away_def.items()})
+        features.update({f"home_off_{k}": v for k, v in home_off.items()})
+        features.update({f"home_def_{k}": v for k, v in home_def.items()})
+        features.update({f"away_off_{k}": v for k, v in away_off.items()})
+        features.update({f"away_def_{k}": v for k, v in away_def.items()})
 
         # Add derived matchup features
-        features['offensive_mismatch'] = self._compute_offensive_mismatch(home_off, away_def)
-        features['defensive_mismatch'] = self._compute_defensive_mismatch(away_off, home_def)
-        features['pace_difference'] = self._compute_pace_difference(home_off, away_off)
-        features['rest_differential'] = 0  # Future: days_since_last_game
+        features["offensive_mismatch"] = self._compute_offensive_mismatch(home_off, away_def)
+        features["defensive_mismatch"] = self._compute_defensive_mismatch(away_off, home_def)
+        features["pace_difference"] = self._compute_pace_difference(home_off, away_off)
+        features["rest_differential"] = 0  # Future: days_since_last_game
 
         # Add injury features
         try:
@@ -443,28 +449,30 @@ class GameFeatureExtractor:
         except Exception as e:
             logger.warning(f"Failed to extract injury features: {e}. Using default values.")
             # Add default injury features (all zeros)
-            features.update({
-                'home_injury_total': 0,
-                'home_injury_severity_index': 0.0,
-                'home_qb_out': 0,
-                'home_key_position_out': 0,
-                'home_oline_injuries': 0,
-                'away_injury_total': 0,
-                'away_injury_severity_index': 0.0,
-                'away_qb_out': 0,
-                'away_key_position_out': 0,
-                'away_oline_injuries': 0,
-                'injury_severity_diff': 0.0,
-                'injury_spread_adjustment': 0.0
-            })
+            features.update(
+                {
+                    "home_injury_total": 0,
+                    "home_injury_severity_index": 0.0,
+                    "home_qb_out": 0,
+                    "home_key_position_out": 0,
+                    "home_oline_injuries": 0,
+                    "away_injury_total": 0,
+                    "away_injury_severity_index": 0.0,
+                    "away_qb_out": 0,
+                    "away_key_position_out": 0,
+                    "away_oline_injuries": 0,
+                    "injury_severity_diff": 0.0,
+                    "injury_spread_adjustment": 0.0,
+                }
+            )
 
         # Add Next Gen Stats features (23 per team)
         if self.ngs_extractor:
             try:
                 home_ngs = self.ngs_extractor.get_team_ngs_features(home_team, season, week)
-                features.update({f'home_ngs_{k}': v for k, v in home_ngs.items()})
+                features.update({f"home_ngs_{k}": v for k, v in home_ngs.items()})
                 away_ngs = self.ngs_extractor.get_team_ngs_features(away_team, season, week)
-                features.update({f'away_ngs_{k}': v for k, v in away_ngs.items()})
+                features.update({f"away_ngs_{k}": v for k, v in away_ngs.items()})
                 logger.debug(f"Added {len(home_ngs) + len(away_ngs)} NGS features")
             except Exception as e:
                 logger.warning(f"Failed to extract NGS features: {e}")
@@ -473,9 +481,9 @@ class GameFeatureExtractor:
         if self.qbr_extractor:
             try:
                 home_qbr = self.qbr_extractor.extract_features(home_team, season, week)
-                features.update({f'home_qbr_{k}': v for k, v in home_qbr.items()})
+                features.update({f"home_qbr_{k}": v for k, v in home_qbr.items()})
                 away_qbr = self.qbr_extractor.extract_features(away_team, season, week)
-                features.update({f'away_qbr_{k}': v for k, v in away_qbr.items()})
+                features.update({f"away_qbr_{k}": v for k, v in away_qbr.items()})
                 logger.debug(f"Added {len(home_qbr) + len(away_qbr)} QBR features")
             except Exception as e:
                 logger.warning(f"Failed to extract QBR features: {e}")
@@ -486,10 +494,12 @@ class GameFeatureExtractor:
                 conn = psycopg2.connect(**self.db_config)
                 try:
                     home_poss = get_team_possession_value_features(conn, home_team, season, week)
-                    features.update({f'home_poss_{k}': v for k, v in home_poss.items()})
+                    features.update({f"home_poss_{k}": v for k, v in home_poss.items()})
                     away_poss = get_team_possession_value_features(conn, away_team, season, week)
-                    features.update({f'away_poss_{k}': v for k, v in away_poss.items()})
-                    logger.debug(f"Added {len(home_poss) + len(away_poss)} possession value features")
+                    features.update({f"away_poss_{k}": v for k, v in away_poss.items()})
+                    logger.debug(
+                        f"Added {len(home_poss) + len(away_poss)} possession value features"
+                    )
                 finally:
                     conn.close()
             except Exception as e:
@@ -501,9 +511,9 @@ class GameFeatureExtractor:
                 conn = psycopg2.connect(**self.db_config)
                 try:
                     home_play = get_team_playcalling_features(conn, home_team, season, week)
-                    features.update({f'home_play_{k}': v for k, v in home_play.items()})
+                    features.update({f"home_play_{k}": v for k, v in home_play.items()})
                     away_play = get_team_playcalling_features(conn, away_team, season, week)
-                    features.update({f'away_play_{k}': v for k, v in away_play.items()})
+                    features.update({f"away_play_{k}": v for k, v in away_play.items()})
                     logger.debug(f"Added {len(home_play) + len(away_play)} playcalling features")
                 finally:
                     conn.close()
@@ -514,9 +524,9 @@ class GameFeatureExtractor:
         if self.oadj_extractor:
             try:
                 home_oadj = self.oadj_extractor.extract_features(home_team, away_team, season, week)
-                features.update({f'home_oadj_{k}': v for k, v in home_oadj.items()})
+                features.update({f"home_oadj_{k}": v for k, v in home_oadj.items()})
                 away_oadj = self.oadj_extractor.extract_features(away_team, home_team, season, week)
-                features.update({f'away_oadj_{k}': v for k, v in away_oadj.items()})
+                features.update({f"away_oadj_{k}": v for k, v in away_oadj.items()})
                 logger.debug(f"Added {len(home_oadj) + len(away_oadj)} opponent-adjusted features")
             except Exception as e:
                 logger.warning(f"Failed to extract opponent-adjusted features: {e}")
@@ -532,7 +542,7 @@ class GameFeatureExtractor:
                 turnover_features = self.turnover_luck_extractor.compute_game_turnover_features(
                     home_team, away_team, season, week
                 )
-                features.update({f'to_{k}': v for k, v in turnover_features.items()})
+                features.update({f"to_{k}": v for k, v in turnover_features.items()})
                 logger.debug(f"Added {len(turnover_features)} turnover luck features")
             except Exception as e:
                 logger.warning(f"Failed to extract turnover luck features: {e}")
@@ -545,8 +555,8 @@ class GameFeatureExtractor:
                 batch_features = self.primetime_extractor.compute_batch_features(season, week)
                 if len(batch_features) > 0:
                     game_row = batch_features[
-                        (batch_features['home_team'] == home_team) &
-                        (batch_features['away_team'] == away_team)
+                        (batch_features["home_team"] == home_team)
+                        & (batch_features["away_team"] == away_team)
                     ]
                     if len(game_row) > 0:
                         primetime_features = game_row.iloc[0].to_dict()
@@ -557,14 +567,30 @@ class GameFeatureExtractor:
                     primetime_features = self.primetime_extractor._neutral_features()
 
                 # Only add numeric features (not game_slot categorical, game_id, team names)
-                exclude_keys = {'game_slot', 'game_id', 'home_team', 'away_team'}
+                exclude_keys = {"game_slot", "game_id", "home_team", "away_team"}
                 for k, v in primetime_features.items():
-                    if k not in exclude_keys and isinstance(v, (bool, int, float, np.bool_, np.integer, np.floating)):
-                        features[f'pt_{k}'] = int(v) if isinstance(v, (bool, np.bool_)) else float(v)
+                    if k not in exclude_keys and isinstance(
+                        v, (bool, int, float, np.bool_, np.integer, np.floating)
+                    ):
+                        features[f"pt_{k}"] = (
+                            int(v) if isinstance(v, (bool, np.bool_)) else float(v)
+                        )
                 # Add game_slot as categorical encoding
-                slot_map = {'TNF': 1, 'SNF': 2, 'MNF': 3, 'LATE_AFTERNOON': 4, 'EARLY_SUNDAY': 5, 'OTHER': 0, 'UNKNOWN': -1}
-                features['pt_game_slot_encoded'] = slot_map.get(primetime_features.get('game_slot', 'UNKNOWN'), -1)
-                logger.debug(f"Added primetime features (primetime={primetime_features.get('is_primetime', False)})")
+                slot_map = {
+                    "TNF": 1,
+                    "SNF": 2,
+                    "MNF": 3,
+                    "LATE_AFTERNOON": 4,
+                    "EARLY_SUNDAY": 5,
+                    "OTHER": 0,
+                    "UNKNOWN": -1,
+                }
+                features["pt_game_slot_encoded"] = slot_map.get(
+                    primetime_features.get("game_slot", "UNKNOWN"), -1
+                )
+                logger.debug(
+                    f"Added primetime features (primetime={primetime_features.get('is_primetime', False)})"
+                )
             except Exception as e:
                 logger.warning(f"Failed to extract primetime features: {e}")
 
@@ -575,7 +601,7 @@ class GameFeatureExtractor:
                 sov_features = self.opponent_strength_extractor.compute_game_sov_features(
                     home_team, away_team, season, week
                 )
-                features.update({f'sov_{k}': v for k, v in sov_features.items()})
+                features.update({f"sov_{k}": v for k, v in sov_features.items()})
                 logger.debug(f"Added {len(sov_features)} strength of victory features")
             except Exception as e:
                 logger.warning(f"Failed to extract strength of victory features: {e}")
@@ -599,11 +625,7 @@ class GameFeatureExtractor:
         return features
 
     def validate_temporal_safety(
-        self,
-        home_team: str,
-        away_team: str,
-        season: int,
-        week: int
+        self, home_team: str, away_team: str, season: int, week: int
     ) -> bool:
         """
         Validate all features are from BEFORE target week (no leakage).
@@ -623,7 +645,7 @@ class GameFeatureExtractor:
             self.offensive_extractor.validate_no_leakage(home_team, season, week),
             self.offensive_extractor.validate_no_leakage(away_team, season, week),
             self.defensive_extractor.validate_no_leakage(home_team, season, week),
-            self.defensive_extractor.validate_no_leakage(away_team, season, week)
+            self.defensive_extractor.validate_no_leakage(away_team, season, week),
         ]
 
         if all(checks):
@@ -646,12 +668,7 @@ class GameFeatureExtractor:
         logger.info(f"Cleared feature cache ({cache_size} entries)")
 
     def _get_features(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        feature_type: str,
-        use_cache: bool
+        self, team: str, season: int, week: int, feature_type: str, use_cache: bool
     ) -> dict[str, float]:
         """
         Get features with caching.
@@ -688,9 +705,9 @@ class GameFeatureExtractor:
 
         # Extract features
         start_time = time.time()
-        if feature_type == 'offensive':
+        if feature_type == "offensive":
             features = self.offensive_extractor.extract_features(team, season, week)
-        elif feature_type == 'defensive':
+        elif feature_type == "defensive":
             features = self.defensive_extractor.extract_features(team, season, week)
         else:
             raise ValueError(f"Invalid feature_type: {feature_type}")
@@ -708,9 +725,7 @@ class GameFeatureExtractor:
         return features
 
     def _compute_offensive_mismatch(
-        self,
-        home_off: dict[str, float],
-        away_def: dict[str, float]
+        self, home_off: dict[str, float], away_def: dict[str, float]
     ) -> float:
         """
         Compute offensive mismatch: home offense vs away defense.
@@ -725,16 +740,14 @@ class GameFeatureExtractor:
         Returns:
             Offensive mismatch score (EPA scale)
         """
-        home_off_epa = home_off.get('off_epa_per_play', 0.0)
-        away_def_epa = away_def.get('def_epa_allowed_per_play', 0.0)
+        home_off_epa = home_off.get("off_epa_per_play", 0.0)
+        away_def_epa = away_def.get("def_epa_allowed_per_play", 0.0)
 
         mismatch = home_off_epa - away_def_epa
         return mismatch
 
     def _compute_defensive_mismatch(
-        self,
-        away_off: dict[str, float],
-        home_def: dict[str, float]
+        self, away_off: dict[str, float], home_def: dict[str, float]
     ) -> float:
         """
         Compute defensive mismatch: away offense vs home defense.
@@ -749,16 +762,14 @@ class GameFeatureExtractor:
         Returns:
             Defensive mismatch score (EPA scale)
         """
-        away_off_epa = away_off.get('off_epa_per_play', 0.0)
-        home_def_epa = home_def.get('def_epa_allowed_per_play', 0.0)
+        away_off_epa = away_off.get("off_epa_per_play", 0.0)
+        home_def_epa = home_def.get("def_epa_allowed_per_play", 0.0)
 
         mismatch = away_off_epa - home_def_epa
         return mismatch
 
     def _compute_pace_difference(
-        self,
-        home_off: dict[str, float],
-        away_off: dict[str, float]
+        self, home_off: dict[str, float], away_off: dict[str, float]
     ) -> float:
         """
         Compute pace difference: home plays/game - away plays/game.
@@ -773,18 +784,14 @@ class GameFeatureExtractor:
         Returns:
             Pace difference (plays per game)
         """
-        home_pace = home_off.get('off_plays_per_game', 0.0)
-        away_pace = away_off.get('off_plays_per_game', 0.0)
+        home_pace = home_off.get("off_plays_per_game", 0.0)
+        away_pace = away_off.get("off_plays_per_game", 0.0)
 
         pace_diff = home_pace - away_pace
         return pace_diff
 
     def _get_injury_features(
-        self,
-        home_team: str,
-        away_team: str,
-        season: int,
-        week: int
+        self, home_team: str, away_team: str, season: int, week: int
     ) -> dict[str, float]:
         """
         Extract injury load features for both teams.
@@ -822,11 +829,11 @@ class GameFeatureExtractor:
         """
         # Connect to database
         conn = psycopg2.connect(
-            host='localhost',
+            host="localhost",
             port=5544,
-            dbname='devdb01',
-            user='dro',
-            password=os.getenv('DB_PASSWORD', 'sicillionbillions')
+            dbname="devdb01",
+            user="dro",
+            password=os.getenv("DB_PASSWORD", "sicillionbillions"),
         )
 
         try:
@@ -855,31 +862,39 @@ class GameFeatureExtractor:
         for row in rows:
             team = row[0]
             injury_data[team] = {
-                'total_injuries': row[1] or 0,
-                'injury_severity_index': row[2] or 0.0,
-                'qb_out': 1 if row[3] else 0,
-                'key_position_out': 1 if row[4] else 0,
-                'oline_injuries': row[5] or 0
+                "total_injuries": row[1] or 0,
+                "injury_severity_index": row[2] or 0.0,
+                "qb_out": 1 if row[3] else 0,
+                "key_position_out": 1 if row[4] else 0,
+                "oline_injuries": row[5] or 0,
             }
 
         # Extract home and away data (default to zeros if missing)
-        home_data = injury_data.get(home_team, {
-            'total_injuries': 0,
-            'injury_severity_index': 0.0,
-            'qb_out': 0,
-            'key_position_out': 0,
-            'oline_injuries': 0
-        })
-        away_data = injury_data.get(away_team, {
-            'total_injuries': 0,
-            'injury_severity_index': 0.0,
-            'qb_out': 0,
-            'key_position_out': 0,
-            'oline_injuries': 0
-        })
+        home_data = injury_data.get(
+            home_team,
+            {
+                "total_injuries": 0,
+                "injury_severity_index": 0.0,
+                "qb_out": 0,
+                "key_position_out": 0,
+                "oline_injuries": 0,
+            },
+        )
+        away_data = injury_data.get(
+            away_team,
+            {
+                "total_injuries": 0,
+                "injury_severity_index": 0.0,
+                "qb_out": 0,
+                "key_position_out": 0,
+                "oline_injuries": 0,
+            },
+        )
 
         # Compute derived features
-        injury_severity_diff = home_data['injury_severity_index'] - away_data['injury_severity_index']
+        injury_severity_diff = (
+            home_data["injury_severity_index"] - away_data["injury_severity_index"]
+        )
 
         # Spread adjustment based on injury impact weights
         # Positive = home team more injured (worse for home team)
@@ -887,44 +902,36 @@ class GameFeatureExtractor:
         spread_adjustment = 0.0
 
         # QB injury impact: -5 points
-        spread_adjustment += home_data['qb_out'] * 5.0
-        spread_adjustment -= away_data['qb_out'] * 5.0
+        spread_adjustment += home_data["qb_out"] * 5.0
+        spread_adjustment -= away_data["qb_out"] * 5.0
 
         # Key position injury impact: -2 points
-        spread_adjustment += home_data['key_position_out'] * 2.0
-        spread_adjustment -= away_data['key_position_out'] * 2.0
+        spread_adjustment += home_data["key_position_out"] * 2.0
+        spread_adjustment -= away_data["key_position_out"] * 2.0
 
         # O-line injury impact: -0.5 points per injury
-        spread_adjustment += home_data['oline_injuries'] * 0.5
-        spread_adjustment -= away_data['oline_injuries'] * 0.5
+        spread_adjustment += home_data["oline_injuries"] * 0.5
+        spread_adjustment -= away_data["oline_injuries"] * 0.5
 
         return {
             # Home team
-            'home_injury_total': home_data['total_injuries'],
-            'home_injury_severity_index': home_data['injury_severity_index'],
-            'home_qb_out': home_data['qb_out'],
-            'home_key_position_out': home_data['key_position_out'],
-            'home_oline_injuries': home_data['oline_injuries'],
-
+            "home_injury_total": home_data["total_injuries"],
+            "home_injury_severity_index": home_data["injury_severity_index"],
+            "home_qb_out": home_data["qb_out"],
+            "home_key_position_out": home_data["key_position_out"],
+            "home_oline_injuries": home_data["oline_injuries"],
             # Away team
-            'away_injury_total': away_data['total_injuries'],
-            'away_injury_severity_index': away_data['injury_severity_index'],
-            'away_qb_out': away_data['qb_out'],
-            'away_key_position_out': away_data['key_position_out'],
-            'away_oline_injuries': away_data['oline_injuries'],
-
+            "away_injury_total": away_data["total_injuries"],
+            "away_injury_severity_index": away_data["injury_severity_index"],
+            "away_qb_out": away_data["qb_out"],
+            "away_key_position_out": away_data["key_position_out"],
+            "away_oline_injuries": away_data["oline_injuries"],
             # Derived
-            'injury_severity_diff': injury_severity_diff,
-            'injury_spread_adjustment': spread_adjustment
+            "injury_severity_diff": injury_severity_diff,
+            "injury_spread_adjustment": spread_adjustment,
         }
 
-    def _validate_inputs(
-        self,
-        home_team: str,
-        away_team: str,
-        season: int,
-        week: int
-    ):
+    def _validate_inputs(self, home_team: str, away_team: str, season: int, week: int):
         """
         Validate input parameters.
 
@@ -967,8 +974,9 @@ def main():
 
     # Example: Current season Week 12 - HOU vs BUF
     from datetime import datetime
-    home_team = 'HOU'
-    away_team = 'BUF'
+
+    home_team = "HOU"
+    away_team = "BUF"
     season = datetime.now().year if datetime.now().month >= 9 else datetime.now().year - 1
     week = 12
 
@@ -988,14 +996,14 @@ def main():
     logger.info("\nSample Features:")
 
     sample_keys = [
-        'home_off_epa_per_play',
-        'home_def_epa_allowed_per_play',
-        'away_off_epa_per_play',
-        'away_def_epa_allowed_per_play',
-        'offensive_mismatch',
-        'defensive_mismatch',
-        'pace_difference',
-        'rest_differential'
+        "home_off_epa_per_play",
+        "home_def_epa_allowed_per_play",
+        "away_off_epa_per_play",
+        "away_def_epa_allowed_per_play",
+        "offensive_mismatch",
+        "defensive_mismatch",
+        "pace_difference",
+        "rest_differential",
     ]
 
     for key in sample_keys:

@@ -148,27 +148,29 @@ def main():
     print("=" * 80)
     print()
 
-    metrics_comparison = pd.DataFrame({
-        "Metric": ["Brier Score", "Log Loss", "Accuracy", "AUC"],
-        "State-Space": [
-            ss_brier,
-            state_space_metrics.get("logloss_win", float("nan")),
-            state_space_metrics.get("accuracy_win", float("nan")),
-            state_space_metrics.get("auc", float("nan")),
-        ],
-        "GNN Ablation": [
-            gnn_abl_brier,
-            gnn_ablation_metrics.get("log_loss", float("nan")),
-            gnn_ablation_metrics.get("accuracy", float("nan")),
-            gnn_ablation_metrics.get("auc", float("nan")),
-        ],
-        "GNN Optuna": [
-            gnn_opt_brier,
-            gnn_optuna_metrics.get("log_loss", float("nan")),
-            gnn_optuna_metrics.get("accuracy", float("nan")),
-            gnn_optuna_metrics.get("auc", float("nan")),
-        ],
-    })
+    metrics_comparison = pd.DataFrame(
+        {
+            "Metric": ["Brier Score", "Log Loss", "Accuracy", "AUC"],
+            "State-Space": [
+                ss_brier,
+                state_space_metrics.get("logloss_win", float("nan")),
+                state_space_metrics.get("accuracy_win", float("nan")),
+                state_space_metrics.get("auc", float("nan")),
+            ],
+            "GNN Ablation": [
+                gnn_abl_brier,
+                gnn_ablation_metrics.get("log_loss", float("nan")),
+                gnn_ablation_metrics.get("accuracy", float("nan")),
+                gnn_ablation_metrics.get("auc", float("nan")),
+            ],
+            "GNN Optuna": [
+                gnn_opt_brier,
+                gnn_optuna_metrics.get("log_loss", float("nan")),
+                gnn_optuna_metrics.get("accuracy", float("nan")),
+                gnn_optuna_metrics.get("auc", float("nan")),
+            ],
+        }
+    )
 
     print(metrics_comparison.to_string(index=False))
     print()

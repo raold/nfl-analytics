@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_data_basic():
@@ -56,7 +53,6 @@ def test_load_data_basic():
     assert result is not None
 
 
-
 def test_load_data_edge_cases():
     """Test load_data: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_data_edge_cases():
     assert result is not None
 
 
-
 def test_load_data_error_handling():
     """Test load_data error handling."""
     with pytest.raises(ValueError):
         load_data(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_load_data_property_idempotent(self, self, test_seasons):
 
     # Assert property
     assert load_data(self, test_seasons) == result, "idempotent violated"
-
 
 
 def test_get_base_predictions_basic():
@@ -100,7 +93,6 @@ def test_get_base_predictions_basic():
     assert result is not None
 
 
-
 def test_get_base_predictions_edge_cases():
     """Test get_base_predictions: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_get_base_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_get_base_predictions_error_handling():
     """Test get_base_predictions error handling."""
     with pytest.raises(ValueError):
         get_base_predictions(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_get_base_predictions_property_idempotent(self, self, df):
 
     # Assert property
     assert get_base_predictions(self, df) == result, "idempotent violated"
-
 
 
 def test_train_stacking_models_basic():
@@ -144,7 +133,6 @@ def test_train_stacking_models_basic():
     assert result is not None
 
 
-
 def test_train_stacking_models_edge_cases():
     """Test train_stacking_models: edge cases."""
     # Arrange
@@ -157,23 +145,24 @@ def test_train_stacking_models_edge_cases():
     assert result is not None
 
 
-
 def test_train_stacking_models_error_handling():
     """Test train_stacking_models error handling."""
     with pytest.raises(ValueError):
         train_stacking_models(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_train_stacking_models_property_idempotent(self, self, v2_preds, v3_preds, y_true, val_split):
+def test_train_stacking_models_property_idempotent(
+    self, self, v2_preds, v3_preds, y_true, val_split
+):
     """Property test: function is idempotent."""
     # Act
     result = train_stacking_models(self, v2_preds, v3_preds, y_true, val_split)
 
     # Assert property
-    assert train_stacking_models(self, v2_preds, v3_preds, y_true, val_split) == result, "idempotent violated"
-
+    assert (
+        train_stacking_models(self, v2_preds, v3_preds, y_true, val_split) == result
+    ), "idempotent violated"
 
 
 def test_evaluate_on_test_basic():
@@ -188,7 +177,6 @@ def test_evaluate_on_test_basic():
     assert result is not None
 
 
-
 def test_evaluate_on_test_edge_cases():
     """Test evaluate_on_test: edge cases."""
     # Arrange
@@ -201,23 +189,24 @@ def test_evaluate_on_test_edge_cases():
     assert result is not None
 
 
-
 def test_evaluate_on_test_error_handling():
     """Test evaluate_on_test error handling."""
     with pytest.raises(ValueError):
         evaluate_on_test(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_evaluate_on_test_property_idempotent(self, self, stacking_results, v2_preds, v3_preds, y_true):
+def test_evaluate_on_test_property_idempotent(
+    self, self, stacking_results, v2_preds, v3_preds, y_true
+):
     """Property test: function is idempotent."""
     # Act
     result = evaluate_on_test(self, stacking_results, v2_preds, v3_preds, y_true)
 
     # Assert property
-    assert evaluate_on_test(self, stacking_results, v2_preds, v3_preds, y_true) == result, "idempotent violated"
-
+    assert (
+        evaluate_on_test(self, stacking_results, v2_preds, v3_preds, y_true) == result
+    ), "idempotent violated"
 
 
 def test_save_ensemble_basic():
@@ -232,7 +221,6 @@ def test_save_ensemble_basic():
     assert result is not None
 
 
-
 def test_save_ensemble_edge_cases():
     """Test save_ensemble: edge cases."""
     # Arrange
@@ -245,12 +233,10 @@ def test_save_ensemble_edge_cases():
     assert result is not None
 
 
-
 def test_save_ensemble_error_handling():
     """Test save_ensemble error handling."""
     with pytest.raises(ValueError):
         save_ensemble(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -260,5 +246,6 @@ def test_save_ensemble_property_idempotent(self, self, stacking_results, test_re
     result = save_ensemble(self, stacking_results, test_results, output_dir)
 
     # Assert property
-    assert save_ensemble(self, stacking_results, test_results, output_dir) == result, "idempotent violated"
-
+    assert (
+        save_ensemble(self, stacking_results, test_results, output_dir) == result
+    ), "idempotent violated"

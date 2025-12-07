@@ -23,7 +23,6 @@ def test_american_to_implied_prob_basic():
     assert result is not None
 
 
-
 def test_american_to_implied_prob_edge_cases():
     """Test american_to_implied_prob: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_american_to_implied_prob_edge_cases():
     assert result is not None
 
 
-
 def test_american_to_implied_prob_error_handling():
     """Test american_to_implied_prob error handling."""
     with pytest.raises(ValueError):
         american_to_implied_prob(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_american_to_implied_prob_property_idempotent(self, odds):
 
     # Assert property
     assert american_to_implied_prob(odds) == result, "idempotent violated"
-
 
 
 def test_calculate_weighted_velocity_basic():
@@ -67,7 +63,6 @@ def test_calculate_weighted_velocity_basic():
     assert result is not None
 
 
-
 def test_calculate_weighted_velocity_edge_cases():
     """Test calculate_weighted_velocity: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_calculate_weighted_velocity_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_weighted_velocity_error_handling():
     """Test calculate_weighted_velocity error handling."""
     with pytest.raises(ValueError):
         calculate_weighted_velocity(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -96,7 +89,6 @@ def test_calculate_weighted_velocity_property_idempotent(self, snapshots, half_l
 
     # Assert property
     assert calculate_weighted_velocity(snapshots, half_life_hours) == result, "idempotent violated"
-
 
 
 def test_analyze_microstructure_basic():
@@ -111,7 +103,6 @@ def test_analyze_microstructure_basic():
     assert result is not None
 
 
-
 def test_analyze_microstructure_edge_cases():
     """Test analyze_microstructure: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_analyze_microstructure_edge_cases():
     assert result is not None
 
 
-
 def test_analyze_microstructure_error_handling():
     """Test analyze_microstructure error handling."""
     with pytest.raises(ValueError):
         analyze_microstructure(invalid_input)
-
 
 
 @given(st.integers())
@@ -140,7 +129,6 @@ def test_analyze_microstructure_property_idempotent(self, snapshots_by_book):
 
     # Assert property
     assert analyze_microstructure(snapshots_by_book) == result, "idempotent violated"
-
 
 
 def test_detect_public_sharp_split_basic():
@@ -155,7 +143,6 @@ def test_detect_public_sharp_split_basic():
     assert result is not None
 
 
-
 def test_detect_public_sharp_split_edge_cases():
     """Test detect_public_sharp_split: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_detect_public_sharp_split_edge_cases():
     assert result is not None
 
 
-
 def test_detect_public_sharp_split_error_handling():
     """Test detect_public_sharp_split error handling."""
     with pytest.raises(ValueError):
         detect_public_sharp_split(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -184,7 +169,6 @@ def test_detect_public_sharp_split_property_idempotent(self, snapshots, public_b
 
     # Assert property
     assert detect_public_sharp_split(snapshots, public_betting_pct) == result, "idempotent violated"
-
 
 
 def test_parse_args_basic():
@@ -199,7 +183,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -212,12 +195,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_main_basic():
@@ -232,7 +213,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_hold_basic():
@@ -265,7 +243,6 @@ def test_hold_basic():
     assert result is not None
 
 
-
 def test_hold_edge_cases():
     """Test hold: edge cases."""
     # Arrange
@@ -278,12 +255,10 @@ def test_hold_edge_cases():
     assert result is not None
 
 
-
 def test_hold_error_handling():
     """Test hold error handling."""
     with pytest.raises(ValueError):
         hold(invalid_input)
-
 
 
 @given(st.integers())
@@ -294,7 +269,6 @@ def test_hold_property_idempotent(val):
 
     # Assert property
     assert hold(val) == result, "idempotent violated"
-
 
 
 def test_is_reduced_juice_basic():
@@ -309,7 +283,6 @@ def test_is_reduced_juice_basic():
     assert result is not None
 
 
-
 def test_is_reduced_juice_edge_cases():
     """Test is_reduced_juice: edge cases."""
     # Arrange
@@ -322,12 +295,10 @@ def test_is_reduced_juice_edge_cases():
     assert result is not None
 
 
-
 def test_is_reduced_juice_error_handling():
     """Test is_reduced_juice error handling."""
     with pytest.raises(ValueError):
         is_reduced_juice(invalid_input)
-
 
 
 @given(st.integers())
@@ -338,7 +309,6 @@ def test_is_reduced_juice_property_idempotent(val):
 
     # Assert property
     assert is_reduced_juice(val) == result, "idempotent violated"
-
 
 
 def test_predicts_further_movement_basic():
@@ -353,7 +323,6 @@ def test_predicts_further_movement_basic():
     assert result is not None
 
 
-
 def test_predicts_further_movement_edge_cases():
     """Test predicts_further_movement: edge cases."""
     # Arrange
@@ -366,12 +335,10 @@ def test_predicts_further_movement_edge_cases():
     assert result is not None
 
 
-
 def test_predicts_further_movement_error_handling():
     """Test predicts_further_movement error handling."""
     with pytest.raises(ValueError):
         predicts_further_movement(invalid_input)
-
 
 
 @given(st.integers())
@@ -382,7 +349,6 @@ def test_predicts_further_movement_property_idempotent(val):
 
     # Assert property
     assert predicts_further_movement(val) == result, "idempotent violated"
-
 
 
 def test_add_snapshot_basic():
@@ -397,7 +363,6 @@ def test_add_snapshot_basic():
     assert result is not None
 
 
-
 def test_add_snapshot_edge_cases():
     """Test add_snapshot: edge cases."""
     # Arrange
@@ -410,23 +375,38 @@ def test_add_snapshot_edge_cases():
     assert result is not None
 
 
-
 def test_add_snapshot_error_handling():
     """Test add_snapshot error handling."""
     with pytest.raises(ValueError):
         add_snapshot(invalid_input)
 
 
-
-@given(st.integers(), st.integers(min_value=1, max_value=1000), st.datetimes(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_add_snapshot_property_idempotent(self, self, game_id, timestamp, book, spread, total, spread_juice_home, spread_juice_away):
+@given(
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.datetimes(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_add_snapshot_property_idempotent(
+    self, self, game_id, timestamp, book, spread, total, spread_juice_home, spread_juice_away
+):
     """Property test: function is idempotent."""
     # Act
-    result = add_snapshot(self, game_id, timestamp, book, spread, total, spread_juice_home, spread_juice_away)
+    result = add_snapshot(
+        self, game_id, timestamp, book, spread, total, spread_juice_home, spread_juice_away
+    )
 
     # Assert property
-    assert add_snapshot(self, game_id, timestamp, book, spread, total, spread_juice_home, spread_juice_away) == result, "idempotent violated"
-
+    assert (
+        add_snapshot(
+            self, game_id, timestamp, book, spread, total, spread_juice_home, spread_juice_away
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_is_reduced_juice_window_basic():
@@ -441,7 +421,6 @@ def test_is_reduced_juice_window_basic():
     assert result is not None
 
 
-
 def test_is_reduced_juice_window_edge_cases():
     """Test is_reduced_juice_window: edge cases."""
     # Arrange
@@ -454,12 +433,10 @@ def test_is_reduced_juice_window_edge_cases():
     assert result is not None
 
 
-
 def test_is_reduced_juice_window_error_handling():
     """Test is_reduced_juice_window error handling."""
     with pytest.raises(ValueError):
         is_reduced_juice_window(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.datetimes())
@@ -470,7 +447,6 @@ def test_is_reduced_juice_window_property_idempotent(self, self, book, timestamp
 
     # Assert property
     assert is_reduced_juice_window(self, book, timestamp) == result, "idempotent violated"
-
 
 
 def test_analyze_game_enhanced_basic():
@@ -485,7 +461,6 @@ def test_analyze_game_enhanced_basic():
     assert result is not None
 
 
-
 def test_analyze_game_enhanced_edge_cases():
     """Test analyze_game_enhanced: edge cases."""
     # Arrange
@@ -498,12 +473,10 @@ def test_analyze_game_enhanced_edge_cases():
     assert result is not None
 
 
-
 def test_analyze_game_enhanced_error_handling():
     """Test analyze_game_enhanced error handling."""
     with pytest.raises(ValueError):
         analyze_game_enhanced(invalid_input)
-
 
 
 @given(st.integers(), st.integers(min_value=1, max_value=1000), st.integers())
@@ -514,7 +487,6 @@ def test_analyze_game_enhanced_property_idempotent(self, self, game_id, public_b
 
     # Assert property
     assert analyze_game_enhanced(self, game_id, public_betting_pct) == result, "idempotent violated"
-
 
 
 def test_get_clv_conversion_rate_basic():
@@ -529,7 +501,6 @@ def test_get_clv_conversion_rate_basic():
     assert result is not None
 
 
-
 def test_get_clv_conversion_rate_edge_cases():
     """Test get_clv_conversion_rate: edge cases."""
     # Arrange
@@ -542,12 +513,10 @@ def test_get_clv_conversion_rate_edge_cases():
     assert result is not None
 
 
-
 def test_get_clv_conversion_rate_error_handling():
     """Test get_clv_conversion_rate error handling."""
     with pytest.raises(ValueError):
         get_clv_conversion_rate(invalid_input)
-
 
 
 @given(st.integers())
@@ -558,4 +527,3 @@ def test_get_clv_conversion_rate_property_idempotent(val):
 
     # Assert property
     assert get_clv_conversion_rate(val) == result, "idempotent violated"
-

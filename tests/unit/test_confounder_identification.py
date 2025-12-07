@@ -23,7 +23,6 @@ def test_propensity_score_matching_basic():
     assert result is not None
 
 
-
 def test_propensity_score_matching_edge_cases():
     """Test propensity_score_matching: edge cases."""
     # Arrange
@@ -36,23 +35,24 @@ def test_propensity_score_matching_edge_cases():
     assert result is not None
 
 
-
 def test_propensity_score_matching_error_handling():
     """Test propensity_score_matching error handling."""
     with pytest.raises(ValueError):
         propensity_score_matching(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_propensity_score_matching_property_idempotent(self, self, df, treatment, confounders, caliper):
+def test_propensity_score_matching_property_idempotent(
+    self, self, df, treatment, confounders, caliper
+):
     """Property test: function is idempotent."""
     # Act
     result = propensity_score_matching(self, df, treatment, confounders, caliper)
 
     # Assert property
-    assert propensity_score_matching(self, df, treatment, confounders, caliper) == result, "idempotent violated"
-
+    assert (
+        propensity_score_matching(self, df, treatment, confounders, caliper) == result
+    ), "idempotent violated"
 
 
 def test_inverse_propensity_weighting_basic():
@@ -67,7 +67,6 @@ def test_inverse_propensity_weighting_basic():
     assert result is not None
 
 
-
 def test_inverse_propensity_weighting_edge_cases():
     """Test inverse_propensity_weighting: edge cases."""
     # Arrange
@@ -80,12 +79,10 @@ def test_inverse_propensity_weighting_edge_cases():
     assert result is not None
 
 
-
 def test_inverse_propensity_weighting_error_handling():
     """Test inverse_propensity_weighting error handling."""
     with pytest.raises(ValueError):
         inverse_propensity_weighting(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -95,5 +92,6 @@ def test_inverse_propensity_weighting_property_idempotent(self, self, df, treatm
     result = inverse_propensity_weighting(self, df, treatment, confounders)
 
     # Assert property
-    assert inverse_propensity_weighting(self, df, treatment, confounders) == result, "idempotent violated"
-
+    assert (
+        inverse_propensity_weighting(self, df, treatment, confounders) == result
+    ), "idempotent violated"

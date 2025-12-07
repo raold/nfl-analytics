@@ -29,9 +29,9 @@ import pandas as pd
 
 from py.ensemble.bayesian_stacking import BayesianStacker, ModelLoader, ValidationFramework
 
-print("="*70)
+print("=" * 70)
 print("BAYESIAN STACKING EXAMPLE")
-print("="*70)
+print("=" * 70)
 print()
 
 
@@ -39,9 +39,9 @@ print()
 # Example 1: Load Models
 # ============================================================================
 
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("EXAMPLE 1: LOAD ENSEMBLE MODELS")
-print("="*70)
+print("=" * 70)
 
 loader = ModelLoader()
 models = loader.load_all()
@@ -55,9 +55,9 @@ for model_name in models.keys():
 # Example 2: Generate Synthetic Validation Data (for demonstration)
 # ============================================================================
 
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("EXAMPLE 2: GENERATE SYNTHETIC VALIDATION DATA")
-print("="*70)
+print("=" * 70)
 print("\nNOTE: In production, use generate_validation_predictions.py")
 
 np.random.seed(42)
@@ -85,20 +85,22 @@ informative_std = np.random.uniform(32, 52, size=n_games)
 xgboost_mean = actual_yards + np.random.normal(0, 56, size=n_games)
 xgboost_std = np.random.uniform(60, 80, size=n_games)  # Overconfident
 
-validation_df = pd.DataFrame({
-    "player_id": [f"player_{i%50}" for i in range(n_games)],
-    "season": np.random.choice([2022, 2023], size=n_games),
-    "week": np.random.randint(1, 18, size=n_games),
-    "actual_yards": actual_yards,
-    "state_space_v2_pred_mean": state_space_mean,
-    "state_space_v2_pred_std": state_space_std,
-    "hierarchical_v2_pred_mean": hierarchical_mean,
-    "hierarchical_v2_pred_std": hierarchical_std,
-    "informative_priors_v2_pred_mean": informative_mean,
-    "informative_priors_v2_pred_std": informative_std,
-    "xgboost_v2_pred_mean": xgboost_mean,
-    "xgboost_v2_pred_std": xgboost_std,
-})
+validation_df = pd.DataFrame(
+    {
+        "player_id": [f"player_{i%50}" for i in range(n_games)],
+        "season": np.random.choice([2022, 2023], size=n_games),
+        "week": np.random.randint(1, 18, size=n_games),
+        "actual_yards": actual_yards,
+        "state_space_v2_pred_mean": state_space_mean,
+        "state_space_v2_pred_std": state_space_std,
+        "hierarchical_v2_pred_mean": hierarchical_mean,
+        "hierarchical_v2_pred_std": hierarchical_std,
+        "informative_priors_v2_pred_mean": informative_mean,
+        "informative_priors_v2_pred_std": informative_std,
+        "xgboost_v2_pred_mean": xgboost_mean,
+        "xgboost_v2_pred_std": xgboost_std,
+    }
+)
 
 print(f"\n✅ Generated {len(validation_df):,} synthetic validation games")
 print(f"   Mean actual yards: {validation_df['actual_yards'].mean():.1f}")
@@ -109,9 +111,9 @@ print(f"   Seasons: {sorted(validation_df['season'].unique())}")
 # Example 3: Compute PSIS-LOO Cross-Validation
 # ============================================================================
 
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("EXAMPLE 3: COMPUTE PSIS-LOO CROSS-VALIDATION")
-print("="*70)
+print("=" * 70)
 
 stacker = BayesianStacker()
 stacker.load_models()
@@ -128,9 +130,9 @@ for model_name, result in sorted(loo_results.items(), key=lambda x: -x[1].elpd_l
 # Example 4: Optimize Stacking Weights
 # ============================================================================
 
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("EXAMPLE 4: OPTIMIZE STACKING WEIGHTS")
-print("="*70)
+print("=" * 70)
 
 stacking_result = stacker.optimize_weights(loo_results, method="stacking")
 
@@ -142,7 +144,7 @@ print(f"   Time:                {stacking_result.optimization_time_sec:.2f}s")
 
 print("\n📊 OPTIMAL WEIGHTS:")
 print(f"\n{'Model':<30s} {'Heuristic':>12s} {'Stacking':>12s} {'Change':>12s}")
-print("-"*70)
+print("-" * 70)
 
 heuristic_weights = stacker.heuristic_weights
 
@@ -163,29 +165,23 @@ for model_name in sorted(stacking_result.weights.keys()):
 # Example 5: Generate Stacked Prediction (Single Game)
 # ============================================================================
 
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("EXAMPLE 5: GENERATE STACKED PREDICTION")
-print("="*70)
+print("=" * 70)
 
 # Example: Patrick Mahomes vs. Bills (hypothetical)
 predictions = {
     "state_space_v2": (285.3, 42.1),
     "hierarchical_v2": (278.5, 38.7),
     "informative_priors_v2": (281.2, 40.3),
-    "xgboost_v2": (272.8, 68.5)
+    "xgboost_v2": (272.8, 68.5),
 }
 
 # Heuristic weights (30/25/15/30)
-heuristic_mean, heuristic_std = stacker.predict_stacked(
-    predictions,
-    stacker.heuristic_weights
-)
+heuristic_mean, heuristic_std = stacker.predict_stacked(predictions, stacker.heuristic_weights)
 
 # Stacking weights (optimized)
-stacking_mean, stacking_std = stacker.predict_stacked(
-    predictions,
-    stacking_result.weights
-)
+stacking_mean, stacking_std = stacker.predict_stacked(predictions, stacking_result.weights)
 
 print("\nIndividual Model Predictions:")
 for model_name, (mean, std) in predictions.items():
@@ -201,9 +197,9 @@ print(f"  Difference:                    {stacking_mean - heuristic_mean:+.1f} y
 # Example 6: Statistical Comparison
 # ============================================================================
 
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("EXAMPLE 6: STATISTICAL COMPARISON (DIEBOLD-MARIANO TEST)")
-print("="*70)
+print("=" * 70)
 
 # Generate errors for both methods
 heuristic_errors = []
@@ -216,8 +212,11 @@ for i, row in validation_df.iterrows():
     preds = {
         "state_space_v2": (row["state_space_v2_pred_mean"], row["state_space_v2_pred_std"]),
         "hierarchical_v2": (row["hierarchical_v2_pred_mean"], row["hierarchical_v2_pred_std"]),
-        "informative_priors_v2": (row["informative_priors_v2_pred_mean"], row["informative_priors_v2_pred_std"]),
-        "xgboost_v2": (row["xgboost_v2_pred_mean"], row["xgboost_v2_pred_std"])
+        "informative_priors_v2": (
+            row["informative_priors_v2_pred_mean"],
+            row["informative_priors_v2_pred_std"],
+        ),
+        "xgboost_v2": (row["xgboost_v2_pred_mean"], row["xgboost_v2_pred_std"]),
     }
 
     # Heuristic ensemble
@@ -238,7 +237,9 @@ stacking_mae = np.mean(np.abs(stacking_errors))
 print("\nMean Absolute Error:")
 print(f"  Heuristic: {heuristic_mae:.2f} yards")
 print(f"  Stacking:  {stacking_mae:.2f} yards")
-print(f"  Improvement: {heuristic_mae - stacking_mae:.2f} yards ({(heuristic_mae - stacking_mae) / heuristic_mae * 100:.1f}%)")
+print(
+    f"  Improvement: {heuristic_mae - stacking_mae:.2f} yards ({(heuristic_mae - stacking_mae) / heuristic_mae * 100:.1f}%)"
+)
 
 # Run statistical test
 framework = ValidationFramework()
@@ -247,29 +248,29 @@ test_results = framework.statistical_tests(heuristic_errors, stacking_errors)
 print("\nDiebold-Mariano Test:")
 print(f"  t-statistic: {test_results['t_statistic']:.3f}")
 print(f"  p-value:     {test_results['p_value']:.4f}")
-print(f"  Significant? {'✅ YES (p < 0.05)' if test_results['significant_at_05'] else '❌ NO (p ≥ 0.05)'}")
+print(
+    f"  Significant? {'✅ YES (p < 0.05)' if test_results['significant_at_05'] else '❌ NO (p ≥ 0.05)'}"
+)
 
 
 # ============================================================================
 # Example 7: Generate Report
 # ============================================================================
 
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("EXAMPLE 7: GENERATE MARKDOWN REPORT")
-print("="*70)
+print("=" * 70)
 
 report = stacker.generate_report(
-    loo_results,
-    stacking_result,
-    output_path=None  # Don't save, just return string
+    loo_results, stacking_result, output_path=None  # Don't save, just return string
 )
 
 print("\n📄 Report Preview (first 30 lines):")
-print("-"*70)
+print("-" * 70)
 for i, line in enumerate(report.split("\n")[:30]):
     print(line)
 print("...")
-print("-"*70)
+print("-" * 70)
 print(f"\nFull report: {len(report.split(chr(10)))} lines")
 
 
@@ -277,9 +278,9 @@ print(f"\nFull report: {len(report.split(chr(10)))} lines")
 # Summary
 # ============================================================================
 
-print("\n" + "="*70)
+print("\n" + "=" * 70)
 print("EXAMPLE COMPLETE")
-print("="*70)
+print("=" * 70)
 
 print("\n✅ Summary:")
 print(f"   1. Loaded {len(models)} ensemble models")
@@ -308,4 +309,4 @@ print("   4. Deploy to staging for A/B testing (2 weeks)")
 print()
 print("   5. Promote to production if ROI >5.5%, Sharpe >2.3")
 
-print("\n" + "="*70)
+print("\n" + "=" * 70)

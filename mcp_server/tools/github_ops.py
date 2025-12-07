@@ -11,7 +11,7 @@ from typing import Any
 logger = logging.getLogger(__name__)
 
 # GitHub CLI must be installed and authenticated
-GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 REPO = "raold/nfl-analytics"  # Default repository
 
 
@@ -26,48 +26,28 @@ def _run_gh_command(args: list[str]) -> dict[str, Any]:
         Dictionary with command output or error
     """
     try:
-        result = subprocess.run(
-            ['gh'] + args,
-            capture_output=True,
-            text=True,
-            timeout=30
-        )
+        result = subprocess.run(["gh"] + args, capture_output=True, text=True, timeout=30)
 
         if result.returncode == 0:
-            return {
-                "success": True,
-                "output": result.stdout.strip()
-            }
+            return {"success": True, "output": result.stdout.strip()}
         else:
-            return {
-                "success": False,
-                "error": result.stderr.strip()
-            }
+            return {"success": False, "error": result.stderr.strip()}
 
     except FileNotFoundError:
         return {
             "success": False,
-            "error": "GitHub CLI (gh) not installed. Install from: https://cli.github.com"
+            "error": "GitHub CLI (gh) not installed. Install from: https://cli.github.com",
         }
 
     except subprocess.TimeoutExpired:
-        return {
-            "success": False,
-            "error": "Command timed out after 30 seconds"
-        }
+        return {"success": False, "error": "Command timed out after 30 seconds"}
 
     except Exception as e:
-        return {
-            "success": False,
-            "error": f"Command execution error: {str(e)}"
-        }
+        return {"success": False, "error": f"Command execution error: {str(e)}"}
 
 
 def create_issue(
-    title: str,
-    body: str,
-    labels: str | None = None,
-    assignees: str | None = None
+    title: str, body: str, labels: str | None = None, assignees: str | None = None
 ) -> dict[str, Any]:
     """
     Create a GitHub issue.
@@ -81,33 +61,26 @@ def create_issue(
     Returns:
         Dictionary with issue URL or error
     """
-    args = [
-        'issue', 'create',
-        '--repo', REPO,
-        '--title', title,
-        '--body', body
-    ]
+    args = ["issue", "create", "--repo", REPO, "--title", title, "--body", body]
 
     if labels:
-        args.extend(['--label', labels])
+        args.extend(["--label", labels])
 
     if assignees:
-        args.extend(['--assignee', assignees])
+        args.extend(["--assignee", assignees])
 
     logger.info(f"Creating GitHub issue: {title}")
 
     result = _run_gh_command(args)
 
-    if result['success']:
+    if result["success"]:
         logger.info(f"Issue created: {result['output']}")
 
     return result
 
 
 def list_recent_issues(
-    limit: int = 10,
-    state: str = "open",
-    labels: str | None = None
+    limit: int = 10, state: str = "open", labels: str | None = None
 ) -> dict[str, Any]:
     """
     List recent GitHub issues.
@@ -121,27 +94,27 @@ def list_recent_issues(
         Dictionary with issues list or error
     """
     args = [
-        'issue', 'list',
-        '--repo', REPO,
-        '--limit', str(limit),
-        '--state', state,
-        '--json', 'number,title,state,createdAt,labels'
+        "issue",
+        "list",
+        "--repo",
+        REPO,
+        "--limit",
+        str(limit),
+        "--state",
+        state,
+        "--json",
+        "number,title,state,createdAt,labels",
     ]
 
     if labels:
-        args.extend(['--label', labels])
+        args.extend(["--label", labels])
 
     logger.info(f"Listing {limit} {state} issues")
 
     return _run_gh_command(args)
 
 
-def create_pr(
-    title: str,
-    body: str,
-    base: str = "main",
-    head: str | None = None
-) -> dict[str, Any]:
+def create_pr(title: str, body: str, base: str = "main", head: str | None = None) -> dict[str, Any]:
     """
     Create a pull request.
 
@@ -154,22 +127,16 @@ def create_pr(
     Returns:
         Dictionary with PR URL or error
     """
-    args = [
-        'pr', 'create',
-        '--repo', REPO,
-        '--title', title,
-        '--body', body,
-        '--base', base
-    ]
+    args = ["pr", "create", "--repo", REPO, "--title", title, "--body", body, "--base", base]
 
     if head:
-        args.extend(['--head', head])
+        args.extend(["--head", head])
 
     logger.info(f"Creating pull request: {title}")
 
     result = _run_gh_command(args)
 
-    if result['success']:
+    if result["success"]:
         logger.info(f"PR created: {result['output']}")
 
     return result
@@ -186,9 +153,13 @@ def get_pr_status(pr_number: int) -> dict[str, Any]:
         Dictionary with PR status or error
     """
     args = [
-        'pr', 'view', str(pr_number),
-        '--repo', REPO,
-        '--json', 'number,title,state,mergeable,reviewDecision,statusCheckRollup'
+        "pr",
+        "view",
+        str(pr_number),
+        "--repo",
+        REPO,
+        "--json",
+        "number,title,state,mergeable,reviewDecision,statusCheckRollup",
     ]
 
     logger.info(f"Getting PR #{pr_number} status")
@@ -196,10 +167,7 @@ def get_pr_status(pr_number: int) -> dict[str, Any]:
     return _run_gh_command(args)
 
 
-def add_comment(
-    issue_number: int,
-    comment: str
-) -> dict[str, Any]:
+def add_comment(issue_number: int, comment: str) -> dict[str, Any]:
     """
     Add a comment to an issue or PR.
 
@@ -210,11 +178,7 @@ def add_comment(
     Returns:
         Success/error dictionary
     """
-    args = [
-        'issue', 'comment', str(issue_number),
-        '--repo', REPO,
-        '--body', comment
-    ]
+    args = ["issue", "comment", str(issue_number), "--repo", REPO, "--body", comment]
 
     logger.info(f"Adding comment to issue #{issue_number}")
 
@@ -229,8 +193,11 @@ def get_repo_stats() -> dict[str, Any]:
         Dictionary with repo stats or error
     """
     args = [
-        'repo', 'view', REPO,
-        '--json', 'name,description,stargazerCount,forkCount,openIssuesCount,watchers'
+        "repo",
+        "view",
+        REPO,
+        "--json",
+        "name,description,stargazerCount,forkCount,openIssuesCount,watchers",
     ]
 
     logger.info("Getting repository statistics")
@@ -238,10 +205,7 @@ def get_repo_stats() -> dict[str, Any]:
     return _run_gh_command(args)
 
 
-def search_code(
-    query: str,
-    limit: int = 10
-) -> dict[str, Any]:
+def search_code(query: str, limit: int = 10) -> dict[str, Any]:
     """
     Search code in the repository.
 
@@ -253,11 +217,15 @@ def search_code(
         Dictionary with search results or error
     """
     args = [
-        'search', 'code',
+        "search",
+        "code",
         query,
-        '--repo', REPO,
-        '--limit', str(limit),
-        '--json', 'path,textMatches'
+        "--repo",
+        REPO,
+        "--limit",
+        str(limit),
+        "--json",
+        "path,textMatches",
     ]
 
     logger.info(f"Searching code: {query}")

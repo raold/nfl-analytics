@@ -95,6 +95,7 @@ class FourthDownState:
 
     All features are normalized to [0, 1] or [-1, 1] for neural network input.
     """
+
     down: int  # Always 4 (included for completeness)
     distance: float  # Yards to first down (normalized 0-1, capped at 20)
     yardline_100: float  # Yards from opponent end zone (normalized 0-1)
@@ -108,18 +109,21 @@ class FourthDownState:
 
     def to_array(self) -> np.ndarray:
         """Convert state to numpy array for neural network input."""
-        return np.array([
-            self.down / 4.0,  # Normalize to [0, 1]
-            self.distance,
-            self.yardline_100,
-            self.score_differential,
-            self.time_remaining,
-            self.quarter,
-            self.timeouts_remaining,
-            self.posteam_wp,
-            self.vegas_wp,
-            self.is_home,
-        ], dtype=np.float32)
+        return np.array(
+            [
+                self.down / 4.0,  # Normalize to [0, 1]
+                self.distance,
+                self.yardline_100,
+                self.score_differential,
+                self.time_remaining,
+                self.quarter,
+                self.timeouts_remaining,
+                self.posteam_wp,
+                self.vegas_wp,
+                self.is_home,
+            ],
+            dtype=np.float32,
+        )
 
     @classmethod
     def from_row(cls, row: dict) -> FourthDownState:
@@ -187,6 +191,7 @@ class FourthDownTransition:
 
     Stores (s, a, r, s', done) tuple for offline RL training.
     """
+
     state: FourthDownState
     action: int  # 0=go, 1=punt, 2=field_goal
     reward: float
@@ -392,10 +397,7 @@ def extract_fourth_down_dataset(
 
     if include_no_play:
         # Remove play_type filter to include no_play
-        query = query.replace(
-            "AND p.play_type IN ('pass', 'run', 'punt', 'field_goal')",
-            ""
-        )
+        query = query.replace("AND p.play_type IN ('pass', 'run', 'punt', 'field_goal')", "")
 
     # Execute query
     conn = psycopg2.connect(DB_CONN)
@@ -456,7 +458,11 @@ def extract_fourth_down_dataset(
     for distance_bin in [(1, 2), (3, 5), (6, 10), (11, 100)]:
         mask = (df["ydstogo"] >= distance_bin[0]) & (df["ydstogo"] <= distance_bin[1])
         if mask.sum() > 0:
-            dist_str = f"{distance_bin[0]}-{distance_bin[1]}" if distance_bin[1] < 100 else f"{distance_bin[0]}+"
+            dist_str = (
+                f"{distance_bin[0]}-{distance_bin[1]}"
+                if distance_bin[1] < 100
+                else f"{distance_bin[0]}+"
+            )
             print(f"\nDistance {dist_str} yards (n={mask.sum():,}):")
             print(df[mask]["play_type"].value_counts(normalize=True))
 

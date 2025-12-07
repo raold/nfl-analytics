@@ -21,6 +21,7 @@ try:
         get_common_schemas,
         validate_schema,
     )
+
     SCHEMA_VALIDATION_AVAILABLE = True
 except ImportError:
     SCHEMA_VALIDATION_AVAILABLE = False
@@ -31,11 +32,7 @@ class GameQueries:
     """Centralized queries for games table and game analytics."""
 
     @staticmethod
-    def current_week_games(
-        conn,
-        season: int,
-        week: int
-    ) -> pd.DataFrame:
+    def current_week_games(conn, season: int, week: int) -> pd.DataFrame:
         """
         Fetch current/upcoming week games with predictions and live scores with error handling.
 
@@ -91,7 +88,7 @@ class GameQueries:
             # Schema validation
             if SCHEMA_VALIDATION_AVAILABLE and not df.empty:
                 schemas = get_common_schemas()
-                df = validate_schema(df, schemas['games'], strict=False)
+                df = validate_schema(df, schemas["games"], strict=False)
 
             logger.info(f"Fetched {len(df)} games for {season} Week {week}")
             return df
@@ -109,11 +106,7 @@ class GameQueries:
             return pd.DataFrame()
 
     @staticmethod
-    def teams_without_games(
-        conn,
-        season: int,
-        week: int
-    ) -> list[str]:
+    def teams_without_games(conn, season: int, week: int) -> list[str]:
         """
         Get list of teams with bye weeks (no games scheduled).
 
@@ -143,20 +136,12 @@ class GameQueries:
         ORDER BY t.team
         """
 
-        df = pd.read_sql_query(
-            query,
-            conn,
-            params=(season, season, season, week, season, week)
-        )
+        df = pd.read_sql_query(query, conn, params=(season, season, season, week, season, week))
 
-        return df['team'].tolist() if not df.empty else []
+        return df["team"].tolist() if not df.empty else []
 
     @staticmethod
-    def season_schedule(
-        conn,
-        season: int,
-        game_type: str = 'REG'
-    ) -> pd.DataFrame:
+    def season_schedule(conn, season: int, game_type: str = "REG") -> pd.DataFrame:
         """
         Fetch complete season schedule.
 
@@ -191,11 +176,7 @@ class GameQueries:
         return pd.read_sql_query(query, conn, params=(season, game_type))
 
     @staticmethod
-    def recent_games(
-        conn,
-        limit: int = 20,
-        completed_only: bool = True
-    ) -> pd.DataFrame:
+    def recent_games(conn, limit: int = 20, completed_only: bool = True) -> pd.DataFrame:
         """
         Fetch most recent games.
 
@@ -303,22 +284,18 @@ class GameQueries:
         if not df.empty:
             row = df.iloc[0]
             return {
-                'earliest_kickoff': row['earliest_kickoff'],
-                'earliest_season': row['earliest_season'],
-                'earliest_week': row['earliest_week'],
-                'latest_kickoff': row['latest_kickoff'],
-                'latest_season': row['latest_season'],
-                'latest_week': row['latest_week'],
+                "earliest_kickoff": row["earliest_kickoff"],
+                "earliest_season": row["earliest_season"],
+                "earliest_week": row["earliest_week"],
+                "latest_kickoff": row["latest_kickoff"],
+                "latest_season": row["latest_season"],
+                "latest_week": row["latest_week"],
             }
 
         return {}
 
     @staticmethod
-    def games_by_team(
-        conn,
-        team: str,
-        season: int | None = None
-    ) -> pd.DataFrame:
+    def games_by_team(conn, team: str, season: int | None = None) -> pd.DataFrame:
         """
         Fetch all games for a specific team.
 

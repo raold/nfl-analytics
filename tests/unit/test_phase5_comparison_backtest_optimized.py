@@ -23,7 +23,6 @@ def test_train_baseline_ensemble_basic():
     assert result is not None
 
 
-
 def test_train_baseline_ensemble_edge_cases():
     """Test train_baseline_ensemble: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_train_baseline_ensemble_edge_cases():
     assert result is not None
 
 
-
 def test_train_baseline_ensemble_error_handling():
     """Test train_baseline_ensemble error handling."""
     with pytest.raises(ValueError):
         train_baseline_ensemble(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(min_value=1, max_value=1000))
@@ -52,7 +49,6 @@ def test_train_baseline_ensemble_property_idempotent(self, train_df, return_dict
 
     # Assert property
     assert train_baseline_ensemble(train_df, return_dict, proc_id) == result, "idempotent violated"
-
 
 
 def test_train_enhanced_ensemble_basic():
@@ -67,7 +63,6 @@ def test_train_enhanced_ensemble_basic():
     assert result is not None
 
 
-
 def test_train_enhanced_ensemble_edge_cases():
     """Test train_enhanced_ensemble: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_train_enhanced_ensemble_edge_cases():
     assert result is not None
 
 
-
 def test_train_enhanced_ensemble_error_handling():
     """Test train_enhanced_ensemble error handling."""
     with pytest.raises(ValueError):
         train_enhanced_ensemble(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(min_value=1, max_value=1000))
@@ -96,7 +89,6 @@ def test_train_enhanced_ensemble_property_idempotent(self, train_df, return_dict
 
     # Assert property
     assert train_enhanced_ensemble(train_df, return_dict, proc_id) == result, "idempotent violated"
-
 
 
 def test_run_comparison_backtest_optimized_basic():
@@ -111,7 +103,6 @@ def test_run_comparison_backtest_optimized_basic():
     assert result is not None
 
 
-
 def test_run_comparison_backtest_optimized_edge_cases():
     """Test run_comparison_backtest_optimized: edge cases."""
     # Arrange
@@ -124,23 +115,29 @@ def test_run_comparison_backtest_optimized_edge_cases():
     assert result is not None
 
 
-
 def test_run_comparison_backtest_optimized_error_handling():
     """Test run_comparison_backtest_optimized error handling."""
     with pytest.raises(ValueError):
         run_comparison_backtest_optimized(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_run_comparison_backtest_optimized_property_idempotent(self, train_seasons, backtest_seasons, initial_bankroll, kelly_multiplier, edge_threshold, vig):
+def test_run_comparison_backtest_optimized_property_idempotent(
+    self, train_seasons, backtest_seasons, initial_bankroll, kelly_multiplier, edge_threshold, vig
+):
     """Property test: function is idempotent."""
     # Act
-    result = run_comparison_backtest_optimized(train_seasons, backtest_seasons, initial_bankroll, kelly_multiplier, edge_threshold, vig)
+    result = run_comparison_backtest_optimized(
+        train_seasons, backtest_seasons, initial_bankroll, kelly_multiplier, edge_threshold, vig
+    )
 
     # Assert property
-    assert run_comparison_backtest_optimized(train_seasons, backtest_seasons, initial_bankroll, kelly_multiplier, edge_threshold, vig) == result, "idempotent violated"
-
+    assert (
+        run_comparison_backtest_optimized(
+            train_seasons, backtest_seasons, initial_bankroll, kelly_multiplier, edge_threshold, vig
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_parse_args_basic():
@@ -155,7 +152,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -168,12 +164,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_main_basic():
@@ -188,7 +182,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -201,9 +194,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

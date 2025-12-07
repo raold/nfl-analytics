@@ -23,7 +23,6 @@ def test_train_cvae_basic():
     assert result is not None
 
 
-
 def test_train_cvae_edge_cases():
     """Test train_cvae: edge cases."""
     # Arrange
@@ -36,23 +35,24 @@ def test_train_cvae_edge_cases():
     assert result is not None
 
 
-
 def test_train_cvae_error_handling():
     """Test train_cvae error handling."""
     with pytest.raises(ValueError):
         train_cvae(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_train_cvae_property_idempotent(self, train_data, val_data, epochs, batch_size, learning_rate, device):
+def test_train_cvae_property_idempotent(
+    self, train_data, val_data, epochs, batch_size, learning_rate, device
+):
     """Property test: function is idempotent."""
     # Act
     result = train_cvae(train_data, val_data, epochs, batch_size, learning_rate, device)
 
     # Assert property
-    assert train_cvae(train_data, val_data, epochs, batch_size, learning_rate, device) == result, "idempotent violated"
-
+    assert (
+        train_cvae(train_data, val_data, epochs, batch_size, learning_rate, device) == result
+    ), "idempotent violated"
 
 
 def test_home_total_basic():
@@ -67,7 +67,6 @@ def test_home_total_basic():
     assert result is not None
 
 
-
 def test_home_total_edge_cases():
     """Test home_total: edge cases."""
     # Arrange
@@ -80,12 +79,10 @@ def test_home_total_edge_cases():
     assert result is not None
 
 
-
 def test_home_total_error_handling():
     """Test home_total error handling."""
     with pytest.raises(ValueError):
         home_total(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +93,6 @@ def test_home_total_property_idempotent(val):
 
     # Assert property
     assert home_total(val) == result, "idempotent violated"
-
 
 
 def test_away_total_basic():
@@ -111,7 +107,6 @@ def test_away_total_basic():
     assert result is not None
 
 
-
 def test_away_total_edge_cases():
     """Test away_total: edge cases."""
     # Arrange
@@ -124,12 +119,10 @@ def test_away_total_edge_cases():
     assert result is not None
 
 
-
 def test_away_total_error_handling():
     """Test away_total error handling."""
     with pytest.raises(ValueError):
         away_total(invalid_input)
-
 
 
 @given(st.integers())
@@ -140,7 +133,6 @@ def test_away_total_property_idempotent(val):
 
     # Assert property
     assert away_total(val) == result, "idempotent violated"
-
 
 
 def test_total_points_basic():
@@ -155,7 +147,6 @@ def test_total_points_basic():
     assert result is not None
 
 
-
 def test_total_points_edge_cases():
     """Test total_points: edge cases."""
     # Arrange
@@ -168,12 +159,10 @@ def test_total_points_edge_cases():
     assert result is not None
 
 
-
 def test_total_points_error_handling():
     """Test total_points error handling."""
     with pytest.raises(ValueError):
         total_points(invalid_input)
-
 
 
 @given(st.integers())
@@ -184,7 +173,6 @@ def test_total_points_property_idempotent(val):
 
     # Assert property
     assert total_points(val) == result, "idempotent violated"
-
 
 
 def test_margin_basic():
@@ -199,7 +187,6 @@ def test_margin_basic():
     assert result is not None
 
 
-
 def test_margin_edge_cases():
     """Test margin: edge cases."""
     # Arrange
@@ -212,12 +199,10 @@ def test_margin_edge_cases():
     assert result is not None
 
 
-
 def test_margin_error_handling():
     """Test margin error handling."""
     with pytest.raises(ValueError):
         margin(invalid_input)
-
 
 
 @given(st.integers())
@@ -228,7 +213,6 @@ def test_margin_property_idempotent(val):
 
     # Assert property
     assert margin(val) == result, "idempotent violated"
-
 
 
 def test_to_tensor_basic():
@@ -243,7 +227,6 @@ def test_to_tensor_basic():
     assert result is not None
 
 
-
 def test_to_tensor_edge_cases():
     """Test to_tensor: edge cases."""
     # Arrange
@@ -256,12 +239,10 @@ def test_to_tensor_edge_cases():
     assert result is not None
 
 
-
 def test_to_tensor_error_handling():
     """Test to_tensor error handling."""
     with pytest.raises(ValueError):
         to_tensor(invalid_input)
-
 
 
 @given(st.integers())
@@ -272,7 +253,6 @@ def test_to_tensor_property_idempotent(val):
 
     # Assert property
     assert to_tensor(val) == result, "idempotent violated"
-
 
 
 def test_from_tensor_basic():
@@ -287,7 +267,6 @@ def test_from_tensor_basic():
     assert result is not None
 
 
-
 def test_from_tensor_edge_cases():
     """Test from_tensor: edge cases."""
     # Arrange
@@ -300,12 +279,10 @@ def test_from_tensor_edge_cases():
     assert result is not None
 
 
-
 def test_from_tensor_error_handling():
     """Test from_tensor error handling."""
     with pytest.raises(ValueError):
         from_tensor(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -316,7 +293,6 @@ def test_from_tensor_property_idempotent(self, cls, tensor):
 
     # Assert property
     assert from_tensor(cls, tensor) == result, "idempotent violated"
-
 
 
 def test_encode_basic():
@@ -331,7 +307,6 @@ def test_encode_basic():
     assert result is not None
 
 
-
 def test_encode_edge_cases():
     """Test encode: edge cases."""
     # Arrange
@@ -344,12 +319,10 @@ def test_encode_edge_cases():
     assert result is not None
 
 
-
 def test_encode_error_handling():
     """Test encode error handling."""
     with pytest.raises(ValueError):
         encode(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -360,7 +333,6 @@ def test_encode_property_idempotent(self, self, x, c):
 
     # Assert property
     assert encode(self, x, c) == result, "idempotent violated"
-
 
 
 def test_reparameterize_basic():
@@ -375,7 +347,6 @@ def test_reparameterize_basic():
     assert result is not None
 
 
-
 def test_reparameterize_edge_cases():
     """Test reparameterize: edge cases."""
     # Arrange
@@ -388,12 +359,10 @@ def test_reparameterize_edge_cases():
     assert result is not None
 
 
-
 def test_reparameterize_error_handling():
     """Test reparameterize error handling."""
     with pytest.raises(ValueError):
         reparameterize(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -404,7 +373,6 @@ def test_reparameterize_property_idempotent(self, self, mu, log_var):
 
     # Assert property
     assert reparameterize(self, mu, log_var) == result, "idempotent violated"
-
 
 
 def test_decode_basic():
@@ -419,7 +387,6 @@ def test_decode_basic():
     assert result is not None
 
 
-
 def test_decode_edge_cases():
     """Test decode: edge cases."""
     # Arrange
@@ -432,12 +399,10 @@ def test_decode_edge_cases():
     assert result is not None
 
 
-
 def test_decode_error_handling():
     """Test decode error handling."""
     with pytest.raises(ValueError):
         decode(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -448,7 +413,6 @@ def test_decode_property_idempotent(self, self, z, c):
 
     # Assert property
     assert decode(self, z, c) == result, "idempotent violated"
-
 
 
 def test_forward_basic():
@@ -463,7 +427,6 @@ def test_forward_basic():
     assert result is not None
 
 
-
 def test_forward_edge_cases():
     """Test forward: edge cases."""
     # Arrange
@@ -476,12 +439,10 @@ def test_forward_edge_cases():
     assert result is not None
 
 
-
 def test_forward_error_handling():
     """Test forward error handling."""
     with pytest.raises(ValueError):
         forward(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -492,7 +453,6 @@ def test_forward_property_idempotent(self, self, x, c):
 
     # Assert property
     assert forward(self, x, c) == result, "idempotent violated"
-
 
 
 def test_loss_function_basic():
@@ -507,7 +467,6 @@ def test_loss_function_basic():
     assert result is not None
 
 
-
 def test_loss_function_edge_cases():
     """Test loss_function: edge cases."""
     # Arrange
@@ -520,12 +479,10 @@ def test_loss_function_edge_cases():
     assert result is not None
 
 
-
 def test_loss_function_error_handling():
     """Test loss_function error handling."""
     with pytest.raises(ValueError):
         loss_function(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -536,7 +493,6 @@ def test_loss_function_property_idempotent(self, self, outputs, targets, mask):
 
     # Assert property
     assert loss_function(self, outputs, targets, mask) == result, "idempotent violated"
-
 
 
 def test_generate_basic():
@@ -551,7 +507,6 @@ def test_generate_basic():
     assert result is not None
 
 
-
 def test_generate_edge_cases():
     """Test generate: edge cases."""
     # Arrange
@@ -564,12 +519,10 @@ def test_generate_edge_cases():
     assert result is not None
 
 
-
 def test_generate_error_handling():
     """Test generate error handling."""
     with pytest.raises(ValueError):
         generate(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -580,7 +533,6 @@ def test_generate_property_idempotent(self, self, conditions, n_samples, tempera
 
     # Assert property
     assert generate(self, conditions, n_samples, temperature) == result, "idempotent violated"
-
 
 
 def test_compute_game_probabilities_basic():
@@ -595,7 +547,6 @@ def test_compute_game_probabilities_basic():
     assert result is not None
 
 
-
 def test_compute_game_probabilities_edge_cases():
     """Test compute_game_probabilities: edge cases."""
     # Arrange
@@ -608,23 +559,24 @@ def test_compute_game_probabilities_edge_cases():
     assert result is not None
 
 
-
 def test_compute_game_probabilities_error_handling():
     """Test compute_game_probabilities error handling."""
     with pytest.raises(ValueError):
         compute_game_probabilities(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_compute_game_probabilities_property_idempotent(self, self, conditions, spread, total, n_samples):
+def test_compute_game_probabilities_property_idempotent(
+    self, self, conditions, spread, total, n_samples
+):
     """Property test: function is idempotent."""
     # Act
     result = compute_game_probabilities(self, conditions, spread, total, n_samples)
 
     # Assert property
-    assert compute_game_probabilities(self, conditions, spread, total, n_samples) == result, "idempotent violated"
-
+    assert (
+        compute_game_probabilities(self, conditions, spread, total, n_samples) == result
+    ), "idempotent violated"
 
 
 def test_load_model_basic():
@@ -639,7 +591,6 @@ def test_load_model_basic():
     assert result is not None
 
 
-
 def test_load_model_edge_cases():
     """Test load_model: edge cases."""
     # Arrange
@@ -652,12 +603,10 @@ def test_load_model_edge_cases():
     assert result is not None
 
 
-
 def test_load_model_error_handling():
     """Test load_model error handling."""
     with pytest.raises(ValueError):
         load_model(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -668,7 +617,6 @@ def test_load_model_property_idempotent(self, self, path):
 
     # Assert property
     assert load_model(self, path) == result, "idempotent violated"
-
 
 
 def test_simulate_game_basic():
@@ -683,7 +631,6 @@ def test_simulate_game_basic():
     assert result is not None
 
 
-
 def test_simulate_game_edge_cases():
     """Test simulate_game: edge cases."""
     # Arrange
@@ -696,12 +643,10 @@ def test_simulate_game_edge_cases():
     assert result is not None
 
 
-
 def test_simulate_game_error_handling():
     """Test simulate_game error handling."""
     with pytest.raises(ValueError):
         simulate_game(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -712,7 +657,6 @@ def test_simulate_game_property_idempotent(self, self, features, n_samples):
 
     # Assert property
     assert simulate_game(self, features, n_samples) == result, "idempotent violated"
-
 
 
 def test_price_derivative_basic():
@@ -727,7 +671,6 @@ def test_price_derivative_basic():
     assert result is not None
 
 
-
 def test_price_derivative_edge_cases():
     """Test price_derivative: edge cases."""
     # Arrange
@@ -740,20 +683,21 @@ def test_price_derivative_edge_cases():
     assert result is not None
 
 
-
 def test_price_derivative_error_handling():
     """Test price_derivative error handling."""
     with pytest.raises(ValueError):
         price_derivative(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_price_derivative_property_idempotent(self, self, features, derivative_type, params, n_samples):
+def test_price_derivative_property_idempotent(
+    self, self, features, derivative_type, params, n_samples
+):
     """Property test: function is idempotent."""
     # Act
     result = price_derivative(self, features, derivative_type, params, n_samples)
 
     # Assert property
-    assert price_derivative(self, features, derivative_type, params, n_samples) == result, "idempotent violated"
-
+    assert (
+        price_derivative(self, features, derivative_type, params, n_samples) == result
+    ), "idempotent violated"

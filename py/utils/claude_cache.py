@@ -23,6 +23,7 @@ from typing import Any
 
 try:
     import redis
+
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
@@ -70,8 +71,7 @@ class ClaudeRedisCache:
         """
         if not REDIS_AVAILABLE:
             raise ImportError(
-                "redis package required for ClaudeRedisCache. "
-                "Install with: pip install redis"
+                "redis package required for ClaudeRedisCache. " "Install with: pip install redis"
             )
 
         self.host = host
@@ -204,9 +204,7 @@ class ClaudeRedisCache:
 
             # Set with TTL
             self.redis_client.setex(hashed_key, ttl_seconds, json_value)
-            logger.debug(
-                f"Cached {key}: {len(json_value)} bytes, TTL={ttl_seconds}s"
-            )
+            logger.debug(f"Cached {key}: {len(json_value)} bytes, TTL={ttl_seconds}s")
 
             return True
 
@@ -334,7 +332,11 @@ class ClaudeRedisCache:
             "hit_rate": hit_rate,
             "hit_rate_percent": f"{hit_rate * 100:.1f}%",
             "target_hit_rate_percent": f"{self.TARGET_HIT_RATE * 100:.1f}%",
-            "performance": "EXCELLENT" if hit_rate >= self.TARGET_HIT_RATE else "GOOD" if hit_rate >= 0.5 else "FAIR",
+            "performance": (
+                "EXCELLENT"
+                if hit_rate >= self.TARGET_HIT_RATE
+                else "GOOD" if hit_rate >= 0.5 else "FAIR"
+            ),
             "uptime_seconds": uptime.total_seconds(),
             "created_at": self.stats["created_at"],
             "redis_server": f"{self.host}:{self.port}/db={self.db}",
@@ -393,9 +395,7 @@ def get_default_cache() -> ClaudeRedisCache | None:
         ...     value = cache.get("my_key")
     """
     if not REDIS_AVAILABLE:
-        logger.warning(
-            "Redis not available. Install with: pip install redis"
-        )
+        logger.warning("Redis not available. Install with: pip install redis")
         return None
 
     try:

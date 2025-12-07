@@ -21,6 +21,7 @@ from typing import Any
 
 try:
     from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
+
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
@@ -54,13 +55,13 @@ class MCPCacheWrapper:
 
     # Tool-specific TTL configuration (in seconds)
     DEFAULT_TTLS = {
-        "team_news": 3600,           # 1 hour (news updates frequently)
-        "database_query": 300,        # 5 minutes (data changes frequently)
-        "player_stats": 1800,         # 30 minutes
-        "github_operations": 600,     # 10 minutes
-        "file_operations": 60,        # 1 minute (files change often)
-        "model_metadata": 3600,       # 1 hour
-        "default": 7 * 24 * 3600     # 7 days (ClaudeRedisCache default)
+        "team_news": 3600,  # 1 hour (news updates frequently)
+        "database_query": 300,  # 5 minutes (data changes frequently)
+        "player_stats": 1800,  # 30 minutes
+        "github_operations": 600,  # 10 minutes
+        "file_operations": 60,  # 1 minute (files change often)
+        "model_metadata": 3600,  # 1 hour
+        "default": 7 * 24 * 3600,  # 7 days (ClaudeRedisCache default)
     }
 
     def __init__(self, redis_cache: ClaudeRedisCache | None = None):
@@ -82,11 +83,7 @@ class MCPCacheWrapper:
             logger.info("MCP Redis cache wrapper initialized")
 
     def _generate_cache_key(
-        self,
-        key_prefix: str,
-        func_name: str,
-        args: tuple,
-        kwargs: dict
+        self, key_prefix: str, func_name: str, args: tuple, kwargs: dict
     ) -> str:
         """
         Generate cache key from function name and arguments.
@@ -101,21 +98,18 @@ class MCPCacheWrapper:
             Cache key string (format: "mcp:{prefix}:{func}:{args_hash}")
         """
         # Create stable representation of arguments
-        args_str = json.dumps({
-            "args": args,
-            "kwargs": sorted(kwargs.items())  # Sort for consistency
-        }, sort_keys=True, default=str)
+        args_str = json.dumps(
+            {"args": args, "kwargs": sorted(kwargs.items())},  # Sort for consistency
+            sort_keys=True,
+            default=str,
+        )
 
         # Hash arguments to keep key length reasonable
         args_hash = hashlib.sha256(args_str.encode()).hexdigest()[:16]
 
         return f"mcp:{key_prefix}:{func_name}:{args_hash}"
 
-    def cached(
-        self,
-        ttl: int | None = None,
-        key_prefix: str = "default"
-    ) -> Callable:
+    def cached(self, ttl: int | None = None, key_prefix: str = "default") -> Callable:
         """
         Decorator to add Redis caching to MCP tool functions.
 
@@ -133,6 +127,7 @@ class MCPCacheWrapper:
                 return fetch_espn_news(team, limit)
             ```
         """
+
         def decorator(func: Callable) -> Callable:
             @wraps(func)
             def wrapper(*args, **kwargs):
@@ -141,12 +136,7 @@ class MCPCacheWrapper:
                     return func(*args, **kwargs)
 
                 # Generate cache key
-                cache_key = self._generate_cache_key(
-                    key_prefix,
-                    func.__name__,
-                    args,
-                    kwargs
-                )
+                cache_key = self._generate_cache_key(key_prefix, func.__name__, args, kwargs)
 
                 # Try to get from cache
                 cached_result = self._redis_cache.get(cache_key)
@@ -159,8 +149,7 @@ class MCPCacheWrapper:
 
                 # Cache miss - execute function
                 logger.debug(
-                    f"MCP cache MISS: {key_prefix}.{func.__name__} "
-                    f"(key: {cache_key[:40]}...)"
+                    f"MCP cache MISS: {key_prefix}.{func.__name__} " f"(key: {cache_key[:40]}...)"
                 )
                 result = func(*args, **kwargs)
 
@@ -169,8 +158,7 @@ class MCPCacheWrapper:
                 self._redis_cache.set(cache_key, result, ttl=cache_ttl)
 
                 logger.debug(
-                    f"MCP cached result: {key_prefix}.{func.__name__} "
-                    f"(TTL: {cache_ttl}s)"
+                    f"MCP cached result: {key_prefix}.{func.__name__} " f"(TTL: {cache_ttl}s)"
                 )
 
                 return result
@@ -205,6 +193,7 @@ class MCPCacheWrapper:
             # Use CacheInvalidator if available
             try:
                 from py.utils.cache_invalidator import CacheInvalidator
+
                 invalidator = CacheInvalidator(self._redis_cache)
                 result = invalidator.invalidate_pattern(pattern)
                 return result.keys_deleted
@@ -215,11 +204,7 @@ class MCPCacheWrapper:
                 deleted = 0
 
                 while True:
-                    cursor, keys = redis_client.scan(
-                        cursor=cursor,
-                        match=pattern,
-                        count=100
-                    )
+                    cursor, keys = redis_client.scan(cursor=cursor, match=pattern, count=100)
                     if keys:
                         deleted += redis_client.delete(*keys)
                     if cursor == 0:
@@ -305,9 +290,9 @@ if __name__ == "__main__":
 
     logging.basicConfig(level=logging.DEBUG)
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("MCP CACHE WRAPPER TEST")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     cache_wrapper = get_mcp_cache_wrapper()
 
@@ -367,6 +352,6 @@ if __name__ == "__main__":
     print(f"  Deleted {deleted} keys from 'test' prefix")
     print()
 
-    print("="*60)
+    print("=" * 60)
     print("✅ ALL TESTS COMPLETE")
-    print("="*60)
+    print("=" * 60)

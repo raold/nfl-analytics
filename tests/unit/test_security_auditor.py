@@ -23,7 +23,6 @@ def test_add_issue_basic():
     assert result is not None
 
 
-
 def test_add_issue_edge_cases():
     """Test add_issue: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_add_issue_edge_cases():
     assert result is not None
 
 
-
 def test_add_issue_error_handling():
     """Test add_issue error handling."""
     with pytest.raises(ValueError):
         add_issue(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_add_issue_property_idempotent(self, self, issue):
 
     # Assert property
     assert add_issue(self, issue) == result, "idempotent violated"
-
 
 
 def test_has_critical_issues_basic():
@@ -67,7 +63,6 @@ def test_has_critical_issues_basic():
     assert result is not None
 
 
-
 def test_has_critical_issues_edge_cases():
     """Test has_critical_issues: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_has_critical_issues_edge_cases():
     assert result is not None
 
 
-
 def test_has_critical_issues_error_handling():
     """Test has_critical_issues error handling."""
     with pytest.raises(ValueError):
         has_critical_issues(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_has_critical_issues_property_idempotent(val):
 
     # Assert property
     assert has_critical_issues(val) == result, "idempotent violated"
-
 
 
 def test_to_json_basic():
@@ -111,7 +103,6 @@ def test_to_json_basic():
     assert result is not None
 
 
-
 def test_to_json_edge_cases():
     """Test to_json: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_to_json_edge_cases():
     assert result is not None
 
 
-
 def test_to_json_error_handling():
     """Test to_json error handling."""
     with pytest.raises(ValueError):
         to_json(invalid_input)
-
 
 
 @given(st.integers())
@@ -140,7 +129,6 @@ def test_to_json_property_idempotent(val):
 
     # Assert property
     assert to_json(val) == result, "idempotent violated"
-
 
 
 def test_run_full_audit_basic():
@@ -155,7 +143,6 @@ def test_run_full_audit_basic():
     assert result is not None
 
 
-
 def test_run_full_audit_edge_cases():
     """Test run_full_audit: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_run_full_audit_edge_cases():
     assert result is not None
 
 
-
 def test_run_full_audit_error_handling():
     """Test run_full_audit error handling."""
     with pytest.raises(ValueError):
         run_full_audit(invalid_input)
-
 
 
 @given(st.integers())
@@ -184,7 +169,6 @@ def test_run_full_audit_property_idempotent(val):
 
     # Assert property
     assert run_full_audit(val) == result, "idempotent violated"
-
 
 
 def test_generate_report_basic():
@@ -199,7 +183,6 @@ def test_generate_report_basic():
     assert result is not None
 
 
-
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
@@ -212,12 +195,10 @@ def test_generate_report_edge_cases():
     assert result is not None
 
 
-
 def test_generate_report_error_handling():
     """Test generate_report error handling."""
     with pytest.raises(ValueError):
         generate_report(invalid_input)
-
 
 
 @given(st.integers())
@@ -228,7 +209,6 @@ def test_generate_report_property_idempotent(val):
 
     # Assert property
     assert generate_report(val) == result, "idempotent violated"
-
 
 
 def test_save_report_basic():
@@ -243,7 +223,6 @@ def test_save_report_basic():
     assert result is not None
 
 
-
 def test_save_report_edge_cases():
     """Test save_report: edge cases."""
     # Arrange
@@ -256,12 +235,10 @@ def test_save_report_edge_cases():
     assert result is not None
 
 
-
 def test_save_report_error_handling():
     """Test save_report error handling."""
     with pytest.raises(ValueError):
         save_report(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -272,4 +249,3 @@ def test_save_report_property_idempotent(self, self, output_path):
 
     # Assert property
     assert save_report(self, output_path) == result, "idempotent violated"
-

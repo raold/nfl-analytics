@@ -44,7 +44,9 @@ logger = logging.getLogger(__name__)
 # Database configuration - password MUST be set via environment variable
 _db_password = os.getenv("DB_PASSWORD")
 if not _db_password:
-    logger.warning("DB_PASSWORD not set - database operations will fail. Set DB_PASSWORD environment variable.")
+    logger.warning(
+        "DB_PASSWORD not set - database operations will fail. Set DB_PASSWORD environment variable."
+    )
 
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "localhost"),
@@ -119,6 +121,7 @@ class GameOutcomePredictorV2:
         if self._feature_extractor is None:
             try:
                 from py.features.game_feature_extractor import GameFeatureExtractor
+
                 self._feature_extractor = GameFeatureExtractor()
                 logger.info("GameFeatureExtractor loaded")
             except ImportError as e:
@@ -132,6 +135,7 @@ class GameOutcomePredictorV2:
         if self._ensemble is None and self.use_ensemble_qb:
             try:
                 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+
                 self._ensemble = EnhancedEnsemble5Way()
                 logger.info("Ensemble v6.1 loaded for QB predictions")
             except ImportError as e:
@@ -145,7 +149,7 @@ class GameOutcomePredictorV2:
         if self.spread_model_path.exists() and self._spread_model is None:
             try:
                 model_data = joblib.load(self.spread_model_path)
-                self._spread_model = model_data['model']
+                self._spread_model = model_data["model"]
                 logger.info(f"Loaded spread model from {self.spread_model_path}")
             except Exception as e:
                 logger.warning(f"Could not load spread model: {e}")
@@ -153,7 +157,7 @@ class GameOutcomePredictorV2:
         if self.total_model_path.exists() and self._total_model is None:
             try:
                 model_data = joblib.load(self.total_model_path)
-                self._total_model = model_data['model']
+                self._total_model = model_data["model"]
                 logger.info(f"Loaded total model from {self.total_model_path}")
             except Exception as e:
                 logger.warning(f"Could not load total model: {e}")
@@ -162,9 +166,7 @@ class GameOutcomePredictorV2:
         """Get database connection."""
         return psycopg2.connect(**DB_CONFIG)
 
-    def _get_starting_qb(
-        self, team: str, season: int, week: int, conn
-    ) -> dict[str, Any] | None:
+    def _get_starting_qb(self, team: str, season: int, week: int, conn) -> dict[str, Any] | None:
         """Get starting QB for a team."""
         cursor = conn.cursor(cursor_factory=RealDictCursor)
 
@@ -212,20 +214,14 @@ class GameOutcomePredictorV2:
 
         return dict(qb) if qb else None
 
-    def _predict_qb_yards(
-        self, player_id: str, season: int, week: int
-    ) -> tuple[float, float]:
+    def _predict_qb_yards(self, player_id: str, season: int, week: int) -> tuple[float, float]:
         """Predict QB passing yards using ensemble."""
         if self.ensemble is None:
             return DEFAULT_QB_YARDS, 50.0
 
         try:
-            result = self.ensemble.predict(
-                player_id=player_id,
-                season=season,
-                week=week
-            )
-            return result['ensemble_mean'], result['ensemble_std']
+            result = self.ensemble.predict(player_id=player_id, season=season, week=week)
+            return result["ensemble_mean"], result["ensemble_std"]
         except Exception as e:
             logger.warning(f"QB prediction failed for {player_id}: {e}")
             return DEFAULT_QB_YARDS, 50.0
@@ -268,26 +264,26 @@ class GameOutcomePredictorV2:
             away_qb = self._get_starting_qb(away_team, season, week, conn)
 
             if home_qb:
-                home_yards, home_std = self._predict_qb_yards(home_qb['player_id'], season, week)
+                home_yards, home_std = self._predict_qb_yards(home_qb["player_id"], season, week)
             else:
                 home_yards, home_std = DEFAULT_QB_YARDS, 50.0
 
             if away_qb:
-                away_yards, away_std = self._predict_qb_yards(away_qb['player_id'], season, week)
+                away_yards, away_std = self._predict_qb_yards(away_qb["player_id"], season, week)
             else:
                 away_yards, away_std = DEFAULT_QB_YARDS, 50.0
 
             # 3. Add QB features
-            game_features['home_qb_predicted_yards'] = home_yards
-            game_features['home_qb_predicted_std'] = home_std
-            game_features['away_qb_predicted_yards'] = away_yards
-            game_features['away_qb_predicted_std'] = away_std
+            game_features["home_qb_predicted_yards"] = home_yards
+            game_features["home_qb_predicted_std"] = home_std
+            game_features["away_qb_predicted_yards"] = away_yards
+            game_features["away_qb_predicted_std"] = away_std
 
             # 4. Add QB metadata
-            game_features['_home_qb_id'] = home_qb['player_id'] if home_qb else None
-            game_features['_home_qb_name'] = home_qb.get('player_display_name') if home_qb else None
-            game_features['_away_qb_id'] = away_qb['player_id'] if away_qb else None
-            game_features['_away_qb_name'] = away_qb.get('player_display_name') if away_qb else None
+            game_features["_home_qb_id"] = home_qb["player_id"] if home_qb else None
+            game_features["_home_qb_name"] = home_qb.get("player_display_name") if home_qb else None
+            game_features["_away_qb_id"] = away_qb["player_id"] if away_qb else None
+            game_features["_away_qb_name"] = away_qb.get("player_display_name") if away_qb else None
 
             return game_features
 
@@ -321,10 +317,10 @@ class GameOutcomePredictorV2:
             features = self.extract_all_features(home_team, away_team, season, week, conn)
 
             # Extract QB metadata before prediction
-            home_qb_id = features.pop('_home_qb_id', None)
-            home_qb_name = features.pop('_home_qb_name', None)
-            away_qb_id = features.pop('_away_qb_id', None)
-            away_qb_name = features.pop('_away_qb_name', None)
+            home_qb_id = features.pop("_home_qb_id", None)
+            home_qb_name = features.pop("_home_qb_name", None)
+            away_qb_id = features.pop("_away_qb_id", None)
+            away_qb_name = features.pop("_away_qb_name", None)
 
             # Convert to DataFrame for model
             feature_df = pd.DataFrame([features])
@@ -365,20 +361,20 @@ class GameOutcomePredictorV2:
             elapsed = time.time() - start
 
             result = {
-                'predicted_home_score': round(predicted_home_score, 1),
-                'predicted_away_score': round(predicted_away_score, 1),
-                'predicted_total': round(predicted_total, 1),
-                'predicted_spread': round(predicted_spread, 1),
-                'predicted_home_win_prob': round(predicted_win_prob, 4),
-                'spread_std': round(spread_std, 1),
-                'total_std': round(total_std, 1),
-                'home_qb_id': home_qb_id,
-                'home_qb_name': home_qb_name,
-                'away_qb_id': away_qb_id,
-                'away_qb_name': away_qb_name,
-                'n_features_used': len(features),
-                'processing_time_ms': round(elapsed * 1000, 1),
-                'model_version': 'v2.0',
+                "predicted_home_score": round(predicted_home_score, 1),
+                "predicted_away_score": round(predicted_away_score, 1),
+                "predicted_total": round(predicted_total, 1),
+                "predicted_spread": round(predicted_spread, 1),
+                "predicted_home_win_prob": round(predicted_win_prob, 4),
+                "spread_std": round(spread_std, 1),
+                "total_std": round(total_std, 1),
+                "home_qb_id": home_qb_id,
+                "home_qb_name": home_qb_name,
+                "away_qb_id": away_qb_id,
+                "away_qb_name": away_qb_name,
+                "n_features_used": len(features),
+                "processing_time_ms": round(elapsed * 1000, 1),
+                "model_version": "v2.0",
             }
 
             logger.info(
@@ -404,22 +400,22 @@ class GameOutcomePredictorV2:
         spread += 2.5
 
         # Offensive EPA differential
-        home_off_epa = features.get('home_off_epa_per_play', 0.0)
-        away_off_epa = features.get('away_off_epa_per_play', 0.0)
+        home_off_epa = features.get("home_off_epa_per_play", 0.0)
+        away_off_epa = features.get("away_off_epa_per_play", 0.0)
         spread += (home_off_epa - away_off_epa) * 10
 
         # Defensive EPA differential (lower is better for defense)
-        home_def_epa = features.get('home_def_epa_allowed_per_play', 0.0)
-        away_def_epa = features.get('away_def_epa_allowed_per_play', 0.0)
+        home_def_epa = features.get("home_def_epa_allowed_per_play", 0.0)
+        away_def_epa = features.get("away_def_epa_allowed_per_play", 0.0)
         spread += (away_def_epa - home_def_epa) * 10
 
         # QB prediction differential
-        home_qb = features.get('home_qb_predicted_yards', DEFAULT_QB_YARDS)
-        away_qb = features.get('away_qb_predicted_yards', DEFAULT_QB_YARDS)
+        home_qb = features.get("home_qb_predicted_yards", DEFAULT_QB_YARDS)
+        away_qb = features.get("away_qb_predicted_yards", DEFAULT_QB_YARDS)
         spread += (home_qb - away_qb) / 30
 
         # Injury adjustment
-        injury_adj = features.get('injury_spread_adjustment', 0.0)
+        injury_adj = features.get("injury_spread_adjustment", 0.0)
         spread += injury_adj
 
         return float(np.clip(spread, -21, 21))
@@ -431,18 +427,18 @@ class GameOutcomePredictorV2:
         total = DEFAULT_TOTAL
 
         # Offensive EPAs
-        home_off = features.get('home_off_epa_per_play', 0.0)
-        away_off = features.get('away_off_epa_per_play', 0.0)
+        home_off = features.get("home_off_epa_per_play", 0.0)
+        away_off = features.get("away_off_epa_per_play", 0.0)
         total += (home_off + away_off) * 5
 
         # Pace (plays per game)
-        home_pace = features.get('home_off_plays_per_game', 65)
-        away_pace = features.get('away_off_plays_per_game', 65)
+        home_pace = features.get("home_off_plays_per_game", 65)
+        away_pace = features.get("away_off_plays_per_game", 65)
         total += ((home_pace + away_pace) / 2 - 65) * 0.3
 
         # QB predictions
-        home_qb = features.get('home_qb_predicted_yards', DEFAULT_QB_YARDS)
-        away_qb = features.get('away_qb_predicted_yards', DEFAULT_QB_YARDS)
+        home_qb = features.get("home_qb_predicted_yards", DEFAULT_QB_YARDS)
+        away_qb = features.get("away_qb_predicted_yards", DEFAULT_QB_YARDS)
         total += ((home_qb + away_qb) / 2 - 240) / 20
 
         return float(np.clip(total, 30, 65))
@@ -476,27 +472,29 @@ class GameOutcomePredictorV2:
 
         # Default hyperparameters
         default_params = {
-            'objective': 'reg:squarederror',
-            'max_depth': 6,
-            'learning_rate': 0.05,
-            'n_estimators': 200,
-            'subsample': 0.8,
-            'colsample_bytree': 0.8,
-            'reg_alpha': 0.1,
-            'reg_lambda': 1.0,
-            'random_state': 42,
+            "objective": "reg:squarederror",
+            "max_depth": 6,
+            "learning_rate": 0.05,
+            "n_estimators": 200,
+            "subsample": 0.8,
+            "colsample_bytree": 0.8,
+            "reg_alpha": 0.1,
+            "reg_lambda": 1.0,
+            "random_state": 42,
         }
         if hyperparams:
             default_params.update(hyperparams)
 
         # Prepare features (exclude target columns and metadata)
-        exclude_cols = ['actual_spread', 'actual_total', 'game_id', 'season', 'week']
-        feature_cols = [c for c in training_data.columns if c not in exclude_cols and not c.startswith('_')]
+        exclude_cols = ["actual_spread", "actual_total", "game_id", "season", "week"]
+        feature_cols = [
+            c for c in training_data.columns if c not in exclude_cols and not c.startswith("_")
+        ]
         X = training_data[feature_cols]
 
         # Train spread model
-        if 'actual_spread' in training_data.columns:
-            y_spread = training_data['actual_spread']
+        if "actual_spread" in training_data.columns:
+            y_spread = training_data["actual_spread"]
             spread_model = xgb.XGBRegressor(**default_params)
             spread_model.fit(X, y_spread)
 
@@ -505,17 +503,17 @@ class GameOutcomePredictorV2:
             spread_rmse = float(np.sqrt(np.mean((pred_spread - y_spread) ** 2)))
 
             model_data = {
-                'model': spread_model,
-                'feature_names': feature_cols,
-                'metrics': {'mae': spread_mae, 'rmse': spread_rmse, 'n_samples': len(y_spread)}
+                "model": spread_model,
+                "feature_names": feature_cols,
+                "metrics": {"mae": spread_mae, "rmse": spread_rmse, "n_samples": len(y_spread)},
             }
-            joblib.dump(model_data, output_dir / 'spread_v2.pkl')
-            results['spread'] = model_data['metrics']
+            joblib.dump(model_data, output_dir / "spread_v2.pkl")
+            results["spread"] = model_data["metrics"]
             logger.info(f"Spread model: MAE={spread_mae:.2f}, RMSE={spread_rmse:.2f}")
 
         # Train total model
-        if 'actual_total' in training_data.columns:
-            y_total = training_data['actual_total']
+        if "actual_total" in training_data.columns:
+            y_total = training_data["actual_total"]
             total_model = xgb.XGBRegressor(**default_params)
             total_model.fit(X, y_total)
 
@@ -524,12 +522,12 @@ class GameOutcomePredictorV2:
             total_rmse = float(np.sqrt(np.mean((pred_total - y_total) ** 2)))
 
             model_data = {
-                'model': total_model,
-                'feature_names': feature_cols,
-                'metrics': {'mae': total_mae, 'rmse': total_rmse, 'n_samples': len(y_total)}
+                "model": total_model,
+                "feature_names": feature_cols,
+                "metrics": {"mae": total_mae, "rmse": total_rmse, "n_samples": len(y_total)},
             }
-            joblib.dump(model_data, output_dir / 'total_v2.pkl')
-            results['total'] = model_data['metrics']
+            joblib.dump(model_data, output_dir / "total_v2.pkl")
+            results["total"] = model_data["metrics"]
             logger.info(f"Total model: MAE={total_mae:.2f}, RMSE={total_rmse:.2f}")
 
         return results
@@ -537,19 +535,13 @@ class GameOutcomePredictorV2:
 
 if __name__ == "__main__":
     logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     predictor = GameOutcomePredictorV2()
 
     # Test with a game
-    result = predictor.predict_game(
-        home_team="HOU",
-        away_team="BUF",
-        season=2024,
-        week=12
-    )
+    result = predictor.predict_game(home_team="HOU", away_team="BUF", season=2024, week=12)
 
     print("\n" + "=" * 60)
     print("GAME PREDICTION V2 TEST: BUF @ HOU (2024 Week 12)")

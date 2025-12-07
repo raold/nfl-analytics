@@ -23,7 +23,6 @@ def test_demo_alt_lines_optimization_basic():
     assert result is not None
 
 
-
 def test_demo_alt_lines_optimization_edge_cases():
     """Test demo_alt_lines_optimization: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_demo_alt_lines_optimization_edge_cases():
     assert result is not None
 
 
-
 def test_demo_alt_lines_optimization_error_handling():
     """Test demo_alt_lines_optimization error handling."""
     with pytest.raises(ValueError):
         demo_alt_lines_optimization(invalid_input)
-
 
 
 def test_decimal_odds_basic():
@@ -56,7 +53,6 @@ def test_decimal_odds_basic():
     assert result is not None
 
 
-
 def test_decimal_odds_edge_cases():
     """Test decimal_odds: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_decimal_odds_edge_cases():
     assert result is not None
 
 
-
 def test_decimal_odds_error_handling():
     """Test decimal_odds error handling."""
     with pytest.raises(ValueError):
         decimal_odds(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_decimal_odds_property_idempotent(val):
 
     # Assert property
     assert decimal_odds(val) == result, "idempotent violated"
-
 
 
 def test_implied_prob_basic():
@@ -100,7 +93,6 @@ def test_implied_prob_basic():
     assert result is not None
 
 
-
 def test_implied_prob_edge_cases():
     """Test implied_prob: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_implied_prob_edge_cases():
     assert result is not None
 
 
-
 def test_implied_prob_error_handling():
     """Test implied_prob error handling."""
     with pytest.raises(ValueError):
         implied_prob(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_implied_prob_property_idempotent(val):
 
     # Assert property
     assert implied_prob(val) == result, "idempotent violated"
-
 
 
 def test_optimize_game_basic():
@@ -144,7 +133,6 @@ def test_optimize_game_basic():
     assert result is not None
 
 
-
 def test_optimize_game_edge_cases():
     """Test optimize_game: edge cases."""
     # Arrange
@@ -157,23 +145,24 @@ def test_optimize_game_edge_cases():
     assert result is not None
 
 
-
 def test_optimize_game_error_handling():
     """Test optimize_game error handling."""
     with pytest.raises(ValueError):
         optimize_game(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_optimize_game_property_idempotent(self, self, mu_home, mu_away, spread_ladder, total_ladder, model_std):
+def test_optimize_game_property_idempotent(
+    self, self, mu_home, mu_away, spread_ladder, total_ladder, model_std
+):
     """Property test: function is idempotent."""
     # Act
     result = optimize_game(self, mu_home, mu_away, spread_ladder, total_ladder, model_std)
 
     # Assert property
-    assert optimize_game(self, mu_home, mu_away, spread_ladder, total_ladder, model_std) == result, "idempotent violated"
-
+    assert (
+        optimize_game(self, mu_home, mu_away, spread_ladder, total_ladder, model_std) == result
+    ), "idempotent violated"
 
 
 def test_find_arbitrage_basic():
@@ -188,7 +177,6 @@ def test_find_arbitrage_basic():
     assert result is not None
 
 
-
 def test_find_arbitrage_edge_cases():
     """Test find_arbitrage: edge cases."""
     # Arrange
@@ -201,12 +189,10 @@ def test_find_arbitrage_edge_cases():
     assert result is not None
 
 
-
 def test_find_arbitrage_error_handling():
     """Test find_arbitrage error handling."""
     with pytest.raises(ValueError):
         find_arbitrage(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -217,7 +203,6 @@ def test_find_arbitrage_property_idempotent(self, self, ladder, tolerance):
 
     # Assert property
     assert find_arbitrage(self, ladder, tolerance) == result, "idempotent violated"
-
 
 
 def test_generate_report_basic():
@@ -232,7 +217,6 @@ def test_generate_report_basic():
     assert result is not None
 
 
-
 def test_generate_report_edge_cases():
     """Test generate_report: edge cases."""
     # Arrange
@@ -245,12 +229,10 @@ def test_generate_report_edge_cases():
     assert result is not None
 
 
-
 def test_generate_report_error_handling():
     """Test generate_report error handling."""
     with pytest.raises(ValueError):
         generate_report(invalid_input)
-
 
 
 @given(st.integers())
@@ -261,4 +243,3 @@ def test_generate_report_property_idempotent(val):
 
     # Assert property
     assert generate_report(val) == result, "idempotent violated"
-

@@ -13,14 +13,14 @@ logger = logging.getLogger(__name__)
 
 # Allowed directories for file operations
 # Auto-detect if running in Docker or locally
-BASE_DIR = '/app' if os.path.exists('/app/models') else os.getcwd()
+BASE_DIR = "/app" if os.path.exists("/app/models") else os.getcwd()
 
 ALLOWED_DIRS = {
-    'models': os.path.join(BASE_DIR, 'models'),
-    'logs': os.path.join(BASE_DIR, 'logs'),
-    'data': os.path.join(BASE_DIR, 'data'),
-    'cache': os.path.join(BASE_DIR, 'cache'),
-    'results': os.path.join(BASE_DIR, 'results')
+    "models": os.path.join(BASE_DIR, "models"),
+    "logs": os.path.join(BASE_DIR, "logs"),
+    "data": os.path.join(BASE_DIR, "data"),
+    "cache": os.path.join(BASE_DIR, "cache"),
+    "results": os.path.join(BASE_DIR, "results"),
 }
 
 # File size limits (10 MB for read operations)
@@ -59,11 +59,7 @@ def _validate_path(directory_type: str, relative_path: str) -> Path | None:
         return None
 
 
-def list_files(
-    directory_type: str,
-    relative_path: str = "",
-    pattern: str = "*"
-) -> dict[str, Any]:
+def list_files(directory_type: str, relative_path: str = "", pattern: str = "*") -> dict[str, Any]:
     """
     List files in a directory.
 
@@ -80,57 +76,44 @@ def list_files(
         if not path:
             return {
                 "success": False,
-                "error": f"Invalid directory type or path: {directory_type}/{relative_path}"
+                "error": f"Invalid directory type or path: {directory_type}/{relative_path}",
             }
 
         if not path.exists():
-            return {
-                "success": False,
-                "error": f"Path does not exist: {path}"
-            }
+            return {"success": False, "error": f"Path does not exist: {path}"}
 
         if not path.is_dir():
-            return {
-                "success": False,
-                "error": f"Path is not a directory: {path}"
-            }
+            return {"success": False, "error": f"Path is not a directory: {path}"}
 
         # List files matching pattern
         files = []
         for file_path in path.glob(pattern):
             stat = file_path.stat()
-            files.append({
-                "name": file_path.name,
-                "path": str(file_path.relative_to(ALLOWED_DIRS[directory_type])),
-                "size": stat.st_size,
-                "modified": stat.st_mtime,
-                "is_dir": file_path.is_dir()
-            })
+            files.append(
+                {
+                    "name": file_path.name,
+                    "path": str(file_path.relative_to(ALLOWED_DIRS[directory_type])),
+                    "size": stat.st_size,
+                    "modified": stat.st_mtime,
+                    "is_dir": file_path.is_dir(),
+                }
+            )
 
         # Sort by name
-        files.sort(key=lambda x: x['name'])
+        files.sort(key=lambda x: x["name"])
 
         logger.info(f"Listed {len(files)} files in {directory_type}/{relative_path}")
 
-        return {
-            "success": True,
-            "files": files,
-            "count": len(files)
-        }
+        return {"success": True, "files": files, "count": len(files)}
 
     except Exception as e:
         error_msg = f"Error listing files: {str(e)}"
         logger.error(error_msg, exc_info=True)
-        return {
-            "success": False,
-            "error": error_msg
-        }
+        return {"success": False, "error": error_msg}
 
 
 def read_file(
-    directory_type: str,
-    relative_path: str,
-    max_lines: int | None = None
+    directory_type: str, relative_path: str, max_lines: int | None = None
 ) -> dict[str, Any]:
     """
     Read a text file.
@@ -146,30 +129,24 @@ def read_file(
     try:
         path = _validate_path(directory_type, relative_path)
         if not path:
-            return {
-                "success": False,
-                "error": f"Invalid path: {directory_type}/{relative_path}"
-            }
+            return {"success": False, "error": f"Invalid path: {directory_type}/{relative_path}"}
 
         if not path.exists():
-            return {
-                "success": False,
-                "error": f"File does not exist: {path}"
-            }
+            return {"success": False, "error": f"File does not exist: {path}"}
 
         # Check file size
         file_size = path.stat().st_size
         if file_size > MAX_FILE_SIZE:
             return {
                 "success": False,
-                "error": f"File too large: {file_size} bytes (max: {MAX_FILE_SIZE})"
+                "error": f"File too large: {file_size} bytes (max: {MAX_FILE_SIZE})",
             }
 
         # Read file
-        with open(path, encoding='utf-8') as f:
+        with open(path, encoding="utf-8") as f:
             if max_lines:
                 lines = [f.readline() for _ in range(max_lines)]
-                content = ''.join(lines)
+                content = "".join(lines)
                 truncated = True
             else:
                 content = f.read()
@@ -177,34 +154,20 @@ def read_file(
 
         logger.info(f"Read file: {directory_type}/{relative_path} ({len(content)} chars)")
 
-        return {
-            "success": True,
-            "content": content,
-            "size": file_size,
-            "truncated": truncated
-        }
+        return {"success": True, "content": content, "size": file_size, "truncated": truncated}
 
     except UnicodeDecodeError:
         error_msg = "File is not a text file (binary content detected)"
         logger.warning(error_msg)
-        return {
-            "success": False,
-            "error": error_msg
-        }
+        return {"success": False, "error": error_msg}
 
     except Exception as e:
         error_msg = f"Error reading file: {str(e)}"
         logger.error(error_msg, exc_info=True)
-        return {
-            "success": False,
-            "error": error_msg
-        }
+        return {"success": False, "error": error_msg}
 
 
-def read_json(
-    directory_type: str,
-    relative_path: str
-) -> dict[str, Any]:
+def read_json(directory_type: str, relative_path: str) -> dict[str, Any]:
     """
     Read and parse a JSON file.
 
@@ -218,48 +181,30 @@ def read_json(
     try:
         path = _validate_path(directory_type, relative_path)
         if not path:
-            return {
-                "success": False,
-                "error": f"Invalid path: {directory_type}/{relative_path}"
-            }
+            return {"success": False, "error": f"Invalid path: {directory_type}/{relative_path}"}
 
         if not path.exists():
-            return {
-                "success": False,
-                "error": f"File does not exist: {path}"
-            }
+            return {"success": False, "error": f"File does not exist: {path}"}
 
-        with open(path, encoding='utf-8') as f:
+        with open(path, encoding="utf-8") as f:
             data = json.load(f)
 
         logger.info(f"Read JSON file: {directory_type}/{relative_path}")
 
-        return {
-            "success": True,
-            "data": data
-        }
+        return {"success": True, "data": data}
 
     except json.JSONDecodeError as e:
         error_msg = f"Invalid JSON: {str(e)}"
         logger.error(error_msg)
-        return {
-            "success": False,
-            "error": error_msg
-        }
+        return {"success": False, "error": error_msg}
 
     except Exception as e:
         error_msg = f"Error reading JSON file: {str(e)}"
         logger.error(error_msg, exc_info=True)
-        return {
-            "success": False,
-            "error": error_msg
-        }
+        return {"success": False, "error": error_msg}
 
 
-def get_file_info(
-    directory_type: str,
-    relative_path: str
-) -> dict[str, Any]:
+def get_file_info(directory_type: str, relative_path: str) -> dict[str, Any]:
     """
     Get metadata about a file or directory.
 
@@ -273,16 +218,10 @@ def get_file_info(
     try:
         path = _validate_path(directory_type, relative_path)
         if not path:
-            return {
-                "success": False,
-                "error": f"Invalid path: {directory_type}/{relative_path}"
-            }
+            return {"success": False, "error": f"Invalid path: {directory_type}/{relative_path}"}
 
         if not path.exists():
-            return {
-                "success": False,
-                "error": f"Path does not exist: {path}"
-            }
+            return {"success": False, "error": f"Path does not exist: {path}"}
 
         stat = path.stat()
 
@@ -294,20 +233,14 @@ def get_file_info(
             "created": stat.st_ctime,
             "is_dir": path.is_dir(),
             "is_file": path.is_file(),
-            "extension": path.suffix
+            "extension": path.suffix,
         }
 
         logger.info(f"Got file info: {directory_type}/{relative_path}")
 
-        return {
-            "success": True,
-            "info": info
-        }
+        return {"success": True, "info": info}
 
     except Exception as e:
         error_msg = f"Error getting file info: {str(e)}"
         logger.error(error_msg, exc_info=True)
-        return {
-            "success": False,
-            "error": error_msg
-        }
+        return {"success": False, "error": error_msg}

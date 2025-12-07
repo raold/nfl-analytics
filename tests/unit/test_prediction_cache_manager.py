@@ -93,9 +93,7 @@ class TestCachePredictions:
             }
         )
 
-        result = cache_manager.cache_predictions(
-            df, model_name="test", stat_type="passing_yards"
-        )
+        result = cache_manager.cache_predictions(df, model_name="test", stat_type="passing_yards")
 
         # Should keep only the latest (most recent)
         assert result == 1
@@ -152,9 +150,7 @@ class TestCachePredictions:
         )
 
         with pytest.raises(Exception, match="Database error"):
-            cache_manager.cache_predictions(
-                df, model_name="test", stat_type="passing_yards"
-            )
+            cache_manager.cache_predictions(df, model_name="test", stat_type="passing_yards")
 
         # Should rollback on error
         assert conn.rollback.called

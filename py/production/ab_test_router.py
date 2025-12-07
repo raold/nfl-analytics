@@ -514,12 +514,12 @@ class ABTestRouter:
                     "n_completed": row["n_completed"],
                     "mae": float(row["mae"]) if row["mae"] else None,
                     "rmse": float(row["rmse"]) if row["rmse"] else None,
-                    "calibration_90_pct": float(row["calibration_90_pct"])
-                    if row["calibration_90_pct"]
-                    else None,
-                    "avg_uncertainty": float(row["avg_uncertainty"])
-                    if row["avg_uncertainty"]
-                    else None,
+                    "calibration_90_pct": (
+                        float(row["calibration_90_pct"]) if row["calibration_90_pct"] else None
+                    ),
+                    "avg_uncertainty": (
+                        float(row["avg_uncertainty"]) if row["avg_uncertainty"] else None
+                    ),
                     "first_prediction": row["first_prediction"],
                     "last_prediction": row["last_prediction"],
                 }

@@ -9,106 +9,98 @@ from datetime import datetime
 from pathlib import Path
 
 # Root directory
-ROOT = Path('/Users/dro/rice/nfl-analytics')
+ROOT = Path("/Users/dro/rice/nfl-analytics")
 
 # Define organizational structure
 CLEANUP_PLAN = {
     # Python utility scripts → scripts/utils/
-    'scripts/utils/': [
-        'add_dois.py',
-        'audit_bibliography.py',
-        'check_notation_consistency.py',
-        'clean_bibliography.py',
-        'fix_latex_tables.py',
-        'fix_references.py',
-        'generate_missing_tables.py',
+    "scripts/utils/": [
+        "add_dois.py",
+        "audit_bibliography.py",
+        "check_notation_consistency.py",
+        "clean_bibliography.py",
+        "fix_latex_tables.py",
+        "fix_references.py",
+        "generate_missing_tables.py",
     ],
-
     # Dissertation-specific scripts → scripts/dissertation/
-    'scripts/dissertation/': [
+    "scripts/dissertation/": [
         # (none identified yet - will check in analysis run)
     ],
-
     # Compute system scripts → scripts/compute/
-    'scripts/compute/': [
-        'generate_heavy_tasks.py',
-        'monitor_and_upgrade.py',
-        'run_compute.py',
-        'watch_and_restart.sh',
+    "scripts/compute/": [
+        "generate_heavy_tasks.py",
+        "monitor_and_upgrade.py",
+        "run_compute.py",
+        "watch_and_restart.sh",
     ],
-
     # Status/progress documentation → docs/reports/
-    'docs/reports/': [
-        'DISSERTATION_RESULTS_SUMMARY.md',
-        'FINAL_COMPLETION_REPORT.md',
-        'FINAL_PRODUCTION_STATUS.md',
-        'FIGURE_6_3_COMPLETION.md',
-        'IMPROVEMENTS_IMPLEMENTED.md',
-        'PHASE_2_COMPLETE.md',
-        'PRODUCTION_READY_CHECKLIST.md',
-        'REAL_RESULTS_SUMMARY.md',
-        'SESSION_2_SUMMARY.md',
-        'SESSION_COMPLETION_SUMMARY.md',
-        'SPRINT_COMPLETED.md',
-        'TABLE_10_3_FIXED.md',
-        'THREE_AGENT_SYNTHESIS_REPORT.md',
-        'WEATHER_ANALYSIS_COMPLETE.md',
-        'WEATHER_INFRASTRUCTURE_ASSESSMENT.md',
+    "docs/reports/": [
+        "DISSERTATION_RESULTS_SUMMARY.md",
+        "FINAL_COMPLETION_REPORT.md",
+        "FINAL_PRODUCTION_STATUS.md",
+        "FIGURE_6_3_COMPLETION.md",
+        "IMPROVEMENTS_IMPLEMENTED.md",
+        "PHASE_2_COMPLETE.md",
+        "PRODUCTION_READY_CHECKLIST.md",
+        "REAL_RESULTS_SUMMARY.md",
+        "SESSION_2_SUMMARY.md",
+        "SESSION_COMPLETION_SUMMARY.md",
+        "SPRINT_COMPLETED.md",
+        "TABLE_10_3_FIXED.md",
+        "THREE_AGENT_SYNTHESIS_REPORT.md",
+        "WEATHER_ANALYSIS_COMPLETE.md",
+        "WEATHER_INFRASTRUCTURE_ASSESSMENT.md",
     ],
-
     # Research/reference documentation → docs/research/
-    'docs/research/': [
-        'ETL_DEVOPS_BEST_PRACTICES_RESEARCH_2025.md',
+    "docs/research/": [
+        "ETL_DEVOPS_BEST_PRACTICES_RESEARCH_2025.md",
     ],
-
     # System documentation → docs/
-    'docs/': [
-        'AGENTS.md',
-        'COMPUTE_SYSTEM.md',
-        'REPRODUCIBILITY.md',
+    "docs/": [
+        "AGENTS.md",
+        "COMPUTE_SYSTEM.md",
+        "REPRODUCIBILITY.md",
     ],
-
     # Log files → logs/
-    'logs/': [
-        'cleanup_report.txt',
-        'reliability_generation.log',
-        'value_monitor.log',
-        'worker1_high.log',
-        'worker2_high.log',
+    "logs/": [
+        "cleanup_report.txt",
+        "reliability_generation.log",
+        "value_monitor.log",
+        "worker1_high.log",
+        "worker2_high.log",
     ],
-
     # Database/cache files → data/cache/
-    'data/cache/': [
-        'compute_queue.db',
-        'compute_queue.db-shm',
-        'compute_queue.db-wal',
-        'dump.rdb',  # Redis dump
+    "data/cache/": [
+        "compute_queue.db",
+        "compute_queue.db-shm",
+        "compute_queue.db-wal",
+        "dump.rdb",  # Redis dump
     ],
-
     # Config files → config/
-    'config/': [
-        'compute_odometer.json',
-        'machine_info.json',
+    "config/": [
+        "compute_odometer.json",
+        "machine_info.json",
     ],
 }
 
 # Files to keep at root
 KEEP_AT_ROOT = {
-    'README.md',
-    'requirements.txt',
-    'Makefile',
-    '.gitignore',
-    '.env',
-    'docker-compose.yml',
-    'pyproject.toml',
-    'setup.py',
+    "README.md",
+    "requirements.txt",
+    "Makefile",
+    ".gitignore",
+    ".env",
+    "docker-compose.yml",
+    "pyproject.toml",
+    "setup.py",
 }
 
 
 def create_backup():
     """Create timestamped backup of current state."""
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    backup_dir = ROOT / 'archive' / f'pre_cleanup_backup_{timestamp}'
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_dir = ROOT / "archive" / f"pre_cleanup_backup_{timestamp}"
     backup_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"Creating backup at: {backup_dir}")
@@ -128,9 +120,9 @@ def create_backup():
 def execute_cleanup(dry_run=True):
     """Execute the cleanup plan."""
     if dry_run:
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("DRY RUN - No files will be moved")
-        print("="*60 + "\n")
+        print("=" * 60 + "\n")
     else:
         backup_dir = create_backup()
         print(f"\nBackup created: {backup_dir}\n")
@@ -160,9 +152,9 @@ def execute_cleanup(dry_run=True):
                 files_not_found.append(filename)
 
     # Report
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("CLEANUP SUMMARY")
-    print("="*60)
+    print("=" * 60)
     print(f"Files to move: {len(moves_executed)}")
     print(f"Files not found: {len(files_not_found)}")
 
@@ -171,10 +163,11 @@ def execute_cleanup(dry_run=True):
         for f in files_not_found:
             print(f"  - {f}")
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("PROPOSED ROOT STRUCTURE AFTER CLEANUP:")
-    print("="*60)
-    print("""
+    print("=" * 60)
+    print(
+        """
     /Users/dro/rice/nfl-analytics/
     ├── README.md                 (project overview)
     ├── requirements.txt          (Python dependencies)
@@ -195,14 +188,15 @@ def execute_cleanup(dry_run=True):
     │   ├── dissertation/         (dissertation tooling)
     │   └── utils/                (general utilities)
     └── tests/                    (test suite)
-    """)
+    """
+    )
 
     return moves_executed, files_not_found
 
 
 def analyze_remaining_files():
     """Identify any files still at root that aren't in the plan."""
-    root_files = [f for f in ROOT.iterdir() if f.is_file() and not f.name.startswith('.')]
+    root_files = [f for f in ROOT.iterdir() if f.is_file() and not f.name.startswith(".")]
 
     # Files in cleanup plan
     planned_files = set()
@@ -211,15 +205,15 @@ def analyze_remaining_files():
 
     # Additional files to keep at root (discovered during analysis)
     additional_keep = {
-        'Dockerfile',
-        'pytest.ini',
-        'renv.lock',
-        'requirements-dev.txt',
-        'requirements-lock.txt',
-        'uv.lock',
-        'setup_packages.R',
-        'coverage.xml',
-        'cleanup_directory_structure.py',  # This script itself
+        "Dockerfile",
+        "pytest.ini",
+        "renv.lock",
+        "requirements-dev.txt",
+        "requirements-lock.txt",
+        "uv.lock",
+        "setup_packages.R",
+        "coverage.xml",
+        "cleanup_directory_structure.py",  # This script itself
     }
 
     # Files to keep
@@ -232,9 +226,9 @@ def analyze_remaining_files():
             unaccounted.append(f.name)
 
     if unaccounted:
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("UNACCOUNTED FILES (not in cleanup plan):")
-        print("="*60)
+        print("=" * 60)
         for f in sorted(unaccounted):
             print(f"  - {f}")
         print("\nThese files may need manual review.")
@@ -242,14 +236,14 @@ def analyze_remaining_files():
     return unaccounted
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import sys
 
     # Default to dry run
-    dry_run = '--execute' not in sys.argv
+    dry_run = "--execute" not in sys.argv
 
     print("NFL Analytics Directory Cleanup")
-    print("="*60)
+    print("=" * 60)
 
     # Analyze current state
     print("\nAnalyzing current directory structure...")
@@ -260,7 +254,7 @@ if __name__ == '__main__':
     moves_executed, files_not_found = execute_cleanup(dry_run=dry_run)
 
     if dry_run:
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("To execute cleanup, run:")
         print("  python cleanup_directory_structure.py --execute")
-        print("="*60)
+        print("=" * 60)

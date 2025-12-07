@@ -28,11 +28,11 @@ import psycopg2
 
 # Database connection
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'port': int(os.getenv('DB_PORT', '5544')),
-    'user': os.getenv('DB_USER', 'dro'),
-    'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
-    'database': os.getenv('DB_NAME', 'devdb01')
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", "5544")),
+    "user": os.getenv("DB_USER", "dro"),
+    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
+    "database": os.getenv("DB_NAME", "devdb01"),
 }
 
 COVERAGE_THRESHOLD = 0.80
@@ -101,24 +101,26 @@ def check_feature_coverage(sample_size: int = 100) -> dict:
 
     # Load opponent strength features
     print("\nLoading opponent strength features...")
-    features_path = Path('data/processed/features/opponent_strength_features.csv')
+    features_path = Path("data/processed/features/opponent_strength_features.csv")
 
     if not features_path.exists():
         print("✗ FAILED: Opponent strength features not found")
         print(f"  Path: {features_path}")
         print("  Run: python py/features/opponent_strength.py")
-        return {'status': 'FAILED', 'reason': 'Missing opponent features file'}
+        return {"status": "FAILED", "reason": "Missing opponent features file"}
 
     opp_df = pd.read_csv(features_path)
     print(f"✓ Loaded {len(opp_df):,} opponent strength records")
 
     # Select features
-    opp_features = opp_df[['game_id', 'team', 'opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty']].copy()
+    opp_features = opp_df[
+        ["game_id", "team", "opp_def_epa_exp", "opp_pass_def_rank", "matchup_difficulty"]
+    ].copy()
 
     # Merge
     print("\nMerging opponent features with sample...")
     before_merge = len(df)
-    merged_df = df.merge(opp_features, on=['game_id', 'team'], how='left')
+    merged_df = df.merge(opp_features, on=["game_id", "team"], how="left")
     after_merge = len(merged_df)
 
     if after_merge != before_merge:
@@ -131,7 +133,7 @@ def check_feature_coverage(sample_size: int = 100) -> dict:
     print("FEATURE COVERAGE AUDIT (SAMPLE)")
     print("=" * 70)
 
-    opponent_features = ['opp_def_epa_exp', 'opp_pass_def_rank', 'matchup_difficulty']
+    opponent_features = ["opp_def_epa_exp", "opp_pass_def_rank", "matchup_difficulty"]
     coverage_report = {}
     all_pass = True
 
@@ -148,7 +150,9 @@ def check_feature_coverage(sample_size: int = 100) -> dict:
             all_pass = False
 
         missing_count = merged_df[feat].isna().sum()
-        print(f"  {feat:30s} {coverage:6.1%}  {status:12s}  (missing: {missing_count}/{len(merged_df)})")
+        print(
+            f"  {feat:30s} {coverage:6.1%}  {status:12s}  (missing: {missing_count}/{len(merged_df)})"
+        )
 
     print("=" * 70)
 
@@ -156,8 +160,10 @@ def check_feature_coverage(sample_size: int = 100) -> dict:
     print("\nMissing data breakdown by season:")
     for season in sorted(merged_df.season.unique()):
         season_df = merged_df[merged_df.season == season]
-        missing_pct = season_df['opp_def_epa_exp'].isna().mean()
-        print(f"  {season}: {missing_pct:5.1%} missing ({season_df['opp_def_epa_exp'].isna().sum()}/{len(season_df)} games)")
+        missing_pct = season_df["opp_def_epa_exp"].isna().mean()
+        print(
+            f"  {season}: {missing_pct:5.1%} missing ({season_df['opp_def_epa_exp'].isna().sum()}/{len(season_df)} games)"
+        )
 
     # Decision
     print("\n" + "=" * 70)
@@ -170,7 +176,7 @@ def check_feature_coverage(sample_size: int = 100) -> dict:
         print("  Expected to replicate on full 2018-2024 dataset")
         print("\nNext step:")
         print("  python py/models/train_xgboost_v3_1_aligned_window.py")
-        decision = 'GO'
+        decision = "GO"
     else:
         print("✗ NO-GO - DO NOT TRAIN")
         print(f"  Some features below {COVERAGE_THRESHOLD:.0%} threshold")
@@ -179,33 +185,36 @@ def check_feature_coverage(sample_size: int = 100) -> dict:
         print("  1. Investigate missing data causes")
         print("  2. Regenerate opponent features (py/features/opponent_strength.py)")
         print("  3. Adjust training window further")
-        decision = 'NO_GO'
+        decision = "NO_GO"
 
     print("=" * 70 + "\n")
 
     return {
-        'status': decision,
-        'sample_size': len(merged_df),
-        'coverage_report': coverage_report,
-        'missing_by_season': {
-            int(season): float(merged_df[merged_df.season == season]['opp_def_epa_exp'].isna().mean())
+        "status": decision,
+        "sample_size": len(merged_df),
+        "coverage_report": coverage_report,
+        "missing_by_season": {
+            int(season): float(
+                merged_df[merged_df.season == season]["opp_def_epa_exp"].isna().mean()
+            )
             for season in merged_df.season.unique()
-        }
+        },
     }
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Validate XGBoost v3.1 feature coverage')
-    parser.add_argument('--sample-size', type=int, default=100,
-                       help='Number of games to sample (default: 100)')
+    parser = argparse.ArgumentParser(description="Validate XGBoost v3.1 feature coverage")
+    parser.add_argument(
+        "--sample-size", type=int, default=100, help="Number of games to sample (default: 100)"
+    )
 
     args = parser.parse_args()
 
     result = check_feature_coverage(sample_size=args.sample_size)
 
     # Exit with status code
-    sys.exit(0 if result['status'] == 'GO' else 1)
+    sys.exit(0 if result["status"] == "GO" else 1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -24,7 +24,6 @@ def test_validate_all_basic():
     assert result is not None
 
 
-
 def test_validate_all_edge_cases():
     """Test validate_all: edge cases."""
     # Arrange
@@ -37,12 +36,10 @@ def test_validate_all_edge_cases():
     assert result is not None
 
 
-
 def test_validate_all_error_handling():
     """Test validate_all error handling."""
     with pytest.raises(ValueError):
         validate_all(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -55,22 +52,14 @@ def test_validate_all_property_idempotent(self, self, df, context):
     assert validate_all(self, df, context) == result, "idempotent violated"
 
 
-
 def test_validate_all_no_temporal_leakage():
     """Ensure validate_all doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = validate_all(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"

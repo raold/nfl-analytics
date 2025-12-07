@@ -23,7 +23,6 @@ def test_analyze_prediction_bias_basic():
     assert result is not None
 
 
-
 def test_analyze_prediction_bias_edge_cases():
     """Test analyze_prediction_bias: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_analyze_prediction_bias_edge_cases():
     assert result is not None
 
 
-
 def test_analyze_prediction_bias_error_handling():
     """Test analyze_prediction_bias error handling."""
     with pytest.raises(ValueError):
         analyze_prediction_bias(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,4 +49,3 @@ def test_analyze_prediction_bias_property_idempotent(self, csv_path):
 
     # Assert property
     assert analyze_prediction_bias(csv_path) == result, "idempotent violated"
-

@@ -35,6 +35,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class BettingOpportunity:
     """Represents a single betting opportunity"""
+
     game_id: str
     player_name: str
     prop_type: str  # "passing_yards", "rushing_yards", etc.
@@ -49,6 +50,7 @@ class BettingOpportunity:
 @dataclass
 class BankrollState:
     """Current bankroll state"""
+
     total_bankroll: float
     available_capital: float  # After existing positions
     max_position_size: float  # Risk limit per bet
@@ -58,6 +60,7 @@ class BankrollState:
 @dataclass
 class BetRecommendation:
     """CQL agent bet recommendation"""
+
     action: str  # "bet_over", "bet_under", "pass"
     bet_size: float  # Dollar amount (0 if pass)
     kelly_fraction: float  # Kelly criterion fraction used
@@ -156,11 +159,7 @@ class CQLBetSizer:
 
         return kelly_f
 
-    def _apply_risk_gates(
-        self,
-        opp: BettingOpportunity,
-        edge: float
-    ) -> dict[str, bool]:
+    def _apply_risk_gates(self, opp: BettingOpportunity, edge: float) -> dict[str, bool]:
         """
         Apply risk gates to filter bad bets
 
@@ -205,9 +204,7 @@ class CQLBetSizer:
         return 0.85
 
     def recommend_bet(
-        self,
-        opportunity: BettingOpportunity,
-        bankroll: BankrollState
+        self, opportunity: BettingOpportunity, bankroll: BankrollState
     ) -> BetRecommendation:
         """
         Generate bet recommendation for a single opportunity
@@ -233,25 +230,25 @@ class CQLBetSizer:
                 confidence=0.0,
                 expected_value=edge,
                 risk_adjusted_ev=0.0,
-                reasoning=f"Failed risk gates: {', '.join(failed_gates)}"
+                reasoning=f"Failed risk gates: {', '.join(failed_gates)}",
             )
 
         # Compute Kelly fraction
         kelly_f = self._compute_kelly_fraction(
-            edge,
-            opportunity.model_prob_over,
-            opportunity.odds_over
+            edge, opportunity.model_prob_over, opportunity.odds_over
         )
 
         # Get CQL risk adjustment
         # State vector: [edge, prob_over, uncertainty, bankroll_pct_used]
         bankroll_pct_used = 1 - (bankroll.available_capital / bankroll.total_bankroll)
-        state = np.array([
-            edge,
-            opportunity.model_prob_over,
-            opportunity.model_std / opportunity.model_prediction,
-            bankroll_pct_used
-        ])
+        state = np.array(
+            [
+                edge,
+                opportunity.model_prob_over,
+                opportunity.model_std / opportunity.model_prediction,
+                bankroll_pct_used,
+            ]
+        )
 
         cql_adjustment = self._get_cql_adjustment(state)
 
@@ -290,14 +287,14 @@ class CQLBetSizer:
             confidence=abs(opportunity.model_prob_over - 0.5) * 2,  # 0-1 scale
             expected_value=expected_value,
             risk_adjusted_ev=risk_adjusted_ev,
-            reasoning=reasoning
+            reasoning=reasoning,
         )
 
     def recommend_portfolio(
         self,
         opportunities: list[BettingOpportunity],
         bankroll: BankrollState,
-        max_positions: int = 5
+        max_positions: int = 5,
     ) -> list[BetRecommendation]:
         """
         Recommend portfolio of bets with correlation-adjusted sizing
@@ -312,16 +309,10 @@ class CQLBetSizer:
         """
 
         # Get individual recommendations
-        recommendations = [
-            self.recommend_bet(opp, bankroll)
-            for opp in opportunities
-        ]
+        recommendations = [self.recommend_bet(opp, bankroll) for opp in opportunities]
 
         # Filter to actionable bets
-        actionable = [
-            rec for rec in recommendations
-            if rec.action in ["bet_over", "bet_under"]
-        ]
+        actionable = [rec for rec in recommendations if rec.action in ["bet_over", "bet_under"]]
 
         # Sort by risk-adjusted EV
         actionable.sort(key=lambda r: r.risk_adjusted_ev, reverse=True)
@@ -346,9 +337,9 @@ class CQLBetSizer:
 def main():
     """Example usage of CQL bet sizer"""
 
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("CQL BET SIZER - PRODUCTION EXAMPLE")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # Initialize bet sizer
     sizer = CQLBetSizer()
@@ -363,7 +354,7 @@ def main():
         odds_under=-110,
         model_prediction=290.5,
         model_std=45.2,
-        model_prob_over=0.62  # 62% probability of going over
+        model_prob_over=0.62,  # 62% probability of going over
     )
 
     # Example bankroll state
@@ -371,19 +362,21 @@ def main():
         total_bankroll=10000.0,
         available_capital=8500.0,  # $1500 in open positions
         max_position_size=500.0,  # $500 max per bet
-        current_positions=3
+        current_positions=3,
     )
 
     # Get recommendation
     recommendation = sizer.recommend_bet(opportunity, bankroll)
 
     # Print results
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("BET RECOMMENDATION")
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info(f"Player: {opportunity.player_name}")
     logger.info(f"Prop: {opportunity.prop_type} {opportunity.line}")
-    logger.info(f"Model prediction: {opportunity.model_prediction:.1f} ± {opportunity.model_std:.1f}")
+    logger.info(
+        f"Model prediction: {opportunity.model_prediction:.1f} ± {opportunity.model_std:.1f}"
+    )
     logger.info(f"Model P(over): {opportunity.model_prob_over:.1%}")
     logger.info("\nRecommendation:")
     logger.info(f"  Action: {recommendation.action.upper()}")

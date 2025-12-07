@@ -23,7 +23,6 @@ def test_create_optimized_ensemble_basic():
     assert result is not None
 
 
-
 def test_create_optimized_ensemble_edge_cases():
     """Test create_optimized_ensemble: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_create_optimized_ensemble_edge_cases():
     assert result is not None
 
 
-
 def test_create_optimized_ensemble_error_handling():
     """Test create_optimized_ensemble error handling."""
     with pytest.raises(ValueError):
         create_optimized_ensemble(invalid_input)
-
 
 
 def test_apply_betting_criteria_basic():
@@ -56,7 +53,6 @@ def test_apply_betting_criteria_basic():
     assert result is not None
 
 
-
 def test_apply_betting_criteria_edge_cases():
     """Test apply_betting_criteria: edge cases."""
     # Arrange
@@ -69,23 +65,29 @@ def test_apply_betting_criteria_edge_cases():
     assert result is not None
 
 
-
 def test_apply_betting_criteria_error_handling():
     """Test apply_betting_criteria error handling."""
     with pytest.raises(ValueError):
         apply_betting_criteria(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_apply_betting_criteria_property_idempotent(self, predictions, min_edge, max_kelly_fraction, prob_clip_low, prob_clip_high):
+def test_apply_betting_criteria_property_idempotent(
+    self, predictions, min_edge, max_kelly_fraction, prob_clip_low, prob_clip_high
+):
     """Property test: function is idempotent."""
     # Act
-    result = apply_betting_criteria(predictions, min_edge, max_kelly_fraction, prob_clip_low, prob_clip_high)
+    result = apply_betting_criteria(
+        predictions, min_edge, max_kelly_fraction, prob_clip_low, prob_clip_high
+    )
 
     # Assert property
-    assert apply_betting_criteria(predictions, min_edge, max_kelly_fraction, prob_clip_low, prob_clip_high) == result, "idempotent violated"
-
+    assert (
+        apply_betting_criteria(
+            predictions, min_edge, max_kelly_fraction, prob_clip_low, prob_clip_high
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_main_basic():
@@ -100,7 +102,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -113,12 +114,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_fit_basic():
@@ -133,7 +132,6 @@ def test_fit_basic():
     assert result is not None
 
 
-
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
@@ -146,12 +144,10 @@ def test_fit_edge_cases():
     assert result is not None
 
 
-
 def test_fit_error_handling():
     """Test fit error handling."""
     with pytest.raises(ValueError):
         fit(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -162,7 +158,6 @@ def test_fit_property_idempotent(self, self, probabilities, targets):
 
     # Assert property
     assert fit(self, probabilities, targets) == result, "idempotent violated"
-
 
 
 def test_transform_basic():
@@ -177,7 +172,6 @@ def test_transform_basic():
     assert result is not None
 
 
-
 def test_transform_edge_cases():
     """Test transform: edge cases."""
     # Arrange
@@ -190,12 +184,10 @@ def test_transform_edge_cases():
     assert result is not None
 
 
-
 def test_transform_error_handling():
     """Test transform error handling."""
     with pytest.raises(ValueError):
         transform(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -206,4 +198,3 @@ def test_transform_property_idempotent(self, self, probabilities):
 
     # Assert property
     assert transform(self, probabilities) == result, "idempotent violated"
-

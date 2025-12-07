@@ -23,7 +23,6 @@ def test_get_db_config_basic():
     assert result is not None
 
 
-
 def test_get_db_config_edge_cases():
     """Test get_db_config: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_get_db_config_edge_cases():
     assert result is not None
 
 
-
 def test_get_db_config_error_handling():
     """Test get_db_config error handling."""
     with pytest.raises(ValueError):
         get_db_config(invalid_input)
-
 
 
 def test_train_model_basic():
@@ -56,7 +53,6 @@ def test_train_model_basic():
     assert result is not None
 
 
-
 def test_train_model_edge_cases():
     """Test train_model: edge cases."""
     # Arrange
@@ -69,23 +65,72 @@ def test_train_model_edge_cases():
     assert result is not None
 
 
-
 def test_train_model_error_handling():
     """Test train_model error handling."""
     with pytest.raises(ValueError):
         train_model(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(min_value=1, max_value=1000), st.integers(), st.integers(), st.integers(), st.integers())
-def test_train_model_property_idempotent(self, start_season, end_season, epochs, batch_size, learning_rate, latent_dim, hidden_dims, beta, device, output_dir, resume_from):
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_train_model_property_idempotent(
+    self,
+    start_season,
+    end_season,
+    epochs,
+    batch_size,
+    learning_rate,
+    latent_dim,
+    hidden_dims,
+    beta,
+    device,
+    output_dir,
+    resume_from,
+):
     """Property test: function is idempotent."""
     # Act
-    result = train_model(start_season, end_season, epochs, batch_size, learning_rate, latent_dim, hidden_dims, beta, device, output_dir, resume_from)
+    result = train_model(
+        start_season,
+        end_season,
+        epochs,
+        batch_size,
+        learning_rate,
+        latent_dim,
+        hidden_dims,
+        beta,
+        device,
+        output_dir,
+        resume_from,
+    )
 
     # Assert property
-    assert train_model(start_season, end_season, epochs, batch_size, learning_rate, latent_dim, hidden_dims, beta, device, output_dir, resume_from) == result, "idempotent violated"
-
+    assert (
+        train_model(
+            start_season,
+            end_season,
+            epochs,
+            batch_size,
+            learning_rate,
+            latent_dim,
+            hidden_dims,
+            beta,
+            device,
+            output_dir,
+            resume_from,
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_main_basic():
@@ -100,7 +145,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -113,9 +157,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

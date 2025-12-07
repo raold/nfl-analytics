@@ -57,8 +57,7 @@ from psycopg2.extensions import connection as Connection
 from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -67,9 +66,11 @@ logger = logging.getLogger(__name__)
 # DATA STRUCTURES
 # ============================================================
 
+
 @dataclass
 class ColumnInfo:
     """Column metadata from information_schema."""
+
     table_schema: str
     table_name: str
     column_name: str
@@ -89,6 +90,7 @@ class ColumnInfo:
 @dataclass
 class ForeignKeyInfo:
     """Foreign key constraint metadata."""
+
     constraint_name: str
     table_schema: str
     table_name: str
@@ -109,6 +111,7 @@ class ForeignKeyInfo:
 @dataclass
 class IndexInfo:
     """Index metadata."""
+
     schema_name: str
     table_name: str
     index_name: str
@@ -120,6 +123,7 @@ class IndexInfo:
 @dataclass
 class ValidationError:
     """Migration validation error."""
+
     severity: str  # 'ERROR', 'WARNING', 'INFO'
     category: str  # 'foreign_key', 'data_type', 'orphaned_record', etc.
     message: str
@@ -132,6 +136,7 @@ class ValidationError:
 @dataclass
 class ValidationReport:
     """Migration validation report."""
+
     migration_file: str
     is_valid: bool
     errors: list[ValidationError] = field(default_factory=list)
@@ -157,12 +162,12 @@ class ValidationReport:
             status = "✅ VALIDATION PASSED"
 
         lines = [
-            "="*70,
+            "=" * 70,
             f"MIGRATION VALIDATION REPORT: {self.migration_file}",
-            "="*70,
+            "=" * 70,
             status,
             f"Validation time: {self.validation_time:.2f}s",
-            ""
+            "",
         ]
 
         if self.errors:
@@ -188,6 +193,7 @@ class ValidationReport:
 @dataclass
 class MigrationResult:
     """Migration execution result."""
+
     migration_file: str
     success: bool
     migration_id: int | None = None
@@ -203,12 +209,12 @@ class MigrationResult:
             status = "❌ MIGRATION FAILED"
 
         lines = [
-            "="*70,
+            "=" * 70,
             f"MIGRATION RESULT: {self.migration_file}",
-            "="*70,
+            "=" * 70,
             status,
             f"Duration: {self.duration:.2f}s",
-            ""
+            "",
         ]
 
         if self.error_message:
@@ -223,13 +229,16 @@ class MigrationResult:
 @dataclass
 class DriftReport:
     """Schema drift detection report."""
+
     source_env: str
     target_env: str
     tables_added: list[str] = field(default_factory=list)
     tables_removed: list[str] = field(default_factory=list)
     columns_added: list[tuple[str, str]] = field(default_factory=list)  # (table, column)
     columns_removed: list[tuple[str, str]] = field(default_factory=list)
-    columns_modified: list[tuple[str, str, str]] = field(default_factory=list)  # (table, column, diff)
+    columns_modified: list[tuple[str, str, str]] = field(
+        default_factory=list
+    )  # (table, column, diff)
     indexes_added: list[str] = field(default_factory=list)
     indexes_removed: list[str] = field(default_factory=list)
     foreign_keys_added: list[str] = field(default_factory=list)
@@ -238,11 +247,15 @@ class DriftReport:
     @property
     def has_drift(self) -> bool:
         return bool(
-            self.tables_added or self.tables_removed or
-            self.columns_added or self.columns_removed or
-            self.columns_modified or self.indexes_added or
-            self.indexes_removed or self.foreign_keys_added or
-            self.foreign_keys_removed
+            self.tables_added
+            or self.tables_removed
+            or self.columns_added
+            or self.columns_removed
+            or self.columns_modified
+            or self.indexes_added
+            or self.indexes_removed
+            or self.foreign_keys_added
+            or self.foreign_keys_removed
         )
 
     def summary(self) -> str:
@@ -251,10 +264,10 @@ class DriftReport:
             return f"✅ NO SCHEMA DRIFT: {self.source_env} and {self.target_env} are in sync"
 
         lines = [
-            "="*70,
+            "=" * 70,
             f"SCHEMA DRIFT REPORT: {self.source_env} vs {self.target_env}",
-            "="*70,
-            ""
+            "=" * 70,
+            "",
         ]
 
         if self.tables_added:
@@ -294,6 +307,7 @@ class DriftReport:
 # DATABASE MIGRATION AGENT
 # ============================================================
 
+
 class DatabaseMigrationAgent:
     """
     Comprehensive database migration agent.
@@ -310,7 +324,7 @@ class DatabaseMigrationAgent:
         self,
         db_config: dict[str, Any] | None = None,
         migrations_dir: str = "db/migrations",
-        project_root: str | None = None
+        project_root: str | None = None,
     ):
         """
         Initialize database migration agent.
@@ -321,11 +335,11 @@ class DatabaseMigrationAgent:
             project_root: Project root directory (default: auto-detect)
         """
         self.db_config = db_config or {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions'
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
         # Project paths
@@ -394,7 +408,8 @@ class DatabaseMigrationAgent:
             cursor.execute("CREATE SCHEMA IF NOT EXISTS admin;")
 
             # Create migration tracking table
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE TABLE IF NOT EXISTS admin.migration_history (
                     migration_id        SERIAL PRIMARY KEY,
                     migration_file      TEXT NOT NULL UNIQUE,
@@ -406,20 +421,23 @@ class DatabaseMigrationAgent:
                     error_message       TEXT,
                     rollback_sql        TEXT
                 );
-            """)
+            """
+            )
 
             # Create index on applied_at
-            cursor.execute("""
+            cursor.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_migration_history_applied_at
                 ON admin.migration_history(applied_at DESC);
-            """)
+            """
+            )
 
             cursor.close()
             logger.info("Migration tracking table ensured: admin.migration_history")
 
     def _compute_checksum(self, sql: str) -> str:
         """Compute SHA256 checksum of SQL content."""
-        return hashlib.sha256(sql.encode('utf-8')).hexdigest()
+        return hashlib.sha256(sql.encode("utf-8")).hexdigest()
 
     def _record_migration(
         self,
@@ -428,18 +446,21 @@ class DatabaseMigrationAgent:
         checksum: str,
         success: bool = True,
         error_message: str | None = None,
-        rollback_sql: str | None = None
+        rollback_sql: str | None = None,
     ) -> int:
         """Record migration in tracking table."""
         with self._transaction() as conn:
             cursor = conn.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO admin.migration_history
                     (migration_file, duration_seconds, checksum, success,
                      error_message, rollback_sql)
                 VALUES (%s, %s, %s, %s, %s, %s)
                 RETURNING migration_id;
-            """, (migration_file, duration, checksum, success, error_message, rollback_sql))
+            """,
+                (migration_file, duration, checksum, success, error_message, rollback_sql),
+            )
             migration_id = cursor.fetchone()[0]
             cursor.close()
             return migration_id
@@ -448,10 +469,12 @@ class DatabaseMigrationAgent:
         """Get list of applied migrations."""
         conn = self._get_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT * FROM admin.migration_history
             ORDER BY applied_at DESC;
-        """)
+        """
+        )
         migrations = cursor.fetchall()
         cursor.close()
         return migrations
@@ -471,26 +494,30 @@ class DatabaseMigrationAgent:
             List of (schema, table_name) tuples
         """
         if schemas is None:
-            schemas = ['public', 'mart', 'ml', 'admin']
+            schemas = ["public", "mart", "ml", "admin"]
 
         conn = self._get_connection()
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT table_schema, table_name
             FROM information_schema.tables
             WHERE table_type = 'BASE TABLE'
                 AND table_schema = ANY(%s)
             ORDER BY table_schema, table_name;
-        """, (schemas,))
+        """,
+            (schemas,),
+        )
         tables = cursor.fetchall()
         cursor.close()
         return tables
 
-    def get_table_columns(self, table_name: str, schema: str = 'public') -> list[ColumnInfo]:
+    def get_table_columns(self, table_name: str, schema: str = "public") -> list[ColumnInfo]:
         """Get all columns for a table."""
         conn = self._get_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 table_schema,
                 table_name,
@@ -505,7 +532,9 @@ class DatabaseMigrationAgent:
             FROM information_schema.columns
             WHERE table_schema = %s AND table_name = %s
             ORDER BY ordinal_position;
-        """, (schema, table_name))
+        """,
+            (schema, table_name),
+        )
         rows = cursor.fetchall()
         cursor.close()
         return [ColumnInfo(**row) for row in rows]
@@ -581,17 +610,19 @@ class DatabaseMigrationAgent:
         # Parse index definitions to determine uniqueness and primary key status
         indexes = []
         for row in rows:
-            index_def = row['index_def']
-            is_unique = 'UNIQUE' in index_def.upper()
-            is_primary = '_pkey' in row['index_name']
-            indexes.append(IndexInfo(
-                schema_name=row['schema_name'],
-                table_name=row['table_name'],
-                index_name=row['index_name'],
-                index_def=index_def,
-                is_unique=is_unique,
-                is_primary=is_primary
-            ))
+            index_def = row["index_def"]
+            is_unique = "UNIQUE" in index_def.upper()
+            is_primary = "_pkey" in row["index_name"]
+            indexes.append(
+                IndexInfo(
+                    schema_name=row["schema_name"],
+                    table_name=row["table_name"],
+                    index_name=row["index_name"],
+                    index_def=index_def,
+                    is_unique=is_unique,
+                    is_primary=is_primary,
+                )
+            )
 
         return indexes
 
@@ -600,9 +631,7 @@ class DatabaseMigrationAgent:
     # ============================================================
 
     def generate_migration(
-        self,
-        schema_diff: dict[str, Any],
-        migration_name: str | None = None
+        self, schema_diff: dict[str, Any], migration_name: str | None = None
     ) -> str:
         """
         Auto-generate migration file from schema diff.
@@ -624,14 +653,14 @@ class DatabaseMigrationAgent:
         """
         # Generate migration name if not provided
         if migration_name is None:
-            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             migration_name = f"{timestamp}_auto_generated"
 
         # Find next migration number
-        existing_migrations = list(self.migrations_dir.glob('*.sql'))
+        existing_migrations = list(self.migrations_dir.glob("*.sql"))
         migration_numbers = []
         for f in existing_migrations:
-            match = re.match(r'^(\d+)_', f.name)
+            match = re.match(r"^(\d+)_", f.name)
             if match:
                 migration_numbers.append(int(match.group(1)))
 
@@ -640,64 +669,64 @@ class DatabaseMigrationAgent:
 
         # Generate SQL
         sql_parts = []
-        sql_parts.append("-- " + "="*60)
+        sql_parts.append("-- " + "=" * 60)
         sql_parts.append(f"-- MIGRATION: {migration_name}")
         sql_parts.append(f"-- Generated: {datetime.now().isoformat()}")
-        sql_parts.append("-- " + "="*60)
+        sql_parts.append("-- " + "=" * 60)
         sql_parts.append("")
 
         # Add tables
-        if 'add_tables' in schema_diff:
+        if "add_tables" in schema_diff:
             sql_parts.append("-- ADD TABLES")
-            for table_info in schema_diff['add_tables']:
+            for table_info in schema_diff["add_tables"]:
                 sql = self._generate_create_table_sql(table_info)
                 sql_parts.append(sql)
                 sql_parts.append("")
 
         # Add columns
-        if 'add_columns' in schema_diff:
+        if "add_columns" in schema_diff:
             sql_parts.append("-- ADD COLUMNS")
-            for col_info in schema_diff['add_columns']:
-                schema = col_info.get('schema', 'public')
-                table = col_info['table']
-                column = col_info['column']
+            for col_info in schema_diff["add_columns"]:
+                schema = col_info.get("schema", "public")
+                table = col_info["table"]
+                column = col_info["column"]
                 sql = self._generate_add_column_sql(schema, table, column)
                 sql_parts.append(sql)
             sql_parts.append("")
 
         # Drop columns
-        if 'drop_columns' in schema_diff:
+        if "drop_columns" in schema_diff:
             sql_parts.append("-- DROP COLUMNS")
-            for col_info in schema_diff['drop_columns']:
-                schema = col_info.get('schema', 'public')
-                table = col_info['table']
-                column = col_info['column']
+            for col_info in schema_diff["drop_columns"]:
+                schema = col_info.get("schema", "public")
+                table = col_info["table"]
+                column = col_info["column"]
                 sql = f"ALTER TABLE {schema}.{table} DROP COLUMN IF EXISTS {column};"
                 sql_parts.append(sql)
             sql_parts.append("")
 
         # Add indexes
-        if 'add_indexes' in schema_diff:
+        if "add_indexes" in schema_diff:
             sql_parts.append("-- ADD INDEXES")
-            for idx_info in schema_diff['add_indexes']:
+            for idx_info in schema_diff["add_indexes"]:
                 sql = self._generate_create_index_sql(idx_info)
                 sql_parts.append(sql)
             sql_parts.append("")
 
         # Add foreign keys
-        if 'add_foreign_keys' in schema_diff:
+        if "add_foreign_keys" in schema_diff:
             sql_parts.append("-- ADD FOREIGN KEYS")
-            for fk_info in schema_diff['add_foreign_keys']:
+            for fk_info in schema_diff["add_foreign_keys"]:
                 sql = self._generate_add_foreign_key_sql(fk_info)
                 sql_parts.append(sql)
             sql_parts.append("")
 
         # Drop tables (put at end for safety)
-        if 'drop_tables' in schema_diff:
+        if "drop_tables" in schema_diff:
             sql_parts.append("-- DROP TABLES (WARNING: Data will be lost)")
-            for table_info in schema_diff['drop_tables']:
-                schema = table_info.get('schema', 'public')
-                table = table_info['name']
+            for table_info in schema_diff["drop_tables"]:
+                schema = table_info.get("schema", "public")
+                table = table_info["name"]
                 sql = f"DROP TABLE IF EXISTS {schema}.{table} CASCADE;"
                 sql_parts.append(sql)
             sql_parts.append("")
@@ -711,20 +740,20 @@ class DatabaseMigrationAgent:
 
     def _generate_create_table_sql(self, table_info: dict[str, Any]) -> str:
         """Generate CREATE TABLE SQL."""
-        schema = table_info.get('schema', 'public')
-        table = table_info['name']
-        columns = table_info.get('columns', [])
+        schema = table_info.get("schema", "public")
+        table = table_info["name"]
+        columns = table_info.get("columns", [])
 
         lines = [f"CREATE TABLE IF NOT EXISTS {schema}.{table} ("]
 
         column_defs = []
         for col in columns:
             col_def = f"  {col['name']} {col['type']}"
-            if col.get('nullable', True) is False:
+            if col.get("nullable", True) is False:
                 col_def += " NOT NULL"
-            if col.get('default'):
+            if col.get("default"):
                 col_def += f" DEFAULT {col['default']}"
-            if col.get('primary_key'):
+            if col.get("primary_key"):
                 col_def += " PRIMARY KEY"
             column_defs.append(col_def)
 
@@ -733,28 +762,23 @@ class DatabaseMigrationAgent:
 
         return "\n".join(lines)
 
-    def _generate_add_column_sql(
-        self,
-        schema: str,
-        table: str,
-        column: dict[str, Any]
-    ) -> str:
+    def _generate_add_column_sql(self, schema: str, table: str, column: dict[str, Any]) -> str:
         """Generate ALTER TABLE ADD COLUMN SQL."""
         col_def = f"{column['name']} {column['type']}"
-        if column.get('nullable', True) is False:
+        if column.get("nullable", True) is False:
             col_def += " NOT NULL"
-        if column.get('default'):
+        if column.get("default"):
             col_def += f" DEFAULT {column['default']}"
 
         return f"ALTER TABLE {schema}.{table} ADD COLUMN IF NOT EXISTS {col_def};"
 
     def _generate_create_index_sql(self, idx_info: dict[str, Any]) -> str:
         """Generate CREATE INDEX SQL."""
-        schema = idx_info.get('schema', 'public')
-        table = idx_info['table']
-        index_name = idx_info['name']
-        columns = idx_info['columns']
-        unique = idx_info.get('unique', False)
+        schema = idx_info.get("schema", "public")
+        table = idx_info["table"]
+        index_name = idx_info["name"]
+        columns = idx_info["columns"]
+        unique = idx_info.get("unique", False)
 
         unique_str = "UNIQUE " if unique else ""
         columns_str = ", ".join(columns)
@@ -766,14 +790,14 @@ class DatabaseMigrationAgent:
 
     def _generate_add_foreign_key_sql(self, fk_info: dict[str, Any]) -> str:
         """Generate ALTER TABLE ADD FOREIGN KEY SQL."""
-        schema = fk_info.get('schema', 'public')
-        table = fk_info['table']
-        constraint_name = fk_info['name']
-        column = fk_info['column']
-        ref_table = fk_info['references']['table']
-        ref_schema = fk_info['references'].get('schema', 'public')
-        ref_column = fk_info['references']['column']
-        on_delete = fk_info.get('on_delete', 'NO ACTION')
+        schema = fk_info.get("schema", "public")
+        table = fk_info["table"]
+        constraint_name = fk_info["name"]
+        column = fk_info["column"]
+        ref_table = fk_info["references"]["table"]
+        ref_schema = fk_info["references"].get("schema", "public")
+        ref_column = fk_info["references"]["column"]
+        on_delete = fk_info.get("on_delete", "NO ACTION")
 
         return (
             f"ALTER TABLE {schema}.{table} "
@@ -787,11 +811,7 @@ class DatabaseMigrationAgent:
     # MIGRATION VALIDATION
     # ============================================================
 
-    def validate_migration(
-        self,
-        migration_file: str,
-        dry_run: bool = True
-    ) -> ValidationReport:
+    def validate_migration(self, migration_file: str, dry_run: bool = True) -> ValidationReport:
         """
         Validate migration before applying.
 
@@ -815,11 +835,13 @@ class DatabaseMigrationAgent:
         # Read migration file
         migration_path = Path(migration_file)
         if not migration_path.exists():
-            report.errors.append(ValidationError(
-                severity='ERROR',
-                category='file_not_found',
-                message=f"Migration file not found: {migration_file}"
-            ))
+            report.errors.append(
+                ValidationError(
+                    severity="ERROR",
+                    category="file_not_found",
+                    message=f"Migration file not found: {migration_file}",
+                )
+            )
             report.is_valid = False
             return report
 
@@ -828,12 +850,14 @@ class DatabaseMigrationAgent:
         # Check if migration was already applied
         applied_migrations = self.get_applied_migrations()
         migration_name = migration_path.name
-        if any(m['migration_file'] == migration_name for m in applied_migrations):
-            report.warnings.append(ValidationError(
-                severity='WARNING',
-                category='already_applied',
-                message=f"Migration already applied: {migration_name}"
-            ))
+        if any(m["migration_file"] == migration_name for m in applied_migrations):
+            report.warnings.append(
+                ValidationError(
+                    severity="WARNING",
+                    category="already_applied",
+                    message=f"Migration already applied: {migration_name}",
+                )
+            )
 
         # Validate SQL syntax by attempting execution in a transaction
         try:
@@ -863,19 +887,23 @@ class DatabaseMigrationAgent:
                 # Always rollback in validation mode
                 if dry_run:
                     conn.rollback()
-                    report.info.append(ValidationError(
-                        severity='INFO',
-                        category='dry_run',
-                        message="Validation complete - transaction rolled back (dry run)"
-                    ))
+                    report.info.append(
+                        ValidationError(
+                            severity="INFO",
+                            category="dry_run",
+                            message="Validation complete - transaction rolled back (dry run)",
+                        )
+                    )
 
         except psycopg2.Error as e:
-            report.errors.append(ValidationError(
-                severity='ERROR',
-                category='sql_syntax',
-                message=f"SQL syntax error: {str(e)}",
-                details={'error': str(e)}
-            ))
+            report.errors.append(
+                ValidationError(
+                    severity="ERROR",
+                    category="sql_syntax",
+                    message=f"SQL syntax error: {str(e)}",
+                    details={"error": str(e)},
+                )
+            )
             report.is_valid = False
 
         # Set is_valid based on errors
@@ -894,21 +922,26 @@ class DatabaseMigrationAgent:
             # Check if referenced table exists
             conn = self._get_connection()
             cursor = conn.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT EXISTS (
                     SELECT 1 FROM information_schema.tables
                     WHERE table_schema = %s AND table_name = %s
                 );
-            """, (fk.foreign_table_schema, fk.foreign_table_name))
+            """,
+                (fk.foreign_table_schema, fk.foreign_table_name),
+            )
             exists = cursor.fetchone()[0]
             cursor.close()
 
             if not exists:
-                errors.append(ValidationError(
-                    severity='ERROR',
-                    category='foreign_key',
-                    message=f"Referenced table does not exist: {fk.full_constraint}"
-                ))
+                errors.append(
+                    ValidationError(
+                        severity="ERROR",
+                        category="foreign_key",
+                        message=f"Referenced table does not exist: {fk.full_constraint}",
+                    )
+                )
 
         return errors
 
@@ -943,12 +976,14 @@ class DatabaseMigrationAgent:
                 orphan_count = cursor.fetchone()[0]
 
                 if orphan_count > 0:
-                    warnings.append(ValidationError(
-                        severity='WARNING',
-                        category='orphaned_record',
-                        message=f"{orphan_count} orphaned records in {fk.full_constraint}",
-                        details={'count': orphan_count, 'constraint': fk.full_constraint}
-                    ))
+                    warnings.append(
+                        ValidationError(
+                            severity="WARNING",
+                            category="orphaned_record",
+                            message=f"{orphan_count} orphaned records in {fk.full_constraint}",
+                            details={"count": orphan_count, "constraint": fk.full_constraint},
+                        )
+                    )
             except psycopg2.Error:
                 # Skip validation if query fails (table might not exist yet)
                 pass
@@ -960,11 +995,7 @@ class DatabaseMigrationAgent:
     # MIGRATION APPLICATION
     # ============================================================
 
-    def apply_migration(
-        self,
-        migration_file: str,
-        dry_run: bool = True
-    ) -> MigrationResult:
+    def apply_migration(self, migration_file: str, dry_run: bool = True) -> MigrationResult:
         """
         Apply migration with safety checks and rollback support.
 
@@ -985,12 +1016,12 @@ class DatabaseMigrationAgent:
 
         # Check if already applied
         applied_migrations = self.get_applied_migrations()
-        if any(m['migration_file'] == migration_name for m in applied_migrations):
+        if any(m["migration_file"] == migration_name for m in applied_migrations):
             logger.warning(f"Migration already applied: {migration_name}")
             return MigrationResult(
                 migration_file=migration_name,
                 success=False,
-                error_message="Migration already applied"
+                error_message="Migration already applied",
             )
 
         # Validate migration first
@@ -1003,7 +1034,7 @@ class DatabaseMigrationAgent:
                 migration_file=migration_name,
                 success=False,
                 error_message="Validation failed",
-                duration=time.time() - start_time
+                duration=time.time() - start_time,
             )
 
         # Apply migration
@@ -1023,7 +1054,7 @@ class DatabaseMigrationAgent:
                     return MigrationResult(
                         migration_file=migration_name,
                         success=True,
-                        duration=time.time() - start_time
+                        duration=time.time() - start_time,
                     )
                 else:
                     # Commit transaction
@@ -1034,7 +1065,7 @@ class DatabaseMigrationAgent:
                         migration_file=migration_name,
                         duration=time.time() - start_time,
                         checksum=checksum,
-                        success=True
+                        success=True,
                     )
 
                     logger.info(f"✅ Migration applied successfully (ID: {migration_id})")
@@ -1043,7 +1074,7 @@ class DatabaseMigrationAgent:
                         migration_file=migration_name,
                         success=True,
                         migration_id=migration_id,
-                        duration=time.time() - start_time
+                        duration=time.time() - start_time,
                     )
 
         except psycopg2.Error as e:
@@ -1056,14 +1087,14 @@ class DatabaseMigrationAgent:
                 duration=time.time() - start_time,
                 checksum=checksum,
                 success=False,
-                error_message=error_msg
+                error_message=error_msg,
             )
 
             return MigrationResult(
                 migration_file=migration_name,
                 success=False,
                 error_message=error_msg,
-                duration=time.time() - start_time
+                duration=time.time() - start_time,
             )
 
     # ============================================================
@@ -1083,10 +1114,13 @@ class DatabaseMigrationAgent:
         # Get migration info
         conn = self._get_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT * FROM admin.migration_history
             WHERE migration_id = %s;
-        """, (migration_id,))
+        """,
+            (migration_id,),
+        )
         migration = cursor.fetchone()
         cursor.close()
 
@@ -1094,7 +1128,7 @@ class DatabaseMigrationAgent:
             logger.error(f"Migration not found: {migration_id}")
             return False
 
-        rollback_sql = migration.get('rollback_sql')
+        rollback_sql = migration.get("rollback_sql")
 
         if not rollback_sql:
             logger.error(f"No rollback SQL available for migration {migration_id}")
@@ -1124,10 +1158,10 @@ class DatabaseMigrationAgent:
         table_name: str,
         column_name: str,
         backfill_value: Any,
-        schema: str = 'public',
+        schema: str = "public",
         batch_size: int = 10000,
         parallel: bool = False,
-        num_workers: int = 4
+        num_workers: int = 4,
     ) -> dict[str, Any]:
         """
         Backfill a column with values.
@@ -1157,22 +1191,20 @@ class DatabaseMigrationAgent:
 
         if parallel and total_rows > batch_size:
             rows_updated = self._backfill_parallel(
-                schema, table_name, column_name, backfill_value,
-                batch_size, num_workers, total_rows
+                schema, table_name, column_name, backfill_value, batch_size, num_workers, total_rows
             )
         else:
             rows_updated = self._backfill_sequential(
-                schema, table_name, column_name, backfill_value,
-                batch_size, total_rows
+                schema, table_name, column_name, backfill_value, batch_size, total_rows
             )
 
         duration = time.time() - start_time
 
         result = {
-            'total_rows': total_rows,
-            'rows_updated': rows_updated,
-            'duration_seconds': duration,
-            'rows_per_second': rows_updated / duration if duration > 0 else 0
+            "total_rows": total_rows,
+            "rows_updated": rows_updated,
+            "duration_seconds": duration,
+            "rows_per_second": rows_updated / duration if duration > 0 else 0,
         }
 
         logger.info(
@@ -1189,7 +1221,7 @@ class DatabaseMigrationAgent:
         column_name: str,
         backfill_value: Any,
         batch_size: int,
-        total_rows: int
+        total_rows: int,
     ) -> int:
         """Backfill sequentially in batches."""
         rows_updated = 0
@@ -1200,12 +1232,15 @@ class DatabaseMigrationAgent:
                 cursor = conn.cursor()
 
                 # Update batch
-                cursor.execute(f"""
+                cursor.execute(
+                    f"""
                     UPDATE {schema}.{table_name}
                     SET {column_name} = %s
                     WHERE {column_name} IS NULL
                     LIMIT %s;
-                """, (backfill_value, batch_size))
+                """,
+                    (backfill_value, batch_size),
+                )
 
                 batch_updated = cursor.rowcount
                 rows_updated += batch_updated
@@ -1228,7 +1263,7 @@ class DatabaseMigrationAgent:
         backfill_value: Any,
         batch_size: int,
         num_workers: int,
-        total_rows: int
+        total_rows: int,
     ) -> int:
         """Backfill in parallel using multiple workers."""
         # Create batches
@@ -1250,12 +1285,15 @@ class DatabaseMigrationAgent:
             cursor = worker_conn.cursor()
 
             try:
-                cursor.execute(f"""
+                cursor.execute(
+                    f"""
                     UPDATE {schema}.{table_name}
                     SET {column_name} = %s
                     WHERE {column_name} IS NULL
                     OFFSET %s LIMIT %s;
-                """, (backfill_value, offset, limit))
+                """,
+                    (backfill_value, offset, limit),
+                )
 
                 updated = cursor.rowcount
                 worker_conn.commit()
@@ -1288,7 +1326,7 @@ class DatabaseMigrationAgent:
         self,
         source_config: dict[str, Any] | None = None,
         target_config: dict[str, Any] | None = None,
-        schemas: list[str] = None
+        schemas: list[str] = None,
     ) -> DriftReport:
         """
         Detect schema drift between two database environments.
@@ -1308,10 +1346,10 @@ class DatabaseMigrationAgent:
             raise ValueError("target_config is required for drift detection")
 
         if schemas is None:
-            schemas = ['public', 'mart', 'ml']
+            schemas = ["public", "mart", "ml"]
 
-        source_env = source_config.get('database', 'source')
-        target_env = target_config.get('database', 'target')
+        source_env = source_config.get("database", "source")
+        target_env = target_config.get("database", "target")
 
         logger.info(f"Auditing schema drift: {source_env} vs {target_env}")
 
@@ -1332,7 +1370,7 @@ class DatabaseMigrationAgent:
             # Compare columns for common tables
             common_tables = source_tables & target_tables
             for table in common_tables:
-                schema, table_name = table.split('.')
+                schema, table_name = table.split(".")
 
                 source_columns = self._get_columns_dict(source_conn, schema, table_name)
                 target_columns = self._get_columns_dict(target_conn, schema, table_name)
@@ -1375,29 +1413,30 @@ class DatabaseMigrationAgent:
     def _get_tables_set(self, conn: Connection, schemas: list[str]) -> set[str]:
         """Get set of fully-qualified table names."""
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT table_schema || '.' || table_name
             FROM information_schema.tables
             WHERE table_type = 'BASE TABLE'
                 AND table_schema = ANY(%s);
-        """, (schemas,))
+        """,
+            (schemas,),
+        )
         tables = {row[0] for row in cursor.fetchall()}
         cursor.close()
         return tables
 
-    def _get_columns_dict(
-        self,
-        conn: Connection,
-        schema: str,
-        table_name: str
-    ) -> dict[str, str]:
+    def _get_columns_dict(self, conn: Connection, schema: str, table_name: str) -> dict[str, str]:
         """Get dictionary of column_name -> data_type."""
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT column_name, data_type
             FROM information_schema.columns
             WHERE table_schema = %s AND table_name = %s;
-        """, (schema, table_name))
+        """,
+            (schema, table_name),
+        )
         columns = {row[0]: row[1] for row in cursor.fetchall()}
         cursor.close()
         return columns
@@ -1405,11 +1444,14 @@ class DatabaseMigrationAgent:
     def _get_indexes_set(self, conn: Connection, schemas: list[str]) -> set[str]:
         """Get set of index names."""
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT schemaname || '.' || indexname
             FROM pg_indexes
             WHERE schemaname = ANY(%s);
-        """, (schemas,))
+        """,
+            (schemas,),
+        )
         indexes = {row[0] for row in cursor.fetchall()}
         cursor.close()
         return indexes
@@ -1417,12 +1459,15 @@ class DatabaseMigrationAgent:
     def _get_foreign_keys_set(self, conn: Connection, schemas: list[str]) -> set[str]:
         """Get set of foreign key constraint names."""
         cursor = conn.cursor()
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT tc.table_schema || '.' || tc.constraint_name
             FROM information_schema.table_constraints tc
             WHERE tc.constraint_type = 'FOREIGN KEY'
                 AND tc.table_schema = ANY(%s);
-        """, (schemas,))
+        """,
+            (schemas,),
+        )
         fks = {row[0] for row in cursor.fetchall()}
         cursor.close()
         return fks
@@ -1432,42 +1477,42 @@ class DatabaseMigrationAgent:
 # CLI INTERFACE
 # ============================================================
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argparse
     import sys
 
-    parser = argparse.ArgumentParser(
-        description='Database Migration Agent for NFL Analytics'
-    )
+    parser = argparse.ArgumentParser(description="Database Migration Agent for NFL Analytics")
 
-    subparsers = parser.add_subparsers(dest='command', help='Command to execute')
+    subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # generate command
-    generate_parser = subparsers.add_parser('generate', help='Generate migration from schema diff')
-    generate_parser.add_argument('schema_diff_file', help='Path to schema diff JSON file')
-    generate_parser.add_argument('--name', help='Migration name (optional)')
+    generate_parser = subparsers.add_parser("generate", help="Generate migration from schema diff")
+    generate_parser.add_argument("schema_diff_file", help="Path to schema diff JSON file")
+    generate_parser.add_argument("--name", help="Migration name (optional)")
 
     # validate command
-    validate_parser = subparsers.add_parser('validate', help='Validate migration')
-    validate_parser.add_argument('migration_file', help='Path to migration file')
+    validate_parser = subparsers.add_parser("validate", help="Validate migration")
+    validate_parser.add_argument("migration_file", help="Path to migration file")
 
     # apply command
-    apply_parser = subparsers.add_parser('apply', help='Apply migration')
-    apply_parser.add_argument('migration_file', help='Path to migration file')
-    apply_parser.add_argument('--dry-run', action='store_true', help='Dry run (rollback after execution)')
+    apply_parser = subparsers.add_parser("apply", help="Apply migration")
+    apply_parser.add_argument("migration_file", help="Path to migration file")
+    apply_parser.add_argument(
+        "--dry-run", action="store_true", help="Dry run (rollback after execution)"
+    )
 
     # rollback command
-    rollback_parser = subparsers.add_parser('rollback', help='Rollback migration')
-    rollback_parser.add_argument('migration_id', type=int, help='Migration ID to rollback')
+    rollback_parser = subparsers.add_parser("rollback", help="Rollback migration")
+    rollback_parser.add_argument("migration_id", type=int, help="Migration ID to rollback")
 
     # audit command
-    audit_parser = subparsers.add_parser('audit', help='Audit schema drift')
-    audit_parser.add_argument('--target-db', help='Target database name (for comparison)')
-    audit_parser.add_argument('--target-host', default='localhost', help='Target host')
-    audit_parser.add_argument('--target-port', type=int, default=5544, help='Target port')
+    audit_parser = subparsers.add_parser("audit", help="Audit schema drift")
+    audit_parser.add_argument("--target-db", help="Target database name (for comparison)")
+    audit_parser.add_argument("--target-host", default="localhost", help="Target host")
+    audit_parser.add_argument("--target-port", type=int, default=5544, help="Target port")
 
     # list command
-    list_parser = subparsers.add_parser('list', help='List applied migrations')
+    list_parser = subparsers.add_parser("list", help="List applied migrations")
 
     args = parser.parse_args()
 
@@ -1479,7 +1524,7 @@ if __name__ == '__main__':
     agent = DatabaseMigrationAgent()
 
     # Execute command
-    if args.command == 'generate':
+    if args.command == "generate":
         # Load schema diff from JSON
         with open(args.schema_diff_file) as f:
             schema_diff = json.load(f)
@@ -1487,49 +1532,49 @@ if __name__ == '__main__':
         migration_file = agent.generate_migration(schema_diff, migration_name=args.name)
         print(f"✅ Generated migration: {migration_file}")
 
-    elif args.command == 'validate':
+    elif args.command == "validate":
         report = agent.validate_migration(args.migration_file, dry_run=True)
         print(report.summary())
         sys.exit(0 if report.is_valid else 1)
 
-    elif args.command == 'apply':
+    elif args.command == "apply":
         result = agent.apply_migration(args.migration_file, dry_run=args.dry_run)
         print(result.summary())
         sys.exit(0 if result.success else 1)
 
-    elif args.command == 'rollback':
+    elif args.command == "rollback":
         success = agent.rollback_migration(args.migration_id)
         sys.exit(0 if success else 1)
 
-    elif args.command == 'audit':
+    elif args.command == "audit":
         if args.target_db is None:
             print("ERROR: --target-db is required for audit command")
             sys.exit(1)
 
         target_config = {
-            'host': args.target_host,
-            'port': args.target_port,
-            'database': args.target_db,
-            'user': agent.db_config['user'],
-            'password': agent.db_config['password']
+            "host": args.target_host,
+            "port": args.target_port,
+            "database": args.target_db,
+            "user": agent.db_config["user"],
+            "password": agent.db_config["password"],
         }
 
         report = agent.audit_schema_drift(target_config=target_config)
         print(report.summary())
 
-    elif args.command == 'list':
+    elif args.command == "list":
         migrations = agent.get_applied_migrations()
 
-        print("="*70)
+        print("=" * 70)
         print(f"APPLIED MIGRATIONS ({len(migrations)} total)")
-        print("="*70)
+        print("=" * 70)
 
         for m in migrations:
-            status = "✅" if m['success'] else "❌"
+            status = "✅" if m["success"] else "❌"
             print(f"{status} [{m['migration_id']}] {m['migration_file']}")
             print(f"    Applied: {m['applied_at']}")
             print(f"    Duration: {m['duration_seconds']:.2f}s")
-            if m['error_message']:
+            if m["error_message"]:
                 print(f"    Error: {m['error_message']}")
             print()
 

@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_fetch_nfl_odds_basic():
@@ -56,7 +53,6 @@ def test_fetch_nfl_odds_basic():
     assert result is not None
 
 
-
 def test_fetch_nfl_odds_edge_cases():
     """Test fetch_nfl_odds: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_fetch_nfl_odds_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_nfl_odds_error_handling():
     """Test fetch_nfl_odds error handling."""
     with pytest.raises(ValueError):
         fetch_nfl_odds(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_fetch_nfl_odds_property_idempotent(self, self, markets, bookmakers):
 
     # Assert property
     assert fetch_nfl_odds(self, markets, bookmakers) == result, "idempotent violated"
-
 
 
 def test_fetch_historical_lines_basic():
@@ -100,7 +93,6 @@ def test_fetch_historical_lines_basic():
     assert result is not None
 
 
-
 def test_fetch_historical_lines_edge_cases():
     """Test fetch_historical_lines: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_fetch_historical_lines_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_historical_lines_error_handling():
     """Test fetch_historical_lines error handling."""
     with pytest.raises(ValueError):
         fetch_historical_lines(invalid_input)
-
 
 
 @given(st.integers(), st.datetimes(), st.integers())
@@ -129,7 +119,6 @@ def test_fetch_historical_lines_property_idempotent(self, self, game_date, marke
 
     # Assert property
     assert fetch_historical_lines(self, game_date, markets) == result, "idempotent violated"
-
 
 
 def test_get_upcoming_games_basic():
@@ -144,7 +133,6 @@ def test_get_upcoming_games_basic():
     assert result is not None
 
 
-
 def test_get_upcoming_games_edge_cases():
     """Test get_upcoming_games: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_get_upcoming_games_edge_cases():
     assert result is not None
 
 
-
 def test_get_upcoming_games_error_handling():
     """Test get_upcoming_games error handling."""
     with pytest.raises(ValueError):
         get_upcoming_games(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_get_upcoming_games_property_idempotent(self, self, season, week):
 
     # Assert property
     assert get_upcoming_games(self, season, week) == result, "idempotent violated"
-
 
 
 def test_predict_games_basic():
@@ -188,7 +173,6 @@ def test_predict_games_basic():
     assert result is not None
 
 
-
 def test_predict_games_edge_cases():
     """Test predict_games: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_predict_games_edge_cases():
     assert result is not None
 
 
-
 def test_predict_games_error_handling():
     """Test predict_games error handling."""
     with pytest.raises(ValueError):
         predict_games(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -217,7 +199,6 @@ def test_predict_games_property_idempotent(self, self, season, week, model_path)
 
     # Assert property
     assert predict_games(self, season, week, model_path) == result, "idempotent violated"
-
 
 
 def test_find_opportunities_basic():
@@ -232,7 +213,6 @@ def test_find_opportunities_basic():
     assert result is not None
 
 
-
 def test_find_opportunities_edge_cases():
     """Test find_opportunities: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_find_opportunities_edge_cases():
     assert result is not None
 
 
-
 def test_find_opportunities_error_handling():
     """Test find_opportunities error handling."""
     with pytest.raises(ValueError):
         find_opportunities(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -261,4 +239,3 @@ def test_find_opportunities_property_idempotent(self, self, season, week):
 
     # Assert property
     assert find_opportunities(self, season, week) == result, "idempotent violated"
-

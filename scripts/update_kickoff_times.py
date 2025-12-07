@@ -19,8 +19,7 @@ import requests
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -30,17 +29,11 @@ DB_CONFIG = {
     "port": int(os.getenv("DB_PORT", "5544")),
     "dbname": os.getenv("DB_NAME", "devdb01"),
     "user": os.getenv("DB_USER", "dro"),
-    "password": os.getenv("DB_PASSWORD", "sicillionbillions")
+    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
 }
 
 # Team abbreviation mapping (ESPN to our database)
-ESPN_TO_DB_TEAMS = {
-    'LAR': 'LAR',
-    'LA': 'LAR',
-    'LAC': 'LAC',
-    'WSH': 'WAS',
-    'WAS': 'WAS'
-}
+ESPN_TO_DB_TEAMS = {"LAR": "LAR", "LA": "LAR", "LAC": "LAC", "WSH": "WAS", "WAS": "WAS"}
 
 
 def fetch_espn_kickoffs(season: int, week: int):
@@ -62,35 +55,32 @@ def fetch_espn_kickoffs(season: int, week: int):
 
         try:
             url = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
-            params = {
-                'dates': date_str,
-                'limit': 100
-            }
+            params = {"dates": date_str, "limit": 100}
 
             response = requests.get(url, params=params, timeout=10)
             response.raise_for_status()
             data = response.json()
 
-            for event in data.get('events', []):
-                comp = event['competitions'][0]
+            for event in data.get("events", []):
+                comp = event["competitions"][0]
 
                 # Get teams
                 home_team = None
                 away_team = None
-                for competitor in comp['competitors']:
-                    team_abbr = competitor['team']['abbreviation']
+                for competitor in comp["competitors"]:
+                    team_abbr = competitor["team"]["abbreviation"]
                     team_abbr = ESPN_TO_DB_TEAMS.get(team_abbr, team_abbr)
 
-                    if competitor['homeAway'] == 'home':
+                    if competitor["homeAway"] == "home":
                         home_team = team_abbr
                     else:
                         away_team = team_abbr
 
                 # Get kickoff time
-                kickoff_str = event.get('date')
+                kickoff_str = event.get("date")
                 if kickoff_str and home_team and away_team:
                     # Parse ISO format timestamp
-                    kickoff_dt = datetime.fromisoformat(kickoff_str.replace('Z', '+00:00'))
+                    kickoff_dt = datetime.fromisoformat(kickoff_str.replace("Z", "+00:00"))
 
                     # Create game_id in our format
                     game_id = f"{season}_{week:02d}_{away_team}_{home_team}"
@@ -121,7 +111,7 @@ def update_database_kickoffs(kickoff_times: dict):
                     SET kickoff = %s
                     WHERE game_id = %s
                     """,
-                    (kickoff_dt, game_id)
+                    (kickoff_dt, game_id),
                 )
 
                 if cursor.rowcount > 0:

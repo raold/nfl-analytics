@@ -51,9 +51,7 @@ class BuggyValidationScript:
 
         # ❌ BLOCKING: api_contract_validation
         # Deprecated parameter: use_adaptive_weights
-        ensemble = EnhancedEnsemble4Way(
-            use_adaptive_weights=True  # Deprecated in v5
-        )
+        ensemble = EnhancedEnsemble4Way(use_adaptive_weights=True)  # Deprecated in v5
 
         return ensemble
 
@@ -76,7 +74,7 @@ class BuggyValidationScript:
         # ❌ BLOCKING: sql_result_validation
         # DataFrame 'elo_rating' accessed without empty check
         elo_rating = pd.read_sql_query(query, conn)
-        rating = elo_rating.iloc[0]['elo_rating']  # Crashes if empty
+        rating = elo_rating.iloc[0]["elo_rating"]  # Crashes if empty
 
         conn.close()
         return rating
@@ -89,12 +87,13 @@ class BuggyValidationScript:
         """
         import rpy2.robjects as ro
         from rpy2.robjects import pandas2ri
+
         pandas2ri.activate()
 
         # ❌ WARNING: r_prediction_validation
         # R model predictions not validated for NaN
         # rpy2 calls not wrapped in try/except
-        r_pred = ro.r('posterior_predict')(model, newdata=newdata, ndraws=100)
+        r_pred = ro.r("posterior_predict")(model, newdata=newdata, ndraws=100)
         prediction = np.array(r_pred).mean()  # Returns NaN if model failed
 
         return prediction
@@ -107,9 +106,7 @@ class BuggyValidationScript:
         """
         from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
-        ensemble = EnhancedEnsemble4Way(
-            db_password=os.getenv("DB_PASSWORD")
-        )
+        ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
 
         # Get predictions from all components
         p1 = ensemble._predict_state_space(player_id, season, week)
@@ -155,7 +152,7 @@ class BuggyValidationScript:
             conn.close()
             return None
 
-        rating = elo_rating.iloc[0]['elo_rating']
+        rating = elo_rating.iloc[0]["elo_rating"]
         conn.close()
         return rating
 
@@ -163,11 +160,12 @@ class BuggyValidationScript:
         """✅ CORRECT: R prediction NaN validation."""
         import rpy2.robjects as ro
         from rpy2.robjects import pandas2ri
+
         pandas2ri.activate()
 
         try:
             # ✅ Wrapped in try/except
-            r_pred = ro.r('posterior_predict')(model, newdata=newdata, ndraws=100)
+            r_pred = ro.r("posterior_predict")(model, newdata=newdata, ndraws=100)
             prediction = np.array(r_pred).mean()
 
             # ✅ NaN validation
@@ -185,9 +183,7 @@ class BuggyValidationScript:
         """✅ CORRECT: Ensemble component validation."""
         from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
-        ensemble = EnhancedEnsemble4Way(
-            db_password=os.getenv("DB_PASSWORD")
-        )
+        ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
 
         # Get predictions from all components
         predictions = []

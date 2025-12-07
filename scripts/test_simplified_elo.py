@@ -21,12 +21,13 @@ from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 def test_elo_predictions():
     """Test ELO predictions on sample 2024 games."""
 
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("Testing Simplified ELO Predictor (No Player Skill Factors)")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Initialize ensemble
     ensemble = EnhancedEnsemble6Way()
@@ -35,10 +36,10 @@ def test_elo_predictions():
     # Using 2024 Week 9 (verified player IDs from mart.player_hierarchy)
     test_cases = [
         ("00-0033873", 2024, 9, "Patrick Mahomes"),  # KC QB - 291 yards actual
-        ("00-0039163", 2024, 9, "C.J. Stroud"),      # HOU QB
-        ("00-0034855", 2024, 9, "Baker Mayfield"),   # TB QB
-        ("00-0023459", 2024, 9, "Aaron Rodgers"),    # NYJ QB
-        ("00-0039732", 2024, 9, "Bo Nix"),           # DEN QB (rookie)
+        ("00-0039163", 2024, 9, "C.J. Stroud"),  # HOU QB
+        ("00-0034855", 2024, 9, "Baker Mayfield"),  # TB QB
+        ("00-0023459", 2024, 9, "Aaron Rodgers"),  # NYJ QB
+        ("00-0039732", 2024, 9, "Bo Nix"),  # DEN QB (rookie)
     ]
 
     results = []
@@ -50,40 +51,34 @@ def test_elo_predictions():
 
             if elo_pred is not None:
                 mean, std = elo_pred
-                results.append({
-                    'player': name,
-                    'mean': mean,
-                    'std': std,
-                    'status': 'PASS' if 150 <= mean <= 450 else 'FAIL'
-                })
-                logger.info(f"  {name:20s}: {mean:6.1f} ± {std:5.1f} yards [{results[-1]['status']}]")
+                results.append(
+                    {
+                        "player": name,
+                        "mean": mean,
+                        "std": std,
+                        "status": "PASS" if 150 <= mean <= 450 else "FAIL",
+                    }
+                )
+                logger.info(
+                    f"  {name:20s}: {mean:6.1f} ± {std:5.1f} yards [{results[-1]['status']}]"
+                )
             else:
                 logger.warning(f"  {name:20s}: FAILED (no prediction)")
-                results.append({
-                    'player': name,
-                    'mean': None,
-                    'std': None,
-                    'status': 'ERROR'
-                })
+                results.append({"player": name, "mean": None, "std": None, "status": "ERROR"})
         except Exception as e:
             logger.error(f"  {name:20s}: ERROR - {e}")
-            results.append({
-                'player': name,
-                'mean': None,
-                'std': None,
-                'status': 'ERROR'
-            })
+            results.append({"player": name, "mean": None, "std": None, "status": "ERROR"})
 
     # Summary
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("SUMMARY")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
-    passed = sum(1 for r in results if r['status'] == 'PASS')
-    failed = sum(1 for r in results if r['status'] == 'FAIL')
-    errors = sum(1 for r in results if r['status'] == 'ERROR')
+    passed = sum(1 for r in results if r["status"] == "PASS")
+    failed = sum(1 for r in results if r["status"] == "FAIL")
+    errors = sum(1 for r in results if r["status"] == "ERROR")
 
-    valid_means = [r['mean'] for r in results if r['mean'] is not None]
+    valid_means = [r["mean"] for r in results if r["mean"] is not None]
 
     if valid_means:
         logger.info(f"Tests Run: {len(results)}")
@@ -102,6 +97,7 @@ def test_elo_predictions():
     else:
         logger.error("\n❌ ALL PREDICTIONS FAILED")
         return 1
+
 
 if __name__ == "__main__":
     exit(test_elo_predictions())

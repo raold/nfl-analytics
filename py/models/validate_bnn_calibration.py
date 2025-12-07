@@ -56,9 +56,9 @@ def load_actual_bnn_model():
         logger.info(f"  Keys: {list(model_data.keys())}")
 
         # Check model structure
-        if 'trace' in model_data:
+        if "trace" in model_data:
             logger.info("  Has posterior trace: ✓")
-        if 'scaler' in model_data:
+        if "scaler" in model_data:
             logger.info("  Has feature scaler: ✓")
 
         return model_data
@@ -102,18 +102,18 @@ def apply_temperature_scaling(predictions, temperature):
 def validate_bnn_calibration():
     """Validate calibration of actual trained BNN model"""
 
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("BNN CALIBRATION VALIDATION - ACTUAL TRAINED MODEL")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # Load actual BNN model
     model_data = load_actual_bnn_model()
 
     if model_data is None:
         logger.error("Cannot proceed without BNN model")
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("FALLBACK RECOMMENDATION")
-        logger.info("="*70)
+        logger.info("=" * 70)
         logger.info("Since no trained BNN model is available, use Conformal Prediction:")
         logger.info("  File: py/models/conformal_prediction_baseline.py")
         logger.info("  Benefit: Guarantees exact 90% coverage (model-agnostic)")
@@ -126,9 +126,9 @@ def validate_bnn_calibration():
     # 2. Run model.predict(X_val)
     # 3. Compare predictions to actual outcomes
 
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("CALIBRATION ASSESSMENT")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # Simulate realistic BNN predictions (under-calibrated as documented)
     np.random.seed(42)
@@ -164,7 +164,7 @@ def validate_bnn_calibration():
             "optimal_temperature": 1.0,
             "coverage_90": baseline_coverage_90,
             "coverage_68": baseline_coverage_68,
-            "status": "PASS"
+            "status": "PASS",
         }
     elif baseline_coverage_90 < 0.85:
         logger.info("\n  Status: ⚠️ UNDER-CALIBRATED (intervals too narrow)")
@@ -174,9 +174,9 @@ def validate_bnn_calibration():
         logger.info("  Solution: Decrease temperature (T < 1.0)")
 
     # Find optimal temperature
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("TEMPERATURE SCALING SEARCH")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     if baseline_coverage_90 < 0.85:
         # Under-calibrated: try T > 1.0
@@ -197,42 +197,43 @@ def validate_bnn_calibration():
 
         in_target = 0.85 <= coverage_90 <= 0.95
 
-        results.append({
-            "temperature": temp,
-            "coverage_90": coverage_90,
-            "coverage_68": coverage_68,
-            "interval_width": interval_width,
-            "mae": mae,
-            "in_target": in_target
-        })
+        results.append(
+            {
+                "temperature": temp,
+                "coverage_90": coverage_90,
+                "coverage_68": coverage_68,
+                "interval_width": interval_width,
+                "mae": mae,
+                "in_target": in_target,
+            }
+        )
 
         if in_target:
             logger.info(f"T={temp:.2f}: Coverage={coverage_90:.1%}, Width={interval_width:.1f}yd ✓")
 
     # Find best temperature (closest to 90%, within target range)
-    target_results = [r for r in results if r['in_target']]
+    target_results = [r for r in results if r["in_target"]]
 
     if target_results:
         optimal = min(
-            target_results,
-            key=lambda r: (abs(r['coverage_90'] - 0.90), r['interval_width'])
+            target_results, key=lambda r: (abs(r["coverage_90"] - 0.90), r["interval_width"])
         )
     else:
         # No result in target range, take closest to 90%
-        optimal = min(results, key=lambda r: abs(r['coverage_90'] - 0.90))
+        optimal = min(results, key=lambda r: abs(r["coverage_90"] - 0.90))
         logger.warning("⚠️  No temperature achieved 85-95% target!")
 
     # Print optimal result
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("OPTIMAL TEMPERATURE")
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info(f"Temperature: {optimal['temperature']:.2f}")
     logger.info(f"Coverage 90%: {optimal['coverage_90']:.1%} (target: 85-95%)")
     logger.info(f"Coverage 68%: {optimal['coverage_68']:.1%} (target: 63-73%)")
     logger.info(f"Interval Width: {optimal['interval_width']:.1f} yards")
     logger.info(f"MAE: {optimal['mae']:.2f} yards")
 
-    if optimal['in_target']:
+    if optimal["in_target"]:
         logger.info("Status: ✅ CALIBRATED")
     else:
         logger.info("Status: ⚠️ BEST AVAILABLE (closest to target)")
@@ -244,26 +245,30 @@ def validate_bnn_calibration():
 
     output_file = output_dir / f"bnn_calibration_validation_{timestamp}.json"
     with open(output_file, "w") as f:
-        json.dump({
-            "model_path": "models/bayesian/bnn_passing_v1.pkl",
-            "baseline_coverage": baseline_coverage_90,
-            "optimal_temperature": optimal['temperature'],
-            "optimal_coverage_90": optimal['coverage_90'],
-            "optimal_coverage_68": optimal['coverage_68'],
-            "optimal_interval_width": optimal['interval_width'],
-            "all_results": results,
-            "recommendation": (
-                f"Apply temperature T={optimal['temperature']:.2f} "
-                f"to achieve {optimal['coverage_90']:.1%} coverage"
-            )
-        }, f, indent=2)
+        json.dump(
+            {
+                "model_path": "models/bayesian/bnn_passing_v1.pkl",
+                "baseline_coverage": baseline_coverage_90,
+                "optimal_temperature": optimal["temperature"],
+                "optimal_coverage_90": optimal["coverage_90"],
+                "optimal_coverage_68": optimal["coverage_68"],
+                "optimal_interval_width": optimal["interval_width"],
+                "all_results": results,
+                "recommendation": (
+                    f"Apply temperature T={optimal['temperature']:.2f} "
+                    f"to achieve {optimal['coverage_90']:.1%} coverage"
+                ),
+            },
+            f,
+            indent=2,
+        )
 
     logger.info(f"\n✓ Results saved to: {output_file}")
 
     # Production recommendation
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("PRODUCTION RECOMMENDATION")
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info(f"1. Set BNN temperature to T={optimal['temperature']:.2f}")
     logger.info("2. Implementation:")
     logger.info("   class ImprovedBNN:")

@@ -18,8 +18,9 @@ from pathlib import Path
 
 def get_file_hash(filepath: Path) -> str:
     """Get MD5 hash of file contents."""
-    with open(filepath, 'rb') as f:
+    with open(filepath, "rb") as f:
         return hashlib.md5(f.read()).hexdigest()
+
 
 def find_duplicate_files(root_dir: str) -> dict[str, list[Path]]:
     """Find files with identical content."""
@@ -28,10 +29,12 @@ def find_duplicate_files(root_dir: str) -> dict[str, list[Path]]:
 
     for root, dirs, files in os.walk(root_dir):
         # Skip virtual environments and hidden directories
-        dirs[:] = [d for d in dirs if not d.startswith('.') and d != '__pycache__' and 'venv' not in d]
+        dirs[:] = [
+            d for d in dirs if not d.startswith(".") and d != "__pycache__" and "venv" not in d
+        ]
 
         for file in files:
-            if file.endswith(('.py', '.R', '.sql', '.sh')):
+            if file.endswith((".py", ".R", ".sql", ".sh")):
                 filepath = Path(root) / file
                 file_hash = get_file_hash(filepath)
 
@@ -44,17 +47,18 @@ def find_duplicate_files(root_dir: str) -> dict[str, list[Path]]:
 
     return duplicates
 
+
 def find_obsolete_files(root_dir: str) -> list[Path]:
     """Identify potentially obsolete files based on patterns."""
     obsolete_patterns = [
-        '*_old.*',
-        '*_backup.*',
-        '*_copy.*',
-        '*test*',  # Test files not in tests/ directory
-        '*.bak',
-        '*deprecated*',
-        '*unused*',
-        '*temp*',
+        "*_old.*",
+        "*_backup.*",
+        "*_copy.*",
+        "*test*",  # Test files not in tests/ directory
+        "*.bak",
+        "*deprecated*",
+        "*unused*",
+        "*temp*",
     ]
 
     obsolete_files = []
@@ -63,10 +67,11 @@ def find_obsolete_files(root_dir: str) -> list[Path]:
     for pattern in obsolete_patterns:
         # Find files matching pattern but not in tests directory
         for file in root_path.rglob(pattern):
-            if 'test' not in file.parts[-2] and file.is_file():
+            if "test" not in file.parts[-2] and file.is_file():
                 obsolete_files.append(file)
 
     return obsolete_files
+
 
 def standardize_filenames(root_dir: str) -> list[tuple[Path, Path]]:
     """Identify files that need renaming for consistency."""
@@ -76,16 +81,16 @@ def standardize_filenames(root_dir: str) -> list[tuple[Path, Path]]:
     # Define naming rules
     rules = {
         # R scripts should use snake_case
-        '.R': lambda name: name.replace('-', '_').lower(),
+        ".R": lambda name: name.replace("-", "_").lower(),
         # Python scripts should use snake_case
-        '.py': lambda name: name.replace('-', '_').lower(),
+        ".py": lambda name: name.replace("-", "_").lower(),
         # SQL files should use numbered migrations
-        '.sql': lambda name: name.lower(),
+        ".sql": lambda name: name.lower(),
     }
 
     for ext, transform in rules.items():
-        for file in root_path.rglob(f'*{ext}'):
-            if 'venv' not in str(file) and '.git' not in str(file):
+        for file in root_path.rglob(f"*{ext}"):
+            if "venv" not in str(file) and ".git" not in str(file):
                 old_name = file.stem
                 new_name = transform(old_name)
 
@@ -96,73 +101,75 @@ def standardize_filenames(root_dir: str) -> list[tuple[Path, Path]]:
 
     return renames
 
+
 def reorganize_structure(root_dir: str) -> dict[str, list[Path]]:
     """Suggest new organization for files."""
     suggestions = {
-        'src/python/ingestion': [],
-        'src/python/features': [],
-        'src/python/models': [],
-        'src/python/utils': [],
-        'src/R/ingestion': [],
-        'src/R/analysis': [],
-        'src/R/utils': [],
-        'src/sql/migrations': [],
-        'src/sql/functions': [],
-        'src/sql/views': [],
-        'scripts/maintenance': [],
-        'scripts/dev': [],
-        'tests/unit': [],
-        'tests/integration': [],
-        'archive': [],
+        "src/python/ingestion": [],
+        "src/python/features": [],
+        "src/python/models": [],
+        "src/python/utils": [],
+        "src/R/ingestion": [],
+        "src/R/analysis": [],
+        "src/R/utils": [],
+        "src/sql/migrations": [],
+        "src/sql/functions": [],
+        "src/sql/views": [],
+        "scripts/maintenance": [],
+        "scripts/dev": [],
+        "tests/unit": [],
+        "tests/integration": [],
+        "archive": [],
     }
 
     root_path = Path(root_dir)
 
     # Categorize Python files
-    for file in root_path.glob('py/**/*.py'):
-        if 'ingest' in file.name:
-            suggestions['src/python/ingestion'].append(file)
-        elif 'feature' in file.name:
-            suggestions['src/python/features'].append(file)
-        elif 'model' in file.name or 'train' in file.name:
-            suggestions['src/python/models'].append(file)
-        elif 'test' in file.name:
-            suggestions['tests/unit'].append(file)
+    for file in root_path.glob("py/**/*.py"):
+        if "ingest" in file.name:
+            suggestions["src/python/ingestion"].append(file)
+        elif "feature" in file.name:
+            suggestions["src/python/features"].append(file)
+        elif "model" in file.name or "train" in file.name:
+            suggestions["src/python/models"].append(file)
+        elif "test" in file.name:
+            suggestions["tests/unit"].append(file)
         else:
-            suggestions['src/python/utils'].append(file)
+            suggestions["src/python/utils"].append(file)
 
     # Categorize R files
-    for file in root_path.glob('R/**/*.R'):
-        if 'ingest' in file.name:
-            suggestions['src/R/ingestion'].append(file)
-        elif 'feature' in file.name or 'analysis' in file.name:
-            suggestions['src/R/analysis'].append(file)
-        elif 'util' in file.name or 'error' in file.name:
-            suggestions['src/R/utils'].append(file)
+    for file in root_path.glob("R/**/*.R"):
+        if "ingest" in file.name:
+            suggestions["src/R/ingestion"].append(file)
+        elif "feature" in file.name or "analysis" in file.name:
+            suggestions["src/R/analysis"].append(file)
+        elif "util" in file.name or "error" in file.name:
+            suggestions["src/R/utils"].append(file)
 
     # SQL files
-    for file in root_path.glob('db/**/*.sql'):
-        if 'migration' in str(file):
-            suggestions['src/sql/migrations'].append(file)
-        elif 'function' in file.name:
-            suggestions['src/sql/functions'].append(file)
-        elif 'view' in file.name:
-            suggestions['src/sql/views'].append(file)
+    for file in root_path.glob("db/**/*.sql"):
+        if "migration" in str(file):
+            suggestions["src/sql/migrations"].append(file)
+        elif "function" in file.name:
+            suggestions["src/sql/functions"].append(file)
+        elif "view" in file.name:
+            suggestions["src/sql/views"].append(file)
 
     # Scripts
-    for file in root_path.glob('scripts/**/*.{py,sh,R}'):
-        if 'maintenance' in str(file) or 'backup' in file.name:
-            suggestions['scripts/maintenance'].append(file)
+    for file in root_path.glob("scripts/**/*.{py,sh,R}"):
+        if "maintenance" in str(file) or "backup" in file.name:
+            suggestions["scripts/maintenance"].append(file)
         else:
-            suggestions['scripts/dev'].append(file)
+            suggestions["scripts/dev"].append(file)
 
     return {k: v for k, v in suggestions.items() if v}
+
 
 def generate_report(
     duplicates: dict[str, list[Path]],
     obsolete: list[Path],
     renames: list[tuple[Path, Path]],
-    reorganize: dict[str, list[Path]]
+    reorganize: dict[str, list[Path]],
 ):
     """Generate cleanup report."""
     report = []
@@ -186,7 +193,7 @@ def generate_report(
     report.append("\n## POTENTIALLY OBSOLETE FILES")
     if obsolete:
         for file in obsolete:
-            modified = datetime.fromtimestamp(file.stat().st_mtime).strftime('%Y-%m-%d')
+            modified = datetime.fromtimestamp(file.stat().st_mtime).strftime("%Y-%m-%d")
             report.append(f"  - {file} (modified: {modified})")
     else:
         report.append("  No obsolete files found")
@@ -224,6 +231,7 @@ def generate_report(
 
     return "\n".join(report)
 
+
 def main():
     """Main cleanup process."""
     root_dir = Path.cwd()
@@ -241,7 +249,7 @@ def main():
 
     # Save report
     report_file = Path("cleanup_report.txt")
-    with open(report_file, 'w') as f:
+    with open(report_file, "w") as f:
         f.write(report)
 
     print(f"\n✅ Analysis complete! Report saved to: {report_file}")
@@ -286,6 +294,7 @@ def main():
             old.rename(new)
             print(f"  Renamed: {old.name} → {new.name}")
         print(f"\n✅ {len(renames)} files renamed")
+
 
 if __name__ == "__main__":
     main()

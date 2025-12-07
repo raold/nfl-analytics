@@ -20,10 +20,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import logging
 import pickle
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -43,7 +40,7 @@ def verify_temperature_scaler():
 
     # Load scaler
     try:
-        with open(scaler_path, 'rb') as f:
+        with open(scaler_path, "rb") as f:
             scaler_data = pickle.load(f)
 
         logger.info("✅ Temperature scaler loaded successfully")
@@ -51,7 +48,7 @@ def verify_temperature_scaler():
         logger.info(f"   Target coverage: {scaler_data['target_coverage']:.1%}")
 
         # Validate temperature is reasonable
-        T = scaler_data['temperature']
+        T = scaler_data["temperature"]
         if not (0.5 <= T <= 2.0):
             logger.warning(f"⚠️  Temperature {T:.4f} outside typical range [0.5, 2.0]")
             return False
@@ -99,6 +96,7 @@ def verify_ensemble_integration():
     except Exception as e:
         logger.error(f"❌ Failed to initialize ensemble: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -110,8 +108,8 @@ def main():
     logger.info("=" * 80 + "\n")
 
     checks = {
-        'Temperature Scaler': verify_temperature_scaler(),
-        'Ensemble Integration': verify_ensemble_integration()
+        "Temperature Scaler": verify_temperature_scaler(),
+        "Ensemble Integration": verify_ensemble_integration(),
     }
 
     # Print summary

@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 # Context variable for correlation ID (thread-safe)
-correlation_id_var: ContextVar[str] = ContextVar('correlation_id', default='')
+correlation_id_var: ContextVar[str] = ContextVar("correlation_id", default="")
 
 
 class StructuredFormatter(logging.Formatter):
@@ -47,7 +47,7 @@ class StructuredFormatter(logging.Formatter):
             log_data["correlation_id"] = correlation_id
 
         # Add extra context from record
-        if hasattr(record, 'context'):
+        if hasattr(record, "context"):
             log_data["context"] = record.context
 
         # Add exception info if present
@@ -67,12 +67,12 @@ class HumanReadableFormatter(logging.Formatter):
 
     # ANSI color codes
     COLORS = {
-        'DEBUG': '\033[36m',      # Cyan
-        'INFO': '\033[32m',       # Green
-        'WARNING': '\033[33m',    # Yellow
-        'ERROR': '\033[31m',      # Red
-        'CRITICAL': '\033[35m',   # Magenta
-        'RESET': '\033[0m'        # Reset
+        "DEBUG": "\033[36m",  # Cyan
+        "INFO": "\033[32m",  # Green
+        "WARNING": "\033[33m",  # Yellow
+        "ERROR": "\033[31m",  # Red
+        "CRITICAL": "\033[35m",  # Magenta
+        "RESET": "\033[0m",  # Reset
     }
 
     def format(self, record: logging.LogRecord) -> str:
@@ -84,15 +84,17 @@ class HumanReadableFormatter(logging.Formatter):
         # Add color to level name
         level_name = record.levelname
         if sys.stdout.isatty():  # Only add colors if outputting to terminal
-            color = self.COLORS.get(level_name, '')
-            reset = self.COLORS['RESET']
+            color = self.COLORS.get(level_name, "")
+            reset = self.COLORS["RESET"]
             level_name = f"{color}{level_name}{reset}"
 
         # Format timestamp
-        timestamp = datetime.fromtimestamp(record.created).strftime('%Y-%m-%d %H:%M:%S')
+        timestamp = datetime.fromtimestamp(record.created).strftime("%Y-%m-%d %H:%M:%S")
 
         # Build message
-        message = f"{timestamp} | {level_name:8} | {record.name:30} | {corr_str}{record.getMessage()}"
+        message = (
+            f"{timestamp} | {level_name:8} | {record.name:30} | {corr_str}{record.getMessage()}"
+        )
 
         # Add exception if present
         if record.exc_info:
@@ -105,7 +107,7 @@ def get_pipeline_logger(
     name: str,
     log_level: str = "INFO",
     log_dir: Path | None = None,
-    format_type: str = "human"  # "human" or "json"
+    format_type: str = "human",  # "human" or "json"
 ) -> logging.Logger:
     """
     Get a configured logger for ETL pipeline.
@@ -171,10 +173,7 @@ def get_correlation_id() -> str:
 
 
 def log_pipeline_event(
-    logger: logging.Logger,
-    level: str,
-    message: str,
-    context: dict[str, Any] | None = None
+    logger: logging.Logger, level: str, message: str, context: dict[str, Any] | None = None
 ):
     """
     Log a pipeline event with context.
@@ -188,7 +187,7 @@ def log_pipeline_event(
     log_level = getattr(logging, level.upper())
 
     # Create log record with context
-    extra = {'context': context} if context else {}
+    extra = {"context": context} if context else {}
     logger.log(log_level, message, extra=extra)
 
 
@@ -199,7 +198,7 @@ if __name__ == "__main__":
         "etl.pipelines.example",
         log_level="DEBUG",
         log_dir=Path("logs/etl"),
-        format_type="human"  # Use "json" for production
+        format_type="human",  # Use "json" for production
     )
 
     # Set correlation ID for this pipeline run
@@ -210,17 +209,11 @@ if __name__ == "__main__":
     logger.debug("Extracting data from source")
 
     log_pipeline_event(
-        logger,
-        "INFO",
-        "Data extracted successfully",
-        context={"rows": 272, "source": "nflverse"}
+        logger, "INFO", "Data extracted successfully", context={"rows": 272, "source": "nflverse"}
     )
 
     log_pipeline_event(
-        logger,
-        "WARNING",
-        "Missing data detected",
-        context={"missing_count": 5, "total": 272}
+        logger, "WARNING", "Missing data detected", context={"missing_count": 5, "total": 272}
     )
 
     try:
@@ -233,15 +226,7 @@ if __name__ == "__main__":
 
     # Example JSON output logger
     print("\n--- JSON Format ---")
-    json_logger = get_pipeline_logger(
-        "etl.pipelines.json_example",
-        format_type="json"
-    )
+    json_logger = get_pipeline_logger("etl.pipelines.json_example", format_type="json")
 
     set_correlation_id("test-123-456")
-    log_pipeline_event(
-        json_logger,
-        "INFO",
-        "Test message",
-        context={"test": True, "value": 42}
-    )
+    log_pipeline_event(json_logger, "INFO", "Test message", context={"test": True, "value": 42})

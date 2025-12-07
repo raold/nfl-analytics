@@ -44,8 +44,10 @@ from py.production.real_time_api import app
 @pytest.fixture
 def mock_ensembles():
     """Mock both ensemble models."""
-    with patch('py.production.ab_test_router.EnsembleV5') as mock_v5, \
-         patch('py.production.ab_test_router.EnsembleV6') as mock_v6:
+    with (
+        patch("py.production.ab_test_router.EnsembleV5") as mock_v5,
+        patch("py.production.ab_test_router.EnsembleV6") as mock_v6,
+    ):
 
         # Mock v5 predictions (control)
         mock_v5_instance = Mock()
@@ -66,7 +68,14 @@ def mock_ensembles():
             "ensemble_std": 42.0,
             "quantile_10": 218.0,
             "quantile_90": 302.0,
-            "weights": {"state_space": 0.25, "bnn": 0.2, "hierarchical": 0.2, "xgb": 0.15, "elo": 0.1, "adaptive": 0.1},
+            "weights": {
+                "state_space": 0.25,
+                "bnn": 0.2,
+                "hierarchical": 0.2,
+                "xgb": 0.15,
+                "elo": 0.1,
+                "adaptive": 0.1,
+            },
             "inference_time_ms": 105.0,
         }
         mock_v6.return_value = mock_v6_instance
@@ -77,11 +86,11 @@ def mock_ensembles():
 @pytest.fixture
 def mock_database():
     """Mock database for end-to-end tests."""
-    with patch('psycopg2.connect') as mock_connect:
+    with patch("psycopg2.connect") as mock_connect:
         mock_cursor = Mock()
         mock_cursor.fetchone.side_effect = [
             (38,),  # model_id for v5.0
-            ("Patrick Mahomes", "KC", "LAC", True)
+            ("Patrick Mahomes", "KC", "LAC", True),
         ] * 1000  # Enough for batch tests
 
         mock_conn = Mock()
@@ -105,8 +114,10 @@ def client():
 class TestFullPredictionFlow:
     """Test complete prediction flow from API to database."""
 
-    @patch('py.production.real_time_api.ab_router')
-    def test_single_prediction_control_group_e2e(self, mock_router, mock_ensembles, mock_database, client):
+    @patch("py.production.real_time_api.ab_router")
+    def test_single_prediction_control_group_e2e(
+        self, mock_router, mock_ensembles, mock_database, client
+    ):
         """Test complete flow for control group prediction."""
         # Configure mock router
         mock_router.enabled = True
@@ -129,7 +140,7 @@ class TestFullPredictionFlow:
                 "prop_type": "passing_yards",
                 "week": 10,
                 "season": 2024,
-            }
+            },
         )
 
         # Verify response
@@ -149,8 +160,10 @@ class TestFullPredictionFlow:
         assert call_kwargs["week"] == 10
         assert call_kwargs["log_to_db"] is True
 
-    @patch('py.production.real_time_api.ab_router')
-    def test_single_prediction_treatment_group_e2e(self, mock_router, mock_ensembles, mock_database, client):
+    @patch("py.production.real_time_api.ab_router")
+    def test_single_prediction_treatment_group_e2e(
+        self, mock_router, mock_ensembles, mock_database, client
+    ):
         """Test complete flow for treatment group prediction."""
         # Configure mock router
         mock_router.enabled = True
@@ -173,7 +186,7 @@ class TestFullPredictionFlow:
                 "prop_type": "passing_yards",
                 "week": 10,
                 "season": 2024,
-            }
+            },
         )
 
         # Verify response
@@ -198,10 +211,7 @@ class TestBatchPredictionsE2E:
         router = ABTestRouter(split_ratio=0.5)
 
         # Create batch of 100 unique players
-        games = [
-            {"player_id": f"player_{i:05d}", "season": 2024, "week": 10}
-            for i in range(100)
-        ]
+        games = [{"player_id": f"player_{i:05d}", "season": 2024, "week": 10} for i in range(100)]
 
         # Get predictions
         df = router.predict_batch(games, log_to_db=False)
@@ -222,10 +232,7 @@ class TestBatchPredictionsE2E:
         router = ABTestRouter(split_ratio=0.5)
 
         # Create batch of 1000 unique players
-        games = [
-            {"player_id": f"player_{i:06d}", "season": 2024, "week": 10}
-            for i in range(1000)
-        ]
+        games = [{"player_id": f"player_{i:06d}", "season": 2024, "week": 10} for i in range(1000)]
 
         # Get predictions
         df = router.predict_batch(games, log_to_db=False)
@@ -242,17 +249,16 @@ class TestBatchPredictionsE2E:
         router = ABTestRouter(split_ratio=0.5)
 
         # Same players, called twice
-        games = [
-            {"player_id": f"player_{i:03d}", "season": 2024, "week": 10}
-            for i in range(50)
-        ]
+        games = [{"player_id": f"player_{i:03d}", "season": 2024, "week": 10} for i in range(50)]
 
         df1 = router.predict_batch(games, log_to_db=False)
         df2 = router.predict_batch(games, log_to_db=False)
 
         # Assignments should be identical
         assert (df1["ab_group"] == df2["ab_group"]).all(), "Assignments not deterministic"
-        assert (df1["model_version"] == df2["model_version"]).all(), "Model versions not deterministic"
+        assert (
+            df1["model_version"] == df2["model_version"]
+        ).all(), "Model versions not deterministic"
 
 
 # ============================================================================
@@ -263,14 +269,14 @@ class TestBatchPredictionsE2E:
 class TestDatabaseLoggingE2E:
     """Test predictions are correctly logged to database."""
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_predictions_logged_with_correct_model_id(self, mock_db, mock_ensembles):
         """Test that predictions use correct model_id from registry."""
         # Mock database
         mock_cursor = Mock()
         mock_cursor.fetchone.side_effect = [
             (38,),  # model_id for v5.0
-            ("Patrick Mahomes", "KC", "LAC", True)
+            ("Patrick Mahomes", "KC", "LAC", True),
         ]
         mock_conn = Mock()
         mock_conn.cursor.return_value = mock_cursor
@@ -279,33 +285,33 @@ class TestDatabaseLoggingE2E:
         router = ABTestRouter(split_ratio=0.0)  # All control
 
         # Make prediction
-        result = router.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10,
-            log_to_db=True
-        )
+        result = router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=True)
 
         # Verify model registry query
-        registry_calls = [call for call in mock_cursor.execute.call_args_list
-                         if "ml.model_registry" in str(call)]
+        registry_calls = [
+            call for call in mock_cursor.execute.call_args_list if "ml.model_registry" in str(call)
+        ]
         assert len(registry_calls) == 1, "Model registry not queried"
 
         # Verify INSERT query
-        insert_calls = [call for call in mock_cursor.execute.call_args_list
-                       if "INSERT INTO ml.predictions" in str(call)]
+        insert_calls = [
+            call
+            for call in mock_cursor.execute.call_args_list
+            if "INSERT INTO ml.predictions" in str(call)
+        ]
         assert len(insert_calls) == 1, "Prediction not inserted"
 
         # Verify commit
         mock_conn.commit.assert_called_once()
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_batch_predictions_all_logged(self, mock_db, mock_ensembles):
         """Test that all batch predictions are logged."""
         # Mock database
         mock_cursor = Mock()
         mock_cursor.fetchone.side_effect = [
-            (38,), ("Player", "KC", "LAC", True)
+            (38,),
+            ("Player", "KC", "LAC", True),
         ] * 50  # 50 predictions
         mock_conn = Mock()
         mock_conn.cursor.return_value = mock_cursor
@@ -314,10 +320,7 @@ class TestDatabaseLoggingE2E:
         router = ABTestRouter(split_ratio=0.5)
 
         # Batch predictions
-        games = [
-            {"player_id": f"player_{i:03d}", "season": 2024, "week": 10}
-            for i in range(50)
-        ]
+        games = [{"player_id": f"player_{i:03d}", "season": 2024, "week": 10} for i in range(50)]
 
         df = router.predict_batch(games, log_to_db=True)
 
@@ -334,7 +337,7 @@ class TestDatabaseLoggingE2E:
 class TestABTestAnalysisWorkflow:
     """Test complete A/B test analysis workflow."""
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_get_test_summary_after_predictions(self, mock_db, mock_ensembles):
         """Test retrieving test summary after making predictions."""
         # Mock database with results
@@ -454,10 +457,7 @@ class TestPerformanceBenchmarks:
         """Test that 100 batch predictions complete in <5s."""
         router = ABTestRouter(split_ratio=0.5)
 
-        games = [
-            {"player_id": f"player_{i:05d}", "season": 2024, "week": 10}
-            for i in range(100)
-        ]
+        games = [{"player_id": f"player_{i:05d}", "season": 2024, "week": 10} for i in range(100)]
 
         start = time.time()
         df = router.predict_batch(games, log_to_db=False)
@@ -474,9 +474,9 @@ class TestPerformanceBenchmarks:
 class TestAPIHealthCheckE2E:
     """Test API health check with A/B test integration."""
 
-    @patch('py.production.real_time_api.ab_router')
-    @patch('py.production.real_time_api.db_pool')
-    @patch('py.production.real_time_api.redis_client')
+    @patch("py.production.real_time_api.ab_router")
+    @patch("py.production.real_time_api.db_pool")
+    @patch("py.production.real_time_api.redis_client")
     def test_health_check_shows_ab_test_status(self, mock_redis, mock_db, mock_router, client):
         """Test that health check includes A/B test status."""
         # Mock services

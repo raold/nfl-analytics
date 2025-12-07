@@ -110,11 +110,10 @@ from psycopg2.extras import RealDictCursor
 # via rolling averages computed across recent games
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class TeamOffensiveFeatures:
@@ -209,11 +208,7 @@ class TeamOffensiveFeatures:
         return psycopg2.connect(**self.db_config)
 
     def _get_recent_games(
-        self,
-        team: str,
-        target_season: int,
-        target_week: int,
-        lookback: int = LOOKBACK_WINDOW
+        self, team: str, target_season: int, target_week: int, lookback: int = LOOKBACK_WINDOW
     ) -> list[tuple[str, int, int]]:
         """
         Get last N games before target week (TEMPORAL SAFETY).
@@ -256,9 +251,7 @@ class TeamOffensiveFeatures:
         return recent_games
 
     def _compute_play_level_features(
-        self,
-        team: str,
-        games: list[tuple[str, int, int]]
+        self, team: str, games: list[tuple[str, int, int]]
     ) -> dict[str, float]:
         """
         Compute play-level offensive features (EPA, success rate, explosive plays, etc.).
@@ -272,22 +265,22 @@ class TeamOffensiveFeatures:
         """
         if not games:
             return {
-                'off_epa_per_play': self.DEFAULT_EPA_PER_PLAY,
-                'off_success_rate': self.DEFAULT_SUCCESS_RATE,
-                'off_explosive_play_rate': self.DEFAULT_EXPLOSIVE_RATE,
-                'off_stuff_rate': self.DEFAULT_STUFF_RATE,
-                'off_first_down_rate': self.DEFAULT_FIRST_DOWN_RATE,
-                'off_third_down_conv_rate': self.DEFAULT_THIRD_DOWN_CONV,
-                'off_pass_epa_per_play': self.DEFAULT_EPA_PER_PLAY,
-                'off_rush_epa_per_play': self.DEFAULT_EPA_PER_PLAY,
-                'off_pass_success_rate': self.DEFAULT_SUCCESS_RATE,
-                'off_rush_success_rate': self.DEFAULT_SUCCESS_RATE,
-                'off_avg_yds_per_pass': self.DEFAULT_YDS_PER_PASS,
-                'off_avg_yds_per_rush': self.DEFAULT_YDS_PER_RUSH,
-                'off_completion_pct': self.DEFAULT_COMPLETION_PCT,
-                'off_sack_rate': self.DEFAULT_SACK_RATE,
-                'off_turnover_rate': self.DEFAULT_TURNOVER_RATE,
-                'off_penalty_rate': self.DEFAULT_PENALTY_RATE,
+                "off_epa_per_play": self.DEFAULT_EPA_PER_PLAY,
+                "off_success_rate": self.DEFAULT_SUCCESS_RATE,
+                "off_explosive_play_rate": self.DEFAULT_EXPLOSIVE_RATE,
+                "off_stuff_rate": self.DEFAULT_STUFF_RATE,
+                "off_first_down_rate": self.DEFAULT_FIRST_DOWN_RATE,
+                "off_third_down_conv_rate": self.DEFAULT_THIRD_DOWN_CONV,
+                "off_pass_epa_per_play": self.DEFAULT_EPA_PER_PLAY,
+                "off_rush_epa_per_play": self.DEFAULT_EPA_PER_PLAY,
+                "off_pass_success_rate": self.DEFAULT_SUCCESS_RATE,
+                "off_rush_success_rate": self.DEFAULT_SUCCESS_RATE,
+                "off_avg_yds_per_pass": self.DEFAULT_YDS_PER_PASS,
+                "off_avg_yds_per_rush": self.DEFAULT_YDS_PER_RUSH,
+                "off_completion_pct": self.DEFAULT_COMPLETION_PCT,
+                "off_sack_rate": self.DEFAULT_SACK_RATE,
+                "off_turnover_rate": self.DEFAULT_TURNOVER_RATE,
+                "off_penalty_rate": self.DEFAULT_PENALTY_RATE,
             }
 
         conn = self._connect_db()
@@ -352,48 +345,66 @@ class TeamOffensiveFeatures:
         # Extract results with defaults
         if result:
             return {
-                'off_epa_per_play': float(result['avg_epa_per_play'] or self.DEFAULT_EPA_PER_PLAY),
-                'off_success_rate': float(result['success_rate'] or self.DEFAULT_SUCCESS_RATE),
-                'off_explosive_play_rate': float(result['explosive_play_rate'] or self.DEFAULT_EXPLOSIVE_RATE),
-                'off_stuff_rate': float(result['stuff_rate'] or self.DEFAULT_STUFF_RATE),
-                'off_first_down_rate': float(result['first_down_rate'] or self.DEFAULT_FIRST_DOWN_RATE),
-                'off_third_down_conv_rate': float(result['third_down_conv_rate'] or self.DEFAULT_THIRD_DOWN_CONV),
-                'off_pass_epa_per_play': float(result['pass_epa_per_play'] or self.DEFAULT_EPA_PER_PLAY),
-                'off_rush_epa_per_play': float(result['rush_epa_per_play'] or self.DEFAULT_EPA_PER_PLAY),
-                'off_pass_success_rate': float(result['pass_success_rate'] or self.DEFAULT_SUCCESS_RATE),
-                'off_rush_success_rate': float(result['rush_success_rate'] or self.DEFAULT_SUCCESS_RATE),
-                'off_avg_yds_per_pass': float(result['avg_yds_per_pass'] or self.DEFAULT_YDS_PER_PASS),
-                'off_avg_yds_per_rush': float(result['avg_yds_per_rush'] or self.DEFAULT_YDS_PER_RUSH),
-                'off_completion_pct': float(result['completion_pct'] or self.DEFAULT_COMPLETION_PCT),
-                'off_sack_rate': float(result['sack_rate'] or self.DEFAULT_SACK_RATE),
-                'off_turnover_rate': float(result['turnover_rate'] or self.DEFAULT_TURNOVER_RATE),
-                'off_penalty_rate': float(result['penalty_rate'] or self.DEFAULT_PENALTY_RATE),
+                "off_epa_per_play": float(result["avg_epa_per_play"] or self.DEFAULT_EPA_PER_PLAY),
+                "off_success_rate": float(result["success_rate"] or self.DEFAULT_SUCCESS_RATE),
+                "off_explosive_play_rate": float(
+                    result["explosive_play_rate"] or self.DEFAULT_EXPLOSIVE_RATE
+                ),
+                "off_stuff_rate": float(result["stuff_rate"] or self.DEFAULT_STUFF_RATE),
+                "off_first_down_rate": float(
+                    result["first_down_rate"] or self.DEFAULT_FIRST_DOWN_RATE
+                ),
+                "off_third_down_conv_rate": float(
+                    result["third_down_conv_rate"] or self.DEFAULT_THIRD_DOWN_CONV
+                ),
+                "off_pass_epa_per_play": float(
+                    result["pass_epa_per_play"] or self.DEFAULT_EPA_PER_PLAY
+                ),
+                "off_rush_epa_per_play": float(
+                    result["rush_epa_per_play"] or self.DEFAULT_EPA_PER_PLAY
+                ),
+                "off_pass_success_rate": float(
+                    result["pass_success_rate"] or self.DEFAULT_SUCCESS_RATE
+                ),
+                "off_rush_success_rate": float(
+                    result["rush_success_rate"] or self.DEFAULT_SUCCESS_RATE
+                ),
+                "off_avg_yds_per_pass": float(
+                    result["avg_yds_per_pass"] or self.DEFAULT_YDS_PER_PASS
+                ),
+                "off_avg_yds_per_rush": float(
+                    result["avg_yds_per_rush"] or self.DEFAULT_YDS_PER_RUSH
+                ),
+                "off_completion_pct": float(
+                    result["completion_pct"] or self.DEFAULT_COMPLETION_PCT
+                ),
+                "off_sack_rate": float(result["sack_rate"] or self.DEFAULT_SACK_RATE),
+                "off_turnover_rate": float(result["turnover_rate"] or self.DEFAULT_TURNOVER_RATE),
+                "off_penalty_rate": float(result["penalty_rate"] or self.DEFAULT_PENALTY_RATE),
             }
         else:
             # Return all defaults if query fails
             return {
-                'off_epa_per_play': self.DEFAULT_EPA_PER_PLAY,
-                'off_success_rate': self.DEFAULT_SUCCESS_RATE,
-                'off_explosive_play_rate': self.DEFAULT_EXPLOSIVE_RATE,
-                'off_stuff_rate': self.DEFAULT_STUFF_RATE,
-                'off_first_down_rate': self.DEFAULT_FIRST_DOWN_RATE,
-                'off_third_down_conv_rate': self.DEFAULT_THIRD_DOWN_CONV,
-                'off_pass_epa_per_play': self.DEFAULT_EPA_PER_PLAY,
-                'off_rush_epa_per_play': self.DEFAULT_EPA_PER_PLAY,
-                'off_pass_success_rate': self.DEFAULT_SUCCESS_RATE,
-                'off_rush_success_rate': self.DEFAULT_SUCCESS_RATE,
-                'off_avg_yds_per_pass': self.DEFAULT_YDS_PER_PASS,
-                'off_avg_yds_per_rush': self.DEFAULT_YDS_PER_RUSH,
-                'off_completion_pct': self.DEFAULT_COMPLETION_PCT,
-                'off_sack_rate': self.DEFAULT_SACK_RATE,
-                'off_turnover_rate': self.DEFAULT_TURNOVER_RATE,
-                'off_penalty_rate': self.DEFAULT_PENALTY_RATE,
+                "off_epa_per_play": self.DEFAULT_EPA_PER_PLAY,
+                "off_success_rate": self.DEFAULT_SUCCESS_RATE,
+                "off_explosive_play_rate": self.DEFAULT_EXPLOSIVE_RATE,
+                "off_stuff_rate": self.DEFAULT_STUFF_RATE,
+                "off_first_down_rate": self.DEFAULT_FIRST_DOWN_RATE,
+                "off_third_down_conv_rate": self.DEFAULT_THIRD_DOWN_CONV,
+                "off_pass_epa_per_play": self.DEFAULT_EPA_PER_PLAY,
+                "off_rush_epa_per_play": self.DEFAULT_EPA_PER_PLAY,
+                "off_pass_success_rate": self.DEFAULT_SUCCESS_RATE,
+                "off_rush_success_rate": self.DEFAULT_SUCCESS_RATE,
+                "off_avg_yds_per_pass": self.DEFAULT_YDS_PER_PASS,
+                "off_avg_yds_per_rush": self.DEFAULT_YDS_PER_RUSH,
+                "off_completion_pct": self.DEFAULT_COMPLETION_PCT,
+                "off_sack_rate": self.DEFAULT_SACK_RATE,
+                "off_turnover_rate": self.DEFAULT_TURNOVER_RATE,
+                "off_penalty_rate": self.DEFAULT_PENALTY_RATE,
             }
 
     def _compute_red_zone_features(
-        self,
-        team: str,
-        games: list[tuple[str, int, int]]
+        self, team: str, games: list[tuple[str, int, int]]
     ) -> dict[str, float]:
         """
         Compute red zone offensive features (TD rate).
@@ -409,7 +420,7 @@ class TeamOffensiveFeatures:
         """
         if not games:
             return {
-                'off_red_zone_td_rate': self.DEFAULT_RED_ZONE_TD_RATE,
+                "off_red_zone_td_rate": self.DEFAULT_RED_ZONE_TD_RATE,
             }
 
         conn = self._connect_db()
@@ -442,14 +453,12 @@ class TeamOffensiveFeatures:
         conn.close()
 
         if result and result[0] is not None:
-            return {'off_red_zone_td_rate': float(result[0])}
+            return {"off_red_zone_td_rate": float(result[0])}
         else:
-            return {'off_red_zone_td_rate': self.DEFAULT_RED_ZONE_TD_RATE}
+            return {"off_red_zone_td_rate": self.DEFAULT_RED_ZONE_TD_RATE}
 
     def _compute_game_level_features(
-        self,
-        team: str,
-        games: list[tuple[str, int, int]]
+        self, team: str, games: list[tuple[str, int, int]]
     ) -> dict[str, float]:
         """
         Compute game-level offensive features (points, yards, plays, TOP, scoring drives).
@@ -463,13 +472,13 @@ class TeamOffensiveFeatures:
         """
         if not games:
             return {
-                'off_time_of_possession': self.DEFAULT_TIME_OF_POSSESSION,
-                'off_plays_per_game': self.DEFAULT_PLAYS_PER_GAME,
-                'off_points_per_game': self.DEFAULT_POINTS_PER_GAME,
-                'off_yds_per_game': self.DEFAULT_YDS_PER_GAME,
-                'off_pass_yds_per_game': self.DEFAULT_PASS_YDS_PER_GAME,
-                'off_rush_yds_per_game': self.DEFAULT_RUSH_YDS_PER_GAME,
-                'off_scoring_drives_pct': self.DEFAULT_SCORING_DRIVES_PCT,
+                "off_time_of_possession": self.DEFAULT_TIME_OF_POSSESSION,
+                "off_plays_per_game": self.DEFAULT_PLAYS_PER_GAME,
+                "off_points_per_game": self.DEFAULT_POINTS_PER_GAME,
+                "off_yds_per_game": self.DEFAULT_YDS_PER_GAME,
+                "off_pass_yds_per_game": self.DEFAULT_PASS_YDS_PER_GAME,
+                "off_rush_yds_per_game": self.DEFAULT_RUSH_YDS_PER_GAME,
+                "off_scoring_drives_pct": self.DEFAULT_SCORING_DRIVES_PCT,
             }
 
         conn = self._connect_db()
@@ -535,41 +544,46 @@ class TeamOffensiveFeatures:
         """
 
         cursor = conn.cursor()
-        cursor.execute(
-            query,
-            (team, team, team, team, team, team, team, game_ids, game_ids, team)
-        )
+        cursor.execute(query, (team, team, team, team, team, team, team, game_ids, game_ids, team))
         result = cursor.fetchone()
 
         cursor.close()
         conn.close()
 
         if result:
-            avg_top, avg_plays, avg_points, avg_yards, avg_pass_yards, avg_rush_yards, scoring_drives_pct = result
+            (
+                avg_top,
+                avg_plays,
+                avg_points,
+                avg_yards,
+                avg_pass_yards,
+                avg_rush_yards,
+                scoring_drives_pct,
+            ) = result
             return {
-                'off_time_of_possession': float(avg_top or self.DEFAULT_TIME_OF_POSSESSION),
-                'off_plays_per_game': float(avg_plays or self.DEFAULT_PLAYS_PER_GAME),
-                'off_points_per_game': float(avg_points or self.DEFAULT_POINTS_PER_GAME),
-                'off_yds_per_game': float(avg_yards or self.DEFAULT_YDS_PER_GAME),
-                'off_pass_yds_per_game': float(avg_pass_yards or self.DEFAULT_PASS_YDS_PER_GAME),
-                'off_rush_yds_per_game': float(avg_rush_yards or self.DEFAULT_RUSH_YDS_PER_GAME),
-                'off_scoring_drives_pct': float(scoring_drives_pct or self.DEFAULT_SCORING_DRIVES_PCT),
+                "off_time_of_possession": float(avg_top or self.DEFAULT_TIME_OF_POSSESSION),
+                "off_plays_per_game": float(avg_plays or self.DEFAULT_PLAYS_PER_GAME),
+                "off_points_per_game": float(avg_points or self.DEFAULT_POINTS_PER_GAME),
+                "off_yds_per_game": float(avg_yards or self.DEFAULT_YDS_PER_GAME),
+                "off_pass_yds_per_game": float(avg_pass_yards or self.DEFAULT_PASS_YDS_PER_GAME),
+                "off_rush_yds_per_game": float(avg_rush_yards or self.DEFAULT_RUSH_YDS_PER_GAME),
+                "off_scoring_drives_pct": float(
+                    scoring_drives_pct or self.DEFAULT_SCORING_DRIVES_PCT
+                ),
             }
         else:
             return {
-                'off_time_of_possession': self.DEFAULT_TIME_OF_POSSESSION,
-                'off_plays_per_game': self.DEFAULT_PLAYS_PER_GAME,
-                'off_points_per_game': self.DEFAULT_POINTS_PER_GAME,
-                'off_yds_per_game': self.DEFAULT_YDS_PER_GAME,
-                'off_pass_yds_per_game': self.DEFAULT_PASS_YDS_PER_GAME,
-                'off_rush_yds_per_game': self.DEFAULT_RUSH_YDS_PER_GAME,
-                'off_scoring_drives_pct': self.DEFAULT_SCORING_DRIVES_PCT,
+                "off_time_of_possession": self.DEFAULT_TIME_OF_POSSESSION,
+                "off_plays_per_game": self.DEFAULT_PLAYS_PER_GAME,
+                "off_points_per_game": self.DEFAULT_POINTS_PER_GAME,
+                "off_yds_per_game": self.DEFAULT_YDS_PER_GAME,
+                "off_pass_yds_per_game": self.DEFAULT_PASS_YDS_PER_GAME,
+                "off_rush_yds_per_game": self.DEFAULT_RUSH_YDS_PER_GAME,
+                "off_scoring_drives_pct": self.DEFAULT_SCORING_DRIVES_PCT,
             }
 
     def _compute_variance_features(
-        self,
-        team: str,
-        games: list[tuple[str, int, int]]
+        self, team: str, games: list[tuple[str, int, int]]
     ) -> dict[str, float]:
         """
         Compute performance variance features (EPA std, scoring std, consistency score).
@@ -593,9 +607,9 @@ class TeamOffensiveFeatures:
         if not games or len(games) < 2:
             # Need at least 2 games to compute variance
             return {
-                'off_epa_std_4wk': self.DEFAULT_EPA_STD,
-                'off_scoring_std_4wk': self.DEFAULT_SCORING_STD,
-                'off_epa_consistency_score': self.DEFAULT_CONSISTENCY_SCORE,
+                "off_epa_std_4wk": self.DEFAULT_EPA_STD,
+                "off_scoring_std_4wk": self.DEFAULT_SCORING_STD,
+                "off_epa_consistency_score": self.DEFAULT_CONSISTENCY_SCORE,
             }
 
         conn = self._connect_db()
@@ -630,9 +644,9 @@ class TeamOffensiveFeatures:
 
         if not results or len(results) < 2:
             return {
-                'off_epa_std_4wk': self.DEFAULT_EPA_STD,
-                'off_scoring_std_4wk': self.DEFAULT_SCORING_STD,
-                'off_epa_consistency_score': self.DEFAULT_CONSISTENCY_SCORE,
+                "off_epa_std_4wk": self.DEFAULT_EPA_STD,
+                "off_scoring_std_4wk": self.DEFAULT_SCORING_STD,
+                "off_epa_consistency_score": self.DEFAULT_CONSISTENCY_SCORE,
             }
 
         # Convert to pandas for rolling std computation
@@ -640,12 +654,12 @@ class TeamOffensiveFeatures:
 
         # Order by game recency (match games order)
         game_id_to_idx = {gid: idx for idx, (gid, _, _) in enumerate(games)}
-        df['game_order'] = df['game_id'].map(game_id_to_idx)
-        df = df.sort_values('game_order')
+        df["game_order"] = df["game_id"].map(game_id_to_idx)
+        df = df.sort_values("game_order")
 
         # Compute standard deviations
-        epa_std = df['game_epa'].std()
-        scoring_std = df['points_scored'].std()
+        epa_std = df["game_epa"].std()
+        scoring_std = df["points_scored"].std()
 
         # Compute consistency score (1 - normalized_std)
         # Normalize EPA std to 0-1 range (assume 0.3 is high variance, 0.0 is perfect consistency)
@@ -654,17 +668,14 @@ class TeamOffensiveFeatures:
         consistency_score = 1.0 - normalized_epa_std
 
         return {
-            'off_epa_std_4wk': float(epa_std if not pd.isna(epa_std) else self.DEFAULT_EPA_STD),
-            'off_scoring_std_4wk': float(scoring_std if not pd.isna(scoring_std) else self.DEFAULT_SCORING_STD),
-            'off_epa_consistency_score': float(consistency_score),
+            "off_epa_std_4wk": float(epa_std if not pd.isna(epa_std) else self.DEFAULT_EPA_STD),
+            "off_scoring_std_4wk": float(
+                scoring_std if not pd.isna(scoring_std) else self.DEFAULT_SCORING_STD
+            ),
+            "off_epa_consistency_score": float(consistency_score),
         }
 
-    def extract_features(
-        self,
-        team: str,
-        season: int,
-        week: int
-    ) -> dict[str, float]:
+    def extract_features(self, team: str, season: int, week: int) -> dict[str, float]:
         """
         Extract all 27 team offensive features for a specific game.
 
@@ -679,12 +690,7 @@ class TeamOffensiveFeatures:
             Dictionary with 27 offensive features
         """
         # Get recent games (temporal safety: BEFORE target week)
-        recent_games = self._get_recent_games(
-            team,
-            season,
-            week,
-            lookback=self.LOOKBACK_WINDOW
-        )
+        recent_games = self._get_recent_games(team, season, week, lookback=self.LOOKBACK_WINDOW)
 
         if len(recent_games) < self.LOOKBACK_WINDOW:
             logger.warning(
@@ -703,12 +709,7 @@ class TeamOffensiveFeatures:
 
         return features
 
-    def validate_no_leakage(
-        self,
-        team: str,
-        season: int,
-        week: int
-    ) -> bool:
+    def validate_no_leakage(self, team: str, season: int, week: int) -> bool:
         """
         Validate temporal ordering: all games used are BEFORE target week.
 
@@ -756,20 +757,10 @@ def main():
     parser.add_argument(
         "--test-team",
         default="KC",
-        help="Test team abbreviation (default: KC for Kansas City Chiefs)"
+        help="Test team abbreviation (default: KC for Kansas City Chiefs)",
     )
-    parser.add_argument(
-        "--test-season",
-        type=int,
-        default=2024,
-        help="Test season (default: 2024)"
-    )
-    parser.add_argument(
-        "--test-week",
-        type=int,
-        default=10,
-        help="Test week (default: 10)"
-    )
+    parser.add_argument("--test-season", type=int, default=2024, help="Test season (default: 2024)")
+    parser.add_argument("--test-week", type=int, default=10, help="Test week (default: 10)")
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
 
     args = parser.parse_args()
@@ -788,9 +779,7 @@ def main():
 
     # Extract features
     features = engine.extract_features(
-        team=args.test_team,
-        season=args.test_season,
-        week=args.test_week
+        team=args.test_team, season=args.test_season, week=args.test_week
     )
 
     print("Team Offensive Features (27 total):")
@@ -819,7 +808,9 @@ def main():
     print(f"  off_penalty_rate:          {features['off_penalty_rate']:.4f}")
 
     print("\n4. Game-Level Metrics:")
-    print(f"  off_time_of_possession:    {features['off_time_of_possession']:.0f} sec ({features['off_time_of_possession']/60:.1f} min)")
+    print(
+        f"  off_time_of_possession:    {features['off_time_of_possession']:.0f} sec ({features['off_time_of_possession']/60:.1f} min)"
+    )
     print(f"  off_plays_per_game:        {features['off_plays_per_game']:.1f}")
     print(f"  off_points_per_game:       {features['off_points_per_game']:.1f}")
     print(f"  off_yds_per_game:          {features['off_yds_per_game']:.1f}")
@@ -839,9 +830,7 @@ def main():
     print("=" * 80)
 
     is_valid = engine.validate_no_leakage(
-        team=args.test_team,
-        season=args.test_season,
-        week=args.test_week
+        team=args.test_team, season=args.test_season, week=args.test_week
     )
 
     if is_valid:

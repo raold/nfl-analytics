@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_connect_db_basic():
@@ -56,7 +53,6 @@ def test_connect_db_basic():
     assert result is not None
 
 
-
 def test_connect_db_edge_cases():
     """Test connect_db: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_connect_db_edge_cases():
     assert result is not None
 
 
-
 def test_connect_db_error_handling():
     """Test connect_db error handling."""
     with pytest.raises(ValueError):
         connect_db(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_connect_db_property_idempotent(val):
 
     # Assert property
     assert connect_db(val) == result, "idempotent violated"
-
 
 
 def test_load_training_data_basic():
@@ -100,7 +93,6 @@ def test_load_training_data_basic():
     assert result is not None
 
 
-
 def test_load_training_data_edge_cases():
     """Test load_training_data: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_load_training_data_edge_cases():
     assert result is not None
 
 
-
 def test_load_training_data_error_handling():
     """Test load_training_data error handling."""
     with pytest.raises(ValueError):
         load_training_data(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -128,8 +118,9 @@ def test_load_training_data_property_idempotent(self, self, features_csv, start_
     result = load_training_data(self, features_csv, start_season, end_season)
 
     # Assert property
-    assert load_training_data(self, features_csv, start_season, end_season) == result, "idempotent violated"
-
+    assert (
+        load_training_data(self, features_csv, start_season, end_season) == result
+    ), "idempotent violated"
 
 
 def test_get_feature_list_basic():
@@ -144,7 +135,6 @@ def test_get_feature_list_basic():
     assert result is not None
 
 
-
 def test_get_feature_list_edge_cases():
     """Test get_feature_list: edge cases."""
     # Arrange
@@ -157,12 +147,10 @@ def test_get_feature_list_edge_cases():
     assert result is not None
 
 
-
 def test_get_feature_list_error_handling():
     """Test get_feature_list error handling."""
     with pytest.raises(ValueError):
         get_feature_list(invalid_input)
-
 
 
 @given(st.integers())
@@ -173,7 +161,6 @@ def test_get_feature_list_property_idempotent(val):
 
     # Assert property
     assert get_feature_list(val) == result, "idempotent violated"
-
 
 
 def test_train_basic():
@@ -188,7 +175,6 @@ def test_train_basic():
     assert result is not None
 
 
-
 def test_train_edge_cases():
     """Test train: edge cases."""
     # Arrange
@@ -201,15 +187,19 @@ def test_train_edge_cases():
     assert result is not None
 
 
-
 def test_train_error_handling():
     """Test train error handling."""
     with pytest.raises(ValueError):
         train(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(min_value=1, max_value=1000), st.integers())
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(min_value=1, max_value=1000),
+    st.integers(),
+)
 def test_train_property_idempotent(self, self, df, params, validation_split, random_state):
     """Property test: function is idempotent."""
     # Act
@@ -217,7 +207,6 @@ def test_train_property_idempotent(self, self, df, params, validation_split, ran
 
     # Assert property
     assert train(self, df, params, validation_split, random_state) == result, "idempotent violated"
-
 
 
 def test_save_model_basic():
@@ -232,7 +221,6 @@ def test_save_model_basic():
     assert result is not None
 
 
-
 def test_save_model_edge_cases():
     """Test save_model: edge cases."""
     # Arrange
@@ -245,12 +233,10 @@ def test_save_model_edge_cases():
     assert result is not None
 
 
-
 def test_save_model_error_handling():
     """Test save_model error handling."""
     with pytest.raises(ValueError):
         save_model(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -261,4 +247,3 @@ def test_save_model_property_idempotent(self, self, model, metrics, output_dir, 
 
     # Assert property
     assert save_model(self, model, metrics, output_dir, version) == result, "idempotent violated"
-

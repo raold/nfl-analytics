@@ -23,7 +23,6 @@ def test_get_machine_id_basic():
     assert result is not None
 
 
-
 def test_get_machine_id_edge_cases():
     """Test get_machine_id: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_get_machine_id_edge_cases():
     assert result is not None
 
 
-
 def test_get_machine_id_error_handling():
     """Test get_machine_id error handling."""
     with pytest.raises(ValueError):
         get_machine_id(invalid_input)
-
 
 
 def test_get_machine_summary_basic():
@@ -56,7 +53,6 @@ def test_get_machine_summary_basic():
     assert result is not None
 
 
-
 def test_get_machine_summary_edge_cases():
     """Test get_machine_summary: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_get_machine_summary_edge_cases():
     assert result is not None
 
 
-
 def test_get_machine_summary_error_handling():
     """Test get_machine_summary error handling."""
     with pytest.raises(ValueError):
         get_machine_summary(invalid_input)
-
 
 
 def test_is_gpu_available_basic():
@@ -89,7 +83,6 @@ def test_is_gpu_available_basic():
     assert result is not None
 
 
-
 def test_is_gpu_available_edge_cases():
     """Test is_gpu_available: edge cases."""
     # Arrange
@@ -102,12 +95,10 @@ def test_is_gpu_available_edge_cases():
     assert result is not None
 
 
-
 def test_is_gpu_available_error_handling():
     """Test is_gpu_available error handling."""
     with pytest.raises(ValueError):
         is_gpu_available(invalid_input)
-
 
 
 def test_get_optimal_config_basic():
@@ -122,7 +113,6 @@ def test_get_optimal_config_basic():
     assert result is not None
 
 
-
 def test_get_optimal_config_edge_cases():
     """Test get_optimal_config: edge cases."""
     # Arrange
@@ -135,12 +125,10 @@ def test_get_optimal_config_edge_cases():
     assert result is not None
 
 
-
 def test_get_optimal_config_error_handling():
     """Test get_optimal_config error handling."""
     with pytest.raises(ValueError):
         get_optimal_config(invalid_input)
-
 
 
 @given(st.integers())
@@ -151,7 +139,6 @@ def test_get_optimal_config_property_idempotent(self, task_type):
 
     # Assert property
     assert get_optimal_config(task_type) == result, "idempotent violated"
-
 
 
 def test_get_machine_info_basic():
@@ -166,7 +153,6 @@ def test_get_machine_info_basic():
     assert result is not None
 
 
-
 def test_get_machine_info_edge_cases():
     """Test get_machine_info: edge cases."""
     # Arrange
@@ -179,12 +165,10 @@ def test_get_machine_info_edge_cases():
     assert result is not None
 
 
-
 def test_get_machine_info_error_handling():
     """Test get_machine_info error handling."""
     with pytest.raises(ValueError):
         get_machine_info(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -195,7 +179,6 @@ def test_get_machine_info_property_idempotent(self, self, force_refresh):
 
     # Assert property
     assert get_machine_info(self, force_refresh) == result, "idempotent violated"
-
 
 
 def test_get_optimal_task_config_basic():
@@ -210,7 +193,6 @@ def test_get_optimal_task_config_basic():
     assert result is not None
 
 
-
 def test_get_optimal_task_config_edge_cases():
     """Test get_optimal_task_config: edge cases."""
     # Arrange
@@ -223,12 +205,10 @@ def test_get_optimal_task_config_edge_cases():
     assert result is not None
 
 
-
 def test_get_optimal_task_config_error_handling():
     """Test get_optimal_task_config error handling."""
     with pytest.raises(ValueError):
         get_optimal_task_config(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -239,7 +219,6 @@ def test_get_optimal_task_config_property_idempotent(self, self, task_type):
 
     # Assert property
     assert get_optimal_task_config(self, task_type) == result, "idempotent violated"
-
 
 
 def test_should_prefer_task_type_basic():
@@ -254,7 +233,6 @@ def test_should_prefer_task_type_basic():
     assert result is not None
 
 
-
 def test_should_prefer_task_type_edge_cases():
     """Test should_prefer_task_type: edge cases."""
     # Arrange
@@ -267,12 +245,10 @@ def test_should_prefer_task_type_edge_cases():
     assert result is not None
 
 
-
 def test_should_prefer_task_type_error_handling():
     """Test should_prefer_task_type error handling."""
     with pytest.raises(ValueError):
         should_prefer_task_type(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -283,7 +259,6 @@ def test_should_prefer_task_type_property_idempotent(self, self, task_type):
 
     # Assert property
     assert should_prefer_task_type(self, task_type) == result, "idempotent violated"
-
 
 
 def test_get_machine_summary_basic():
@@ -298,7 +273,6 @@ def test_get_machine_summary_basic():
     assert result is not None
 
 
-
 def test_get_machine_summary_edge_cases():
     """Test get_machine_summary: edge cases."""
     # Arrange
@@ -311,12 +285,10 @@ def test_get_machine_summary_edge_cases():
     assert result is not None
 
 
-
 def test_get_machine_summary_error_handling():
     """Test get_machine_summary error handling."""
     with pytest.raises(ValueError):
         get_machine_summary(invalid_input)
-
 
 
 @given(st.integers())
@@ -327,4 +299,3 @@ def test_get_machine_summary_property_idempotent(val):
 
     # Assert property
     assert get_machine_summary(val) == result, "idempotent violated"
-

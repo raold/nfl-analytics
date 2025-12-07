@@ -24,7 +24,6 @@ def test_simulate_prob_row_basic():
     assert result is not None
 
 
-
 def test_simulate_prob_row_edge_cases():
     """Test simulate_prob_row: edge cases."""
     # Arrange
@@ -37,12 +36,10 @@ def test_simulate_prob_row_edge_cases():
     assert result is not None
 
 
-
 def test_simulate_prob_row_error_handling():
     """Test simulate_prob_row error handling."""
     with pytest.raises(ValueError):
         simulate_prob_row(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -53,4 +50,3 @@ def test_simulate_prob_row_property_idempotent(self, xrow, n):
 
     # Assert property
     assert simulate_prob_row(xrow, n) == result, "idempotent violated"
-

@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_passing_plays_basic():
@@ -56,7 +53,6 @@ def test_load_passing_plays_basic():
     assert result is not None
 
 
-
 def test_load_passing_plays_edge_cases():
     """Test load_passing_plays: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_passing_plays_edge_cases():
     assert result is not None
 
 
-
 def test_load_passing_plays_error_handling():
     """Test load_passing_plays error handling."""
     with pytest.raises(ValueError):
         load_passing_plays(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_load_passing_plays_property_idempotent(self, self, start_season, end_se
 
     # Assert property
     assert load_passing_plays(self, start_season, end_season) == result, "idempotent violated"
-
 
 
 def test_calculate_defensive_pressure_rankings_basic():
@@ -100,7 +93,6 @@ def test_calculate_defensive_pressure_rankings_basic():
     assert result is not None
 
 
-
 def test_calculate_defensive_pressure_rankings_edge_cases():
     """Test calculate_defensive_pressure_rankings: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_calculate_defensive_pressure_rankings_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_defensive_pressure_rankings_error_handling():
     """Test calculate_defensive_pressure_rankings error handling."""
     with pytest.raises(ValueError):
         calculate_defensive_pressure_rankings(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_calculate_defensive_pressure_rankings_property_idempotent(self, self, p
 
     # Assert property
     assert calculate_defensive_pressure_rankings(self, plays) == result, "idempotent violated"
-
 
 
 def test_classify_pressure_situations_basic():
@@ -144,7 +133,6 @@ def test_classify_pressure_situations_basic():
     assert result is not None
 
 
-
 def test_classify_pressure_situations_edge_cases():
     """Test classify_pressure_situations: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_classify_pressure_situations_edge_cases():
     assert result is not None
 
 
-
 def test_classify_pressure_situations_error_handling():
     """Test classify_pressure_situations error handling."""
     with pytest.raises(ValueError):
         classify_pressure_situations(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_classify_pressure_situations_property_idempotent(self, self, plays):
 
     # Assert property
     assert classify_pressure_situations(self, plays) == result, "idempotent violated"
-
 
 
 def test_calculate_qb_pressure_features_basic():
@@ -188,7 +173,6 @@ def test_calculate_qb_pressure_features_basic():
     assert result is not None
 
 
-
 def test_calculate_qb_pressure_features_edge_cases():
     """Test calculate_qb_pressure_features: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_calculate_qb_pressure_features_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_qb_pressure_features_error_handling():
     """Test calculate_qb_pressure_features error handling."""
     with pytest.raises(ValueError):
         calculate_qb_pressure_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -216,8 +198,9 @@ def test_calculate_qb_pressure_features_property_idempotent(self, self, plays, d
     result = calculate_qb_pressure_features(self, plays, defense_ranks)
 
     # Assert property
-    assert calculate_qb_pressure_features(self, plays, defense_ranks) == result, "idempotent violated"
-
+    assert (
+        calculate_qb_pressure_features(self, plays, defense_ranks) == result
+    ), "idempotent violated"
 
 
 def test_add_rolling_pressure_features_basic():
@@ -232,7 +215,6 @@ def test_add_rolling_pressure_features_basic():
     assert result is not None
 
 
-
 def test_add_rolling_pressure_features_edge_cases():
     """Test add_rolling_pressure_features: edge cases."""
     # Arrange
@@ -245,12 +227,10 @@ def test_add_rolling_pressure_features_edge_cases():
     assert result is not None
 
 
-
 def test_add_rolling_pressure_features_error_handling():
     """Test add_rolling_pressure_features error handling."""
     with pytest.raises(ValueError):
         add_rolling_pressure_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -261,7 +241,6 @@ def test_add_rolling_pressure_features_property_idempotent(self, self, qb_games)
 
     # Assert property
     assert add_rolling_pressure_features(self, qb_games) == result, "idempotent violated"
-
 
 
 def test_generate_features_basic():
@@ -276,7 +255,6 @@ def test_generate_features_basic():
     assert result is not None
 
 
-
 def test_generate_features_edge_cases():
     """Test generate_features: edge cases."""
     # Arrange
@@ -289,12 +267,10 @@ def test_generate_features_edge_cases():
     assert result is not None
 
 
-
 def test_generate_features_error_handling():
     """Test generate_features error handling."""
     with pytest.raises(ValueError):
         generate_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -305,4 +281,3 @@ def test_generate_features_property_idempotent(self, self, start_season, end_sea
 
     # Assert property
     assert generate_features(self, start_season, end_season) == result, "idempotent violated"
-

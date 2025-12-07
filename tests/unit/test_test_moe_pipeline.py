@@ -23,7 +23,6 @@ def test_test_pipeline_with_historical_data_basic():
     assert result is not None
 
 
-
 def test_test_pipeline_with_historical_data_edge_cases():
     """Test test_pipeline_with_historical_data: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_test_pipeline_with_historical_data_edge_cases():
     assert result is not None
 
 
-
 def test_test_pipeline_with_historical_data_error_handling():
     """Test test_pipeline_with_historical_data error handling."""
     with pytest.raises(ValueError):
         test_pipeline_with_historical_data(invalid_input)
-
 
 
 def test_compare_to_actual_results_basic():
@@ -56,7 +53,6 @@ def test_compare_to_actual_results_basic():
     assert result is not None
 
 
-
 def test_compare_to_actual_results_edge_cases():
     """Test compare_to_actual_results: edge cases."""
     # Arrange
@@ -69,20 +65,21 @@ def test_compare_to_actual_results_edge_cases():
     assert result is not None
 
 
-
 def test_compare_to_actual_results_error_handling():
     """Test compare_to_actual_results error handling."""
     with pytest.raises(ValueError):
         compare_to_actual_results(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers())
-def test_compare_to_actual_results_property_idempotent(self, recommendations, test_season, test_week):
+def test_compare_to_actual_results_property_idempotent(
+    self, recommendations, test_season, test_week
+):
     """Property test: function is idempotent."""
     # Act
     result = compare_to_actual_results(recommendations, test_season, test_week)
 
     # Assert property
-    assert compare_to_actual_results(recommendations, test_season, test_week) == result, "idempotent violated"
-
+    assert (
+        compare_to_actual_results(recommendations, test_season, test_week) == result
+    ), "idempotent violated"

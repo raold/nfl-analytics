@@ -168,7 +168,7 @@ class AdvancedFeatureLoader:
             DataFrame with weather, travel, venue, and rivalry features
         """
         # Team classifications
-        dome_teams = ['NO', 'ATL', 'DET', 'MIN', 'DAL', 'ARI', 'LA', 'LV']
+        dome_teams = ["NO", "ATL", "DET", "MIN", "DAL", "ARI", "LA", "LV"]
 
         query = """
         SELECT
@@ -217,9 +217,9 @@ class AdvancedFeatureLoader:
             df = pd.read_sql_query(query, conn)
 
         # Add venue adaptation features
-        df['away_is_dome_team'] = df['away_team'].isin(dome_teams).astype(int)
-        df['venue_adaptation'] = (
-            (df['away_is_dome_team'] == 1) & (df['is_outdoor_game'] == 1)
+        df["away_is_dome_team"] = df["away_team"].isin(dome_teams).astype(int)
+        df["venue_adaptation"] = (
+            (df["away_is_dome_team"] == 1) & (df["is_outdoor_game"] == 1)
         ).astype(int)
 
         self.logger.info(f"Loaded environmental features for {len(df)} games")
@@ -237,40 +237,45 @@ class AdvancedFeatureLoader:
         vegas_features = self.load_vegas_features(game_ids)
 
         # Merge on game_id
-        df = env_features.merge(vegas_features, on='game_id', how='inner', suffixes=('', '_vegas'))
+        df = env_features.merge(vegas_features, on="game_id", how="inner", suffixes=("", "_vegas"))
 
         # Calculate interactions
 
         # 1. Weather × Travel interactions
-        df['dome_team_outdoor_cold'] = (
-            df['away_is_dome_team'] * df['is_outdoor_game'] * df['extreme_cold']
+        df["dome_team_outdoor_cold"] = (
+            df["away_is_dome_team"] * df["is_outdoor_game"] * df["extreme_cold"]
         )
-        df['dome_team_outdoor_wind'] = (
-            df['away_is_dome_team'] * df['is_outdoor_game'] * df['high_wind']
+        df["dome_team_outdoor_wind"] = (
+            df["away_is_dome_team"] * df["is_outdoor_game"] * df["high_wind"]
         )
 
         # 2. Rest × Travel interactions
-        df['thursday_short_rest'] = df['is_thursday_night'] * df['away_short_rest']
+        df["thursday_short_rest"] = df["is_thursday_night"] * df["away_short_rest"]
 
         # 3. Vegas × Context interactions
-        df['division_toss_up'] = df['is_division_game'] * df['is_small_spread']
+        df["division_toss_up"] = df["is_division_game"] * df["is_small_spread"]
 
         # 4. Weather severity composite
-        df['weather_severity'] = (
-            df['extreme_cold'].astype(float) +
-            df['extreme_heat'].astype(float) +
-            df['high_wind'].astype(float) * 0.5
+        df["weather_severity"] = (
+            df["extreme_cold"].astype(float)
+            + df["extreme_heat"].astype(float)
+            + df["high_wind"].astype(float) * 0.5
         )
 
         # 5. Big favorite in bad weather
-        df['big_favorite_bad_weather'] = df['is_large_spread'] * df['weather_severity']
+        df["big_favorite_bad_weather"] = df["is_large_spread"] * df["weather_severity"]
 
         # Select interaction columns
         interaction_cols = [
-            'game_id', 'home_team', 'away_team',
-            'dome_team_outdoor_cold', 'dome_team_outdoor_wind',
-            'thursday_short_rest', 'division_toss_up',
-            'weather_severity', 'big_favorite_bad_weather'
+            "game_id",
+            "home_team",
+            "away_team",
+            "dome_team_outdoor_cold",
+            "dome_team_outdoor_wind",
+            "thursday_short_rest",
+            "division_toss_up",
+            "weather_severity",
+            "big_favorite_bad_weather",
         ]
 
         result = df[interaction_cols].copy()
@@ -299,13 +304,13 @@ class AdvancedFeatureLoader:
 
         # Merge all features on game_id
         merged = defensive_features.merge(
-            vegas_features, on='game_id', how='inner', suffixes=('', '_vegas')
+            vegas_features, on="game_id", how="inner", suffixes=("", "_vegas")
         )
         merged = merged.merge(
-            environmental_features, on='game_id', how='inner', suffixes=('', '_env')
+            environmental_features, on="game_id", how="inner", suffixes=("", "_env")
         )
         merged = merged.merge(
-            interaction_features, on='game_id', how='inner', suffixes=('', '_inter')
+            interaction_features, on="game_id", how="inner", suffixes=("", "_inter")
         )
 
         self.logger.info(f"✓ Loaded {len(merged)} games with {len(merged.columns)} features")

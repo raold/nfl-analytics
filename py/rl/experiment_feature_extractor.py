@@ -20,6 +20,7 @@ import psycopg2
 
 class ExperimentFeature(Enum):
     """Enumeration of experiment-derived features"""
+
     # cVAE Features
     BLOWOUT_PROBABILITY = "cvae_007_blowout_prob"
     MULTI_HORIZON_Q1_PRED = "cvae_008_q1_pred"
@@ -57,6 +58,7 @@ class ExperimentFeature(Enum):
 @dataclass
 class ExperimentFeatures:
     """Container for all experiment-derived features for a single game"""
+
     game_id: str
     season: int
     week: int
@@ -98,39 +100,42 @@ class ExperimentFeatures:
 
     def to_array(self) -> np.ndarray:
         """Convert features to numpy array for RL agent"""
-        return np.array([
-            # cVAE features (13)
-            self.blowout_probability,
-            self.multi_horizon_q1,
-            self.multi_horizon_q2,
-            self.multi_horizon_q3,
-            self.multi_horizon_q4,
-            self.injury_adjustment,
-            self.home_advantage,
-            self.rivalry_variance,
-            self.playoff_resting_prob,
-            self.rookie_qb_adjustment,
-            self.two_minute_score,
-            self.coordinator_change,
-            self.season_trend,
-            # Causal features (16)
-            self.surface_effect,
-            self.home_field_ate,
-            self.altitude_effect,
-            self.cross_country_travel,
-            self.short_week_effect,
-            self.ol_quality_rushing,
-            self.ol_quality_passing,
-            self.veteran_qb_effect,
-            self.personnel_heavy,
-            self.personnel_spread,
-            self.fourth_down_aggression,
-            self.conservative_bias,
-            self.new_rules_effect,
-            self.defensive_scheme,
-            self.recency_bias,
-            self.sunk_cost_effect
-        ], dtype=np.float32)
+        return np.array(
+            [
+                # cVAE features (13)
+                self.blowout_probability,
+                self.multi_horizon_q1,
+                self.multi_horizon_q2,
+                self.multi_horizon_q3,
+                self.multi_horizon_q4,
+                self.injury_adjustment,
+                self.home_advantage,
+                self.rivalry_variance,
+                self.playoff_resting_prob,
+                self.rookie_qb_adjustment,
+                self.two_minute_score,
+                self.coordinator_change,
+                self.season_trend,
+                # Causal features (16)
+                self.surface_effect,
+                self.home_field_ate,
+                self.altitude_effect,
+                self.cross_country_travel,
+                self.short_week_effect,
+                self.ol_quality_rushing,
+                self.ol_quality_passing,
+                self.veteran_qb_effect,
+                self.personnel_heavy,
+                self.personnel_spread,
+                self.fourth_down_aggression,
+                self.conservative_bias,
+                self.new_rules_effect,
+                self.defensive_scheme,
+                self.recency_bias,
+                self.sunk_cost_effect,
+            ],
+            dtype=np.float32,
+        )
 
     @property
     def feature_dimension(self) -> int:
@@ -156,11 +161,11 @@ class ExperimentFeatureExtractor:
             db_params: Database connection parameters. If None, uses defaults.
         """
         self.db_params = db_params or {
-            'dbname': 'devdb01',
-            'user': 'dro',
-            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
-            'host': 'localhost',
-            'port': 5544
+            "dbname": "devdb01",
+            "user": "dro",
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
+            "host": "localhost",
+            "port": 5544,
         }
         self.conn = None
 
@@ -174,8 +179,9 @@ class ExperimentFeatureExtractor:
         if self.conn is None or self.conn.closed:
             self.conn = psycopg2.connect(**self.db_params)
 
-    def extract_features(self, game_id: str, season: int, week: int,
-                        home_team: str, away_team: str) -> ExperimentFeatures:
+    def extract_features(
+        self, game_id: str, season: int, week: int, home_team: str, away_team: str
+    ) -> ExperimentFeatures:
         """
         Extract all experiment-derived features for a game.
 
@@ -192,18 +198,17 @@ class ExperimentFeatureExtractor:
         self.connect()
 
         features = ExperimentFeatures(
-            game_id=game_id,
-            season=season,
-            week=week,
-            home_team=home_team,
-            away_team=away_team
+            game_id=game_id, season=season, week=week, home_team=home_team, away_team=away_team
         )
 
         # Extract cVAE features
         features.blowout_probability = self._extract_blowout_prob(game_id)
-        features.multi_horizon_q1, features.multi_horizon_q2, \
-        features.multi_horizon_q3, features.multi_horizon_q4 = \
-            self._extract_multi_horizon(game_id)
+        (
+            features.multi_horizon_q1,
+            features.multi_horizon_q2,
+            features.multi_horizon_q3,
+            features.multi_horizon_q4,
+        ) = self._extract_multi_horizon(game_id)
         features.injury_adjustment = self._extract_injury_adjustment(game_id)
         features.home_advantage = self._extract_home_advantage(home_team)
         features.rivalry_variance = self._extract_rivalry_variance(home_team, away_team)
@@ -212,27 +217,23 @@ class ExperimentFeatureExtractor:
         )
         features.rookie_qb_adjustment = self._extract_rookie_qb(game_id)
         features.two_minute_score = self._extract_two_minute_drill(game_id)
-        features.coordinator_change = self._extract_coordinator_change(
-            home_team, away_team, season
-        )
+        features.coordinator_change = self._extract_coordinator_change(home_team, away_team, season)
         features.season_trend = self._extract_season_trend(season, week)
 
         # Extract causal features
         features.surface_effect = self._extract_surface_effect(game_id)
         features.home_field_ate = 2.65  # From CAUSAL-003 empirical result
         features.altitude_effect = self._extract_altitude_effect(game_id)
-        features.cross_country_travel = self._extract_travel_effect(
-            home_team, away_team
-        )
+        features.cross_country_travel = self._extract_travel_effect(home_team, away_team)
         features.short_week_effect = self._extract_short_week(week)
-        features.ol_quality_rushing, features.ol_quality_passing = \
-            self._extract_ol_quality(home_team, away_team, season)
+        features.ol_quality_rushing, features.ol_quality_passing = self._extract_ol_quality(
+            home_team, away_team, season
+        )
         features.veteran_qb_effect = self._extract_vet_qb_effect(game_id)
-        features.personnel_heavy, features.personnel_spread = \
-            self._extract_personnel_effects(home_team, away_team)
-        features.fourth_down_aggression = self._extract_fourth_down_aggression(
+        features.personnel_heavy, features.personnel_spread = self._extract_personnel_effects(
             home_team, away_team
         )
+        features.fourth_down_aggression = self._extract_fourth_down_aggression(home_team, away_team)
         features.conservative_bias = self._extract_conservative_bias(game_id)
         features.new_rules_effect = self._extract_rules_effect(season)
         features.defensive_scheme = self._extract_defensive_scheme(home_team, away_team)
@@ -287,14 +288,14 @@ class ExperimentFeatureExtractor:
         """
         # Check if divisional game
         divisions = {
-            'AFC East': ['BUF', 'MIA', 'NE', 'NYJ'],
-            'AFC North': ['BAL', 'CIN', 'CLE', 'PIT'],
-            'AFC South': ['HOU', 'IND', 'JAX', 'TEN'],
-            'AFC West': ['DEN', 'KC', 'LV', 'LAC'],
-            'NFC East': ['DAL', 'NYG', 'PHI', 'WAS'],
-            'NFC North': ['CHI', 'DET', 'GB', 'MIN'],
-            'NFC South': ['ATL', 'CAR', 'NO', 'TB'],
-            'NFC West': ['ARI', 'LAR', 'SF', 'SEA']
+            "AFC East": ["BUF", "MIA", "NE", "NYJ"],
+            "AFC North": ["BAL", "CIN", "CLE", "PIT"],
+            "AFC South": ["HOU", "IND", "JAX", "TEN"],
+            "AFC West": ["DEN", "KC", "LV", "LAC"],
+            "NFC East": ["DAL", "NYG", "PHI", "WAS"],
+            "NFC North": ["CHI", "DET", "GB", "MIN"],
+            "NFC South": ["ATL", "CAR", "NO", "TB"],
+            "NFC West": ["ARI", "LAR", "SF", "SEA"],
         }
 
         for teams in divisions.values():
@@ -302,8 +303,9 @@ class ExperimentFeatureExtractor:
                 return 0.15  # +15% variance for divisional games
         return 0.0
 
-    def _extract_playoff_resting(self, home_team: str, away_team: str,
-                                 season: int, week: int) -> float:
+    def _extract_playoff_resting(
+        self, home_team: str, away_team: str, season: int, week: int
+    ) -> float:
         """
         CVAE-014: Playoff-Bound Team Trajectories
         Resting starters edge=9.5%, Detection=74%
@@ -329,8 +331,7 @@ class ExperimentFeatureExtractor:
         # Placeholder for two-minute drill scoring probability
         return 0.0
 
-    def _extract_coordinator_change(self, home_team: str, away_team: str,
-                                    season: int) -> float:
+    def _extract_coordinator_change(self, home_team: str, away_team: str, season: int) -> float:
         """
         CVAE-017: Offensive Coordinator Change
         Detection=68%, Adjustment period=4.2 weeks
@@ -380,8 +381,9 @@ class ExperimentFeatureExtractor:
         # Would check days since last game
         return 0.0
 
-    def _extract_ol_quality(self, home_team: str, away_team: str,
-                           season: int) -> tuple[float, float]:
+    def _extract_ol_quality(
+        self, home_team: str, away_team: str, season: int
+    ) -> tuple[float, float]:
         """
         CAUSAL-008: Offensive Line Quality Effect
         Rushing ATE=-12.5 yards, Passing ATE=-18.2 yards
@@ -397,8 +399,7 @@ class ExperimentFeatureExtractor:
         """
         return 0.0
 
-    def _extract_personnel_effects(self, home_team: str,
-                                   away_team: str) -> tuple[float, float]:
+    def _extract_personnel_effects(self, home_team: str, away_team: str) -> tuple[float, float]:
         """
         CAUSAL-012: Personnel Grouping Effect
         Heavy ATE=-3.5, Spread ATE=-1.8
@@ -429,7 +430,7 @@ class ExperimentFeatureExtractor:
         rule_changes = {
             2018: 0.18,  # Helmet contact rule
             2020: 0.15,  # COVID protocol effects
-            2022: 0.12   # Taunting emphasis
+            2022: 0.12,  # Taunting emphasis
         }
         return rule_changes.get(season, 0.0)
 
@@ -454,7 +455,9 @@ class ExperimentFeatureExtractor:
         """
         return 0.0
 
-    def extract_batch(self, games: list[tuple[str, int, int, str, str]]) -> list[ExperimentFeatures]:
+    def extract_batch(
+        self, games: list[tuple[str, int, int, str, str]]
+    ) -> list[ExperimentFeatures]:
         """
         Extract features for multiple games in batch.
 

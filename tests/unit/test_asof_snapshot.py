@@ -23,7 +23,6 @@ def test_parse_args_basic():
     assert result is not None
 
 
-
 def test_parse_args_edge_cases():
     """Test parse_args: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_parse_args_edge_cases():
     assert result is not None
 
 
-
 def test_parse_args_error_handling():
     """Test parse_args error handling."""
     with pytest.raises(ValueError):
         parse_args(invalid_input)
-
 
 
 def test_get_connection_basic():
@@ -56,7 +53,6 @@ def test_get_connection_basic():
     assert result is not None
 
 
-
 def test_get_connection_edge_cases():
     """Test get_connection: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_get_connection_edge_cases():
     assert result is not None
 
 
-
 def test_get_connection_error_handling():
     """Test get_connection error handling."""
     with pytest.raises(ValueError):
         get_connection(invalid_input)
-
 
 
 def test_build_snapshot_basic():
@@ -89,7 +83,6 @@ def test_build_snapshot_basic():
     assert result is not None
 
 
-
 def test_build_snapshot_edge_cases():
     """Test build_snapshot: edge cases."""
     # Arrange
@@ -102,12 +95,10 @@ def test_build_snapshot_edge_cases():
     assert result is not None
 
 
-
 def test_build_snapshot_error_handling():
     """Test build_snapshot error handling."""
     with pytest.raises(ValueError):
         build_snapshot(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -118,7 +109,6 @@ def test_build_snapshot_property_idempotent(self, conn, cutoff_iso):
 
     # Assert property
     assert build_snapshot(conn, cutoff_iso) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -133,7 +123,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -146,9 +135,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

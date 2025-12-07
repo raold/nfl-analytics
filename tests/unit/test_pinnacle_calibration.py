@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_adjust_edge_threshold_basic():
@@ -56,7 +53,6 @@ def test_adjust_edge_threshold_basic():
     assert result is not None
 
 
-
 def test_adjust_edge_threshold_edge_cases():
     """Test adjust_edge_threshold: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_adjust_edge_threshold_edge_cases():
     assert result is not None
 
 
-
 def test_adjust_edge_threshold_error_handling():
     """Test adjust_edge_threshold error handling."""
     with pytest.raises(ValueError):
         adjust_edge_threshold(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -84,8 +78,9 @@ def test_adjust_edge_threshold_property_idempotent(self, self, standard_min_edge
     result = adjust_edge_threshold(self, standard_min_edge, safety_margin)
 
     # Assert property
-    assert adjust_edge_threshold(self, standard_min_edge, safety_margin) == result, "idempotent violated"
-
+    assert (
+        adjust_edge_threshold(self, standard_min_edge, safety_margin) == result
+    ), "idempotent violated"
 
 
 def test_adjust_kelly_fraction_basic():
@@ -100,7 +95,6 @@ def test_adjust_kelly_fraction_basic():
     assert result is not None
 
 
-
 def test_adjust_kelly_fraction_edge_cases():
     """Test adjust_kelly_fraction: edge cases."""
     # Arrange
@@ -113,12 +107,10 @@ def test_adjust_kelly_fraction_edge_cases():
     assert result is not None
 
 
-
 def test_adjust_kelly_fraction_error_handling():
     """Test adjust_kelly_fraction error handling."""
     with pytest.raises(ValueError):
         adjust_kelly_fraction(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -128,8 +120,9 @@ def test_adjust_kelly_fraction_property_idempotent(self, self, standard_kelly, a
     result = adjust_kelly_fraction(self, standard_kelly, aggression_factor)
 
     # Assert property
-    assert adjust_kelly_fraction(self, standard_kelly, aggression_factor) == result, "idempotent violated"
-
+    assert (
+        adjust_kelly_fraction(self, standard_kelly, aggression_factor) == result
+    ), "idempotent violated"
 
 
 def test_estimate_roi_improvement_basic():
@@ -144,7 +137,6 @@ def test_estimate_roi_improvement_basic():
     assert result is not None
 
 
-
 def test_estimate_roi_improvement_edge_cases():
     """Test estimate_roi_improvement: edge cases."""
     # Arrange
@@ -157,12 +149,10 @@ def test_estimate_roi_improvement_edge_cases():
     assert result is not None
 
 
-
 def test_estimate_roi_improvement_error_handling():
     """Test estimate_roi_improvement error handling."""
     with pytest.raises(ValueError):
         estimate_roi_improvement(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -173,7 +163,6 @@ def test_estimate_roi_improvement_property_idempotent(self, self, current_roi, c
 
     # Assert property
     assert estimate_roi_improvement(self, current_roi, current_vig) == result, "idempotent violated"
-
 
 
 def test_calibrate_bet_opportunities_basic():
@@ -188,7 +177,6 @@ def test_calibrate_bet_opportunities_basic():
     assert result is not None
 
 
-
 def test_calibrate_bet_opportunities_edge_cases():
     """Test calibrate_bet_opportunities: edge cases."""
     # Arrange
@@ -201,23 +189,29 @@ def test_calibrate_bet_opportunities_edge_cases():
     assert result is not None
 
 
-
 def test_calibrate_bet_opportunities_error_handling():
     """Test calibrate_bet_opportunities error handling."""
     with pytest.raises(ValueError):
         calibrate_bet_opportunities(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_calibrate_bet_opportunities_property_idempotent(self, self, predictions_df, prop_lines_df, standard_min_edge, standard_kelly):
+def test_calibrate_bet_opportunities_property_idempotent(
+    self, self, predictions_df, prop_lines_df, standard_min_edge, standard_kelly
+):
     """Property test: function is idempotent."""
     # Act
-    result = calibrate_bet_opportunities(self, predictions_df, prop_lines_df, standard_min_edge, standard_kelly)
+    result = calibrate_bet_opportunities(
+        self, predictions_df, prop_lines_df, standard_min_edge, standard_kelly
+    )
 
     # Assert property
-    assert calibrate_bet_opportunities(self, predictions_df, prop_lines_df, standard_min_edge, standard_kelly) == result, "idempotent violated"
-
+    assert (
+        calibrate_bet_opportunities(
+            self, predictions_df, prop_lines_df, standard_min_edge, standard_kelly
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_get_calibration_summary_basic():
@@ -232,7 +226,6 @@ def test_get_calibration_summary_basic():
     assert result is not None
 
 
-
 def test_get_calibration_summary_edge_cases():
     """Test get_calibration_summary: edge cases."""
     # Arrange
@@ -245,12 +238,10 @@ def test_get_calibration_summary_edge_cases():
     assert result is not None
 
 
-
 def test_get_calibration_summary_error_handling():
     """Test get_calibration_summary error handling."""
     with pytest.raises(ValueError):
         get_calibration_summary(invalid_input)
-
 
 
 @given(st.integers())
@@ -261,4 +252,3 @@ def test_get_calibration_summary_property_idempotent(val):
 
     # Assert property
     assert get_calibration_summary(val) == result, "idempotent violated"
-

@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_fetch_player_ratings_basic():
@@ -56,7 +53,6 @@ def test_fetch_player_ratings_basic():
     assert result is not None
 
 
-
 def test_fetch_player_ratings_edge_cases():
     """Test fetch_player_ratings: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_fetch_player_ratings_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_player_ratings_error_handling():
     """Test fetch_player_ratings error handling."""
     with pytest.raises(ValueError):
         fetch_player_ratings(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -84,8 +78,9 @@ def test_fetch_player_ratings_property_idempotent(self, self, stat_type, season,
     result = fetch_player_ratings(self, stat_type, season, model_version)
 
     # Assert property
-    assert fetch_player_ratings(self, stat_type, season, model_version) == result, "idempotent violated"
-
+    assert (
+        fetch_player_ratings(self, stat_type, season, model_version) == result
+    ), "idempotent violated"
 
 
 def test_calculate_hierarchical_features_basic():
@@ -100,7 +95,6 @@ def test_calculate_hierarchical_features_basic():
     assert result is not None
 
 
-
 def test_calculate_hierarchical_features_edge_cases():
     """Test calculate_hierarchical_features: edge cases."""
     # Arrange
@@ -113,23 +107,24 @@ def test_calculate_hierarchical_features_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_hierarchical_features_error_handling():
     """Test calculate_hierarchical_features error handling."""
     with pytest.raises(ValueError):
         calculate_hierarchical_features(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers())
-def test_calculate_hierarchical_features_property_idempotent(self, self, player_ratings, opponent_team):
+def test_calculate_hierarchical_features_property_idempotent(
+    self, self, player_ratings, opponent_team
+):
     """Property test: function is idempotent."""
     # Act
     result = calculate_hierarchical_features(self, player_ratings, opponent_team)
 
     # Assert property
-    assert calculate_hierarchical_features(self, player_ratings, opponent_team) == result, "idempotent violated"
-
+    assert (
+        calculate_hierarchical_features(self, player_ratings, opponent_team) == result
+    ), "idempotent violated"
 
 
 def test_get_player_props_features_basic():
@@ -144,7 +139,6 @@ def test_get_player_props_features_basic():
     assert result is not None
 
 
-
 def test_get_player_props_features_edge_cases():
     """Test get_player_props_features: edge cases."""
     # Arrange
@@ -157,23 +151,24 @@ def test_get_player_props_features_edge_cases():
     assert result is not None
 
 
-
 def test_get_player_props_features_error_handling():
     """Test get_player_props_features error handling."""
     with pytest.raises(ValueError):
         get_player_props_features(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_get_player_props_features_property_idempotent(self, self, players, stat_type, season, week, opponent_teams):
+def test_get_player_props_features_property_idempotent(
+    self, self, players, stat_type, season, week, opponent_teams
+):
     """Property test: function is idempotent."""
     # Act
     result = get_player_props_features(self, players, stat_type, season, week, opponent_teams)
 
     # Assert property
-    assert get_player_props_features(self, players, stat_type, season, week, opponent_teams) == result, "idempotent violated"
-
+    assert (
+        get_player_props_features(self, players, stat_type, season, week, opponent_teams) == result
+    ), "idempotent violated"
 
 
 def test_create_ensemble_features_basic():
@@ -188,7 +183,6 @@ def test_create_ensemble_features_basic():
     assert result is not None
 
 
-
 def test_create_ensemble_features_edge_cases():
     """Test create_ensemble_features: edge cases."""
     # Arrange
@@ -201,23 +195,24 @@ def test_create_ensemble_features_edge_cases():
     assert result is not None
 
 
-
 def test_create_ensemble_features_error_handling():
     """Test create_ensemble_features error handling."""
     with pytest.raises(ValueError):
         create_ensemble_features(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers())
-def test_create_ensemble_features_property_idempotent(self, self, xgboost_predictions, stat_type, season):
+def test_create_ensemble_features_property_idempotent(
+    self, self, xgboost_predictions, stat_type, season
+):
     """Property test: function is idempotent."""
     # Act
     result = create_ensemble_features(self, xgboost_predictions, stat_type, season)
 
     # Assert property
-    assert create_ensemble_features(self, xgboost_predictions, stat_type, season) == result, "idempotent violated"
-
+    assert (
+        create_ensemble_features(self, xgboost_predictions, stat_type, season) == result
+    ), "idempotent violated"
 
 
 def test_close_basic():
@@ -232,7 +227,6 @@ def test_close_basic():
     assert result is not None
 
 
-
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
@@ -245,12 +239,10 @@ def test_close_edge_cases():
     assert result is not None
 
 
-
 def test_close_error_handling():
     """Test close error handling."""
     with pytest.raises(ValueError):
         close(invalid_input)
-
 
 
 @given(st.integers())
@@ -261,4 +253,3 @@ def test_close_property_idempotent(val):
 
     # Assert property
     assert close(val) == result, "idempotent violated"
-

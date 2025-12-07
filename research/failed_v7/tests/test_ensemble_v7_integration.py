@@ -32,6 +32,7 @@ from py.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way
 # FIXTURES
 # ============================================================================
 
+
 @pytest.fixture
 def test_db_config():
     """Test database configuration (may be mocked)."""
@@ -73,9 +74,11 @@ def jalen_hurts_2024_week5():
 @pytest.fixture
 def ensemble_v7_with_mocks(test_db_config):
     """Create ensemble v7.0 with all components mocked."""
-    with patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1") as mock_causal, \
-         patch("py.ensemble.enhanced_ensemble_v7.RModelInterface") as mock_r, \
-         patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"):
+    with (
+        patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1") as mock_causal,
+        patch("py.ensemble.enhanced_ensemble_v7.RModelInterface") as mock_r,
+        patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
+    ):
 
         # Create ensemble
         ensemble = EnhancedEnsemble5Way(
@@ -93,24 +96,28 @@ def ensemble_v7_with_mocks(test_db_config):
         ensemble._predict_hybrid = Mock(return_value=(250.0, 51.0))
 
         # Mock database feature fetch
-        ensemble._fetch_features = Mock(return_value={
-            "pass_yards_l3": 250.0,
-            "pass_attempts_l3": 35.0,
-            "completions_l3": 24.0,
-            "completions_pct_l3": 0.686,
-            "opponent_epa": -0.05,
-            "opponent_points_allowed": 20.0,
-            "home_away_encoded": 1,
-        })
+        ensemble._fetch_features = Mock(
+            return_value={
+                "pass_yards_l3": 250.0,
+                "pass_attempts_l3": 35.0,
+                "completions_l3": 24.0,
+                "completions_pct_l3": 0.686,
+                "opponent_epa": -0.05,
+                "opponent_points_allowed": 20.0,
+                "home_away_encoded": 1,
+            }
+        )
 
         # Mock causal features
         mock_causal_instance = Mock()
-        mock_causal_instance.calculate_features = Mock(return_value={
-            "did_roughing_yards": 17.70,  # HOU is high-roughing
-            "psm_travel_yards": 0.0,
-            "psm_weather_yards": 0.0,
-            "causal_total_yards": 17.70,
-        })
+        mock_causal_instance.calculate_features = Mock(
+            return_value={
+                "did_roughing_yards": 17.70,  # HOU is high-roughing
+                "psm_travel_yards": 0.0,
+                "psm_weather_yards": 0.0,
+                "causal_total_yards": 17.70,
+            }
+        )
         mock_causal.return_value = mock_causal_instance
         ensemble.causal_features = mock_causal_instance
 
@@ -121,10 +128,13 @@ def ensemble_v7_with_mocks(test_db_config):
 # INTEGRATION TESTS: End-to-End Prediction
 # ============================================================================
 
+
 class TestEnsembleE2EPrediction:
     """Test full prediction pipeline."""
 
-    def test_all_5_components_generate_predictions(self, ensemble_v7_with_mocks, mahomes_2024_week10):
+    def test_all_5_components_generate_predictions(
+        self, ensemble_v7_with_mocks, mahomes_2024_week10
+    ):
         """All 5 components should generate valid predictions."""
         result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10)
 
@@ -132,8 +142,9 @@ class TestEnsembleE2EPrediction:
         assert isinstance(result, dict)
         assert "ensemble_mean" in result
         assert "valid_components" in result
-        assert len(result["valid_components"]) == 5, \
-            f"Expected 5 components, got {len(result['valid_components'])}"
+        assert (
+            len(result["valid_components"]) == 5
+        ), f"Expected 5 components, got {len(result['valid_components'])}"
 
         # Check all component names present
         expected_components = {
@@ -150,8 +161,7 @@ class TestEnsembleE2EPrediction:
         result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10)
 
         ensemble_mean = result["ensemble_mean"]
-        assert 180 <= ensemble_mean <= 350, \
-            f"Ensemble mean {ensemble_mean} outside [180, 350]"
+        assert 180 <= ensemble_mean <= 350, f"Ensemble mean {ensemble_mean} outside [180, 350]"
 
     def test_ensemble_mean_not_placeholder(self, ensemble_v7_with_mocks, mahomes_2024_week10):
         """Ensemble mean should not be exactly 250 (placeholder)."""
@@ -177,10 +187,7 @@ class TestEnsembleE2EPrediction:
 
     def test_prediction_returns_uncertainty(self, ensemble_v7_with_mocks, mahomes_2024_week10):
         """Should return uncertainty estimates."""
-        result = ensemble_v7_with_mocks.predict(
-            **mahomes_2024_week10,
-            return_uncertainty=True
-        )
+        result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10, return_uncertainty=True)
 
         assert "ensemble_std" in result
         assert "calibrated_std" in result
@@ -191,12 +198,11 @@ class TestEnsembleE2EPrediction:
         assert result["upper_90"] > result["ensemble_mean"]
         assert result["lower_90"] < result["ensemble_mean"]
 
-    def test_prediction_includes_component_details(self, ensemble_v7_with_mocks, mahomes_2024_week10):
+    def test_prediction_includes_component_details(
+        self, ensemble_v7_with_mocks, mahomes_2024_week10
+    ):
         """With return_components=True, should include component predictions."""
-        result = ensemble_v7_with_mocks.predict(
-            **mahomes_2024_week10,
-            return_components=True
-        )
+        result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10, return_components=True)
 
         assert "components" in result
         assert len(result["components"]) == 5
@@ -212,18 +218,18 @@ class TestEnsembleE2EPrediction:
 # INTEGRATION TESTS: Component Diversity
 # ============================================================================
 
+
 class TestComponentDiversity:
     """Test that components produce diverse predictions."""
 
-    def test_component_diversity_threshold_5_yards(self, ensemble_v7_with_mocks, mahomes_2024_week10):
+    def test_component_diversity_threshold_5_yards(
+        self, ensemble_v7_with_mocks, mahomes_2024_week10
+    ):
         """Component diversity should be >= 5 yards (max - min)."""
         # Components: [240, 235, 245, 230, 250]
         # Max - min = 250 - 230 = 20 yards (sufficient diversity)
 
-        result = ensemble_v7_with_mocks.predict(
-            **mahomes_2024_week10,
-            return_components=True
-        )
+        result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10, return_components=True)
 
         components = result["components"]
         means = [c["mean"] for c in components.values()]
@@ -233,47 +239,40 @@ class TestComponentDiversity:
 
     def test_ensemble_weighted_average_correct(self, ensemble_v7_with_mocks, mahomes_2024_week10):
         """Ensemble mean should be proper weighted average."""
-        result = ensemble_v7_with_mocks.predict(
-            **mahomes_2024_week10,
-            return_components=True
-        )
+        result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10, return_components=True)
 
         components = result["components"]
         weights = result["weights"]
 
         # Calculate expected weighted average (without causal adjustment)
-        expected_mean = sum(
-            components[name]["mean"] * weights[name]
-            for name in components
-        )
+        expected_mean = sum(components[name]["mean"] * weights[name] for name in components)
 
-        assert np.isclose(result["base_ensemble_mean"], expected_mean, atol=0.1), \
-            f"Base ensemble mean {result['base_ensemble_mean']} != weighted avg {expected_mean}"
+        assert np.isclose(
+            result["base_ensemble_mean"], expected_mean, atol=0.1
+        ), f"Base ensemble mean {result['base_ensemble_mean']} != weighted avg {expected_mean}"
 
     def test_uncertainty_pooling(self, ensemble_v7_with_mocks, mahomes_2024_week10):
         """Variance pooling should be correct."""
-        result = ensemble_v7_with_mocks.predict(
-            **mahomes_2024_week10,
-            return_components=True
-        )
+        result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10, return_components=True)
 
         components = result["components"]
         weights = result["weights"]
 
         # Calculate expected variance: sum(std^2 * weight^2)
         expected_var = sum(
-            (components[name]["std"] ** 2) * (weights[name] ** 2)
-            for name in components
+            (components[name]["std"] ** 2) * (weights[name] ** 2) for name in components
         )
         expected_std = np.sqrt(expected_var)
 
-        assert np.isclose(result["ensemble_std"], expected_std, atol=0.1), \
-            f"Ensemble std {result['ensemble_std']} != calculated {expected_std}"
+        assert np.isclose(
+            result["ensemble_std"], expected_std, atol=0.1
+        ), f"Ensemble std {result['ensemble_std']} != calculated {expected_std}"
 
 
 # ============================================================================
 # INTEGRATION TESTS: Causal Features Integration
 # ============================================================================
+
 
 class TestCausalAdjustment:
     """Test DiD roughing causal adjustment layer."""
@@ -285,8 +284,9 @@ class TestCausalAdjustment:
         result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10)
 
         # HOU is high-roughing defense, should get +17.70 yards
-        assert result["causal_adjustment"] == 17.70, \
-            f"Expected +17.70 yards, got {result['causal_adjustment']}"
+        assert (
+            result["causal_adjustment"] == 17.70
+        ), f"Expected +17.70 yards, got {result['causal_adjustment']}"
 
     def test_causal_adjustment_zero_low_roughing_defense(
         self, ensemble_v7_with_mocks, jalen_hurts_2024_week5
@@ -304,8 +304,9 @@ class TestCausalAdjustment:
 
         result = ensemble_v7_with_mocks.predict(**jalen_hurts_2024_week5)
 
-        assert result["causal_adjustment"] == 0.0, \
-            f"Expected 0 yards, got {result['causal_adjustment']}"
+        assert (
+            result["causal_adjustment"] == 0.0
+        ), f"Expected 0 yards, got {result['causal_adjustment']}"
 
     def test_causal_features_breakdown(self, ensemble_v7_with_mocks, mahomes_2024_week10):
         """Result should include breakdown of causal features."""
@@ -319,7 +320,9 @@ class TestCausalAdjustment:
         assert "psm_weather_yards" in causal
         assert "causal_total_yards" in causal
 
-    def test_ensemble_mean_includes_causal_adjustment(self, ensemble_v7_with_mocks, mahomes_2024_week10):
+    def test_ensemble_mean_includes_causal_adjustment(
+        self, ensemble_v7_with_mocks, mahomes_2024_week10
+    ):
         """Ensemble mean should include causal adjustment."""
         result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10)
 
@@ -332,6 +335,7 @@ class TestCausalAdjustment:
 # INTEGRATION TESTS: Temperature Scaling
 # ============================================================================
 
+
 class TestTemperatureScaling:
     """Test temperature scaling calibration."""
 
@@ -341,24 +345,22 @@ class TestTemperatureScaling:
         assert ensemble_v7_with_mocks.temperature is not None
         assert ensemble_v7_with_mocks.temperature > 0, "Temperature must be positive"
 
-    def test_calibrated_std_differs_from_ensemble_std(self, ensemble_v7_with_mocks, mahomes_2024_week10):
+    def test_calibrated_std_differs_from_ensemble_std(
+        self, ensemble_v7_with_mocks, mahomes_2024_week10
+    ):
         """Calibrated std should differ from ensemble std if T != 1.0."""
-        result = ensemble_v7_with_mocks.predict(
-            **mahomes_2024_week10,
-            return_uncertainty=True
-        )
+        result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10, return_uncertainty=True)
 
         if ensemble_v7_with_mocks.temperature != 1.0:
             # calibrated_std = ensemble_std / temperature
             expected_calibrated = result["ensemble_std"] / ensemble_v7_with_mocks.temperature
             assert np.isclose(result["calibrated_std"], expected_calibrated, atol=0.1)
 
-    def test_prediction_intervals_use_calibrated_std(self, ensemble_v7_with_mocks, mahomes_2024_week10):
+    def test_prediction_intervals_use_calibrated_std(
+        self, ensemble_v7_with_mocks, mahomes_2024_week10
+    ):
         """90% prediction intervals should use calibrated std."""
-        result = ensemble_v7_with_mocks.predict(
-            **mahomes_2024_week10,
-            return_uncertainty=True
-        )
+        result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10, return_uncertainty=True)
 
         z_90 = 1.645
         expected_lower = result["ensemble_mean"] - z_90 * result["calibrated_std"]
@@ -372,10 +374,13 @@ class TestTemperatureScaling:
 # INTEGRATION TESTS: Graceful Degradation
 # ============================================================================
 
+
 class TestComponentFailureHandling:
     """Test graceful degradation when components fail."""
 
-    def test_ensemble_handles_one_component_failure(self, ensemble_v7_with_mocks, mahomes_2024_week10):
+    def test_ensemble_handles_one_component_failure(
+        self, ensemble_v7_with_mocks, mahomes_2024_week10
+    ):
         """Ensemble should handle 1 component failure (4 of 5 working)."""
         # Hierarchical fails
         ensemble_v7_with_mocks._predict_hierarchical = Mock(return_value=(None, None))
@@ -386,7 +391,9 @@ class TestComponentFailureHandling:
         assert len(result["valid_components"]) == 4
         assert "ensemble_mean" in result
 
-    def test_ensemble_handles_two_component_failures(self, ensemble_v7_with_mocks, mahomes_2024_week10):
+    def test_ensemble_handles_two_component_failures(
+        self, ensemble_v7_with_mocks, mahomes_2024_week10
+    ):
         """Ensemble should handle 2 component failures (3 of 5 working)."""
         # Hierarchical and Informative Priors fail
         ensemble_v7_with_mocks._predict_hierarchical = Mock(return_value=(None, None))
@@ -398,7 +405,9 @@ class TestComponentFailureHandling:
         assert len(result["valid_components"]) == 3
         assert "ensemble_mean" in result
 
-    def test_ensemble_fails_with_three_component_failures(self, ensemble_v7_with_mocks, mahomes_2024_week10):
+    def test_ensemble_fails_with_three_component_failures(
+        self, ensemble_v7_with_mocks, mahomes_2024_week10
+    ):
         """Ensemble should fail with 3 component failures (< 3 working)."""
         # Hierarchical, Informative Priors, and Hybrid fail
         ensemble_v7_with_mocks._predict_hierarchical = Mock(return_value=(None, None))
@@ -426,6 +435,7 @@ class TestComponentFailureHandling:
 # INTEGRATION TESTS: Output Structure
 # ============================================================================
 
+
 class TestPredictionOutputStructure:
     """Test that prediction output has correct structure."""
 
@@ -448,22 +458,28 @@ class TestPredictionOutputStructure:
             "valid_components",
         }
 
-        assert required_keys.issubset(set(result.keys())), \
-            f"Missing keys: {required_keys - set(result.keys())}"
+        assert required_keys.issubset(
+            set(result.keys())
+        ), f"Missing keys: {required_keys - set(result.keys())}"
 
     def test_output_values_are_numeric(self, ensemble_v7_with_mocks, mahomes_2024_week10):
         """Numeric output values should be float or int."""
         result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10)
 
         numeric_keys = {
-            "ensemble_mean", "base_ensemble_mean", "causal_adjustment",
-            "ensemble_std", "calibrated_std", "lower_90", "upper_90",
-            "temperature", "prediction_time_ms"
+            "ensemble_mean",
+            "base_ensemble_mean",
+            "causal_adjustment",
+            "ensemble_std",
+            "calibrated_std",
+            "lower_90",
+            "upper_90",
+            "temperature",
+            "prediction_time_ms",
         }
 
         for key in numeric_keys:
-            assert isinstance(result[key], (int, float)), \
-                f"{key} = {result[key]} is not numeric"
+            assert isinstance(result[key], (int, float)), f"{key} = {result[key]} is not numeric"
 
     def test_weights_sum_to_one(self, ensemble_v7_with_mocks, mahomes_2024_week10):
         """Weights in result should sum to 1.0."""
@@ -476,8 +492,9 @@ class TestPredictionOutputStructure:
         """Prediction time should be < 5 seconds."""
         result = ensemble_v7_with_mocks.predict(**mahomes_2024_week10)
 
-        assert result["prediction_time_ms"] < 5000, \
-            f"Prediction took {result['prediction_time_ms']}ms (> 5s)"
+        assert (
+            result["prediction_time_ms"] < 5000
+        ), f"Prediction took {result['prediction_time_ms']}ms (> 5s)"
 
 
 if __name__ == "__main__":

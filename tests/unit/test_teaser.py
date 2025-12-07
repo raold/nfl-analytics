@@ -23,7 +23,6 @@ def test_teaser_ev_basic():
     assert result is not None
 
 
-
 def test_teaser_ev_edge_cases():
     """Test teaser_ev: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_teaser_ev_edge_cases():
     assert result is not None
 
 
-
 def test_teaser_ev_error_handling():
     """Test teaser_ev error handling."""
     with pytest.raises(ValueError):
         teaser_ev(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_teaser_ev_property_idempotent(self, q1, q2, payout_decimal, rho):
 
     # Assert property
     assert teaser_ev(q1, q2, payout_decimal, rho) == result, "idempotent violated"
-
 
 
 def test_middle_breakeven_basic():
@@ -67,7 +63,6 @@ def test_middle_breakeven_basic():
     assert result is not None
 
 
-
 def test_middle_breakeven_edge_cases():
     """Test middle_breakeven: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_middle_breakeven_edge_cases():
     assert result is not None
 
 
-
 def test_middle_breakeven_error_handling():
     """Test middle_breakeven error handling."""
     with pytest.raises(ValueError):
         middle_breakeven(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -96,4 +89,3 @@ def test_middle_breakeven_property_idempotent(self, required_mass, pmf_margin, n
 
     # Assert property
     assert middle_breakeven(required_mass, pmf_margin, n) == result, "idempotent violated"
-

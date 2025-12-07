@@ -21,7 +21,6 @@ def test_get_performance_monitor_basic():
     assert result is not None
 
 
-
 def test_get_performance_monitor_edge_cases():
     """Test get_performance_monitor: edge cases."""
     # Arrange
@@ -34,12 +33,10 @@ def test_get_performance_monitor_edge_cases():
     assert result is not None
 
 
-
 def test_get_performance_monitor_error_handling():
     """Test get_performance_monitor error handling."""
     with pytest.raises(ValueError):
         get_performance_monitor(invalid_input)
-
 
 
 def test_get_stress_test_monitor_basic():
@@ -54,7 +51,6 @@ def test_get_stress_test_monitor_basic():
     assert result is not None
 
 
-
 def test_get_stress_test_monitor_edge_cases():
     """Test get_stress_test_monitor: edge cases."""
     # Arrange
@@ -67,12 +63,10 @@ def test_get_stress_test_monitor_edge_cases():
     assert result is not None
 
 
-
 def test_get_stress_test_monitor_error_handling():
     """Test get_stress_test_monitor error handling."""
     with pytest.raises(ValueError):
         get_stress_test_monitor(invalid_input)
-
 
 
 def test_get_thompson_sampler_basic():
@@ -87,7 +81,6 @@ def test_get_thompson_sampler_basic():
     assert result is not None
 
 
-
 def test_get_thompson_sampler_edge_cases():
     """Test get_thompson_sampler: edge cases."""
     # Arrange
@@ -100,9 +93,7 @@ def test_get_thompson_sampler_edge_cases():
     assert result is not None
 
 
-
 def test_get_thompson_sampler_error_handling():
     """Test get_thompson_sampler error handling."""
     with pytest.raises(ValueError):
         get_thompson_sampler(invalid_input)
-

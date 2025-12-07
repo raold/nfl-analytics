@@ -39,11 +39,10 @@ import psycopg2
 from scipy import stats
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class Phase1Validator:
@@ -178,10 +177,7 @@ class Phase1Validator:
 
         return df
 
-    def compute_baseline_predictions(
-        self,
-        validation_df: pd.DataFrame
-    ) -> pd.DataFrame:
+    def compute_baseline_predictions(self, validation_df: pd.DataFrame) -> pd.DataFrame:
         """
         Compute baseline predictions using simple historical average.
 
@@ -199,31 +195,29 @@ class Phase1Validator:
         df = validation_df.copy()
 
         # For each player-game, compute historical average from PRIOR games
-        df['baseline_pred'] = np.nan
+        df["baseline_pred"] = np.nan
 
-        for player_id in df['player_id'].unique():
-            player_mask = df['player_id'] == player_id
-            player_df = df[player_mask].sort_values('kickoff')
+        for player_id in df["player_id"].unique():
+            player_mask = df["player_id"] == player_id
+            player_df = df[player_mask].sort_values("kickoff")
 
             # Expanding mean (excludes current game)
-            historical_avg = player_df['actual_passing_yards'].expanding().mean().shift(1)
+            historical_avg = player_df["actual_passing_yards"].expanding().mean().shift(1)
 
-            df.loc[player_mask, 'baseline_pred'] = historical_avg
+            df.loc[player_mask, "baseline_pred"] = historical_avg
 
         # Fill NaN with league average for first game
-        league_avg = df['actual_passing_yards'].mean()
-        df['baseline_pred'] = df['baseline_pred'].fillna(league_avg)
+        league_avg = df["actual_passing_yards"].mean()
+        df["baseline_pred"] = df["baseline_pred"].fillna(league_avg)
 
         # Compute baseline MAE
-        baseline_mae = np.mean(np.abs(df['baseline_pred'] - df['actual_passing_yards']))
+        baseline_mae = np.mean(np.abs(df["baseline_pred"] - df["actual_passing_yards"]))
         logger.info(f"Baseline MAE: {baseline_mae:.2f} yards")
 
         return df
 
     def add_opponent_strength_features(
-        self,
-        validation_df: pd.DataFrame,
-        opponent_strength_df: pd.DataFrame
+        self, validation_df: pd.DataFrame, opponent_strength_df: pd.DataFrame
     ) -> pd.DataFrame:
         """
         Join opponent defensive strength features to validation data.
@@ -242,32 +236,34 @@ class Phase1Validator:
         # Join on (game_id, team) to get opponent's defensive strength
         # Player's team faces opponent's defense
         df = df.merge(
-            opponent_strength_df[[
-                'game_id', 'opponent', 'opp_def_epa_exp', 'opp_def_rank',
-                'opp_pass_def_rank', 'matchup_difficulty'
-            ]],
-            left_on=['game_id', 'team'],
-            right_on=['game_id', 'opponent'],
-            how='left',
-            suffixes=('', '_opp')
+            opponent_strength_df[
+                [
+                    "game_id",
+                    "opponent",
+                    "opp_def_epa_exp",
+                    "opp_def_rank",
+                    "opp_pass_def_rank",
+                    "matchup_difficulty",
+                ]
+            ],
+            left_on=["game_id", "team"],
+            right_on=["game_id", "opponent"],
+            how="left",
+            suffixes=("", "_opp"),
         )
 
         # Fill missing values with neutral (50th percentile)
-        df['opp_def_epa_exp'] = df['opp_def_epa_exp'].fillna(0.0)
-        df['opp_def_rank'] = df['opp_def_rank'].fillna(50.0)
-        df['opp_pass_def_rank'] = df['opp_pass_def_rank'].fillna(50.0)
-        df['matchup_difficulty'] = df['matchup_difficulty'].fillna(50.0)
+        df["opp_def_epa_exp"] = df["opp_def_epa_exp"].fillna(0.0)
+        df["opp_def_rank"] = df["opp_def_rank"].fillna(50.0)
+        df["opp_pass_def_rank"] = df["opp_pass_def_rank"].fillna(50.0)
+        df["matchup_difficulty"] = df["matchup_difficulty"].fillna(50.0)
 
         logger.info(f"Added opponent strength features to {len(df):,} observations")
         logger.info(f"  Mean matchup difficulty: {df['matchup_difficulty'].mean():.1f}")
 
         return df
 
-    def add_elo_features(
-        self,
-        validation_df: pd.DataFrame,
-        elo_df: pd.DataFrame
-    ) -> pd.DataFrame:
+    def add_elo_features(self, validation_df: pd.DataFrame, elo_df: pd.DataFrame) -> pd.DataFrame:
         """
         Add ELO-based features to validation data.
 
@@ -285,37 +281,31 @@ class Phase1Validator:
         # For each player's game, get their team's ELO and opponent's ELO
         # Join player's team ELO
         df = df.merge(
-            elo_df[['game_id', 'home_team', 'away_team', 'home_elo_pregame', 'away_elo_pregame']],
-            on='game_id',
-            how='left'
+            elo_df[["game_id", "home_team", "away_team", "home_elo_pregame", "away_elo_pregame"]],
+            on="game_id",
+            how="left",
         )
 
         # Determine player's team ELO
-        df['team_elo'] = np.where(
-            df['is_home'] == 1,
-            df['home_elo_pregame'],
-            df['away_elo_pregame']
+        df["team_elo"] = np.where(
+            df["is_home"] == 1, df["home_elo_pregame"], df["away_elo_pregame"]
         )
 
         # Determine opponent's ELO
-        df['opp_elo'] = np.where(
-            df['is_home'] == 1,
-            df['away_elo_pregame'],
-            df['home_elo_pregame']
-        )
+        df["opp_elo"] = np.where(df["is_home"] == 1, df["away_elo_pregame"], df["home_elo_pregame"])
 
         # ELO differential
-        df['elo_diff'] = df['team_elo'] - df['opp_elo']
+        df["elo_diff"] = df["team_elo"] - df["opp_elo"]
 
         # Expected score margin from ELO (conversion: ~26 ELO points = 1 Vegas point)
         # Home field advantage already in ELO ratings (+65 points)
-        df['elo_expected_margin'] = df['elo_diff'] / 26.0
+        df["elo_expected_margin"] = df["elo_diff"] / 26.0
 
         # Fill missing with 0 (neutral)
-        df['team_elo'] = df['team_elo'].fillna(1500)
-        df['opp_elo'] = df['opp_elo'].fillna(1500)
-        df['elo_diff'] = df['elo_diff'].fillna(0)
-        df['elo_expected_margin'] = df['elo_expected_margin'].fillna(0)
+        df["team_elo"] = df["team_elo"].fillna(1500)
+        df["opp_elo"] = df["opp_elo"].fillna(1500)
+        df["elo_diff"] = df["elo_diff"].fillna(0)
+        df["elo_expected_margin"] = df["elo_expected_margin"].fillna(0)
 
         logger.info(f"Added ELO features to {len(df):,} observations")
         logger.info(f"  Mean team ELO: {df['team_elo'].mean():.1f}")
@@ -328,11 +318,7 @@ class Phase1Validator:
         return np.mean(np.abs(actual - predicted))
 
     def compute_calibration(
-        self,
-        actual: np.ndarray,
-        predicted: np.ndarray,
-        std: np.ndarray,
-        coverage: float = 0.90
+        self, actual: np.ndarray, predicted: np.ndarray, std: np.ndarray, coverage: float = 0.90
     ) -> tuple[float, float]:
         """
         Compute calibration (90% prediction interval coverage).
@@ -358,10 +344,7 @@ class Phase1Validator:
 
         return actual_coverage, coverage
 
-    def validate_opponent_strength_impact(
-        self,
-        df: pd.DataFrame
-    ) -> dict:
+    def validate_opponent_strength_impact(self, df: pd.DataFrame) -> dict:
         """
         Validate impact of opponent strength features using simple linear model.
 
@@ -371,30 +354,28 @@ class Phase1Validator:
         Returns:
             Dictionary with validation metrics
         """
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("VALIDATING OPPONENT STRENGTH IMPACT")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         # Filter to complete cases
-        complete = df.dropna(subset=['baseline_pred', 'opp_def_rank', 'actual_passing_yards'])
+        complete = df.dropna(subset=["baseline_pred", "opp_def_rank", "actual_passing_yards"])
 
         # Model 1: Baseline only
         baseline_mae = self.compute_mae(
-            complete['actual_passing_yards'].values,
-            complete['baseline_pred'].values
+            complete["actual_passing_yards"].values, complete["baseline_pred"].values
         )
 
         # Model 2: Baseline + Opponent Strength adjustment
         # Simple adjustment: reduce predicted yards when facing tough defense
         # matchup_difficulty: 0 = easy, 100 = hard
         # Adjustment factor: -0.5 yards per difficulty point (heuristic)
-        difficulty_adjustment = -0.5 * (complete['matchup_difficulty'] - 50) / 50
+        difficulty_adjustment = -0.5 * (complete["matchup_difficulty"] - 50) / 50
 
-        complete['adjusted_pred'] = complete['baseline_pred'] + difficulty_adjustment
+        complete["adjusted_pred"] = complete["baseline_pred"] + difficulty_adjustment
 
         adjusted_mae = self.compute_mae(
-            complete['actual_passing_yards'].values,
-            complete['adjusted_pred'].values
+            complete["actual_passing_yards"].values, complete["adjusted_pred"].values
         )
 
         improvement = baseline_mae - adjusted_mae
@@ -405,8 +386,8 @@ class Phase1Validator:
         logger.info(f"Improvement: {improvement:.2f} yards ({improvement_pct:.2f}%)")
 
         # Test statistical significance
-        baseline_errors = np.abs(complete['baseline_pred'] - complete['actual_passing_yards'])
-        adjusted_errors = np.abs(complete['adjusted_pred'] - complete['actual_passing_yards'])
+        baseline_errors = np.abs(complete["baseline_pred"] - complete["actual_passing_yards"])
+        adjusted_errors = np.abs(complete["adjusted_pred"] - complete["actual_passing_yards"])
 
         t_stat, p_value = stats.ttest_rel(baseline_errors, adjusted_errors)
 
@@ -418,23 +399,20 @@ class Phase1Validator:
             logger.warning("⚠️  Improvement not statistically significant")
 
         results = {
-            'feature': 'opponent_strength',
-            'baseline_mae': baseline_mae,
-            'improved_mae': adjusted_mae,
-            'improvement_yards': improvement,
-            'improvement_pct': improvement_pct,
-            't_statistic': t_stat,
-            'p_value': p_value,
-            'significant': p_value < 0.05,
-            'n_observations': len(complete)
+            "feature": "opponent_strength",
+            "baseline_mae": baseline_mae,
+            "improved_mae": adjusted_mae,
+            "improvement_yards": improvement,
+            "improvement_pct": improvement_pct,
+            "t_statistic": t_stat,
+            "p_value": p_value,
+            "significant": p_value < 0.05,
+            "n_observations": len(complete),
         }
 
         return results
 
-    def validate_elo_impact(
-        self,
-        df: pd.DataFrame
-    ) -> dict:
+    def validate_elo_impact(self, df: pd.DataFrame) -> dict:
         """
         Validate impact of ELO features.
 
@@ -444,30 +422,30 @@ class Phase1Validator:
         Returns:
             Dictionary with validation metrics
         """
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("VALIDATING ELO COMPONENT IMPACT")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         # Filter to complete cases
-        complete = df.dropna(subset=['baseline_pred', 'elo_expected_margin', 'actual_passing_yards'])
+        complete = df.dropna(
+            subset=["baseline_pred", "elo_expected_margin", "actual_passing_yards"]
+        )
 
         # Baseline MAE
         baseline_mae = self.compute_mae(
-            complete['actual_passing_yards'].values,
-            complete['baseline_pred'].values
+            complete["actual_passing_yards"].values, complete["baseline_pred"].values
         )
 
         # ELO adjustment: expected margin affects passing volume
         # Positive margin (favorite) → more passing to run up score
         # Negative margin (underdog) → more passing to catch up
         # Heuristic: 2 yards per point of expected margin
-        elo_adjustment = 2.0 * complete['elo_expected_margin']
+        elo_adjustment = 2.0 * complete["elo_expected_margin"]
 
-        complete['elo_adjusted_pred'] = complete['baseline_pred'] + elo_adjustment
+        complete["elo_adjusted_pred"] = complete["baseline_pred"] + elo_adjustment
 
         elo_mae = self.compute_mae(
-            complete['actual_passing_yards'].values,
-            complete['elo_adjusted_pred'].values
+            complete["actual_passing_yards"].values, complete["elo_adjusted_pred"].values
         )
 
         improvement = baseline_mae - elo_mae
@@ -478,8 +456,8 @@ class Phase1Validator:
         logger.info(f"Improvement: {improvement:.2f} yards ({improvement_pct:.2f}%)")
 
         # Statistical significance
-        baseline_errors = np.abs(complete['baseline_pred'] - complete['actual_passing_yards'])
-        elo_errors = np.abs(complete['elo_adjusted_pred'] - complete['actual_passing_yards'])
+        baseline_errors = np.abs(complete["baseline_pred"] - complete["actual_passing_yards"])
+        elo_errors = np.abs(complete["elo_adjusted_pred"] - complete["actual_passing_yards"])
 
         t_stat, p_value = stats.ttest_rel(baseline_errors, elo_errors)
 
@@ -491,15 +469,15 @@ class Phase1Validator:
             logger.warning("⚠️  Improvement not statistically significant")
 
         results = {
-            'feature': 'elo',
-            'baseline_mae': baseline_mae,
-            'improved_mae': elo_mae,
-            'improvement_yards': improvement,
-            'improvement_pct': improvement_pct,
-            't_statistic': t_stat,
-            'p_value': p_value,
-            'significant': p_value < 0.05,
-            'n_observations': len(complete)
+            "feature": "elo",
+            "baseline_mae": baseline_mae,
+            "improved_mae": elo_mae,
+            "improvement_yards": improvement,
+            "improvement_pct": improvement_pct,
+            "t_statistic": t_stat,
+            "p_value": p_value,
+            "significant": p_value < 0.05,
+            "n_observations": len(complete),
         }
 
         return results
@@ -511,9 +489,9 @@ class Phase1Validator:
         Returns:
             DataFrame with validation results for all features
         """
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("PHASE 1 FEATURE VALIDATION - FULL PIPELINE")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         # Load validation data
         validation_df = self.load_validation_data(start_season=2022, end_season=2024)
@@ -535,11 +513,11 @@ class Phase1Validator:
         # Run validation for each feature
         results = []
 
-        if 'matchup_difficulty' in validation_df.columns:
+        if "matchup_difficulty" in validation_df.columns:
             opp_results = self.validate_opponent_strength_impact(validation_df)
             results.append(opp_results)
 
-        if 'elo_expected_margin' in validation_df.columns:
+        if "elo_expected_margin" in validation_df.columns:
             elo_results = self.validate_elo_impact(validation_df)
             results.append(elo_results)
 
@@ -547,17 +525,26 @@ class Phase1Validator:
         results_df = pd.DataFrame(results)
 
         # Summary
-        logger.info("\n" + "="*80)
+        logger.info("\n" + "=" * 80)
         logger.info("VALIDATION SUMMARY")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         if len(results_df) > 0:
-            print(results_df[[
-                'feature', 'baseline_mae', 'improved_mae',
-                'improvement_yards', 'improvement_pct', 'p_value', 'significant'
-            ]].to_string(index=False))
+            print(
+                results_df[
+                    [
+                        "feature",
+                        "baseline_mae",
+                        "improved_mae",
+                        "improvement_yards",
+                        "improvement_pct",
+                        "p_value",
+                        "significant",
+                    ]
+                ].to_string(index=False)
+            )
 
-            total_improvement = results_df['improvement_yards'].sum()
+            total_improvement = results_df["improvement_yards"].sum()
             logger.info(f"\n✅ Total cumulative improvement: {total_improvement:.2f} yards")
         else:
             logger.warning("No features validated - check data availability")
@@ -579,9 +566,9 @@ def main():
 
     logger.info(f"\n✅ Validation results saved: {output_path}")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("VALIDATION COMPLETE")
-    print("="*80)
+    print("=" * 80)
     print(f"Results: {output_path}")
     print("Next: Integrate features into XGBoost v3 and ensemble v6")
 

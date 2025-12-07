@@ -24,7 +24,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -37,12 +36,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_initialize_models_basic():
@@ -57,7 +54,6 @@ def test_initialize_models_basic():
     assert result is not None
 
 
-
 def test_initialize_models_edge_cases():
     """Test initialize_models: edge cases."""
     # Arrange
@@ -70,12 +66,10 @@ def test_initialize_models_edge_cases():
     assert result is not None
 
 
-
 def test_initialize_models_error_handling():
     """Test initialize_models error handling."""
     with pytest.raises(ValueError):
         initialize_models(invalid_input)
-
 
 
 @given(st.integers())
@@ -86,7 +80,6 @@ def test_initialize_models_property_idempotent(val):
 
     # Assert property
     assert initialize_models(val) == result, "idempotent violated"
-
 
 
 def test_get_model_stats_basic():
@@ -101,7 +94,6 @@ def test_get_model_stats_basic():
     assert result is not None
 
 
-
 def test_get_model_stats_edge_cases():
     """Test get_model_stats: edge cases."""
     # Arrange
@@ -114,12 +106,10 @@ def test_get_model_stats_edge_cases():
     assert result is not None
 
 
-
 def test_get_model_stats_error_handling():
     """Test get_model_stats error handling."""
     with pytest.raises(ValueError):
         get_model_stats(invalid_input)
-
 
 
 @given(st.integers(), st.text(min_size=1, max_size=100))
@@ -130,7 +120,6 @@ def test_get_model_stats_property_idempotent(self, self, model_name):
 
     # Assert property
     assert get_model_stats(self, model_name) == result, "idempotent violated"
-
 
 
 def test_select_model_basic():
@@ -145,7 +134,6 @@ def test_select_model_basic():
     assert result is not None
 
 
-
 def test_select_model_edge_cases():
     """Test select_model: edge cases."""
     # Arrange
@@ -158,12 +146,10 @@ def test_select_model_edge_cases():
     assert result is not None
 
 
-
 def test_select_model_error_handling():
     """Test select_model error handling."""
     with pytest.raises(ValueError):
         select_model(invalid_input)
-
 
 
 @given(st.integers())
@@ -174,7 +160,6 @@ def test_select_model_property_idempotent(val):
 
     # Assert property
     assert select_model(val) == result, "idempotent violated"
-
 
 
 def test_update_model_basic():
@@ -189,7 +174,6 @@ def test_update_model_basic():
     assert result is not None
 
 
-
 def test_update_model_edge_cases():
     """Test update_model: edge cases."""
     # Arrange
@@ -202,12 +186,10 @@ def test_update_model_edge_cases():
     assert result is not None
 
 
-
 def test_update_model_error_handling():
     """Test update_model error handling."""
     with pytest.raises(ValueError):
         update_model(invalid_input)
-
 
 
 @given(st.integers(), st.text(min_size=1, max_size=100), st.integers())
@@ -220,25 +202,17 @@ def test_update_model_property_idempotent(self, self, model_name, result):
     assert update_model(self, model_name, result) == result, "idempotent violated"
 
 
-
 def test_update_model_no_temporal_leakage():
     """Ensure update_model doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = update_model(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"
 
 
 def test_get_all_stats_basic():
@@ -253,7 +227,6 @@ def test_get_all_stats_basic():
     assert result is not None
 
 
-
 def test_get_all_stats_edge_cases():
     """Test get_all_stats: edge cases."""
     # Arrange
@@ -266,12 +239,10 @@ def test_get_all_stats_edge_cases():
     assert result is not None
 
 
-
 def test_get_all_stats_error_handling():
     """Test get_all_stats error handling."""
     with pytest.raises(ValueError):
         get_all_stats(invalid_input)
-
 
 
 @given(st.integers())
@@ -282,7 +253,6 @@ def test_get_all_stats_property_idempotent(val):
 
     # Assert property
     assert get_all_stats(val) == result, "idempotent violated"
-
 
 
 def test_reset_basic():
@@ -297,7 +267,6 @@ def test_reset_basic():
     assert result is not None
 
 
-
 def test_reset_edge_cases():
     """Test reset: edge cases."""
     # Arrange
@@ -310,12 +279,10 @@ def test_reset_edge_cases():
     assert result is not None
 
 
-
 def test_reset_error_handling():
     """Test reset error handling."""
     with pytest.raises(ValueError):
         reset(invalid_input)
-
 
 
 @given(st.integers(), st.text(min_size=1, max_size=100))
@@ -326,7 +293,6 @@ def test_reset_property_idempotent(self, self, model_name):
 
     # Assert property
     assert reset(self, model_name) == result, "idempotent violated"
-
 
 
 def test_plot_distributions_basic():
@@ -341,7 +307,6 @@ def test_plot_distributions_basic():
     assert result is not None
 
 
-
 def test_plot_distributions_edge_cases():
     """Test plot_distributions: edge cases."""
     # Arrange
@@ -354,12 +319,10 @@ def test_plot_distributions_edge_cases():
     assert result is not None
 
 
-
 def test_plot_distributions_error_handling():
     """Test plot_distributions error handling."""
     with pytest.raises(ValueError):
         plot_distributions(invalid_input)
-
 
 
 @given(st.integers())
@@ -370,7 +333,6 @@ def test_plot_distributions_property_idempotent(val):
 
     # Assert property
     assert plot_distributions(val) == result, "idempotent violated"
-
 
 
 def test_simulate_regret_basic():
@@ -385,7 +347,6 @@ def test_simulate_regret_basic():
     assert result is not None
 
 
-
 def test_simulate_regret_edge_cases():
     """Test simulate_regret: edge cases."""
     # Arrange
@@ -398,12 +359,10 @@ def test_simulate_regret_edge_cases():
     assert result is not None
 
 
-
 def test_simulate_regret_error_handling():
     """Test simulate_regret error handling."""
     with pytest.raises(ValueError):
         simulate_regret(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -414,4 +373,3 @@ def test_simulate_regret_property_idempotent(self, self, n_bets, true_win_rates)
 
     # Assert property
     assert simulate_regret(self, n_bets, true_win_rates) == result, "idempotent violated"
-

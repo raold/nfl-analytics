@@ -63,11 +63,7 @@ def connection_pool():
         ThreadedConnectionPool (5-50 connections)
     """
     try:
-        pool_obj = pool.ThreadedConnectionPool(
-            minconn=5,
-            maxconn=50,
-            **DB_CONFIG
-        )
+        pool_obj = pool.ThreadedConnectionPool(minconn=5, maxconn=50, **DB_CONFIG)
         yield pool_obj
         pool_obj.closeall()
     except psycopg2.OperationalError as e:
@@ -190,14 +186,10 @@ def test_concurrent_query_handling(connection_pool, simple_query):
     failed = [r for r in results if not r["success"]]
 
     if failed:
-        pytest.fail(
-            f"{len(failed)} queries failed:\n"
-            + "\n".join(str(r) for r in failed)
-        )
+        pytest.fail(f"{len(failed)} queries failed:\n" + "\n".join(str(r) for r in failed))
 
     logger.info(
-        f"✅ Concurrent queries: {success_count}/{num_workers} succeeded "
-        f"in {total_time:.2f}s"
+        f"✅ Concurrent queries: {success_count}/{num_workers} succeeded " f"in {total_time:.2f}s"
     )
 
     # Validate performance
@@ -237,8 +229,7 @@ def test_connection_reuse(connection_pool, simple_query):
 
     # Should be much less than 100 (reuse is happening)
     assert unique_connections < 20, (
-        f"Too many unique connections: {unique_connections} "
-        f"(expected < 20 for 100 queries)"
+        f"Too many unique connections: {unique_connections} " f"(expected < 20 for 100 queries)"
     )
 
     logger.info(
@@ -329,12 +320,14 @@ def test_transaction_support(connection_pool):
     cursor.execute("DROP TABLE IF EXISTS test_transactions")
 
     # Create table
-    cursor.execute("""
+    cursor.execute(
+        """
         CREATE TABLE test_transactions (
             id SERIAL PRIMARY KEY,
             value TEXT
         )
-    """)
+    """
+    )
     conn.commit()
     cursor.close()
     pool_obj.putconn(conn)
@@ -446,9 +439,9 @@ def test_high_load_performance(connection_pool, simple_query):
     )
 
     # Validate
-    assert success_count >= 0.95 * num_queries, (
-        f"Success rate too low: {success_count}/{num_queries}"
-    )
+    assert (
+        success_count >= 0.95 * num_queries
+    ), f"Success rate too low: {success_count}/{num_queries}"
     assert total_time < 60, f"High load too slow: {total_time:.2f}s"
 
 

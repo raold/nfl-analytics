@@ -34,10 +34,10 @@ import pytest
 def mock_mcmc_config_slow():
     """Create slow MCMC configuration."""
     return {
-        'chains': 8,      # Too many chains (diminishing returns)
-        'tune': 5000,     # Excessive tuning
-        'draws': 5000,    # Too many draws
-        'target_accept': 0.99,  # Very high (slow sampling)
+        "chains": 8,  # Too many chains (diminishing returns)
+        "tune": 5000,  # Excessive tuning
+        "draws": 5000,  # Too many draws
+        "target_accept": 0.99,  # Very high (slow sampling)
     }
 
 
@@ -45,10 +45,10 @@ def mock_mcmc_config_slow():
 def mock_mcmc_config_fast():
     """Create optimized MCMC configuration."""
     return {
-        'chains': 4,      # Optimal for most CPUs
-        'tune': 1000,     # Sufficient tuning
-        'draws': 2000,    # Sufficient samples
-        'target_accept': 0.90,  # Balanced (default)
+        "chains": 4,  # Optimal for most CPUs
+        "tune": 1000,  # Sufficient tuning
+        "draws": 2000,  # Sufficient samples
+        "target_accept": 0.90,  # Balanced (default)
     }
 
 
@@ -89,7 +89,7 @@ def test_mcmc_config_time_estimation(mock_mcmc_config_slow, mock_mcmc_config_fas
     time_per_iter = 0.05  # 50ms per iteration
 
     def estimate_time(config):
-        total_iters = config['chains'] * (config['tune'] + config['draws'])
+        total_iters = config["chains"] * (config["tune"] + config["draws"])
         return total_iters * time_per_iter
 
     slow_time = estimate_time(mock_mcmc_config_slow)
@@ -119,18 +119,17 @@ def test_mcmc_optimal_chains_for_cpu():
 def test_mcmc_excessive_chains_warning():
     """Test warning for excessive chains (diminishing returns)."""
     configs = [
-        {'chains': 2, 'warning': False},
-        {'chains': 4, 'warning': False},
-        {'chains': 6, 'warning': True},   # Diminishing returns
-        {'chains': 8, 'warning': True},   # Too many
+        {"chains": 2, "warning": False},
+        {"chains": 4, "warning": False},
+        {"chains": 6, "warning": True},  # Diminishing returns
+        {"chains": 8, "warning": True},  # Too many
     ]
 
     for config in configs:
-        chains = config['chains']
+        chains = config["chains"]
         should_warn = chains > 4
 
-        assert should_warn == config['warning'], \
-            f"Chains={chains} should_warn={config['warning']}"
+        assert should_warn == config["warning"], f"Chains={chains} should_warn={config['warning']}"
 
 
 def test_mcmc_draws_sufficiency():
@@ -139,10 +138,10 @@ def test_mcmc_draws_sufficiency():
     # (ESS typically 40-60% of draws for well-tuned chains)
 
     test_cases = [
-        (500, False),   # Insufficient
-        (1000, True),   # Borderline
-        (2000, True),   # Good
-        (5000, True),   # Excessive (but safe)
+        (500, False),  # Insufficient
+        (1000, True),  # Borderline
+        (2000, True),  # Good
+        (5000, True),  # Excessive (but safe)
     ]
 
     for draws, sufficient in test_cases:
@@ -214,19 +213,19 @@ def test_sql_join_without_index():
     """Test detection of joins on unindexed columns."""
     # Mock database schema
     indexes = {
-        'games': ['game_id', 'season'],
-        'plays': ['play_id', 'game_id'],
+        "games": ["game_id", "season"],
+        "plays": ["play_id", "game_id"],
     }
 
     # Query joins on game_id (indexed - good)
-    join_column = 'game_id'
-    is_indexed = join_column in indexes['plays']
+    join_column = "game_id"
+    is_indexed = join_column in indexes["plays"]
 
     assert is_indexed, "game_id should be indexed"
 
     # Query joins on unindexed column (bad)
-    unindexed_join_column = 'stadium'
-    is_indexed_bad = unindexed_join_column in indexes['games']
+    unindexed_join_column = "stadium"
+    is_indexed_bad = unindexed_join_column in indexes["games"]
 
     assert not is_indexed_bad, "stadium not indexed"
 
@@ -236,9 +235,9 @@ def test_sql_order_by_performance():
     # ORDER BY on indexed column (fast)
     # ORDER BY on unindexed column (slow - requires sort)
 
-    indexed_columns = ['game_id', 'kickoff', 'season']
+    indexed_columns = ["game_id", "kickoff", "season"]
 
-    order_by_col = 'kickoff'
+    order_by_col = "kickoff"
     is_indexed = order_by_col in indexed_columns
 
     assert is_indexed, "ORDER BY on indexed column is fast"
@@ -254,10 +253,10 @@ def test_sql_query_complexity_estimation():
 
     def estimate_complexity(query):
         complexity = 0
-        complexity += query.upper().count('JOIN')
-        complexity += query.upper().count('WHERE')
-        complexity += query.upper().count('GROUP BY')
-        complexity += query.upper().count('ORDER BY')
+        complexity += query.upper().count("JOIN")
+        complexity += query.upper().count("WHERE")
+        complexity += query.upper().count("GROUP BY")
+        complexity += query.upper().count("ORDER BY")
         return complexity
 
     simple_query = "SELECT * FROM games WHERE season = 2024"
@@ -340,21 +339,23 @@ def test_parallel_backtest_speedup():
 def test_avoid_iterrows():
     """Test that vectorized operations are faster than iterrows."""
     n = 10000
-    df = pd.DataFrame({
-        'a': np.random.randint(1, 100, n),
-        'b': np.random.randint(1, 100, n),
-    })
+    df = pd.DataFrame(
+        {
+            "a": np.random.randint(1, 100, n),
+            "b": np.random.randint(1, 100, n),
+        }
+    )
 
     # BAD: Using iterrows
     start = time.time()
     result_slow = []
     for idx, row in df.iterrows():
-        result_slow.append(row['a'] + row['b'])
+        result_slow.append(row["a"] + row["b"])
     time_iterrows = time.time() - start
 
     # GOOD: Vectorized operation
     start = time.time()
-    result_fast = df['a'] + df['b']
+    result_fast = df["a"] + df["b"]
     time_vectorized = time.time() - start
 
     # Vectorized should be much faster
@@ -367,18 +368,20 @@ def test_avoid_iterrows():
 def test_apply_vs_vectorized():
     """Test that vectorized operations are faster than apply."""
     n = 10000
-    df = pd.DataFrame({
-        'yards': np.random.randint(0, 100, n),
-    })
+    df = pd.DataFrame(
+        {
+            "yards": np.random.randint(0, 100, n),
+        }
+    )
 
     # SLOWER: Using apply
     start = time.time()
-    result_apply = df['yards'].apply(lambda x: x * 2)
+    result_apply = df["yards"].apply(lambda x: x * 2)
     time_apply = time.time() - start
 
     # FASTER: Vectorized
     start = time.time()
-    result_vectorized = df['yards'] * 2
+    result_vectorized = df["yards"] * 2
     time_vectorized = time.time() - start
 
     # Vectorized should be faster
@@ -388,14 +391,16 @@ def test_apply_vs_vectorized():
 def test_groupby_agg_performance():
     """Test efficient groupby aggregations."""
     n = 100000
-    df = pd.DataFrame({
-        'team': np.random.choice(['TEAM_A', 'TEAM_B', 'TEAM_C'], n),
-        'yards': np.random.randint(0, 100, n),
-    })
+    df = pd.DataFrame(
+        {
+            "team": np.random.choice(["TEAM_A", "TEAM_B", "TEAM_C"], n),
+            "yards": np.random.randint(0, 100, n),
+        }
+    )
 
     # Efficient aggregation
     start = time.time()
-    result = df.groupby('team')['yards'].agg(['mean', 'sum', 'count'])
+    result = df.groupby("team")["yards"].agg(["mean", "sum", "count"])
     time_agg = time.time() - start
 
     # Should complete quickly (< 0.1s for 100k rows)
@@ -412,21 +417,25 @@ def test_memory_efficient_dtypes():
     n = 1000000
 
     # Inefficient: int64, float64
-    df_inefficient = pd.DataFrame({
-        'player_id': np.random.randint(1, 1000, n),  # int64
-        'yards': np.random.randint(0, 100, n),       # int64
-        'epa': np.random.randn(n),                   # float64
-    })
+    df_inefficient = pd.DataFrame(
+        {
+            "player_id": np.random.randint(1, 1000, n),  # int64
+            "yards": np.random.randint(0, 100, n),  # int64
+            "epa": np.random.randn(n),  # float64
+        }
+    )
 
     # Efficient: int16, float32
-    df_efficient = pd.DataFrame({
-        'player_id': np.random.randint(1, 1000, n).astype(np.int16),
-        'yards': np.random.randint(0, 100, n).astype(np.int16),
-        'epa': np.random.randn(n).astype(np.float32),
-    })
+    df_efficient = pd.DataFrame(
+        {
+            "player_id": np.random.randint(1, 1000, n).astype(np.int16),
+            "yards": np.random.randint(0, 100, n).astype(np.int16),
+            "epa": np.random.randn(n).astype(np.float32),
+        }
+    )
 
     mem_inefficient = df_inefficient.memory_usage(deep=True).sum() / 1024**2  # MB
-    mem_efficient = df_efficient.memory_usage(deep=True).sum() / 1024**2      # MB
+    mem_efficient = df_efficient.memory_usage(deep=True).sum() / 1024**2  # MB
 
     # Efficient should use less memory
     assert mem_efficient < mem_inefficient
@@ -465,18 +474,18 @@ def test_training_time_estimation_by_model_type():
 
     # Model complexity (rough estimates)
     model_times = {
-        'linear': 1.0,         # Baseline
-        'xgboost': 5.0,        # 5x slower than linear
-        'bayesian_mcmc': 60.0, # 60x slower (MCMC sampling)
-        'bnn': 30.0,           # 30x slower (variational inference)
+        "linear": 1.0,  # Baseline
+        "xgboost": 5.0,  # 5x slower than linear
+        "bayesian_mcmc": 60.0,  # 60x slower (MCMC sampling)
+        "bnn": 30.0,  # 30x slower (variational inference)
     }
 
     for model, relative_time in model_times.items():
         estimated_time = (n_samples / 1000) * relative_time
 
-        if model == 'linear':
+        if model == "linear":
             assert estimated_time == pytest.approx(10.0)
-        elif model == 'bayesian_mcmc':
+        elif model == "bayesian_mcmc":
             assert estimated_time == pytest.approx(600.0)
 
 
@@ -504,11 +513,11 @@ def test_training_time_scales_with_features():
 def test_identify_slowest_operations():
     """Test identification of slowest operations in pipeline."""
     operations = {
-        'data_loading': 2.0,
-        'feature_engineering': 15.0,  # Slowest
-        'model_training': 60.0,         # Second slowest
-        'prediction': 1.0,
-        'evaluation': 0.5,
+        "data_loading": 2.0,
+        "feature_engineering": 15.0,  # Slowest
+        "model_training": 60.0,  # Second slowest
+        "prediction": 1.0,
+        "evaluation": 0.5,
     }
 
     # Sort by time
@@ -518,29 +527,29 @@ def test_identify_slowest_operations():
     bottleneck_1 = sorted_ops[0]
     bottleneck_2 = sorted_ops[1]
 
-    assert bottleneck_1[0] == 'model_training'
-    assert bottleneck_2[0] == 'feature_engineering'
+    assert bottleneck_1[0] == "model_training"
+    assert bottleneck_2[0] == "feature_engineering"
 
 
 def test_profiling_recommendations():
     """Test performance recommendations based on profiling."""
     profile_results = {
-        'sql_query_time': 25.0,      # Slow
-        'feature_eng_time': 5.0,     # Fast
-        'training_time': 120.0,      # Very slow
+        "sql_query_time": 25.0,  # Slow
+        "feature_eng_time": 5.0,  # Fast
+        "training_time": 120.0,  # Very slow
     }
 
     recommendations = []
 
-    if profile_results['sql_query_time'] > 10:
+    if profile_results["sql_query_time"] > 10:
         recommendations.append("Optimize SQL queries (add indexes, reduce JOINs)")
 
-    if profile_results['training_time'] > 60:
+    if profile_results["training_time"] > 60:
         recommendations.append("Consider faster model or reduce hyperparameters")
 
     assert len(recommendations) == 2
-    assert any('SQL' in r for r in recommendations)
-    assert any('training' in r.lower() for r in recommendations)
+    assert any("SQL" in r for r in recommendations)
+    assert any("training" in r.lower() for r in recommendations)
 
 
 # ============================================================================
@@ -552,24 +561,21 @@ def test_end_to_end_optimization_workflow():
     """Test complete optimization workflow."""
     # Step 1: Profile current performance
     baseline_times = {
-        'data_load': 3.0,
-        'feature_eng': 20.0,
-        'training': 180.0,
+        "data_load": 3.0,
+        "feature_eng": 20.0,
+        "training": 180.0,
     }
 
     total_baseline = sum(baseline_times.values())
 
     # Step 2: Apply optimizations
     optimizations = {
-        'data_load': 0.8,    # 20% faster (SQL optimization)
-        'feature_eng': 0.6,  # 40% faster (vectorization)
-        'training': 0.7,     # 30% faster (MCMC tuning)
+        "data_load": 0.8,  # 20% faster (SQL optimization)
+        "feature_eng": 0.6,  # 40% faster (vectorization)
+        "training": 0.7,  # 30% faster (MCMC tuning)
     }
 
-    optimized_times = {
-        op: baseline_times[op] * speedup
-        for op, speedup in optimizations.items()
-    }
+    optimized_times = {op: baseline_times[op] * speedup for op, speedup in optimizations.items()}
 
     total_optimized = sum(optimized_times.values())
 

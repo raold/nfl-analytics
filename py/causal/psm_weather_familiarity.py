@@ -39,6 +39,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class PSMResult:
     """Container for PSM estimation results."""
+
     att: float
     se: float
     ci_lower: float
@@ -64,13 +65,24 @@ class PSMWeatherFamiliarityAnalyzer:
     """Propensity Score Matching for weather familiarity effects."""
 
     # Define team classifications
-    COLD_WEATHER_TEAMS = ['GB', 'CHI', 'BUF', 'CLE', 'PIT', 'NE', 'NYG', 'NYJ', 'PHI', 'WAS', 'BAL']
-    DOME_TEAMS = ['NO', 'ATL', 'DET', 'MIN', 'DAL', 'ARI', 'LAR', 'LAC', 'IND', 'LV']  # LAR/LAC when indoors
+    COLD_WEATHER_TEAMS = ["GB", "CHI", "BUF", "CLE", "PIT", "NE", "NYG", "NYJ", "PHI", "WAS", "BAL"]
+    DOME_TEAMS = [
+        "NO",
+        "ATL",
+        "DET",
+        "MIN",
+        "DAL",
+        "ARI",
+        "LAR",
+        "LAC",
+        "IND",
+        "LV",
+    ]  # LAR/LAC when indoors
 
     def __init__(
         self,
         db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01",
-        weather_data_path: str = "/Users/dro/rice/nfl-analytics/data/historical_weather_2018_2024.csv"
+        weather_data_path: str = "/Users/dro/rice/nfl-analytics/data/historical_weather_2018_2024.csv",
     ):
         """Initialize with database and weather data."""
         self.db_url = db_url
@@ -81,10 +93,7 @@ class PSMWeatherFamiliarityAnalyzer:
         """Create database connection."""
         return psycopg2.connect(self.db_url)
 
-    def _fetch_game_data_with_weather(
-        self,
-        seasons: list[int]
-    ) -> pd.DataFrame:
+    def _fetch_game_data_with_weather(self, seasons: list[int]) -> pd.DataFrame:
         """
         Fetch game data and merge with weather information.
 
@@ -133,14 +142,14 @@ class PSMWeatherFamiliarityAnalyzer:
             df = pd.read_sql_query(query, conn, params=(seasons,))
 
         # Convert temperature to numeric (may be stored as string)
-        df['temp_numeric'] = pd.to_numeric(df['temp'], errors='coerce')
-        df['wind_numeric'] = pd.to_numeric(df['wind'], errors='coerce')
+        df["temp_numeric"] = pd.to_numeric(df["temp"], errors="coerce")
+        df["wind_numeric"] = pd.to_numeric(df["wind"], errors="coerce")
 
         # Classify dome games
-        df['is_dome'] = df['roof'].isin(['dome', 'closed'])
+        df["is_dome"] = df["roof"].isin(["dome", "closed"])
 
         # Classify cold weather (< 40°F)
-        df['is_cold'] = (df['temp_numeric'] < 40) & (~df['is_dome'])
+        df["is_cold"] = (df["temp_numeric"] < 40) & (~df["is_dome"])
 
         logger.info(f"Fetched {len(df)} games with weather data")
         logger.info(f"Cold games: {df['is_cold'].sum()}, Dome games: {df['is_dome'].sum()}")
@@ -151,7 +160,7 @@ class PSMWeatherFamiliarityAnalyzer:
         self,
         seasons: list[int] = list(range(2018, 2025)),
         n_matches: int = 3,
-        output_dir: Path | None = None
+        output_dir: Path | None = None,
     ) -> PSMResult:
         """
         Analyze home field advantage for cold-weather teams in cold conditions.
@@ -174,44 +183,49 @@ class PSMWeatherFamiliarityAnalyzer:
         df = self._fetch_game_data_with_weather(seasons)
 
         # Define treatment: cold-weather team at home in cold conditions
-        df['cold_weather_treatment'] = (
-            df['home_team'].isin(self.COLD_WEATHER_TEAMS) &
-            df['is_cold']
+        df["cold_weather_treatment"] = (
+            df["home_team"].isin(self.COLD_WEATHER_TEAMS) & df["is_cold"]
         ).astype(int)
 
         # Control: non-cold-weather teams at home in moderate weather
-        df['control_group'] = (
-            (~df['home_team'].isin(self.COLD_WEATHER_TEAMS)) &
-            (df['temp_numeric'] >= 50) &
-            (df['temp_numeric'] <= 70) &
-            (~df['is_dome'])
+        df["control_group"] = (
+            (~df["home_team"].isin(self.COLD_WEATHER_TEAMS))
+            & (df["temp_numeric"] >= 50)
+            & (df["temp_numeric"] <= 70)
+            & (~df["is_dome"])
         ).astype(int)
 
         # Filter to treatment + control only
-        df = df[(df['cold_weather_treatment'] == 1) | (df['control_group'] == 1)].copy()
+        df = df[(df["cold_weather_treatment"] == 1) | (df["control_group"] == 1)].copy()
 
         # Covariates
-        covariates = ['away_rest', 'home_rest', 'spread_close', 'wind_numeric']
+        covariates = ["away_rest", "home_rest", "spread_close", "wind_numeric"]
 
         # Drop missing
-        df = df.dropna(subset=covariates + ['home_total_yards'])
+        df = df.dropna(subset=covariates + ["home_total_yards"])
 
         # Estimate propensity scores
-        propensity_scores = self._estimate_propensity_scores(df, 'cold_weather_treatment', covariates)
+        propensity_scores = self._estimate_propensity_scores(
+            df, "cold_weather_treatment", covariates
+        )
 
         # Common support
-        treated_ps = propensity_scores[df['cold_weather_treatment'] == 1]
-        control_ps = propensity_scores[df['cold_weather_treatment'] == 0]
+        treated_ps = propensity_scores[df["cold_weather_treatment"] == 1]
+        control_ps = propensity_scores[df["cold_weather_treatment"] == 0]
         common_min = max(treated_ps.min(), control_ps.min())
         common_max = min(treated_ps.max(), control_ps.max())
-        common_support_pct = 100 * (
-            ((treated_ps >= common_min) & (treated_ps <= common_max)).sum() +
-            ((control_ps >= common_min) & (control_ps <= common_max)).sum()
-        ) / len(df)
+        common_support_pct = (
+            100
+            * (
+                ((treated_ps >= common_min) & (treated_ps <= common_max)).sum()
+                + ((control_ps >= common_min) & (control_ps <= common_max)).sum()
+            )
+            / len(df)
+        )
 
         # Match
         matched_treated, matched_control = self._match_observations(
-            df, propensity_scores, 'cold_weather_treatment', n_matches=n_matches
+            df, propensity_scores, "cold_weather_treatment", n_matches=n_matches
         )
 
         # Balance
@@ -219,8 +233,7 @@ class PSMWeatherFamiliarityAnalyzer:
 
         # ATT
         att, se, ci_lower, ci_upper, p_value = self._estimate_att(
-            matched_treated['home_total_yards'],
-            matched_control['home_total_yards']
+            matched_treated["home_total_yards"], matched_control["home_total_yards"]
         )
 
         result = PSMResult(
@@ -229,11 +242,11 @@ class PSMWeatherFamiliarityAnalyzer:
             ci_lower=ci_lower,
             ci_upper=ci_upper,
             p_value=p_value,
-            n_treated=len(df[df['cold_weather_treatment'] == 1]),
-            n_control=len(df[df['cold_weather_treatment'] == 0]),
+            n_treated=len(df[df["cold_weather_treatment"] == 1]),
+            n_control=len(df[df["cold_weather_treatment"] == 0]),
             n_matched=len(matched_control),
             balance_diagnostics=balance,
-            common_support_pct=common_support_pct
+            common_support_pct=common_support_pct,
         )
 
         logger.info(f"Cold Weather Home Advantage PSM Results:\n{result}")
@@ -247,7 +260,7 @@ class PSMWeatherFamiliarityAnalyzer:
         self,
         seasons: list[int] = list(range(2018, 2025)),
         n_matches: int = 3,
-        output_dir: Path | None = None
+        output_dir: Path | None = None,
     ) -> PSMResult:
         """
         Analyze performance penalty for dome teams playing outdoors.
@@ -270,42 +283,46 @@ class PSMWeatherFamiliarityAnalyzer:
         df = self._fetch_game_data_with_weather(seasons)
 
         # Define treatment: dome team playing outdoor road game
-        df['dome_outdoor_treatment'] = (
-            df['away_team'].isin(self.DOME_TEAMS) &
-            (~df['is_dome'])
+        df["dome_outdoor_treatment"] = (
+            df["away_team"].isin(self.DOME_TEAMS) & (~df["is_dome"])
         ).astype(int)
 
         # Control: outdoor team playing outdoor road game
-        df['control_group'] = (
-            (~df['away_team'].isin(self.DOME_TEAMS)) &
-            (~df['is_dome'])
-        ).astype(int)
+        df["control_group"] = ((~df["away_team"].isin(self.DOME_TEAMS)) & (~df["is_dome"])).astype(
+            int
+        )
 
         # Filter
-        df = df[(df['dome_outdoor_treatment'] == 1) | (df['control_group'] == 1)].copy()
+        df = df[(df["dome_outdoor_treatment"] == 1) | (df["control_group"] == 1)].copy()
 
         # Covariates
-        covariates = ['away_rest', 'home_rest', 'spread_close', 'temp_numeric', 'wind_numeric']
+        covariates = ["away_rest", "home_rest", "spread_close", "temp_numeric", "wind_numeric"]
 
         # Drop missing
-        df = df.dropna(subset=covariates + ['away_total_yards'])
+        df = df.dropna(subset=covariates + ["away_total_yards"])
 
         # Propensity scores
-        propensity_scores = self._estimate_propensity_scores(df, 'dome_outdoor_treatment', covariates)
+        propensity_scores = self._estimate_propensity_scores(
+            df, "dome_outdoor_treatment", covariates
+        )
 
         # Common support
-        treated_ps = propensity_scores[df['dome_outdoor_treatment'] == 1]
-        control_ps = propensity_scores[df['dome_outdoor_treatment'] == 0]
+        treated_ps = propensity_scores[df["dome_outdoor_treatment"] == 1]
+        control_ps = propensity_scores[df["dome_outdoor_treatment"] == 0]
         common_min = max(treated_ps.min(), control_ps.min())
         common_max = min(treated_ps.max(), control_ps.max())
-        common_support_pct = 100 * (
-            ((treated_ps >= common_min) & (treated_ps <= common_max)).sum() +
-            ((control_ps >= common_min) & (control_ps <= common_max)).sum()
-        ) / len(df)
+        common_support_pct = (
+            100
+            * (
+                ((treated_ps >= common_min) & (treated_ps <= common_max)).sum()
+                + ((control_ps >= common_min) & (control_ps <= common_max)).sum()
+            )
+            / len(df)
+        )
 
         # Match
         matched_treated, matched_control = self._match_observations(
-            df, propensity_scores, 'dome_outdoor_treatment', n_matches=n_matches
+            df, propensity_scores, "dome_outdoor_treatment", n_matches=n_matches
         )
 
         # Balance
@@ -313,8 +330,7 @@ class PSMWeatherFamiliarityAnalyzer:
 
         # ATT
         att, se, ci_lower, ci_upper, p_value = self._estimate_att(
-            matched_treated['away_total_yards'],
-            matched_control['away_total_yards']
+            matched_treated["away_total_yards"], matched_control["away_total_yards"]
         )
 
         result = PSMResult(
@@ -323,11 +339,11 @@ class PSMWeatherFamiliarityAnalyzer:
             ci_lower=ci_lower,
             ci_upper=ci_upper,
             p_value=p_value,
-            n_treated=len(df[df['dome_outdoor_treatment'] == 1]),
-            n_control=len(df[df['dome_outdoor_treatment'] == 0]),
+            n_treated=len(df[df["dome_outdoor_treatment"] == 1]),
+            n_control=len(df[df["dome_outdoor_treatment"] == 0]),
             n_matched=len(matched_control),
             balance_diagnostics=balance,
-            common_support_pct=common_support_pct
+            common_support_pct=common_support_pct,
         )
 
         logger.info(f"Dome Team Outdoor Penalty PSM Results:\n{result}")
@@ -338,10 +354,7 @@ class PSMWeatherFamiliarityAnalyzer:
         return result
 
     def _estimate_propensity_scores(
-        self,
-        df: pd.DataFrame,
-        treatment_var: str,
-        covariates: list[str]
+        self, df: pd.DataFrame, treatment_var: str, covariates: list[str]
     ) -> np.ndarray:
         """Estimate propensity scores using logistic regression."""
         X = df[covariates].values
@@ -364,11 +377,11 @@ class PSMWeatherFamiliarityAnalyzer:
         propensity_scores: np.ndarray,
         treatment_var: str,
         n_matches: int = 1,
-        caliper: float = 0.1
+        caliper: float = 0.1,
     ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """Match treated and control observations using nearest neighbor."""
         df = df.copy()
-        df['propensity_score'] = propensity_scores
+        df["propensity_score"] = propensity_scores
 
         treated = df[df[treatment_var] == 1].copy()
         control = df[df[treatment_var] == 0].copy()
@@ -376,15 +389,15 @@ class PSMWeatherFamiliarityAnalyzer:
         matched_control_indices = []
 
         for idx, treated_row in treated.iterrows():
-            treated_ps = treated_row['propensity_score']
+            treated_ps = treated_row["propensity_score"]
 
-            control['ps_distance'] = np.abs(control['propensity_score'] - treated_ps)
-            eligible_control = control[control['ps_distance'] <= caliper].copy()
+            control["ps_distance"] = np.abs(control["propensity_score"] - treated_ps)
+            eligible_control = control[control["ps_distance"] <= caliper].copy()
 
             if len(eligible_control) == 0:
                 continue
 
-            nearest = eligible_control.nsmallest(n_matches, 'ps_distance')
+            nearest = eligible_control.nsmallest(n_matches, "ps_distance")
             matched_control_indices.extend(nearest.index.tolist())
 
         matched_control = control.loc[matched_control_indices].copy()
@@ -393,10 +406,7 @@ class PSMWeatherFamiliarityAnalyzer:
         return treated, matched_control
 
     def _calculate_balance_diagnostics(
-        self,
-        matched_treated: pd.DataFrame,
-        matched_control: pd.DataFrame,
-        covariates: list[str]
+        self, matched_treated: pd.DataFrame, matched_control: pd.DataFrame, covariates: list[str]
     ) -> dict[str, float]:
         """Calculate standardized mean difference (SMD) for balance."""
         balance = {}
@@ -415,9 +425,7 @@ class PSMWeatherFamiliarityAnalyzer:
         return balance
 
     def _estimate_att(
-        self,
-        treated_outcome: pd.Series,
-        control_outcome: pd.Series
+        self, treated_outcome: pd.Series, control_outcome: pd.Series
     ) -> tuple[float, float, float, float, float]:
         """Estimate ATT with standard error and confidence intervals."""
         att = treated_outcome.mean() - control_outcome.mean()
@@ -430,33 +438,30 @@ class PSMWeatherFamiliarityAnalyzer:
         ci_upper = att + 1.96 * se
 
         t_stat = att / se
-        p_value = 2 * (1 - stats.t.cdf(abs(t_stat), df=len(treated_outcome) + len(control_outcome) - 2))
+        p_value = 2 * (
+            1 - stats.t.cdf(abs(t_stat), df=len(treated_outcome) + len(control_outcome) - 2)
+        )
 
         return att, se, ci_lower, ci_upper, p_value
 
-    def _plot_balance_diagnostics(
-        self,
-        balance: dict[str, float],
-        output_dir: Path,
-        filename: str
-    ):
+    def _plot_balance_diagnostics(self, balance: dict[str, float], output_dir: Path, filename: str):
         """Plot balance diagnostics (SMD)."""
         plt.figure(figsize=(8, 6))
 
         covariates = list(balance.keys())
         smds = list(balance.values())
 
-        plt.barh(covariates, smds, color='steelblue')
-        plt.axvline(x=0.1, color='red', linestyle='--', label='SMD < 0.1 threshold')
-        plt.xlabel('Standardized Mean Difference (SMD)', fontsize=12)
-        plt.ylabel('Covariate', fontsize=12)
-        plt.title('Balance Diagnostics After Matching', fontsize=14, fontweight='bold')
+        plt.barh(covariates, smds, color="steelblue")
+        plt.axvline(x=0.1, color="red", linestyle="--", label="SMD < 0.1 threshold")
+        plt.xlabel("Standardized Mean Difference (SMD)", fontsize=12)
+        plt.ylabel("Covariate", fontsize=12)
+        plt.title("Balance Diagnostics After Matching", fontsize=14, fontweight="bold")
         plt.legend()
-        plt.grid(alpha=0.3, axis='x')
+        plt.grid(alpha=0.3, axis="x")
         plt.tight_layout()
 
         output_path = output_dir / f"{filename}.png"
-        plt.savefig(output_path, dpi=300, bbox_inches='tight')
+        plt.savefig(output_path, dpi=300, bbox_inches="tight")
         logger.info(f"Saved balance plot to {output_path}")
         plt.close()
 
@@ -481,5 +486,9 @@ if __name__ == "__main__":
     logger.info("\n" + "=" * 80)
     logger.info("SUMMARY OF WEATHER FAMILIARITY PSM RESULTS")
     logger.info("=" * 80)
-    logger.info(f"\n1. Cold Weather Home Advantage: {cold_weather_result.att:.2f} yards (p={cold_weather_result.p_value:.4f})")
-    logger.info(f"2. Dome Team Outdoor Penalty: {dome_outdoor_result.att:.2f} yards (p={dome_outdoor_result.p_value:.4f})")
+    logger.info(
+        f"\n1. Cold Weather Home Advantage: {cold_weather_result.att:.2f} yards (p={cold_weather_result.p_value:.4f})"
+    )
+    logger.info(
+        f"2. Dome Team Outdoor Penalty: {dome_outdoor_result.att:.2f} yards (p={dome_outdoor_result.p_value:.4f})"
+    )

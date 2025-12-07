@@ -31,27 +31,55 @@ class TeamNameStandardizer:
 
     # Standard 3-letter abbreviations
     STANDARD_TEAMS = {
-        'ARI', 'ATL', 'BAL', 'BUF', 'CAR', 'CHI', 'CIN', 'CLE',
-        'DAL', 'DEN', 'DET', 'GB', 'HOU', 'IND', 'JAX', 'KC',
-        'LAC', 'LAR', 'LV', 'MIA', 'MIN', 'NE', 'NO', 'NYG',
-        'NYJ', 'PHI', 'PIT', 'SEA', 'SF', 'TB', 'TEN', 'WAS'
+        "ARI",
+        "ATL",
+        "BAL",
+        "BUF",
+        "CAR",
+        "CHI",
+        "CIN",
+        "CLE",
+        "DAL",
+        "DEN",
+        "DET",
+        "GB",
+        "HOU",
+        "IND",
+        "JAX",
+        "KC",
+        "LAC",
+        "LAR",
+        "LV",
+        "MIA",
+        "MIN",
+        "NE",
+        "NO",
+        "NYG",
+        "NYJ",
+        "PHI",
+        "PIT",
+        "SEA",
+        "SF",
+        "TB",
+        "TEN",
+        "WAS",
     }
 
     # Historical mappings (team relocations)
     HISTORICAL_MAPPINGS = {
-        'OAK': {'before': 2020, 'after': 'LV'},  # Raiders
-        'SD': {'before': 2017, 'after': 'LAC'},   # Chargers
-        'STL': {'before': 2016, 'after': 'LAR'},  # Rams
+        "OAK": {"before": 2020, "after": "LV"},  # Raiders
+        "SD": {"before": 2017, "after": "LAC"},  # Chargers
+        "STL": {"before": 2016, "after": "LAR"},  # Rams
     }
 
     # Common aliases
     ALIAS_MAPPINGS = {
-        'LA': None,  # Ambiguous - needs context
-        'WSH': 'WAS',
-        'WFT': 'WAS',  # Washington Football Team (2020-2021)
-        'JAC': 'JAX',
-        'SL': 'STL',   # Historical St. Louis
-        'GNB': 'GB',
+        "LA": None,  # Ambiguous - needs context
+        "WSH": "WAS",
+        "WFT": "WAS",  # Washington Football Team (2020-2021)
+        "JAC": "JAX",
+        "SL": "STL",  # Historical St. Louis
+        "GNB": "GB",
     }
 
     def __init__(self):
@@ -59,10 +87,7 @@ class TeamNameStandardizer:
         self.warnings: list[str] = []
 
     def standardize(
-        self,
-        team: str,
-        season: int | None = None,
-        context_teams: set[str] | None = None
+        self, team: str, season: int | None = None, context_teams: set[str] | None = None
     ) -> str:
         """
         Standardize team abbreviation.
@@ -90,8 +115,8 @@ class TeamNameStandardizer:
         # Check historical mappings
         if team in self.HISTORICAL_MAPPINGS:
             mapping = self.HISTORICAL_MAPPINGS[team]
-            if season and season >= mapping['before']:
-                return mapping['after']
+            if season and season >= mapping["before"]:
+                return mapping["after"]
             return team  # Keep historical abbreviation for old seasons
 
         # Check aliases
@@ -101,9 +126,9 @@ class TeamNameStandardizer:
                 return mapped
 
             # Handle ambiguous "LA"
-            if team == 'LA' and context_teams:
+            if team == "LA" and context_teams:
                 # If only one LA team in context, use that
-                la_teams = {'LAR', 'LAC'} & context_teams
+                la_teams = {"LAR", "LAC"} & context_teams
                 if len(la_teams) == 1:
                     return la_teams.pop()
 
@@ -119,10 +144,7 @@ class TeamNameStandardizer:
         return team
 
     def standardize_dataframe(
-        self,
-        df: pd.DataFrame,
-        team_columns: list[str],
-        season_column: str | None = 'season'
+        self, df: pd.DataFrame, team_columns: list[str], season_column: str | None = "season"
     ) -> pd.DataFrame:
         """
         Standardize team names in a DataFrame.
@@ -152,9 +174,9 @@ class TeamNameStandardizer:
                 lambda row: self.standardize(
                     row[col],
                     season=row.get(season_column) if season_column in df_copy.columns else None,
-                    context_teams=all_teams
+                    context_teams=all_teams,
                 ),
-                axis=1
+                axis=1,
             )
 
         return df_copy
@@ -177,9 +199,7 @@ class DataCleaner:
         self.cleaning_stats: dict[str, Any] = {}
 
     def handle_column_aliases(
-        self,
-        df: pd.DataFrame,
-        alias_map: dict[str, list[str]]
+        self, df: pd.DataFrame, alias_map: dict[str, list[str]]
     ) -> pd.DataFrame:
         """
         Handle column name variations.
@@ -211,10 +231,7 @@ class DataCleaner:
         return df_copy
 
     def remove_duplicates(
-        self,
-        df: pd.DataFrame,
-        subset: list[str] | None = None,
-        keep: str = 'last'
+        self, df: pd.DataFrame, subset: list[str] | None = None, keep: str = "last"
     ) -> pd.DataFrame:
         """
         Remove duplicate rows.
@@ -234,15 +251,12 @@ class DataCleaner:
         duplicates_removed = before_count - after_count
         if duplicates_removed > 0:
             logger.warning(f"Removed {duplicates_removed} duplicate rows")
-            self.cleaning_stats['duplicates_removed'] = duplicates_removed
+            self.cleaning_stats["duplicates_removed"] = duplicates_removed
 
         return df_clean
 
     def standardize_datetimes(
-        self,
-        df: pd.DataFrame,
-        datetime_columns: list[str],
-        target_tz: str = 'UTC'
+        self, df: pd.DataFrame, datetime_columns: list[str], target_tz: str = "UTC"
     ) -> pd.DataFrame:
         """
         Standardize datetime columns to a specific timezone.
@@ -273,19 +287,15 @@ class DataCleaner:
             try:
                 if df_copy[col].dt.tz is None:
                     # Assume UTC if no timezone
-                    df_copy[col] = df_copy[col].dt.tz_localize('UTC')
+                    df_copy[col] = df_copy[col].dt.tz_localize("UTC")
                 else:
-                    df_copy[col] = df_copy[col].dt.tz_convert('UTC')
+                    df_copy[col] = df_copy[col].dt.tz_convert("UTC")
             except Exception as e:
                 logger.warning(f"Could not convert {col} to {target_tz}: {e}")
 
         return df_copy
 
-    def fill_nulls(
-        self,
-        df: pd.DataFrame,
-        fill_strategy: dict[str, Any]
-    ) -> pd.DataFrame:
+    def fill_nulls(self, df: pd.DataFrame, fill_strategy: dict[str, Any]) -> pd.DataFrame:
         """
         Fill null values using specified strategies.
 
@@ -303,13 +313,13 @@ class DataCleaner:
             if col not in df_copy.columns:
                 continue
 
-            if strategy == 'ffill':
-                df_copy[col] = df_copy[col].fillna(method='ffill')
-            elif strategy == 'bfill':
-                df_copy[col] = df_copy[col].fillna(method='bfill')
-            elif strategy == 'mean':
+            if strategy == "ffill":
+                df_copy[col] = df_copy[col].fillna(method="ffill")
+            elif strategy == "bfill":
+                df_copy[col] = df_copy[col].fillna(method="bfill")
+            elif strategy == "mean":
                 df_copy[col] = df_copy[col].fillna(df_copy[col].mean())
-            elif strategy == 'median':
+            elif strategy == "median":
                 df_copy[col] = df_copy[col].fillna(df_copy[col].median())
             else:
                 # Assume it's a constant value
@@ -317,11 +327,7 @@ class DataCleaner:
 
         return df_copy
 
-    def enforce_types(
-        self,
-        df: pd.DataFrame,
-        type_map: dict[str, str]
-    ) -> pd.DataFrame:
+    def enforce_types(self, df: pd.DataFrame, type_map: dict[str, str]) -> pd.DataFrame:
         """
         Enforce data types on columns.
 
@@ -339,7 +345,7 @@ class DataCleaner:
                 continue
 
             try:
-                if dtype == 'datetime64[ns]':
+                if dtype == "datetime64[ns]":
                     df_copy[col] = pd.to_datetime(df_copy[col])
                 else:
                     df_copy[col] = df_copy[col].astype(dtype)
@@ -360,12 +366,12 @@ if __name__ == "__main__":
 
     # Test various team names
     test_cases = [
-        ('ARI', 2024, 'ARI'),
-        ('LA', 2024, None),  # Ambiguous
-        ('OAK', 2019, 'OAK'),  # Before move
-        ('OAK', 2020, 'LV'),   # After move
-        ('WSH', 2024, 'WAS'),
-        ('JAC', 2024, 'JAX'),
+        ("ARI", 2024, "ARI"),
+        ("LA", 2024, None),  # Ambiguous
+        ("OAK", 2019, "OAK"),  # Before move
+        ("OAK", 2020, "LV"),  # After move
+        ("WSH", 2024, "WAS"),
+        ("JAC", 2024, "JAX"),
     ]
 
     print("Team Name Standardization Tests:")
@@ -379,12 +385,14 @@ if __name__ == "__main__":
     cleaner = DataCleaner()
 
     # Sample data with column alias
-    df_test = pd.DataFrame({
-        'game_id': ['2025_01_SF_PIT', '2025_01_BAL_KC'],
-        'qtr': [1, 2],  # Should be renamed to 'quarter'
-        'epa': [0.5, -0.3]
-    })
+    df_test = pd.DataFrame(
+        {
+            "game_id": ["2025_01_SF_PIT", "2025_01_BAL_KC"],
+            "qtr": [1, 2],  # Should be renamed to 'quarter'
+            "epa": [0.5, -0.3],
+        }
+    )
 
     print(f"Before: {df_test.columns.tolist()}")
-    df_clean = cleaner.handle_column_aliases(df_test, {'quarter': ['qtr', 'quarter']})
+    df_clean = cleaner.handle_column_aliases(df_test, {"quarter": ["qtr", "quarter"]})
     print(f"After: {df_clean.columns.tolist()}")

@@ -23,7 +23,6 @@ def test_fetch_team_game_features_v2_basic():
     assert result is not None
 
 
-
 def test_fetch_team_game_features_v2_edge_cases():
     """Test fetch_team_game_features_v2: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_fetch_team_game_features_v2_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_team_game_features_v2_error_handling():
     """Test fetch_team_game_features_v2 error handling."""
     with pytest.raises(ValueError):
         fetch_team_game_features_v2(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_fetch_team_game_features_v2_property_idempotent(self, conn):
 
     # Assert property
     assert fetch_team_game_features_v2(conn) == result, "idempotent violated"
-
 
 
 def test_compute_team_history_v2_basic():
@@ -67,7 +63,6 @@ def test_compute_team_history_v2_basic():
     assert result is not None
 
 
-
 def test_compute_team_history_v2_edge_cases():
     """Test compute_team_history_v2: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_compute_team_history_v2_edge_cases():
     assert result is not None
 
 
-
 def test_compute_team_history_v2_error_handling():
     """Test compute_team_history_v2 error handling."""
     with pytest.raises(ValueError):
         compute_team_history_v2(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_compute_team_history_v2_property_idempotent(self, df):
 
     # Assert property
     assert compute_team_history_v2(df) == result, "idempotent violated"
-
 
 
 def test_pivot_to_games_v2_basic():
@@ -111,7 +103,6 @@ def test_pivot_to_games_v2_basic():
     assert result is not None
 
 
-
 def test_pivot_to_games_v2_edge_cases():
     """Test pivot_to_games_v2: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_pivot_to_games_v2_edge_cases():
     assert result is not None
 
 
-
 def test_pivot_to_games_v2_error_handling():
     """Test pivot_to_games_v2 error handling."""
     with pytest.raises(ValueError):
         pivot_to_games_v2(invalid_input)
-
 
 
 @given(st.integers())
@@ -140,7 +129,6 @@ def test_pivot_to_games_v2_property_idempotent(self, df):
 
     # Assert property
     assert pivot_to_games_v2(df) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -155,7 +143,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -168,9 +155,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

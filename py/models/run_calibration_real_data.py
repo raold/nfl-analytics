@@ -34,11 +34,7 @@ def load_real_passing_data():
     logger.info("Loading real passing data...")
 
     conn = psycopg2.connect(
-        host="localhost",
-        port=5544,
-        user="dro",
-        password="sicillionbillions",
-        database="devdb01"
+        host="localhost", port=5544, user="dro", password="sicillionbillions", database="devdb01"
     )
 
     # Get passing yards from player_game_stats
@@ -135,22 +131,22 @@ def apply_temperature_scaling(predictions, temperature):
 def run_temperature_scaling_experiments():
     """Run temperature scaling experiments on real data"""
 
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("BNN CALIBRATION - TEMPERATURE SCALING ON REAL DATA")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # Load real data
     df = load_real_passing_data()
 
     # Train/test split (2020-2023 train, 2024 test)
-    train_df = df[df['season'] <= 2023].copy()
-    test_df = df[df['season'] == 2024].copy()
+    train_df = df[df["season"] <= 2023].copy()
+    test_df = df[df["season"] == 2024].copy()
 
     logger.info(f"\nTrain: {len(train_df)} games (2020-2023)")
     logger.info(f"Test: {len(test_df)} games (2024)")
 
     # Use test set for calibration
-    y_test = test_df['yards'].values
+    y_test = test_df["yards"].values
 
     # Simulate BNN predictions (under-calibrated)
     logger.info("\nSimulating under-calibrated BNN predictions...")
@@ -179,14 +175,16 @@ def run_temperature_scaling_experiments():
 
         status = "✓ PASS" if 0.85 <= coverage_90 <= 0.95 else "✗ FAIL"
 
-        results.append({
-            "temperature": temp,
-            "coverage_90": coverage_90,
-            "coverage_68": coverage_68,
-            "interval_width_90": interval_width_90,
-            "mae": mae,
-            "status": status
-        })
+        results.append(
+            {
+                "temperature": temp,
+                "coverage_90": coverage_90,
+                "coverage_68": coverage_68,
+                "interval_width_90": interval_width_90,
+                "mae": mae,
+                "status": status,
+            }
+        )
 
         logger.info(
             f"T={temp:.1f}: Coverage={coverage_90:.1%}, "
@@ -194,23 +192,22 @@ def run_temperature_scaling_experiments():
         )
 
     # Find optimal temperature
-    passing_results = [r for r in results if r['status'] == "✓ PASS"]
+    passing_results = [r for r in results if r["status"] == "✓ PASS"]
 
     if passing_results:
         # Choose the one closest to 90% with narrowest interval
         optimal_result = min(
-            passing_results,
-            key=lambda r: (abs(r['coverage_90'] - 0.90), r['interval_width_90'])
+            passing_results, key=lambda r: (abs(r["coverage_90"] - 0.90), r["interval_width_90"])
         )
     else:
         # No passing results, take closest to 90%
-        optimal_result = min(results, key=lambda r: abs(r['coverage_90'] - 0.90))
+        optimal_result = min(results, key=lambda r: abs(r["coverage_90"] - 0.90))
         logger.warning("⚠️  No temperature achieved 85-95% coverage!")
 
     # Print optimal result
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("OPTIMAL TEMPERATURE")
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info(f"Temperature: {optimal_result['temperature']:.1f}")
     logger.info(f"Coverage 90%: {optimal_result['coverage_90']:.1%} (target: 85-95%)")
     logger.info(f"Coverage 68%: {optimal_result['coverage_68']:.1%} (target: 63-73%)")
@@ -225,29 +222,43 @@ def run_temperature_scaling_experiments():
 
     output_file = output_dir / f"temperature_scaling_real_data_{timestamp}.json"
     with open(output_file, "w") as f:
-        json.dump({
-            "optimal_temperature": optimal_result["temperature"],
-            "optimal_metrics": optimal_result,
-            "all_results": results,
-            "test_size": len(y_test),
-            "baseline_coverage": baseline_coverage,
-            "recommendation": (
-                f"Use temperature={optimal_result['temperature']:.1f} "
-                f"for production BNN predictions"
-            )
-        }, f, indent=2)
+        json.dump(
+            {
+                "optimal_temperature": optimal_result["temperature"],
+                "optimal_metrics": optimal_result,
+                "all_results": results,
+                "test_size": len(y_test),
+                "baseline_coverage": baseline_coverage,
+                "recommendation": (
+                    f"Use temperature={optimal_result['temperature']:.1f} "
+                    f"for production BNN predictions"
+                ),
+            },
+            f,
+            indent=2,
+        )
 
     logger.info(f"\n✓ Results saved to: {output_file}")
 
     # Production recommendation
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("PRODUCTION RECOMMENDATION")
-    logger.info("="*70)
-    logger.info(f"1. Apply temperature T={optimal_result['temperature']:.1f} to all BNN predictions")
+    logger.info("=" * 70)
+    logger.info(
+        f"1. Apply temperature T={optimal_result['temperature']:.1f} to all BNN predictions"
+    )
     logger.info("2. Implementation:")
-    logger.info("   predictions['std'] *= {:.1f}".format(optimal_result['temperature']))
-    logger.info("   predictions['q05'] = mean - 1.645 * (std * {:.1f})".format(optimal_result['temperature']))
-    logger.info("   predictions['q95'] = mean + 1.645 * (std * {:.1f})".format(optimal_result['temperature']))
+    logger.info("   predictions['std'] *= {:.1f}".format(optimal_result["temperature"]))
+    logger.info(
+        "   predictions['q05'] = mean - 1.645 * (std * {:.1f})".format(
+            optimal_result["temperature"]
+        )
+    )
+    logger.info(
+        "   predictions['q95'] = mean + 1.645 * (std * {:.1f})".format(
+            optimal_result["temperature"]
+        )
+    )
     logger.info("3. Validate on fresh 2024 data")
     logger.info("4. Monitor calibration in production (target: 85-95%)")
 

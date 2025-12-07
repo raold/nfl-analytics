@@ -84,9 +84,7 @@ def analyze_task(args):
     if args.verbose:
         print("\nDETAILED SCORES:")
         for agent_type, score in sorted(
-            routing.context["scores"].items(),
-            key=lambda x: x[1],
-            reverse=True
+            routing.context["scores"].items(), key=lambda x: x[1], reverse=True
         ):
             agent = coordinator.get_agent_info(agent_type)
             print(f"  {agent.name:30s} {score:.1%}")
@@ -108,7 +106,7 @@ def list_agents(args):
         print(f"  Type: {agent_key}")
         print(f"  Description: {info['description']}")
         print(f"  Responsibilities: {len(info['responsibilities'])}")
-        if info['dependencies']:
+        if info["dependencies"]:
             print(f"  Dependencies: {', '.join(info['dependencies'])}")
         if args.verbose:
             print(f"  Sample Keywords: {', '.join(info['keywords_sample'])}")
@@ -208,7 +206,7 @@ def show_history(args):
     for i, entry in enumerate(reversed(history), 1):
         print(f"{i}. {entry['task']}")
         print(f"   Primary: {entry['primary_agent']} (confidence: {entry['confidence']})")
-        if entry['supporting_agents']:
+        if entry["supporting_agents"]:
             print(f"   Support: {', '.join(entry['supporting_agents'])}")
         print(f"   Created: {entry['created_at']}")
         print()
@@ -228,62 +226,34 @@ def main():
 
     # Analyze command
     analyze_parser = subparsers.add_parser(
-        "analyze",
-        help="Analyze a task and get routing recommendation"
+        "analyze", help="Analyze a task and get routing recommendation"
     )
     analyze_parser.add_argument("task", help="Task description to analyze")
+    analyze_parser.add_argument("--files", nargs="+", help="Files involved in the task")
     analyze_parser.add_argument(
-        "--files",
-        nargs="+",
-        help="Files involved in the task"
-    )
-    analyze_parser.add_argument(
-        "-v", "--verbose",
-        action="store_true",
-        help="Show detailed scores for all agents"
+        "-v", "--verbose", action="store_true", help="Show detailed scores for all agents"
     )
 
     # List command
-    list_parser = subparsers.add_parser(
-        "list",
-        help="List all available agents"
-    )
-    list_parser.add_argument(
-        "-v", "--verbose",
-        action="store_true",
-        help="Show additional details"
-    )
+    list_parser = subparsers.add_parser("list", help="List all available agents")
+    list_parser.add_argument("-v", "--verbose", action="store_true", help="Show additional details")
 
     # Info command
     info_parser = subparsers.add_parser(
-        "info",
-        help="Show detailed information about a specific agent"
+        "info", help="Show detailed information about a specific agent"
     )
-    info_parser.add_argument(
-        "agent_type",
-        help="Agent type (e.g., model_management, dissertation)"
-    )
+    info_parser.add_argument("agent_type", help="Agent type (e.g., model_management, dissertation)")
 
     # Workflow command
-    workflow_parser = subparsers.add_parser(
-        "workflow",
-        help="Show suggested workflow for an agent"
-    )
+    workflow_parser = subparsers.add_parser("workflow", help="Show suggested workflow for an agent")
     workflow_parser.add_argument(
-        "agent_type",
-        help="Agent type (e.g., model_management, prediction_engine)"
+        "agent_type", help="Agent type (e.g., model_management, prediction_engine)"
     )
 
     # History command
-    history_parser = subparsers.add_parser(
-        "history",
-        help="Show recent routing history"
-    )
+    history_parser = subparsers.add_parser("history", help="Show recent routing history")
     history_parser.add_argument(
-        "--limit",
-        type=int,
-        default=10,
-        help="Number of entries to show (default: 10)"
+        "--limit", type=int, default=10, help="Number of entries to show (default: 10)"
     )
 
     args = parser.parse_args()

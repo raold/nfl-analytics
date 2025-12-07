@@ -24,11 +24,11 @@ def extract_conditions_from_database():
     Extract pre-game condition vectors from database (same as cVAE training).
     """
     db_config = {
-        'host': 'localhost',
-        'port': 5544,
-        'database': 'devdb01',
-        'user': 'dro',
-        'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
+        "host": "localhost",
+        "port": 5544,
+        "database": "devdb01",
+        "user": "dro",
+        "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
     }
 
     conn = psycopg2.connect(**db_config)
@@ -113,18 +113,18 @@ def create_condition_vector(game):
     condition = np.zeros(20)
 
     # Betting lines
-    condition[0] = game.get('spread_line', 0) if game.get('spread_line') else 0
-    condition[1] = game.get('total_line', 45) if game.get('total_line') else 45
-    condition[2] = game.get('home_moneyline', -110) if game.get('home_moneyline') else -110
-    condition[3] = game.get('away_moneyline', -110) if game.get('away_moneyline') else -110
+    condition[0] = game.get("spread_line", 0) if game.get("spread_line") else 0
+    condition[1] = game.get("total_line", 45) if game.get("total_line") else 45
+    condition[2] = game.get("home_moneyline", -110) if game.get("home_moneyline") else -110
+    condition[3] = game.get("away_moneyline", -110) if game.get("away_moneyline") else -110
 
     # Recent performance
-    condition[4] = game.get('home_recent_ppg', 21) if game.get('home_recent_ppg') else 21
-    condition[5] = game.get('home_recent_papg', 21) if game.get('home_recent_papg') else 21
-    condition[6] = game.get('away_recent_ppg', 21) if game.get('away_recent_ppg') else 21
-    condition[7] = game.get('away_recent_papg', 21) if game.get('away_recent_papg') else 21
-    condition[8] = game.get('home_recent_ypg', 350) if game.get('home_recent_ypg') else 350
-    condition[9] = game.get('away_recent_ypg', 350) if game.get('away_recent_ypg') else 350
+    condition[4] = game.get("home_recent_ppg", 21) if game.get("home_recent_ppg") else 21
+    condition[5] = game.get("home_recent_papg", 21) if game.get("home_recent_papg") else 21
+    condition[6] = game.get("away_recent_ppg", 21) if game.get("away_recent_ppg") else 21
+    condition[7] = game.get("away_recent_papg", 21) if game.get("away_recent_papg") else 21
+    condition[8] = game.get("home_recent_ypg", 350) if game.get("home_recent_ypg") else 350
+    condition[9] = game.get("away_recent_ypg", 350) if game.get("away_recent_ypg") else 350
 
     # Rest (simplified)
     condition[10] = 7  # Home rest days
@@ -132,13 +132,13 @@ def create_condition_vector(game):
 
     # Weather (defaults)
     condition[12] = 60  # Temperature (F)
-    condition[13] = 5   # Wind speed (mph)
-    condition[14] = 0   # Precipitation (mm)
+    condition[13] = 5  # Wind speed (mph)
+    condition[14] = 0  # Precipitation (mm)
 
     # Game context
     condition[15] = 0  # Division game
     condition[16] = 0  # Primetime
-    condition[17] = game.get('week', 9)  # Week of season
+    condition[17] = game.get("week", 9)  # Week of season
 
     # Win percentages (estimate from spread)
     spread = condition[0]
@@ -186,7 +186,7 @@ def create_scaler():
     output_path = Path("models/cvae/scaler_conditions.pkl")
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(output_path, 'wb') as f:
+    with open(output_path, "wb") as f:
         pickle.dump(scaler, f)
 
     logger.info(f"✓ Scaler saved to {output_path}")

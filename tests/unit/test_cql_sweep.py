@@ -23,7 +23,6 @@ def test_create_param_grid_basic():
     assert result is not None
 
 
-
 def test_create_param_grid_edge_cases():
     """Test create_param_grid: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_create_param_grid_edge_cases():
     assert result is not None
 
 
-
 def test_create_param_grid_error_handling():
     """Test create_param_grid error handling."""
     with pytest.raises(ValueError):
         create_param_grid(invalid_input)
-
 
 
 def test_run_single_config_basic():
@@ -56,7 +53,6 @@ def test_run_single_config_basic():
     assert result is not None
 
 
-
 def test_run_single_config_edge_cases():
     """Test run_single_config: edge cases."""
     # Arrange
@@ -69,23 +65,36 @@ def test_run_single_config_edge_cases():
     assert result is not None
 
 
-
 def test_run_single_config_error_handling():
     """Test run_single_config error handling."""
     with pytest.raises(ValueError):
         run_single_config(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_run_single_config_property_idempotent(self, config, states, actions, rewards, device, epochs, batch_size, output_dir):
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+)
+def test_run_single_config_property_idempotent(
+    self, config, states, actions, rewards, device, epochs, batch_size, output_dir
+):
     """Property test: function is idempotent."""
     # Act
-    result = run_single_config(config, states, actions, rewards, device, epochs, batch_size, output_dir)
+    result = run_single_config(
+        config, states, actions, rewards, device, epochs, batch_size, output_dir
+    )
 
     # Assert property
-    assert run_single_config(config, states, actions, rewards, device, epochs, batch_size, output_dir) == result, "idempotent violated"
-
+    assert (
+        run_single_config(config, states, actions, rewards, device, epochs, batch_size, output_dir)
+        == result
+    ), "idempotent violated"
 
 
 def test_run_sweep_basic():
@@ -100,7 +109,6 @@ def test_run_sweep_basic():
     assert result is not None
 
 
-
 def test_run_sweep_edge_cases():
     """Test run_sweep: edge cases."""
     # Arrange
@@ -113,23 +121,24 @@ def test_run_sweep_edge_cases():
     assert result is not None
 
 
-
 def test_run_sweep_error_handling():
     """Test run_sweep error handling."""
     with pytest.raises(ValueError):
         run_sweep(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_run_sweep_property_idempotent(self, dataset_path, output_dir, epochs, batch_size, device_arg, state_cols):
+def test_run_sweep_property_idempotent(
+    self, dataset_path, output_dir, epochs, batch_size, device_arg, state_cols
+):
     """Property test: function is idempotent."""
     # Act
     result = run_sweep(dataset_path, output_dir, epochs, batch_size, device_arg, state_cols)
 
     # Assert property
-    assert run_sweep(dataset_path, output_dir, epochs, batch_size, device_arg, state_cols) == result, "idempotent violated"
-
+    assert (
+        run_sweep(dataset_path, output_dir, epochs, batch_size, device_arg, state_cols) == result
+    ), "idempotent violated"
 
 
 def test_main_basic():
@@ -144,7 +153,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -157,9 +165,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

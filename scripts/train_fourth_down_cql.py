@@ -57,7 +57,9 @@ def single_training_run(args):
     train_states, train_actions, train_rewards, _ = load_fourth_down_dataset(args.train_data)
 
     print(f"Loading test data from {args.test_data}")
-    test_states, test_actions, test_rewards, test_metadata = load_fourth_down_dataset(args.test_data)
+    test_states, test_actions, test_rewards, test_metadata = load_fourth_down_dataset(
+        args.test_data
+    )
 
     # Initialize agent
     agent = CQLAgent(
@@ -139,7 +141,9 @@ def grid_search(args):
     train_states, train_actions, train_rewards, _ = load_fourth_down_dataset(args.train_data)
 
     print(f"Loading test data from {args.test_data}")
-    test_states, test_actions, test_rewards, test_metadata = load_fourth_down_dataset(args.test_data)
+    test_states, test_actions, test_rewards, test_metadata = load_fourth_down_dataset(
+        args.test_data
+    )
 
     # Define hyperparameter grid
     param_grid = {
@@ -155,17 +159,20 @@ def grid_search(args):
 
     # Generate all combinations (limited by n_trials)
     from itertools import product
-    param_combinations = list(product(
-        param_grid["alpha"],
-        param_grid["lr"],
-        param_grid["hidden_dims"],
-        param_grid["batch_size"],
-    ))
+
+    param_combinations = list(
+        product(
+            param_grid["alpha"],
+            param_grid["lr"],
+            param_grid["hidden_dims"],
+            param_grid["batch_size"],
+        )
+    )
 
     # Sample n_trials combinations
     if args.n_trials < len(param_combinations):
         np.random.shuffle(param_combinations)
-        param_combinations = param_combinations[:args.n_trials]
+        param_combinations = param_combinations[: args.n_trials]
 
     print(f"\nRunning {len(param_combinations)} trials...")
     print(f"Epochs per trial: {args.epochs}")
@@ -266,8 +273,12 @@ def parse_args():
     ap = argparse.ArgumentParser(description="Train CQL agent for 4th down decisions")
 
     # Mode
-    ap.add_argument("--mode", choices=["single", "grid"], default="single",
-                    help="Training mode: single run or grid search")
+    ap.add_argument(
+        "--mode",
+        choices=["single", "grid"],
+        default="single",
+        help="Training mode: single run or grid search",
+    )
 
     # Data paths
     ap.add_argument("--train-data", default="data/fourth_down_dataset_train.csv")
@@ -284,8 +295,12 @@ def parse_args():
     ap.add_argument("--target-update-freq", type=int, default=1000)
 
     # Grid search
-    ap.add_argument("--n-trials", type=int, default=20,
-                    help="Number of hyperparameter combinations to try (grid mode)")
+    ap.add_argument(
+        "--n-trials",
+        type=int,
+        default=20,
+        help="Number of hyperparameter combinations to try (grid mode)",
+    )
 
     # Infrastructure
     ap.add_argument("--device", default="auto")

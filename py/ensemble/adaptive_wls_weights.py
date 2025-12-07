@@ -64,11 +64,10 @@ import pandas as pd
 from scipy.optimize import minimize
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class AdaptiveWLSWeights:
@@ -89,7 +88,7 @@ class AdaptiveWLSWeights:
         self,
         predictions_df: pd.DataFrame,
         model_names: list[str] | None = None,
-        actual_col: str = 'actual',
+        actual_col: str = "actual",
         halflife: float = 4.0,
         min_observations: int = 10,
     ):
@@ -113,7 +112,8 @@ class AdaptiveWLSWeights:
         if model_names is None:
             # All columns except actual_col
             self.model_names = [
-                col for col in predictions_df.columns
+                col
+                for col in predictions_df.columns
                 if col != actual_col and predictions_df[col].dtype in [float, int]
             ]
         else:
@@ -177,13 +177,13 @@ class AdaptiveWLSWeights:
 
         # Decay: most recent (n-1) gets weight 1.0, oldest gets weight 0.5^((n-1)/halflife)
         decay_factors = (n - 1 - time_indices) / self.halflife
-        weights = 0.5 ** decay_factors
+        weights = 0.5**decay_factors
 
         return weights
 
     def optimize_weights(
         self,
-        method: str = 'SLSQP',
+        method: str = "SLSQP",
         initial_weights: dict[str, float] | None = None,
     ) -> dict[str, float]:
         """
@@ -205,7 +205,7 @@ class AdaptiveWLSWeights:
 
         # Get predictions and actuals as matrices
         X = self.predictions_df[self.model_names].values  # (n_obs, n_models)
-        y = self.predictions_df[self.actual_col].values   # (n_obs,)
+        y = self.predictions_df[self.actual_col].values  # (n_obs,)
 
         n_obs, n_models = X.shape
 
@@ -227,7 +227,7 @@ class AdaptiveWLSWeights:
             errors = ensemble_preds - y
 
             # Weighted squared errors
-            weighted_sse = np.sum(time_weights * errors ** 2)
+            weighted_sse = np.sum(time_weights * errors**2)
 
             return weighted_sse
 
@@ -256,9 +256,7 @@ class AdaptiveWLSWeights:
             w0 = np.array([initial_weights[name] for name in self.model_names])
 
         # Constraints: sum to 1, all non-negative
-        constraints = [
-            {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}  # Sum = 1
-        ]
+        constraints = [{"type": "eq", "fun": lambda w: np.sum(w) - 1}]  # Sum = 1
         bounds = [(0, 1) for _ in range(n_models)]  # 0 ≤ w_i ≤ 1
 
         # Optimize
@@ -269,7 +267,7 @@ class AdaptiveWLSWeights:
             jac=gradient,
             bounds=bounds,
             constraints=constraints,
-            options={'maxiter': 1000, 'disp': False}
+            options={"maxiter": 1000, "disp": False},
         )
 
         if not result.success:
@@ -278,9 +276,7 @@ class AdaptiveWLSWeights:
             return self.current_weights
 
         # Extract optimized weights
-        optimal_weights = {
-            name: float(w) for name, w in zip(self.model_names, result.x)
-        }
+        optimal_weights = {name: float(w) for name, w in zip(self.model_names, result.x)}
 
         # Compute performance metrics
         baseline_sse = objective(w0)
@@ -298,14 +294,16 @@ class AdaptiveWLSWeights:
             logger.info(f"  {name:25s}: {weight:.4f} (Δ {change:+.4f})")
 
         # Store in history
-        self.optimization_history.append({
-            'timestamp': pd.Timestamp.now(),
-            'weights': optimal_weights.copy(),
-            'baseline_sse': baseline_sse,
-            'optimal_sse': optimal_sse,
-            'improvement_pct': improvement_pct,
-            'n_observations': n_obs,
-        })
+        self.optimization_history.append(
+            {
+                "timestamp": pd.Timestamp.now(),
+                "weights": optimal_weights.copy(),
+                "baseline_sse": baseline_sse,
+                "optimal_sse": optimal_sse,
+                "improvement_pct": improvement_pct,
+                "n_observations": n_obs,
+            }
+        )
 
         # Update current weights
         self.current_weights = optimal_weights
@@ -348,7 +346,7 @@ class AdaptiveWLSWeights:
                 model_names=self.model_names,
                 actual_col=self.actual_col,
                 halflife=self.halflife,
-                min_observations=10
+                min_observations=10,
             )
 
             # Optimize
@@ -360,11 +358,11 @@ class AdaptiveWLSWeights:
 
                 # Store results
                 result = {
-                    'window_end': end_idx,
-                    'date': df.index[end_idx-1] if hasattr(df.index, 'date') else end_idx-1,
-                    **{f'{name}_weight': optimal_weights[name] for name in self.model_names},
-                    'sse': hist['optimal_sse'],
-                    'improvement_pct': hist['improvement_pct'],
+                    "window_end": end_idx,
+                    "date": df.index[end_idx - 1] if hasattr(df.index, "date") else end_idx - 1,
+                    **{f"{name}_weight": optimal_weights[name] for name in self.model_names},
+                    "sse": hist["optimal_sse"],
+                    "improvement_pct": hist["improvement_pct"],
                 }
                 results.append(result)
 
@@ -382,18 +380,18 @@ class AdaptiveWLSWeights:
         import json
 
         weights_data = {
-            'weights': self.current_weights,
-            'metadata': {
-                'timestamp': str(pd.Timestamp.now()),
-                'n_observations': len(self.predictions_df),
-                'halflife': self.halflife,
-                'model_names': self.model_names,
-            }
+            "weights": self.current_weights,
+            "metadata": {
+                "timestamp": str(pd.Timestamp.now()),
+                "n_observations": len(self.predictions_df),
+                "halflife": self.halflife,
+                "model_names": self.model_names,
+            },
         }
 
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(weights_data, f, indent=2)
 
         logger.info(f"✅ Saved optimal weights to: {output_path}")
@@ -409,7 +407,7 @@ class AdaptiveWLSWeights:
         logger.info(f"Loaded weights from: {weights_path}")
         logger.info(f"  Timestamp: {weights_data['metadata']['timestamp']}")
 
-        return weights_data['weights']
+        return weights_data["weights"]
 
 
 def main():
@@ -421,24 +419,23 @@ def main():
     actual = np.random.randn(n_games) * 10 + 50  # Mean 50, std 10
 
     # Model predictions (with different biases and noise)
-    predictions_df = pd.DataFrame({
-        'state_space': actual + np.random.randn(n_games) * 8 - 2,   # Slight underestimate
-        'hierarchical': actual + np.random.randn(n_games) * 7 + 1,  # Slight overestimate
-        'xgboost': actual + np.random.randn(n_games) * 9,           # Neutral bias
-        'informative': actual + np.random.randn(n_games) * 10 + 3,  # Large overestimate
-        'elo': actual + np.random.randn(n_games) * 12,              # High variance
-        'actual': actual
-    })
+    predictions_df = pd.DataFrame(
+        {
+            "state_space": actual + np.random.randn(n_games) * 8 - 2,  # Slight underestimate
+            "hierarchical": actual + np.random.randn(n_games) * 7 + 1,  # Slight overestimate
+            "xgboost": actual + np.random.randn(n_games) * 9,  # Neutral bias
+            "informative": actual + np.random.randn(n_games) * 10 + 3,  # Large overestimate
+            "elo": actual + np.random.randn(n_games) * 12,  # High variance
+            "actual": actual,
+        }
+    )
 
     print("=" * 80)
     print("ADAPTIVE WLS ENSEMBLE WEIGHT OPTIMIZATION DEMO")
     print("=" * 80)
 
     # Initialize optimizer
-    wls = AdaptiveWLSWeights(
-        predictions_df=predictions_df,
-        halflife=4.0
-    )
+    wls = AdaptiveWLSWeights(predictions_df=predictions_df, halflife=4.0)
 
     # Optimize weights
     optimal_weights = wls.optimize_weights()
@@ -465,7 +462,7 @@ def main():
         ensemble_preds = np.zeros(len(predictions_df))
         for name, weight in weights.items():
             ensemble_preds += weight * predictions_df[name].values
-        mae = np.mean(np.abs(ensemble_preds - predictions_df['actual'].values))
+        mae = np.mean(np.abs(ensemble_preds - predictions_df["actual"].values))
         return mae
 
     baseline_mae = compute_ensemble_mae(baseline_weights)

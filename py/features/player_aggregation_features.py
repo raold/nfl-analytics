@@ -49,12 +49,11 @@ import pandas as pd
 import psycopg2
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 def gini_coefficient(values: np.ndarray) -> float:
@@ -83,7 +82,9 @@ def gini_coefficient(values: np.ndarray) -> float:
     return float(gini)
 
 
-def calculate_depth_ratio(values: np.ndarray, top_pct: float = 0.25, bottom_pct: float = 0.75) -> float:
+def calculate_depth_ratio(
+    values: np.ndarray, top_pct: float = 0.25, bottom_pct: float = 0.75
+) -> float:
     """
     Calculate depth quality ratio: (top X% mean) / (bottom Y% mean).
 
@@ -149,15 +150,11 @@ def aggregate_player_projections(
 
     # Default to all available models
     if model_names is None:
-        model_names = ['state_space_v2', 'hierarchical_v2', 'informative_priors_v2']
+        model_names = ["state_space_v2", "hierarchical_v2", "informative_priors_v2"]
 
     # Connect to database
     conn = psycopg2.connect(
-        host=db_host,
-        port=db_port,
-        dbname=db_name,
-        user=db_user,
-        password=db_password
+        host=db_host, port=db_port, dbname=db_name, user=db_user, password=db_password
     )
 
     # Load games for this week
@@ -193,11 +190,7 @@ def aggregate_player_projections(
         AND ph.position_group IN ('QB', 'RB', 'WR', 'TE')  -- Offensive skill positions
     ORDER BY rmp.model_name, ph.current_team, rmp.prediction_mean DESC
     """
-    projections_df = pd.read_sql_query(
-        projections_query,
-        conn,
-        params=(season, week, model_names)
-    )
+    projections_df = pd.read_sql_query(projections_query, conn, params=(season, week, model_names))
     conn.close()
 
     logger.info(f"  Loaded {len(projections_df)} player projections from {len(model_names)} models")
@@ -223,35 +216,41 @@ def aggregate_player_projections(
 
             # Calculate aggregation features
             features = {
-                'season': season,
-                'week': week,
-                'team': team,
-                'model_name': model_name,
-
+                "season": season,
+                "week": week,
+                "team": team,
+                "model_name": model_name,
                 # Basic aggregations
-                'proj_total_mean': np.sum(means),  # Total expected output
-                'proj_avg_mean': np.mean(means),   # Average player quality
-                'proj_total_std': np.sqrt(np.sum(stds**2)),  # Total uncertainty (variance sum)
-                'proj_avg_std': np.mean(stds),     # Average uncertainty per player
-
+                "proj_total_mean": np.sum(means),  # Total expected output
+                "proj_avg_mean": np.mean(means),  # Average player quality
+                "proj_total_std": np.sqrt(np.sum(stds**2)),  # Total uncertainty (variance sum)
+                "proj_avg_std": np.mean(stds),  # Average uncertainty per player
                 # Star power (inequality)
-                'proj_gini': gini_coefficient(means),  # Talent concentration
-
+                "proj_gini": gini_coefficient(means),  # Talent concentration
                 # Depth quality
-                'proj_depth_ratio': calculate_depth_ratio(means, top_pct=0.25, bottom_pct=0.75),
-                'proj_p75_mean': np.mean(means) if len(means) < 4 else np.mean(means[means >= np.percentile(means, 75)]),
-                'proj_p25_mean': np.mean(means) if len(means) < 4 else np.mean(means[means <= np.percentile(means, 25)]),
-
+                "proj_depth_ratio": calculate_depth_ratio(means, top_pct=0.25, bottom_pct=0.75),
+                "proj_p75_mean": (
+                    np.mean(means)
+                    if len(means) < 4
+                    else np.mean(means[means >= np.percentile(means, 75)])
+                ),
+                "proj_p25_mean": (
+                    np.mean(means)
+                    if len(means) < 4
+                    else np.mean(means[means <= np.percentile(means, 25)])
+                ),
                 # Top player concentration
-                'proj_top1_pct': np.max(means) / np.sum(means) if np.sum(means) > 0 else 0,
-                'proj_top3_pct': np.sum(np.sort(means)[-3:]) / np.sum(means) if np.sum(means) > 0 and len(means) >= 3 else 0,
-
+                "proj_top1_pct": np.max(means) / np.sum(means) if np.sum(means) > 0 else 0,
+                "proj_top3_pct": (
+                    np.sum(np.sort(means)[-3:]) / np.sum(means)
+                    if np.sum(means) > 0 and len(means) >= 3
+                    else 0
+                ),
                 # Count features
-                'proj_player_count': len(team_df),
-
+                "proj_player_count": len(team_df),
                 # Uncertainty features
-                'proj_max_std': np.max(stds),      # Most uncertain player
-                'proj_std_std': np.std(stds),      # Heterogeneity of uncertainty
+                "proj_max_std": np.max(stds),  # Most uncertain player
+                "proj_std_std": np.std(stds),  # Heterogeneity of uncertainty
             }
 
             aggregated_features.append(features)
@@ -267,11 +266,13 @@ def aggregate_player_projections(
         model_features = features_df[features_df.model_name == model_name].copy()
 
         # Rename columns to include model name
-        rename_map = {col: f"{model_name}_{col}"
-                     for col in model_features.columns
-                     if col not in ['season', 'week', 'team', 'model_name']}
+        rename_map = {
+            col: f"{model_name}_{col}"
+            for col in model_features.columns
+            if col not in ["season", "week", "team", "model_name"]
+        }
         model_features = model_features.rename(columns=rename_map)
-        model_features = model_features.drop(columns=['model_name'])
+        model_features = model_features.drop(columns=["model_name"])
 
         pivot_dfs.append(model_features)
 
@@ -279,11 +280,7 @@ def aggregate_player_projections(
     if len(pivot_dfs) > 1:
         merged_features = pivot_dfs[0]
         for df in pivot_dfs[1:]:
-            merged_features = merged_features.merge(
-                df,
-                on=['season', 'week', 'team'],
-                how='outer'
-            )
+            merged_features = merged_features.merge(df, on=["season", "week", "team"], how="outer")
     else:
         merged_features = pivot_dfs[0]
 
@@ -294,26 +291,26 @@ def aggregate_player_projections(
 
     for _, game in games_df.iterrows():
         game_features = {
-            'game_id': game['game_id'],
-            'season': game['season'],
-            'week': game['week'],
-            'home_team': game['home_team'],
-            'away_team': game['away_team'],
+            "game_id": game["game_id"],
+            "season": game["season"],
+            "week": game["week"],
+            "home_team": game["home_team"],
+            "away_team": game["away_team"],
         }
 
         # Get home team features
-        home_features = merged_features[merged_features.team == game['home_team']]
+        home_features = merged_features[merged_features.team == game["home_team"]]
         if len(home_features) > 0:
             for col in home_features.columns:
-                if col not in ['season', 'week', 'team']:
-                    game_features[f'home_{col}'] = home_features[col].values[0]
+                if col not in ["season", "week", "team"]:
+                    game_features[f"home_{col}"] = home_features[col].values[0]
 
         # Get away team features
-        away_features = merged_features[merged_features.team == game['away_team']]
+        away_features = merged_features[merged_features.team == game["away_team"]]
         if len(away_features) > 0:
             for col in away_features.columns:
-                if col not in ['season', 'week', 'team']:
-                    game_features[f'away_{col}'] = away_features[col].values[0]
+                if col not in ["season", "week", "team"]:
+                    game_features[f"away_{col}"] = away_features[col].values[0]
 
         result_dfs.append(game_features)
 
@@ -321,7 +318,9 @@ def aggregate_player_projections(
     result_df = pd.DataFrame(result_dfs)
 
     logger.info(f"  Final shape: {result_df.shape}")
-    logger.info(f"  Feature columns: {[col for col in result_df.columns if col.startswith(('home_', 'away_'))][:5]}...")
+    logger.info(
+        f"  Feature columns: {[col for col in result_df.columns if col.startswith(('home_', 'away_'))][:5]}..."
+    )
 
     return result_df
 
@@ -390,9 +389,7 @@ if __name__ == "__main__":
 
     # Test single week
     df = aggregate_player_projections(
-        season=2024,
-        week=1,
-        model_names=['state_space_v2', 'hierarchical_v2']
+        season=2024, week=1, model_names=["state_space_v2", "hierarchical_v2"]
     )
 
     print(f"\n✓ Generated {len(df)} games with {df.shape[1]} features")
@@ -400,6 +397,6 @@ if __name__ == "__main__":
     print(df.iloc[0, :10])
 
     print("\nFeature names (home team only):")
-    home_features = [col for col in df.columns if col.startswith('home_')]
+    home_features = [col for col in df.columns if col.startswith("home_")]
     for i, feat in enumerate(home_features[:15], 1):
         print(f"  {i:2d}. {feat}")

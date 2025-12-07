@@ -23,7 +23,6 @@ def test_create_cli_dashboard_basic():
     assert result is not None
 
 
-
 def test_create_cli_dashboard_edge_cases():
     """Test create_cli_dashboard: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_create_cli_dashboard_edge_cases():
     assert result is not None
 
 
-
 def test_create_cli_dashboard_error_handling():
     """Test create_cli_dashboard error handling."""
     with pytest.raises(ValueError):
         create_cli_dashboard(invalid_input)
-
 
 
 def test_load_performance_data_basic():
@@ -56,7 +53,6 @@ def test_load_performance_data_basic():
     assert result is not None
 
 
-
 def test_load_performance_data_edge_cases():
     """Test load_performance_data: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_performance_data_edge_cases():
     assert result is not None
 
 
-
 def test_load_performance_data_error_handling():
     """Test load_performance_data error handling."""
     with pytest.raises(ValueError):
         load_performance_data(invalid_input)
-
 
 
 @given(st.integers(), st.datetimes(), st.datetimes(), st.integers())
@@ -84,8 +78,9 @@ def test_load_performance_data_property_idempotent(self, self, start_date, end_d
     result = load_performance_data(self, start_date, end_date, model_version)
 
     # Assert property
-    assert load_performance_data(self, start_date, end_date, model_version) == result, "idempotent violated"
-
+    assert (
+        load_performance_data(self, start_date, end_date, model_version) == result
+    ), "idempotent violated"
 
 
 def test_calculate_metrics_basic():
@@ -100,7 +95,6 @@ def test_calculate_metrics_basic():
     assert result is not None
 
 
-
 def test_calculate_metrics_edge_cases():
     """Test calculate_metrics: edge cases."""
     # Arrange
@@ -113,12 +107,10 @@ def test_calculate_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_metrics_error_handling():
     """Test calculate_metrics error handling."""
     with pytest.raises(ValueError):
         calculate_metrics(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,7 +121,6 @@ def test_calculate_metrics_property_idempotent(self, self, df):
 
     # Assert property
     assert calculate_metrics(self, df) == result, "idempotent violated"
-
 
 
 def test_create_dashboard_basic():
@@ -144,7 +135,6 @@ def test_create_dashboard_basic():
     assert result is not None
 
 
-
 def test_create_dashboard_edge_cases():
     """Test create_dashboard: edge cases."""
     # Arrange
@@ -157,12 +147,10 @@ def test_create_dashboard_edge_cases():
     assert result is not None
 
 
-
 def test_create_dashboard_error_handling():
     """Test create_dashboard error handling."""
     with pytest.raises(ValueError):
         create_dashboard(invalid_input)
-
 
 
 @given(st.integers())
@@ -173,4 +161,3 @@ def test_create_dashboard_property_idempotent(val):
 
     # Assert property
     assert create_dashboard(val) == result, "idempotent violated"
-

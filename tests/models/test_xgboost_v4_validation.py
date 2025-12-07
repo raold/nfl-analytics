@@ -32,6 +32,7 @@ from sklearn.preprocessing import StandardScaler
 # UNIT TESTS: Ridge Coefficient Stability
 # ============================================================================
 
+
 def test_ridge_coefficient_stability_across_seasons():
     """Test that Ridge coefficients are stable across different training seasons."""
     # Arrange: Generate synthetic data for two "seasons"
@@ -61,7 +62,9 @@ def test_ridge_coefficient_stability_across_seasons():
     # Assert: Coefficient magnitudes within 20% of each other
     for i in range(n_features):
         ratio = ridge1.coef_[i] / (ridge2.coef_[i] + 1e-10)
-        assert 0.8 < ratio < 1.2, f"Coefficient {i} unstable: {ridge1.coef_[i]:.4f} vs {ridge2.coef_[i]:.4f}"
+        assert (
+            0.8 < ratio < 1.2
+        ), f"Coefficient {i} unstable: {ridge1.coef_[i]:.4f} vs {ridge2.coef_[i]:.4f}"
 
 
 def test_ridge_coefficient_sign_consistency():
@@ -71,7 +74,9 @@ def test_ridge_coefficient_sign_consistency():
     n_samples = 1000
 
     opp_epa = np.random.randn(n_samples)  # Opponent defensive strength
-    passing_yards = 250 - 30 * opp_epa + np.random.randn(n_samples) * 10  # Strong defense = fewer yards
+    passing_yards = (
+        250 - 30 * opp_epa + np.random.randn(n_samples) * 10
+    )  # Strong defense = fewer yards
 
     X = opp_epa.reshape(-1, 1)
 
@@ -110,6 +115,7 @@ def test_ridge_coefficient_magnitude_reasonable():
 # ============================================================================
 # UNIT TESTS: Residual Distribution Consistency
 # ============================================================================
+
 
 def test_residual_distribution_normality():
     """Test that residuals are approximately normally distributed."""
@@ -174,6 +180,7 @@ def test_residual_heteroskedasticity():
 # UNIT TESTS: Feature Importance Stability
 # ============================================================================
 
+
 def test_feature_importance_consistency_across_seasons():
     """Test that XGBoost feature importance is consistent across seasons."""
     # Arrange: Generate two seasons with same feature relationships
@@ -201,8 +208,9 @@ def test_feature_importance_consistency_across_seasons():
     top2_season1 = np.argsort(model1.feature_importances_)[-2:][::-1]
     top2_season2 = np.argsort(model2.feature_importances_)[-2:][::-1]
 
-    assert np.array_equal(top2_season1, top2_season2), \
-        f"Feature importance unstable: {top2_season1} vs {top2_season2}"
+    assert np.array_equal(
+        top2_season1, top2_season2
+    ), f"Feature importance unstable: {top2_season1} vs {top2_season2}"
 
 
 def test_residual_feature_has_high_importance():
@@ -229,6 +237,7 @@ def test_residual_feature_has_high_importance():
 # ============================================================================
 # UNIT TESTS: Prediction Consistency (Deterministic Behavior)
 # ============================================================================
+
 
 def test_prediction_deterministic_same_input():
     """Test that same input produces same output."""
@@ -299,6 +308,7 @@ def test_two_stage_pipeline_deterministic():
 # UNIT TESTS: Two-Stage Pipeline Error Handling
 # ============================================================================
 
+
 def test_ridge_handles_missing_values():
     """Test that Ridge gracefully handles missing values."""
     # Arrange
@@ -316,7 +326,7 @@ def test_ridge_handles_missing_values():
     ridge.fit(X_filled, y)
 
     # Assert: Model should train without error
-    assert hasattr(ridge, 'coef_'), "Ridge failed to fit"
+    assert hasattr(ridge, "coef_"), "Ridge failed to fit"
     assert not np.any(np.isnan(ridge.coef_)), "Ridge coefficients contain NaN"
 
 
@@ -370,7 +380,7 @@ def test_pipeline_handles_perfect_collinearity():
     ridge.fit(X, y)
 
     # Assert: Model should train without error
-    assert hasattr(ridge, 'coef_'), "Ridge failed to handle collinearity"
+    assert hasattr(ridge, "coef_"), "Ridge failed to handle collinearity"
     assert np.all(np.isfinite(ridge.coef_)), "Ridge coefficients non-finite"
 
 
@@ -378,10 +388,11 @@ def test_pipeline_handles_perfect_collinearity():
 # PROPERTY-BASED TESTS: Residual Calculation
 # ============================================================================
 
+
 @given(
     n_samples=st.integers(min_value=50, max_value=200),
     n_features=st.integers(min_value=2, max_value=5),
-    noise_level=st.floats(min_value=0.1, max_value=5.0)
+    noise_level=st.floats(min_value=0.1, max_value=5.0),
 )
 @settings(max_examples=20, deadline=5000)
 def test_residual_property_sum_to_zero(n_samples, n_features, noise_level):
@@ -399,13 +410,14 @@ def test_residual_property_sum_to_zero(n_samples, n_features, noise_level):
 
     # Assert: Sum of residuals near zero
     residual_sum = np.sum(residuals)
-    assert abs(residual_sum) < 5 * noise_level * np.sqrt(n_samples), \
-        f"Residuals don't sum to zero: {residual_sum:.4f}"
+    assert abs(residual_sum) < 5 * noise_level * np.sqrt(
+        n_samples
+    ), f"Residuals don't sum to zero: {residual_sum:.4f}"
 
 
 @given(
     n_samples=st.integers(min_value=50, max_value=200),
-    n_features=st.integers(min_value=2, max_value=5)
+    n_features=st.integers(min_value=2, max_value=5),
 )
 @settings(max_examples=20, deadline=5000)
 def test_residual_property_orthogonal_to_predictions(n_samples, n_features):
@@ -426,9 +438,7 @@ def test_residual_property_orthogonal_to_predictions(n_samples, n_features):
     assert abs(correlation) < 0.3, f"Residuals correlated with predictions: {correlation:.4f}"
 
 
-@given(
-    n_samples=st.integers(min_value=100, max_value=300)
-)
+@given(n_samples=st.integers(min_value=100, max_value=300))
 @settings(max_examples=20, deadline=5000)
 def test_residual_property_variance_reduction(n_samples):
     """Property test: Adding residual feature should reduce prediction variance."""
@@ -452,13 +462,15 @@ def test_residual_property_variance_reduction(n_samples):
     var_with = np.var(y - pred_with)
 
     # Assert: Adding residual should reduce prediction error variance
-    assert var_with < var_without, \
-        f"Residual didn't reduce variance: {var_without:.4f} -> {var_with:.4f}"
+    assert (
+        var_with < var_without
+    ), f"Residual didn't reduce variance: {var_without:.4f} -> {var_with:.4f}"
 
 
 # ============================================================================
 # INTEGRATION TESTS: End-to-End Pipeline
 # ============================================================================
+
 
 def test_full_pipeline_integration():
     """Test full two-stage pipeline end-to-end."""
@@ -479,8 +491,12 @@ def test_full_pipeline_integration():
     player_avg_test = np.random.uniform(200, 300, n_test)
 
     # True relationship: yards = player_avg - 50*opp_epa - 2*opp_points + noise
-    y_train = player_avg_train - 50 * opp_epa_train - 2 * opp_points_train + np.random.randn(n_train) * 15
-    y_test = player_avg_test - 50 * opp_epa_test - 2 * opp_points_test + np.random.randn(n_test) * 15
+    y_train = (
+        player_avg_train - 50 * opp_epa_train - 2 * opp_points_train + np.random.randn(n_train) * 15
+    )
+    y_test = (
+        player_avg_test - 50 * opp_epa_test - 2 * opp_points_test + np.random.randn(n_test) * 15
+    )
 
     # Act: Stage 1 - Ridge on opponent features
     X_ridge_train = np.column_stack([opp_epa_train, opp_points_train])
@@ -525,6 +541,7 @@ def test_full_pipeline_integration():
 # REGRESSION TESTS: Known Values
 # ============================================================================
 
+
 def test_known_baseline_comparison():
     """Test that v4 beats known v2 baseline on synthetic data."""
     # Arrange: Generate data where v4 should excel
@@ -537,6 +554,7 @@ def test_known_baseline_comparison():
 
     # Baseline model (player_skill only)
     from sklearn.linear_model import LinearRegression
+
     baseline = LinearRegression()
     baseline.fit(player_skill.reshape(-1, 1), y)
     baseline_pred = baseline.predict(player_skill.reshape(-1, 1))

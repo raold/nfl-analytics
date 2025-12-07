@@ -55,13 +55,12 @@ import pandas as pd
 import psycopg2
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Suppress R warnings
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class EnhancedEnsemble4Way:
@@ -121,7 +120,9 @@ class EnhancedEnsemble4Way:
         self.hierarchical_path = self._resolve_path(hierarchical_path)
         self.informative_path = self._resolve_path(informative_path)
         self.hybrid_xgboost_path = self._resolve_path(hybrid_xgboost_path)
-        self.skills_path = self._resolve_path("models/bayesian/simplified_random_walk_skills_v2.csv")
+        self.skills_path = self._resolve_path(
+            "models/bayesian/simplified_random_walk_skills_v2.csv"
+        )
 
         # Set weights
         self.weights = weights if weights is not None else self.DEFAULT_WEIGHTS.copy()
@@ -148,9 +149,10 @@ class EnhancedEnsemble4Way:
             temp_path = self._resolve_path(temperature_scaler_path)
             if temp_path.exists():
                 import pickle
-                with open(temp_path, 'rb') as f:
+
+                with open(temp_path, "rb") as f:
                     scaler_data = pickle.load(f)
-                    self.temperature = scaler_data['temperature']
+                    self.temperature = scaler_data["temperature"]
                     self.temperature_scaler = scaler_data
                 logger.info(f"Loaded temperature scaler: T = {self.temperature:.4f}")
             else:
@@ -185,6 +187,7 @@ class EnhancedEnsemble4Way:
         # Load Hybrid XGBoost
         if self.hybrid_xgboost_path.exists():
             from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
+
             self.hybrid_xgboost_model = HybridStaticIncrementalXGBoost()
             self.hybrid_xgboost_model.load(str(self.hybrid_xgboost_path))
             logger.info(f"✅ Hybrid XGBoost v1 loaded: {self.hybrid_xgboost_path}")
@@ -206,12 +209,7 @@ class EnhancedEnsemble4Way:
         return psycopg2.connect(**self.db_config)
 
     def _get_r_prediction(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        model_path: Path,
-        model_name: str
+        self, player_id: str, season: int, week: int, model_path: Path, model_name: str
     ) -> tuple[float, float] | None:
         """
         Get predictions from R/brms model using rpy2.
@@ -232,7 +230,7 @@ class EnhancedEnsemble4Way:
             from rpy2.robjects.conversion import localconverter
 
             # Load brms library
-            ro.r('suppressPackageStartupMessages(library(brms))')
+            ro.r("suppressPackageStartupMessages(library(brms))")
 
             # Load R model
             ro.r(f'model <- readRDS("{model_path}")')
@@ -295,18 +293,20 @@ class EnhancedEnsemble4Way:
                 r_df = ro.conversion.py2rpy(df)
 
             # Generate posterior predictions
-            ro.r.assign('new_data', r_df)
-            ro.r('new_data$log_attempts <- log(pmax(new_data$attempts, 1))')
+            ro.r.assign("new_data", r_df)
+            ro.r("new_data$log_attempts <- log(pmax(new_data$attempts, 1))")
             # CRITICAL: allow_new_levels=TRUE for 2025 holdout (new player_season levels)
-            ro.r('posterior_preds <- posterior_predict(model, newdata = new_data, ndraws = 1000, allow_new_levels = TRUE)')
+            ro.r(
+                "posterior_preds <- posterior_predict(model, newdata = new_data, ndraws = 1000, allow_new_levels = TRUE)"
+            )
 
             # CRITICAL: R models predict log_yards, must exponentiate
-            ro.r('posterior_preds_exp <- exp(posterior_preds)')
-            ro.r('pred_mean <- mean(posterior_preds_exp)')
-            ro.r('pred_sd <- sd(posterior_preds_exp)')
+            ro.r("posterior_preds_exp <- exp(posterior_preds)")
+            ro.r("pred_mean <- mean(posterior_preds_exp)")
+            ro.r("pred_sd <- sd(posterior_preds_exp)")
 
-            mean_pred = float(ro.r('pred_mean')[0])
-            std_pred = float(ro.r('pred_sd')[0])
+            mean_pred = float(ro.r("pred_mean")[0])
+            std_pred = float(ro.r("pred_sd")[0])
 
             logger.debug(f"{model_name}: {mean_pred:.1f} ± {std_pred:.1f} yards")
             return (mean_pred, std_pred)
@@ -316,10 +316,7 @@ class EnhancedEnsemble4Way:
             return None
 
     def _get_state_space_prediction(
-        self,
-        player_id: str,
-        season: int,
-        week: int
+        self, player_id: str, season: int, week: int
     ) -> tuple[float, float] | None:
         """
         Get state-space prediction using player skills.
@@ -364,13 +361,13 @@ class EnhancedEnsemble4Way:
                 attempts = 30  # Default
 
             # Get latest player skill
-            player_skills = self.skills_df[self.skills_df['player_id'] == player_id]
+            player_skills = self.skills_df[self.skills_df["player_id"] == player_id]
             if len(player_skills) == 0:
                 logger.warning(f"State-space: No skills for {player_id}")
                 return None
 
             # Use most recent skill
-            latest_skill = player_skills.iloc[-1]['skill_mean']
+            latest_skill = player_skills.iloc[-1]["skill_mean"]
 
             # State-space model formula: log(yards) ~ skill + log(attempts) + home_effect + noise
             # From model training: home_effect ≈ 0.05, sigma ≈ 0.35
@@ -392,10 +389,7 @@ class EnhancedEnsemble4Way:
             return None
 
     def _get_hybrid_xgboost_prediction(
-        self,
-        player_id: str,
-        season: int,
-        week: int
+        self, player_id: str, season: int, week: int
     ) -> tuple[float, float] | None:
         """
         Get Hybrid XGBoost prediction (70% static + 30% incremental).
@@ -442,9 +436,7 @@ class EnhancedEnsemble4Way:
             df["yards_per_attempt"] = df["yards"] / df["attempts"].replace(0, np.nan)
             df["td_rate"] = df["touchdowns"] / df["attempts"].replace(0, np.nan)
             df["spread_abs"] = df["spread_line"].abs()
-            df["is_bad_weather"] = (
-                ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
-            )
+            df["is_bad_weather"] = ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
             df["week_in_season"] = df["week"].astype(float)
 
             # Rolling features (simplified - use current values)
@@ -453,15 +445,17 @@ class EnhancedEnsemble4Way:
             df["td_rate_L3"] = df["td_rate"]
 
             # Fill missing values
-            df = df.fillna({
-                "temp": 70.0,
-                "wind": 5.0,
-                "yards_per_attempt": 7.0,
-                "td_rate": 0.04,
-                "yards_L3": 250.0,
-                "yards_per_attempt_L3": 7.0,
-                "td_rate_L3": 0.04,
-            })
+            df = df.fillna(
+                {
+                    "temp": 70.0,
+                    "wind": 5.0,
+                    "yards_per_attempt": 7.0,
+                    "td_rate": 0.04,
+                    "yards_L3": 250.0,
+                    "yards_per_attempt_L3": 7.0,
+                    "td_rate_L3": 0.04,
+                }
+            )
 
             # Alias for compatibility
             df["total_line"] = df["total_close"]
@@ -500,11 +494,7 @@ class EnhancedEnsemble4Way:
             return None
 
     def predict(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        return_individual: bool = False
+        self, player_id: str, season: int, week: int, return_individual: bool = False
     ) -> dict:
         """
         Generate 4-way ensemble prediction with uncertainty quantification.
@@ -543,9 +533,7 @@ class EnhancedEnsemble4Way:
         # 2. Hierarchical v2
         if self.hierarchical_path.exists():
             pred = self._get_r_prediction(
-                player_id, season, week,
-                self.hierarchical_path,
-                "Hierarchical v2"
+                player_id, season, week, self.hierarchical_path, "Hierarchical v2"
             )
             if pred:
                 predictions["hierarchical_v2"] = pred
@@ -561,9 +549,7 @@ class EnhancedEnsemble4Way:
         # 4. Informative Priors v2
         if self.informative_path.exists():
             pred = self._get_r_prediction(
-                player_id, season, week,
-                self.informative_path,
-                "Informative Priors v2"
+                player_id, season, week, self.informative_path, "Informative Priors v2"
             )
             if pred:
                 predictions["informative_priors_v2"] = pred
@@ -590,7 +576,12 @@ class EnhancedEnsemble4Way:
         active_weights = []
         active_models = []
 
-        for model_name in ["state_space_v2", "hierarchical_v2", "hybrid_xgboost_v1", "informative_priors_v2"]:
+        for model_name in [
+            "state_space_v2",
+            "hierarchical_v2",
+            "hybrid_xgboost_v1",
+            "informative_priors_v2",
+        ]:
             if model_name in predictions:
                 means.append(predictions[model_name][0])
                 stds.append(predictions[model_name][1])
@@ -608,7 +599,7 @@ class EnhancedEnsemble4Way:
 
         # Variance pooling for uncertainty quantification
         # Ensemble variance = within-model variance + between-model variance
-        within_var = np.sum(active_weights * (stds ** 2))
+        within_var = np.sum(active_weights * (stds**2))
         between_var = np.sum(active_weights * ((means - ensemble_mean) ** 2))
         ensemble_var = within_var + between_var
         ensemble_std_raw = np.sqrt(ensemble_var)
@@ -645,11 +636,7 @@ class EnhancedEnsemble4Way:
 
         return result
 
-    def predict_batch(
-        self,
-        games: list[dict],
-        output_csv: str | None = None
-    ) -> pd.DataFrame:
+    def predict_batch(self, games: list[dict], output_csv: str | None = None) -> pd.DataFrame:
         """
         Generate ensemble predictions for multiple games.
 
@@ -669,20 +656,20 @@ class EnhancedEnsemble4Way:
                 logger.info(f"Progress: {i+1}/{len(games)} games")
 
             pred = self.predict(
-                player_id=game["player_id"],
-                season=game["season"],
-                week=game["week"]
+                player_id=game["player_id"], season=game["season"], week=game["week"]
             )
 
-            results.append({
-                "player_id": game["player_id"],
-                "season": game["season"],
-                "week": game["week"],
-                "ensemble_mean": pred["ensemble_mean"],
-                "ensemble_std": pred["ensemble_std"],
-                "quantile_10": pred["quantile_10"],
-                "quantile_90": pred["quantile_90"],
-            })
+            results.append(
+                {
+                    "player_id": game["player_id"],
+                    "season": game["season"],
+                    "week": game["week"],
+                    "ensemble_mean": pred["ensemble_mean"],
+                    "ensemble_std": pred["ensemble_std"],
+                    "quantile_10": pred["quantile_10"],
+                    "quantile_90": pred["quantile_90"],
+                }
+            )
 
         df = pd.DataFrame(results)
 
@@ -713,10 +700,7 @@ def main():
 
     ensemble = EnhancedEnsemble4Way()
     result = ensemble.predict(
-        player_id=args.player_id,
-        season=args.season,
-        week=args.week,
-        return_individual=True
+        player_id=args.player_id, season=args.season, week=args.week, return_individual=True
     )
 
     print(f"\n{'='*70}")
@@ -729,12 +713,16 @@ def main():
     print(f"Inference time: {result['inference_time_ms']:.1f}ms")
 
     if args.output:
-        df = pd.DataFrame([{
-            "player_id": args.player_id,
-            "season": args.season,
-            "week": args.week,
-            **result,
-        }])
+        df = pd.DataFrame(
+            [
+                {
+                    "player_id": args.player_id,
+                    "season": args.season,
+                    "week": args.week,
+                    **result,
+                }
+            ]
+        )
         df.to_csv(args.output, index=False)
         print(f"\n✅ Predictions saved to: {args.output}")
 

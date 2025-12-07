@@ -23,7 +23,6 @@ def test_get_db_connection_basic():
     assert result is not None
 
 
-
 def test_get_db_connection_edge_cases():
     """Test get_db_connection: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_get_db_connection_edge_cases():
     assert result is not None
 
 
-
 def test_get_db_connection_error_handling():
     """Test get_db_connection error handling."""
     with pytest.raises(ValueError):
         get_db_connection(invalid_input)
-
 
 
 def test_calculate_sharpe_basic():
@@ -56,7 +53,6 @@ def test_calculate_sharpe_basic():
     assert result is not None
 
 
-
 def test_calculate_sharpe_edge_cases():
     """Test calculate_sharpe: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_calculate_sharpe_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_sharpe_error_handling():
     """Test calculate_sharpe error handling."""
     with pytest.raises(ValueError):
         calculate_sharpe(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_calculate_sharpe_property_idempotent(self, returns, active_weeks, total
 
     # Assert property
     assert calculate_sharpe(returns, active_weeks, total_weeks) == result, "idempotent violated"
-
 
 
 def test_calculate_max_drawdown_basic():
@@ -100,7 +93,6 @@ def test_calculate_max_drawdown_basic():
     assert result is not None
 
 
-
 def test_calculate_max_drawdown_edge_cases():
     """Test calculate_max_drawdown: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_calculate_max_drawdown_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_max_drawdown_error_handling():
     """Test calculate_max_drawdown error handling."""
     with pytest.raises(ValueError):
         calculate_max_drawdown(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_calculate_max_drawdown_property_idempotent(self, cumulative_returns):
 
     # Assert property
     assert calculate_max_drawdown(cumulative_returns) == result, "idempotent violated"
-
 
 
 def test_kelly_lcb_baseline_basic():
@@ -144,7 +133,6 @@ def test_kelly_lcb_baseline_basic():
     assert result is not None
 
 
-
 def test_kelly_lcb_baseline_edge_cases():
     """Test kelly_lcb_baseline: edge cases."""
     # Arrange
@@ -157,23 +145,24 @@ def test_kelly_lcb_baseline_edge_cases():
     assert result is not None
 
 
-
 def test_kelly_lcb_baseline_error_handling():
     """Test kelly_lcb_baseline error handling."""
     with pytest.raises(ValueError):
         kelly_lcb_baseline(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_kelly_lcb_baseline_property_idempotent(self, conn, season_start, season_end, threshold, alpha):
+def test_kelly_lcb_baseline_property_idempotent(
+    self, conn, season_start, season_end, threshold, alpha
+):
     """Property test: function is idempotent."""
     # Act
     result = kelly_lcb_baseline(conn, season_start, season_end, threshold, alpha)
 
     # Assert property
-    assert kelly_lcb_baseline(conn, season_start, season_end, threshold, alpha) == result, "idempotent violated"
-
+    assert (
+        kelly_lcb_baseline(conn, season_start, season_end, threshold, alpha) == result
+    ), "idempotent violated"
 
 
 def test_rl_policy_simulation_basic():
@@ -188,7 +177,6 @@ def test_rl_policy_simulation_basic():
     assert result is not None
 
 
-
 def test_rl_policy_simulation_edge_cases():
     """Test rl_policy_simulation: edge cases."""
     # Arrange
@@ -201,12 +189,10 @@ def test_rl_policy_simulation_edge_cases():
     assert result is not None
 
 
-
 def test_rl_policy_simulation_error_handling():
     """Test rl_policy_simulation error handling."""
     with pytest.raises(ValueError):
         rl_policy_simulation(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -217,7 +203,6 @@ def test_rl_policy_simulation_property_idempotent(self, conn, season_start, seas
 
     # Assert property
     assert rl_policy_simulation(conn, season_start, season_end) == result, "idempotent violated"
-
 
 
 def test_generate_comparison_table_basic():
@@ -232,7 +217,6 @@ def test_generate_comparison_table_basic():
     assert result is not None
 
 
-
 def test_generate_comparison_table_edge_cases():
     """Test generate_comparison_table: edge cases."""
     # Arrange
@@ -245,12 +229,10 @@ def test_generate_comparison_table_edge_cases():
     assert result is not None
 
 
-
 def test_generate_comparison_table_error_handling():
     """Test generate_comparison_table error handling."""
     with pytest.raises(ValueError):
         generate_comparison_table(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -260,8 +242,9 @@ def test_generate_comparison_table_property_idempotent(self, season_start, seaso
     result = generate_comparison_table(season_start, season_end, output_tex)
 
     # Assert property
-    assert generate_comparison_table(season_start, season_end, output_tex) == result, "idempotent violated"
-
+    assert (
+        generate_comparison_table(season_start, season_end, output_tex) == result
+    ), "idempotent violated"
 
 
 def test_main_basic():
@@ -276,7 +259,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -289,9 +271,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

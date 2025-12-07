@@ -24,7 +24,7 @@ Author: Claude Code (River Optimization - November 12, 2025)
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import logging
 from collections import deque
@@ -72,27 +72,27 @@ class MultiOnlineEnsemble:
         from river import forest
 
         self.models = {
-            'arf': forest.ARFRegressor(
+            "arf": forest.ARFRegressor(
                 n_models=arf_n_models,
                 grace_period=arf_grace_period,
-                max_features='sqrt',
+                max_features="sqrt",
                 lambda_value=2,
                 delta=0.10,
                 tau=0.10,
                 drift_detector=ADWIN(delta=0.01),
                 seed=42,
             ),
-            'amt': tree.HoeffdingAdaptiveTreeRegressor(
+            "amt": tree.HoeffdingAdaptiveTreeRegressor(
                 grace_period=arf_grace_period,
                 delta=0.01,  # Confidence for splits
                 max_depth=10,
                 seed=42,
             ),
-            'pa': linear_model.PARegressor(
+            "pa": linear_model.PARegressor(
                 C=0.01,  # Regularization
                 mode=2,  # PA-II (epsilon-insensitive)
             ),
-            'knn': neighbors.KNNRegressor(
+            "knn": neighbors.KNNRegressor(
                 n_neighbors=knn_n_neighbors,
             ),
         }
@@ -124,8 +124,9 @@ class MultiOnlineEnsemble:
         predictions = {k: m.predict_one(x) for k, m in self.models.items()}
 
         # Calculate errors
-        errors = {k: abs(y - pred) if pred is not None else 100.0
-                 for k, pred in predictions.items()}
+        errors = {
+            k: abs(y - pred) if pred is not None else 100.0 for k, pred in predictions.items()
+        }
 
         # Store errors for weight adaptation
         for k, error in errors.items():
@@ -195,10 +196,11 @@ class MultiOnlineEnsemble:
     def get_metrics(self) -> dict[str, any]:
         """Get ensemble metrics and model weights"""
         return {
-            'weights': self.weights.copy(),
-            'n_samples': self.n_samples,
-            'recent_errors': {k: np.mean(list(v)) if len(v) > 0 else 0.0
-                            for k, v in self.error_history.items()},
+            "weights": self.weights.copy(),
+            "n_samples": self.n_samples,
+            "recent_errors": {
+                k: np.mean(list(v)) if len(v) > 0 else 0.0 for k, v in self.error_history.items()
+            },
         }
 
 
@@ -214,13 +216,13 @@ if __name__ == "__main__":
     for i in range(100):
         # Synthetic features
         x = {
-            'passing_yards_L3': np.random.randn() * 50 + 250,
-            'attempts_L3': np.random.randn() * 5 + 35,
-            'completion_pct_L3': np.random.randn() * 0.05 + 0.65,
+            "passing_yards_L3": np.random.randn() * 50 + 250,
+            "attempts_L3": np.random.randn() * 5 + 35,
+            "completion_pct_L3": np.random.randn() * 0.05 + 0.65,
         }
 
         # Synthetic target
-        y = x['passing_yards_L3'] + np.random.randn() * 30
+        y = x["passing_yards_L3"] + np.random.randn() * 30
 
         # Predict, then train
         pred = ensemble.predict_one(x)

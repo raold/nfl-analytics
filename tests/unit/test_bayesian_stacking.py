@@ -37,6 +37,7 @@ from py.ensemble.bayesian_stacking import (
 # Fixtures
 # ============================================================================
 
+
 @pytest.fixture
 def synthetic_validation_data():
     """Generate synthetic validation data for testing."""
@@ -45,20 +46,22 @@ def synthetic_validation_data():
 
     actual_yards = np.random.gamma(shape=5.0, scale=50.0, size=n_games)
 
-    df = pd.DataFrame({
-        "player_id": [f"player_{i%10}" for i in range(n_games)],
-        "season": np.random.choice([2022, 2023], size=n_games),
-        "week": np.random.randint(1, 18, size=n_games),
-        "actual_yards": actual_yards,
-        "state_space_v2_pred_mean": actual_yards + np.random.normal(0, 45, size=n_games),
-        "state_space_v2_pred_std": np.random.uniform(35, 55, size=n_games),
-        "hierarchical_v2_pred_mean": actual_yards + np.random.normal(0, 50, size=n_games),
-        "hierarchical_v2_pred_std": np.random.uniform(30, 50, size=n_games),
-        "informative_priors_v2_pred_mean": actual_yards + np.random.normal(0, 52, size=n_games),
-        "informative_priors_v2_pred_std": np.random.uniform(32, 52, size=n_games),
-        "xgboost_v2_pred_mean": actual_yards + np.random.normal(0, 56, size=n_games),
-        "xgboost_v2_pred_std": np.random.uniform(60, 80, size=n_games),
-    })
+    df = pd.DataFrame(
+        {
+            "player_id": [f"player_{i%10}" for i in range(n_games)],
+            "season": np.random.choice([2022, 2023], size=n_games),
+            "week": np.random.randint(1, 18, size=n_games),
+            "actual_yards": actual_yards,
+            "state_space_v2_pred_mean": actual_yards + np.random.normal(0, 45, size=n_games),
+            "state_space_v2_pred_std": np.random.uniform(35, 55, size=n_games),
+            "hierarchical_v2_pred_mean": actual_yards + np.random.normal(0, 50, size=n_games),
+            "hierarchical_v2_pred_std": np.random.uniform(30, 50, size=n_games),
+            "informative_priors_v2_pred_mean": actual_yards + np.random.normal(0, 52, size=n_games),
+            "informative_priors_v2_pred_std": np.random.uniform(32, 52, size=n_games),
+            "xgboost_v2_pred_mean": actual_yards + np.random.normal(0, 56, size=n_games),
+            "xgboost_v2_pred_std": np.random.uniform(60, 80, size=n_games),
+        }
+    )
 
     return df
 
@@ -74,7 +77,7 @@ def mock_loo_results():
             se_elpd=12.8,
             pareto_k_max=0.62,
             pareto_k_good_pct=98.5,
-            log_likelihoods=np.random.normal(-2.8, 0.5, size=100)
+            log_likelihoods=np.random.normal(-2.8, 0.5, size=100),
         ),
         "hierarchical_v2": LOOResult(
             model_name="hierarchical_v2",
@@ -83,7 +86,7 @@ def mock_loo_results():
             se_elpd=13.5,
             pareto_k_max=0.58,
             pareto_k_good_pct=99.1,
-            log_likelihoods=np.random.normal(-2.9, 0.6, size=100)
+            log_likelihoods=np.random.normal(-2.9, 0.6, size=100),
         ),
         "informative_priors_v2": LOOResult(
             model_name="informative_priors_v2",
@@ -92,7 +95,7 @@ def mock_loo_results():
             se_elpd=14.2,
             pareto_k_max=0.65,
             pareto_k_good_pct=97.8,
-            log_likelihoods=np.random.normal(-3.0, 0.7, size=100)
+            log_likelihoods=np.random.normal(-3.0, 0.7, size=100),
         ),
         "xgboost_v2": LOOResult(
             model_name="xgboost_v2",
@@ -101,7 +104,7 @@ def mock_loo_results():
             se_elpd=15.1,
             pareto_k_max=0.69,
             pareto_k_good_pct=96.2,
-            log_likelihoods=np.random.normal(-3.1, 0.8, size=100)
+            log_likelihoods=np.random.normal(-3.1, 0.8, size=100),
         ),
     }
 
@@ -109,6 +112,7 @@ def mock_loo_results():
 # ============================================================================
 # ModelLoader Tests
 # ============================================================================
+
 
 class TestModelLoader:
     """Test suite for ModelLoader class."""
@@ -139,6 +143,7 @@ class TestModelLoader:
 # BayesianStacker Tests
 # ============================================================================
 
+
 class TestBayesianStacker:
     """Test suite for BayesianStacker class."""
 
@@ -157,9 +162,7 @@ class TestBayesianStacker:
         y_pred_mean = synthetic_validation_data["state_space_v2_pred_mean"].values[:10]
         y_pred_std = synthetic_validation_data["state_space_v2_pred_std"].values[:10]
 
-        log_lik = stacker._compute_log_likelihood(
-            "state_space_v2", y_true, y_pred_mean, y_pred_std
-        )
+        log_lik = stacker._compute_log_likelihood("state_space_v2", y_true, y_pred_mean, y_pred_std)
 
         assert len(log_lik) == 10
         assert np.all(np.isfinite(log_lik))
@@ -218,14 +221,14 @@ class TestBayesianStacker:
             "state_space_v2": (265.3, 45.2),
             "hierarchical_v2": (272.1, 38.6),
             "informative_priors_v2": (268.5, 41.3),
-            "xgboost_v2": (258.7, 52.1)
+            "xgboost_v2": (258.7, 52.1),
         }
 
         weights = {
             "state_space_v2": 0.35,
             "hierarchical_v2": 0.28,
             "informative_priors_v2": 0.14,
-            "xgboost_v2": 0.23
+            "xgboost_v2": 0.23,
         }
 
         ensemble_mean, ensemble_std = stacker.predict_stacked(predictions, weights)
@@ -246,14 +249,14 @@ class TestBayesianStacker:
             "state_space_v2": (265.3, 45.2),
             # hierarchical_v2 missing
             "informative_priors_v2": (268.5, 41.3),
-            "xgboost_v2": (258.7, 52.1)
+            "xgboost_v2": (258.7, 52.1),
         }
 
         weights = {
             "state_space_v2": 0.35,
             "hierarchical_v2": 0.28,
             "informative_priors_v2": 0.14,
-            "xgboost_v2": 0.23
+            "xgboost_v2": 0.23,
         }
 
         ensemble_mean, ensemble_std = stacker.predict_stacked(predictions, weights)
@@ -271,7 +274,7 @@ class TestBayesianStacker:
             "state_space_v2": 0.35,
             "hierarchical_v2": 0.28,
             "informative_priors_v2": 0.14,
-            "xgboost_v2": 0.23
+            "xgboost_v2": 0.23,
         }
 
         ensemble_mean, ensemble_std = stacker.predict_stacked(predictions, weights)
@@ -289,20 +292,16 @@ class TestBayesianStacker:
                 "state_space_v2": 0.35,
                 "hierarchical_v2": 0.28,
                 "informative_priors_v2": 0.14,
-                "xgboost_v2": 0.23
+                "xgboost_v2": 0.23,
             },
             elpd_loo_stacking=-2847.32,
             elpd_loo_equal=-2859.14,
             improvement=11.82,
             status="SUCCESS",
-            optimization_time_sec=2.34
+            optimization_time_sec=2.34,
         )
 
-        report = stacker.generate_report(
-            mock_loo_results,
-            stacking_result,
-            output_path=None
-        )
+        report = stacker.generate_report(mock_loo_results, stacking_result, output_path=None)
 
         assert isinstance(report, str)
         assert "Bayesian Stacking" in report
@@ -314,6 +313,7 @@ class TestBayesianStacker:
 # ============================================================================
 # ValidationFramework Tests
 # ============================================================================
+
 
 class TestValidationFramework:
     """Test suite for ValidationFramework class."""
@@ -365,6 +365,7 @@ class TestValidationFramework:
 # Integration Tests
 # ============================================================================
 
+
 class TestBayesianStackingIntegration:
     """Integration tests for full stacking workflow."""
 
@@ -387,9 +388,7 @@ class TestBayesianStackingIntegration:
             "state_space_v2": (265.3, 45.2),
             "hierarchical_v2": (272.1, 38.6),
         }
-        ensemble_mean, ensemble_std = stacker.predict_stacked(
-            predictions, stacking_result.weights
-        )
+        ensemble_mean, ensemble_std = stacker.predict_stacked(predictions, stacking_result.weights)
         assert np.isfinite(ensemble_mean)
 
         # 5. Generate report
@@ -401,6 +400,7 @@ class TestBayesianStackingIntegration:
 # ============================================================================
 # Edge Cases and Error Handling
 # ============================================================================
+
 
 class TestEdgeCases:
     """Test edge cases and error handling."""
@@ -444,14 +444,16 @@ class TestEdgeCases:
         stacker.models = {"state_space_v2": Mock()}
 
         # Only 3 games
-        small_df = pd.DataFrame({
-            "player_id": ["p1", "p2", "p3"],
-            "season": [2023, 2023, 2023],
-            "week": [1, 2, 3],
-            "actual_yards": [250, 280, 260],
-            "state_space_v2_pred_mean": [255, 275, 265],
-            "state_space_v2_pred_std": [45, 50, 48],
-        })
+        small_df = pd.DataFrame(
+            {
+                "player_id": ["p1", "p2", "p3"],
+                "season": [2023, 2023, 2023],
+                "week": [1, 2, 3],
+                "actual_yards": [250, 280, 260],
+                "state_space_v2_pred_mean": [255, 275, 265],
+                "state_space_v2_pred_std": [45, 50, 48],
+            }
+        )
 
         # Should still work (though not statistically meaningful)
         loo_results = stacker.compute_loo_cv(small_df, save_results=False)
@@ -461,6 +463,7 @@ class TestEdgeCases:
 # ============================================================================
 # Performance Tests
 # ============================================================================
+
 
 @pytest.mark.slow
 class TestPerformance:
@@ -473,19 +476,22 @@ class TestPerformance:
 
         actual_yards = np.random.gamma(shape=5.0, scale=50.0, size=n_games)
 
-        large_df = pd.DataFrame({
-            "player_id": [f"player_{i%100}" for i in range(n_games)],
-            "season": np.random.choice([2020, 2021, 2022, 2023], size=n_games),
-            "week": np.random.randint(1, 18, size=n_games),
-            "actual_yards": actual_yards,
-            "state_space_v2_pred_mean": actual_yards + np.random.normal(0, 45, size=n_games),
-            "state_space_v2_pred_std": np.random.uniform(35, 55, size=n_games),
-        })
+        large_df = pd.DataFrame(
+            {
+                "player_id": [f"player_{i%100}" for i in range(n_games)],
+                "season": np.random.choice([2020, 2021, 2022, 2023], size=n_games),
+                "week": np.random.randint(1, 18, size=n_games),
+                "actual_yards": actual_yards,
+                "state_space_v2_pred_mean": actual_yards + np.random.normal(0, 45, size=n_games),
+                "state_space_v2_pred_std": np.random.uniform(35, 55, size=n_games),
+            }
+        )
 
         stacker = BayesianStacker()
         stacker.models = {"state_space_v2": Mock()}
 
         import time
+
         start = time.time()
         loo_results = stacker.compute_loo_cv(large_df, save_results=False)
         elapsed = time.time() - start

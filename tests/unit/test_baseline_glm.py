@@ -23,7 +23,6 @@ def test_load_data_basic():
     assert result is not None
 
 
-
 def test_load_data_edge_cases():
     """Test load_data: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_load_data_edge_cases():
     assert result is not None
 
 
-
 def test_load_data_error_handling():
     """Test load_data error handling."""
     with pytest.raises(ValueError):
         load_data(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_load_data_property_idempotent(self, csv_path):
 
     # Assert property
     assert load_data(csv_path) == result, "idempotent violated"
-
 
 
 def test_train_and_predict_basic():
@@ -67,7 +63,6 @@ def test_train_and_predict_basic():
     assert result is not None
 
 
-
 def test_train_and_predict_edge_cases():
     """Test train_and_predict: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_train_and_predict_edge_cases():
     assert result is not None
 
 
-
 def test_train_and_predict_error_handling():
     """Test train_and_predict error handling."""
     with pytest.raises(ValueError):
         train_and_predict(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -96,7 +89,6 @@ def test_train_and_predict_property_idempotent(self, df, test_season, features, 
 
     # Assert property
     assert train_and_predict(df, test_season, features, min_season) == result, "idempotent violated"
-
 
 
 def test_plot_reliability_diagram_basic():
@@ -111,7 +103,6 @@ def test_plot_reliability_diagram_basic():
     assert result is not None
 
 
-
 def test_plot_reliability_diagram_edge_cases():
     """Test plot_reliability_diagram: edge cases."""
     # Arrange
@@ -124,23 +115,24 @@ def test_plot_reliability_diagram_edge_cases():
     assert result is not None
 
 
-
 def test_plot_reliability_diagram_error_handling():
     """Test plot_reliability_diagram error handling."""
     with pytest.raises(ValueError):
         plot_reliability_diagram(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
-def test_plot_reliability_diagram_property_idempotent(self, y_true, y_pred_proba, output_path, n_bins, season):
+def test_plot_reliability_diagram_property_idempotent(
+    self, y_true, y_pred_proba, output_path, n_bins, season
+):
     """Property test: function is idempotent."""
     # Act
     result = plot_reliability_diagram(y_true, y_pred_proba, output_path, n_bins, season)
 
     # Assert property
-    assert plot_reliability_diagram(y_true, y_pred_proba, output_path, n_bins, season) == result, "idempotent violated"
-
+    assert (
+        plot_reliability_diagram(y_true, y_pred_proba, output_path, n_bins, season) == result
+    ), "idempotent violated"
 
 
 def test_main_basic():
@@ -155,7 +147,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -168,9 +159,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

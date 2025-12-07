@@ -23,7 +23,6 @@ def test_hyperparameter_search_basic():
     assert result is not None
 
 
-
 def test_hyperparameter_search_edge_cases():
     """Test hyperparameter_search: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_hyperparameter_search_edge_cases():
     assert result is not None
 
 
-
 def test_hyperparameter_search_error_handling():
     """Test hyperparameter_search error handling."""
     with pytest.raises(ValueError):
         hyperparameter_search(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_hyperparameter_search_property_idempotent(self, train_df, val_df, outpu
 
     # Assert property
     assert hyperparameter_search(train_df, val_df, output_dir) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -67,7 +63,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -80,9 +75,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

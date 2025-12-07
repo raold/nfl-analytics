@@ -43,8 +43,7 @@ from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -106,7 +105,7 @@ class DatabasePoolManager:
                 password=password,
                 # Performance tuning
                 connect_timeout=10,
-                options="-c statement_timeout=30000"  # 30s query timeout
+                options="-c statement_timeout=30000",  # 30s query timeout
             )
 
             logger.info(
@@ -291,9 +290,9 @@ if __name__ == "__main__":
     # Test connection pooling
     import time
 
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("DATABASE CONNECTION POOL TEST")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     pool = DatabasePoolManager(minconn=2, maxconn=5)
 
@@ -331,8 +330,7 @@ if __name__ == "__main__":
     logger.info("\nTest 4: execute_query_dict helper")
     start = time.time()
     games = pool.execute_query_dict(
-        "SELECT game_id, season, week FROM games WHERE season = %s LIMIT 5",
-        params=(2024,)
+        "SELECT game_id, season, week FROM games WHERE season = %s LIMIT 5", params=(2024,)
     )
     elapsed = time.time() - start
     logger.info(f"  Retrieved {len(games)} games ({elapsed*1000:.1f}ms)")

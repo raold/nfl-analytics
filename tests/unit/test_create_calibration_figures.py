@@ -21,7 +21,6 @@ def test_coverage_comparison_bar_chart_basic():
     assert result is not None
 
 
-
 def test_coverage_comparison_bar_chart_edge_cases():
     """Test coverage_comparison_bar_chart: edge cases."""
     # Arrange
@@ -34,12 +33,10 @@ def test_coverage_comparison_bar_chart_edge_cases():
     assert result is not None
 
 
-
 def test_coverage_comparison_bar_chart_error_handling():
     """Test coverage_comparison_bar_chart error handling."""
     with pytest.raises(ValueError):
         coverage_comparison_bar_chart(invalid_input)
-
 
 
 def test_calibration_sharpness_scatter_basic():
@@ -54,7 +51,6 @@ def test_calibration_sharpness_scatter_basic():
     assert result is not None
 
 
-
 def test_calibration_sharpness_scatter_edge_cases():
     """Test calibration_sharpness_scatter: edge cases."""
     # Arrange
@@ -67,12 +63,10 @@ def test_calibration_sharpness_scatter_edge_cases():
     assert result is not None
 
 
-
 def test_calibration_sharpness_scatter_error_handling():
     """Test calibration_sharpness_scatter error handling."""
     with pytest.raises(ValueError):
         calibration_sharpness_scatter(invalid_input)
-
 
 
 def test_feature_ablation_progression_basic():
@@ -87,7 +81,6 @@ def test_feature_ablation_progression_basic():
     assert result is not None
 
 
-
 def test_feature_ablation_progression_edge_cases():
     """Test feature_ablation_progression: edge cases."""
     # Arrange
@@ -100,12 +93,10 @@ def test_feature_ablation_progression_edge_cases():
     assert result is not None
 
 
-
 def test_feature_ablation_progression_error_handling():
     """Test feature_ablation_progression error handling."""
     with pytest.raises(ValueError):
         feature_ablation_progression(invalid_input)
-
 
 
 def test_main_basic():
@@ -120,7 +111,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -133,9 +123,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

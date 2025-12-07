@@ -23,7 +23,6 @@ def test_run_basic():
     assert result is not None
 
 
-
 def test_run_edge_cases():
     """Test run: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_run_edge_cases():
     assert result is not None
 
 
-
 def test_run_error_handling():
     """Test run error handling."""
     with pytest.raises(ValueError):
         run(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -52,7 +49,6 @@ def test_run_property_idempotent(self, self, config, progress_callback):
 
     # Assert property
     assert run(self, config, progress_callback) == result, "idempotent violated"
-
 
 
 def test_load_checkpoint_basic():
@@ -67,7 +63,6 @@ def test_load_checkpoint_basic():
     assert result is not None
 
 
-
 def test_load_checkpoint_edge_cases():
     """Test load_checkpoint: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_load_checkpoint_edge_cases():
     assert result is not None
 
 
-
 def test_load_checkpoint_error_handling():
     """Test load_checkpoint error handling."""
     with pytest.raises(ValueError):
         load_checkpoint(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -96,4 +89,3 @@ def test_load_checkpoint_property_idempotent(self, self, checkpoint_path):
 
     # Assert property
     assert load_checkpoint(self, checkpoint_path) == result, "idempotent violated"
-

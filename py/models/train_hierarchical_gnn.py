@@ -45,27 +45,32 @@ def get_gpu_stats() -> dict[str, float]:
     try:
         # Query nvidia-smi for detailed stats
         result = subprocess.run(
-            ['nvidia-smi', '--query-gpu=utilization.gpu,memory.used,memory.total,power.draw,temperature.gpu',
-             '--format=csv,noheader,nounits'],
-            capture_output=True, text=True, timeout=2
+            [
+                "nvidia-smi",
+                "--query-gpu=utilization.gpu,memory.used,memory.total,power.draw,temperature.gpu",
+                "--format=csv,noheader,nounits",
+            ],
+            capture_output=True,
+            text=True,
+            timeout=2,
         )
 
         if result.returncode == 0:
-            gpu_util, mem_used, mem_total, power_draw, temp = result.stdout.strip().split(', ')
+            gpu_util, mem_used, mem_total, power_draw, temp = result.stdout.strip().split(", ")
             return {
-                'gpu_util_pct': float(gpu_util),
-                'vram_used_mb': float(mem_used),
-                'vram_total_mb': float(mem_total),
-                'power_draw_w': float(power_draw),
-                'temp_c': float(temp)
+                "gpu_util_pct": float(gpu_util),
+                "vram_used_mb": float(mem_used),
+                "vram_total_mb": float(mem_total),
+                "power_draw_w": float(power_draw),
+                "temp_c": float(temp),
             }
     except Exception:
         pass
 
     # Fallback to PyTorch stats (less detailed)
     return {
-        'vram_used_mb': torch.cuda.memory_allocated() / 1024**2,
-        'vram_total_mb': torch.cuda.get_device_properties(0).total_memory / 1024**2
+        "vram_used_mb": torch.cuda.memory_allocated() / 1024**2,
+        "vram_total_mb": torch.cuda.get_device_properties(0).total_memory / 1024**2,
     }
 
 
@@ -135,7 +140,9 @@ class NFLGameDataset:
         away_team_idx = graph.team_id_map.get(away_team)
 
         if home_team_idx is None or away_team_idx is None:
-            raise ValueError(f"Team not found in graph for season {season}: {home_team} or {away_team}")
+            raise ValueError(
+                f"Team not found in graph for season {season}: {home_team} or {away_team}"
+            )
 
         # Target: home team win (1) or loss (0)
         target = 1 if game["home_score"] > game["away_score"] else 0
@@ -194,7 +201,9 @@ def load_multi_season_data(
                 include_matchups=False,
             )
             graphs_by_season[season] = graph
-            logger.info(f"  Season {season}: {graph.num_nodes} nodes, {len(graph.edges.get('player_to_position', []))} edges")
+            logger.info(
+                f"  Season {season}: {graph.num_nodes} nodes, {len(graph.edges.get('player_to_position', []))} edges"
+            )
     else:
         # Legacy: Build unified graph (HAS TEMPORAL LEAKAGE - not recommended)
         logger.warning("⚠️ Using unified multi-season graph (temporal leakage risk!)")
@@ -241,7 +250,9 @@ def create_splits(
 # =============================================================================
 
 
-def remap_edges_to_type_indices(edges: list[tuple[int, int]], graph: NFLGraph, src_type: str, dst_type: str) -> list[tuple[int, int]]:
+def remap_edges_to_type_indices(
+    edges: list[tuple[int, int]], graph: NFLGraph, src_type: str, dst_type: str
+) -> list[tuple[int, int]]:
     """Remap edges from global node IDs to type-specific indices."""
     remapped = []
 
@@ -292,8 +303,12 @@ def remap_edges_to_type_indices(edges: list[tuple[int, int]], graph: NFLGraph, s
 
         if len(remapped) > 0:
             src_remapped, dst_remapped = zip(*remapped)
-            logger.info(f"    Remapped src range: [0, {max(src_remapped)}] (expected max: {len(src_ids)-1})")
-            logger.info(f"    Remapped dst range: [0, {max(dst_remapped)}] (expected max: {len(dst_ids)-1})")
+            logger.info(
+                f"    Remapped src range: [0, {max(src_remapped)}] (expected max: {len(src_ids)-1})"
+            )
+            logger.info(
+                f"    Remapped dst range: [0, {max(dst_remapped)}] (expected max: {len(dst_ids)-1})"
+            )
             logger.info("\n  Sample remapped edges (first 5):")
             for i, (src, dst) in enumerate(remapped[:5]):
                 logger.info(f"    Edge {i}: ({src}, {dst}) [local indices]")
@@ -305,15 +320,19 @@ def remap_edges_to_type_indices(edges: list[tuple[int, int]], graph: NFLGraph, s
 
 def _prepare_graph_tensors(graph: NFLGraph, device: str) -> dict:
     """Prepare graph tensors for a single season's graph."""
-    non_blocking = (device in ["cuda", "mps"])
+    non_blocking = device in ["cuda", "mps"]
 
     player_features = graph.node_features.get("player")
     if player_features is None:
         raise ValueError("No player features in graph")
 
     player_features = player_features.to(device, non_blocking=non_blocking)
-    position_indices = torch.arange(len(graph.node_type_to_ids["position"])).to(device, non_blocking=non_blocking)
-    team_indices = torch.arange(len(graph.node_type_to_ids["team"])).to(device, non_blocking=non_blocking)
+    position_indices = torch.arange(len(graph.node_type_to_ids["position"])).to(
+        device, non_blocking=non_blocking
+    )
+    team_indices = torch.arange(len(graph.node_type_to_ids["team"])).to(
+        device, non_blocking=non_blocking
+    )
 
     # Edge indices (remap from global IDs to type-specific indices)
     player_to_position_edges_remapped = remap_edges_to_type_indices(
@@ -322,21 +341,35 @@ def _prepare_graph_tensors(graph: NFLGraph, device: str) -> dict:
     position_to_team_edges_remapped = remap_edges_to_type_indices(
         graph.edges["position_to_team"], graph, "position", "team"
     )
-    chemistry_edges_remapped = remap_edges_to_type_indices(
-        graph.edges["player_chemistry"], graph, "player", "player"
-    ) if graph.edges["player_chemistry"] else []
+    chemistry_edges_remapped = (
+        remap_edges_to_type_indices(graph.edges["player_chemistry"], graph, "player", "player")
+        if graph.edges["player_chemistry"]
+        else []
+    )
 
-    player_to_position_edges = torch.tensor(
-        player_to_position_edges_remapped, dtype=torch.long
-    ).t().to(device, non_blocking=non_blocking) if player_to_position_edges_remapped else torch.zeros((2, 0), dtype=torch.long).to(device, non_blocking=non_blocking)
+    player_to_position_edges = (
+        torch.tensor(player_to_position_edges_remapped, dtype=torch.long)
+        .t()
+        .to(device, non_blocking=non_blocking)
+        if player_to_position_edges_remapped
+        else torch.zeros((2, 0), dtype=torch.long).to(device, non_blocking=non_blocking)
+    )
 
-    position_to_team_edges = torch.tensor(
-        position_to_team_edges_remapped, dtype=torch.long
-    ).t().to(device, non_blocking=non_blocking) if position_to_team_edges_remapped else torch.zeros((2, 0), dtype=torch.long).to(device, non_blocking=non_blocking)
+    position_to_team_edges = (
+        torch.tensor(position_to_team_edges_remapped, dtype=torch.long)
+        .t()
+        .to(device, non_blocking=non_blocking)
+        if position_to_team_edges_remapped
+        else torch.zeros((2, 0), dtype=torch.long).to(device, non_blocking=non_blocking)
+    )
 
-    chemistry_edges = torch.tensor(
-        chemistry_edges_remapped, dtype=torch.long
-    ).t().to(device, non_blocking=non_blocking) if chemistry_edges_remapped else None
+    chemistry_edges = (
+        torch.tensor(chemistry_edges_remapped, dtype=torch.long)
+        .t()
+        .to(device, non_blocking=non_blocking)
+        if chemistry_edges_remapped
+        else None
+    )
 
     # Create team ID to index mapping
     team_ids = graph.node_type_to_ids["team"]
@@ -377,12 +410,14 @@ def train_epoch(
     use_amp = scaler is not None
 
     # Check if we have per-season graphs
-    has_per_season_graphs = hasattr(dataset, 'graphs_by_season') and len(dataset.graphs_by_season) > 1
+    has_per_season_graphs = (
+        hasattr(dataset, "graphs_by_season") and len(dataset.graphs_by_season) > 1
+    )
 
     if has_per_season_graphs:
         # Group games by season for per-season processing
         games_df = dataset.games
-        seasons_in_dataset = games_df['season'].unique()
+        seasons_in_dataset = games_df["season"].unique()
         logger.debug(f"Processing {len(seasons_in_dataset)} seasons with per-season graphs")
 
         # Prepare graph tensors for each season
@@ -416,12 +451,13 @@ def train_epoch(
 
         # Shuffle indices for stochastic training while keeping season grouping
         import random
+
         random.shuffle(all_indices)
 
         # Group shuffled indices by season
         indices_by_season = {}
         for idx in all_indices:
-            season = int(games_df.iloc[idx]['season'])
+            season = int(games_df.iloc[idx]["season"])
             if season not in indices_by_season:
                 indices_by_season[season] = []
             indices_by_season[season].append(idx)
@@ -561,7 +597,7 @@ def evaluate(
     games_df = dataset.games
     indices_by_season = {}
     for idx in range(len(dataset)):
-        season = int(games_df.iloc[idx]['season'])
+        season = int(games_df.iloc[idx]["season"])
         if season not in indices_by_season:
             indices_by_season[season] = []
         indices_by_season[season].append(idx)
@@ -577,7 +613,9 @@ def evaluate(
     with torch.no_grad():
         for season, season_indices in indices_by_season.items():
             if season not in graph_tensors_by_season:
-                logger.warning(f"Season {season} not in graphs, skipping {len(season_indices)} games")
+                logger.warning(
+                    f"Season {season} not in graphs, skipping {len(season_indices)} games"
+                )
                 continue
 
             gt = graph_tensors_by_season[season]
@@ -720,7 +758,9 @@ def train_gnn_single_config(
     logger.info(f"  Chemistry: {use_chemistry}, Device: {device}")
 
     # Load data (now returns per-season graphs to avoid temporal leakage)
-    graphs_by_season, games_by_season = load_multi_season_data(seasons, include_chemistry=use_chemistry)
+    graphs_by_season, games_by_season = load_multi_season_data(
+        seasons, include_chemistry=use_chemistry
+    )
 
     # Create splits (last season test, second-to-last val)
     test_seasons = [max(seasons)]
@@ -760,7 +800,11 @@ def train_gnn_single_config(
     for epoch in range(epochs):
         # Train
         train_loss = train_epoch(
-            model, train_dataset, optimizer, criterion, device,
+            model,
+            train_dataset,
+            optimizer,
+            criterion,
+            device,
             scaler=None,  # No mixed precision for Optuna (CPU training)
             batch_size=batch_size,
             accumulation_steps=1,
@@ -817,7 +861,7 @@ def train_gnn_single_config(
             "learning_rate": learning_rate,
             "batch_size": batch_size,
             "use_chemistry": use_chemistry,
-        }
+        },
     }
 
 
@@ -868,7 +912,11 @@ def main():
     parser.add_argument(
         "--device",
         type=str,
-        default="cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu",
+        default=(
+            "cuda"
+            if torch.cuda.is_available()
+            else "mps" if torch.backends.mps.is_available() else "cpu"
+        ),
         help="Device to train on (auto-detects CUDA > MPS > CPU)",
     )
     parser.add_argument(
@@ -958,9 +1006,15 @@ def main():
         test_seasons = [season]
 
         logger.info(f"Dataset splits (single season {season}):")
-        logger.info(f"  Train: {len(train_games)} games (weeks {train_games['week'].min()}-{train_games['week'].max()})")
-        logger.info(f"  Val:   {len(val_games)} games (weeks {val_games['week'].min()}-{val_games['week'].max()})")
-        logger.info(f"  Test:  {len(test_games)} games (weeks {test_games['week'].min()}-{test_games['week'].max()})")
+        logger.info(
+            f"  Train: {len(train_games)} games (weeks {train_games['week'].min()}-{train_games['week'].max()})"
+        )
+        logger.info(
+            f"  Val:   {len(val_games)} games (weeks {val_games['week'].min()}-{val_games['week'].max()})"
+        )
+        logger.info(
+            f"  Test:  {len(test_games)} games (weeks {test_games['week'].min()}-{test_games['week'].max()})"
+        )
     else:
         # Multiple seasons: use last season for test, second-to-last for val
         test_seasons = [max(args.seasons)]
@@ -999,9 +1053,13 @@ def main():
 
     # Log active optimizations
     if args.device == "cuda":
-        logger.info("  Optimizations: Batch-parallel (12x) + FP16 (2.5x) + Async transfers (1.1x) + Batch-128 (1.4x)")
+        logger.info(
+            "  Optimizations: Batch-parallel (12x) + FP16 (2.5x) + Async transfers (1.1x) + Batch-128 (1.4x)"
+        )
     elif args.device == "mps":
-        logger.info("  MPS Optimizations: Batch-parallel (12x) + Async transfers (1.1x) + Batch-128 (1.4x)")
+        logger.info(
+            "  MPS Optimizations: Batch-parallel (12x) + Async transfers (1.1x) + Batch-128 (1.4x)"
+        )
         logger.info("  Note: Mixed precision (FP16) not yet supported on MPS")
 
     # Optimizer and loss (use BCEWithLogitsLoss for FP16 autocast compatibility)
@@ -1024,9 +1082,7 @@ def main():
 
     # Load checkpoint if resuming
     if args.resume:
-        start_epoch, best_val_brier = load_checkpoint(
-            checkpoint_dir, model, optimizer
-        )
+        start_epoch, best_val_brier = load_checkpoint(checkpoint_dir, model, optimizer)
         if start_epoch > 0:
             logger.info(f"Resuming from epoch {start_epoch}/{args.epochs}")
 
@@ -1039,7 +1095,11 @@ def main():
 
         # Train
         train_loss = train_epoch(
-            model, train_dataset, optimizer, criterion, args.device,
+            model,
+            train_dataset,
+            optimizer,
+            criterion,
+            args.device,
             scaler=scaler,
             batch_size=args.batch_size,
             accumulation_steps=args.accumulation_steps,
@@ -1067,7 +1127,7 @@ def main():
 
         # Add GPU stats if available
         if gpu_stats:
-            if 'gpu_util_pct' in gpu_stats:
+            if "gpu_util_pct" in gpu_stats:
                 status_msg += (
                     f"\n  GPU Stats:\n"
                     f"    Utilization: {gpu_stats['gpu_util_pct']:.0f}%\n"
@@ -1150,13 +1210,15 @@ def main():
     logger.info(f"Metadata saved to {metadata_path}")
 
     # Save predictions
-    predictions_df = pd.DataFrame({
-        "game_id": test_dataset.games["game_id"],
-        "prediction": test_predictions,
-        "target": test_targets,
-        "home_team": test_dataset.games["home_team"],
-        "away_team": test_dataset.games["away_team"],
-    })
+    predictions_df = pd.DataFrame(
+        {
+            "game_id": test_dataset.games["game_id"],
+            "prediction": test_predictions,
+            "target": test_targets,
+            "home_team": test_dataset.games["home_team"],
+            "away_team": test_dataset.games["away_team"],
+        }
+    )
 
     predictions_path = output_dir / "hierarchical_gnn_predictions.csv"
     predictions_df.to_csv(predictions_path, index=False)

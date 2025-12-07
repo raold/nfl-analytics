@@ -23,7 +23,6 @@ def test_connect_basic():
     assert result is not None
 
 
-
 def test_connect_edge_cases():
     """Test connect: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_connect_edge_cases():
     assert result is not None
 
 
-
 def test_connect_error_handling():
     """Test connect error handling."""
     with pytest.raises(ValueError):
         connect(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_connect_property_idempotent(val):
 
     # Assert property
     assert connect(val) == result, "idempotent violated"
-
 
 
 def test_close_basic():
@@ -67,7 +63,6 @@ def test_close_basic():
     assert result is not None
 
 
-
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_close_edge_cases():
     assert result is not None
 
 
-
 def test_close_error_handling():
     """Test close error handling."""
     with pytest.raises(ValueError):
         close(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_close_property_idempotent(val):
 
     # Assert property
     assert close(val) == result, "idempotent violated"
-
 
 
 def test_build_player_game_panel_basic():
@@ -111,7 +103,6 @@ def test_build_player_game_panel_basic():
     assert result is not None
 
 
-
 def test_build_player_game_panel_edge_cases():
     """Test build_player_game_panel: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_build_player_game_panel_edge_cases():
     assert result is not None
 
 
-
 def test_build_player_game_panel_error_handling():
     """Test build_player_game_panel error handling."""
     with pytest.raises(ValueError):
         build_player_game_panel(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_build_player_game_panel_property_idempotent(self, self, config):
 
     # Assert property
     assert build_player_game_panel(self, config) == result, "idempotent violated"
-
 
 
 def test_add_player_ability_features_basic():
@@ -155,7 +143,6 @@ def test_add_player_ability_features_basic():
     assert result is not None
 
 
-
 def test_add_player_ability_features_edge_cases():
     """Test add_player_ability_features: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_add_player_ability_features_edge_cases():
     assert result is not None
 
 
-
 def test_add_player_ability_features_error_handling():
     """Test add_player_ability_features error handling."""
     with pytest.raises(ValueError):
         add_player_ability_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -184,4 +169,3 @@ def test_add_player_ability_features_property_idempotent(self, self, df, window)
 
     # Assert property
     assert add_player_ability_features(self, df, window) == result, "idempotent violated"
-

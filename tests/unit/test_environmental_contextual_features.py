@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_load_games_with_context_basic():
@@ -56,7 +53,6 @@ def test_load_games_with_context_basic():
     assert result is not None
 
 
-
 def test_load_games_with_context_edge_cases():
     """Test load_games_with_context: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_load_games_with_context_edge_cases():
     assert result is not None
 
 
-
 def test_load_games_with_context_error_handling():
     """Test load_games_with_context error handling."""
     with pytest.raises(ValueError):
         load_games_with_context(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_load_games_with_context_property_idempotent(self, self, start_season, e
 
     # Assert property
     assert load_games_with_context(self, start_season, end_season) == result, "idempotent violated"
-
 
 
 def test_calculate_thursday_night_features_basic():
@@ -100,7 +93,6 @@ def test_calculate_thursday_night_features_basic():
     assert result is not None
 
 
-
 def test_calculate_thursday_night_features_edge_cases():
     """Test calculate_thursday_night_features: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_calculate_thursday_night_features_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_thursday_night_features_error_handling():
     """Test calculate_thursday_night_features error handling."""
     with pytest.raises(ValueError):
         calculate_thursday_night_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -129,7 +119,6 @@ def test_calculate_thursday_night_features_property_idempotent(self, self, games
 
     # Assert property
     assert calculate_thursday_night_features(self, games) == result, "idempotent violated"
-
 
 
 def test_calculate_travel_impact_features_basic():
@@ -144,7 +133,6 @@ def test_calculate_travel_impact_features_basic():
     assert result is not None
 
 
-
 def test_calculate_travel_impact_features_edge_cases():
     """Test calculate_travel_impact_features: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_calculate_travel_impact_features_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_travel_impact_features_error_handling():
     """Test calculate_travel_impact_features error handling."""
     with pytest.raises(ValueError):
         calculate_travel_impact_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_calculate_travel_impact_features_property_idempotent(self, self, games)
 
     # Assert property
     assert calculate_travel_impact_features(self, games) == result, "idempotent violated"
-
 
 
 def test_calculate_venue_adaptation_features_basic():
@@ -188,7 +173,6 @@ def test_calculate_venue_adaptation_features_basic():
     assert result is not None
 
 
-
 def test_calculate_venue_adaptation_features_edge_cases():
     """Test calculate_venue_adaptation_features: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_calculate_venue_adaptation_features_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_venue_adaptation_features_error_handling():
     """Test calculate_venue_adaptation_features error handling."""
     with pytest.raises(ValueError):
         calculate_venue_adaptation_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -217,7 +199,6 @@ def test_calculate_venue_adaptation_features_property_idempotent(self, self, gam
 
     # Assert property
     assert calculate_venue_adaptation_features(self, games) == result, "idempotent violated"
-
 
 
 def test_calculate_rivalry_features_basic():
@@ -232,7 +213,6 @@ def test_calculate_rivalry_features_basic():
     assert result is not None
 
 
-
 def test_calculate_rivalry_features_edge_cases():
     """Test calculate_rivalry_features: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_calculate_rivalry_features_edge_cases():
     assert result is not None
 
 
-
 def test_calculate_rivalry_features_error_handling():
     """Test calculate_rivalry_features error handling."""
     with pytest.raises(ValueError):
         calculate_rivalry_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -261,7 +239,6 @@ def test_calculate_rivalry_features_property_idempotent(self, self, games):
 
     # Assert property
     assert calculate_rivalry_features(self, games) == result, "idempotent violated"
-
 
 
 def test_generate_all_features_basic():
@@ -276,7 +253,6 @@ def test_generate_all_features_basic():
     assert result is not None
 
 
-
 def test_generate_all_features_edge_cases():
     """Test generate_all_features: edge cases."""
     # Arrange
@@ -289,12 +265,10 @@ def test_generate_all_features_edge_cases():
     assert result is not None
 
 
-
 def test_generate_all_features_error_handling():
     """Test generate_all_features error handling."""
     with pytest.raises(ValueError):
         generate_all_features(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -305,4 +279,3 @@ def test_generate_all_features_property_idempotent(self, self, start_season, end
 
     # Assert property
     assert generate_all_features(self, start_season, end_season) == result, "idempotent violated"
-

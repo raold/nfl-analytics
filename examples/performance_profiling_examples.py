@@ -32,16 +32,15 @@ from py.utils.performance_profiling_agent import (
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 
 def example_1_database_profiling():
     """Example 1: Database query profiling."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("EXAMPLE 1: DATABASE QUERY PROFILING")
-    print("="*70)
+    print("=" * 70)
 
     agent = PerformanceProfilingAgent()
 
@@ -60,24 +59,25 @@ def example_1_database_profiling():
     if report.slow_queries:
         print("\nTop 5 Slowest Queries:")
         for i, query in enumerate(report.slow_queries[:5], 1):
-            print(f"\n{i}. Avg: {float(query['avg_time_ms']):.1f}ms, "
-                  f"Calls: {query['calls']}, "
-                  f"Total: {float(query['total_time_ms'])/1000:.1f}s")
+            print(
+                f"\n{i}. Avg: {float(query['avg_time_ms']):.1f}ms, "
+                f"Calls: {query['calls']}, "
+                f"Total: {float(query['total_time_ms'])/1000:.1f}s"
+            )
             print(f"   {query['query'][:100]}...")
 
     if report.n_plus_one_queries:
         print("\nN+1 Query Patterns:")
         for i, query in enumerate(report.n_plus_one_queries[:3], 1):
-            print(f"\n{i}. Calls: {query['calls']}, "
-                  f"Avg: {float(query['avg_time_ms']):.1f}ms")
+            print(f"\n{i}. Calls: {query['calls']}, " f"Avg: {float(query['avg_time_ms']):.1f}ms")
             print(f"   {query['query'][:100]}...")
 
 
 def example_2_python_profiling():
     """Example 2: Python code profiling."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("EXAMPLE 2: PYTHON CODE PROFILING")
-    print("="*70)
+    print("=" * 70)
 
     agent = PerformanceProfilingAgent()
 
@@ -86,7 +86,7 @@ def example_2_python_profiling():
         """Simulate expensive computation."""
         total = 0
         for i in range(n):
-            total += i ** 2
+            total += i**2
         return total
 
     # Profile function
@@ -117,9 +117,9 @@ def example_2_python_profiling():
 
 def example_3_api_profiling():
     """Example 3: API endpoint profiling."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("EXAMPLE 3: API ENDPOINT PROFILING")
-    print("="*70)
+    print("=" * 70)
 
     agent = PerformanceProfilingAgent()
 
@@ -133,15 +133,17 @@ def example_3_api_profiling():
     if report.slow_endpoints:
         print("\nSlow Endpoints (>100ms):")
         for i, endpoint in enumerate(report.slow_endpoints[:5], 1):
-            print(f"  {i}. {endpoint['method']} {endpoint['endpoint']}: "
-                  f"{endpoint['avg_latency_ms']:.1f}ms")
+            print(
+                f"  {i}. {endpoint['method']} {endpoint['endpoint']}: "
+                f"{endpoint['avg_latency_ms']:.1f}ms"
+            )
 
 
 def example_4_full_stack_profiling():
     """Example 4: Full stack profiling."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("EXAMPLE 4: FULL STACK PROFILING")
-    print("="*70)
+    print("=" * 70)
 
     agent = PerformanceProfilingAgent()
 
@@ -179,9 +181,9 @@ def example_4_full_stack_profiling():
 
 def example_5_recommendations():
     """Example 5: Recommendation generation."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("EXAMPLE 5: RECOMMENDATION GENERATION")
-    print("="*70)
+    print("=" * 70)
 
     agent = PerformanceProfilingAgent()
 
@@ -209,7 +211,7 @@ def example_5_recommendations():
 
             if rec.code_example:
                 print("   Code Example:")
-                for line in rec.code_example.strip().split('\n')[:5]:
+                for line in rec.code_example.strip().split("\n")[:5]:
                     print(f"     {line}")
 
             if rec.reference_docs:
@@ -218,9 +220,9 @@ def example_5_recommendations():
 
 def example_6_report_export():
     """Example 6: Report export."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("EXAMPLE 6: REPORT EXPORT")
-    print("="*70)
+    print("=" * 70)
 
     agent = PerformanceProfilingAgent()
 
@@ -251,17 +253,17 @@ def example_6_report_export():
         print(f"   Size: {html_file.stat().st_size / 1024:.1f}KB")
 
     # Generate summary report
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("SUMMARY REPORT")
-    print("="*70)
+    print("=" * 70)
     print(agent.generate_summary_report())
 
 
 def example_7_explain_query():
     """Example 7: EXPLAIN ANALYZE query."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("EXAMPLE 7: EXPLAIN ANALYZE QUERY")
-    print("="*70)
+    print("=" * 70)
 
     agent = PerformanceProfilingAgent()
 
@@ -293,9 +295,9 @@ def example_7_explain_query():
 
 def main():
     """Run all examples."""
-    print("="*70)
+    print("=" * 70)
     print("PERFORMANCE PROFILING AGENT - EXAMPLES")
-    print("="*70)
+    print("=" * 70)
 
     examples = [
         ("Database Profiling", example_1_database_profiling),
@@ -319,11 +321,12 @@ def main():
         except Exception as e:
             print(f"\n❌ {name} failed: {e}")
             import traceback
+
             traceback.print_exc()
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("✅ All examples complete!")
-    print("="*70)
+    print("=" * 70)
 
 
 if __name__ == "__main__":

@@ -32,8 +32,7 @@ load_dotenv()
 
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -74,6 +73,7 @@ def test_gnn_component():
         print("\nTEST 1: FAILED ✗")
         print(f"Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -87,10 +87,7 @@ def test_ensemble_v6_2_initialization():
     try:
         from py.ensemble.enhanced_ensemble_v6_2_gnn import EnhancedEnsemble6WayGNN
 
-        ensemble = EnhancedEnsemble6WayGNN(
-            db_password=os.getenv("DB_PASSWORD"),
-            enable_gnn=True
-        )
+        ensemble = EnhancedEnsemble6WayGNN(db_password=os.getenv("DB_PASSWORD"), enable_gnn=True)
 
         print("✓ Ensemble initialized")
         print(f"  Components: {len(ensemble.weights)}")
@@ -112,6 +109,7 @@ def test_ensemble_v6_2_initialization():
         print("\nTEST 2: FAILED ✗")
         print(f"Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -125,10 +123,7 @@ def test_game_outcome_prediction():
     try:
         from py.ensemble.enhanced_ensemble_v6_2_gnn import EnhancedEnsemble6WayGNN
 
-        ensemble = EnhancedEnsemble6WayGNN(
-            db_password=os.getenv("DB_PASSWORD"),
-            enable_gnn=True
-        )
+        ensemble = EnhancedEnsemble6WayGNN(db_password=os.getenv("DB_PASSWORD"), enable_gnn=True)
 
         if not ensemble.gnn_available:
             print("ℹ GNN not available, skipping prediction test")
@@ -137,11 +132,7 @@ def test_game_outcome_prediction():
 
         print("Testing game outcome prediction...")
         result = ensemble.predict_game_outcome(
-            home_team="KC",
-            away_team="BUF",
-            season=2024,
-            week=1,
-            return_components=True
+            home_team="KC", away_team="BUF", season=2024, week=1, return_components=True
         )
 
         if result.get("ensemble_mean") is not None:
@@ -153,9 +144,9 @@ def test_game_outcome_prediction():
             print(f"    Valid components: {result['valid_components']}")
 
             # Validate prediction is reasonable
-            assert 0.0 <= result['ensemble_mean'] <= 1.0, "Win prob out of range"
-            assert result['ensemble_std'] >= 0.0, "Negative std"
-            assert result['gnn_used'], "GNN should be used"
+            assert 0.0 <= result["ensemble_mean"] <= 1.0, "Win prob out of range"
+            assert result["ensemble_std"] >= 0.0, "Negative std"
+            assert result["gnn_used"], "GNN should be used"
 
             if "components" in result:
                 print("\n  Component predictions:")
@@ -173,6 +164,7 @@ def test_game_outcome_prediction():
         print("\nTEST 3: FAILED ✗")
         print(f"Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -187,10 +179,7 @@ def test_graceful_degradation():
         from py.ensemble.enhanced_ensemble_v6_2_gnn import EnhancedEnsemble6WayGNN
 
         # Initialize with GNN disabled
-        ensemble = EnhancedEnsemble6WayGNN(
-            db_password=os.getenv("DB_PASSWORD"),
-            enable_gnn=False
-        )
+        ensemble = EnhancedEnsemble6WayGNN(db_password=os.getenv("DB_PASSWORD"), enable_gnn=False)
 
         print("✓ Ensemble initialized with GNN disabled")
         print(f"  Components: {len(ensemble.weights)}")
@@ -210,6 +199,7 @@ def test_graceful_degradation():
         print("\nTEST 4: FAILED ✗")
         print(f"Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -245,6 +235,7 @@ def test_weight_strategies():
         print("\nTEST 5: FAILED ✗")
         print(f"Error: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 

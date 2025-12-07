@@ -33,11 +33,7 @@ class BatchedAPIClient:
         self.timeout = timeout
 
     def get_game_predictions_batch(
-        self,
-        game_ids: list[str],
-        season: int,
-        week: int,
-        max_workers: int = 10
+        self, game_ids: list[str], season: int, week: int, max_workers: int = 10
     ) -> dict[str, dict]:
         """
         Fetch game predictions for multiple games using parallel HTTP requests.
@@ -90,18 +86,18 @@ class BatchedAPIClient:
                 response = requests.post(
                     f"{self.base_url}/api/v1/predict/game",
                     json={"game_id": game_id, "season": season, "week": week},
-                    timeout=self.timeout
+                    timeout=self.timeout,
                 )
 
                 if response.status_code == 200:
                     data = response.json()
 
                     # Extract predictions
-                    home_yards = data.get('home_prediction', {}).get('predicted_passing_yards', 0)
-                    home_std = data.get('home_prediction', {}).get('predicted_passing_yards_std', 0)
-                    away_yards = data.get('away_prediction', {}).get('predicted_passing_yards', 0)
-                    away_std = data.get('away_prediction', {}).get('predicted_passing_yards_std', 0)
-                    total_yards = data.get('total_predicted_yards', 0)
+                    home_yards = data.get("home_prediction", {}).get("predicted_passing_yards", 0)
+                    home_std = data.get("home_prediction", {}).get("predicted_passing_yards_std", 0)
+                    away_yards = data.get("away_prediction", {}).get("predicted_passing_yards", 0)
+                    away_std = data.get("away_prediction", {}).get("predicted_passing_yards_std", 0)
+                    total_yards = data.get("total_predicted_yards", 0)
 
                     # Estimate scores from QB yards (simple heuristic)
                     # Historical correlation: team score ≈ 10 + (QB_yards / 20)
@@ -120,21 +116,25 @@ class BatchedAPIClient:
                         # Simple win probability from spread (logistic function)
                         # P(home win) = 1 / (1 + exp(-spread / 7))
                         import math
+
                         predicted_home_win_prob = 1 / (1 + math.exp(-predicted_spread / 7))
 
-                    return (game_id, {
-                        'home_qb_yards': home_yards,
-                        'home_qb_yards_std': home_std,
-                        'away_qb_yards': away_yards,
-                        'away_qb_yards_std': away_std,
-                        'total_yards': total_yards,
-                        'predicted_home_score': predicted_home_score,
-                        'predicted_away_score': predicted_away_score,
-                        'predicted_spread': predicted_spread,
-                        'predicted_total': predicted_total,
-                        'predicted_home_win_prob': predicted_home_win_prob,
-                        'inference_time_ms': data.get('processing_ms', 0)
-                    })
+                    return (
+                        game_id,
+                        {
+                            "home_qb_yards": home_yards,
+                            "home_qb_yards_std": home_std,
+                            "away_qb_yards": away_yards,
+                            "away_qb_yards_std": away_std,
+                            "total_yards": total_yards,
+                            "predicted_home_score": predicted_home_score,
+                            "predicted_away_score": predicted_away_score,
+                            "predicted_spread": predicted_spread,
+                            "predicted_total": predicted_total,
+                            "predicted_home_win_prob": predicted_home_win_prob,
+                            "inference_time_ms": data.get("processing_ms", 0),
+                        },
+                    )
                 else:
                     logger.warning(f"API error for {game_id}: HTTP {response.status_code}")
                     return (game_id, None)
@@ -148,8 +148,7 @@ class BatchedAPIClient:
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
             # Submit all tasks
             future_to_game = {
-                executor.submit(fetch_single_game, game_id): game_id
-                for game_id in game_ids
+                executor.submit(fetch_single_game, game_id): game_id for game_id in game_ids
             }
 
             # Collect results as they complete
@@ -166,8 +165,8 @@ class BatchedAPIClient:
         player_ids: list[int],
         season: int,
         week: int,
-        stat_type: str = 'passing_yards',
-        max_workers: int = 10
+        stat_type: str = "passing_yards",
+        max_workers: int = 10,
     ) -> dict[int, dict]:
         """
         Fetch player predictions for multiple players using parallel HTTP requests.
@@ -202,9 +201,9 @@ class BatchedAPIClient:
                         "player_id": player_id,
                         "season": season,
                         "week": week,
-                        "stat_type": stat_type
+                        "stat_type": stat_type,
                     },
-                    timeout=self.timeout
+                    timeout=self.timeout,
                 )
 
                 if response.status_code == 200:
@@ -233,7 +232,9 @@ class BatchedAPIClient:
                 if prediction is not None:
                     results[player_id] = prediction
 
-        logger.info(f"Batched API fetch: {len(results)}/{len(player_ids)} player predictions retrieved")
+        logger.info(
+            f"Batched API fetch: {len(results)}/{len(player_ids)} player predictions retrieved"
+        )
         return results
 
 

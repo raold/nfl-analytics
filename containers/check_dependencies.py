@@ -13,39 +13,34 @@ import sys
 # Package mappings: import name -> pip package spec
 PACKAGE_MAPPINGS = {
     # Core dependencies
-    'redis': 'redis>=4.5.0',
-    'aioredis': 'aioredis>=2.0.0',
-    'psutil': 'psutil>=5.9.0',
-
+    "redis": "redis>=4.5.0",
+    "aioredis": "aioredis>=2.0.0",
+    "psutil": "psutil>=5.9.0",
     # Data science packages
-    'numpy': 'numpy',
-    'pandas': 'pandas',
-    'polars': 'polars',
-    'pyarrow': 'pyarrow',
-    'scipy': 'scipy',
-    'sklearn': 'scikit-learn',
-    'xgboost': 'xgboost',
-
+    "numpy": "numpy",
+    "pandas": "pandas",
+    "polars": "polars",
+    "pyarrow": "pyarrow",
+    "scipy": "scipy",
+    "sklearn": "scikit-learn",
+    "xgboost": "xgboost",
     # Database
-    'sqlalchemy': 'SQLAlchemy',
-    'psycopg': 'psycopg[binary]',
-    'dotenv': 'python-dotenv',
-
+    "sqlalchemy": "SQLAlchemy",
+    "psycopg": "psycopg[binary]",
+    "dotenv": "python-dotenv",
     # Visualization
-    'matplotlib': 'matplotlib',
-    'meteostat': 'meteostat',
-
+    "matplotlib": "matplotlib",
+    "meteostat": "meteostat",
     # Testing
-    'pytest': 'pytest',
-
+    "pytest": "pytest",
     # Web/API
-    'requests': 'requests',
+    "requests": "requests",
 }
 
 # Optional packages (don't fail if missing)
 OPTIONAL_PACKAGES = {
-    'torch': 'torch',  # PyTorch - platform specific
-    'tensorflow': 'tensorflow',  # TensorFlow - optional
+    "torch": "torch",  # PyTorch - platform specific
+    "tensorflow": "tensorflow",  # TensorFlow - optional
 }
 
 
@@ -61,14 +56,14 @@ def check_package_installed(package_name: str) -> bool:
 
     # Check alternative import names
     alternative_names = {
-        'sklearn': 'scikit-learn',
-        'dotenv': 'python-dotenv',
-        'psycopg': 'psycopg2',
+        "sklearn": "scikit-learn",
+        "dotenv": "python-dotenv",
+        "psycopg": "psycopg2",
     }
 
     if package_name in alternative_names:
         try:
-            spec = importlib.util.find_spec(alternative_names[package_name].replace('-', '_'))
+            spec = importlib.util.find_spec(alternative_names[package_name].replace("-", "_"))
             if spec is not None:
                 return True
         except:
@@ -81,13 +76,13 @@ def get_installed_packages() -> dict[str, str]:
     """Get list of installed packages with versions."""
     try:
         result = subprocess.run(
-            [sys.executable, '-m', 'pip', 'list', '--format=json'],
+            [sys.executable, "-m", "pip", "list", "--format=json"],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
         )
         packages = json.loads(result.stdout)
-        return {pkg['name'].lower(): pkg['version'] for pkg in packages}
+        return {pkg["name"].lower(): pkg["version"] for pkg in packages}
     except Exception as e:
         print(f"⚠️ Failed to get installed packages: {e}")
         return {}
@@ -98,9 +93,9 @@ def install_package(package_spec: str) -> bool:
     print(f"📦 Installing {package_spec}...")
     try:
         subprocess.run(
-            [sys.executable, '-m', 'pip', 'install', '--no-cache-dir', package_spec],
+            [sys.executable, "-m", "pip", "install", "--no-cache-dir", package_spec],
             check=True,
-            capture_output=True
+            capture_output=True,
         )
         print(f"✅ Successfully installed {package_spec}")
         return True
@@ -166,7 +161,8 @@ def verify_redis_connection() -> bool:
     print("\n🔧 Checking Redis connection...")
     try:
         import redis
-        r = redis.Redis(host='localhost', port=6379, socket_connect_timeout=1)
+
+        r = redis.Redis(host="localhost", port=6379, socket_connect_timeout=1)
         r.ping()
         print("✅ Redis connection successful")
         return True
@@ -186,6 +182,7 @@ def check_hardware_support():
     # CPU info
     try:
         import psutil
+
         cpu_count = psutil.cpu_count()
         memory_gb = psutil.virtual_memory().total / (1024**3)
         print(f"✅ CPU: {cpu_count} cores")
@@ -196,6 +193,7 @@ def check_hardware_support():
     # GPU info
     try:
         import torch
+
         if torch.cuda.is_available():
             gpu_name = torch.cuda.get_device_name(0)
             gpu_memory = torch.cuda.get_device_properties(0).total_memory / (1024**3)

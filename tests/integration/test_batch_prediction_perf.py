@@ -204,12 +204,10 @@ def test_batch_vs_single_correctness(ensemble, small_batch):
             std_diff = abs(single["std"] - batch_result["ensemble_std"])
 
             assert mean_diff < 0.01, (
-                f"Mean mismatch for {single['player_id']}: "
-                f"{mean_diff:.4f} yards"
+                f"Mean mismatch for {single['player_id']}: " f"{mean_diff:.4f} yards"
             )
             assert std_diff < 0.01, (
-                f"Std mismatch for {single['player_id']}: "
-                f"{std_diff:.4f} yards"
+                f"Std mismatch for {single['player_id']}: " f"{std_diff:.4f} yards"
             )
 
         logger.info("✅ Batch vs single predictions: IDENTICAL")
@@ -275,9 +273,7 @@ def test_performance_speedup(ensemble, large_batch):
 
         # Validate speedup
         if speedup < 5:
-            logger.warning(
-                f"⚠️ Speedup below target: {speedup:.1f}x (expected 10-50x)"
-            )
+            logger.warning(f"⚠️ Speedup below target: {speedup:.1f}x (expected 10-50x)")
         else:
             logger.info(f"✅ Speedup validated: {speedup:.1f}x")
 
@@ -294,8 +290,7 @@ def test_performance_speedup(ensemble, large_batch):
 @pytest.mark.critical
 @pytest.mark.slow  # ~2 minutes
 @pytest.mark.skipif(
-    not psutil.LINUX and not psutil.MACOS,
-    reason="Memory profiling only on Linux/macOS"
+    not psutil.LINUX and not psutil.MACOS, reason="Memory profiling only on Linux/macOS"
 )
 def test_memory_efficiency(ensemble, large_batch):
     """
@@ -331,10 +326,7 @@ def test_memory_efficiency(ensemble, large_batch):
         per_game_memory = mem_growth / len(large_batch)
 
         assert mem_growth < 500, f"Memory growth too high: {mem_growth:.1f} MB"
-        logger.info(
-            f"✅ Memory efficiency: {per_game_memory:.2f} MB/game "
-            f"(constant memory)"
-        )
+        logger.info(f"✅ Memory efficiency: {per_game_memory:.2f} MB/game " f"(constant memory)")
 
     except AttributeError:
         logger.warning("⚠️ predict_batch() not implemented - skipping memory test")
@@ -371,9 +363,7 @@ def test_large_batch_handling(db_connection):
         valid_components.append("state_space")
 
     if len(valid_components) < 3:
-        raise RuntimeError(
-            f"Insufficient ensemble components: Only {len(valid_components)} loaded"
-        )
+        raise RuntimeError(f"Insufficient ensemble components: Only {len(valid_components)} loaded")
 
     # Load 500 games
     query = """
@@ -466,13 +456,11 @@ def test_concurrent_batch_predictions(ensemble, small_batch):
         if failed:
             logger.warning(f"⚠️ {len(failed)} concurrent batches failed: {failed}")
 
-        logger.info(
-            f"✅ Concurrent batches: {success_count}/{num_workers} succeeded"
-        )
+        logger.info(f"✅ Concurrent batches: {success_count}/{num_workers} succeeded")
 
-        assert success_count == num_workers, (
-            f"Not all batches succeeded: {success_count}/{num_workers}"
-        )
+        assert (
+            success_count == num_workers
+        ), f"Not all batches succeeded: {success_count}/{num_workers}"
 
     except AttributeError:
         logger.warning("⚠️ predict_batch() not implemented - skipping concurrent test")
@@ -497,6 +485,7 @@ def test_batch_prediction_throughput(large_batch, benchmark):
     batch_df = pd.DataFrame(large_batch[:50])
 
     try:
+
         def run_batch():
             return ensemble.predict_batch(batch_df)
 

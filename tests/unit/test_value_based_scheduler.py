@@ -24,7 +24,6 @@ def test_estimate_task_value_basic():
     assert result is not None
 
 
-
 def test_estimate_task_value_edge_cases():
     """Test estimate_task_value: edge cases."""
     # Arrange
@@ -37,23 +36,36 @@ def test_estimate_task_value_edge_cases():
     assert result is not None
 
 
-
 def test_estimate_task_value_error_handling():
     """Test estimate_task_value error handling."""
     with pytest.raises(ValueError):
         estimate_task_value(invalid_input)
 
 
-
-@given(st.integers(), st.integers(), st.integers(), st.integers(), st.text(min_size=1, max_size=100), st.datetimes())
-def test_estimate_task_value_property_idempotent(self, self, task_type, config, priority_multiplier, strategic_importance, time_sensitivity):
+@given(
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.integers(),
+    st.text(min_size=1, max_size=100),
+    st.datetimes(),
+)
+def test_estimate_task_value_property_idempotent(
+    self, self, task_type, config, priority_multiplier, strategic_importance, time_sensitivity
+):
     """Property test: function is idempotent."""
     # Act
-    result = estimate_task_value(self, task_type, config, priority_multiplier, strategic_importance, time_sensitivity)
+    result = estimate_task_value(
+        self, task_type, config, priority_multiplier, strategic_importance, time_sensitivity
+    )
 
     # Assert property
-    assert estimate_task_value(self, task_type, config, priority_multiplier, strategic_importance, time_sensitivity) == result, "idempotent violated"
-
+    assert (
+        estimate_task_value(
+            self, task_type, config, priority_multiplier, strategic_importance, time_sensitivity
+        )
+        == result
+    ), "idempotent violated"
 
 
 def test_rank_tasks_basic():
@@ -68,7 +80,6 @@ def test_rank_tasks_basic():
     assert result is not None
 
 
-
 def test_rank_tasks_edge_cases():
     """Test rank_tasks: edge cases."""
     # Arrange
@@ -81,12 +92,10 @@ def test_rank_tasks_edge_cases():
     assert result is not None
 
 
-
 def test_rank_tasks_error_handling():
     """Test rank_tasks error handling."""
     with pytest.raises(ValueError):
         rank_tasks(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -97,7 +106,6 @@ def test_rank_tasks_property_idempotent(self, self, tasks):
 
     # Assert property
     assert rank_tasks(self, tasks) == result, "idempotent violated"
-
 
 
 def test_update_queue_priorities_basic():
@@ -112,7 +120,6 @@ def test_update_queue_priorities_basic():
     assert result is not None
 
 
-
 def test_update_queue_priorities_edge_cases():
     """Test update_queue_priorities: edge cases."""
     # Arrange
@@ -125,12 +132,10 @@ def test_update_queue_priorities_edge_cases():
     assert result is not None
 
 
-
 def test_update_queue_priorities_error_handling():
     """Test update_queue_priorities error handling."""
     with pytest.raises(ValueError):
         update_queue_priorities(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -143,25 +148,17 @@ def test_update_queue_priorities_property_idempotent(self, self, ranked_tasks):
     assert update_queue_priorities(self, ranked_tasks) == result, "idempotent violated"
 
 
-
 def test_update_queue_priorities_no_temporal_leakage():
     """Ensure update_queue_priorities doesn't use future data."""
     # Arrange: Create temporal data
-    train = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-01', periods=10),
-    'value': range(10)
-    })
-    test = pd.DataFrame({
-    'kickoff': pd.date_range('2024-01-11', periods=5),
-    'value': range(10, 15)
-    })
+    train = pd.DataFrame({"kickoff": pd.date_range("2024-01-01", periods=10), "value": range(10)})
+    test = pd.DataFrame({"kickoff": pd.date_range("2024-01-11", periods=5), "value": range(10, 15)})
 
     # Act: Call function
     result = update_queue_priorities(train, test)
 
     # Assert: No leakage
-    assert result['train_max_date'] < result['test_min_date'],         "Temporal leakage detected"
-
+    assert result["train_max_date"] < result["test_min_date"], "Temporal leakage detected"
 
 
 def test_get_current_rankings_basic():
@@ -176,7 +173,6 @@ def test_get_current_rankings_basic():
     assert result is not None
 
 
-
 def test_get_current_rankings_edge_cases():
     """Test get_current_rankings: edge cases."""
     # Arrange
@@ -189,12 +185,10 @@ def test_get_current_rankings_edge_cases():
     assert result is not None
 
 
-
 def test_get_current_rankings_error_handling():
     """Test get_current_rankings error handling."""
     with pytest.raises(ValueError):
         get_current_rankings(invalid_input)
-
 
 
 @given(st.integers())
@@ -205,7 +199,6 @@ def test_get_current_rankings_property_idempotent(val):
 
     # Assert property
     assert get_current_rankings(val) == result, "idempotent violated"
-
 
 
 def test_monitor_and_rerank_basic():
@@ -220,7 +213,6 @@ def test_monitor_and_rerank_basic():
     assert result is not None
 
 
-
 def test_monitor_and_rerank_edge_cases():
     """Test monitor_and_rerank: edge cases."""
     # Arrange
@@ -233,12 +225,10 @@ def test_monitor_and_rerank_edge_cases():
     assert result is not None
 
 
-
 def test_monitor_and_rerank_error_handling():
     """Test monitor_and_rerank error handling."""
     with pytest.raises(ValueError):
         monitor_and_rerank(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -249,7 +239,6 @@ def test_monitor_and_rerank_property_idempotent(self, self, interval_seconds):
 
     # Assert property
     assert monitor_and_rerank(self, interval_seconds) == result, "idempotent violated"
-
 
 
 def test_close_basic():
@@ -264,7 +253,6 @@ def test_close_basic():
     assert result is not None
 
 
-
 def test_close_edge_cases():
     """Test close: edge cases."""
     # Arrange
@@ -277,12 +265,10 @@ def test_close_edge_cases():
     assert result is not None
 
 
-
 def test_close_error_handling():
     """Test close error handling."""
     with pytest.raises(ValueError):
         close(invalid_input)
-
 
 
 @given(st.integers())
@@ -293,4 +279,3 @@ def test_close_property_idempotent(val):
 
     # Assert property
     assert close(val) == result, "idempotent violated"
-

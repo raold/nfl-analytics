@@ -115,13 +115,22 @@ def cli():
 
 
 @cli.command()
-@click.option("--status", type=click.Choice(["training", "completed", "failed", "deprecated", "production"]), help="Filter by status")
+@click.option(
+    "--status",
+    type=click.Choice(["training", "completed", "failed", "deprecated", "production"]),
+    help="Filter by status",
+)
 @click.option("--training-window", help="Filter by training window (e.g., '2018-2024')")
 @click.option("--model-type", help="Filter by model type (e.g., 'bnn', 'xgboost', 'hierarchical')")
 @click.option("--model-family", help="Filter by model family (e.g., 'bayesian', 'deep_learning')")
 @click.option("--production-only", is_flag=True, help="Show only production models")
 @click.option("--limit", type=int, default=50, help="Maximum number of results (default: 50)")
-@click.option("--sort-by", type=click.Choice(["name", "created", "updated", "duration"]), default="updated", help="Sort by field")
+@click.option(
+    "--sort-by",
+    type=click.Choice(["name", "created", "updated", "duration"]),
+    default="updated",
+    help="Sort by field",
+)
 def list(status, training_window, model_type, model_family, production_only, limit, sort_by):
     """List models with optional filtering."""
     conn = get_db_connection()
@@ -160,7 +169,10 @@ def list(status, training_window, model_type, model_family, production_only, lim
             query += " AND train_start_season = %s AND train_end_season = %s"
             params.extend([int(start), int(end)])
         except ValueError:
-            click.echo(f"❌ Invalid training window format: {training_window}. Use format: '2018-2024'", err=True)
+            click.echo(
+                f"❌ Invalid training window format: {training_window}. Use format: '2018-2024'",
+                err=True,
+            )
             return
 
     if model_type:
@@ -202,19 +214,31 @@ def list(status, training_window, model_type, model_family, production_only, lim
 
             prod_indicator = "✓" if row["is_production"] else ""
 
-            table_data.append([
-                row["model_id"],
-                row["model_name"],
-                row["model_type"],
-                row["version"],
-                row["status"],
-                prod_indicator,
-                training_window_str,
-                format_duration(row["training_duration_seconds"]),
-                format_datetime(row["updated_at"]),
-            ])
+            table_data.append(
+                [
+                    row["model_id"],
+                    row["model_name"],
+                    row["model_type"],
+                    row["version"],
+                    row["status"],
+                    prod_indicator,
+                    training_window_str,
+                    format_duration(row["training_duration_seconds"]),
+                    format_datetime(row["updated_at"]),
+                ]
+            )
 
-        headers = ["ID", "Name", "Type", "Version", "Status", "Prod", "Train Window", "Duration", "Updated"]
+        headers = [
+            "ID",
+            "Name",
+            "Type",
+            "Version",
+            "Status",
+            "Prod",
+            "Train Window",
+            "Duration",
+            "Updated",
+        ]
         click.echo(tabulate(table_data, headers=headers, tablefmt="grid"))
         click.echo(f"\nTotal: {len(results)} models")
 
@@ -297,10 +321,14 @@ def search(model_type, status, min_accuracy, max_mae, hardware, git_branch):
         for row in results:
             click.echo(f"{'=' * 80}")
             click.echo(f"Model: {row['model_name']} ({row['version']})")
-            click.echo(f"Type: {row['model_type']} | Status: {row['status']} | Prod: {'✓' if row['is_production'] else '✗'}")
+            click.echo(
+                f"Type: {row['model_type']} | Status: {row['status']} | Prod: {'✓' if row['is_production'] else '✗'}"
+            )
 
             if row["train_start_season"] and row["train_end_season"]:
-                click.echo(f"Training Window: {row['train_start_season']}-{row['train_end_season']}")
+                click.echo(
+                    f"Training Window: {row['train_start_season']}-{row['train_end_season']}"
+                )
 
             if row["hardware"]:
                 click.echo(f"Hardware: {row['hardware']}")
@@ -390,7 +418,11 @@ def compare(model1, model2, show_diff_only):
             ["Model Type", m1_result["model_type"], m2_result["model_type"]],
             ["Version", m1_result["version"], m2_result["version"]],
             ["Status", m1_result["status"], m2_result["status"]],
-            ["Production", "✓" if m1_result["is_production"] else "✗", "✓" if m2_result["is_production"] else "✗"],
+            [
+                "Production",
+                "✓" if m1_result["is_production"] else "✗",
+                "✓" if m2_result["is_production"] else "✗",
+            ],
         ]
 
         # Training window
@@ -404,14 +436,32 @@ def compare(model1, model2, show_diff_only):
         else:
             tw2 = "N/A"
 
-        comparison_data.extend([
-            ["Training Window", tw1, tw2],
-            ["Duration", format_duration(m1_result["training_duration_seconds"]), format_duration(m2_result["training_duration_seconds"])],
-            ["Train Samples", m1_result["train_samples"] or "N/A", m2_result["train_samples"] or "N/A"],
-            ["Test Samples", m1_result["test_samples"] or "N/A", m2_result["test_samples"] or "N/A"],
-            ["Hardware", m1_result["hardware"] or "N/A", m2_result["hardware"] or "N/A"],
-            ["Created", format_datetime(m1_result["created_at"]), format_datetime(m2_result["created_at"])],
-        ])
+        comparison_data.extend(
+            [
+                ["Training Window", tw1, tw2],
+                [
+                    "Duration",
+                    format_duration(m1_result["training_duration_seconds"]),
+                    format_duration(m2_result["training_duration_seconds"]),
+                ],
+                [
+                    "Train Samples",
+                    m1_result["train_samples"] or "N/A",
+                    m2_result["train_samples"] or "N/A",
+                ],
+                [
+                    "Test Samples",
+                    m1_result["test_samples"] or "N/A",
+                    m2_result["test_samples"] or "N/A",
+                ],
+                ["Hardware", m1_result["hardware"] or "N/A", m2_result["hardware"] or "N/A"],
+                [
+                    "Created",
+                    format_datetime(m1_result["created_at"]),
+                    format_datetime(m2_result["created_at"]),
+                ],
+            ]
+        )
 
         click.echo(tabulate(comparison_data, tablefmt="grid"))
 
@@ -456,25 +506,29 @@ def compare(model1, model2, show_diff_only):
                         else:
                             better = model2 if delta > 0 else model1
 
-                        metrics_data.append([
-                            metric,
-                            f"{val1_float:.4f}",
-                            f"{val2_float:.4f}",
-                            f"{delta:+.4f}",
-                            f"{delta_pct:+.2f}%",
-                            "✓" if better == model2 else ("✗" if better == model1 else "="),
-                        ])
+                        metrics_data.append(
+                            [
+                                metric,
+                                f"{val1_float:.4f}",
+                                f"{val2_float:.4f}",
+                                f"{delta:+.4f}",
+                                f"{delta_pct:+.2f}%",
+                                "✓" if better == model2 else ("✗" if better == model1 else "="),
+                            ]
+                        )
                     except (ValueError, TypeError):
                         metrics_data.append([metric, str(val1), str(val2), "N/A", "N/A", "N/A"])
                 else:
-                    metrics_data.append([
-                        metric,
-                        f"{val1:.4f}" if val1 is not None else "N/A",
-                        f"{val2:.4f}" if val2 is not None else "N/A",
-                        "N/A",
-                        "N/A",
-                        "N/A",
-                    ])
+                    metrics_data.append(
+                        [
+                            metric,
+                            f"{val1:.4f}" if val1 is not None else "N/A",
+                            f"{val2:.4f}" if val2 is not None else "N/A",
+                            "N/A",
+                            "N/A",
+                            "N/A",
+                        ]
+                    )
 
             if len(metrics_data) > 2:
                 click.echo(tabulate(metrics_data, headers="firstrow", tablefmt="grid"))
@@ -495,7 +549,13 @@ def compare(model1, model2, show_diff_only):
 @click.option("--metric", default="mae", help="Metric to sort by (default: mae)")
 @click.option("--stat-type", help="Filter by stat type (e.g., 'passing', 'rushing', 'receiving')")
 @click.option("--limit", type=int, default=20, help="Number of models to show (default: 20)")
-@click.option("--format", "output_format", type=click.Choice(["table", "latex", "csv", "json"]), default="table", help="Output format")
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["table", "latex", "csv", "json"]),
+    default="table",
+    help="Output format",
+)
 @click.option("--ascending", is_flag=True, help="Sort ascending (for loss metrics)")
 def leaderboard(metric, stat_type, limit, output_format, ascending):
     """Rank models by performance metrics."""
@@ -542,16 +602,22 @@ def leaderboard(metric, stat_type, limit, output_format, ascending):
             if metric in metrics:
                 try:
                     metric_value = float(metrics[metric])
-                    leaderboard_data.append({
-                        "model_name": row["model_name"],
-                        "model_type": row["model_type"],
-                        "version": row["version"],
-                        "status": row["status"],
-                        "is_production": row["is_production"],
-                        "train_window": f"{row['train_start_season']}-{row['train_end_season']}" if row["train_start_season"] else "N/A",
-                        "metric_value": metric_value,
-                        "evaluated_at": row["evaluated_at"],
-                    })
+                    leaderboard_data.append(
+                        {
+                            "model_name": row["model_name"],
+                            "model_type": row["model_type"],
+                            "version": row["version"],
+                            "status": row["status"],
+                            "is_production": row["is_production"],
+                            "train_window": (
+                                f"{row['train_start_season']}-{row['train_end_season']}"
+                                if row["train_start_season"]
+                                else "N/A"
+                            ),
+                            "metric_value": metric_value,
+                            "evaluated_at": row["evaluated_at"],
+                        }
+                    )
                 except (ValueError, TypeError):
                     continue
 
@@ -568,18 +634,29 @@ def leaderboard(metric, stat_type, limit, output_format, ascending):
             table_data = []
             for i, row in enumerate(leaderboard_data, 1):
                 prod_indicator = "✓" if row["is_production"] else ""
-                table_data.append([
-                    i,
-                    row["model_name"],
-                    row["model_type"],
-                    row["version"],
-                    f"{row['metric_value']:.4f}",
-                    row["status"],
-                    prod_indicator,
-                    row["train_window"],
-                ])
+                table_data.append(
+                    [
+                        i,
+                        row["model_name"],
+                        row["model_type"],
+                        row["version"],
+                        f"{row['metric_value']:.4f}",
+                        row["status"],
+                        prod_indicator,
+                        row["train_window"],
+                    ]
+                )
 
-            headers = ["Rank", "Model", "Type", "Version", metric.upper(), "Status", "Prod", "Train Window"]
+            headers = [
+                "Rank",
+                "Model",
+                "Type",
+                "Version",
+                metric.upper(),
+                "Status",
+                "Prod",
+                "Train Window",
+            ]
             click.echo(f"\n🏆 MODEL LEADERBOARD - Sorted by {metric}\n")
             click.echo(tabulate(table_data, headers=headers, tablefmt="grid"))
 
@@ -594,7 +671,9 @@ def leaderboard(metric, stat_type, limit, output_format, ascending):
 
             for i, row in enumerate(leaderboard_data, 1):
                 model_name = row["model_name"].replace("_", "\\_")
-                click.echo(f"{i} & {model_name} & {row['model_type']} & {row['version']} & {row['metric_value']:.4f} & {row['status']} \\\\")
+                click.echo(
+                    f"{i} & {model_name} & {row['model_type']} & {row['version']} & {row['metric_value']:.4f} & {row['status']} \\\\"
+                )
 
             click.echo("\\bottomrule")
             click.echo("\\end{tabular}")
@@ -603,7 +682,9 @@ def leaderboard(metric, stat_type, limit, output_format, ascending):
         elif output_format == "csv":
             click.echo("Rank,Model,Type,Version,Metric,Status,Production,Train_Window")
             for i, row in enumerate(leaderboard_data, 1):
-                click.echo(f"{i},{row['model_name']},{row['model_type']},{row['version']},{row['metric_value']:.4f},{row['status']},{row['is_production']},{row['train_window']}")
+                click.echo(
+                    f"{i},{row['model_name']},{row['model_type']},{row['version']},{row['metric_value']:.4f},{row['status']},{row['is_production']},{row['train_window']}"
+                )
 
         elif output_format == "json":
             output = {
@@ -630,7 +711,8 @@ def check_safe_delete(model_name):
 
     try:
         # Get model info
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 model_id,
                 model_name,
@@ -643,7 +725,9 @@ def check_safe_delete(model_name):
                 updated_at
             FROM ml.model_registry
             WHERE model_name = %s
-        """, (model_name,))
+        """,
+            (model_name,),
+        )
 
         model = cursor.fetchone()
 
@@ -671,39 +755,51 @@ def check_safe_delete(model_name):
             click.echo(f"✓ Status: {model['status']}")
 
         # Check 3: Ensemble membership
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 ensemble_name,
                 version,
                 is_active
             FROM ml.ensemble_configs
             WHERE %s = ANY(model_ids)
-        """, (model["model_id"],))
+        """,
+            (model["model_id"],),
+        )
 
         ensembles = cursor.fetchall()
         if ensembles:
             for ens in ensembles:
                 if ens["is_active"]:
-                    issues.append(f"⛔ Used in ACTIVE ensemble: {ens['ensemble_name']} ({ens['version']})")
+                    issues.append(
+                        f"⛔ Used in ACTIVE ensemble: {ens['ensemble_name']} ({ens['version']})"
+                    )
                 else:
-                    warnings.append(f"⚠️  Used in inactive ensemble: {ens['ensemble_name']} ({ens['version']})")
+                    warnings.append(
+                        f"⚠️  Used in inactive ensemble: {ens['ensemble_name']} ({ens['version']})"
+                    )
         else:
             click.echo("✓ Not used in any ensembles")
 
         # Check 4: Active deployments
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 deployment_name,
                 environment,
                 status
             FROM ml.production_deployments
             WHERE model_id = %s AND status = 'active'
-        """, (model["model_id"],))
+        """,
+            (model["model_id"],),
+        )
 
         deployments = cursor.fetchall()
         if deployments:
             for dep in deployments:
-                issues.append(f"⛔ Has ACTIVE deployment: {dep['deployment_name']} ({dep['environment']})")
+                issues.append(
+                    f"⛔ Has ACTIVE deployment: {dep['deployment_name']} ({dep['environment']})"
+                )
         else:
             click.echo("✓ No active deployments")
 
@@ -716,26 +812,34 @@ def check_safe_delete(model_name):
                 click.echo(f"📁 File size: {format_bytes(file_size)}")
 
                 # Check for associated artifacts
-                cursor.execute("""
+                cursor.execute(
+                    """
                     SELECT
                         COUNT(*) as artifact_count,
                         SUM(file_size_bytes) as total_size
                     FROM ml.model_artifacts
                     WHERE model_id = %s
-                """, (model["model_id"],))
+                """,
+                    (model["model_id"],),
+                )
 
                 artifact_info = cursor.fetchone()
                 if artifact_info["artifact_count"] and artifact_info["artifact_count"] > 0:
-                    click.echo(f"📦 Artifacts: {artifact_info['artifact_count']} files, {format_bytes(artifact_info['total_size'])}")
+                    click.echo(
+                        f"📦 Artifacts: {artifact_info['artifact_count']} files, {format_bytes(artifact_info['total_size'])}"
+                    )
             else:
                 warnings.append(f"⚠️  Model file not found: {model_path}")
 
         # Check 6: Last used date
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT MAX(evaluated_at) as last_eval
             FROM ml.model_evaluations
             WHERE model_id = %s
-        """, (model["model_id"],))
+        """,
+            (model["model_id"],),
+        )
 
         last_eval = cursor.fetchone()
         if last_eval["last_eval"]:
@@ -760,7 +864,9 @@ def check_safe_delete(model_name):
 
         if not issues:
             click.echo("\n💡 To delete this model, run:")
-            click.echo(f"   psql {DB_CONFIG['database']} -c \"DELETE FROM ml.model_registry WHERE model_name = '{model_name}';\"")
+            click.echo(
+                f"   psql {DB_CONFIG['database']} -c \"DELETE FROM ml.model_registry WHERE model_name = '{model_name}';\""
+            )
 
     except psycopg2.Error as e:
         click.echo(f"❌ Safety check failed: {e}", err=True)
@@ -781,11 +887,14 @@ def info(model_name, show_training, show_metrics, show_artifacts):
 
     try:
         # Get model info
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT *
             FROM ml.model_registry
             WHERE model_name = %s
-        """, (model_name,))
+        """,
+            (model_name,),
+        )
 
         model = cursor.fetchone()
 
@@ -813,7 +922,9 @@ def info(model_name, show_training, show_metrics, show_artifacts):
 
         # Training info
         if model["train_start_season"] and model["train_end_season"]:
-            info_data.append(["Training Window", f"{model['train_start_season']}-{model['train_end_season']}"])
+            info_data.append(
+                ["Training Window", f"{model['train_start_season']}-{model['train_end_season']}"]
+            )
 
         if model["training_start"]:
             info_data.append(["Training Started", format_datetime(model["training_start"])])
@@ -822,7 +933,9 @@ def info(model_name, show_training, show_metrics, show_artifacts):
             info_data.append(["Training Ended", format_datetime(model["training_end"])])
 
         if model["training_duration_seconds"]:
-            info_data.append(["Training Duration", format_duration(model["training_duration_seconds"])])
+            info_data.append(
+                ["Training Duration", format_duration(model["training_duration_seconds"])]
+            )
 
         # Dataset info
         if model["train_samples"]:
@@ -856,10 +969,12 @@ def info(model_name, show_training, show_metrics, show_artifacts):
             info_data.append(["Metadata Path", model["metadata_path"]])
 
         # Timestamps
-        info_data.extend([
-            ["Created At", format_datetime(model["created_at"])],
-            ["Updated At", format_datetime(model["updated_at"])],
-        ])
+        info_data.extend(
+            [
+                ["Created At", format_datetime(model["created_at"])],
+                ["Updated At", format_datetime(model["updated_at"])],
+            ]
+        )
 
         click.echo(tabulate(info_data, tablefmt="grid"))
 
@@ -872,7 +987,8 @@ def info(model_name, show_training, show_metrics, show_artifacts):
 
         # Training runs
         if show_training:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     run_id,
                     run_name,
@@ -889,7 +1005,9 @@ def info(model_name, show_training, show_metrics, show_artifacts):
                 FROM ml.training_runs
                 WHERE model_id = %s
                 ORDER BY started_at DESC
-            """, (model["model_id"],))
+            """,
+                (model["model_id"],),
+            )
 
             training_runs = cursor.fetchall()
 
@@ -900,11 +1018,15 @@ def info(model_name, show_training, show_metrics, show_artifacts):
 
                 for run in training_runs:
                     click.echo(f"Run ID: {run['run_id']} | {run['run_name'] or 'Unnamed'}")
-                    click.echo(f"Status: {run['status']} | Duration: {format_duration(run['duration_seconds'])}")
+                    click.echo(
+                        f"Status: {run['status']} | Duration: {format_duration(run['duration_seconds'])}"
+                    )
                     click.echo(f"Started: {format_datetime(run['started_at'])}")
 
                     if run["epochs"]:
-                        click.echo(f"Epochs: {run['epochs']} | Batch Size: {run['batch_size']} | LR: {run['learning_rate']}")
+                        click.echo(
+                            f"Epochs: {run['epochs']} | Batch Size: {run['batch_size']} | LR: {run['learning_rate']}"
+                        )
 
                     if run["optimizer"]:
                         click.echo(f"Optimizer: {run['optimizer']}")
@@ -924,7 +1046,8 @@ def info(model_name, show_training, show_metrics, show_artifacts):
 
         # Evaluation metrics
         if show_metrics:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     evaluation_name,
                     evaluation_type,
@@ -937,7 +1060,9 @@ def info(model_name, show_training, show_metrics, show_artifacts):
                 FROM ml.model_evaluations
                 WHERE model_id = %s
                 ORDER BY evaluated_at DESC
-            """, (model["model_id"],))
+            """,
+                (model["model_id"],),
+            )
 
             evaluations = cursor.fetchall()
 
@@ -947,11 +1072,15 @@ def info(model_name, show_training, show_metrics, show_artifacts):
                 click.echo(f"{'=' * 100}\n")
 
                 for eval_row in evaluations:
-                    click.echo(f"Evaluation: {eval_row['evaluation_name']} ({eval_row['evaluation_type']})")
+                    click.echo(
+                        f"Evaluation: {eval_row['evaluation_name']} ({eval_row['evaluation_type']})"
+                    )
                     click.echo(f"Evaluated: {format_datetime(eval_row['evaluated_at'])}")
 
                     if eval_row["dataset_name"]:
-                        click.echo(f"Dataset: {eval_row['dataset_name']} ({eval_row['dataset_size']:,} samples)")
+                        click.echo(
+                            f"Dataset: {eval_row['dataset_name']} ({eval_row['dataset_size']:,} samples)"
+                        )
 
                     if eval_row["metrics"]:
                         click.echo("Metrics:")
@@ -971,7 +1100,8 @@ def info(model_name, show_training, show_metrics, show_artifacts):
 
         # Artifacts
         if show_artifacts:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     artifact_type,
                     artifact_name,
@@ -984,7 +1114,9 @@ def info(model_name, show_training, show_metrics, show_artifacts):
                 FROM ml.model_artifacts
                 WHERE model_id = %s
                 ORDER BY created_at DESC
-            """, (model["model_id"],))
+            """,
+                (model["model_id"],),
+            )
 
             artifacts = cursor.fetchall()
 
@@ -997,18 +1129,21 @@ def info(model_name, show_training, show_metrics, show_artifacts):
                 artifact_data.append(["─" * 20, "─" * 30, "─" * 15, "─" * 5, "─" * 20])
 
                 for art in artifacts:
-                    artifact_data.append([
-                        art["artifact_type"],
-                        art["artifact_name"],
-                        format_bytes(art["file_size_bytes"]),
-                        "✓" if art["is_best"] else "",
-                        format_datetime(art["created_at"]),
-                    ])
+                    artifact_data.append(
+                        [
+                            art["artifact_type"],
+                            art["artifact_name"],
+                            format_bytes(art["file_size_bytes"]),
+                            "✓" if art["is_best"] else "",
+                            format_datetime(art["created_at"]),
+                        ]
+                    )
 
                 click.echo(tabulate(artifact_data, headers="firstrow", tablefmt="grid"))
 
         # Ensemble membership
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT
                 ec.ensemble_name,
                 ec.version,
@@ -1016,7 +1151,9 @@ def info(model_name, show_training, show_metrics, show_artifacts):
                 ec.is_active
             FROM ml.ensemble_configs ec
             WHERE %s = ANY(ec.model_ids)
-        """, (model["model_id"],))
+        """,
+            (model["model_id"],),
+        )
 
         ensembles = cursor.fetchall()
 
@@ -1027,7 +1164,9 @@ def info(model_name, show_training, show_metrics, show_artifacts):
 
             for ens in ensembles:
                 active_str = "ACTIVE" if ens["is_active"] else "INACTIVE"
-                click.echo(f"• {ens['ensemble_name']} ({ens['version']}) - {ens['weighting_method']} - {active_str}")
+                click.echo(
+                    f"• {ens['ensemble_name']} ({ens['version']}) - {ens['weighting_method']} - {active_str}"
+                )
 
     except psycopg2.Error as e:
         click.echo(f"❌ Info query failed: {e}", err=True)
@@ -1039,7 +1178,13 @@ def info(model_name, show_training, show_metrics, show_artifacts):
 @cli.command()
 @click.option("--metric", help="Filter by specific metric")
 @click.option("--status", help="Filter by status")
-@click.option("--format", "output_format", type=click.Choice(["latex", "csv", "json", "markdown"]), default="latex", help="Export format")
+@click.option(
+    "--format",
+    "output_format",
+    type=click.Choice(["latex", "csv", "json", "markdown"]),
+    default="latex",
+    help="Export format",
+)
 @click.option("--output", type=click.Path(), help="Output file path (default: stdout)")
 def export(metric, status, output_format, output):
     """Export model information to various formats."""
@@ -1099,42 +1244,58 @@ def export(metric, status, output_format, output):
 
             for row in results:
                 model_name = row["model_name"].replace("_", "\\_")
-                train_window = f"{row['train_start_season']}-{row['train_end_season']}" if row["train_start_season"] else "N/A"
+                train_window = (
+                    f"{row['train_start_season']}-{row['train_end_season']}"
+                    if row["train_start_season"]
+                    else "N/A"
+                )
                 hw = row["hardware"] or "N/A"
 
-                output_lines.append(f"{model_name} & {row['model_type']} & {row['version']} & {row['status']} & {train_window} & {hw} \\\\")
+                output_lines.append(
+                    f"{model_name} & {row['model_type']} & {row['version']} & {row['status']} & {train_window} & {hw} \\\\"
+                )
 
             output_lines.append("\\bottomrule")
             output_lines.append("\\end{tabular}")
             output_lines.append("\\end{table}")
 
         elif output_format == "csv":
-            output_lines.append("Model,Type,Family,Version,Status,Production,Train_Window,Duration,Hardware")
+            output_lines.append(
+                "Model,Type,Family,Version,Status,Production,Train_Window,Duration,Hardware"
+            )
 
             for row in results:
-                train_window = f"{row['train_start_season']}-{row['train_end_season']}" if row["train_start_season"] else "N/A"
+                train_window = (
+                    f"{row['train_start_season']}-{row['train_end_season']}"
+                    if row["train_start_season"]
+                    else "N/A"
+                )
                 duration = format_duration(row["training_duration_seconds"])
                 hw = row["hardware"] or "N/A"
 
-                output_lines.append(f"{row['model_name']},{row['model_type']},{row['model_family']},{row['version']},{row['status']},{row['is_production']},{train_window},{duration},{hw}")
+                output_lines.append(
+                    f"{row['model_name']},{row['model_type']},{row['model_family']},{row['version']},{row['status']},{row['is_production']},{train_window},{duration},{hw}"
+                )
 
         elif output_format == "json":
             export_data = []
             for row in results:
-                export_data.append({
-                    "model_name": row["model_name"],
-                    "model_type": row["model_type"],
-                    "model_family": row["model_family"],
-                    "version": row["version"],
-                    "status": row["status"],
-                    "is_production": row["is_production"],
-                    "train_start_season": row["train_start_season"],
-                    "train_end_season": row["train_end_season"],
-                    "training_duration_seconds": row["training_duration_seconds"],
-                    "hardware": row["hardware"],
-                    "metrics": row["metrics"],
-                    "evaluated_at": format_datetime(row["evaluated_at"]),
-                })
+                export_data.append(
+                    {
+                        "model_name": row["model_name"],
+                        "model_type": row["model_type"],
+                        "model_family": row["model_family"],
+                        "version": row["version"],
+                        "status": row["status"],
+                        "is_production": row["is_production"],
+                        "train_start_season": row["train_start_season"],
+                        "train_end_season": row["train_end_season"],
+                        "training_duration_seconds": row["training_duration_seconds"],
+                        "hardware": row["hardware"],
+                        "metrics": row["metrics"],
+                        "evaluated_at": format_datetime(row["evaluated_at"]),
+                    }
+                )
 
             output_lines.append(json.dumps(export_data, indent=2))
 
@@ -1144,10 +1305,16 @@ def export(metric, status, output_format, output):
             output_lines.append("|-------|------|---------|--------|--------------|----------|")
 
             for row in results:
-                train_window = f"{row['train_start_season']}-{row['train_end_season']}" if row["train_start_season"] else "N/A"
+                train_window = (
+                    f"{row['train_start_season']}-{row['train_end_season']}"
+                    if row["train_start_season"]
+                    else "N/A"
+                )
                 hw = row["hardware"] or "N/A"
 
-                output_lines.append(f"| {row['model_name']} | {row['model_type']} | {row['version']} | {row['status']} | {train_window} | {hw} |")
+                output_lines.append(
+                    f"| {row['model_name']} | {row['model_type']} | {row['version']} | {row['status']} | {train_window} | {hw} |"
+                )
 
         # Output to file or stdout
         output_text = "\n".join(output_lines)

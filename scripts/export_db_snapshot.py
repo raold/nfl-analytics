@@ -52,7 +52,7 @@ try:
     print(f"✓ File size: {size_mb:.2f} MB")
     print("\nNext steps:")
     print(f"  git add {output_file}")
-    print(f"  git commit -m \"chore: database snapshot for Mac transition ({timestamp})\"")
+    print(f'  git commit -m "chore: database snapshot for Mac transition ({timestamp})"')
     print("  git push origin main")
 
 except FileNotFoundError:

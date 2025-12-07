@@ -52,10 +52,7 @@ class TestGNNComponent:
     def test_graceful_degradation_when_unavailable(self):
         """Test that component gracefully handles missing model."""
         # Point to non-existent model
-        component = GNNComponent(
-            model_path="/tmp/nonexistent_model.pt",
-            device="cpu"
-        )
+        component = GNNComponent(model_path="/tmp/nonexistent_model.pt", device="cpu")
 
         assert not component.is_available
         assert component.model is None
@@ -65,8 +62,7 @@ class TestGNNComponent:
         assert pred is None
 
     @pytest.mark.skipif(
-        not Path("models/gnn/hierarchical_gnn_best.pt").exists(),
-        reason="GNN model not trained yet"
+        not Path("models/gnn/hierarchical_gnn_best.pt").exists(), reason="GNN model not trained yet"
     )
     def test_model_loading(self, component):
         """Test that model loads successfully if available."""
@@ -77,8 +73,7 @@ class TestGNNComponent:
             assert component.hidden_dim > 0
 
     @pytest.mark.skipif(
-        not Path("models/gnn/hierarchical_gnn_best.pt").exists(),
-        reason="GNN model not trained yet"
+        not Path("models/gnn/hierarchical_gnn_best.pt").exists(), reason="GNN model not trained yet"
     )
     def test_prediction_format(self, component):
         """Test that prediction returns correct ModelPrediction format."""
@@ -101,8 +96,7 @@ class TestGNNComponent:
             assert "away_team" in pred.metadata
 
     @pytest.mark.skipif(
-        not Path("models/gnn/hierarchical_gnn_best.pt").exists(),
-        reason="GNN model not trained yet"
+        not Path("models/gnn/hierarchical_gnn_best.pt").exists(), reason="GNN model not trained yet"
     )
     def test_prediction_uncertainty(self, component):
         """Test that uncertainty estimation is reasonable."""
@@ -120,8 +114,7 @@ class TestGNNComponent:
             assert 0.0 <= pred.prediction_mean <= 1.0
 
     @pytest.mark.skipif(
-        not Path("models/gnn/hierarchical_gnn_best.pt").exists(),
-        reason="GNN model not trained yet"
+        not Path("models/gnn/hierarchical_gnn_best.pt").exists(), reason="GNN model not trained yet"
     )
     def test_batch_prediction(self, component):
         """Test batch prediction interface."""
@@ -172,8 +165,7 @@ class TestGNNComponent:
         assert pred is None
 
     @pytest.mark.skipif(
-        not Path("models/gnn/hierarchical_gnn_best.pt").exists(),
-        reason="GNN model not trained yet"
+        not Path("models/gnn/hierarchical_gnn_best.pt").exists(), reason="GNN model not trained yet"
     )
     def test_metadata_loading(self, component):
         """Test that metadata is loaded correctly."""
@@ -193,8 +185,7 @@ class TestGNNComponentIntegration:
     """Integration tests for GNN component."""
 
     @pytest.mark.skipif(
-        not Path("models/gnn/hierarchical_gnn_best.pt").exists(),
-        reason="GNN model not trained yet"
+        not Path("models/gnn/hierarchical_gnn_best.pt").exists(), reason="GNN model not trained yet"
     )
     def test_prediction_consistency(self):
         """Test that predictions are consistent across calls."""
@@ -215,8 +206,7 @@ class TestGNNComponentIntegration:
             assert abs(pred1.prediction_std - pred2.prediction_std) < 0.1
 
     @pytest.mark.skipif(
-        not Path("models/gnn/hierarchical_gnn_best.pt").exists(),
-        reason="GNN model not trained yet"
+        not Path("models/gnn/hierarchical_gnn_best.pt").exists(), reason="GNN model not trained yet"
     )
     def test_home_away_asymmetry(self):
         """Test that home/away order matters (not symmetric)."""
@@ -242,6 +232,7 @@ class TestGNNComponentIntegration:
 def test_component_import():
     """Test that component can be imported correctly."""
     from py.ensemble.components import GNNComponent as ImportedComponent
+
     assert ImportedComponent is GNNComponent
 
 

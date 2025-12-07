@@ -23,7 +23,6 @@ def test_load_passing_data_basic():
     assert result is not None
 
 
-
 def test_load_passing_data_edge_cases():
     """Test load_passing_data: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_load_passing_data_edge_cases():
     assert result is not None
 
 
-
 def test_load_passing_data_error_handling():
     """Test load_passing_data error handling."""
     with pytest.raises(ValueError):
         load_passing_data(invalid_input)
-
 
 
 def test_prepare_features_basic():
@@ -56,7 +53,6 @@ def test_prepare_features_basic():
     assert result is not None
 
 
-
 def test_prepare_features_edge_cases():
     """Test prepare_features: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_prepare_features_edge_cases():
     assert result is not None
 
 
-
 def test_prepare_features_error_handling():
     """Test prepare_features error handling."""
     with pytest.raises(ValueError):
         prepare_features(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_prepare_features_property_idempotent(self, df):
 
     # Assert property
     assert prepare_features(df) == result, "idempotent violated"
-
 
 
 def test_run_calibration_experiments_basic():
@@ -100,7 +93,6 @@ def test_run_calibration_experiments_basic():
     assert result is not None
 
 
-
 def test_run_calibration_experiments_edge_cases():
     """Test run_calibration_experiments: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_run_calibration_experiments_edge_cases():
     assert result is not None
 
 
-
 def test_run_calibration_experiments_error_handling():
     """Test run_calibration_experiments error handling."""
     with pytest.raises(ValueError):
         run_calibration_experiments(invalid_input)
-
 
 
 def test_fit_basic():
@@ -133,7 +123,6 @@ def test_fit_basic():
     assert result is not None
 
 
-
 def test_fit_edge_cases():
     """Test fit: edge cases."""
     # Arrange
@@ -146,12 +135,10 @@ def test_fit_edge_cases():
     assert result is not None
 
 
-
 def test_fit_error_handling():
     """Test fit error handling."""
     with pytest.raises(ValueError):
         fit(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -162,7 +149,6 @@ def test_fit_property_idempotent(self, self, X, y, verbose):
 
     # Assert property
     assert fit(self, X, y, verbose) == result, "idempotent violated"
-
 
 
 def test_predict_basic():
@@ -177,7 +163,6 @@ def test_predict_basic():
     assert result is not None
 
 
-
 def test_predict_edge_cases():
     """Test predict: edge cases."""
     # Arrange
@@ -190,12 +175,10 @@ def test_predict_edge_cases():
     assert result is not None
 
 
-
 def test_predict_error_handling():
     """Test predict error handling."""
     with pytest.raises(ValueError):
         predict(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -206,7 +189,6 @@ def test_predict_property_idempotent(self, self, X, return_quantiles, n_samples)
 
     # Assert property
     assert predict(self, X, return_quantiles, n_samples) == result, "idempotent violated"
-
 
 
 def test_save_basic():
@@ -221,7 +203,6 @@ def test_save_basic():
     assert result is not None
 
 
-
 def test_save_edge_cases():
     """Test save: edge cases."""
     # Arrange
@@ -234,12 +215,10 @@ def test_save_edge_cases():
     assert result is not None
 
 
-
 def test_save_error_handling():
     """Test save error handling."""
     with pytest.raises(ValueError):
         save(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -250,4 +229,3 @@ def test_save_property_idempotent(self, self, path):
 
     # Assert property
     assert save(self, path) == result, "idempotent violated"
-

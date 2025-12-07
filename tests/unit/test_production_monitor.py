@@ -23,7 +23,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-
 
 
 def test_connect_db_basic():
@@ -56,7 +53,6 @@ def test_connect_db_basic():
     assert result is not None
 
 
-
 def test_connect_db_edge_cases():
     """Test connect_db: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_connect_db_edge_cases():
     assert result is not None
 
 
-
 def test_connect_db_error_handling():
     """Test connect_db error handling."""
     with pytest.raises(ValueError):
         connect_db(invalid_input)
-
 
 
 @given(st.integers())
@@ -85,7 +79,6 @@ def test_connect_db_property_idempotent(val):
 
     # Assert property
     assert connect_db(val) == result, "idempotent violated"
-
 
 
 def test_init_monitoring_tables_basic():
@@ -100,7 +93,6 @@ def test_init_monitoring_tables_basic():
     assert result is not None
 
 
-
 def test_init_monitoring_tables_edge_cases():
     """Test init_monitoring_tables: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_init_monitoring_tables_edge_cases():
     assert result is not None
 
 
-
 def test_init_monitoring_tables_error_handling():
     """Test init_monitoring_tables error handling."""
     with pytest.raises(ValueError):
         init_monitoring_tables(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_init_monitoring_tables_property_idempotent(val):
 
     # Assert property
     assert init_monitoring_tables(val) == result, "idempotent violated"
-
 
 
 def test_load_predictions_basic():
@@ -144,7 +133,6 @@ def test_load_predictions_basic():
     assert result is not None
 
 
-
 def test_load_predictions_edge_cases():
     """Test load_predictions: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_load_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_load_predictions_error_handling():
     """Test load_predictions error handling."""
     with pytest.raises(ValueError):
         load_predictions(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_load_predictions_property_idempotent(self, self, predictions_file):
 
     # Assert property
     assert load_predictions(self, predictions_file) == result, "idempotent violated"
-
 
 
 def test_load_actual_results_basic():
@@ -188,7 +173,6 @@ def test_load_actual_results_basic():
     assert result is not None
 
 
-
 def test_load_actual_results_edge_cases():
     """Test load_actual_results: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_load_actual_results_edge_cases():
     assert result is not None
 
 
-
 def test_load_actual_results_error_handling():
     """Test load_actual_results error handling."""
     with pytest.raises(ValueError):
         load_actual_results(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -217,7 +199,6 @@ def test_load_actual_results_property_idempotent(self, self, season, week):
 
     # Assert property
     assert load_actual_results(self, season, week) == result, "idempotent violated"
-
 
 
 def test_evaluate_predictions_basic():
@@ -232,7 +213,6 @@ def test_evaluate_predictions_basic():
     assert result is not None
 
 
-
 def test_evaluate_predictions_edge_cases():
     """Test evaluate_predictions: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_evaluate_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_evaluate_predictions_error_handling():
     """Test evaluate_predictions error handling."""
     with pytest.raises(ValueError):
         evaluate_predictions(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -261,7 +239,6 @@ def test_evaluate_predictions_property_idempotent(self, self, predictions, actua
 
     # Assert property
     assert evaluate_predictions(self, predictions, actuals) == result, "idempotent violated"
-
 
 
 def test_log_predictions_basic():
@@ -276,7 +253,6 @@ def test_log_predictions_basic():
     assert result is not None
 
 
-
 def test_log_predictions_edge_cases():
     """Test log_predictions: edge cases."""
     # Arrange
@@ -289,12 +265,10 @@ def test_log_predictions_edge_cases():
     assert result is not None
 
 
-
 def test_log_predictions_error_handling():
     """Test log_predictions error handling."""
     with pytest.raises(ValueError):
         log_predictions(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -305,7 +279,6 @@ def test_log_predictions_property_idempotent(self, self, predictions, actuals):
 
     # Assert property
     assert log_predictions(self, predictions, actuals) == result, "idempotent violated"
-
 
 
 def test_log_metrics_basic():
@@ -320,7 +293,6 @@ def test_log_metrics_basic():
     assert result is not None
 
 
-
 def test_log_metrics_edge_cases():
     """Test log_metrics: edge cases."""
     # Arrange
@@ -333,12 +305,10 @@ def test_log_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_log_metrics_error_handling():
     """Test log_metrics error handling."""
     with pytest.raises(ValueError):
         log_metrics(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers(), st.integers())
@@ -349,7 +319,6 @@ def test_log_metrics_property_idempotent(self, self, model_version, season, week
 
     # Assert property
     assert log_metrics(self, model_version, season, week, metrics) == result, "idempotent violated"
-
 
 
 def test_generate_weekly_report_basic():
@@ -364,7 +333,6 @@ def test_generate_weekly_report_basic():
     assert result is not None
 
 
-
 def test_generate_weekly_report_edge_cases():
     """Test generate_weekly_report: edge cases."""
     # Arrange
@@ -377,12 +345,10 @@ def test_generate_weekly_report_edge_cases():
     assert result is not None
 
 
-
 def test_generate_weekly_report_error_handling():
     """Test generate_weekly_report error handling."""
     with pytest.raises(ValueError):
         generate_weekly_report(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -393,7 +359,6 @@ def test_generate_weekly_report_property_idempotent(self, self, season, week):
 
     # Assert property
     assert generate_weekly_report(self, season, week) == result, "idempotent violated"
-
 
 
 def test_check_data_drift_basic():
@@ -408,7 +373,6 @@ def test_check_data_drift_basic():
     assert result is not None
 
 
-
 def test_check_data_drift_edge_cases():
     """Test check_data_drift: edge cases."""
     # Arrange
@@ -421,12 +385,10 @@ def test_check_data_drift_edge_cases():
     assert result is not None
 
 
-
 def test_check_data_drift_error_handling():
     """Test check_data_drift error handling."""
     with pytest.raises(ValueError):
         check_data_drift(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -436,5 +398,6 @@ def test_check_data_drift_property_idempotent(self, self, current_features, base
     result = check_data_drift(self, current_features, baseline_features)
 
     # Assert property
-    assert check_data_drift(self, current_features, baseline_features) == result, "idempotent violated"
-
+    assert (
+        check_data_drift(self, current_features, baseline_features) == result
+    ), "idempotent violated"

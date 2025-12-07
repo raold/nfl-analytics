@@ -23,7 +23,6 @@ def test_spread_to_prob_basic():
     assert result is not None
 
 
-
 def test_spread_to_prob_edge_cases():
     """Test spread_to_prob: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_spread_to_prob_edge_cases():
     assert result is not None
 
 
-
 def test_spread_to_prob_error_handling():
     """Test spread_to_prob error handling."""
     with pytest.raises(ValueError):
         spread_to_prob(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_spread_to_prob_property_idempotent(self, spread):
 
     # Assert property
     assert spread_to_prob(spread) == result, "idempotent violated"
-
 
 
 def test_prepare_ensemble_data_basic():
@@ -67,7 +63,6 @@ def test_prepare_ensemble_data_basic():
     assert result is not None
 
 
-
 def test_prepare_ensemble_data_edge_cases():
     """Test prepare_ensemble_data: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_prepare_ensemble_data_edge_cases():
     assert result is not None
 
 
-
 def test_prepare_ensemble_data_error_handling():
     """Test prepare_ensemble_data error handling."""
     with pytest.raises(ValueError):
         prepare_ensemble_data(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -96,7 +89,6 @@ def test_prepare_ensemble_data_property_idempotent(self, input_path, output_path
 
     # Assert property
     assert prepare_ensemble_data(input_path, output_path, season) == result, "idempotent violated"
-
 
 
 def test_main_basic():
@@ -111,7 +103,6 @@ def test_main_basic():
     assert result is not None
 
 
-
 def test_main_edge_cases():
     """Test main: edge cases."""
     # Arrange
@@ -124,9 +115,7 @@ def test_main_edge_cases():
     assert result is not None
 
 
-
 def test_main_error_handling():
     """Test main error handling."""
     with pytest.raises(ValueError):
         main(invalid_input)
-

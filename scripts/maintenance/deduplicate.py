@@ -14,10 +14,7 @@ from rich.prompt import Confirm
 
 console = Console()
 
-DB_URL = os.environ.get(
-    "DATABASE_URL",
-    "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-)
+DB_URL = os.environ.get("DATABASE_URL", "postgresql://dro:sicillionbillions@localhost:5544/devdb01")
 
 
 class DataDeduplicator:
@@ -55,14 +52,17 @@ class DataDeduplicator:
                 else:
                     # Commit changes
                     conn.commit()
-                    console.print(f"\n[green]✅ Deduplication complete - removed {self.removed_count} duplicates[/green]")
+                    console.print(
+                        f"\n[green]✅ Deduplication complete - removed {self.removed_count} duplicates[/green]"
+                    )
 
     def dedupe_games(self, conn):
         """Remove duplicate games, keeping the most complete record."""
         console.print("[cyan]Checking games table...[/cyan]")
 
         # Find duplicates
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             WITH duplicates AS (
                 SELECT
                     game_id,
@@ -79,7 +79,8 @@ class DataDeduplicator:
             FROM games g
             JOIN duplicates d ON g.game_id = d.game_id
             ORDER BY g.game_id, g.ctid
-        """)
+        """
+        )
 
         duplicates = cur.fetchall()
 
@@ -90,9 +91,9 @@ class DataDeduplicator:
         # Group by game_id for display
         games_to_fix = {}
         for dup in duplicates:
-            if dup['game_id'] not in games_to_fix:
-                games_to_fix[dup['game_id']] = []
-            games_to_fix[dup['game_id']].append(dup)
+            if dup["game_id"] not in games_to_fix:
+                games_to_fix[dup["game_id"]] = []
+            games_to_fix[dup["game_id"]].append(dup)
 
         console.print(f"  Found {len(games_to_fix)} games with duplicates")
 
@@ -100,12 +101,13 @@ class DataDeduplicator:
         for game_id in list(games_to_fix.keys())[:3]:
             console.print(f"\n  Game: {game_id}")
             for record in games_to_fix[game_id]:
-                status = "✓ KEEP" if record['action'] == 'KEEP' else "✗ DELETE"
+                status = "✓ KEEP" if record["action"] == "KEEP" else "✗ DELETE"
                 console.print(f"    {status}: Score {record['home_score']}-{record['away_score']}")
 
         if not self.dry_run:
             # Delete duplicates
-            deleted = conn.execute("""
+            deleted = conn.execute(
+                """
                 DELETE FROM games
                 WHERE ctid IN (
                     SELECT g.ctid
@@ -118,7 +120,8 @@ class DataDeduplicator:
                     ) d ON g.game_id = d.game_id
                     WHERE g.ctid != d.keep_ctid
                 )
-            """)
+            """
+            )
             count = deleted.rowcount
             self.removed_count += count
             console.print(f"  ✅ Removed {count} duplicate games")
@@ -128,7 +131,8 @@ class DataDeduplicator:
         console.print("\n[cyan]Checking plays table...[/cyan]")
 
         # Count duplicates (don't fetch all - could be millions)
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT COUNT(*) as dup_count
             FROM (
                 SELECT game_id, play_id
@@ -136,10 +140,11 @@ class DataDeduplicator:
                 GROUP BY game_id, play_id
                 HAVING COUNT(*) > 1
             ) dups
-        """)
+        """
+        )
 
         result = cur.fetchone()
-        dup_count = result['dup_count']
+        dup_count = result["dup_count"]
 
         if dup_count == 0:
             console.print("  ✅ No duplicate plays found")
@@ -149,7 +154,8 @@ class DataDeduplicator:
 
         if not self.dry_run:
             # Delete duplicates, keeping one with most data
-            deleted = conn.execute("""
+            deleted = conn.execute(
+                """
                 DELETE FROM plays
                 WHERE ctid IN (
                     SELECT ctid FROM (
@@ -166,7 +172,8 @@ class DataDeduplicator:
                     ) ranked
                     WHERE rn > 1
                 )
-            """)
+            """
+            )
             count = deleted.rowcount
             self.removed_count += count
             console.print(f"  ✅ Removed {count} duplicate plays")
@@ -176,7 +183,8 @@ class DataDeduplicator:
         console.print("\n[cyan]Checking odds_history table...[/cyan]")
 
         # Count duplicates
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT COUNT(*) as dup_count
             FROM (
                 SELECT
@@ -187,10 +195,11 @@ class DataDeduplicator:
                          outcome_name, snapshot_at
                 HAVING COUNT(*) > 1
             ) dups
-        """)
+        """
+        )
 
         result = cur.fetchone()
-        dup_count = result['dup_count']
+        dup_count = result["dup_count"]
 
         if dup_count == 0:
             console.print("  ✅ No duplicate odds records found")
@@ -199,7 +208,8 @@ class DataDeduplicator:
         console.print(f"  ⚠️  Found {dup_count} duplicate odds groups (paid data!)")
 
         # Show sample of duplicates
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT
                 event_id,
                 bookmaker_key,
@@ -210,14 +220,18 @@ class DataDeduplicator:
                      outcome_name, snapshot_at
             HAVING COUNT(*) > 1
             LIMIT 5
-        """)
+        """
+        )
 
         for row in cur:
-            console.print(f"    {row['event_id'][:20]}... / {row['bookmaker_key']} / {row['market_key']}: {row['copies']} copies")
+            console.print(
+                f"    {row['event_id'][:20]}... / {row['bookmaker_key']} / {row['market_key']}: {row['copies']} copies"
+            )
 
         if not self.dry_run:
             # Delete duplicates, keeping the first one
-            deleted = conn.execute("""
+            deleted = conn.execute(
+                """
                 DELETE FROM odds_history
                 WHERE ctid IN (
                     SELECT ctid FROM (
@@ -233,7 +247,8 @@ class DataDeduplicator:
                     ) ranked
                     WHERE rn > 1
                 )
-            """)
+            """
+            )
             count = deleted.rowcount
             self.removed_count += count
             console.print(f"  ✅ Removed {count} duplicate odds records")
@@ -242,7 +257,8 @@ class DataDeduplicator:
         """Remove duplicate roster entries."""
         console.print("\n[cyan]Checking rosters table...[/cyan]")
 
-        cur = conn.execute("""
+        cur = conn.execute(
+            """
             SELECT COUNT(*) as dup_count
             FROM (
                 SELECT season, week, team, player_id
@@ -251,10 +267,11 @@ class DataDeduplicator:
                 GROUP BY season, week, team, player_id
                 HAVING COUNT(*) > 1
             ) dups
-        """)
+        """
+        )
 
         result = cur.fetchone()
-        dup_count = result['dup_count']
+        dup_count = result["dup_count"]
 
         if dup_count == 0:
             console.print("  ✅ No duplicate roster entries found")
@@ -263,7 +280,8 @@ class DataDeduplicator:
         console.print(f"  Found {dup_count} duplicate roster entries")
 
         if not self.dry_run:
-            deleted = conn.execute("""
+            deleted = conn.execute(
+                """
                 DELETE FROM rosters
                 WHERE ctid IN (
                     SELECT ctid FROM (
@@ -278,15 +296,18 @@ class DataDeduplicator:
                     ) ranked
                     WHERE rn > 1
                 )
-            """)
+            """
+            )
             count = deleted.rowcount
             self.removed_count += count
             console.print(f"  ✅ Removed {count} duplicate roster entries")
 
 
 @click.command()
-@click.option('--live', is_flag=True, help='Actually remove duplicates (default is dry run)')
-@click.option('--backup-first', is_flag=True, default=True, help='Create backup before deduplication')
+@click.option("--live", is_flag=True, help="Actually remove duplicates (default is dry run)")
+@click.option(
+    "--backup-first", is_flag=True, default=True, help="Create backup before deduplication"
+)
 def main(live, backup_first):
     """Remove duplicate records from NFL Analytics database."""
 

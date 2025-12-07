@@ -47,35 +47,35 @@ from py.ensemble.adaptive_wls_weights_v2 import (
 
 # Database connection
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5544,
-    'database': 'devdb01',
-    'user': 'dro',
-    'password': 'sicillionbillions',
+    "host": "localhost",
+    "port": 5544,
+    "database": "devdb01",
+    "user": "dro",
+    "password": "sicillionbillions",
 }
 
 # Model names (must match ensemble components)
 MODEL_NAMES = [
-    'state_space_v2',
-    'hierarchical_v2',
-    'xgboost_v4_ridge',
-    'informative_priors_v2',
-    'elo',
+    "state_space_v2",
+    "hierarchical_v2",
+    "xgboost_v4_ridge",
+    "informative_priors_v2",
+    "elo",
 ]
 
 # Optimization parameters
 HALFLIFE_CANDIDATES = [2.0, 3.0, 4.0, 5.0, 6.0, 8.0]  # weeks
 VALIDATION_SPLIT = 0.2  # 20% of data for validation
-METRIC = 'mae'  # Loss metric for optimization
+METRIC = "mae"  # Loss metric for optimization
 LOOKBACK_WEEKS = 6  # Number of weeks to use for optimization
 
 # Output paths
-WEIGHTS_OUTPUT_PATH = Path('models/ensemble/adaptive_wls_weights_weekly.json')
-LOG_OUTPUT_PATH = Path('logs/wls_optimization')
+WEIGHTS_OUTPUT_PATH = Path("models/ensemble/adaptive_wls_weights_weekly.json")
+LOG_OUTPUT_PATH = Path("logs/wls_optimization")
 
 # Weight constraints (optional bounds per model)
 WEIGHT_CONSTRAINTS = {
-    'elo': (0.05, 0.15),  # ELO: 5-15% (diversification tool, not accuracy)
+    "elo": (0.05, 0.15),  # ELO: 5-15% (diversification tool, not accuracy)
 }
 
 # ============================================================================
@@ -86,11 +86,13 @@ LOG_OUTPUT_PATH.mkdir(parents=True, exist_ok=True)
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler(LOG_OUTPUT_PATH / f'wls_optimization_{datetime.now():%Y%m%d_%H%M%S}.log'),
+        logging.FileHandler(
+            LOG_OUTPUT_PATH / f"wls_optimization_{datetime.now():%Y%m%d_%H%M%S}.log"
+        ),
         logging.StreamHandler(sys.stdout),
-    ]
+    ],
 )
 
 logger = logging.getLogger(__name__)
@@ -99,6 +101,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # DATABASE QUERIES
 # ============================================================================
+
 
 def query_recent_predictions(
     weeks: int = 6,
@@ -161,7 +164,7 @@ def query_recent_predictions(
     LIMIT 500;
     """
 
-    df = pd.read_sql_query(query, conn, params={'season': season, 'weeks': weeks})
+    df = pd.read_sql_query(query, conn, params={"season": season, "weeks": weeks})
     conn.close()
 
     logger.info(f"  Queried {len(df):,} player-game observations")
@@ -187,7 +190,7 @@ def query_recent_predictions(
     np.random.seed(42)
     for model_name in MODEL_NAMES:
         # Add noise around actual values as placeholder
-        df[model_name] = df['actual'] + np.random.normal(0, 25, len(df))
+        df[model_name] = df["actual"] + np.random.normal(0, 25, len(df))
 
     # Drop rows with missing predictions
     df = df.dropna(subset=MODEL_NAMES)
@@ -200,6 +203,7 @@ def query_recent_predictions(
 # ============================================================================
 # OPTIMIZATION
 # ============================================================================
+
 
 def optimize_weekly_weights(
     predictions_df: pd.DataFrame,
@@ -227,7 +231,7 @@ def optimize_weekly_weights(
     wls = AdaptiveWLSWeightsV2(
         predictions_df=predictions_df,
         model_names=MODEL_NAMES,
-        actual_col='actual',
+        actual_col="actual",
         halflife_candidates=halflife_candidates,
         weight_constraints=weight_constraints,
     )
@@ -242,7 +246,7 @@ def optimize_weekly_weights(
     performance_metrics = compute_ensemble_performance_metrics(
         predictions_df=predictions_df,
         weights=optimal_weights,
-        actual_col='actual',
+        actual_col="actual",
     )
 
     logger.info("Optimization complete:")
@@ -270,7 +274,7 @@ def compare_with_previous_weights(
     # Load previous weights
     with open(previous_weights_path) as f:
         prev_data = json.load(f)
-        prev_weights = prev_data['weights']
+        prev_weights = prev_data["weights"]
 
     logger.info("Weight changes from previous week:")
 
@@ -281,12 +285,15 @@ def compare_with_previous_weights(
         delta_pct = (delta / prev_w * 100) if prev_w > 0 else 0.0
 
         if abs(delta) > 0.01:  # Threshold for significant change
-            logger.info(f"  {name:25s}: {prev_w:.4f} → {new_w:.4f} (Δ {delta:+.4f}, {delta_pct:+.1f}%)")
+            logger.info(
+                f"  {name:25s}: {prev_w:.4f} → {new_w:.4f} (Δ {delta:+.4f}, {delta_pct:+.1f}%)"
+            )
 
 
 # ============================================================================
 # MAIN WORKFLOW
 # ============================================================================
+
 
 def main(
     weeks: int = LOOKBACK_WEEKS,
@@ -315,7 +322,9 @@ def main(
         predictions_df = query_recent_predictions(weeks=weeks, season=season)
 
         if len(predictions_df) < 10:
-            logger.error(f"Insufficient data: {len(predictions_df)} observations. Need at least 10.")
+            logger.error(
+                f"Insufficient data: {len(predictions_df)} observations. Need at least 10."
+            )
             sys.exit(1)
 
         # Step 2: Optimize weights
@@ -330,22 +339,22 @@ def main(
         # Step 4: Save weights
         if not dry_run:
             output_data = {
-                'weights': optimal_weights,
-                'metadata': {
-                    'halflife': optimal_halflife,
-                    'validation_mae': performance_metrics['mae'],
-                    'validation_rmse': performance_metrics['rmse'],
-                    'validation_r2': performance_metrics['r2'],
-                    'n_observations': len(predictions_df),
-                    'lookback_weeks': weeks,
-                    'optimization_date': datetime.now().isoformat(),
-                    'halflife_candidates': HALFLIFE_CANDIDATES,
-                }
+                "weights": optimal_weights,
+                "metadata": {
+                    "halflife": optimal_halflife,
+                    "validation_mae": performance_metrics["mae"],
+                    "validation_rmse": performance_metrics["rmse"],
+                    "validation_r2": performance_metrics["r2"],
+                    "n_observations": len(predictions_df),
+                    "lookback_weeks": weeks,
+                    "optimization_date": datetime.now().isoformat(),
+                    "halflife_candidates": HALFLIFE_CANDIDATES,
+                },
             }
 
             WEIGHTS_OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(WEIGHTS_OUTPUT_PATH, 'w') as f:
+            with open(WEIGHTS_OUTPUT_PATH, "w") as f:
                 json.dump(output_data, f, indent=2)
 
             logger.info(f"✅ Saved weights to: {WEIGHTS_OUTPUT_PATH}")
@@ -361,24 +370,21 @@ def main(
         sys.exit(1)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Weekly WLS weight re-optimization')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Weekly WLS weight re-optimization")
     parser.add_argument(
-        '--weeks',
+        "--weeks",
         type=int,
         default=LOOKBACK_WEEKS,
-        help=f'Number of weeks to use for optimization (default: {LOOKBACK_WEEKS})'
+        help=f"Number of weeks to use for optimization (default: {LOOKBACK_WEEKS})",
     )
     parser.add_argument(
-        '--season',
-        type=int,
-        default=None,
-        help='Season to optimize (defaults to current season)'
+        "--season", type=int, default=None, help="Season to optimize (defaults to current season)"
     )
     parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help='Run optimization but do not save weights (testing only)'
+        "--dry-run",
+        action="store_true",
+        help="Run optimization but do not save weights (testing only)",
     )
 
     args = parser.parse_args()

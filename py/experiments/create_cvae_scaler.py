@@ -36,11 +36,11 @@ def create_scaler():
 
     # Connect to database and extract training data
     db_config = {
-        'host': 'localhost',
-        'port': 5544,
-        'database': 'devdb01',
-        'user': 'dro',
-        'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
+        "host": "localhost",
+        "port": 5544,
+        "database": "devdb01",
+        "user": "dro",
+        "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
     }
 
     pipeline = CVAEDataPipeline(db_config)
@@ -50,8 +50,7 @@ def create_scaler():
         logger.info("Extracting game trajectories from 2020-2024 (same as training)...")
 
         trajectories, conditions = pipeline.extract_game_trajectories(
-            start_season=2020,
-            end_season=2024
+            start_season=2020, end_season=2024
         )
 
         logger.info(f"Extracted {len(trajectories)} games")
@@ -85,7 +84,7 @@ def create_scaler():
     output_path = Path("models/cvae/scaler_conditions.pkl")
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    with open(output_path, 'wb') as f:
+    with open(output_path, "wb") as f:
         pickle.dump(scaler, f)
 
     logger.info(f"✓ Scaler saved to {output_path}")

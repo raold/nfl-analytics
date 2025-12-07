@@ -107,9 +107,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
     df["wind"] = pd.to_numeric(df["wind"], errors="coerce")
 
-    df["is_bad_weather"] = (
-        ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
-    )
+    df["is_bad_weather"] = ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
 
     # Rolling averages (per player)
     df = df.sort_values(["player_id", "season", "week"])
@@ -190,7 +188,7 @@ def tune_temperature(
     bnn: BayesianNeuralNetwork,
     X_val: np.ndarray,
     y_val: np.ndarray,
-    target_calibration: float = 0.68
+    target_calibration: float = 0.68,
 ) -> float:
     """
     Tune temperature parameter T to achieve target calibration
@@ -216,11 +214,7 @@ def tune_temperature(
         return loss
 
     # Optimize temperature using golden section search
-    result = minimize_scalar(
-        calibration_loss,
-        bounds=(0.1, 3.0),
-        method='bounded'
-    )
+    result = minimize_scalar(calibration_loss, bounds=(0.1, 3.0), method="bounded")
 
     T_opt = result.x
 
@@ -237,9 +231,9 @@ def tune_temperature(
 
 def main():
     """Main temperature scaling pipeline"""
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("BNN TEMPERATURE SCALING - Post-hoc Calibration Fix")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     # Load and prepare data
     df = load_passing_data_from_db()
@@ -260,7 +254,7 @@ def main():
             inference_method="advi",
             n_samples=2000,
             prior_scale=0.3,
-            heteroscedastic=True
+            heteroscedastic=True,
         )
 
         # Normalize target for training
@@ -281,9 +275,9 @@ def main():
         logger.info("✓ Model loaded successfully\n")
 
     # Evaluate baseline (before temperature scaling)
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("BASELINE EVALUATION (Before Temperature Scaling)")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     pred_mean_val, pred_std_val = bnn.predict(X_val, return_std=True)
     pred_mean_test, pred_std_test = bnn.predict(X_test, return_std=True)
@@ -305,16 +299,16 @@ def main():
     logger.info(f"  Mean Uncertainty: {pred_std_test.mean():.1f} yards")
 
     # Tune temperature on validation set
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("TEMPERATURE TUNING")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     T_opt = tune_temperature(bnn, X_val, y_val, target_calibration=0.68)
 
     # Evaluate with temperature scaling
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("CALIBRATED EVALUATION (After Temperature Scaling)")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Apply temperature scaling
     pred_std_val_scaled = pred_std_val * T_opt
@@ -350,14 +344,15 @@ def main():
         "mean_uncertainty_val_after": float(pred_std_val_scaled.mean()),
         "mean_uncertainty_test_before": float(pred_std_test.mean()),
         "mean_uncertainty_test_after": float(pred_std_test_scaled.mean()),
-        "timestamp": pd.Timestamp.now().isoformat()
+        "timestamp": pd.Timestamp.now().isoformat(),
     }
 
     results_path = Path("analysis/results/bnn_temperature_scaling_results.json")
     results_path.parent.mkdir(parents=True, exist_ok=True)
 
     import json
-    with open(results_path, 'w') as f:
+
+    with open(results_path, "w") as f:
         json.dump(results, f, indent=2)
 
     logger.info(f"\n✓ Results saved to {results_path}")
@@ -368,7 +363,7 @@ def main():
         "temperature": T_opt,
         "method": "temperature_scaling",
         "calibration_target": 0.68,
-        "achieved_calibration_test": float(calib_test_scaled)
+        "achieved_calibration_test": float(calib_test_scaled),
     }
 
     calibrated_path = Path("models/bayesian/bnn_temperature_scaled_v1.pkl")
@@ -376,14 +371,16 @@ def main():
     logger.info(f"✓ Calibrated model saved to {calibrated_path}")
 
     # Summary
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("TEMPERATURE SCALING SUMMARY")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("\n✓ Temperature Scaling Complete")
     logger.info(f"  Optimal Temperature: T = {T_opt:.3f}")
     logger.info(f"  Test MAE: {mae_test:.2f} yards (unchanged)")
     logger.info(f"  Test Calibration: {calib_test:.1%} → {calib_test_scaled:.1%}")
-    logger.info(f"  Calibration Improvement: {abs(calib_test_scaled - 0.68):.1%} from target (vs {abs(calib_test - 0.68):.1%} before)")
+    logger.info(
+        f"  Calibration Improvement: {abs(calib_test_scaled - 0.68):.1%} from target (vs {abs(calib_test - 0.68):.1%} before)"
+    )
 
     if abs(calib_test_scaled - 0.68) < 0.05:
         logger.info("\n✓✓ EXCELLENT CALIBRATION - Ready for production")
@@ -392,9 +389,9 @@ def main():
     else:
         logger.info("\n⚠️  POOR CALIBRATION - Consider MC Dropout or Laplace instead")
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("NEXT STEPS")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("\n1. Compare with MC Dropout and Laplace implementations")
     logger.info("2. Select best approach based on calibration + MAE")
     logger.info("3. Integrate into 4-way ensemble")

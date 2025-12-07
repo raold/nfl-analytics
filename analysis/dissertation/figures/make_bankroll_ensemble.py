@@ -5,6 +5,7 @@ Outputs:
   • Optional histogram PDF (via --histout)
   • Printed summary (+ optional CSV via --summary)
 """
+
 import argparse
 import os
 
@@ -51,9 +52,7 @@ def load_bets(csv_path: str) -> pd.DataFrame:
     if np.any((prob < 0) | (prob > 1)):
         raise ValueError("prob must be in [0,1].")
     b_net = np.clip(dec - 1.0, 0.0, None)
-    return pd.DataFrame(
-        {"prob": prob, "decimal_odds": dec, "b_net": b_net}
-    ).reset_index(drop=True)
+    return pd.DataFrame({"prob": prob, "decimal_odds": dec, "b_net": b_net}).reset_index(drop=True)
 
 
 def simulate_bankroll_paths(
@@ -118,6 +117,7 @@ def plot_final_hist(bankrolls: np.ndarray, out_pdf: str, bins=60):
 def summarize(bankrolls: np.ndarray) -> dict:
     def q(a: float) -> float:
         return float(np.quantile(bankrolls[:, -1], a))
+
     median_path = np.median(bankrolls, axis=0)
     run_max = np.maximum.accumulate(median_path)
     dd = (run_max - median_path) / np.maximum(run_max, 1e-12)
@@ -134,9 +134,7 @@ def summarize(bankrolls: np.ndarray) -> dict:
 
 
 def main():
-    ap = argparse.ArgumentParser(
-        description="Bankroll ensemble simulator (fractional Kelly)."
-    )
+    ap = argparse.ArgumentParser(description="Bankroll ensemble simulator (fractional Kelly).")
     ap.add_argument(
         "--csv",
         type=str,
@@ -162,9 +160,7 @@ def main():
         n_bets, p_true = 200, 0.54
         dec = np.full(n_bets, 2.0)
         b_net = dec - 1.0
-        bets = pd.DataFrame(
-            {"prob": np.full(n_bets, p_true), "decimal_odds": dec, "b_net": b_net}
-        )
+        bets = pd.DataFrame({"prob": np.full(n_bets, p_true), "decimal_odds": dec, "b_net": b_net})
         title = "Bankroll trajectories (demo, p=0.54, even money)"
 
     br = simulate_bankroll_paths(

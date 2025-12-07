@@ -82,10 +82,7 @@ class NFLGraph:
         self.num_nodes = 0
 
     def add_node(
-        self,
-        node_type: str,
-        features: torch.Tensor | None = None,
-        external_id: str | None = None
+        self, node_type: str, features: torch.Tensor | None = None, external_id: str | None = None
     ) -> int:
         """Add a node and return its internal ID."""
         node_id = self.num_nodes
@@ -166,10 +163,7 @@ class MessagePassingLayer(nn.Module):
         )
 
     def forward(
-        self,
-        src_embeddings: torch.Tensor,
-        dst_embeddings: torch.Tensor,
-        edge_index: torch.Tensor
+        self, src_embeddings: torch.Tensor, dst_embeddings: torch.Tensor, edge_index: torch.Tensor
     ) -> torch.Tensor:
         """
         Args:
@@ -233,7 +227,7 @@ class AttentionLayer(nn.Module):
         self.query = nn.Linear(embed_dim, embed_dim)
         self.key = nn.Linear(embed_dim, embed_dim)
         self.value = nn.Linear(embed_dim, embed_dim)
-        self.scale = embed_dim ** 0.5
+        self.scale = embed_dim**0.5
 
     def forward(self, embeddings: torch.Tensor, edge_index: torch.Tensor) -> torch.Tensor:
         """
@@ -308,8 +302,12 @@ class HierarchicalGNN(nn.Module):
         self.team_embedding = nn.Embedding(32, embedding_dim)  # 32 NFL teams
 
         # Message passing layers
-        self.player_to_position = MessagePassingLayer(embedding_dim, embedding_dim, "player_to_position")
-        self.position_to_team = MessagePassingLayer(embedding_dim, embedding_dim, "position_to_team")
+        self.player_to_position = MessagePassingLayer(
+            embedding_dim, embedding_dim, "player_to_position"
+        )
+        self.position_to_team = MessagePassingLayer(
+            embedding_dim, embedding_dim, "position_to_team"
+        )
 
         # Chemistry attention (QB-WR, etc.)
         if use_attention:
@@ -361,7 +359,9 @@ class HierarchicalGNN(nn.Module):
             player_embeds = self.chemistry_attention(player_embeds, chemistry_edges)
 
         # Level 2: Position group embeddings (aggregate from players)
-        position_embeds = self.position_embedding(position_indices)  # (num_positions, embedding_dim)
+        position_embeds = self.position_embedding(
+            position_indices
+        )  # (num_positions, embedding_dim)
 
         for _ in range(self.num_message_rounds):
             position_embeds = self.player_to_position(
@@ -392,7 +392,9 @@ class HierarchicalGNN(nn.Module):
                 away_embeds = team_embeds[away_team_idx]  # (batch_size, embedding_dim)
 
                 # Concatenate for each game in batch
-                game_embeds = torch.cat([home_embeds, away_embeds], dim=1)  # (batch_size, 2*embedding_dim)
+                game_embeds = torch.cat(
+                    [home_embeds, away_embeds], dim=1
+                )  # (batch_size, 2*embedding_dim)
 
                 # Predict all games in parallel
                 logits = self.game_predictor(game_embeds)  # (batch_size, 1)

@@ -23,7 +23,6 @@ def test_load_metrics_basic():
     assert result is not None
 
 
-
 def test_load_metrics_edge_cases():
     """Test load_metrics: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_load_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_load_metrics_error_handling():
     """Test load_metrics error handling."""
     with pytest.raises(ValueError):
         load_metrics(invalid_input)
-
 
 
 @given(st.integers())
@@ -52,7 +49,6 @@ def test_load_metrics_property_idempotent(self, path):
 
     # Assert property
     assert load_metrics(path) == result, "idempotent violated"
-
 
 
 def test_pmf_to_arrays_basic():
@@ -67,7 +63,6 @@ def test_pmf_to_arrays_basic():
     assert result is not None
 
 
-
 def test_pmf_to_arrays_edge_cases():
     """Test pmf_to_arrays: edge cases."""
     # Arrange
@@ -80,12 +75,10 @@ def test_pmf_to_arrays_edge_cases():
     assert result is not None
 
 
-
 def test_pmf_to_arrays_error_handling():
     """Test pmf_to_arrays error handling."""
     with pytest.raises(ValueError):
         pmf_to_arrays(invalid_input)
-
 
 
 @given(st.integers())
@@ -96,7 +89,6 @@ def test_pmf_to_arrays_property_idempotent(self, pmf_dict):
 
     # Assert property
     assert pmf_to_arrays(pmf_dict) == result, "idempotent violated"
-
 
 
 def test_compute_emd_basic():
@@ -111,7 +103,6 @@ def test_compute_emd_basic():
     assert result is not None
 
 
-
 def test_compute_emd_edge_cases():
     """Test compute_emd: edge cases."""
     # Arrange
@@ -124,12 +115,10 @@ def test_compute_emd_edge_cases():
     assert result is not None
 
 
-
 def test_compute_emd_error_handling():
     """Test compute_emd error handling."""
     with pytest.raises(ValueError):
         compute_emd(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -140,7 +129,6 @@ def test_compute_emd_property_idempotent(self, hist_pmf, sim_pmf):
 
     # Assert property
     assert compute_emd(hist_pmf, sim_pmf) == result, "idempotent violated"
-
 
 
 def test_compute_key_mass_delta_basic():
@@ -155,7 +143,6 @@ def test_compute_key_mass_delta_basic():
     assert result is not None
 
 
-
 def test_compute_key_mass_delta_edge_cases():
     """Test compute_key_mass_delta: edge cases."""
     # Arrange
@@ -168,12 +155,10 @@ def test_compute_key_mass_delta_edge_cases():
     assert result is not None
 
 
-
 def test_compute_key_mass_delta_error_handling():
     """Test compute_key_mass_delta error handling."""
     with pytest.raises(ValueError):
         compute_key_mass_delta(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -184,7 +169,6 @@ def test_compute_key_mass_delta_property_idempotent(self, hist_masses, sim_masse
 
     # Assert property
     assert compute_key_mass_delta(hist_masses, sim_masses) == result, "idempotent violated"
-
 
 
 def test_compute_dependence_delta_basic():
@@ -199,7 +183,6 @@ def test_compute_dependence_delta_basic():
     assert result is not None
 
 
-
 def test_compute_dependence_delta_edge_cases():
     """Test compute_dependence_delta: edge cases."""
     # Arrange
@@ -212,12 +195,10 @@ def test_compute_dependence_delta_edge_cases():
     assert result is not None
 
 
-
 def test_compute_dependence_delta_error_handling():
     """Test compute_dependence_delta error handling."""
     with pytest.raises(ValueError):
         compute_dependence_delta(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -228,7 +209,6 @@ def test_compute_dependence_delta_property_idempotent(self, hist_dep, sim_dep):
 
     # Assert property
     assert compute_dependence_delta(hist_dep, sim_dep) == result, "idempotent violated"
-
 
 
 def test_run_acceptance_tests_basic():
@@ -243,7 +223,6 @@ def test_run_acceptance_tests_basic():
     assert result is not None
 
 
-
 def test_run_acceptance_tests_edge_cases():
     """Test run_acceptance_tests: edge cases."""
     # Arrange
@@ -256,20 +235,21 @@ def test_run_acceptance_tests_edge_cases():
     assert result is not None
 
 
-
 def test_run_acceptance_tests_error_handling():
     """Test run_acceptance_tests error handling."""
     with pytest.raises(ValueError):
         run_acceptance_tests(invalid_input)
 
 
-
 @given(st.integers(), st.integers(), st.integers())
-def test_run_acceptance_tests_property_idempotent(self, historical_path, simulated_path, output_path):
+def test_run_acceptance_tests_property_idempotent(
+    self, historical_path, simulated_path, output_path
+):
     """Property test: function is idempotent."""
     # Act
     result = run_acceptance_tests(historical_path, simulated_path, output_path)
 
     # Assert property
-    assert run_acceptance_tests(historical_path, simulated_path, output_path) == result, "idempotent violated"
-
+    assert (
+        run_acceptance_tests(historical_path, simulated_path, output_path) == result
+    ), "idempotent violated"

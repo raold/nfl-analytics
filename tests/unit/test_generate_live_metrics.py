@@ -23,7 +23,6 @@ def test_connect_db_basic():
     assert result is not None
 
 
-
 def test_connect_db_edge_cases():
     """Test connect_db: edge cases."""
     # Arrange
@@ -36,12 +35,10 @@ def test_connect_db_edge_cases():
     assert result is not None
 
 
-
 def test_connect_db_error_handling():
     """Test connect_db error handling."""
     with pytest.raises(ValueError):
         connect_db(invalid_input)
-
 
 
 def test_fetch_betting_games_basic():
@@ -56,7 +53,6 @@ def test_fetch_betting_games_basic():
     assert result is not None
 
 
-
 def test_fetch_betting_games_edge_cases():
     """Test fetch_betting_games: edge cases."""
     # Arrange
@@ -69,12 +65,10 @@ def test_fetch_betting_games_edge_cases():
     assert result is not None
 
 
-
 def test_fetch_betting_games_error_handling():
     """Test fetch_betting_games error handling."""
     with pytest.raises(ValueError):
         fetch_betting_games(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -85,7 +79,6 @@ def test_fetch_betting_games_property_idempotent(self, conn, start_season, min_w
 
     # Assert property
     assert fetch_betting_games(conn, start_season, min_week) == result, "idempotent violated"
-
 
 
 def test_load_model_params_basic():
@@ -100,7 +93,6 @@ def test_load_model_params_basic():
     assert result is not None
 
 
-
 def test_load_model_params_edge_cases():
     """Test load_model_params: edge cases."""
     # Arrange
@@ -113,12 +105,10 @@ def test_load_model_params_edge_cases():
     assert result is not None
 
 
-
 def test_load_model_params_error_handling():
     """Test load_model_params error handling."""
     with pytest.raises(ValueError):
         load_model_params(invalid_input)
-
 
 
 @given(st.integers())
@@ -129,7 +119,6 @@ def test_load_model_params_property_idempotent(self, path):
 
     # Assert property
     assert load_model_params(path) == result, "idempotent violated"
-
 
 
 def test_predict_spread_and_prob_basic():
@@ -144,7 +133,6 @@ def test_predict_spread_and_prob_basic():
     assert result is not None
 
 
-
 def test_predict_spread_and_prob_edge_cases():
     """Test predict_spread_and_prob: edge cases."""
     # Arrange
@@ -157,12 +145,10 @@ def test_predict_spread_and_prob_edge_cases():
     assert result is not None
 
 
-
 def test_predict_spread_and_prob_error_handling():
     """Test predict_spread_and_prob error handling."""
     with pytest.raises(ValueError):
         predict_spread_and_prob(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers())
@@ -173,7 +159,6 @@ def test_predict_spread_and_prob_property_idempotent(self, home_team, away_team,
 
     # Assert property
     assert predict_spread_and_prob(home_team, away_team, params) == result, "idempotent violated"
-
 
 
 def test_compute_clv_basic():
@@ -188,7 +173,6 @@ def test_compute_clv_basic():
     assert result is not None
 
 
-
 def test_compute_clv_edge_cases():
     """Test compute_clv: edge cases."""
     # Arrange
@@ -201,12 +185,10 @@ def test_compute_clv_edge_cases():
     assert result is not None
 
 
-
 def test_compute_clv_error_handling():
     """Test compute_clv error handling."""
     with pytest.raises(ValueError):
         compute_clv(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -217,7 +199,6 @@ def test_compute_clv_property_idempotent(self, model_prob, closing_line):
 
     # Assert property
     assert compute_clv(model_prob, closing_line) == result, "idempotent violated"
-
 
 
 def test_compute_roi_basic():
@@ -232,7 +213,6 @@ def test_compute_roi_basic():
     assert result is not None
 
 
-
 def test_compute_roi_edge_cases():
     """Test compute_roi: edge cases."""
     # Arrange
@@ -245,12 +225,10 @@ def test_compute_roi_edge_cases():
     assert result is not None
 
 
-
 def test_compute_roi_error_handling():
     """Test compute_roi error handling."""
     with pytest.raises(ValueError):
         compute_roi(invalid_input)
-
 
 
 @given(st.integers(), st.integers(), st.integers(), st.integers())
@@ -261,7 +239,6 @@ def test_compute_roi_property_idempotent(self, df, model_probs, spreads, kelly_f
 
     # Assert property
     assert compute_roi(df, model_probs, spreads, kelly_fraction) == result, "idempotent violated"
-
 
 
 def test_generate_live_metrics_basic():
@@ -276,7 +253,6 @@ def test_generate_live_metrics_basic():
     assert result is not None
 
 
-
 def test_generate_live_metrics_edge_cases():
     """Test generate_live_metrics: edge cases."""
     # Arrange
@@ -289,12 +265,10 @@ def test_generate_live_metrics_edge_cases():
     assert result is not None
 
 
-
 def test_generate_live_metrics_error_handling():
     """Test generate_live_metrics error handling."""
     with pytest.raises(ValueError):
         generate_live_metrics(invalid_input)
-
 
 
 @given(st.integers(), st.integers())
@@ -305,4 +279,3 @@ def test_generate_live_metrics_property_idempotent(self, output_path, start_seas
 
     # Assert property
     assert generate_live_metrics(output_path, start_season) == result, "idempotent violated"
-
