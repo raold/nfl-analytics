@@ -174,3 +174,6 @@ check_*.sh
 # Backup files (prevent tracking of .bak and .backup files)
 *.bak
 *.backup
+
+# Database backups (large files, sync separately)
+backups/
