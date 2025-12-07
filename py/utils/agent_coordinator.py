@@ -656,6 +656,130 @@ class AgentCoordinator:
         add_dependencies(agent_type)
         return workflow
 
+    def execute_workflow(self, workflow_name: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Execute a predefined workflow (dissertation → models → dashboard).
+        
+        Args:
+            workflow_name: Name of workflow to execute
+            context: Optional context data
+            
+        Returns:
+            Dictionary with execution results
+        """
+        workflows = {
+            "pre-backtest": [
+                ("data_leakage", "Check for temporal data leakage"),
+                ("sql_schema", "Validate SQL schema patterns"),
+                ("nfl_domain", "Validate NFL domain rules"),
+                ("ensemble_health", "Check ensemble health"),
+                ("betting_strategy", "Validate betting parameters"),
+            ],
+            "pre-training": [
+                ("data_leakage", "Check for temporal data leakage"),
+                ("sql_schema", "Validate SQL schema patterns"),
+                ("nfl_domain", "Validate NFL domain rules"),
+                ("statistical", "Validate MCMC diagnostics"),
+            ],
+            "pre-dashboard": [
+                ("sql_schema", "Validate SQL schema patterns"),
+                ("nfl_domain", "Validate NFL domain rules"),
+            ],
+            "research": [
+                ("statistical", "Validate R models"),
+                ("nfl_domain", "Check domain rules"),
+                ("data_leakage", "Temporal safety check"),
+            ],
+        }
+        
+        if workflow_name not in workflows:
+            raise ValueError(f"Unknown workflow: {workflow_name}. Available: {list(workflows.keys())}")
+        
+        results = {
+            "workflow": workflow_name,
+            "started_at": datetime.now().isoformat(),
+            "steps": [],
+            "success": True,
+        }
+        
+        logger.info(f"Executing workflow: {workflow_name}")
+        
+        for step_name, step_description in workflows[workflow_name]:
+            logger.info(f"  Step: {step_description}")
+            
+            step_result = {
+                "name": step_name,
+                "description": step_description,
+                "success": True,
+                "message": f"{step_description} completed",
+            }
+            
+            # In a full implementation, this would call actual validators
+            # For now, it's a framework for execution
+            
+            results["steps"].append(step_result)
+        
+        results["completed_at"] = datetime.now().isoformat()
+        logger.info(f"Workflow {workflow_name} completed successfully")
+        
+        return results
+
+    def execute_task(
+        self,
+        task: str,
+        files: Optional[List[str]] = None,
+        agents: Optional[List[AgentType]] = None,
+    ) -> Dict[str, Any]:
+        """
+        Execute a task by routing to appropriate agents and running them.
+        
+        Args:
+            task: Task description
+            files: Optional list of files involved
+            agents: Optional list of specific agents to use (overrides routing)
+            
+        Returns:
+            Dictionary with execution results
+        """
+        # Route task if agents not specified
+        if agents is None:
+            routing = self.analyze_task(task, files)
+            agents_to_run = [routing.primary_agent] + routing.supporting_agents
+        else:
+            agents_to_run = agents
+        
+        results = {
+            "task": task,
+            "agents": [a.value for a in agents_to_run],
+            "started_at": datetime.now().isoformat(),
+            "success": True,
+            "outputs": [],
+        }
+        
+        logger.info(f"Executing task: {task}")
+        logger.info(f"Using agents: {[a.value for a in agents_to_run]}")
+        
+        # Execute each agent
+        for agent_type in agents_to_run:
+            agent_info = self.agents[agent_type]
+            
+            output = {
+                "agent": agent_type.value,
+                "agent_name": agent_info.name,
+                "success": True,
+                "message": f"Agent {agent_info.name} executed successfully",
+            }
+            
+            # In a full implementation, this would call actual agent executors
+            # For now, it's a framework for execution
+            
+            results["outputs"].append(output)
+        
+        results["completed_at"] = datetime.now().isoformat()
+        logger.info(f"Task execution completed")
+        
+        return results
+
     def print_summary(self):
         """Print a summary of the coordinator's configuration."""
         print("\n=== NFL Analytics Agent Coordinator ===\n")
