@@ -13,7 +13,7 @@ for game outcome predictions. Single entry point that coordinates feature extrac
 TeamOffensiveFeatures, TeamDefensiveFeatures, NextGen Stats, QBR, Possession Value,
 Playcalling, Opponent-Adjusted, and mart.team_injury_load.
 
-**Features Extracted (293 total):**
+**Features Extracted (305 total):**
 
 1. Home Team Offensive (27):
    - Prefix: 'home_off_'
@@ -100,6 +100,14 @@ Playcalling, Opponent-Adjusted, and mart.team_injury_load.
       sov_sov_diff, sov_sos_diff, sov_win_rate_diff
     - Research: Quality wins matter more than quantity (Sagarin-style)
 
+15. Line Movement Features (12):
+    - Prefix: 'lm_'
+    - Source: LineMovementFeatures.extract_by_teams()
+    - Examples: lm_spread_movement, lm_sharp_indicator, lm_consensus_spread,
+      lm_spread_dispersion, lm_movement_direction, lm_reverse_line_move
+    - Research: Sharp money (>1.5 pt movement) predictive of outcomes,
+      low dispersion + movement = strong sharp consensus
+
 **Temporal Safety:**
 All features use ONLY games BEFORE target week. Both underlying extractors implement
 temporal safety via shift(1) and explicit week filtering.
@@ -182,6 +190,12 @@ try:
     from py.features.opponent_strength import OpponentStrengthEngine
 except ImportError:
     OpponentStrengthEngine = None
+
+# Line movement features (Phase 1 - Dec 2025)
+try:
+    from py.features.line_movement_features import LineMovementFeatures
+except ImportError:
+    LineMovementFeatures = None
 
 import os
 
@@ -311,6 +325,24 @@ class GameFeatureExtractor:
         else:
             self.opponent_strength_extractor = None
             logger.warning("Opponent Strength (SoV) extractor unavailable")
+
+        # Line movement features (Dec 2025 - Phase 1)
+        if LineMovementFeatures:
+            self.line_movement_extractor = LineMovementFeatures(
+                db_host=db_config.get("host", "localhost") if db_config else "localhost",
+                db_port=db_config.get("port", 5544) if db_config else 5544,
+                db_name=db_config.get("dbname", "devdb01") if db_config else "devdb01",
+                db_user=db_config.get("user", "dro") if db_config else "dro",
+                db_password=(
+                    db_config.get("password", "sicillionbillions")
+                    if db_config
+                    else "sicillionbillions"
+                ),
+            )
+            logger.info("Line Movement extractor initialized")
+        else:
+            self.line_movement_extractor = None
+            logger.warning("Line Movement extractor unavailable")
 
         # Database connection for function-based extractors
         self.db_config = db_config or {
@@ -605,6 +637,23 @@ class GameFeatureExtractor:
                 logger.debug(f"Added {len(sov_features)} strength of victory features")
             except Exception as e:
                 logger.warning(f"Failed to extract strength of victory features: {e}")
+
+        # Add line movement features (12 features: sharp money, consensus, dispersion)
+        # Research: Sharp action (>1.5 pt movement) predictive of outcomes
+        # Phase 1 implementation - Dec 2025
+        if self.line_movement_extractor:
+            try:
+                lm_features = self.line_movement_extractor.extract_by_teams(
+                    home_team, away_team, season, week
+                )
+                features.update({f"lm_{k}": v for k, v in lm_features.items()})
+                logger.debug(
+                    f"Added {len(lm_features)} line movement features "
+                    f"(movement={lm_features.get('spread_movement', 0):+.2f}, "
+                    f"sharp={lm_features.get('sharp_indicator', 0)})"
+                )
+            except Exception as e:
+                logger.warning(f"Failed to extract line movement features: {e}")
 
         # Validate: Check for NaN values
         nan_features = [k for k, v in features.items() if pd.isna(v)]
