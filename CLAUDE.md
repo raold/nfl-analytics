@@ -1,15 +1,15 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** December 9, 2025 | **Version:** 5.8 | **Status:** Production Ready (Grade A+)
+**Last Updated:** December 9, 2025 | **Version:** 5.9 | **Status:** Production Ready (Grade A+)
 
 ## Quick Status
 
 | Component | State | Key Metric |
 |-----------|-------|------------|
 | Ensemble | v6.2 + equal-weight props | 54.5% spread (games), 44.25 MAE (props) |
-| Features | 232 total (Phase 2 complete) | NextGen, QBR, Possession, Playcalling |
-| Database | 257 columns, 1.25M plays | PostgreSQL + Redis |
-| Dissertation | 667 pages | Compiles cleanly |
+| Features | 342 total (Phase 2 + Synthetic) | Base 305 + 37 synthetic/research |
+| Database | 56 tables, 1.25M plays | PostgreSQL + Redis |
+| Dissertation | 664 pages | Compiles cleanly |
 | Infrastructure | 8/9 Docker services | ~105ms inference |
 
 **Critical Files:** `py/ensemble/enhanced_ensemble_v6_production.py`, `py/ensemble/strategy/base.py`, `py/features/game_feature_extractor.py`
@@ -59,26 +59,94 @@
 - `models/` - Trained artifacts (~60 files)
 - `docs/` - 400+ documentation files
 
-**Features (232 total):**
-- Production (112): TeamOffensive/Defensive (48), Matchup (4), Injury (24), Coaching (16)
-- Phase 2 (120): NextGen (46), QBR (20), Possession (8), Playcalling (32), Opponent-Adj (14)
-- Entry Point: `GameFeatureExtractor` (unified API, <500ms)
+**Features (342 total):**
+
+| Category | Count | Module |
+|----------|-------|--------|
+| TeamOffensive | 42 | `game_feature_extractor.py` |
+| TeamDefensive | 38 | `game_feature_extractor.py` |
+| NextGen | 28 | `nextgen_features.py` |
+| QBR | 18 | `qbr_features.py` |
+| OpponentAdjusted | 45 | `opponent_adjusted_features.py` |
+| TurnoverLuck | 12 | `turnover_luck_features.py` |
+| Primetime | 8 | `primetime_features.py` |
+| Strength of Victory | 24 | `strength_of_victory_features.py` |
+| PossessionValue | 16 | `possession_value_features.py` |
+| Playcalling | 22 | `playcalling_features.py` |
+| **Synthetic Interaction** | 11 | `synthetic_interaction_features.py` (NEW) |
+| **Synthetic Momentum** | 11 | `synthetic_momentum_features.py` (NEW) |
+| **Research-Driven** | 15 | `research_driven_features.py` (NEW) |
+| Props Stability | N/A | `py/ensemble/props_stability_weights.py` (NEW) |
+
+**Entry Points:**
+- `GameFeatureExtractor` - Base 305 features (unified API, <500ms)
+- `SyntheticInteractionEngine` - QB-OL synergy, defensive balance, explosive mismatch
+- `SyntheticMomentumEngine` - Form intensity, pressure consistency, RZ efficiency
+- `ResearchDrivenEngine` - nfelo EPA weighting (1.6:1.0), coaching rationality
 
 ---
 
-## Database Schema
+## Database Schema & Data Layer
 
 **Connection:** `postgresql://dro:sicillionbillions@localhost:5544/devdb01`
 
-**Critical Conventions:**
-- Use `kickoff` (not `game_date`), `spread_close` (not `spread_line`)
-- Team abbreviations: LAR/LAC (not LA)
-- 56 tables across 4 user schemas (public, mart, ml, metadata) + TimescaleDB internal schemas
+### Schema Overview
 
-**SCHEMA-FIRST DISCIPLINE:**
+| Schema | Purpose | Key Tables |
+|--------|---------|------------|
+| `public` | Core NFL data | `games`, `plays`, `players`, `rosters`, `nextgen_*` |
+| `mart` | Aggregated analytics | `team_offensive_stats`, `team_defensive_stats`, `player_game_stats` |
+| `ml` | ML pipeline tables | `game_predictions`, `model_registry`, `feature_store` |
+| `metadata` | System metadata | `table_documentation`, `column_statistics` |
+
+### Critical Tables
+
+| Table | Rows | Key Columns | Notes |
+|-------|------|-------------|-------|
+| `games` | 6,991 | `game_id`, `season`, `week`, `kickoff` | Use `kickoff` not `game_date` |
+| `plays` | 1.25M | `game_id`, `play_id`, `epa`, `wpa` | Core analytics source |
+| `nextgen_passing` | 25,677 | `player_id`, `season`, `week` | Tracking data (2016+) |
+| `participation` | 433,805 | `game_id`, `play_id`, `player_id` | Player-play mapping |
+
+### Column Naming Conventions
+
+| Correct | WRONG | Notes |
+|---------|-------|-------|
+| `kickoff` | `game_date` | Timestamp field for game time |
+| `spread_close` | `spread_line` | Closing spread value |
+| `quarter` | `qtr` | Quarter number (1-5) |
+| `pass` | `pass_attempt` | Boolean pass play indicator |
+| `posteam` | `team` | Possession team |
+| `defteam` | `opponent` | Defensive team |
+
+### Team Abbreviations
+- Los Angeles teams: `LAR` (Rams), `LAC` (Chargers) - NOT `LA`
+- Washington: `WAS` (current), check season for historical
+
+### SCHEMA-FIRST DISCIPLINE
 - `mart.player_game_stats` has NO `game_id` column - use `(season, week, team)` composite key
 - Always check schema before writing SQL: `docs/database/DATABASE_QUICK_REFERENCE.md`
 - Validate queries: `python py/utils/sql_validator.py "YOUR QUERY"`
+
+### Data Ingestion Pipelines
+
+| Pipeline | Source | Schedule | Script |
+|----------|--------|----------|--------|
+| NFL play-by-play | nflreadr | Weekly (Tue) | `R/ingestion/ingest_current_season.R` |
+| Odds data | The Odds API | 3x daily | `py/ingest_odds_smart.py` |
+| Injuries | nflreadr | Weekly | `R/ingestion/ingest_injuries.R` |
+| Materialized views | Internal | Daily 5am | `scripts/refresh_marts.py` |
+
+### Quick Schema Queries
+```sql
+-- List all columns in a table
+SELECT column_name, data_type FROM information_schema.columns
+WHERE table_name = 'plays' ORDER BY ordinal_position;
+
+-- Check if column exists
+SELECT EXISTS (SELECT 1 FROM information_schema.columns
+WHERE table_name = 'plays' AND column_name = 'epa');
+```
 
 ---
 
@@ -157,12 +225,20 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 - 2025 Holdout Validation: 74.9% spread accuracy, 44.25 MAE props (Dec 9)
 - Phase 2 Advanced Stats: 120 new features
 - Dirichlet Optimization: Equal weights outperform v8.0 on holdout
+- **Synthetic Features (Dec 9):** 37 new features across 3 modules
+  - Interaction features: QB-OL synergy, defensive balance, explosive mismatch
+  - Momentum features: Form intensity, pressure consistency, RZ efficiency
+  - Research-driven: nfelo EPA weighting (1.6:1.0), coaching rationality
+- **Props Stability Weighting (Dec 9):** SumerSports YoY correlation research integrated
 
-**Key Finding (Dec 9):** Equal-weight ensemble beats Dirichlet v8.0 on 2025 holdout (44.25 vs 44.91 MAE), suggesting simpler averaging generalizes better than learned weights.
+**Key Findings (Dec 9):**
+- Equal-weight ensemble beats Dirichlet v8.0 on 2025 holdout (44.25 vs 44.91 MAE)
+- Offensive EPA is 60% more predictive than defensive EPA (nfelo research)
+- RB stats have ~0 YoY correlation (downweight in props models)
 
 **In Progress:**
-- XGBoost v5 retraining with 232-feature set
-- Ensemble v6.2 integration
+- XGBoost v5 retraining with 342-feature set
+- Ensemble v6.2 integration with synthetic features
 
 **Strategic Decisions:**
 - BNN research abandoned (Nov 9) - 84 hours, 6 approaches, only BNN v3.1 Rushing remains
@@ -217,7 +293,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ---
 
-**Version:** 5.8 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
+**Version:** 5.9 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
 
 **Project Rules:**
 - Never take shortcuts, never use synthetic data

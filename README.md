@@ -4,28 +4,36 @@
 
 <h1 align="center">NFL Analytics</h1>
 
-This repo provides R + Python pipelines and a TimescaleDB schema for NFL data (games, plays, weather, and odds history), enhanced with **formal statistical testing frameworks** and **distributed compute capabilities**.
+Production-grade NFL analytics platform featuring a 6-way Bayesian ensemble, 342 engineered features, and R + Python pipelines backed by TimescaleDB. Includes **formal statistical testing frameworks**, **distributed compute**, and comprehensive **dissertation documentation**.
+
+## 🚀 Latest Results (Dec 9, 2025)
+
+| Metric | Performance | Notes |
+|--------|-------------|-------|
+| **Spread Accuracy** | 74.9% | 2025 holdout (179 bets) |
+| **Props MAE** | 44.25 yards | Equal-weight ensemble |
+| **Features** | 342 total | 305 base + 37 synthetic |
+| **Dissertation** | 664 pages | 12 chapters + appendices |
 
 ## 📚 Documentation
 
-**📖 [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md)** - Complete catalog of all 267 documentation files
-
 **Quick Links:**
-- **[CLAUDE.md](CLAUDE.md)** - Comprehensive AI assistant documentation (45 KB)
-- **[PROJECT_STATUS.md](PROJECT_STATUS.md)** - Current project status (updated Nov 1, 2025)
+- **[CLAUDE.md](CLAUDE.md)** - Comprehensive project documentation (v5.9)
+- **[PROJECT_STATUS.md](PROJECT_STATUS.md)** - Current project status (updated Dec 9, 2025)
 - **[SETUP.md](SETUP.md)** - Environment setup instructions
 
 **Key Documentation:**
-- **[Guides](docs/guides/)**: Deployment guide, compute quickstart
-- **[Milestones](docs/milestones/)**: Project completion summaries
-  - [Simulator Acceptance Tests Complete](docs/milestones/SIMULATOR_ACCEPTANCE_COMPLETE.md)
-  - [CQL Training Complete](docs/milestones/CQL_COMPLETE_SUMMARY.md)
-  - [Dissertation Compilation Success](docs/milestones/COMPILATION_SUCCESS.md)
-- **[Dissertation](analysis/dissertation/main/main.pdf)**: 324-page dissertation (complete, PDF compiled)
-  - Comprehensive coverage: Data foundation through production deployment
-  - Causal inference framework, Bayesian models, RL, risk management
-  - Recent work: TikZ figure standardization (Oct 19, 2025)
-- **[Database Schema Audit](docs/DATABASE_SCHEMA_AUDIT.md)** - 56-table comprehensive audit (Oct 30, 2025)
+- **[Database Reference](docs/database/DATABASE_QUICK_REFERENCE.md)**: Schema, conventions, SQL patterns
+- **[Architecture Reference](docs/ARCHITECTURE_REFERENCE.md)**: System design and components
+- **[Milestones](docs/milestones/)**: 122+ project completion summaries
+  - [2025 Holdout Validation](PROJECT_STATUS.md) (Dec 9, 2025)
+  - [GNN v2 Integration](docs/milestones/GNN_V2_INTEGRATION_DEC7.md) (Dec 7, 2025)
+  - [Dirichlet Optimization](docs/synthesis/DIRICHLET_WEIGHT_OPTIMIZATION_SYNTHESIS_NOV27.md) (Nov 27, 2025)
+- **[Dissertation](analysis/dissertation/main/main.pdf)**: 664-page dissertation
+  - 12 chapters: Data foundation through production deployment
+  - Causal inference, Bayesian hierarchical models, Reinforcement Learning
+  - Comprehensive appendices (BNN investigation, architecture evolution)
+- **[Database Schema Audit](docs/database/DATABASE_SCHEMA_AUDIT.md)** - 56-table comprehensive audit
 
 Below is a minimal local bootstrap.
 
@@ -245,131 +253,46 @@ print('Sync conflicts:', conflicts)
 "
 ```
 
-### 8. Bayesian Hierarchical Player Props Models
+### 8. 6-Way Bayesian Ensemble (v6.2)
 
-**🆕 Bayesian Hierarchical Modeling Complete (Oct 12, 2025)** - MacBook M4
+**Status: Production Ready (Dec 9, 2025)**
 
-Train hierarchical Bayesian models for player prop predictions using brms/Stan:
+**Ensemble Architecture**:
+| Component | Weight | Model Type |
+|-----------|--------|------------|
+| State-Space | 24% | Kalman filter with time decay |
+| Hierarchical | 24% | brms hierarchical Bayesian |
+| XGBoost | 20% | Gradient boosting (293 features) |
+| Informative Priors | 12% | Domain-informed Bayesian |
+| Hybrid | 10% | Combined approach |
+| GNN | 10% | Graph Neural Network (player interactions) |
 
+**2025 Holdout Results (Dec 9)**:
+- **Spread accuracy**: 74.9% (179 games)
+- **Props MAE**: 44.25 yards (equal-weight ensemble)
+- **Key finding**: Equal-weight averaging outperformed Dirichlet v8.0 on 2025 holdout
+
+**Train Models**:
 ```bash
-# Train passing yards model (4 chains, 2000 iterations each)
-Rscript R/bayesian_player_props.R
+# Train all Bayesian models (R/brms)
+Rscript R/train_hierarchical_v2_canonical.R
+Rscript R/train_informative_priors_v2_canonical.R
+Rscript R/state_space/train_state_space_v2_canonical.R
 
-# Or train simplified version for individual stat types
-Rscript R/train_passing_model_simple.R
-Rscript R/train_rushing_model_simple.R
-Rscript R/train_receiving_model_simple.R
+# Train XGBoost (Python)
+uv run python py/models/train_xgboost_v4.py
+
+# Generate ensemble predictions
+uv run python py/ensemble/enhanced_ensemble_v6_production.py
 ```
 
-**Model Architecture**:
-- **Hierarchical Structure**: League → Position Group → Position → Team → Player → Game
-- **Partial Pooling**: Borrows strength across similar players (critical for rookies/backups)
-- **MCMC Sampling**: 4 chains × 2000 iterations via cmdstanr
-- **Uncertainty Quantification**: Full posterior distributions with credible intervals
+**Key Features (342 total)**:
+- **Base features** (305): TeamOffensive, TeamDefensive, NextGen, QBR, OpponentAdjusted
+- **Synthetic interaction** (11): QB-OL synergy, defensive balance, explosive mismatch
+- **Synthetic momentum** (11): Form intensity, pressure consistency, RZ efficiency
+- **Research-driven** (15): nfelo EPA weighting (1.6:1.0), coaching rationality
 
-**Training Results (Passing Yards Model)**:
-- Data: 3,208 records from 118 QBs (2020-2024)
-- Training Time: ~10 minutes (MacBook M4, 4 chains parallel)
-- Convergence: Some divergences but acceptable Rhat < 1.12
-- Model: `models/bayesian/passing_yards_hierarchical_v1.rds`
-- Ratings: Stored in `mart.bayesian_player_ratings` (118 QBs)
-
-**Multi-Year Backtest** (2022-2024):
-```bash
-# Run backtest with Bayesian predictions
-uv run python py/backtests/bayesian_props_multiyear_backtest.py
-```
-
-**Features**:
-- Hierarchical shrinkage improves predictions for limited-data players
-- Full uncertainty quantification for Kelly criterion betting
-- Position/team effects capture offensive systems
-- Integration with XGBoost ensemble models via `py/features/bayesian_player_features.py`
-
-**Database Schema**:
-- `mart.player_hierarchy` - 15,213 players with position group mappings
-- `mart.player_game_stats` - 24,950 player-game records
-- `mart.bayesian_player_ratings` - Player ratings with posterior distributions
-
-**Files Created**:
-- `R/bayesian_player_props.R` - Complete 3-model training pipeline
-- `R/train_passing_model_simple.R` - Simplified passing model trainer
-- `py/features/bayesian_player_features.py` - Feature extraction from posteriors
-- `py/backtests/bayesian_props_backtest_2024.py` - Single season backtest
-- `py/backtests/bayesian_props_multiyear_backtest.py` - Multi-season validation
-- `db/migrations/023_player_hierarchy_schema.sql` - Database infrastructure
-
-See **docs/milestones/BAYESIAN_PROPS_COMPLETE.md** for full methodology.
-
-### 9. Ensemble v3.0 Player Props System
-
-**Status Update: October 13, 2025** - MacBook M4 + Improved BNN
-
-Advanced 4-way ensemble system combining multiple modeling approaches for superior player prop predictions:
-
-**Component Models**:
-```
-Model Type              Version    Status              Performance
-─────────────────────────────────────────────────────────────────────
-Bayesian Hierarchical   v2.5       ✅ Trained          86.4% MAE improvement
-XGBoost                 v2.1       ✅ Trained          High accuracy
-BNN (Neural Net)        v2.0       ⏳ Training         Convergence improved
-State-space             v1.0       ✅ Trained          Time-series modeling
-```
-
-**Ensemble Methods**:
-- **Inverse Variance Weighting**: Default combination (no meta-learner required)
-- **Stacking**: Optional meta-learner for optimal weights
-- **Portfolio Optimization**: Kelly criterion for bet sizing
-
-**Key Improvements (BNN v2.0)**:
-```
-Metric                  Original    Improved    Status
-─────────────────────────────────────────────────────────
-Divergences             85 (4.25%)  0 (0.00%)   ✅ FIXED
-R-hat (max)             1.384       1.0027      ✅ EXCELLENT
-ESS (mean)              ~4000       8626        ✅ EXCELLENT
-90% CI Coverage         19.8%       TBD         ⏳ Testing
-```
-
-**Implementation**:
-```bash
-# Train improved BNN (training in progress)
-uv run python py/models/train_bnn_rushing_improved.py
-
-# Generate ensemble predictions (pending BNN completion)
-uv run python py/ensemble/enhanced_ensemble_v3.py \
-  --bayesian models/bayesian/informative_priors_v2.5.pkl \
-  --xgboost models/xgboost/v2_1.pkl \
-  --bnn models/bayesian/bnn_rushing_improved_v2.pkl \
-  --output predictions/ensemble_v3_week8.csv
-
-# Backtest with walk-forward validation (recommended)
-uv run python py/backtests/comprehensive_ensemble_backtest.py \
-  --start-season 2022 --end-season 2024 \
-  --walk-forward
-```
-
-**Critical Issues Identified**:
-- ❌ Missing historical predictions in database
-- ⚠️ Look-ahead bias in current backtest methodology
-- ✅ Database schema fixes completed
-- ⏳ BNN calibration improvements pending verification
-
-**Files**:
-- `py/ensemble/enhanced_ensemble_v3.py` - 4-way ensemble implementation
-- `py/models/train_bnn_rushing_improved.py` - Improved BNN with hierarchical effects
-- `py/backtests/comprehensive_ensemble_backtest.py` - Validation framework
-- `docs/models/ENSEMBLE_V3_STATUS.md` - Detailed status and issues
-- `docs/models/BNN_IMPROVEMENT_REPORT.md` - BNN improvement analysis
-
-**Next Steps**:
-1. ⏳ Complete BNN v2.0 training and verify calibration
-2. 🔄 Integrate BNN into ensemble with proper weighting
-3. 🔄 Implement walk-forward backtest validation
-4. 🔄 Generate 2024 predictions for paper trading
-
-See **docs/models/ENSEMBLE_V3_STATUS.md** for comprehensive status report.
+See **CLAUDE.md** for complete feature documentation.
 
 ### 10. Conservative Q-Learning (CQL) Training
 

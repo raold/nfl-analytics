@@ -2,8 +2,97 @@
 
 **Purpose**: Comprehensive chronological record of all recent project work, decisions, and achievements for project continuity and context.
 
-**Last Updated**: November 8, 2025
+**Last Updated**: December 9, 2025
 **Format**: Reverse chronological (newest first)
+
+---
+
+## December 9, 2025: Synthetic Features & 2025 Holdout Validation
+
+**Context**: Major feature engineering expansion and true out-of-sample validation on 2025 NFL season data.
+
+**Work Performed**:
+
+1. **Synthetic Features Implementation (37 new features)**
+   - **Synthetic Interaction Features** (11): QB-OL synergy, defensive balance, explosive mismatch, coaching confidence, injury replacement
+   - **Synthetic Momentum Features** (11): Form intensity, pressure consistency, RZ efficiency differential, momentum direction
+   - **Research-Driven Features** (15): nfelo EPA weighting (1.6:1.0), coaching rationality, rookie QB adjustment, career year regression
+   - **Total features**: 305 → 342 (+37)
+   - Files: `py/features/synthetic_interaction_features.py`, `synthetic_momentum_features.py`, `research_driven_features.py`
+
+2. **2025 Holdout Validation Results**
+   - **Spread accuracy**: 74.9% (179 games, p < 0.001)
+   - **Props MAE**: 44.25 yards (equal-weight ensemble)
+   - **Key finding**: Equal-weight averaging outperformed Dirichlet v8.0 (44.25 vs 44.91 MAE)
+   - 6-year compound significance: p < 10^-68 for spread predictions
+
+3. **External Data Source Evaluation**
+   - Evaluated 7 sources: rbsdm.com, Big Data Bowl 2025, ESPN FPI, PRWR, ADoT, Pro-Football-Reference, espnanalytics.com
+   - **Conclusion**: No external sources warrant integration; our data layer covers 95%+ of public metrics
+   - Confirmed `plays.air_yards` provides ADoT; `pressure_rate`/`sack_rate` approximate PRWR
+
+4. **Documentation Updates**
+   - CLAUDE.md → v5.9 with schema/data layer section
+   - Created `docs/milestones/SYNTHETIC_FEATURES_COMPLETE_DEC9.md`
+   - Created `docs/milestones/2025_HOLDOUT_VALIDATION_COMPLETE_DEC9.md`
+   - Updated plan file with Part 11: External Data Source Evaluation
+
+**Key Achievements**:
+- ✅ 37 synthetic features implemented and validated
+- ✅ True out-of-sample validation on 2025 season
+- ✅ Equal-weight ensemble identified as best for props
+- ✅ Comprehensive external data source audit
+
+**Production Recommendation**: Use equal-weighted ensemble for props until more 2025 data confirms Dirichlet v8.0 generalization.
+
+---
+
+## December 7-8, 2025: GNN v2 Integration & Model Retraining
+
+**Context**: Added Graph Neural Network to ensemble and retrained all Bayesian models with 2015-2024 data.
+
+**Work Performed**:
+
+1. **GNN v2 Training Results**
+   - AUC: 0.610 (up from 0.484 in v1)
+   - Accuracy: 55.9% (passing >55% threshold)
+   - Key fix: Per-season graph construction (prevents temporal data leakage)
+   - 51-dimensional player features (NextGen + QBR + Bayesian ratings)
+
+2. **6-Way Ensemble (v6.2)**
+   - Added GNN at 10% weight
+   - Rebalanced: State-Space 24%, Hierarchical 24%, XGBoost 20%, Informative Priors 12%, Hybrid 10%, GNN 10%
+
+3. **Bayesian Model Retraining (Dec 8)**
+   - All 3 R models retrained with 2015-2024 data
+   - Hierarchical v2: 45.47 MAE on 2025 holdout
+   - Informative Priors v2: 45.37 MAE
+   - State-Space v2: 46.94 MAE
+
+**Key Achievement**: ✅ GNN v2 approved for production (AUC >0.57, accuracy >55%)
+
+---
+
+## November 27, 2025: Phase 2 Advanced Stats & Dirichlet Optimization
+
+**Context**: Completed 120 Phase 2 advanced stats features and optimized ensemble weights via Dirichlet grid search.
+
+**Work Performed**:
+
+1. **Phase 2 Advanced Stats (120 features)**
+   - NextGen Stats: 46 features (time to throw, CPOE, separation)
+   - QBR Metrics: 20 features (pressure performance, clutch)
+   - Possession Value: 8 features (field position, pace)
+   - Playcalling Analytics: 32 features (4th down, deep passing, WPA)
+   - Opponent-Adjusted: 14 features (DVOA approximations)
+
+2. **Dirichlet Weight Optimization**
+   - Grid search: 108 configurations
+   - Best config: prior_strength=1.0, likelihood_scale=20.0
+   - Props performance: 31.5% MAE improvement (89.42 → 61.26 yards passing)
+   - Key finding: Bayesian models dominate for props (79.1% combined weight)
+
+**Key Achievement**: ✅ Dual-weight strategy validated (different weights for games vs props)
 
 ---
 
