@@ -1,12 +1,12 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** November 27, 2025 | **Version:** 5.7 | **Status:** Production Ready (Grade A+)
+**Last Updated:** December 9, 2025 | **Version:** 5.8 | **Status:** Production Ready (Grade A+)
 
 ## Quick Status
 
 | Component | State | Key Metric |
 |-----------|-------|------------|
-| Ensemble | v6.1 + v8.0 dual-weight | 54.5% cover (games), -31.5% MAE (props) |
+| Ensemble | v6.2 + equal-weight props | 54.5% spread (games), 44.25 MAE (props) |
 | Features | 232 total (Phase 2 complete) | NextGen, QBR, Possession, Playcalling |
 | Database | 257 columns, 1.25M plays | PostgreSQL + Redis |
 | Dissertation | 667 pages | Compiles cleanly |
@@ -32,6 +32,8 @@
 **Weight Selection:** `ensemble.use_default_weights()` (games) or `ensemble.use_dirichlet_weights()` (props)
 
 **Why Static Weights?** Dynamic meta-learning tested and rejected (ADR-009). See [docs/adr/009-abandon-ensemble-v7-meta-learning.md](docs/adr/009-abandon-ensemble-v7-meta-learning.md)
+
+**2025 Holdout Update (Dec 9):** Equal-weight averaging outperformed Dirichlet v8.0 on true out-of-sample 2025 data. Consider using simple average for props until more data confirms v8.0 generalization.
 
 ### Services
 
@@ -71,7 +73,7 @@
 **Critical Conventions:**
 - Use `kickoff` (not `game_date`), `spread_close` (not `spread_line`)
 - Team abbreviations: LAR/LAC (not LA)
-- 56 tables across 5 schemas (public, mart, ml, staging, metadata)
+- 56 tables across 4 user schemas (public, mart, ml, metadata) + TimescaleDB internal schemas
 
 **SCHEMA-FIRST DISCIPLINE:**
 - `mart.player_game_stats` has NO `game_id` column - use `(season, week, team)` composite key
@@ -149,12 +151,14 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ---
 
-## Current Status (Nov 27, 2025)
+## Current Status (Dec 9, 2025)
 
 **Completed:**
-- Phase 2 Advanced Stats: 120 new features (NextGen, QBR, Possession, Playcalling, Opponent-Adj)
-- Dirichlet Optimization: 108-config grid search, dual-weight strategy validated
-- DC Features: 16 coaching features (8 OC + 8 DC)
+- 2025 Holdout Validation: 74.9% spread accuracy, 44.25 MAE props (Dec 9)
+- Phase 2 Advanced Stats: 120 new features
+- Dirichlet Optimization: Equal weights outperform v8.0 on holdout
+
+**Key Finding (Dec 9):** Equal-weight ensemble beats Dirichlet v8.0 on 2025 holdout (44.25 vs 44.91 MAE), suggesting simpler averaging generalizes better than learned weights.
 
 **In Progress:**
 - XGBoost v5 retraining with 232-feature set
@@ -213,7 +217,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ---
 
-**Version:** 5.7 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
+**Version:** 5.8 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
 
 **Project Rules:**
 - Never take shortcuts, never use synthetic data
