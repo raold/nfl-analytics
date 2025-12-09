@@ -14,20 +14,21 @@ Date: November 7, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import DataLoader, TensorDataset
+import argparse
+import logging
+
 import numpy as np
 import pandas as pd
 import psycopg
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-import argparse
-import json
-import logging
+from torch.utils.data import DataLoader, TensorDataset
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,6 +36,7 @@ logger = logging.getLogger(__name__)
 
 class BayesianLinear(nn.Module):
     """Bayesian linear layer with weight uncertainty"""
+
     def __init__(self, in_features, out_features, prior_var=1.0):
         super().__init__()
         self.in_features = in_features
@@ -52,7 +54,7 @@ class BayesianLinear(nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        nn.init.kaiming_normal_(self.weight_mu, mode='fan_in')
+        nn.init.kaiming_normal_(self.weight_mu, mode="fan_in")
         nn.init.constant_(self.weight_rho, -3)
         nn.init.zeros_(self.bias_mu)
         nn.init.constant_(self.bias_rho, -3)
@@ -78,13 +80,17 @@ class BayesianLinear(nn.Module):
         bias_sigma = torch.log1p(torch.exp(self.bias_rho))
 
         kl_weight = 0.5 * torch.sum(
-            weight_sigma**2 / self.prior_var + self.weight_mu**2 / self.prior_var
-            - torch.log(weight_sigma**2 / self.prior_var) - 1
+            weight_sigma**2 / self.prior_var
+            + self.weight_mu**2 / self.prior_var
+            - torch.log(weight_sigma**2 / self.prior_var)
+            - 1
         )
 
         kl_bias = 0.5 * torch.sum(
-            bias_sigma**2 / self.prior_var + self.bias_mu**2 / self.prior_var
-            - torch.log(bias_sigma**2 / self.prior_var) - 1
+            bias_sigma**2 / self.prior_var
+            + self.bias_mu**2 / self.prior_var
+            - torch.log(bias_sigma**2 / self.prior_var)
+            - 1
         )
 
         return kl_weight + kl_bias
@@ -92,6 +98,7 @@ class BayesianLinear(nn.Module):
 
 class PassingYardsBNN(nn.Module):
     """Bayesian Neural Network for Passing Yards Prediction"""
+
     def __init__(self, input_dim=19, hidden_dim=64, dropout_rate=0.2):
         super().__init__()
         self.fc1 = BayesianLinear(input_dim, hidden_dim)
@@ -173,8 +180,8 @@ def load_training_data(db_url, feature_cols):
     # Compute rolling features (same as feature extractor)
     features_list = []
 
-    for player_id in df['player_id'].unique():
-        player_df = df[df['player_id'] == player_id].sort_values(['season', 'week'])
+    for player_id in df["player_id"].unique():
+        player_df = df[df["player_id"] == player_id].sort_values(["season", "week"])
 
         for idx in range(5, len(player_df)):  # Need at least 5 games for features
             row = player_df.iloc[idx]
@@ -182,29 +189,33 @@ def load_training_data(db_url, feature_cols):
 
             last3 = prev_games.tail(3)
             last5 = prev_games.tail(5)
-            season_games = prev_games[prev_games['season'] == row['season']]
+            season_games = prev_games[prev_games["season"] == row["season"]]
 
             feature_dict = {
-                'yards_target': row['yards'],  # Target
-                'passing_yards_last3': last3['yards'].mean(),
-                'passing_yards_last5': last5['yards'].mean(),
-                'passing_yards_season': season_games['yards'].mean() if len(season_games) > 0 else last5['yards'].mean(),
-                'pass_attempts_last3': last3['attempts'].mean(),
-                'pass_attempts_last5': last5['attempts'].mean(),
-                'completions_last3': last3['completions'].mean(),
-                'completions_last5': last5['completions'].mean(),
-                'passing_tds_last3': last3['tds'].mean(),
-                'interceptions_last3': last3['interceptions'].mean(),
-                'sacks_last3': 2.5,  # Default (not in database)
-                'opponent_passing_yards_allowed_avg': 250.0,  # Default (requires opponent query)
-                'implied_team_total': row['implied_team_total'] if pd.notna(row['implied_team_total']) else 22.0,
-                'spread': row['spread'] if pd.notna(row['spread']) else 0.0,
-                'is_home': row['is_home'],
-                'weather_wind_mph': 5.0,  # Default
-                'weather_temp': 60.0,  # Default
-                'days_rest': 7.0,  # Default
-                'is_dome': 0.0,  # Default
-                'is_outdoors': 1.0,  # Default
+                "yards_target": row["yards"],  # Target
+                "passing_yards_last3": last3["yards"].mean(),
+                "passing_yards_last5": last5["yards"].mean(),
+                "passing_yards_season": (
+                    season_games["yards"].mean() if len(season_games) > 0 else last5["yards"].mean()
+                ),
+                "pass_attempts_last3": last3["attempts"].mean(),
+                "pass_attempts_last5": last5["attempts"].mean(),
+                "completions_last3": last3["completions"].mean(),
+                "completions_last5": last5["completions"].mean(),
+                "passing_tds_last3": last3["tds"].mean(),
+                "interceptions_last3": last3["interceptions"].mean(),
+                "sacks_last3": 2.5,  # Default (not in database)
+                "opponent_passing_yards_allowed_avg": 250.0,  # Default (requires opponent query)
+                "implied_team_total": (
+                    row["implied_team_total"] if pd.notna(row["implied_team_total"]) else 22.0
+                ),
+                "spread": row["spread"] if pd.notna(row["spread"]) else 0.0,
+                "is_home": row["is_home"],
+                "weather_wind_mph": 5.0,  # Default
+                "weather_temp": 60.0,  # Default
+                "days_rest": 7.0,  # Default
+                "is_dome": 0.0,  # Default
+                "is_outdoors": 1.0,  # Default
             }
 
             features_list.append(feature_dict)
@@ -218,20 +229,31 @@ def load_training_data(db_url, feature_cols):
 def train_bnn(args):
     """Train BNN model"""
 
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("TRAINING BNN FOR PASSING YARDS ENSEMBLE")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     # Feature columns (same as XGBoost)
     feature_cols = [
-        "passing_yards_last3", "passing_yards_last5", "passing_yards_season",
-        "pass_attempts_last3", "pass_attempts_last5",
-        "completions_last3", "completions_last5",
-        "passing_tds_last3", "interceptions_last3", "sacks_last3",
+        "passing_yards_last3",
+        "passing_yards_last5",
+        "passing_yards_season",
+        "pass_attempts_last3",
+        "pass_attempts_last5",
+        "completions_last3",
+        "completions_last5",
+        "passing_tds_last3",
+        "interceptions_last3",
+        "sacks_last3",
         "opponent_passing_yards_allowed_avg",
-        "implied_team_total", "spread", "is_home",
-        "weather_wind_mph", "weather_temp", "days_rest",
-        "is_dome", "is_outdoors"
+        "implied_team_total",
+        "spread",
+        "is_home",
+        "weather_wind_mph",
+        "weather_temp",
+        "days_rest",
+        "is_dome",
+        "is_outdoors",
     ]
 
     # Load data
@@ -240,7 +262,7 @@ def train_bnn(args):
 
     # Prepare features and target
     X = df[feature_cols].values
-    y = df['yards_target'].values
+    y = df["yards_target"].values
 
     # Train/val split
     X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -255,9 +277,11 @@ def train_bnn(args):
     y_train_scaled = scaler_y.fit_transform(y_train.reshape(-1, 1)).ravel()
     y_val_scaled = scaler_y.transform(y_val.reshape(-1, 1)).ravel()
 
-    logger.info(f"\nTarget statistics:")
+    logger.info("\nTarget statistics:")
     logger.info(f"  y_train mean: {y_train.mean():.2f}, std: {y_train.std():.2f}")
-    logger.info(f"  y_train_scaled mean: {y_train_scaled.mean():.4f}, std: {y_train_scaled.std():.4f}")
+    logger.info(
+        f"  y_train_scaled mean: {y_train_scaled.mean():.4f}, std: {y_train_scaled.std():.4f}"
+    )
 
     # Convert to tensors
     X_train_t = torch.FloatTensor(X_train_scaled)
@@ -274,25 +298,23 @@ def train_bnn(args):
 
     # Initialize model
     model = PassingYardsBNN(
-        input_dim=len(feature_cols),
-        hidden_dim=args.hidden_dim,
-        dropout_rate=args.dropout
+        input_dim=len(feature_cols), hidden_dim=args.hidden_dim, dropout_rate=args.dropout
     )
 
     optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
 
-    logger.info(f"\nModel Architecture:")
+    logger.info("\nModel Architecture:")
     logger.info(f"  Input: {len(feature_cols)} features")
     logger.info(f"  Hidden: {args.hidden_dim}")
-    logger.info(f"  Output: yards_mean, yards_log_std")
-    logger.info(f"\nTraining Settings:")
+    logger.info("  Output: yards_mean, yards_log_std")
+    logger.info("\nTraining Settings:")
     logger.info(f"  Epochs: {args.epochs}")
     logger.info(f"  Batch size: {args.batch_size}")
     logger.info(f"  Learning rate: {args.learning_rate}")
     logger.info(f"  KL scale: {args.kl_scale}")
 
     # Training loop
-    best_val_loss = float('inf')
+    best_val_loss = float("inf")
 
     for epoch in range(args.epochs):
         model.train()
@@ -306,7 +328,7 @@ def train_bnn(args):
 
             # Negative log likelihood (Gaussian)
             std = torch.exp(log_std)
-            nll = 0.5 * torch.log(2 * np.pi * std**2) + 0.5 * ((y_batch - mean) / std)**2
+            nll = 0.5 * torch.log(2 * np.pi * std**2) + 0.5 * ((y_batch - mean) / std) ** 2
             nll_loss = nll.mean()
 
             # KL divergence
@@ -330,7 +352,7 @@ def train_bnn(args):
             for X_batch, y_batch in val_loader:
                 mean, log_std = model(X_batch, sample=False)
                 std = torch.exp(log_std)
-                nll = 0.5 * torch.log(2 * np.pi * std**2) + 0.5 * ((y_batch - mean) / std)**2
+                nll = 0.5 * torch.log(2 * np.pi * std**2) + 0.5 * ((y_batch - mean) / std) ** 2
                 val_loss += nll.mean().item()
                 val_mae_scaled += torch.abs(y_batch - mean).mean().item()
 
@@ -345,7 +367,9 @@ def train_bnn(args):
         val_mae_yards /= len(val_loader)
 
         if (epoch + 1) % 20 == 0:
-            logger.info(f"Epoch {epoch+1:3d}/{args.epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f} | Val MAE: {val_mae_yards:.2f} yards")
+            logger.info(
+                f"Epoch {epoch+1:3d}/{args.epochs} | Train Loss: {train_loss:.4f} | Val Loss: {val_loss:.4f} | Val MAE: {val_mae_yards:.2f} yards"
+            )
 
         # Save best model
         if val_loss < best_val_loss:
@@ -354,22 +378,22 @@ def train_bnn(args):
 
             # Save checkpoint
             checkpoint = {
-                'model_state_dict': model.state_dict(),
-                'scaler_X_mean': scaler_X.mean_,
-                'scaler_X_scale': scaler_X.scale_,
-                'scaler_y_mean': scaler_y.mean_[0],
-                'scaler_y_scale': scaler_y.scale_[0],
-                'feature_cols': feature_cols,
-                'args': vars(args),
-                'best_val_loss': best_val_loss,
-                'best_val_mae': best_val_mae
+                "model_state_dict": model.state_dict(),
+                "scaler_X_mean": scaler_X.mean_,
+                "scaler_X_scale": scaler_X.scale_,
+                "scaler_y_mean": scaler_y.mean_[0],
+                "scaler_y_scale": scaler_y.scale_[0],
+                "feature_cols": feature_cols,
+                "args": vars(args),
+                "best_val_loss": best_val_loss,
+                "best_val_mae": best_val_mae,
             }
 
             output_path = Path(args.output)
             output_path.parent.mkdir(parents=True, exist_ok=True)
             torch.save(checkpoint, output_path)
 
-    logger.info(f"\n✅ Training complete!")
+    logger.info("\n✅ Training complete!")
     logger.info(f"Best validation loss: {best_val_loss:.4f}")
     logger.info(f"Best validation MAE: {best_val_mae:.2f} yards")
     logger.info(f"Model saved: {args.output}")
@@ -390,7 +414,9 @@ if __name__ == "__main__":
     parser.add_argument("--kl-scale", type=float, default=0.01, help="KL divergence scale")
     parser.add_argument("--hidden-dim", type=int, default=64, help="Hidden layer dimension")
     parser.add_argument("--dropout", type=float, default=0.2, help="Dropout rate")
-    parser.add_argument("--output", default="models/bayesian/bnn_passing_ensemble_v1.pt", help="Output path")
+    parser.add_argument(
+        "--output", default="models/bayesian/bnn_passing_ensemble_v1.pt", help="Output path"
+    )
 
     args = parser.parse_args()
 

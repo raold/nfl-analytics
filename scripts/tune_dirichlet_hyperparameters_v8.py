@@ -45,7 +45,6 @@ import logging
 import sys
 import time
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -57,8 +56,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from py.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStacking
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -99,9 +97,8 @@ OUTPUT_FILE = Path("results/dirichlet_hyperparameter_tuning_v8.json")
 # Synthetic Data Generation (for testing)
 # ============================================================================
 
-def generate_synthetic_predictions(
-    n_games_per_season: int = 180
-) -> Dict[int, pd.DataFrame]:
+
+def generate_synthetic_predictions(n_games_per_season: int = 180) -> dict[int, pd.DataFrame]:
     """
     Generate synthetic component predictions for testing the algorithm.
 
@@ -152,18 +149,20 @@ def generate_synthetic_predictions(
             # Hybrid: Moderate bias (-6 yards), moderate variance (std 46)
             hybrid = actual - 6 + np.random.normal(0, 46)
 
-            data.append({
-                "player_id": player_id,
-                "player_display_name": f"Player {player_id}",
-                "season": season,
-                "week": week,
-                "actual": actual,
-                "state_space_v2": state_space,
-                "hierarchical_v2": hierarchical,
-                "xgboost_v4_ridge": xgboost_v4,
-                "informative_priors_v2": informative_priors,
-                "hybrid_static_incremental": hybrid,
-            })
+            data.append(
+                {
+                    "player_id": player_id,
+                    "player_display_name": f"Player {player_id}",
+                    "season": season,
+                    "week": week,
+                    "actual": actual,
+                    "state_space_v2": state_space,
+                    "hierarchical_v2": hierarchical,
+                    "xgboost_v4_ridge": xgboost_v4,
+                    "informative_priors_v2": informative_priors,
+                    "hybrid_static_incremental": hybrid,
+                }
+            )
 
         df = pd.DataFrame(data)
         df = df.sort_values(["week", "player_id"]).reset_index(drop=True)
@@ -182,7 +181,8 @@ def generate_synthetic_predictions(
 # Data Loading
 # ============================================================================
 
-def load_component_predictions() -> Dict[int, pd.DataFrame]:
+
+def load_component_predictions() -> dict[int, pd.DataFrame]:
     """
     Load component predictions from v6 backtest CSV files.
 
@@ -210,8 +210,9 @@ def load_component_predictions() -> Dict[int, pd.DataFrame]:
         df = pd.read_csv(csv_path)
 
         # Rename columns from CSV format to Dirichlet format
-        rename_dict = {csv_name: dirichlet_name
-                      for csv_name, dirichlet_name in COMPONENT_MAPPING.items()}
+        rename_dict = {
+            csv_name: dirichlet_name for csv_name, dirichlet_name in COMPONENT_MAPPING.items()
+        }
         df = df.rename(columns=rename_dict)
 
         # Validate required columns
@@ -238,12 +239,13 @@ def load_component_predictions() -> Dict[int, pd.DataFrame]:
 # Prequential Evaluation
 # ============================================================================
 
+
 def evaluate_configuration(
     prior_strength: float,
     likelihood_scale: float,
     scoring_rule: str,
-    predictions_by_season: Dict[int, pd.DataFrame]
-) -> Dict:
+    predictions_by_season: dict[int, pd.DataFrame],
+) -> dict:
     """
     Evaluate single hyperparameter configuration using prequential protocol.
 
@@ -271,7 +273,7 @@ def evaluate_configuration(
         prior_weights=V6_PRIOR_WEIGHTS,
         prior_strength=prior_strength,
         likelihood_scale=likelihood_scale,
-        scoring_rule=scoring_rule
+        scoring_rule=scoring_rule,
     )
 
     # ========================================================================
@@ -283,10 +285,7 @@ def evaluate_configuration(
 
         for _, row in df.iterrows():
             # Extract component predictions
-            component_preds = {
-                name: float(row[name])
-                for name in V6_PRIOR_WEIGHTS.keys()
-            }
+            component_preds = {name: float(row[name]) for name in V6_PRIOR_WEIGHTS.keys()}
 
             # Predict-then-update (prequential protocol)
             actual = float(row["actual"])
@@ -306,10 +305,7 @@ def evaluate_configuration(
 
     for _, row in df_2024.iterrows():
         # Extract component predictions
-        component_preds = {
-            name: float(row[name])
-            for name in V6_PRIOR_WEIGHTS.keys()
-        }
+        component_preds = {name: float(row[name]) for name in V6_PRIOR_WEIGHTS.keys()}
 
         # Predict (no update)
         ensemble_pred, _ = stacker.predict(component_preds)
@@ -326,8 +322,9 @@ def evaluate_configuration(
 
     # Compute metrics
     mae_2024 = float(np.mean(errors_2024))
-    component_maes = {name: float(np.mean(errors))
-                     for name, errors in component_errors_2024.items()}
+    component_maes = {
+        name: float(np.mean(errors)) for name, errors in component_errors_2024.items()
+    }
 
     return {
         "mae_2024": mae_2024,
@@ -337,7 +334,7 @@ def evaluate_configuration(
         "num_warmup": n_warmup,
         "min_weight": min(final_weights.values()),
         "max_weight": max(final_weights.values()),
-        "weight_variance": float(np.var(list(final_weights.values())))
+        "weight_variance": float(np.var(list(final_weights.values()))),
     }
 
 
@@ -345,11 +342,12 @@ def evaluate_configuration(
 # Grid Search
 # ============================================================================
 
+
 def run_grid_search(
-    predictions_by_season: Dict[int, pd.DataFrame],
+    predictions_by_season: dict[int, pd.DataFrame],
     test_mode: bool = False,
-    checkpoint_file: Path = None
-) -> List[Dict]:
+    checkpoint_file: Path = None,
+) -> list[dict]:
     """
     Run grid search over hyperparameter space.
 
@@ -366,8 +364,8 @@ def run_grid_search(
         # Test mode: 3 configurations (default + 2 variants)
         grid = [
             (10.0, 40.0, "exponential"),  # Default
-            (5.0, 30.0, "squared"),       # Gentler prior, gentler scale
-            (20.0, 60.0, "log"),          # Stronger prior, slower adaptation
+            (5.0, 30.0, "squared"),  # Gentler prior, gentler scale
+            (20.0, 60.0, "log"),  # Stronger prior, slower adaptation
         ]
         logger.info(f"TEST MODE: Evaluating {len(grid)} configurations")
     else:
@@ -385,14 +383,14 @@ def run_grid_search(
     results = []
     if checkpoint_file and checkpoint_file.exists():
         logger.info(f"Resuming from checkpoint: {checkpoint_file}")
-        with open(checkpoint_file, "r") as f:
+        with open(checkpoint_file) as f:
             checkpoint_data = json.load(f)
         results = checkpoint_data.get("results", [])
         for result in results:
             config_tuple = (
                 result["prior_strength"],
                 result["likelihood_scale"],
-                result["scoring_rule"]
+                result["scoring_rule"],
             )
             completed_configs.add(config_tuple)
         logger.info(f"Loaded {len(results)} completed configurations")
@@ -413,7 +411,7 @@ def run_grid_search(
                 prior_strength=prior_strength,
                 likelihood_scale=likelihood_scale,
                 scoring_rule=scoring_rule,
-                predictions_by_season=predictions_by_season
+                predictions_by_season=predictions_by_season,
             )
 
             # Add configuration metadata
@@ -448,7 +446,8 @@ def run_grid_search(
 # Analysis & Reporting
 # ============================================================================
 
-def analyze_results(results: List[Dict], predictions_by_season: Dict[int, pd.DataFrame]) -> Dict:
+
+def analyze_results(results: list[dict], predictions_by_season: dict[int, pd.DataFrame]) -> dict:
     """
     Analyze grid search results and identify best configuration.
 
@@ -481,8 +480,7 @@ def analyze_results(results: List[Dict], predictions_by_season: Dict[int, pd.Dat
     for _, row in df_2024.iterrows():
         # Compute weighted average with v6.0 static weights
         ensemble_pred = sum(
-            V6_PRIOR_WEIGHTS[name] * float(row[name])
-            for name in V6_PRIOR_WEIGHTS.keys()
+            V6_PRIOR_WEIGHTS[name] * float(row[name]) for name in V6_PRIOR_WEIGHTS.keys()
         )
         actual = float(row["actual"])
         error = abs(ensemble_pred - actual)
@@ -500,14 +498,14 @@ def analyze_results(results: List[Dict], predictions_by_season: Dict[int, pd.Dat
     logger.info(f"Baseline (v6.0 static):      {baseline_mae:.2f} yards MAE")
     logger.info(f"Best (Dirichlet adaptive):   {best['mae_2024']:.2f} yards MAE")
     logger.info(f"Improvement:                 {improvement:.2f} yards ({pct_improvement:.1f}%)")
-    logger.info(f"\nBest Configuration:")
+    logger.info("\nBest Configuration:")
     logger.info(f"  Prior strength:            {best['prior_strength']}")
     logger.info(f"  Likelihood scale:          {best['likelihood_scale']}")
     logger.info(f"  Scoring rule:              {best['scoring_rule']}")
-    logger.info(f"\nLearned Weights (after 2022-2023 warmup):")
+    logger.info("\nLearned Weights (after 2022-2023 warmup):")
     for name, weight in best["final_weights"].items():
         logger.info(f"  {name:30s} {weight:.3f}")
-    logger.info(f"\nWeight Statistics:")
+    logger.info("\nWeight Statistics:")
     logger.info(f"  Min weight:                {best['min_weight']:.3f}")
     logger.info(f"  Max weight:                {best['max_weight']:.3f}")
     logger.info(f"  Variance:                  {best['weight_variance']:.4f}")
@@ -521,21 +519,21 @@ def analyze_results(results: List[Dict], predictions_by_season: Dict[int, pd.Dat
             "mae_2024": best["mae_2024"],
             "final_weights": best["final_weights"],
             "min_weight": best["min_weight"],
-            "max_weight": best["max_weight"]
+            "max_weight": best["max_weight"],
         },
         "top_5_configs": [
             {
                 "prior_strength": r["prior_strength"],
                 "likelihood_scale": r["likelihood_scale"],
                 "scoring_rule": r["scoring_rule"],
-                "mae_2024": r["mae_2024"]
+                "mae_2024": r["mae_2024"],
             }
             for r in top_5
         ],
         "baseline_mae": baseline_mae,
         "improvement_yards": improvement,
         "improvement_pct": pct_improvement,
-        "num_configs_evaluated": len(results)
+        "num_configs_evaluated": len(results),
     }
 
 
@@ -543,29 +541,22 @@ def analyze_results(results: List[Dict], predictions_by_season: Dict[int, pd.Dat
 # Main
 # ============================================================================
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Dirichlet Bayesian Stacking Hyperparameter Tuning (Phase 2)"
     )
     parser.add_argument(
-        "--full",
-        action="store_true",
-        help="Run full grid search (108 configs, ~15-20 minutes)"
+        "--full", action="store_true", help="Run full grid search (108 configs, ~15-20 minutes)"
     )
     parser.add_argument(
-        "--test",
-        action="store_true",
-        help="Run test mode (3 configs, ~30 seconds)"
+        "--test", action="store_true", help="Run test mode (3 configs, ~30 seconds)"
     )
-    parser.add_argument(
-        "--resume",
-        type=str,
-        help="Resume from checkpoint file"
-    )
+    parser.add_argument("--resume", type=str, help="Resume from checkpoint file")
     parser.add_argument(
         "--synthetic",
         action="store_true",
-        help="Use synthetic data (for testing when real data is unavailable)"
+        help="Use synthetic data (for testing when real data is unavailable)",
     )
 
     args = parser.parse_args()
@@ -589,12 +580,14 @@ def main():
         return 1
 
     # Run grid search
-    checkpoint_file = Path(args.resume) if args.resume else Path("results/dirichlet_checkpoint.json")
+    checkpoint_file = (
+        Path(args.resume) if args.resume else Path("results/dirichlet_checkpoint.json")
+    )
 
     results = run_grid_search(
         predictions_by_season=predictions_by_season,
         test_mode=args.test,
-        checkpoint_file=checkpoint_file if args.full or args.resume else None
+        checkpoint_file=checkpoint_file if args.full or args.resume else None,
     )
 
     if not results:
@@ -610,10 +603,10 @@ def main():
             "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
             "mode": "test" if args.test else "full",
             "grid_size": len(results),
-            "v6_prior_weights": V6_PRIOR_WEIGHTS
+            "v6_prior_weights": V6_PRIOR_WEIGHTS,
         },
         "summary": analysis,
-        "all_results": results
+        "all_results": results,
     }
 
     OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -624,7 +617,7 @@ def main():
 
     # Check if target improvement achieved
     if analysis["improvement_yards"] >= 1.5:
-        logger.info(f"\n🎯 SUCCESS: Target improvement ≥1.5 yards achieved!")
+        logger.info("\n🎯 SUCCESS: Target improvement ≥1.5 yards achieved!")
     else:
         logger.warning(
             f"\n⚠️  Target improvement (≥1.5 yards) not achieved. "

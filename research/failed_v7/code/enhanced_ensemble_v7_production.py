@@ -56,7 +56,6 @@ import json
 import logging
 import pickle
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -69,6 +68,7 @@ from py.features.meta_learning_context import MetaLearningContextEngine
 # Optional R imports (lazy loaded when needed)
 try:
     import rpy2.robjects as ro
+
     R_AVAILABLE = True
 except ImportError:
     ro = None
@@ -87,11 +87,11 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 
 DEFAULT_WEIGHTS_V6 = {
-    'state_space_v2': 0.30,
-    'hierarchical_v2': 0.27,
-    'xgboost_v4_ridge': 0.23,
-    'informative_priors_v2': 0.12,
-    'elo': 0.08,
+    "state_space_v2": 0.30,
+    "hierarchical_v2": 0.27,
+    "xgboost_v4_ridge": 0.23,
+    "informative_priors_v2": 0.12,
+    "elo": 0.08,
 }
 
 MODEL_NAMES = list(DEFAULT_WEIGHTS_V6.keys())
@@ -100,6 +100,7 @@ MODEL_NAMES = list(DEFAULT_WEIGHTS_V6.keys())
 # ============================================================================
 # ENHANCED ENSEMBLE V7.0
 # ============================================================================
+
 
 class EnhancedEnsemble7Way:
     """
@@ -137,23 +138,20 @@ class EnhancedEnsemble7Way:
         ridge_path: str = "models/ridge_residuals_v7_backtest2024_20251114_184552.pkl",
         xgboost_v4_path: str = "models/xgb_ridge_residuals_v7_backtest2024_20251114_184552.json",
         elo_ratings_path: str = "models/elo/team_elo_ratings.csv",
-
         # v7.0 paths
         meta_model_path: str = "models/ensemble/meta_learning_weight_predictor.pkl",
         wls_weights_path: str = "models/ensemble/adaptive_wls_weights_weekly.json",
         temperature_scaler_path: str = "models/calibration/temperature_scaler_5way.pkl",
-
         # v7.0 configuration
         use_meta_learning: bool = True,
         use_wls_recency: bool = True,
         meta_wls_blend: float = 0.6,  # 60% meta, 40% WLS
-
         # Database configuration
-        db_host: str = 'localhost',
+        db_host: str = "localhost",
         db_port: int = 5544,
-        db_name: str = 'devdb01',
-        db_user: str = 'dro',
-        db_password: str = 'sicillionbillions',
+        db_name: str = "devdb01",
+        db_user: str = "dro",
+        db_password: str = "sicillionbillions",
     ):
         """
         Initialize Enhanced Ensemble v7.0.
@@ -195,11 +193,11 @@ class EnhancedEnsemble7Way:
 
         # Database configuration
         self.db_config = {
-            'host': db_host,
-            'port': db_port,
-            'database': db_name,
-            'user': db_user,
-            'password': db_password,
+            "host": db_host,
+            "port": db_port,
+            "database": db_name,
+            "user": db_user,
+            "password": db_password,
         }
 
         # Model objects (lazy loaded)
@@ -233,11 +231,11 @@ class EnhancedEnsemble7Way:
         # Load Ridge model (opponent baseline)
         if self.ridge_path.exists():
             try:
-                with open(self.ridge_path, 'rb') as f:
+                with open(self.ridge_path, "rb") as f:
                     ridge_data = pickle.load(f)
-                    self.ridge_model = ridge_data['ridge']
-                    self.ridge_scaler = ridge_data['scaler']
-                logger.info(f"✅ Ridge model loaded")
+                    self.ridge_model = ridge_data["ridge"]
+                    self.ridge_scaler = ridge_data["scaler"]
+                logger.info("✅ Ridge model loaded")
             except Exception as e:
                 logger.warning(f"⚠️  Failed to load Ridge model: {e}")
 
@@ -246,7 +244,7 @@ class EnhancedEnsemble7Way:
             try:
                 self.xgboost_v4_model = xgb.Booster()
                 self.xgboost_v4_model.load_model(str(self.xgboost_v4_path))
-                logger.info(f"✅ XGBoost v4 loaded")
+                logger.info("✅ XGBoost v4 loaded")
             except Exception as e:
                 logger.warning(f"⚠️  Failed to load XGBoost v4: {e}")
 
@@ -261,9 +259,11 @@ class EnhancedEnsemble7Way:
         # Load temperature scaler
         if self.temperature_scaler_path.exists():
             try:
-                with open(self.temperature_scaler_path, 'rb') as f:
+                with open(self.temperature_scaler_path, "rb") as f:
                     self.temperature_scaler = pickle.load(f)
-                logger.info(f"✅ Temperature scaler loaded (T={self.temperature_scaler.get('temperature', 1.0):.4f})")
+                logger.info(
+                    f"✅ Temperature scaler loaded (T={self.temperature_scaler.get('temperature', 1.0):.4f})"
+                )
             except Exception as e:
                 logger.warning(f"⚠️  Failed to load temperature scaler: {e}")
 
@@ -271,7 +271,7 @@ class EnhancedEnsemble7Way:
         if self.use_meta_learning and self.meta_model_path.exists():
             try:
                 self.meta_model = MetaLearningWeightPredictor.load(str(self.meta_model_path))
-                logger.info(f"✅ Meta-learning model loaded")
+                logger.info("✅ Meta-learning model loaded")
             except Exception as e:
                 logger.warning(f"⚠️  Failed to load meta-model: {e}")
                 self.use_meta_learning = False
@@ -279,10 +279,10 @@ class EnhancedEnsemble7Way:
         # Load WLS weights (v7.0)
         if self.use_wls_recency and self.wls_weights_path.exists():
             try:
-                with open(self.wls_weights_path, 'r') as f:
+                with open(self.wls_weights_path) as f:
                     wls_data = json.load(f)
-                    self.wls_weights = wls_data['weights']
-                    self.wls_halflife = wls_data['metadata'].get('halflife', 4.0)
+                    self.wls_weights = wls_data["weights"]
+                    self.wls_halflife = wls_data["metadata"].get("halflife", 4.0)
                 logger.info(f"✅ WLS weights loaded (halflife={self.wls_halflife})")
             except Exception as e:
                 logger.warning(f"⚠️  Failed to load WLS weights: {e}")
@@ -292,13 +292,13 @@ class EnhancedEnsemble7Way:
         if self.use_meta_learning:
             try:
                 self.context_engine = MetaLearningContextEngine(
-                    db_host=self.db_config['host'],
-                    db_port=self.db_config['port'],
-                    db_name=self.db_config['database'],
-                    db_user=self.db_config['user'],
-                    db_password=self.db_config['password'],
+                    db_host=self.db_config["host"],
+                    db_port=self.db_config["port"],
+                    db_name=self.db_config["database"],
+                    db_user=self.db_config["user"],
+                    db_password=self.db_config["password"],
                 )
-                logger.info(f"✅ Context engine initialized")
+                logger.info("✅ Context engine initialized")
             except Exception as e:
                 logger.warning(f"⚠️  Failed to initialize context engine: {e}")
                 self.use_meta_learning = False
@@ -306,6 +306,7 @@ class EnhancedEnsemble7Way:
         # Initialize R model interface for Bayesian predictions (v7.0)
         try:
             from py.ensemble.r_model_interface import RModelInterface
+
             self.r_interface = RModelInterface(self.db_config)
             logger.info("✅ R model interface initialized")
         except Exception as e:
@@ -317,7 +318,9 @@ class EnhancedEnsemble7Way:
         if skills_path.exists():
             try:
                 self.state_space_skills = pd.read_csv(skills_path)
-                logger.info(f"✅ State-Space skills loaded ({len(self.state_space_skills)} players)")
+                logger.info(
+                    f"✅ State-Space skills loaded ({len(self.state_space_skills)} players)"
+                )
             except Exception as e:
                 logger.warning(f"⚠️  Failed to load State-Space skills: {e}")
                 self.state_space_skills = None
@@ -341,7 +344,7 @@ class EnhancedEnsemble7Way:
         player_id: str,
         season: int,
         week: int,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get XGBoost v4 prediction (Ridge baseline + residual).
 
@@ -358,36 +361,51 @@ class EnhancedEnsemble7Way:
             # NOTE: mart.game_opponent_features table doesn't exist
             # Use league average defaults for Ridge baseline
             # This is acceptable since XGBoost residual model will capture player-specific patterns
-            df_opp = pd.DataFrame([{
-                'opp_def_epa_exp': 0.0,         # League average defensive EPA
-                'opp_points_allowed_avg': 22.5,  # League average points allowed
-                'matchup_difficulty': 0.0        # Neutral matchup
-            }])
+            df_opp = pd.DataFrame(
+                [
+                    {
+                        "opp_def_epa_exp": 0.0,  # League average defensive EPA
+                        "opp_points_allowed_avg": 22.5,  # League average points allowed
+                        "matchup_difficulty": 0.0,  # Neutral matchup
+                    }
+                ]
+            )
 
             # Ridge baseline prediction
-            X_ridge = df_opp[['opp_def_epa_exp', 'opp_points_allowed_avg', 'matchup_difficulty']].values
+            X_ridge = df_opp[
+                ["opp_def_epa_exp", "opp_points_allowed_avg", "matchup_difficulty"]
+            ].values
             X_ridge_scaled = self.ridge_scaler.transform(X_ridge)
             ridge_pred = self.ridge_model.predict(X_ridge_scaled)[0]
 
             # NOTE: mart.player_game_features table doesn't exist
             # Use league average defaults for player history
             # This is acceptable since XGBoost will learn from the ridge baseline
-            df_player = pd.DataFrame([{
-                'pass_yards_l3': 250.0,        # League average passing yards
-                'pass_attempts_l3': 30.0,      # League average attempts
-                'completions_l3': 20.0,        # League average completions
-                'completions_pct_l3': 0.65,    # League average completion %
-                'home_away_encoded': 1         # Assume home game (slight advantage)
-            }])
+            df_player = pd.DataFrame(
+                [
+                    {
+                        "pass_yards_l3": 250.0,  # League average passing yards
+                        "pass_attempts_l3": 30.0,  # League average attempts
+                        "completions_l3": 20.0,  # League average completions
+                        "completions_pct_l3": 0.65,  # League average completion %
+                        "home_away_encoded": 1,  # Assume home game (slight advantage)
+                    }
+                ]
+            )
 
             conn.close()
 
             # XGBoost expects: baseline features + residual_feature
             # For prediction, use ridge baseline as residual feature estimate
-            baseline_features = df_player[[
-                'pass_yards_l3', 'pass_attempts_l3', 'completions_l3',
-                'completions_pct_l3', 'home_away_encoded'
-            ]].values[0]
+            baseline_features = df_player[
+                [
+                    "pass_yards_l3",
+                    "pass_attempts_l3",
+                    "completions_l3",
+                    "completions_pct_l3",
+                    "home_away_encoded",
+                ]
+            ].values[0]
 
             # Use Ridge prediction as residual feature (will be refined by XGBoost)
             residual_feature = ridge_pred - 250.0  # Deviation from league average
@@ -413,14 +431,14 @@ class EnhancedEnsemble7Way:
         player_id: str,
         season: int,
         week: int,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get Hierarchical v2 prediction via R model interface.
 
         Returns:
             (mean, std) tuple or None if prediction fails
         """
-        if not hasattr(self, 'r_interface') or self.r_interface is None:
+        if not hasattr(self, "r_interface") or self.r_interface is None:
             logger.warning("R model interface not available")
             return None
 
@@ -435,7 +453,7 @@ class EnhancedEnsemble7Way:
                 season=season,
                 week=week,
                 model_path=self.hierarchical_path,
-                ndraws=1000
+                ndraws=1000,
             )
 
             return (mean, std) if mean is not None else None
@@ -449,14 +467,14 @@ class EnhancedEnsemble7Way:
         player_id: str,
         season: int,
         week: int,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get Informative Priors v2 prediction via R model interface.
 
         Returns:
             (mean, std) tuple or None if prediction fails
         """
-        if not hasattr(self, 'r_interface') or self.r_interface is None:
+        if not hasattr(self, "r_interface") or self.r_interface is None:
             logger.warning("R model interface not available")
             return None
 
@@ -471,7 +489,7 @@ class EnhancedEnsemble7Way:
                 season=season,
                 week=week,
                 model_path=self.informative_path,
-                ndraws=1000
+                ndraws=1000,
             )
 
             return (mean, std) if mean is not None else None
@@ -485,7 +503,7 @@ class EnhancedEnsemble7Way:
         player_id: str,
         season: int,
         week: int,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get State-Space v2 prediction via R model interface.
 
@@ -494,11 +512,11 @@ class EnhancedEnsemble7Way:
         Returns:
             (mean, std) tuple or None if prediction fails
         """
-        if not hasattr(self, 'r_interface') or self.r_interface is None:
+        if not hasattr(self, "r_interface") or self.r_interface is None:
             logger.warning("R model interface not available")
             return None
 
-        if not hasattr(self, 'state_space_skills') or self.state_space_skills is None:
+        if not hasattr(self, "state_space_skills") or self.state_space_skills is None:
             logger.warning("State-space skills not loaded")
             return None
 
@@ -509,10 +527,7 @@ class EnhancedEnsemble7Way:
                 self.r_interface = RModelInterface(self.db_config)
 
             mean, std = self.r_interface.predict_state_space(
-                player_id=player_id,
-                season=season,
-                week=week,
-                skills_df=self.state_space_skills
+                player_id=player_id, season=season, week=week, skills_df=self.state_space_skills
             )
 
             return (mean, std) if mean is not None else None
@@ -526,7 +541,7 @@ class EnhancedEnsemble7Way:
         player_id: str,
         season: int,
         week: int,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Get ELO-based prediction using simple linear conversion.
 
@@ -572,15 +587,18 @@ class EnhancedEnsemble7Way:
                 logger.warning(f"No game found for {player_id} week {week}")
                 return None
 
-            team = df_game.iloc[0]['team']
-            opponent = df_game.iloc[0]['opponent']
+            team = df_game.iloc[0]["team"]
+            opponent = df_game.iloc[0]["opponent"]
 
             # Lookup ELO ratings from game-based CSV
             # CSV has: home_team, away_team, home_elo_pregame, away_elo_pregame
             elo_game = self.elo_ratings[
-                (self.elo_ratings['season'] == season) &
-                (self.elo_ratings['week'] == week) &
-                ((self.elo_ratings['home_team'] == team) | (self.elo_ratings['away_team'] == team))
+                (self.elo_ratings["season"] == season)
+                & (self.elo_ratings["week"] == week)
+                & (
+                    (self.elo_ratings["home_team"] == team)
+                    | (self.elo_ratings["away_team"] == team)
+                )
             ]
 
             if len(elo_game) == 0:
@@ -589,12 +607,12 @@ class EnhancedEnsemble7Way:
 
             # Determine if team is home or away, get corresponding ELO
             game_row = elo_game.iloc[0]
-            if game_row['home_team'] == team:
-                team_elo = game_row['home_elo_pregame']
-                opp_elo = game_row['away_elo_pregame']
+            if game_row["home_team"] == team:
+                team_elo = game_row["home_elo_pregame"]
+                opp_elo = game_row["away_elo_pregame"]
             else:
-                team_elo = game_row['away_elo_pregame']
-                opp_elo = game_row['home_elo_pregame']
+                team_elo = game_row["away_elo_pregame"]
+                opp_elo = game_row["home_elo_pregame"]
 
             # Simple linear conversion: +100 ELO = +10 yards
             elo_diff = team_elo - opp_elo
@@ -611,10 +629,10 @@ class EnhancedEnsemble7Way:
 
     def _get_recent_ensemble_errors(
         self,
-        ensemble_version: str = 'v7.0',
+        ensemble_version: str = "v7.0",
         n_recent: int = 50,
         halflife_weeks: float = 4.0,
-    ) -> Optional[pd.DataFrame]:
+    ) -> pd.DataFrame | None:
         """
         Get recent ensemble prediction errors for WLS bias correction.
 
@@ -667,22 +685,26 @@ class EnhancedEnsemble7Way:
             conn.close()
 
             if len(df) < 10:
-                logger.warning(f"Insufficient recent predictions for WLS adjustment: {len(df)} < 10")
+                logger.warning(
+                    f"Insufficient recent predictions for WLS adjustment: {len(df)} < 10"
+                )
                 return None
 
             # Compute week offsets (most recent = 0)
-            df['week_offset'] = range(len(df) - 1, -1, -1)
+            df["week_offset"] = range(len(df) - 1, -1, -1)
 
             # Compute exponential decay weights: w_i = exp(-decay * weeks_ago)
             decay = np.log(2) / halflife_weeks
-            df['wls_weight'] = np.exp(-decay * df['week_offset'])
+            df["wls_weight"] = np.exp(-decay * df["week_offset"])
 
             # Normalize weights to sum=1
-            df['wls_weight'] = df['wls_weight'] / df['wls_weight'].sum()
+            df["wls_weight"] = df["wls_weight"] / df["wls_weight"].sum()
 
-            logger.info(f"Retrieved {len(df)} recent predictions for WLS adjustment (halflife={halflife_weeks} weeks)")
+            logger.info(
+                f"Retrieved {len(df)} recent predictions for WLS adjustment (halflife={halflife_weeks} weeks)"
+            )
 
-            return df[['week_offset', 'error', 'wls_weight']]
+            return df[["week_offset", "error", "wls_weight"]]
 
         except Exception as e:
             logger.error(f"Failed to retrieve recent ensemble errors: {e}")
@@ -691,9 +713,9 @@ class EnhancedEnsemble7Way:
     def _apply_ensemble_wls(
         self,
         ensemble_mean_raw: float,
-        ensemble_version: str = 'v7.0',
+        ensemble_version: str = "v7.0",
         halflife_weeks: float = 4.0,
-    ) -> Tuple[float, float, Dict]:
+    ) -> tuple[float, float, dict]:
         """
         Apply WLS bias correction to WHOLE ENSEMBLE prediction.
 
@@ -709,10 +731,10 @@ class EnhancedEnsemble7Way:
             (ensemble_mean_adjusted, adjustment_magnitude, metadata)
         """
         metadata = {
-            'wls_applied': False,
-            'adjustment': 0.0,
-            'n_recent': 0,
-            'halflife': halflife_weeks,
+            "wls_applied": False,
+            "adjustment": 0.0,
+            "n_recent": 0,
+            "halflife": halflife_weeks,
         }
 
         # Get recent errors
@@ -728,17 +750,17 @@ class EnhancedEnsemble7Way:
 
         # Compute weighted bias estimate
         # bias = weighted mean of (predicted - actual)
-        wls_bias = (df_errors['error'] * df_errors['wls_weight']).sum()
+        wls_bias = (df_errors["error"] * df_errors["wls_weight"]).sum()
 
         # Adjustment: subtract bias from raw prediction
         adjustment = -wls_bias  # Negative because bias = pred - actual
         ensemble_mean_adjusted = ensemble_mean_raw + adjustment
 
         # Update metadata
-        metadata['wls_applied'] = True
-        metadata['adjustment'] = float(adjustment)
-        metadata['n_recent'] = len(df_errors)
-        metadata['wls_bias_estimate'] = float(wls_bias)
+        metadata["wls_applied"] = True
+        metadata["adjustment"] = float(adjustment)
+        metadata["n_recent"] = len(df_errors)
+        metadata["wls_bias_estimate"] = float(wls_bias)
 
         # Warn if adjustment is suspiciously large (>20 yards)
         if abs(adjustment) > 20.0:
@@ -759,7 +781,7 @@ class EnhancedEnsemble7Way:
         player_id: str,
         season: int,
         week: int,
-    ) -> Tuple[Dict[str, float], Dict]:
+    ) -> tuple[dict[str, float], dict]:
         """
         Compute adaptive ensemble weights using meta-learning + WLS.
 
@@ -772,14 +794,18 @@ class EnhancedEnsemble7Way:
             (weights_dict, metadata_dict)
         """
         metadata = {
-            'meta_weights': None,
-            'wls_weights': None,
-            'blend_ratio': self.meta_wls_blend,
-            'source': 'default',
+            "meta_weights": None,
+            "wls_weights": None,
+            "blend_ratio": self.meta_wls_blend,
+            "source": "default",
         }
 
         # Step 1: Meta-learning weights (from context)
-        if self.use_meta_learning and self.meta_model is not None and self.context_engine is not None:
+        if (
+            self.use_meta_learning
+            and self.meta_model is not None
+            and self.context_engine is not None
+        ):
             try:
                 # Extract context features
                 context_features = self.context_engine.extract_context_features(
@@ -790,8 +816,8 @@ class EnhancedEnsemble7Way:
 
                 # Predict weights from context
                 meta_weights = self.meta_model.predict_weights(context_features)
-                metadata['meta_weights'] = meta_weights
-                metadata['source'] = 'meta'
+                metadata["meta_weights"] = meta_weights
+                metadata["source"] = "meta"
 
                 logger.debug(f"Meta-learning weights: {meta_weights}")
             except Exception as e:
@@ -803,9 +829,9 @@ class EnhancedEnsemble7Way:
         # Step 2: WLS recency weights (from recent performance)
         if self.use_wls_recency and self.wls_weights is not None:
             wls_weights = self.wls_weights.copy()
-            metadata['wls_weights'] = wls_weights
-            if metadata['source'] == 'default':
-                metadata['source'] = 'wls'
+            metadata["wls_weights"] = wls_weights
+            if metadata["source"] == "default":
+                metadata["source"] = "wls"
         else:
             wls_weights = None
 
@@ -817,14 +843,13 @@ class EnhancedEnsemble7Way:
                 meta_w = meta_weights.get(name, self.default_weights[name])
                 wls_w = wls_weights.get(name, self.default_weights[name])
                 blended_weights[name] = (
-                    self.meta_wls_blend * meta_w +
-                    (1 - self.meta_wls_blend) * wls_w
+                    self.meta_wls_blend * meta_w + (1 - self.meta_wls_blend) * wls_w
                 )
 
             # Normalize to sum=1.0
             total = sum(blended_weights.values())
             final_weights = {k: v / total for k, v in blended_weights.items()}
-            metadata['source'] = 'meta+wls'
+            metadata["source"] = "meta+wls"
 
         elif meta_weights is not None:
             final_weights = meta_weights
@@ -835,7 +860,7 @@ class EnhancedEnsemble7Way:
         else:
             # Fallback: default weights
             final_weights = self.default_weights.copy()
-            metadata['source'] = 'default'
+            metadata["source"] = "default"
 
         logger.info(f"Adaptive weights ({metadata['source']}): {final_weights}")
 
@@ -847,7 +872,7 @@ class EnhancedEnsemble7Way:
         season: int,
         week: int,
         return_components: bool = False,
-    ) -> Dict:
+    ) -> dict:
         """
         Generate ensemble prediction with adaptive weights.
 
@@ -879,64 +904,51 @@ class EnhancedEnsemble7Way:
         # XGBoost v4 (Ridge baseline + residual)
         xgb_pred = self._get_xgboost_prediction(player_id, season, week)
         if xgb_pred is not None:
-            component_predictions['xgboost_v4_ridge'] = {
-                'mean': xgb_pred[0],
-                'std': xgb_pred[1]
-            }
+            component_predictions["xgboost_v4_ridge"] = {"mean": xgb_pred[0], "std": xgb_pred[1]}
 
         # Hierarchical v2 (R Bayesian)
         hier_pred = self._get_hierarchical_prediction(player_id, season, week)
         if hier_pred is not None:
-            component_predictions['hierarchical_v2'] = {
-                'mean': hier_pred[0],
-                'std': hier_pred[1]
-            }
+            component_predictions["hierarchical_v2"] = {"mean": hier_pred[0], "std": hier_pred[1]}
 
         # Informative Priors v2 (R Bayesian)
         ip_pred = self._get_informative_priors_prediction(player_id, season, week)
         if ip_pred is not None:
-            component_predictions['informative_priors_v2'] = {
-                'mean': ip_pred[0],
-                'std': ip_pred[1]
-            }
+            component_predictions["informative_priors_v2"] = {"mean": ip_pred[0], "std": ip_pred[1]}
 
         # State-Space v2 (R Bayesian with skills)
         ss_pred = self._get_state_space_prediction(player_id, season, week)
         if ss_pred is not None:
-            component_predictions['state_space_v2'] = {
-                'mean': ss_pred[0],
-                'std': ss_pred[1]
-            }
+            component_predictions["state_space_v2"] = {"mean": ss_pred[0], "std": ss_pred[1]}
 
         # ELO ratings (simple conversion)
         elo_pred = self._get_elo_prediction(player_id, season, week)
         if elo_pred is not None:
-            component_predictions['elo'] = {
-                'mean': elo_pred[0],
-                'std': elo_pred[1]
-            }
+            component_predictions["elo"] = {"mean": elo_pred[0], "std": elo_pred[1]}
 
         # Check if we have enough components (require 3/5 minimum)
         if len(component_predictions) < 3:
-            logger.error(f"⛔ Only {len(component_predictions)}/5 components available - aborting prediction")
+            logger.error(
+                f"⛔ Only {len(component_predictions)}/5 components available - aborting prediction"
+            )
             return {
-                'error': 'Insufficient components',
-                'available_components': len(component_predictions),
-                'required_minimum': 3
+                "error": "Insufficient components",
+                "available_components": len(component_predictions),
+                "required_minimum": 3,
             }
 
         logger.info(f"✅ Generated predictions from {len(component_predictions)}/5 base models")
 
         # Compute weighted ensemble mean
         ensemble_mean_raw = sum(
-            weights[k] * component_predictions[k]['mean']
+            weights[k] * component_predictions[k]["mean"]
             for k in component_predictions
             if k in weights
         )
 
         # Compute pooled uncertainty (weighted variance)
         ensemble_var = sum(
-            (weights[k] ** 2) * (component_predictions[k]['std'] ** 2)
+            (weights[k] ** 2) * (component_predictions[k]["std"] ** 2)
             for k in component_predictions
             if k in weights
         )
@@ -949,16 +961,16 @@ class EnhancedEnsemble7Way:
         # This corrects systematic ensemble bias using recent errors
         ensemble_mean_adjusted, wls_adjustment, wls_metadata = self._apply_ensemble_wls(
             ensemble_mean_raw=ensemble_mean_raw,
-            ensemble_version='v7.0',
+            ensemble_version="v7.0",
             halflife_weeks=4.0,
         )
 
         # Add WLS metadata to result metadata
-        metadata['wls_ensemble_adjustment'] = wls_metadata
+        metadata["wls_ensemble_adjustment"] = wls_metadata
 
         # Apply temperature scaling if available
         if self.temperature_scaler is not None:
-            temperature = self.temperature_scaler.get('temperature', 1.0)
+            temperature = self.temperature_scaler.get("temperature", 1.0)
             ensemble_std = ensemble_std_raw * temperature
         else:
             ensemble_std = ensemble_std_raw
@@ -969,18 +981,18 @@ class EnhancedEnsemble7Way:
         ensemble_ci_upper = ensemble_mean_adjusted + z_90 * ensemble_std
 
         result = {
-            'ensemble_mean': ensemble_mean_adjusted,
-            'ensemble_mean_raw': ensemble_mean_raw,  # Keep raw for debugging
-            'wls_adjustment': wls_adjustment,
-            'ensemble_std': ensemble_std,
-            'ensemble_ci_lower': ensemble_ci_lower,
-            'ensemble_ci_upper': ensemble_ci_upper,
-            'weights': weights,
-            'metadata': metadata,
+            "ensemble_mean": ensemble_mean_adjusted,
+            "ensemble_mean_raw": ensemble_mean_raw,  # Keep raw for debugging
+            "wls_adjustment": wls_adjustment,
+            "ensemble_std": ensemble_std,
+            "ensemble_ci_lower": ensemble_ci_lower,
+            "ensemble_ci_upper": ensemble_ci_upper,
+            "weights": weights,
+            "metadata": metadata,
         }
 
         if return_components:
-            result['components'] = component_predictions
+            result["components"] = component_predictions
 
         return result
 
@@ -988,6 +1000,7 @@ class EnhancedEnsemble7Way:
 # ============================================================================
 # CONVENIENCE FUNCTIONS
 # ============================================================================
+
 
 def load_ensemble_v7(
     use_meta_learning: bool = True,

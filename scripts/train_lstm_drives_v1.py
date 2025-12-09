@@ -14,19 +14,18 @@ Author: NFL Analytics Team
 Date: November 22, 2025
 """
 
-import pandas as pd
+import json
+import logging
+import sys
+from datetime import datetime
+from pathlib import Path
+
 import numpy as np
+import pandas as pd
 import torch
-import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from pathlib import Path
-import logging
-from typing import Dict, Tuple
-import json
-from datetime import datetime
 from tqdm import tqdm
-import sys
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -34,9 +33,9 @@ sys.path.insert(0, str(project_root))
 
 # Import after adding to path
 import importlib.util
+
 spec = importlib.util.spec_from_file_location(
-    "lstm_drive_prediction",
-    project_root / "py" / "models" / "lstm_drive_prediction.py"
+    "lstm_drive_prediction", project_root / "py" / "models" / "lstm_drive_prediction.py"
 )
 lstm_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(lstm_module)
@@ -53,11 +52,7 @@ logger = logging.getLogger(__name__)
 class LSTMTrainer:
     """LSTM training orchestrator."""
 
-    def __init__(
-        self,
-        config: LSTMConfig,
-        device: str = 'cpu'
-    ):
+    def __init__(self, config: LSTMConfig, device: str = "cpu"):
         """
         Initialize trainer.
 
@@ -79,22 +74,19 @@ class LSTMTrainer:
 
         # Scheduler
         self.scheduler = optim.lr_scheduler.ReduceLROnPlateau(
-            self.optimizer,
-            mode='min',
-            factor=0.5,
-            patience=5
+            self.optimizer, mode="min", factor=0.5, patience=5
         )
 
         # Training history
         self.history = {
-            'train_loss': [],
-            'val_loss': [],
-            'val_yards_mae': [],
-            'val_points_acc': [],
-            'val_result_acc': []
+            "train_loss": [],
+            "val_loss": [],
+            "val_yards_mae": [],
+            "val_points_acc": [],
+            "val_result_acc": [],
         }
 
-    def train_epoch(self, train_loader: DataLoader) -> Dict[str, float]:
+    def train_epoch(self, train_loader: DataLoader) -> dict[str, float]:
         """
         Train for one epoch.
 
@@ -106,12 +98,7 @@ class LSTMTrainer:
         """
         self.model.train()
 
-        total_losses = {
-            'total': 0.0,
-            'yards': 0.0,
-            'points': 0.0,
-            'result': 0.0
-        }
+        total_losses = {"total": 0.0, "yards": 0.0, "points": 0.0, "result": 0.0}
         num_batches = 0
 
         pbar = tqdm(train_loader, desc="Training")
@@ -127,11 +114,7 @@ class LSTMTrainer:
             predictions = self.model(features)
 
             # Compute loss
-            targets = {
-                'yards': yards,
-                'points': points,
-                'result': results
-            }
+            targets = {"yards": yards, "points": points, "result": results}
 
             loss, loss_dict = self.criterion(predictions, targets)
 
@@ -147,14 +130,14 @@ class LSTMTrainer:
             num_batches += 1
 
             # Update progress bar
-            pbar.set_postfix({'loss': loss.item()})
+            pbar.set_postfix({"loss": loss.item()})
 
         # Average losses
         avg_losses = {k: v / num_batches for k, v in total_losses.items()}
 
         return avg_losses
 
-    def validate(self, val_loader: DataLoader) -> Dict[str, float]:
+    def validate(self, val_loader: DataLoader) -> dict[str, float]:
         """
         Validate model.
 
@@ -166,12 +149,7 @@ class LSTMTrainer:
         """
         self.model.eval()
 
-        total_losses = {
-            'total': 0.0,
-            'yards': 0.0,
-            'points': 0.0,
-            'result': 0.0
-        }
+        total_losses = {"total": 0.0, "yards": 0.0, "points": 0.0, "result": 0.0}
 
         # For metric computation
         all_yards_pred = []
@@ -195,11 +173,7 @@ class LSTMTrainer:
                 predictions = self.model(features)
 
                 # Compute loss
-                targets = {
-                    'yards': yards,
-                    'points': points,
-                    'result': results
-                }
+                targets = {"yards": yards, "points": points, "result": results}
 
                 loss, loss_dict = self.criterion(predictions, targets)
 
@@ -209,14 +183,14 @@ class LSTMTrainer:
                 num_batches += 1
 
                 # Store predictions for metrics
-                all_yards_pred.append(predictions['yards'].squeeze().cpu().numpy())
+                all_yards_pred.append(predictions["yards"].squeeze().cpu().numpy())
                 all_yards_true.append(yards.cpu().numpy())
 
-                points_pred_classes = predictions['points'].argmax(dim=-1).cpu().numpy()
+                points_pred_classes = predictions["points"].argmax(dim=-1).cpu().numpy()
                 all_points_pred.append(points_pred_classes)
                 all_points_true.append(points.cpu().numpy())
 
-                result_pred_classes = predictions['result'].argmax(dim=-1).cpu().numpy()
+                result_pred_classes = predictions["result"].argmax(dim=-1).cpu().numpy()
                 all_result_pred.append(result_pred_classes)
                 all_result_true.append(results.cpu().numpy())
 
@@ -238,9 +212,9 @@ class LSTMTrainer:
 
         return {
             **avg_losses,
-            'yards_mae': yards_mae,
-            'points_acc': points_acc,
-            'result_acc': result_acc
+            "yards_mae": yards_mae,
+            "points_acc": points_acc,
+            "result_acc": result_acc,
         }
 
     def train(
@@ -248,7 +222,7 @@ class LSTMTrainer:
         train_loader: DataLoader,
         val_loader: DataLoader,
         num_epochs: int = 50,
-        early_stopping_patience: int = 10
+        early_stopping_patience: int = 10,
     ):
         """
         Train model with early stopping.
@@ -261,7 +235,7 @@ class LSTMTrainer:
         """
         logger.info(f"Training LSTM for {num_epochs} epochs")
 
-        best_val_mae = float('inf')
+        best_val_mae = float("inf")
         patience_counter = 0
 
         for epoch in range(num_epochs):
@@ -269,35 +243,39 @@ class LSTMTrainer:
 
             # Train
             train_losses = self.train_epoch(train_loader)
-            logger.info(f"Train Loss: {train_losses['total']:.4f} "
-                       f"(Yards: {train_losses['yards']:.4f}, "
-                       f"Points: {train_losses['points']:.4f}, "
-                       f"Result: {train_losses['result']:.4f})")
+            logger.info(
+                f"Train Loss: {train_losses['total']:.4f} "
+                f"(Yards: {train_losses['yards']:.4f}, "
+                f"Points: {train_losses['points']:.4f}, "
+                f"Result: {train_losses['result']:.4f})"
+            )
 
             # Validate
             val_metrics = self.validate(val_loader)
-            logger.info(f"Val Loss: {val_metrics['total']:.4f}, "
-                       f"Yards MAE: {val_metrics['yards_mae']:.2f}, "
-                       f"Points Acc: {val_metrics['points_acc']:.3f}, "
-                       f"Result Acc: {val_metrics['result_acc']:.3f}")
+            logger.info(
+                f"Val Loss: {val_metrics['total']:.4f}, "
+                f"Yards MAE: {val_metrics['yards_mae']:.2f}, "
+                f"Points Acc: {val_metrics['points_acc']:.3f}, "
+                f"Result Acc: {val_metrics['result_acc']:.3f}"
+            )
 
             # Update history
-            self.history['train_loss'].append(train_losses['total'])
-            self.history['val_loss'].append(val_metrics['total'])
-            self.history['val_yards_mae'].append(val_metrics['yards_mae'])
-            self.history['val_points_acc'].append(val_metrics['points_acc'])
-            self.history['val_result_acc'].append(val_metrics['result_acc'])
+            self.history["train_loss"].append(train_losses["total"])
+            self.history["val_loss"].append(val_metrics["total"])
+            self.history["val_yards_mae"].append(val_metrics["yards_mae"])
+            self.history["val_points_acc"].append(val_metrics["points_acc"])
+            self.history["val_result_acc"].append(val_metrics["result_acc"])
 
             # Learning rate scheduling
-            self.scheduler.step(val_metrics['yards_mae'])
+            self.scheduler.step(val_metrics["yards_mae"])
 
             # Early stopping
-            if val_metrics['yards_mae'] < best_val_mae:
-                best_val_mae = val_metrics['yards_mae']
+            if val_metrics["yards_mae"] < best_val_mae:
+                best_val_mae = val_metrics["yards_mae"]
                 patience_counter = 0
 
                 # Save best model
-                self.save_checkpoint('models/lstm_drive_v1_best.pt')
+                self.save_checkpoint("models/lstm_drive_v1_best.pt")
                 logger.info(f"✓ New best model! MAE: {best_val_mae:.2f}")
             else:
                 patience_counter += 1
@@ -311,20 +289,19 @@ class LSTMTrainer:
 
     def save_checkpoint(self, path: str):
         """Save model checkpoint."""
-        torch.save({
-            'model_state_dict': self.model.state_dict(),
-            'optimizer_state_dict': self.optimizer.state_dict(),
-            'config': self.config,
-            'history': self.history
-        }, path)
+        torch.save(
+            {
+                "model_state_dict": self.model.state_dict(),
+                "optimizer_state_dict": self.optimizer.state_dict(),
+                "config": self.config,
+                "history": self.history,
+            },
+            path,
+        )
         logger.info(f"Saved checkpoint to {path}")
 
 
-def load_and_prepare_data(
-    csv_path: str,
-    train_seasons: list,
-    val_seasons: list
-) -> Tuple:
+def load_and_prepare_data(csv_path: str, train_seasons: list, val_seasons: list) -> tuple:
     """
     Load and prepare drive data.
 
@@ -341,23 +318,32 @@ def load_and_prepare_data(
     df = pd.read_csv(csv_path)
 
     # Extract season from game_id (first 4 characters)
-    df['season'] = df['game_id'].str[:4].astype(int)
+    df["season"] = df["game_id"].str[:4].astype(int)
 
     # Split train/val
-    train_df = df[df['season'].isin(train_seasons)].copy()
-    val_df = df[df['season'].isin(val_seasons)].copy()
+    train_df = df[df["season"].isin(train_seasons)].copy()
+    val_df = df[df["season"].isin(val_seasons)].copy()
 
     logger.info(f"Train: {len(train_df):,} drives from {train_df['game_id'].nunique()} games")
     logger.info(f"Val: {len(val_df):,} drives from {val_df['game_id'].nunique()} games")
 
     # Feature columns (excluding targets and identifiers)
     feature_cols = [
-        'field_position', 'down', 'ydstogo', 'game_seconds_remaining',
-        'score_differential', 'drive_number',
-        'recent_yards_per_drive', 'recent_epa_per_play', 'recent_success_rate',
-        'opp_recent_yards_allowed_per_drive', 'opp_recent_epa_allowed_per_play',
-        'opp_recent_success_rate_allowed',
-        'points_in_last_2_drives', 'consecutive_first_downs', 'drives_since_score'
+        "field_position",
+        "down",
+        "ydstogo",
+        "game_seconds_remaining",
+        "score_differential",
+        "drive_number",
+        "recent_yards_per_drive",
+        "recent_epa_per_play",
+        "recent_success_rate",
+        "opp_recent_yards_allowed_per_drive",
+        "opp_recent_epa_allowed_per_play",
+        "opp_recent_success_rate_allowed",
+        "points_in_last_2_drives",
+        "consecutive_first_downs",
+        "drives_since_score",
     ]
 
     # Fill NaNs
@@ -374,30 +360,38 @@ def load_and_prepare_data(
     # Encode targets
     # Points: 0 -> class 0, 3 -> class 1, 6 -> class 2
     points_mapping = {0: 0, 3: 1, 6: 2}
-    train_df['points_class'] = train_df['points_scored'].map(points_mapping).fillna(0).astype(int)
-    val_df['points_class'] = val_df['points_scored'].map(points_mapping).fillna(0).astype(int)
+    train_df["points_class"] = train_df["points_scored"].map(points_mapping).fillna(0).astype(int)
+    val_df["points_class"] = val_df["points_scored"].map(points_mapping).fillna(0).astype(int)
 
     # Result: Encode as integers
-    result_categories = ['touchdown', 'field_goal', 'punt', 'turnover', 'turnover_on_downs', 'end_half', 'unknown']
+    result_categories = [
+        "touchdown",
+        "field_goal",
+        "punt",
+        "turnover",
+        "turnover_on_downs",
+        "end_half",
+        "unknown",
+    ]
     result_mapping = {cat: i for i, cat in enumerate(result_categories)}
-    train_df['result_class'] = train_df['result'].map(result_mapping).fillna(6).astype(int)
-    val_df['result_class'] = val_df['result'].map(result_mapping).fillna(6).astype(int)
+    train_df["result_class"] = train_df["result"].map(result_mapping).fillna(6).astype(int)
+    val_df["result_class"] = val_df["result"].map(result_mapping).fillna(6).astype(int)
 
     # Extract arrays
     train_data = {
-        'features': train_df[feature_cols].values,
-        'yards': train_df['yards_gained'].values,
-        'points': train_df['points_class'].values,
-        'results': train_df['result_class'].values,
-        'game_ids': train_df['game_id'].values
+        "features": train_df[feature_cols].values,
+        "yards": train_df["yards_gained"].values,
+        "points": train_df["points_class"].values,
+        "results": train_df["result_class"].values,
+        "game_ids": train_df["game_id"].values,
     }
 
     val_data = {
-        'features': val_df[feature_cols].values,
-        'yards': val_df['yards_gained'].values,
-        'points': val_df['points_class'].values,
-        'results': val_df['result_class'].values,
-        'game_ids': val_df['game_id'].values
+        "features": val_df[feature_cols].values,
+        "yards": val_df["yards_gained"].values,
+        "points": val_df["points_class"].values,
+        "results": val_df["result_class"].values,
+        "game_ids": val_df["game_id"].values,
     }
 
     return train_data, val_data, feature_means, feature_stds
@@ -410,7 +404,7 @@ def run_training(
     learning_rate: float = 1e-3,
     dropout: float = 0.2,
     batch_size: int = 64,
-    num_epochs: int = 50
+    num_epochs: int = 50,
 ):
     """
     Run single training configuration.
@@ -424,32 +418,34 @@ def run_training(
         batch_size: Batch size
         num_epochs: Max epochs
     """
-    logger.info("="*80)
-    logger.info(f"Training LSTM: hidden={hidden_size}, layers={num_layers}, "
-               f"seq_len={sequence_length}, lr={learning_rate}, dropout={dropout}")
-    logger.info("="*80)
+    logger.info("=" * 80)
+    logger.info(
+        f"Training LSTM: hidden={hidden_size}, layers={num_layers}, "
+        f"seq_len={sequence_length}, lr={learning_rate}, dropout={dropout}"
+    )
+    logger.info("=" * 80)
 
     # Load data
     train_data, val_data, feat_means, feat_stds = load_and_prepare_data(
-        csv_path='data/drives_2018_2024.csv',
+        csv_path="data/drives_2018_2024.csv",
         train_seasons=list(range(2018, 2024)),
-        val_seasons=[2024]
+        val_seasons=[2024],
     )
 
     # Create dataloaders
     train_loader, val_loader = create_dataloaders(
-        train_features=train_data['features'],
-        train_yards=train_data['yards'],
-        train_points=train_data['points'],
-        train_results=train_data['results'],
-        train_game_ids=train_data['game_ids'],
-        val_features=val_data['features'],
-        val_yards=val_data['yards'],
-        val_points=val_data['points'],
-        val_results=val_data['results'],
-        val_game_ids=val_data['game_ids'],
+        train_features=train_data["features"],
+        train_yards=train_data["yards"],
+        train_points=train_data["points"],
+        train_results=train_data["results"],
+        train_game_ids=train_data["game_ids"],
+        val_features=val_data["features"],
+        val_yards=val_data["yards"],
+        val_points=val_data["points"],
+        val_results=val_data["results"],
+        val_game_ids=val_data["game_ids"],
         sequence_length=sequence_length,
-        batch_size=batch_size
+        batch_size=batch_size,
     )
 
     # Model config
@@ -460,11 +456,11 @@ def run_training(
         dropout=dropout,
         sequence_length=sequence_length,
         num_points_classes=3,  # 0, 3, 6
-        num_result_classes=7   # 7 result categories
+        num_result_classes=7,  # 7 result categories
     )
 
     # Initialize trainer
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     logger.info(f"Using device: {device}")
 
     trainer = LSTMTrainer(config, device=device)
@@ -474,12 +470,14 @@ def run_training(
         train_loader=train_loader,
         val_loader=val_loader,
         num_epochs=num_epochs,
-        early_stopping_patience=10
+        early_stopping_patience=10,
     )
 
     # Save training history
-    history_path = f'models/lstm_drive_v1_history_h{hidden_size}_l{num_layers}_s{sequence_length}.json'
-    with open(history_path, 'w') as f:
+    history_path = (
+        f"models/lstm_drive_v1_history_h{hidden_size}_l{num_layers}_s{sequence_length}.json"
+    )
+    with open(history_path, "w") as f:
         json.dump(trainer.history, f, indent=2)
 
     logger.info(f"Saved training history to {history_path}")
@@ -499,7 +497,7 @@ if __name__ == "__main__":
         learning_rate=1e-3,
         dropout=0.2,
         batch_size=64,
-        num_epochs=50
+        num_epochs=50,
     )
 
     logger.info(f"\nCompleted at: {datetime.now()}")

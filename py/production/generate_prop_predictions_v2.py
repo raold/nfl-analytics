@@ -19,11 +19,10 @@ Usage:
 import argparse
 import json
 import logging
-import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import Any
 
 import pandas as pd
 import xgboost as xgb
@@ -32,7 +31,7 @@ import xgboost as xgb
 sys.path.append(str(Path(__file__).parent.parent))
 
 # Import repositories
-from py.data.repository import GameRepository, PredictionRepository, DatabaseConfig
+from py.data.repository import DatabaseConfig, GameRepository, PredictionRepository
 
 logging.basicConfig(
     level=logging.INFO,
@@ -214,9 +213,7 @@ class PropPredictionGeneratorV2:
 
         # Use repository instead of raw SQL
         result = self.game_repo.get_games_by_season(
-            season=season,
-            week=week,
-            cache_ttl=3600  # Cache for 1 hour
+            season=season, week=week, cache_ttl=3600  # Cache for 1 hour
         )
 
         logger.info(
@@ -231,12 +228,12 @@ class PropPredictionGeneratorV2:
         df = pd.DataFrame(result.rows)
 
         # Add derived fields (same logic as v1)
-        df['is_dome'] = df['roof'].isin(['dome', 'closed'])
-        df['is_turf'] = df['surface'].isin(['fieldturf', 'astroturf'])
+        df["is_dome"] = df["roof"].isin(["dome", "closed"])
+        df["is_turf"] = df["surface"].isin(["fieldturf", "astroturf"])
 
         return df
 
-    def save_predictions(self, predictions: List[Dict[str, Any]], model_version: str = "v1"):
+    def save_predictions(self, predictions: list[dict[str, Any]], model_version: str = "v1"):
         """
         Save predictions to database.
 
@@ -259,13 +256,13 @@ class PropPredictionGeneratorV2:
         rows_affected = self.prediction_repo.save_predictions(
             predictions=predictions,
             model_version=model_version,
-            invalidate_cache=True  # Clear prediction caches
+            invalidate_cache=True,  # Clear prediction caches
         )
 
         logger.info(f"✓ Saved {rows_affected} predictions to database")
         return rows_affected
 
-    def generate_predictions(self, season: int, week: int) -> List[Dict[str, Any]]:
+    def generate_predictions(self, season: int, week: int) -> list[dict[str, Any]]:
         """
         Generate predictions for all props in upcoming games.
 
@@ -295,7 +292,7 @@ class PropPredictionGeneratorV2:
         logger.info(f"Generated {len(all_predictions)} total predictions")
         return all_predictions
 
-    def _predict_game(self, game: pd.Series) -> List[Dict[str, Any]]:
+    def _predict_game(self, game: pd.Series) -> list[dict[str, Any]]:
         """
         Generate predictions for all props in a game.
 
@@ -349,6 +346,7 @@ def main():
 
     # Show cache statistics
     from py.data.repository import BaseRepository
+
     stats = BaseRepository.cache_stats()
     logger.info(
         f"Cache stats: {stats['hit_rate_pct']}% hit rate "

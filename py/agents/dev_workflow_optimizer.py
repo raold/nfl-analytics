@@ -35,13 +35,12 @@ Phase: 6 (Frontend Agents - Week 4)
 """
 
 import logging
-import subprocess
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
 import docker
 import yaml
@@ -77,13 +76,13 @@ class DevelopmentCycle:
 
     cycle_id: int
     started_at: datetime
-    ended_at: Optional[datetime]
+    ended_at: datetime | None
     change_type: ChangeType
     rebuild_type: RebuildType
-    duration_seconds: Optional[float]
-    files_changed: List[str]
+    duration_seconds: float | None
+    files_changed: list[str]
     success: bool
-    error: Optional[str]
+    error: str | None
 
 
 @dataclass
@@ -92,8 +91,8 @@ class DevelopmentSession:
 
     session_id: str
     started_at: datetime
-    ended_at: Optional[datetime]
-    cycles: List[DevelopmentCycle] = field(default_factory=list)
+    ended_at: datetime | None
+    cycles: list[DevelopmentCycle] = field(default_factory=list)
 
 
 @dataclass
@@ -104,8 +103,8 @@ class CycleTimeReport:
     avg_cycle_time_seconds: float
     median_cycle_time_seconds: float
     p95_cycle_time_seconds: float
-    cycles_by_type: Dict[ChangeType, int]
-    rebuilds_by_type: Dict[RebuildType, int]
+    cycles_by_type: dict[ChangeType, int]
+    rebuilds_by_type: dict[RebuildType, int]
     hot_reload_rate: float  # % of cycles with no rebuild
     generated_at: datetime = field(default_factory=datetime.now)
 
@@ -133,14 +132,14 @@ class DevWorkflowOptimizer:
         self,
         project_root: str = ".",
         docker_compose_file: str = "docker-compose.yml",
-        docker_compose_dev_file: str = "docker-compose.dev.yml"
+        docker_compose_dev_file: str = "docker-compose.dev.yml",
     ):
         self.project_root = Path(project_root)
         self.docker_compose_file = self.project_root / docker_compose_file
         self.docker_compose_dev_file = self.project_root / docker_compose_dev_file
 
-        self.sessions: List[DevelopmentSession] = []
-        self.current_session: Optional[DevelopmentSession] = None
+        self.sessions: list[DevelopmentSession] = []
+        self.current_session: DevelopmentSession | None = None
 
         self.docker_client = docker.from_env()
 
@@ -152,9 +151,7 @@ class DevWorkflowOptimizer:
             DevelopmentSession object to track cycles
         """
         session = DevelopmentSession(
-            session_id=f"session_{int(time.time())}",
-            started_at=datetime.now(),
-            ended_at=None
+            session_id=f"session_{int(time.time())}", started_at=datetime.now(), ended_at=None
         )
 
         self.current_session = session
@@ -173,11 +170,7 @@ class DevWorkflowOptimizer:
         session.ended_at = datetime.now()
         logger.info(f"Ended session: {session.session_id}")
 
-    def track_cycle(
-        self,
-        change_type: ChangeType,
-        files_changed: List[str]
-    ) -> DevelopmentCycle:
+    def track_cycle(self, change_type: ChangeType, files_changed: list[str]) -> DevelopmentCycle:
         """
         Track a development cycle (code change → result visible).
 
@@ -200,7 +193,7 @@ class DevWorkflowOptimizer:
             duration_seconds=None,
             files_changed=files_changed,
             success=False,
-            error=None
+            error=None,
         )
 
         # Determine rebuild type
@@ -211,10 +204,7 @@ class DevWorkflowOptimizer:
         return cycle
 
     def complete_cycle(
-        self,
-        cycle: DevelopmentCycle,
-        success: bool,
-        error: Optional[str] = None
+        self, cycle: DevelopmentCycle, success: bool, error: str | None = None
     ) -> None:
         """
         Mark a cycle as complete.
@@ -233,8 +223,7 @@ class DevWorkflowOptimizer:
             cycle.duration_seconds = duration
 
             logger.info(
-                f"Cycle {cycle.cycle_id} complete: "
-                f"{duration:.1f}s ({cycle.rebuild_type.value})"
+                f"Cycle {cycle.cycle_id} complete: " f"{duration:.1f}s ({cycle.rebuild_type.value})"
             )
 
     def analyze_cycle_times(self) -> CycleTimeReport:
@@ -259,7 +248,7 @@ class DevWorkflowOptimizer:
                 p95_cycle_time_seconds=0.0,
                 cycles_by_type={},
                 rebuilds_by_type={},
-                hot_reload_rate=0.0
+                hot_reload_rate=0.0,
             )
 
         durations = sorted(c.duration_seconds for c in completed)
@@ -290,10 +279,10 @@ class DevWorkflowOptimizer:
             p95_cycle_time_seconds=p95,
             cycles_by_type=cycles_by_type,
             rebuilds_by_type=rebuilds_by_type,
-            hot_reload_rate=hot_reload_rate
+            hot_reload_rate=hot_reload_rate,
         )
 
-    def suggest_optimizations(self) -> List[OptimizationSuggestion]:
+    def suggest_optimizations(self) -> list[OptimizationSuggestion]:
         """
         Suggest workflow optimizations based on analysis.
 
@@ -305,88 +294,91 @@ class DevWorkflowOptimizer:
 
         # Suggestion 1: Enable hot reload if not already
         if report.hot_reload_rate < 0.5:
-            suggestions.append(OptimizationSuggestion(
-                category="docker",
-                title="Enable hot reload for faster iteration",
-                description=(
-                    f"Only {report.hot_reload_rate:.0%} of cycles use hot reload. "
-                    "Enabling hot reload can reduce cycle time from 45s to 5s."
-                ),
-                expected_improvement="9x faster iteration (45s → 5s)",
-                implementation=(
-                    "Use docker-compose.dev.yml with volume mounts and --reload flags. "
-                    "See docs/guides/FRONTEND_DEV_WORKFLOW.md"
-                ),
-                priority="HIGH"
-            ))
+            suggestions.append(
+                OptimizationSuggestion(
+                    category="docker",
+                    title="Enable hot reload for faster iteration",
+                    description=(
+                        f"Only {report.hot_reload_rate:.0%} of cycles use hot reload. "
+                        "Enabling hot reload can reduce cycle time from 45s to 5s."
+                    ),
+                    expected_improvement="9x faster iteration (45s → 5s)",
+                    implementation=(
+                        "Use docker-compose.dev.yml with volume mounts and --reload flags. "
+                        "See docs/guides/FRONTEND_DEV_WORKFLOW.md"
+                    ),
+                    priority="HIGH",
+                )
+            )
 
         # Suggestion 2: Optimize Docker layer caching
         if report.avg_cycle_time_seconds > 30:
-            suggestions.append(OptimizationSuggestion(
-                category="docker",
-                title="Optimize Docker layer caching",
-                description=(
-                    f"Average cycle time is {report.avg_cycle_time_seconds:.0f}s. "
-                    "Proper layer caching can reduce rebuild time by 50-80%."
-                ),
-                expected_improvement="2-5x faster rebuilds",
-                implementation=(
-                    "1. Copy requirements.txt before source code\n"
-                    "2. Use multi-stage builds\n"
-                    "3. Minimize COPY commands\n"
-                    "4. Use .dockerignore"
-                ),
-                priority="HIGH"
-            ))
+            suggestions.append(
+                OptimizationSuggestion(
+                    category="docker",
+                    title="Optimize Docker layer caching",
+                    description=(
+                        f"Average cycle time is {report.avg_cycle_time_seconds:.0f}s. "
+                        "Proper layer caching can reduce rebuild time by 50-80%."
+                    ),
+                    expected_improvement="2-5x faster rebuilds",
+                    implementation=(
+                        "1. Copy requirements.txt before source code\n"
+                        "2. Use multi-stage builds\n"
+                        "3. Minimize COPY commands\n"
+                        "4. Use .dockerignore"
+                    ),
+                    priority="HIGH",
+                )
+            )
 
         # Suggestion 3: Use BuildKit
-        suggestions.append(OptimizationSuggestion(
-            category="docker",
-            title="Enable Docker BuildKit",
-            description=(
-                "BuildKit provides faster builds with improved caching and parallelization."
-            ),
-            expected_improvement="20-50% faster builds",
-            implementation=(
-                "Set DOCKER_BUILDKIT=1 environment variable or add to .bashrc:\n"
-                "export DOCKER_BUILDKIT=1"
-            ),
-            priority="MEDIUM"
-        ))
+        suggestions.append(
+            OptimizationSuggestion(
+                category="docker",
+                title="Enable Docker BuildKit",
+                description=(
+                    "BuildKit provides faster builds with improved caching and parallelization."
+                ),
+                expected_improvement="20-50% faster builds",
+                implementation=(
+                    "Set DOCKER_BUILDKIT=1 environment variable or add to .bashrc:\n"
+                    "export DOCKER_BUILDKIT=1"
+                ),
+                priority="MEDIUM",
+            )
+        )
 
         # Suggestion 4: Pre-commit hooks
-        suggestions.append(OptimizationSuggestion(
-            category="tooling",
-            title="Use pre-commit hooks for faster feedback",
-            description=(
-                "Catch linting/formatting errors before Docker rebuild cycle."
-            ),
-            expected_improvement="Catch errors in <1s vs 30-45s rebuild cycle",
-            implementation=(
-                "Install pre-commit hooks: pre-commit install\n"
-                "Runs Black, flake8, mypy locally before commit"
-            ),
-            priority="MEDIUM"
-        ))
+        suggestions.append(
+            OptimizationSuggestion(
+                category="tooling",
+                title="Use pre-commit hooks for faster feedback",
+                description=("Catch linting/formatting errors before Docker rebuild cycle."),
+                expected_improvement="Catch errors in <1s vs 30-45s rebuild cycle",
+                implementation=(
+                    "Install pre-commit hooks: pre-commit install\n"
+                    "Runs Black, flake8, mypy locally before commit"
+                ),
+                priority="MEDIUM",
+            )
+        )
 
         # Suggestion 5: Watch mode for tests
-        suggestions.append(OptimizationSuggestion(
-            category="tooling",
-            title="Use pytest-watch for continuous testing",
-            description=(
-                "Automatically re-run tests on file changes for immediate feedback."
-            ),
-            expected_improvement="Instant test feedback vs manual pytest runs",
-            implementation=(
-                "Install: pip install pytest-watch\n"
-                "Run: ptw tests/ --clear"
-            ),
-            priority="LOW"
-        ))
+        suggestions.append(
+            OptimizationSuggestion(
+                category="tooling",
+                title="Use pytest-watch for continuous testing",
+                description=("Automatically re-run tests on file changes for immediate feedback."),
+                expected_improvement="Instant test feedback vs manual pytest runs",
+                implementation=("Install: pip install pytest-watch\n" "Run: ptw tests/ --clear"),
+                priority="LOW",
+            )
+        )
 
         return suggestions
 
-    def check_docker_dev_config(self) -> Dict[str, Any]:
+    def check_docker_dev_config(self) -> dict[str, Any]:
         """
         Check if docker-compose.dev.yml is configured correctly.
 
@@ -399,8 +391,8 @@ class DevWorkflowOptimizer:
                 "message": "docker-compose.dev.yml not found",
                 "recommendations": [
                     "Create docker-compose.dev.yml with hot reload enabled",
-                    "See docs/guides/FRONTEND_DEV_WORKFLOW.md"
-                ]
+                    "See docs/guides/FRONTEND_DEV_WORKFLOW.md",
+                ],
             }
 
         try:
@@ -430,28 +422,31 @@ class DevWorkflowOptimizer:
                 "has_volumes": has_volumes,
                 "has_reload": has_reload,
                 "message": (
-                    "Docker dev config looks good!" if configured
+                    "Docker dev config looks good!"
+                    if configured
                     else "Docker dev config needs optimization"
                 ),
-                "recommendations": [] if configured else [
-                    "Add volume mounts for hot reload" if not has_volumes else "",
-                    "Add --reload flag to uvicorn" if not has_reload else ""
-                ]
+                "recommendations": (
+                    []
+                    if configured
+                    else [
+                        "Add volume mounts for hot reload" if not has_volumes else "",
+                        "Add --reload flag to uvicorn" if not has_reload else "",
+                    ]
+                ),
             }
 
         except Exception as e:
             return {
                 "configured": False,
                 "message": f"Error parsing docker-compose.dev.yml: {e}",
-                "recommendations": ["Fix YAML syntax errors"]
+                "recommendations": ["Fix YAML syntax errors"],
             }
 
     # Private helper methods
 
     def _determine_rebuild_type(
-        self,
-        change_type: ChangeType,
-        files_changed: List[str]
+        self, change_type: ChangeType, files_changed: list[str]
     ) -> RebuildType:
         """Determine what type of rebuild is required."""
 
@@ -476,12 +471,12 @@ if __name__ == "__main__":
 
     # Check dev configuration
     dev_config = optimizer.check_docker_dev_config()
-    print(f"\n=== Docker Dev Configuration ===")
+    print("\n=== Docker Dev Configuration ===")
     print(f"Configured: {dev_config['configured']}")
     print(f"Message: {dev_config['message']}")
 
     if dev_config["recommendations"]:
-        print(f"\nRecommendations:")
+        print("\nRecommendations:")
         for rec in dev_config["recommendations"]:
             if rec:
                 print(f"  - {rec}")
@@ -491,22 +486,21 @@ if __name__ == "__main__":
 
     # Track a cycle
     cycle = optimizer.track_cycle(
-        change_type=ChangeType.PYTHON_CODE,
-        files_changed=["dashboard/app.py"]
+        change_type=ChangeType.PYTHON_CODE, files_changed=["dashboard/app.py"]
     )
     time.sleep(0.1)  # Simulate work
     optimizer.complete_cycle(cycle, success=True)
 
     # Get report
     report = optimizer.analyze_cycle_times()
-    print(f"\n=== Cycle Time Report ===")
+    print("\n=== Cycle Time Report ===")
     print(f"Total cycles: {report.total_cycles}")
     print(f"Avg cycle time: {report.avg_cycle_time_seconds:.1f}s")
     print(f"Hot reload rate: {report.hot_reload_rate:.0%}")
 
     # Get suggestions
     suggestions = optimizer.suggest_optimizations()
-    print(f"\n=== Optimization Suggestions ===")
+    print("\n=== Optimization Suggestions ===")
     for sug in suggestions[:3]:
         print(f"\n{sug.priority}: {sug.title}")
         print(f"  {sug.description}")

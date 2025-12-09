@@ -41,72 +41,72 @@ Author: Claude Code (Phase 4 Dissertation Enhancement)
 Created: November 9, 2025
 """
 
-import sys
 import os
+import sys
 
 # Add project root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-import logging
-from pathlib import Path
-from typing import Dict, List, Tuple, Optional, Union, Any
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-import warnings
 import json
-import pickle
+import logging
+import warnings
+from dataclasses import dataclass, field
+from datetime import datetime
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
-from river import drift, ensemble, forest, tree, metrics, preprocessing, linear_model
+from river import forest, linear_model, metrics, preprocessing, tree
 from river.drift import ADWIN, KSWIN, PageHinkley
-import psycopg2
-from scipy import stats
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 # =============================================================================
 # Data Classes for Drift Events
 # =============================================================================
 
+
 @dataclass
 class DriftEvent:
     """Records a detected concept drift event"""
+
     timestamp: datetime
     week: int
     season: int
     detector_name: str
     drift_magnitude: float
-    affected_features: List[str]
-    suspected_cause: Optional[str] = None
-    recovery_time: Optional[int] = None  # Games to recover
+    affected_features: list[str]
+    suspected_cause: str | None = None
+    recovery_time: int | None = None  # Games to recover
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary for serialization"""
         return {
-            'timestamp': self.timestamp.isoformat(),
-            'week': self.week,
-            'season': self.season,
-            'detector_name': self.detector_name,
-            'drift_magnitude': self.drift_magnitude,
-            'affected_features': self.affected_features,
-            'suspected_cause': self.suspected_cause,
-            'recovery_time': self.recovery_time,
+            "timestamp": self.timestamp.isoformat(),
+            "week": self.week,
+            "season": self.season,
+            "detector_name": self.detector_name,
+            "drift_magnitude": self.drift_magnitude,
+            "affected_features": self.affected_features,
+            "suspected_cause": self.suspected_cause,
+            "recovery_time": self.recovery_time,
         }
 
 
 @dataclass
 class PerformanceMetrics:
     """Tracks online learning performance over time"""
-    mae_history: List[float] = field(default_factory=list)
-    rmse_history: List[float] = field(default_factory=list)
-    calibration_history: List[float] = field(default_factory=list)
-    prediction_times: List[float] = field(default_factory=list)
-    drift_events: List[DriftEvent] = field(default_factory=list)
+
+    mae_history: list[float] = field(default_factory=list)
+    rmse_history: list[float] = field(default_factory=list)
+    calibration_history: list[float] = field(default_factory=list)
+    prediction_times: list[float] = field(default_factory=list)
+    drift_events: list[DriftEvent] = field(default_factory=list)
 
     def add_metrics(self, mae: float, rmse: float, calibration: float, time: float):
         """Add performance metrics for current window"""
@@ -115,22 +115,30 @@ class PerformanceMetrics:
         self.calibration_history.append(calibration)
         self.prediction_times.append(time)
 
-    def get_summary(self) -> Dict[str, float]:
+    def get_summary(self) -> dict[str, float]:
         """Calculate summary statistics"""
         return {
-            'mean_mae': np.mean(self.mae_history) if self.mae_history else 0.0,
-            'mean_rmse': np.mean(self.rmse_history) if self.rmse_history else 0.0,
-            'mean_calibration': np.mean(self.calibration_history) if self.calibration_history else 0.0,
-            'mean_prediction_time': np.mean(self.prediction_times) if self.prediction_times else 0.0,
-            'num_drift_events': len(self.drift_events),
-            'mean_recovery_time': np.mean([d.recovery_time for d in self.drift_events if d.recovery_time])
-                if any(d.recovery_time for d in self.drift_events) else 0.0,
+            "mean_mae": np.mean(self.mae_history) if self.mae_history else 0.0,
+            "mean_rmse": np.mean(self.rmse_history) if self.rmse_history else 0.0,
+            "mean_calibration": (
+                np.mean(self.calibration_history) if self.calibration_history else 0.0
+            ),
+            "mean_prediction_time": (
+                np.mean(self.prediction_times) if self.prediction_times else 0.0
+            ),
+            "num_drift_events": len(self.drift_events),
+            "mean_recovery_time": (
+                np.mean([d.recovery_time for d in self.drift_events if d.recovery_time])
+                if any(d.recovery_time for d in self.drift_events)
+                else 0.0
+            ),
         }
 
 
 # =============================================================================
 # Drift Detection System
 # =============================================================================
+
 
 class DriftDetector:
     """
@@ -163,12 +171,12 @@ class DriftDetector:
             ph_delta: Minimum amplitude of change to detect
         """
         self.detectors = {
-            'ADWIN': ADWIN(delta=adwin_delta),
-            'KSWIN': KSWIN(alpha=kswin_alpha, window_size=kswin_window_size),
-            'PageHinkley': PageHinkley(threshold=ph_threshold, delta=ph_delta),
+            "ADWIN": ADWIN(delta=adwin_delta),
+            "KSWIN": KSWIN(alpha=kswin_alpha, window_size=kswin_window_size),
+            "PageHinkley": PageHinkley(threshold=ph_threshold, delta=ph_delta),
         }
 
-        self.drift_counts = {'ADWIN': 0, 'KSWIN': 0, 'PageHinkley': 0}
+        self.drift_counts = {"ADWIN": 0, "KSWIN": 0, "PageHinkley": 0}
         self.last_drift_time = None
 
         logger.info(f"Initialized multi-detector system: {list(self.detectors.keys())}")
@@ -206,18 +214,19 @@ class DriftDetector:
             detector._reset()
         logger.info("All drift detectors reset")
 
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Get current drift detection status"""
         return {
-            'drift_counts': self.drift_counts.copy(),
-            'last_drift_time': self.last_drift_time.isoformat() if self.last_drift_time else None,
-            'detectors': list(self.detectors.keys()),
+            "drift_counts": self.drift_counts.copy(),
+            "last_drift_time": self.last_drift_time.isoformat() if self.last_drift_time else None,
+            "detectors": list(self.detectors.keys()),
         }
 
 
 # =============================================================================
 # Online Model Adapter
 # =============================================================================
+
 
 class OnlineModelAdapter:
     """
@@ -231,7 +240,7 @@ class OnlineModelAdapter:
 
     def __init__(
         self,
-        model_type: str = 'adaptive_random_forest',
+        model_type: str = "adaptive_random_forest",
         n_models: int = 10,
         grace_period: int = 50,
         max_features: int = 20,
@@ -262,7 +271,7 @@ class OnlineModelAdapter:
 
     def _create_model(self):
         """Create river online learning model"""
-        if self.model_type == 'adaptive_random_forest':
+        if self.model_type == "adaptive_random_forest":
             # Adaptive Random Forest (ARF): Best for concept drift
             return forest.ARFRegressor(
                 n_models=self.n_models,
@@ -270,38 +279,38 @@ class OnlineModelAdapter:
                 grace_period=self.grace_period,
                 seed=42,
             )
-        elif self.model_type == 'adaptive_random_forest_nfl':
+        elif self.model_type == "adaptive_random_forest_nfl":
             # NFL-optimized ARF: Tuned for small datasets (373 samples)
             return forest.ARFRegressor(
-                n_models=3,           # Fewer models, more samples each (124 per model)
-                max_features='sqrt',  # Use sqrt(features) for each split
-                lambda_value=2,       # Faster adaptation
-                grace_period=10,      # Quick splits (2.7% of dataset)
-                delta=0.10,          # Less conservative split decisions (higher = faster splits)
-                tau=0.10,            # Tie-breaking threshold (higher = faster splits)
+                n_models=3,  # Fewer models, more samples each (124 per model)
+                max_features="sqrt",  # Use sqrt(features) for each split
+                lambda_value=2,  # Faster adaptation
+                grace_period=10,  # Quick splits (2.7% of dataset)
+                delta=0.10,  # Less conservative split decisions (higher = faster splits)
+                tau=0.10,  # Tie-breaking threshold (higher = faster splits)
                 drift_detector=ADWIN(delta=0.01),  # More sensitive
                 seed=42,
             )
-        elif self.model_type == 'amrules':
+        elif self.model_type == "amrules":
             # Adaptive Model Rules: Fast rule-based learner
             return forest.AMFRegressor(
                 n_estimators=self.n_models,
                 max_features=self.max_features,
                 seed=42,
             )
-        elif self.model_type == 'hoeffding_tree':
+        elif self.model_type == "hoeffding_tree":
             # Single Hoeffding tree (baseline)
             return tree.HoeffdingTreeRegressor(
                 grace_period=self.grace_period,
                 max_depth=20,
             )
-        elif self.model_type == 'linear_sgd':
+        elif self.model_type == "linear_sgd":
             # Streaming linear regression with SGD
             return preprocessing.StandardScaler() | linear_model.LinearRegression()
         else:
             raise ValueError(f"Unknown model type: {self.model_type}")
 
-    def predict(self, x: Dict[str, float]) -> float:
+    def predict(self, x: dict[str, float]) -> float:
         """
         Predict for single sample
 
@@ -318,7 +327,7 @@ class OnlineModelAdapter:
             logger.error(f"Prediction error: {e}")
             return 0.0
 
-    def partial_fit(self, x: Dict[str, float], y: float):
+    def partial_fit(self, x: dict[str, float], y: float):
         """
         Update model with single sample (online learning)
 
@@ -368,12 +377,12 @@ class OnlineModelAdapter:
             x_dict = {k: float(v) if pd.notna(v) else 0.0 for k, v in row.to_dict().items()}
             self.partial_fit(x_dict, float(target))
 
-    def get_metrics(self) -> Dict[str, float]:
+    def get_metrics(self) -> dict[str, float]:
         """Get current performance metrics"""
         return {
-            'mae': self.running_mae.get(),
-            'rmse': self.running_rmse.get(),
-            'n_samples': self.n_samples,
+            "mae": self.running_mae.get(),
+            "rmse": self.running_rmse.get(),
+            "n_samples": self.n_samples,
         }
 
     def reset_metrics(self):
@@ -385,6 +394,7 @@ class OnlineModelAdapter:
 # =============================================================================
 # Online Prediction Pipeline
 # =============================================================================
+
 
 class OnlinePredictionPipeline:
     """
@@ -407,8 +417,8 @@ class OnlinePredictionPipeline:
     def __init__(
         self,
         batch_model_dir: str = "models/",
-        online_model_type: str = 'adaptive_random_forest',
-        drift_sensitivity: str = 'medium',
+        online_model_type: str = "adaptive_random_forest",
+        drift_sensitivity: str = "medium",
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
@@ -429,19 +439,19 @@ class OnlinePredictionPipeline:
 
         # Database connection
         self.db_params = {
-            'host': db_host,
-            'port': db_port,
-            'dbname': db_name,
-            'user': db_user,
-            'password': db_password or os.getenv('DB_PASSWORD', 'sicillionbillions'),
+            "host": db_host,
+            "port": db_port,
+            "dbname": db_name,
+            "user": db_user,
+            "password": db_password or os.getenv("DB_PASSWORD", "sicillionbillions"),
         }
 
         # Set drift detector sensitivity
-        if drift_sensitivity == 'low':
+        if drift_sensitivity == "low":
             adwin_delta, kswin_alpha = 0.01, 0.01
-        elif drift_sensitivity == 'medium':
+        elif drift_sensitivity == "medium":
             adwin_delta, kswin_alpha = 0.002, 0.005
-        elif drift_sensitivity == 'high':
+        elif drift_sensitivity == "high":
             adwin_delta, kswin_alpha = 0.0002, 0.001
         else:
             raise ValueError(f"Unknown sensitivity: {drift_sensitivity}")
@@ -485,8 +495,8 @@ class OnlinePredictionPipeline:
         X: pd.DataFrame,
         use_batch: bool = True,
         use_online: bool = True,
-        ensemble_weights: Optional[Dict[str, float]] = None,
-    ) -> Tuple[np.ndarray, np.ndarray]:
+        ensemble_weights: dict[str, float] | None = None,
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Generate predictions with uncertainty
 
@@ -504,8 +514,8 @@ class OnlinePredictionPipeline:
             batch_weight = max(0.5, 1.0 - (self.online_model.n_samples / 500))
             online_weight = 1.0 - batch_weight
         else:
-            batch_weight = ensemble_weights.get('batch', 0.7)
-            online_weight = ensemble_weights.get('online', 0.3)
+            batch_weight = ensemble_weights.get("batch", 0.7)
+            online_weight = ensemble_weights.get("online", 0.3)
 
         predictions = np.zeros(len(X))
         uncertainties = np.zeros(len(X))
@@ -561,15 +571,17 @@ class OnlinePredictionPipeline:
             timestamp=datetime.now(),
             week=self.current_week,
             season=self.current_season,
-            detector_name='Ensemble',
+            detector_name="Ensemble",
             drift_magnitude=0.0,  # Compute from error distribution
             affected_features=[],  # Analyze feature importance shifts
-            suspected_cause='Unknown',
+            suspected_cause="Unknown",
         )
 
         self.performance.drift_events.append(drift_event)
 
-        logger.warning(f"Drift event recorded: Season {self.current_season}, Week {self.current_week}")
+        logger.warning(
+            f"Drift event recorded: Season {self.current_season}, Week {self.current_week}"
+        )
 
         # Optionally trigger retraining
         if len(self.performance.drift_events) >= 3:  # 3 drift events = retrain
@@ -587,10 +599,10 @@ class OnlinePredictionPipeline:
     def evaluate_prequential(
         self,
         df: pd.DataFrame,
-        target_col: str = 'passing_yards',
-        date_col: str = 'kickoff',
+        target_col: str = "passing_yards",
+        date_col: str = "kickoff",
         window_size: int = 50,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Prequential evaluation (test-then-train) on historical data
 
@@ -606,9 +618,23 @@ class OnlinePredictionPipeline:
         df = df.sort_values(date_col).reset_index(drop=True)
 
         # Select only numeric features, excluding identifiers and dates
-        exclude_cols = [target_col, date_col, 'player_id', 'player_name', 'game_id', 'season', 'week',
-                       'home_team', 'away_team', 'home_score', 'away_score', 'num_plays']
-        feature_cols = [c for c in df.columns if c not in exclude_cols and df[c].dtype in ['int64', 'float64']]
+        exclude_cols = [
+            target_col,
+            date_col,
+            "player_id",
+            "player_name",
+            "game_id",
+            "season",
+            "week",
+            "home_team",
+            "away_team",
+            "home_score",
+            "away_score",
+            "num_plays",
+        ]
+        feature_cols = [
+            c for c in df.columns if c not in exclude_cols and df[c].dtype in ["int64", "float64"]
+        ]
         X = df[feature_cols]
         y = df[target_col]
 
@@ -617,7 +643,7 @@ class OnlinePredictionPipeline:
 
         for i in range(window_size, len(df)):
             # Test (predict)
-            x_test = X.iloc[i:i+1]
+            x_test = X.iloc[i : i + 1]
             y_test = y.iloc[i]
 
             pred, _ = self.predict(x_test, use_batch=False, use_online=True)
@@ -635,40 +661,42 @@ class OnlinePredictionPipeline:
 
         # Calculate metrics
         results = {
-            'mean_mae': np.mean(mae_history),
-            'median_mae': np.median(mae_history),
-            'std_mae': np.std(mae_history),
-            'num_drift_events': len(drift_events),
-            'drift_event_indices': drift_events,
-            'final_model_samples': self.online_model.n_samples,
+            "mean_mae": np.mean(mae_history),
+            "median_mae": np.median(mae_history),
+            "std_mae": np.std(mae_history),
+            "num_drift_events": len(drift_events),
+            "drift_event_indices": drift_events,
+            "final_model_samples": self.online_model.n_samples,
         }
 
-        logger.info(f"Prequential evaluation: MAE={results['mean_mae']:.2f}, Drifts={len(drift_events)}")
+        logger.info(
+            f"Prequential evaluation: MAE={results['mean_mae']:.2f}, Drifts={len(drift_events)}"
+        )
 
         return results
 
     def save_state(self, path: str):
         """Save pipeline state (for checkpointing)"""
         state = {
-            'drift_detector_status': self.drift_detector.get_status(),
-            'online_model_metrics': self.online_model.get_metrics(),
-            'performance_summary': self.performance.get_summary(),
-            'current_week': self.current_week,
-            'current_season': self.current_season,
+            "drift_detector_status": self.drift_detector.get_status(),
+            "online_model_metrics": self.online_model.get_metrics(),
+            "performance_summary": self.performance.get_summary(),
+            "current_week": self.current_week,
+            "current_season": self.current_season,
         }
 
-        with open(path, 'w') as f:
+        with open(path, "w") as f:
             json.dump(state, f, indent=2)
 
         logger.info(f"Pipeline state saved to {path}")
 
     def load_state(self, path: str):
         """Load pipeline state (for resuming)"""
-        with open(path, 'r') as f:
+        with open(path) as f:
             state = json.load(f)
 
-        self.current_week = state['current_week']
-        self.current_season = state['current_season']
+        self.current_week = state["current_week"]
+        self.current_season = state["current_season"]
 
         logger.info(f"Pipeline state loaded from {path}")
 
@@ -676,6 +704,7 @@ class OnlinePredictionPipeline:
 # =============================================================================
 # Adaptive Retraining Strategy
 # =============================================================================
+
 
 class AdaptiveRetrainer:
     """
@@ -690,7 +719,7 @@ class AdaptiveRetrainer:
 
     def __init__(
         self,
-        strategy: str = 'hybrid',
+        strategy: str = "hybrid",
         periodic_interval: int = 8,  # Retrain every 8 weeks
         performance_threshold: float = 0.15,  # 15% MAE degradation
         drift_threshold: int = 3,  # 3 drift events
@@ -720,7 +749,7 @@ class AdaptiveRetrainer:
         self,
         current_mae: float,
         drift_detected: bool,
-    ) -> Tuple[bool, str]:
+    ) -> tuple[bool, str]:
         """
         Determine if retraining should be triggered
 
@@ -743,25 +772,25 @@ class AdaptiveRetrainer:
         reasons = []
 
         # Check periodic trigger
-        if self.strategy in ['periodic', 'hybrid']:
+        if self.strategy in ["periodic", "hybrid"]:
             if self.weeks_since_retrain >= self.periodic_interval:
                 reasons.append(f"periodic ({self.weeks_since_retrain} weeks)")
 
         # Check performance trigger
-        if self.strategy in ['performance', 'hybrid']:
+        if self.strategy in ["performance", "hybrid"]:
             degradation = (current_mae - self.baseline_mae) / self.baseline_mae
             if degradation > self.performance_threshold:
                 reasons.append(f"performance ({degradation:.1%} degradation)")
 
         # Check drift trigger
-        if self.strategy in ['drift', 'hybrid']:
+        if self.strategy in ["drift", "hybrid"]:
             if self.drift_event_count >= self.drift_threshold:
                 reasons.append(f"drift ({self.drift_event_count} events)")
 
         if reasons:
             logger.warning(f"Retraining triggered: {', '.join(reasons)}")
             self._reset_after_retrain()
-            return True, ', '.join(reasons)
+            return True, ", ".join(reasons)
 
         return False, ""
 
@@ -776,9 +805,10 @@ class AdaptiveRetrainer:
 # Utility Functions
 # =============================================================================
 
+
 def compare_online_vs_static(
-    online_results: Dict[str, float],
-    static_results: Dict[str, float],
+    online_results: dict[str, float],
+    static_results: dict[str, float],
 ) -> pd.DataFrame:
     """
     Compare online learning vs static model performance
@@ -790,13 +820,15 @@ def compare_online_vs_static(
     Returns:
         Comparison DataFrame
     """
-    comparison = pd.DataFrame({
-        'Online': online_results,
-        'Static': static_results,
-    })
+    comparison = pd.DataFrame(
+        {
+            "Online": online_results,
+            "Static": static_results,
+        }
+    )
 
-    comparison['Improvement'] = (
-        (comparison['Static'] - comparison['Online']) / comparison['Static'] * 100
+    comparison["Improvement"] = (
+        (comparison["Static"] - comparison["Online"]) / comparison["Static"] * 100
     )
 
     return comparison
@@ -804,8 +836,8 @@ def compare_online_vs_static(
 
 def detect_known_drift_events(
     df: pd.DataFrame,
-    date_col: str = 'kickoff',
-) -> List[Dict[str, Any]]:
+    date_col: str = "kickoff",
+) -> list[dict[str, Any]]:
     """
     Identify known concept drift events in NFL data
 
@@ -825,28 +857,28 @@ def detect_known_drift_events(
     df[date_col] = pd.to_datetime(df[date_col])
 
     # Get timezone from data if present
-    tz = df[date_col].dt.tz if hasattr(df[date_col].dt, 'tz') else None
+    tz = df[date_col].dt.tz if hasattr(df[date_col].dt, "tz") else None
 
     known_events = [
         {
-            'date': pd.Timestamp('2020-09-10', tz=tz),
-            'name': 'COVID-19 Season Start',
-            'description': 'No fans, schedule disruptions',
+            "date": pd.Timestamp("2020-09-10", tz=tz),
+            "name": "COVID-19 Season Start",
+            "description": "No fans, schedule disruptions",
         },
         {
-            'date': pd.Timestamp('2018-09-06', tz=tz),
-            'name': 'Helmet Hit Rule Changes',
-            'description': 'New targeting rules, more penalties',
+            "date": pd.Timestamp("2018-09-06", tz=tz),
+            "name": "Helmet Hit Rule Changes",
+            "description": "New targeting rules, more penalties",
         },
         {
-            'date': pd.Timestamp('2021-09-09', tz=tz),
-            'name': '17-Game Season Expansion',
-            'description': 'Schedule length change',
+            "date": pd.Timestamp("2021-09-09", tz=tz),
+            "name": "17-Game Season Expansion",
+            "description": "Schedule length change",
         },
         {
-            'date': pd.Timestamp('2023-09-07', tz=tz),
-            'name': 'New Kickoff Rules',
-            'description': 'Fair catch changes',
+            "date": pd.Timestamp("2023-09-07", tz=tz),
+            "name": "New Kickoff Rules",
+            "description": "Fair catch changes",
         },
     ]
 
@@ -854,10 +886,7 @@ def detect_known_drift_events(
     min_date = df[date_col].min()
     max_date = df[date_col].max()
 
-    events_in_range = [
-        e for e in known_events
-        if min_date <= e['date'] <= max_date
-    ]
+    events_in_range = [e for e in known_events if min_date <= e["date"] <= max_date]
 
     logger.info(f"Found {len(events_in_range)} known drift events in dataset")
 
@@ -865,7 +894,7 @@ def detect_known_drift_events(
 
 
 def calculate_adaptation_speed(
-    mae_history: List[float],
+    mae_history: list[float],
     drift_index: int,
     recovery_threshold: float = 0.05,
 ) -> int:
@@ -883,7 +912,7 @@ def calculate_adaptation_speed(
     if drift_index >= len(mae_history) - 1:
         return -1
 
-    pre_drift_mae = np.mean(mae_history[max(0, drift_index-10):drift_index])
+    pre_drift_mae = np.mean(mae_history[max(0, drift_index - 10) : drift_index])
 
     for i in range(drift_index + 1, len(mae_history)):
         if mae_history[i] <= pre_drift_mae * (1 + recovery_threshold):
@@ -898,8 +927,8 @@ if __name__ == "__main__":
 
     # Initialize pipeline
     pipeline = OnlinePredictionPipeline(
-        online_model_type='adaptive_random_forest',
-        drift_sensitivity='medium',
+        online_model_type="adaptive_random_forest",
+        drift_sensitivity="medium",
     )
 
     logger.info("✓ Pipeline initialized successfully")

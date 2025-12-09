@@ -26,19 +26,16 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 15, 2025
 """
 
-import pytest
-import psycopg2
-from psycopg2.extras import RealDictCursor
-import pandas as pd
-import numpy as np
-from pathlib import Path
-import time
-import pickle
 import logging
-from typing import Dict, List, Optional, Tuple
-from datetime import datetime, timedelta
-from collections import defaultdict
 import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import psycopg2
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -51,7 +48,7 @@ DB_CONFIG = {
     "port": 5544,
     "dbname": "devdb01",
     "user": "dro",
-    "password": "sicillionbillions"  # pragma: allowlist secret
+    "password": "sicillionbillions",  # pragma: allowlist secret
 }
 
 
@@ -91,18 +88,21 @@ def mock_predictions():
     """Generate mock ensemble predictions for testing."""
     np.random.seed(42)
     n_games = 50
-    return pd.DataFrame({
-        "game_id": range(1, n_games + 1),
-        "player_id": [f"00-00195{i:02d}" for i in range(n_games)],
-        "ensemble_mean": np.random.normal(280, 40, n_games),
-        "ensemble_std": np.random.uniform(15, 25, n_games),
-        "actual_yards": np.random.normal(280, 45, n_games)
-    })
+    return pd.DataFrame(
+        {
+            "game_id": range(1, n_games + 1),
+            "player_id": [f"00-00195{i:02d}" for i in range(n_games)],
+            "ensemble_mean": np.random.normal(280, 40, n_games),
+            "ensemble_std": np.random.uniform(15, 25, n_games),
+            "actual_yards": np.random.normal(280, 45, n_games),
+        }
+    )
 
 
 # ============================================================================
 # 1. Walk-Forward Validation Tests
 # ============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.critical
@@ -117,7 +117,7 @@ class TestWalkForwardValidation:
         train_sizes = []
         for i in range(10, len(games), 5):  # Start at game 10, step by 5
             train = games.iloc[:i]
-            test = games.iloc[i:i+5]
+            test = games.iloc[i : i + 5]
 
             train_sizes.append(len(train))
 
@@ -126,7 +126,7 @@ class TestWalkForwardValidation:
 
         # Verify training set is expanding
         for i in range(1, len(train_sizes)):
-            assert train_sizes[i] > train_sizes[i-1], "Training set not expanding"
+            assert train_sizes[i] > train_sizes[i - 1], "Training set not expanding"
 
         logger.info(f"✅ Walk-forward: training sizes {train_sizes[0]} → {train_sizes[-1]}")
 
@@ -136,7 +136,7 @@ class TestWalkForwardValidation:
 
         for i in range(10, len(games), 5):
             train = games.iloc[:i]
-            test = games.iloc[i:i+5]
+            test = games.iloc[i : i + 5]
 
             # Critical check: no overlap
             train_dates = set(train["kickoff"])
@@ -167,7 +167,7 @@ class TestWalkForwardValidation:
         games = sample_backtest_games.sort_values("kickoff")
 
         for i in range(10, len(games), 5):
-            test = games.iloc[i:i+5]
+            test = games.iloc[i : i + 5]
 
             # Test window should be 1-2 weeks max
             test_date_range = (test["kickoff"].max() - test["kickoff"].min()).days
@@ -179,6 +179,7 @@ class TestWalkForwardValidation:
 # ============================================================================
 # 2. Rolling Origin Cross-Validation Tests
 # ============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.critical
@@ -192,8 +193,8 @@ class TestRollingOriginCV:
 
         train_sizes = []
         for i in range(window_size, len(games), 5):
-            train = games.iloc[i-window_size:i]
-            test = games.iloc[i:i+5]
+            train = games.iloc[i - window_size : i]
+            test = games.iloc[i : i + 5]
 
             train_sizes.append(len(train))
 
@@ -211,7 +212,7 @@ class TestRollingOriginCV:
 
         prev_train_start = None
         for i in range(window_size, len(games), 5):
-            train = games.iloc[i-window_size:i]
+            train = games.iloc[i - window_size : i]
             train_start = train.iloc[0]["kickoff"]
 
             if prev_train_start:
@@ -228,8 +229,8 @@ class TestRollingOriginCV:
         window_size = 20
 
         for i in range(window_size, len(games), 5):
-            train = games.iloc[i-window_size:i]
-            test = games.iloc[i:i+5]
+            train = games.iloc[i - window_size : i]
+            test = games.iloc[i : i + 5]
 
             gap_days = (test["kickoff"].min() - train["kickoff"].max()).days
 
@@ -242,6 +243,7 @@ class TestRollingOriginCV:
 # ============================================================================
 # 3. Risk Gate Enforcement Tests
 # ============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.critical
@@ -295,10 +297,7 @@ class TestRiskGateEnforcement:
         lower = preds["ensemble_mean"] - 1.645 * preds["ensemble_std"]
         upper = preds["ensemble_mean"] + 1.645 * preds["ensemble_std"]
 
-        coverage = np.mean(
-            (preds["actual_yards"] >= lower) &
-            (preds["actual_yards"] <= upper)
-        )
+        coverage = np.mean((preds["actual_yards"] >= lower) & (preds["actual_yards"] <= upper))
 
         # Gate: 85-95%
         gate_passed = 0.85 <= coverage <= 0.95
@@ -313,12 +312,7 @@ class TestRiskGateEnforcement:
 
     def test_all_gates_evaluated(self):
         """Verify all 4 critical gates are evaluated."""
-        required_gates = [
-            "MAE < 45.2 yards",
-            "Calibration 85-95%",
-            "Sharpe > 2.2",
-            "ROI > 5%"
-        ]
+        required_gates = ["MAE < 45.2 yards", "Calibration 85-95%", "Sharpe > 2.2", "ROI > 5%"]
 
         # This test ensures documentation matches implementation
         logger.info(f"✅ All {len(required_gates)} gates documented")
@@ -328,6 +322,7 @@ class TestRiskGateEnforcement:
 # ============================================================================
 # 4. Metric Calculation Tests
 # ============================================================================
+
 
 @pytest.mark.integration
 class TestMetricCalculation:
@@ -359,10 +354,7 @@ class TestMetricCalculation:
         lower = preds["ensemble_mean"] - 1.645 * preds["ensemble_std"]
         upper = preds["ensemble_mean"] + 1.645 * preds["ensemble_std"]
 
-        coverage_90 = np.mean(
-            (preds["actual_yards"] >= lower) &
-            (preds["actual_yards"] <= upper)
-        )
+        coverage_90 = np.mean((preds["actual_yards"] >= lower) & (preds["actual_yards"] <= upper))
 
         assert 0 <= coverage_90 <= 1.0
         logger.info(f"✅ 90% CI Coverage: {coverage_90:.2%}")
@@ -415,9 +407,17 @@ class TestMetricCalculation:
     def test_all_metrics_calculated(self):
         """Verify all 11 metrics are defined."""
         required_metrics = [
-            "MAE", "RMSE", "Coverage", "Sharpe", "ROI",
-            "Win Rate", "Interval Width", "Bias", "Max Drawdown",
-            "Calmar Ratio", "Sortino Ratio"
+            "MAE",
+            "RMSE",
+            "Coverage",
+            "Sharpe",
+            "ROI",
+            "Win Rate",
+            "Interval Width",
+            "Bias",
+            "Max Drawdown",
+            "Calmar Ratio",
+            "Sortino Ratio",
         ]
 
         logger.info(f"✅ All {len(required_metrics)} metrics documented")
@@ -427,6 +427,7 @@ class TestMetricCalculation:
 # ============================================================================
 # 5. Database Connection Pooling Tests
 # ============================================================================
+
 
 @pytest.mark.integration
 class TestDatabasePooling:
@@ -438,7 +439,7 @@ class TestDatabasePooling:
         queries = [
             "SELECT COUNT(*) FROM games WHERE season = 2024",
             "SELECT COUNT(*) FROM games WHERE season = 2023",
-            "SELECT COUNT(*) FROM games WHERE season = 2022"
+            "SELECT COUNT(*) FROM games WHERE season = 2022",
         ]
 
         # Time without pooling
@@ -469,11 +470,7 @@ class TestDatabasePooling:
     def test_connection_reuse(self, db_connection):
         """Verify connection is reused across queries."""
         # Execute multiple queries on same connection
-        queries = [
-            "SELECT 1",
-            "SELECT 2",
-            "SELECT 3"
-        ]
+        queries = ["SELECT 1", "SELECT 2", "SELECT 3"]
 
         for query in queries:
             cur = db_connection.cursor()
@@ -488,6 +485,7 @@ class TestDatabasePooling:
 # ============================================================================
 # 6. Feature Caching Tests
 # ============================================================================
+
 
 @pytest.mark.integration
 class TestFeatureCaching:
@@ -535,6 +533,7 @@ class TestFeatureCaching:
 # 7. Temporal Safety Tests
 # ============================================================================
 
+
 @pytest.mark.integration
 @pytest.mark.critical
 class TestTemporalSafety:
@@ -559,11 +558,13 @@ class TestTemporalSafety:
     def test_lag_features_negative_shift(self):
         """Verify lag features use negative shift (L1, L3, L5)."""
         # Simulate feature engineering
-        data = pd.DataFrame({
-            "player_id": ["A", "A", "A", "B", "B"],
-            "week": [1, 2, 3, 1, 2],
-            "yards": [280, 290, 275, 260, 270]
-        })
+        data = pd.DataFrame(
+            {
+                "player_id": ["A", "A", "A", "B", "B"],
+                "week": [1, 2, 3, 1, 2],
+                "yards": [280, 290, 275, 260, 270],
+            }
+        )
 
         # Create lag features (correct way)
         data["yards_L1"] = data.groupby("player_id")["yards"].shift(1)
@@ -579,6 +580,7 @@ class TestTemporalSafety:
 # ============================================================================
 # 8. Performance Tests
 # ============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.slow
@@ -614,6 +616,7 @@ class TestBacktestPerformance:
 # 9. Statistical Significance Tests
 # ============================================================================
 
+
 @pytest.mark.integration
 class TestStatisticalSignificance:
     """Test Diebold-Mariano and statistical significance."""
@@ -632,6 +635,7 @@ class TestStatisticalSignificance:
 
         # p-value approximation
         from scipy.stats import norm
+
         p_value = 2 * (1 - norm.cdf(np.abs(dm_stat)))
 
         logger.info(f"📊 DM test: stat={dm_stat:.3f}, p={p_value:.4f}")

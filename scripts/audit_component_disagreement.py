@@ -33,7 +33,6 @@ sys.path.insert(0, str(project_root))
 
 import argparse
 import json
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -76,7 +75,7 @@ OUTPUT_FILE = "results/component_disagreement_audit.json"
 # ==============================================================================
 
 
-def get_validation_games(seasons: List[int]) -> pd.DataFrame:
+def get_validation_games(seasons: list[int]) -> pd.DataFrame:
     """Get all QB games from specified seasons with component predictions."""
     conn = psycopg2.connect(**DB_CONFIG)
 
@@ -104,7 +103,7 @@ def get_validation_games(seasons: List[int]) -> pd.DataFrame:
     return df
 
 
-def get_opponent_epa_stats(seasons: List[int]) -> pd.DataFrame:
+def get_opponent_epa_stats(seasons: list[int]) -> pd.DataFrame:
     """Get defensive EPA stats for opponent strength context."""
     conn = psycopg2.connect(**DB_CONFIG)
 
@@ -140,30 +139,22 @@ class ContextFeatureExtractor:
         self.qb_exp_extractor = QBExperienceFeatures()
         self.roster_stability_extractor = RosterStabilityFeatures()
 
-    def extract(
-        self, player_id: str, team: str, opponent: str, season: int, week: int
-    ) -> Dict:
+    def extract(self, player_id: str, team: str, opponent: str, season: int, week: int) -> dict:
         """Extract all context features for a player-game."""
         # QB Experience
         try:
             qb_exp = self.qb_exp_extractor.extract(player_id, season, week)
             games_with_stats = qb_exp.get("games_with_stats", 0)
         except Exception as e:
-            print(
-                f"  ⚠️  QB experience error for {player_id} S{season}W{week}: {e}"
-            )
+            print(f"  ⚠️  QB experience error for {player_id} S{season}W{week}: {e}")
             games_with_stats = 0
 
         # Roster Stability
         try:
-            roster_stability = self.roster_stability_extractor.extract(
-                team, season, week
-            )
+            roster_stability = self.roster_stability_extractor.extract(team, season, week)
             stability_l3 = roster_stability.get("roster_stability_l3", 0.75)
         except Exception as e:
-            print(
-                f"  ⚠️  Roster stability error for {team} S{season}W{week}: {e}"
-            )
+            print(f"  ⚠️  Roster stability error for {team} S{season}W{week}: {e}")
             stability_l3 = 0.75
 
         # Market Dispersion (requires odds_history data - not yet populated)
@@ -225,9 +216,7 @@ def collect_component_predictions(
                     "informative_priors_v2",
                     "xgb_hybrid",
                 ]
-                missing_components = [
-                    c for c in expected_components if c not in valid_components
-                ]
+                missing_components = [c for c in expected_components if c not in valid_components]
                 if missing_components:
                     print(f"  ⚠️  Missing components: {missing_components}")
                 continue
@@ -251,21 +240,13 @@ def collect_component_predictions(
                 "opponent": row["opponent"],
                 "actual_yards": row["actual_yards"],
                 # Component predictions
-                "state_space_v2_pred": components.get("state_space_v2", {}).get(
+                "state_space_v2_pred": components.get("state_space_v2", {}).get("mean", np.nan),
+                "hierarchical_v2_pred": components.get("hierarchical_v2", {}).get("mean", np.nan),
+                "xgb_ridge_v4_pred": components.get("xgb_ridge_v4", {}).get("mean", np.nan),
+                "informative_priors_v2_pred": components.get("informative_priors_v2", {}).get(
                     "mean", np.nan
                 ),
-                "hierarchical_v2_pred": components.get("hierarchical_v2", {}).get(
-                    "mean", np.nan
-                ),
-                "xgb_ridge_v4_pred": components.get("xgb_ridge_v4", {}).get(
-                    "mean", np.nan
-                ),
-                "informative_priors_v2_pred": components.get(
-                    "informative_priors_v2", {}
-                ).get("mean", np.nan),
-                "xgb_hybrid_pred": components.get("xgb_hybrid", {}).get(
-                    "mean", np.nan
-                ),
+                "xgb_hybrid_pred": components.get("xgb_hybrid", {}).get("mean", np.nan),
                 # Context features
                 "qb_games_with_stats": context_features["qb_games_with_stats"],
                 "roster_stability_l3": context_features["roster_stability_l3"],
@@ -291,7 +272,7 @@ def collect_component_predictions(
 # ==============================================================================
 
 
-def segment_by_qb_experience(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+def segment_by_qb_experience(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
     """Segment games by QB experience level."""
     return {
         "rookie": df[df["qb_games_with_stats"] < QB_EXPERIENCE_ROOKIE_THRESHOLD],
@@ -303,29 +284,23 @@ def segment_by_qb_experience(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
     }
 
 
-def segment_by_roster_stability(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+def segment_by_roster_stability(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
     """Segment games by roster stability."""
     return {
-        "high_stability": df[
-            df["roster_stability_l3"] >= ROSTER_STABILITY_HIGH_THRESHOLD
-        ],
+        "high_stability": df[df["roster_stability_l3"] >= ROSTER_STABILITY_HIGH_THRESHOLD],
         "medium_stability": df[
             (df["roster_stability_l3"] >= ROSTER_STABILITY_LOW_THRESHOLD)
             & (df["roster_stability_l3"] < ROSTER_STABILITY_HIGH_THRESHOLD)
         ],
-        "low_stability": df[
-            df["roster_stability_l3"] < ROSTER_STABILITY_LOW_THRESHOLD
-        ],
+        "low_stability": df[df["roster_stability_l3"] < ROSTER_STABILITY_LOW_THRESHOLD],
     }
 
 
-def segment_by_market_dispersion(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
+def segment_by_market_dispersion(df: pd.DataFrame) -> dict[str, pd.DataFrame]:
     """Segment games by market dispersion (bookmaker disagreement)."""
     # NOTE: Currently all 0.0 due to missing odds_history data
     return {
-        "high_dispersion": df[
-            df["market_dispersion"] >= MARKET_DISPERSION_HIGH_THRESHOLD
-        ],
+        "high_dispersion": df[df["market_dispersion"] >= MARKET_DISPERSION_HIGH_THRESHOLD],
         "low_dispersion": df[df["market_dispersion"] < MARKET_DISPERSION_HIGH_THRESHOLD],
     }
 
@@ -335,7 +310,7 @@ def segment_by_market_dispersion(df: pd.DataFrame) -> Dict[str, pd.DataFrame]:
 # ==============================================================================
 
 
-def calculate_component_correlations(df: pd.DataFrame) -> Dict:
+def calculate_component_correlations(df: pd.DataFrame) -> dict:
     """
     Calculate pairwise Pearson correlations between components.
 
@@ -392,7 +367,7 @@ def calculate_component_correlations(df: pd.DataFrame) -> Dict:
 # ==============================================================================
 
 
-def analyze_component_disagreement(seasons: List[int]) -> Dict:
+def analyze_component_disagreement(seasons: list[int]) -> dict:
     """
     Main analysis workflow:
     1. Load ensemble
@@ -410,9 +385,7 @@ def analyze_component_disagreement(seasons: List[int]) -> Dict:
     print("Loading ensemble...")
     import os
 
-    ensemble = EnhancedEnsemble5Way(
-        db_password=os.getenv("DB_PASSWORD", DB_CONFIG["password"])
-    )
+    ensemble = EnhancedEnsemble5Way(db_password=os.getenv("DB_PASSWORD", DB_CONFIG["password"]))
     print(f"✅ Ensemble loaded with weights: {ensemble.weights}")
     print()
 
@@ -424,7 +397,7 @@ def analyze_component_disagreement(seasons: List[int]) -> Dict:
 
     # Save raw predictions for analysis
     results_df.to_csv("results/component_predictions_by_context.csv", index=False)
-    print(f"✅ Saved raw predictions to results/component_predictions_by_context.csv")
+    print("✅ Saved raw predictions to results/component_predictions_by_context.csv")
     print()
 
     # Step 4: Overall correlation (baseline)
@@ -486,15 +459,9 @@ def analyze_component_disagreement(seasons: List[int]) -> Dict:
         print(f"  Games: {len(segment_df)}")
         print(f"  Samples: {segment_corr['n_samples']}")
         if len(segment_df) > 0:
-            print(
-                f"  Avg correlation: {segment_corr.get('avg_correlation', np.nan):.3f}"
-            )
-            print(
-                f"  Min correlation: {segment_corr.get('min_correlation', np.nan):.3f}"
-            )
-            print(
-                f"  Max correlation: {segment_corr.get('max_correlation', np.nan):.3f}"
-            )
+            print(f"  Avg correlation: {segment_corr.get('avg_correlation', np.nan):.3f}")
+            print(f"  Min correlation: {segment_corr.get('min_correlation', np.nan):.3f}")
+            print(f"  Max correlation: {segment_corr.get('max_correlation', np.nan):.3f}")
         else:
             print("  ⚠️  No games in this segment (odds_history data missing)")
 
@@ -518,12 +485,8 @@ def analyze_component_disagreement(seasons: List[int]) -> Dict:
             print(f"  - {context_name}: avg={avg_corr:.3f}, min={min_corr:.3f}")
         print("\n✅ Meta-learning has potential - proceed to Phase 1.2")
     else:
-        print(
-            "\n❌ FAIL: All contexts have ρ > 0.70 (high correlation between components)"
-        )
-        print(
-            "⚠️  Meta-learning unlikely to improve performance - recommend STOP before Phase 2"
-        )
+        print("\n❌ FAIL: All contexts have ρ > 0.70 (high correlation between components)")
+        print("⚠️  Meta-learning unlikely to improve performance - recommend STOP before Phase 2")
 
     # Step 7: Save results
     output = {

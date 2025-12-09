@@ -13,6 +13,7 @@ Purpose: Fast verification before full 3-season validation
 
 import sys
 from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
@@ -21,17 +22,14 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 import psycopg2
+
 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 
 def get_db_connection():
     """Get database connection."""
     return psycopg2.connect(
-        host="localhost",
-        port=5544,
-        dbname="devdb01",
-        user="dro",
-        password="sicillionbillions"
+        host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
     )
 
 
@@ -88,53 +86,58 @@ def main():
 
     results = []
     for idx, row in games.iterrows():
-        player_id = row['player_id']
-        player_name = row['player_display_name']
-        season = int(row['season'])
-        week = int(row['week'])
-        actual_yards = row['actual_yards']
+        player_id = row["player_id"]
+        player_name = row["player_display_name"]
+        season = int(row["season"])
+        week = int(row["week"])
+        actual_yards = row["actual_yards"]
 
         # Get prediction with component breakdowns
         try:
             pred_dict = ensemble.predict(
-                player_id=player_id,
-                season=season,
-                week=week,
-                return_components=True
+                player_id=player_id, season=season, week=week, return_components=True
             )
 
             # Extract component predictions
-            components = pred_dict.get('components', {})
-            state_space_pred = components.get('state_space_v2', {}).get('mean', None)
-            xgb_v4_pred = components.get('xgboost_v4_ridge', {}).get('mean', None)
-            ensemble_pred = pred_dict.get('mean', None)
+            components = pred_dict.get("components", {})
+            state_space_pred = components.get("state_space_v2", {}).get("mean", None)
+            xgb_v4_pred = components.get("xgboost_v4_ridge", {}).get("mean", None)
+            ensemble_pred = pred_dict.get("mean", None)
 
             # Store results
-            results.append({
-                'player': player_name,
-                'actual': actual_yards,
-                'ensemble': ensemble_pred,
-                'state_space': state_space_pred,
-                'xgb_v4': xgb_v4_pred
-            })
+            results.append(
+                {
+                    "player": player_name,
+                    "actual": actual_yards,
+                    "ensemble": ensemble_pred,
+                    "state_space": state_space_pred,
+                    "xgb_v4": xgb_v4_pred,
+                }
+            )
 
             # Print results
             print(f"\n{player_name} (actual: {actual_yards:.1f} yards)")
             print(f"  Ensemble:     {ensemble_pred:.1f} yards")
-            print(f"  State-Space:  {state_space_pred:.1f} yards" +
-                  ("  ❌ BROKEN" if state_space_pred < 50 else "  ✅"))
-            print(f"  XGBoost v4:   {xgb_v4_pred:.1f} yards" +
-                  ("  ❌ BROKEN" if xgb_v4_pred > 350 else "  ✅"))
+            print(
+                f"  State-Space:  {state_space_pred:.1f} yards"
+                + ("  ❌ BROKEN" if state_space_pred < 50 else "  ✅")
+            )
+            print(
+                f"  XGBoost v4:   {xgb_v4_pred:.1f} yards"
+                + ("  ❌ BROKEN" if xgb_v4_pred > 350 else "  ✅")
+            )
 
         except Exception as e:
             print(f"\n{player_name}: ❌ ERROR - {e}")
-            results.append({
-                'player': player_name,
-                'actual': actual_yards,
-                'ensemble': None,
-                'state_space': None,
-                'xgb_v4': None
-            })
+            results.append(
+                {
+                    "player": player_name,
+                    "actual": actual_yards,
+                    "ensemble": None,
+                    "state_space": None,
+                    "xgb_v4": None,
+                }
+            )
 
     print()
     print("-" * 60)
@@ -145,21 +148,21 @@ def main():
     df = pd.DataFrame(results)
 
     # Check state-space predictions
-    state_space_valid = df['state_space'].dropna()
+    state_space_valid = df["state_space"].dropna()
     if len(state_space_valid) > 0:
         ss_mean = state_space_valid.mean()
         ss_min = state_space_valid.min()
         ss_max = state_space_valid.max()
         ss_broken = (state_space_valid < 50).sum()
 
-        print(f"\nState-Space v2:")
+        print("\nState-Space v2:")
         print(f"  Mean: {ss_mean:.1f} yards (expect ~180-260)")
         print(f"  Range: {ss_min:.1f} - {ss_max:.1f} yards")
         print(f"  Broken (<50 yards): {ss_broken}/{len(state_space_valid)}")
         print(f"  Status: {'✅ FIXED' if ss_broken == 0 and ss_mean > 100 else '❌ STILL BROKEN'}")
 
     # Check XGBoost v4 predictions
-    xgb_valid = df['xgb_v4'].dropna()
+    xgb_valid = df["xgb_v4"].dropna()
     if len(xgb_valid) > 0:
         xgb_mean = xgb_valid.mean()
         xgb_std = xgb_valid.std()
@@ -168,19 +171,21 @@ def main():
         xgb_constant = xgb_std < 5  # If std < 5, likely constant
         xgb_broken = (xgb_valid > 350).sum()
 
-        print(f"\nXGBoost v4 Ridge:")
+        print("\nXGBoost v4 Ridge:")
         print(f"  Mean: {xgb_mean:.1f} yards")
         print(f"  Std Dev: {xgb_std:.1f} yards (expect >10 for varying predictions)")
         print(f"  Range: {xgb_min:.1f} - {xgb_max:.1f} yards")
         print(f"  Broken (>350 yards or constant): {xgb_broken}/{len(xgb_valid)}")
-        print(f"  Status: {'✅ FIXED' if not xgb_constant and xgb_broken == 0 else '❌ STILL BROKEN'}")
+        print(
+            f"  Status: {'✅ FIXED' if not xgb_constant and xgb_broken == 0 else '❌ STILL BROKEN'}"
+        )
 
     # Check ensemble predictions
-    ensemble_valid = df['ensemble'].dropna()
+    ensemble_valid = df["ensemble"].dropna()
     if len(ensemble_valid) > 0:
-        ens_mae = np.abs(ensemble_valid - df.loc[ensemble_valid.index, 'actual']).mean()
+        ens_mae = np.abs(ensemble_valid - df.loc[ensemble_valid.index, "actual"]).mean()
 
-        print(f"\nEnsemble v6.0:")
+        print("\nEnsemble v6.0:")
         print(f"  MAE (5 games): {ens_mae:.2f} yards")
         print(f"  Status: {'✅ REASONABLE' if ens_mae < 80 else '⚠️  HIGH ERROR'}")
 

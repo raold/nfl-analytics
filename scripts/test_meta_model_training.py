@@ -63,20 +63,20 @@ def generate_synthetic_historical_data(n_games: int = 100, seed: int = 42) -> pd
         actual = np.random.normal(250, 60)
 
         # Generate context features
-        qb_experience = np.random.choice(['rookie', 'developing', 'veteran', 'elite_veteran'])
+        qb_experience = np.random.choice(["rookie", "developing", "veteran", "elite_veteran"])
         is_division_game = np.random.choice([0, 1], p=[0.7, 0.3])
         market_dispersion = np.random.uniform(0.3, 2.0)
         roster_stability = np.random.uniform(0.7, 0.95)
 
         # Generate predictions with context-dependent error patterns
-        if qb_experience == 'rookie':
+        if qb_experience == "rookie":
             # Rookie: ELO best, State-Space worst
             state_space_error = np.random.normal(15, 35)
             hierarchical_error = np.random.normal(12, 30)
             xgboost_error = np.random.normal(8, 25)
             ip_error = np.random.normal(10, 28)
             elo_error = np.random.normal(5, 20)  # Best for rookies
-        elif qb_experience == 'elite_veteran':
+        elif qb_experience == "elite_veteran":
             # Elite veteran: State-Space best, ELO worst
             state_space_error = np.random.normal(5, 20)  # Best for veterans
             hierarchical_error = np.random.normal(6, 22)
@@ -105,43 +105,43 @@ def generate_synthetic_historical_data(n_games: int = 100, seed: int = 42) -> pd
 
         # Generate predictions
         predictions = {
-            'state_space_v2': actual + state_space_error,
-            'hierarchical_v2': actual + hierarchical_error,
-            'xgboost_v4_ridge': actual + xgboost_error,
-            'informative_priors_v2': actual + ip_error,
-            'elo': actual + elo_error,
+            "state_space_v2": actual + state_space_error,
+            "hierarchical_v2": actual + hierarchical_error,
+            "xgboost_v4_ridge": actual + xgboost_error,
+            "informative_priors_v2": actual + ip_error,
+            "elo": actual + elo_error,
         }
 
         # One-hot encode QB experience
         qb_exp_onehot = {
-            'qb_exp_rookie': 1.0 if qb_experience == 'rookie' else 0.0,
-            'qb_exp_developing': 1.0 if qb_experience == 'developing' else 0.0,
-            'qb_exp_veteran': 1.0 if qb_experience == 'veteran' else 0.0,
-            'qb_exp_elite_veteran': 1.0 if qb_experience == 'elite_veteran' else 0.0,
+            "qb_exp_rookie": 1.0 if qb_experience == "rookie" else 0.0,
+            "qb_exp_developing": 1.0 if qb_experience == "developing" else 0.0,
+            "qb_exp_veteran": 1.0 if qb_experience == "veteran" else 0.0,
+            "qb_exp_elite_veteran": 1.0 if qb_experience == "elite_veteran" else 0.0,
         }
 
         # Full context features
         context = {
             **qb_exp_onehot,
-            'log_games_experience': np.log(np.random.uniform(10, 150)),
-            'roster_stability_l3': roster_stability,
-            'market_dispersion': market_dispersion,
-            'high_dispersion_flag': 1.0 if market_dispersion > 1.5 else 0.0,
-            'is_home': np.random.choice([0, 1]),
-            'is_dome_game': np.random.choice([0, 1]),
-            'is_division_game': float(is_division_game),
-            'temp_numeric': np.random.uniform(40, 80),
-            'wind_numeric': np.random.uniform(0, 20),
-            'is_cold_game': np.random.choice([0, 1], p=[0.8, 0.2]),
-            'is_windy_game': np.random.choice([0, 1], p=[0.85, 0.15]),
+            "log_games_experience": np.log(np.random.uniform(10, 150)),
+            "roster_stability_l3": roster_stability,
+            "market_dispersion": market_dispersion,
+            "high_dispersion_flag": 1.0 if market_dispersion > 1.5 else 0.0,
+            "is_home": np.random.choice([0, 1]),
+            "is_dome_game": np.random.choice([0, 1]),
+            "is_division_game": float(is_division_game),
+            "temp_numeric": np.random.uniform(40, 80),
+            "wind_numeric": np.random.uniform(0, 20),
+            "is_cold_game": np.random.choice([0, 1], p=[0.8, 0.2]),
+            "is_windy_game": np.random.choice([0, 1], p=[0.85, 0.15]),
         }
 
         # Combine
         row = {
-            'player_id': f'player_{i % 20:02d}',
-            'season': 2022 + (i // 34),  # ~34 games per season
-            'week': (i % 17) + 1,
-            'actual': actual,
+            "player_id": f"player_{i % 20:02d}",
+            "season": 2022 + (i // 34),  # ~34 games per season
+            "week": (i % 17) + 1,
+            "actual": actual,
             **predictions,
             **context,
         }
@@ -151,8 +151,10 @@ def generate_synthetic_historical_data(n_games: int = 100, seed: int = 42) -> pd
     df = pd.DataFrame(data)
 
     print(f"Generated {len(df)} synthetic games:")
-    print(f"  QB Experience: {df['qb_exp_rookie'].sum():.0f} rookie, "
-          f"{df['qb_exp_elite_veteran'].sum():.0f} elite veteran")
+    print(
+        f"  QB Experience: {df['qb_exp_rookie'].sum():.0f} rookie, "
+        f"{df['qb_exp_elite_veteran'].sum():.0f} elite veteran"
+    )
     print(f"  High Dispersion: {df['high_dispersion_flag'].sum():.0f} games")
     print(f"  Division Games: {df['is_division_game'].sum():.0f} games")
 
@@ -173,7 +175,7 @@ def test_meta_model_training():
 
     # Split train/test (time-series)
     train_df = df.iloc[:80]  # First 80 games
-    test_df = df.iloc[80:]   # Last 20 games
+    test_df = df.iloc[80:]  # Last 20 games
 
     print(f"\n  Train: {len(train_df)} games")
     print(f"  Test:  {len(test_df)} games")
@@ -181,13 +183,13 @@ def test_meta_model_training():
     # Train meta-model
     print("\n2. Training meta-model...")
     predictor = MetaLearningWeightPredictor(
-        model_type='lightgbm',
+        model_type="lightgbm",
         n_estimators=50,
         learning_rate=0.1,
         max_depth=3,
     )
 
-    metrics = predictor.fit(
+    predictor.fit(
         historical_df=train_df,
         cv_splits=3,
         n_random_samples=200,  # Fewer samples for faster testing
@@ -208,7 +210,11 @@ def test_meta_model_training():
     print("\n4. Testing predictions on different contexts:")
 
     # Context 1: Rookie QB
-    rookie_context = test_df[test_df['qb_exp_rookie'] == 1.0].iloc[0:1] if (test_df['qb_exp_rookie'] == 1.0).any() else None
+    rookie_context = (
+        test_df[test_df["qb_exp_rookie"] == 1.0].iloc[0:1]
+        if (test_df["qb_exp_rookie"] == 1.0).any()
+        else None
+    )
     if rookie_context is not None:
         rookie_weights = predictor.predict_weights(rookie_context[predictor.feature_names])
         print("\n  Rookie QB Context:")
@@ -216,7 +222,11 @@ def test_meta_model_training():
             print(f"    {name:25s}: {weight:.4f} ({weight*100:.1f}%)")
 
     # Context 2: Elite Veteran QB
-    veteran_context = test_df[test_df['qb_exp_elite_veteran'] == 1.0].iloc[0:1] if (test_df['qb_exp_elite_veteran'] == 1.0).any() else None
+    veteran_context = (
+        test_df[test_df["qb_exp_elite_veteran"] == 1.0].iloc[0:1]
+        if (test_df["qb_exp_elite_veteran"] == 1.0).any()
+        else None
+    )
     if veteran_context is not None:
         veteran_weights = predictor.predict_weights(veteran_context[predictor.feature_names])
         print("\n  Elite Veteran QB Context:")
@@ -224,7 +234,11 @@ def test_meta_model_training():
             print(f"    {name:25s}: {weight:.4f} ({weight*100:.1f}%)")
 
     # Context 3: High Market Dispersion
-    high_disp_context = test_df[test_df['high_dispersion_flag'] == 1.0].iloc[0:1] if (test_df['high_dispersion_flag'] == 1.0).any() else None
+    high_disp_context = (
+        test_df[test_df["high_dispersion_flag"] == 1.0].iloc[0:1]
+        if (test_df["high_dispersion_flag"] == 1.0).any()
+        else None
+    )
     if high_disp_context is not None:
         high_disp_weights = predictor.predict_weights(high_disp_context[predictor.feature_names])
         print("\n  High Market Dispersion Context:")
@@ -237,27 +251,27 @@ def test_meta_model_training():
 
     # Compare with static weights
     static_weights = {
-        'state_space_v2': 0.30,
-        'hierarchical_v2': 0.27,
-        'xgboost_v4_ridge': 0.23,
-        'informative_priors_v2': 0.12,
-        'elo': 0.08,
+        "state_space_v2": 0.30,
+        "hierarchical_v2": 0.27,
+        "xgboost_v4_ridge": 0.23,
+        "informative_priors_v2": 0.12,
+        "elo": 0.08,
     }
 
     compare_static_vs_adaptive_weights(static_weights, test_predictions)
 
     # Save model
     print("\n6. Testing save/load...")
-    output_path = Path('models/ensemble/test_meta_model.pkl')
+    output_path = Path("models/ensemble/test_meta_model.pkl")
     predictor.save(output_path)
 
-    loaded_predictor = MetaLearningWeightPredictor.load(output_path)
-    print(f"  ✅ Model saved and loaded successfully")
+    MetaLearningWeightPredictor.load(output_path)
+    print("  ✅ Model saved and loaded successfully")
 
     print("\n" + "=" * 80)
     print("✅ All tests passed!")
     print("=" * 80)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_meta_model_training()

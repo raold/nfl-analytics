@@ -45,9 +45,6 @@ Usage:
 
 import logging
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Tuple
-from datetime import datetime, timedelta
-import numpy as np
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -74,12 +71,12 @@ class BetProposal:
     bankroll: float  # Current bankroll ($)
 
     # Optional fields (must come after required fields)
-    book_hold: Optional[float] = None  # Bookmaker vig
+    book_hold: float | None = None  # Bookmaker vig
     player_id: str = ""
     player_name: str = ""
     prop_type: str = ""
     game_id: str = ""
-    session_metrics: Optional[Dict] = None  # Daily/session stats
+    session_metrics: dict | None = None  # Daily/session stats
 
 
 @dataclass
@@ -88,9 +85,9 @@ class GateResult:
 
     gate_name: str
     passed: bool
-    rejection_reason: Optional[str] = None
-    warnings: List[str] = None
-    metrics: Optional[Dict] = None
+    rejection_reason: str | None = None
+    warnings: list[str] = None
+    metrics: dict | None = None
 
     def __post_init__(self):
         if self.warnings is None:
@@ -113,17 +110,14 @@ class RiskGateSystem:
         min_confidence: float = 0.60,
         max_uncertainty: float = 0.30,
         min_calibration_score: float = 0.80,
-
         # Gate 2: Market Gate
         max_vig: float = 0.06,  # 6% maximum hold
         min_odds: float = -200,  # Don't bet heavy favorites
-        max_odds: float = 200,   # Don't bet heavy underdogs
-
+        max_odds: float = 200,  # Don't bet heavy underdogs
         # Gate 3: Portfolio Gate
         max_bet_pct: float = 0.05,  # 5% of bankroll max per bet
         max_position_correlation: float = 0.70,  # Max corr between bets
         max_total_exposure: float = 0.30,  # Max 30% of bankroll at risk
-
         # Gate 4: Operational Gate
         max_daily_loss_pct: float = 0.10,  # 10% daily stop-loss
         max_weekly_loss_pct: float = 0.20,  # 20% weekly stop-loss
@@ -161,7 +155,7 @@ class RiskGateSystem:
             f"max_bet={max_bet_pct:.1%}"
         )
 
-    def evaluate_bet(self, bet: BetProposal) -> Dict:
+    def evaluate_bet(self, bet: BetProposal) -> dict:
         """
         Evaluate a bet through all 4 risk gates.
 
@@ -210,11 +204,11 @@ class RiskGateSystem:
         )
 
         return {
-            'approved': True,
-            'rejection_reason': None,
-            'gate_results': gate_results,
-            'warnings': warnings,
-            'metrics': self._aggregate_metrics(gate_results)
+            "approved": True,
+            "rejection_reason": None,
+            "gate_results": gate_results,
+            "warnings": warnings,
+            "metrics": self._aggregate_metrics(gate_results),
         }
 
     def _gate1_statistical(self, bet: BetProposal) -> GateResult:
@@ -235,7 +229,7 @@ class RiskGateSystem:
             return GateResult(
                 gate_name="Gate 1: Statistical",
                 passed=False,
-                rejection_reason=f"Edge too small: {bet.edge:.2%} < {self.min_edge:.2%}"
+                rejection_reason=f"Edge too small: {bet.edge:.2%} < {self.min_edge:.2%}",
             )
 
         # Check confidence
@@ -243,7 +237,7 @@ class RiskGateSystem:
             return GateResult(
                 gate_name="Gate 1: Statistical",
                 passed=False,
-                rejection_reason=f"Confidence too low: {bet.confidence:.2%} < {self.min_confidence:.2%}"
+                rejection_reason=f"Confidence too low: {bet.confidence:.2%} < {self.min_confidence:.2%}",
             )
 
         # Check uncertainty
@@ -251,7 +245,7 @@ class RiskGateSystem:
             return GateResult(
                 gate_name="Gate 1: Statistical",
                 passed=False,
-                rejection_reason=f"Uncertainty too high: {bet.model_uncertainty:.2%} > {self.max_uncertainty:.2%}"
+                rejection_reason=f"Uncertainty too high: {bet.model_uncertainty:.2%} > {self.max_uncertainty:.2%}",
             )
 
         # Warnings for borderline cases
@@ -262,16 +256,13 @@ class RiskGateSystem:
             warnings.append(f"Confidence marginally above threshold: {bet.confidence:.2%}")
 
         metrics = {
-            'edge': bet.edge,
-            'confidence': bet.confidence,
-            'uncertainty': bet.model_uncertainty
+            "edge": bet.edge,
+            "confidence": bet.confidence,
+            "uncertainty": bet.model_uncertainty,
         }
 
         return GateResult(
-            gate_name="Gate 1: Statistical",
-            passed=True,
-            warnings=warnings,
-            metrics=metrics
+            gate_name="Gate 1: Statistical", passed=True, warnings=warnings, metrics=metrics
         )
 
     def _gate2_market(self, bet: BetProposal) -> GateResult:
@@ -292,41 +283,38 @@ class RiskGateSystem:
                 return GateResult(
                     gate_name="Gate 2: Market",
                     passed=False,
-                    rejection_reason=f"Vig too high: {bet.book_hold:.2%} > {self.max_vig:.2%}"
+                    rejection_reason=f"Vig too high: {bet.book_hold:.2%} > {self.max_vig:.2%}",
                 )
 
             if bet.book_hold > self.max_vig * 0.9:  # Within 10% of max
                 warnings.append(f"Vig close to maximum: {bet.book_hold:.2%}")
 
-            metrics['vig'] = bet.book_hold
+            metrics["vig"] = bet.book_hold
 
         # Check odds range
         if bet.odds < self.min_odds:
             return GateResult(
                 gate_name="Gate 2: Market",
                 passed=False,
-                rejection_reason=f"Odds too favorable (heavy favorite): {bet.odds} < {self.min_odds}"
+                rejection_reason=f"Odds too favorable (heavy favorite): {bet.odds} < {self.min_odds}",
             )
 
         if bet.odds > self.max_odds:
             return GateResult(
                 gate_name="Gate 2: Market",
                 passed=False,
-                rejection_reason=f"Odds too unfavorable (heavy underdog): {bet.odds} > {self.max_odds}"
+                rejection_reason=f"Odds too unfavorable (heavy underdog): {bet.odds} > {self.max_odds}",
             )
 
         # Prefer Pinnacle for lower vig
-        if bet.bookmaker != 'pinnacle':
+        if bet.bookmaker != "pinnacle":
             warnings.append(f"Not using Pinnacle (bookmaker: {bet.bookmaker})")
 
-        metrics['odds'] = bet.odds
-        metrics['bookmaker'] = bet.bookmaker
+        metrics["odds"] = bet.odds
+        metrics["bookmaker"] = bet.bookmaker
 
         return GateResult(
-            gate_name="Gate 2: Market",
-            passed=True,
-            warnings=warnings,
-            metrics=metrics
+            gate_name="Gate 2: Market", passed=True, warnings=warnings, metrics=metrics
         )
 
     def _gate3_portfolio(self, bet: BetProposal) -> GateResult:
@@ -348,33 +336,30 @@ class RiskGateSystem:
             return GateResult(
                 gate_name="Gate 3: Portfolio",
                 passed=False,
-                rejection_reason=f"Bet too large: {bet_pct:.2%} of bankroll > {self.max_bet_pct:.2%}"
+                rejection_reason=f"Bet too large: {bet_pct:.2%} of bankroll > {self.max_bet_pct:.2%}",
             )
 
         if bet_pct > self.max_bet_pct * 0.8:  # Within 20% of max
             warnings.append(f"Bet size close to maximum: {bet_pct:.2%} of bankroll")
 
         # Check total exposure (if session_metrics provided)
-        if bet.session_metrics and 'total_exposure' in bet.session_metrics:
-            total_exposure = bet.session_metrics['total_exposure'] / bet.bankroll
+        if bet.session_metrics and "total_exposure" in bet.session_metrics:
+            total_exposure = bet.session_metrics["total_exposure"] / bet.bankroll
 
             if total_exposure > self.max_total_exposure:
                 return GateResult(
                     gate_name="Gate 3: Portfolio",
                     passed=False,
-                    rejection_reason=f"Total exposure too high: {total_exposure:.2%} > {self.max_total_exposure:.2%}"
+                    rejection_reason=f"Total exposure too high: {total_exposure:.2%} > {self.max_total_exposure:.2%}",
                 )
 
-            metrics['total_exposure'] = total_exposure
+            metrics["total_exposure"] = total_exposure
 
-        metrics['bet_size_pct'] = bet_pct
-        metrics['bet_size'] = bet.bet_size
+        metrics["bet_size_pct"] = bet_pct
+        metrics["bet_size"] = bet.bet_size
 
         return GateResult(
-            gate_name="Gate 3: Portfolio",
-            passed=True,
-            warnings=warnings,
-            metrics=metrics
+            gate_name="Gate 3: Portfolio", passed=True, warnings=warnings, metrics=metrics
         )
 
     def _gate4_operational(self, bet: BetProposal) -> GateResult:
@@ -395,79 +380,78 @@ class RiskGateSystem:
             return GateResult(
                 gate_name="Gate 4: Operational",
                 passed=False,
-                rejection_reason=f"Bankroll too low: ${bet.bankroll:.0f} < ${self.min_bankroll:.0f}"
+                rejection_reason=f"Bankroll too low: ${bet.bankroll:.0f} < ${self.min_bankroll:.0f}",
             )
 
         # Check daily loss limit (if session_metrics provided)
         if bet.session_metrics:
-            if 'daily_loss' in bet.session_metrics:
-                daily_loss = bet.session_metrics['daily_loss']
+            if "daily_loss" in bet.session_metrics:
+                daily_loss = bet.session_metrics["daily_loss"]
                 daily_loss_pct = abs(daily_loss) / bet.bankroll
 
                 if daily_loss_pct > self.max_daily_loss_pct:
                     return GateResult(
                         gate_name="Gate 4: Operational",
                         passed=False,
-                        rejection_reason=f"Daily loss limit exceeded: {daily_loss_pct:.2%} > {self.max_daily_loss_pct:.2%}"
+                        rejection_reason=f"Daily loss limit exceeded: {daily_loss_pct:.2%} > {self.max_daily_loss_pct:.2%}",
                     )
 
                 if daily_loss_pct > self.max_daily_loss_pct * 0.8:
                     warnings.append(f"Daily loss approaching limit: {daily_loss_pct:.2%}")
 
-                metrics['daily_loss_pct'] = daily_loss_pct
+                metrics["daily_loss_pct"] = daily_loss_pct
 
             # Check weekly loss limit
-            if 'weekly_loss' in bet.session_metrics:
-                weekly_loss = bet.session_metrics['weekly_loss']
+            if "weekly_loss" in bet.session_metrics:
+                weekly_loss = bet.session_metrics["weekly_loss"]
                 weekly_loss_pct = abs(weekly_loss) / bet.bankroll
 
                 if weekly_loss_pct > self.max_weekly_loss_pct:
                     return GateResult(
                         gate_name="Gate 4: Operational",
                         passed=False,
-                        rejection_reason=f"Weekly loss limit exceeded: {weekly_loss_pct:.2%} > {self.max_weekly_loss_pct:.2%}"
+                        rejection_reason=f"Weekly loss limit exceeded: {weekly_loss_pct:.2%} > {self.max_weekly_loss_pct:.2%}",
                     )
 
-                metrics['weekly_loss_pct'] = weekly_loss_pct
+                metrics["weekly_loss_pct"] = weekly_loss_pct
 
             # Check circuit breaker (consecutive losses)
-            if 'consecutive_losses' in bet.session_metrics:
-                consecutive_losses = bet.session_metrics['consecutive_losses']
+            if "consecutive_losses" in bet.session_metrics:
+                consecutive_losses = bet.session_metrics["consecutive_losses"]
 
                 if consecutive_losses >= self.circuit_breaker_consecutive_losses:
                     return GateResult(
                         gate_name="Gate 4: Operational",
                         passed=False,
-                        rejection_reason=f"Circuit breaker triggered: {consecutive_losses} consecutive losses"
+                        rejection_reason=f"Circuit breaker triggered: {consecutive_losses} consecutive losses",
                     )
 
                 if consecutive_losses >= self.circuit_breaker_consecutive_losses - 1:
-                    warnings.append(f"Approaching circuit breaker: {consecutive_losses} consecutive losses")
+                    warnings.append(
+                        f"Approaching circuit breaker: {consecutive_losses} consecutive losses"
+                    )
 
-                metrics['consecutive_losses'] = consecutive_losses
+                metrics["consecutive_losses"] = consecutive_losses
 
-        metrics['bankroll'] = bet.bankroll
+        metrics["bankroll"] = bet.bankroll
 
         return GateResult(
-            gate_name="Gate 4: Operational",
-            passed=True,
-            warnings=warnings,
-            metrics=metrics
+            gate_name="Gate 4: Operational", passed=True, warnings=warnings, metrics=metrics
         )
 
-    def _format_rejection(self, gate_results: List[GateResult], reason: str) -> Dict:
+    def _format_rejection(self, gate_results: list[GateResult], reason: str) -> dict:
         """Format rejection response."""
         logger.warning(f"❌ Bet REJECTED: {reason}")
 
         return {
-            'approved': False,
-            'rejection_reason': reason,
-            'gate_results': gate_results,
-            'warnings': [],
-            'metrics': self._aggregate_metrics(gate_results)
+            "approved": False,
+            "rejection_reason": reason,
+            "gate_results": gate_results,
+            "warnings": [],
+            "metrics": self._aggregate_metrics(gate_results),
         }
 
-    def _aggregate_metrics(self, gate_results: List[GateResult]) -> Dict:
+    def _aggregate_metrics(self, gate_results: list[GateResult]) -> dict:
         """Aggregate metrics from all gates."""
         metrics = {}
 
@@ -477,31 +461,31 @@ class RiskGateSystem:
 
         return metrics
 
-    def get_configuration(self) -> Dict:
+    def get_configuration(self) -> dict:
         """Get current gate configuration."""
         return {
-            'gate1_statistical': {
-                'min_edge': self.min_edge,
-                'min_confidence': self.min_confidence,
-                'max_uncertainty': self.max_uncertainty,
-                'min_calibration_score': self.min_calibration_score
+            "gate1_statistical": {
+                "min_edge": self.min_edge,
+                "min_confidence": self.min_confidence,
+                "max_uncertainty": self.max_uncertainty,
+                "min_calibration_score": self.min_calibration_score,
             },
-            'gate2_market': {
-                'max_vig': self.max_vig,
-                'min_odds': self.min_odds,
-                'max_odds': self.max_odds
+            "gate2_market": {
+                "max_vig": self.max_vig,
+                "min_odds": self.min_odds,
+                "max_odds": self.max_odds,
             },
-            'gate3_portfolio': {
-                'max_bet_pct': self.max_bet_pct,
-                'max_position_correlation': self.max_position_correlation,
-                'max_total_exposure': self.max_total_exposure
+            "gate3_portfolio": {
+                "max_bet_pct": self.max_bet_pct,
+                "max_position_correlation": self.max_position_correlation,
+                "max_total_exposure": self.max_total_exposure,
             },
-            'gate4_operational': {
-                'max_daily_loss_pct': self.max_daily_loss_pct,
-                'max_weekly_loss_pct': self.max_weekly_loss_pct,
-                'circuit_breaker_consecutive_losses': self.circuit_breaker_consecutive_losses,
-                'min_bankroll': self.min_bankroll
-            }
+            "gate4_operational": {
+                "max_daily_loss_pct": self.max_daily_loss_pct,
+                "max_weekly_loss_pct": self.max_weekly_loss_pct,
+                "circuit_breaker_consecutive_losses": self.circuit_breaker_consecutive_losses,
+                "min_bankroll": self.min_bankroll,
+            },
         }
 
 
@@ -509,17 +493,18 @@ class RiskGateSystem:
 # CLI for testing
 # ============================================================================
 
+
 def main():
     """Test the risk gate system."""
     import argparse
 
-    parser = argparse.ArgumentParser(description='Risk Gate System Test')
-    parser.add_argument('--edge', type=float, default=0.03, help='Edge (e.g., 0.03 = 3%)')
-    parser.add_argument('--confidence', type=float, default=0.65, help='Confidence (0-1)')
-    parser.add_argument('--uncertainty', type=float, default=0.15, help='Uncertainty (std dev)')
-    parser.add_argument('--odds', type=float, default=-110, help='American odds')
-    parser.add_argument('--bet-size', type=float, default=250, help='Bet size ($)')
-    parser.add_argument('--bankroll', type=float, default=10000, help='Bankroll ($)')
+    parser = argparse.ArgumentParser(description="Risk Gate System Test")
+    parser.add_argument("--edge", type=float, default=0.03, help="Edge (e.g., 0.03 = 3%)")
+    parser.add_argument("--confidence", type=float, default=0.65, help="Confidence (0-1)")
+    parser.add_argument("--uncertainty", type=float, default=0.15, help="Uncertainty (std dev)")
+    parser.add_argument("--odds", type=float, default=-110, help="American odds")
+    parser.add_argument("--bet-size", type=float, default=250, help="Bet size ($)")
+    parser.add_argument("--bankroll", type=float, default=10000, help="Bankroll ($)")
 
     args = parser.parse_args()
 
@@ -528,7 +513,7 @@ def main():
         min_edge=0.025,  # 2.5% for Pinnacle
         min_confidence=0.60,
         max_uncertainty=0.30,
-        max_bet_pct=0.05
+        max_bet_pct=0.05,
     )
 
     # Create test bet
@@ -539,46 +524,46 @@ def main():
         prediction=250.0,
         odds=args.odds,
         line_value=225.5,
-        bet_side='over',
-        bookmaker='pinnacle',
+        bet_side="over",
+        bookmaker="pinnacle",
         book_hold=0.045,
         bet_size=args.bet_size,
         bankroll=args.bankroll,
         player_name="Test Player",
         prop_type="player_pass_yds",
-        session_metrics={'daily_loss': 0, 'consecutive_losses': 0}
+        session_metrics={"daily_loss": 0, "consecutive_losses": 0},
     )
 
     # Evaluate
     result = gates.evaluate_bet(bet)
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("RISK GATE EVALUATION RESULT")
-    print("="*80)
+    print("=" * 80)
     print(f"\nApproved: {'✅ YES' if result['approved'] else '❌ NO'}")
 
-    if not result['approved']:
+    if not result["approved"]:
         print(f"Rejection Reason: {result['rejection_reason']}")
 
-    if result['warnings']:
-        print(f"\nWarnings:")
-        for warning in result['warnings']:
+    if result["warnings"]:
+        print("\nWarnings:")
+        for warning in result["warnings"]:
             print(f"  ⚠️  {warning}")
 
-    print(f"\nGate Results:")
-    for gate_result in result['gate_results']:
+    print("\nGate Results:")
+    for gate_result in result["gate_results"]:
         status = "✅ PASS" if gate_result.passed else "❌ FAIL"
         print(f"  {gate_result.gate_name}: {status}")
 
-    print(f"\nMetrics:")
-    for key, value in result['metrics'].items():
+    print("\nMetrics:")
+    for key, value in result["metrics"].items():
         if isinstance(value, float) and value < 1:
             print(f"  {key}: {value:.2%}")
         else:
             print(f"  {key}: {value}")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

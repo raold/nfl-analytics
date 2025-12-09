@@ -15,23 +15,20 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 19, 2025
 """
 
-import os
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-import pytest
+
 import pandas as pd
-import numpy as np
+import pytest
 
 # Add project root
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 
 # ============================================================================
 # FIXTURES
 # ============================================================================
+
 
 @pytest.fixture
 def project_root():
@@ -54,6 +51,7 @@ def models_directory(project_root):
 # ============================================================================
 # TESTS: Causal Features Data Files
 # ============================================================================
+
 
 class TestCausalFeaturesData:
     """Test causal features data files (DiD Roughing, Travel Distance)."""
@@ -91,6 +89,7 @@ class TestCausalFeaturesData:
 # ============================================================================
 # TESTS: Model Files Existence
 # ============================================================================
+
 
 class TestModelFilesExistence:
     """Test model file paths are resolvable."""
@@ -180,6 +179,7 @@ class TestModelFilesExistence:
 # TESTS: Database Schema Validation
 # ============================================================================
 
+
 class TestDatabaseSchema:
     """Test database schema assumptions."""
 
@@ -188,20 +188,6 @@ class TestDatabaseSchema:
         # This test validates the SQL query structure (not execution)
 
         # Expected query pattern from v6 ensemble
-        query_pattern = """
-        SELECT
-            pass_yards_l3,
-            pass_attempts_l3,
-            completions_l3,
-            completions_pct_l3,
-            opponent_epa,
-            opponent_points_allowed,
-            home_away_encoded
-        FROM mart.player_game_stats
-        WHERE player_id = %s
-          AND season = %s
-          AND week = %s
-        """
 
         # Validate query has expected columns (manual check - no SQL execution)
         expected_columns = [

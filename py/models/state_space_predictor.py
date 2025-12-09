@@ -32,7 +32,6 @@ Usage:
 
 import logging
 from pathlib import Path
-from typing import Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -83,25 +82,25 @@ class StateSpacePredictor:
         logger.info(f"Loading CmdStan model from {self.model_path}...")
 
         # Load R libraries
-        ro.r('library(cmdstanr)')
-        ro.r('library(posterior)')
+        ro.r("library(cmdstanr)")
+        ro.r("library(posterior)")
 
         # Load fitted model
         ro.r(f'fit <- readRDS("{self.model_path}")')
 
         # Extract global parameter posteriors
-        ro.r('draws <- fit$draws()')
-        ro.r('summary_df <- summarise_draws(draws)')
+        ro.r("draws <- fit$draws()")
+        ro.r("summary_df <- summarise_draws(draws)")
 
         # Extract key parameters with pandas2ri converter
         with localconverter(ro.default_converter + pandas2ri.converter):
-            summary_df = ro.conversion.rpy2py(ro.r('summary_df'))
+            summary_df = ro.conversion.rpy2py(ro.r("summary_df"))
 
         # Store parameter means
         self.params = {}
-        for var in ['beta_attempts', 'beta_home', 'R']:
-            if var in summary_df['variable'].values:
-                self.params[var] = summary_df[summary_df['variable'] == var]['mean'].values[0]
+        for var in ["beta_attempts", "beta_home", "R"]:
+            if var in summary_df["variable"].values:
+                self.params[var] = summary_df[summary_df["variable"] == var]["mean"].values[0]
             else:
                 logger.warning(f"Parameter {var} not found in model, using default")
                 self.params[var] = 0.0
@@ -111,12 +110,14 @@ class StateSpacePredictor:
         ro.r('beta_home_samples <- fit$draws("beta_home", format = "matrix")')
         ro.r('R_samples <- fit$draws("R", format = "matrix")')
 
-        self.beta_attempts_samples = np.array(ro.r('as.vector(beta_attempts_samples)'))
-        self.beta_home_samples = np.array(ro.r('as.vector(beta_home_samples)'))
-        self.R_samples = np.array(ro.r('as.vector(R_samples)'))
+        self.beta_attempts_samples = np.array(ro.r("as.vector(beta_attempts_samples)"))
+        self.beta_home_samples = np.array(ro.r("as.vector(beta_home_samples)"))
+        self.R_samples = np.array(ro.r("as.vector(R_samples)"))
 
-        logger.info(f"  ✓ Loaded parameters: beta_attempts={self.params['beta_attempts']:.3f}, "
-                   f"beta_home={self.params['beta_home']:.3f}, R={self.params['R']:.3f}")
+        logger.info(
+            f"  ✓ Loaded parameters: beta_attempts={self.params['beta_attempts']:.3f}, "
+            f"beta_home={self.params['beta_home']:.3f}, R={self.params['R']:.3f}"
+        )
         logger.info(f"  ✓ Loaded {len(self.beta_attempts_samples)} posterior samples")
 
     def _load_skills(self):
@@ -125,7 +126,7 @@ class StateSpacePredictor:
 
         self.skills_df = pd.read_csv(self.skills_path)
 
-        n_players = self.skills_df['player_id'].nunique()
+        n_players = self.skills_df["player_id"].nunique()
         n_total_games = len(self.skills_df)
 
         logger.info(f"  ✓ Loaded {n_total_games} skill values for {n_players} players")
@@ -133,10 +134,8 @@ class StateSpacePredictor:
         self.is_loaded = True
 
     def get_player_skill(
-        self,
-        player_id: str,
-        game_number: Optional[int] = None
-    ) -> Tuple[float, float]:
+        self, player_id: str, game_number: int | None = None
+    ) -> tuple[float, float]:
         """
         Get player's skill at specific game number
 
@@ -151,7 +150,7 @@ class StateSpacePredictor:
             raise RuntimeError("Model not loaded. Call __init__() first.")
 
         # Filter to player
-        player_skills = self.skills_df[self.skills_df['player_id'] == player_id]
+        player_skills = self.skills_df[self.skills_df["player_id"] == player_id]
 
         if len(player_skills) == 0:
             logger.warning(f"Player {player_id} not found in training data")
@@ -160,16 +159,16 @@ class StateSpacePredictor:
 
         # Get skill at specific game or latest
         if game_number is None:
-            skill_mean = player_skills['skill_mean'].iloc[-1]
+            skill_mean = player_skills["skill_mean"].iloc[-1]
         else:
             if game_number > len(player_skills):
                 # Extrapolate using latest skill (random walk → constant after last obs)
-                skill_mean = player_skills['skill_mean'].iloc[-1]
+                skill_mean = player_skills["skill_mean"].iloc[-1]
             else:
-                skill_mean = player_skills.iloc[game_number - 1]['skill_mean']
+                skill_mean = player_skills.iloc[game_number - 1]["skill_mean"]
 
         # Estimate skill uncertainty from trajectory variance
-        skill_std = player_skills['skill_mean'].std()
+        skill_std = player_skills["skill_mean"].std()
         if skill_std < 0.01:  # Avoid zero uncertainty
             skill_std = 0.1
 
@@ -182,9 +181,9 @@ class StateSpacePredictor:
         week: int,
         attempts: float,
         is_home: int,
-        game_number: Optional[int] = None,
+        game_number: int | None = None,
         n_samples: int = 1000,
-    ) -> Tuple[float, float]:
+    ) -> tuple[float, float]:
         """
         Generate prediction with uncertainty for a single game
 
@@ -221,11 +220,7 @@ class StateSpacePredictor:
         theta_samp = np.random.normal(theta_mean, theta_std, size=n_samples)
 
         # Compute log(yards) predictions
-        log_yards_pred = (
-            theta_samp
-            + beta_attempts_samp * log_attempts
-            + beta_home_samp * is_home
-        )
+        log_yards_pred = theta_samp + beta_attempts_samp * log_attempts + beta_home_samp * is_home
 
         # Add measurement noise
         log_yards_pred += np.random.normal(0, R_samp)
@@ -257,15 +252,21 @@ class StateSpacePredictor:
             pred_std = yards_pred_filtered.std()
             n_outliers = n_samples - len(yards_pred_filtered)
             if n_outliers > 0:
-                logger.debug(f"  Removed {n_outliers} outliers (>{upper_bound:.0f} or <{lower_bound:.0f} yards)")
+                logger.debug(
+                    f"  Removed {n_outliers} outliers (>{upper_bound:.0f} or <{lower_bound:.0f} yards)"
+                )
         else:
             # Too many outliers removed, fall back to clipped samples
             pred_mean = yards_pred.mean()
             pred_std = yards_pred.std()
-            logger.warning(f"  Too many outliers detected ({n_samples - len(yards_pred_filtered)}), using all clipped samples")
+            logger.warning(
+                f"  Too many outliers detected ({n_samples - len(yards_pred_filtered)}), using all clipped samples"
+            )
 
-        logger.info(f"  State-space prediction for {player_id} (W{week}, {season}): "
-                   f"{pred_mean:.1f} ± {pred_std:.1f} yards (n_samples={len(yards_pred_filtered) if len(yards_pred_filtered) > n_samples * 0.5 else n_samples})")
+        logger.info(
+            f"  State-space prediction for {player_id} (W{week}, {season}): "
+            f"{pred_mean:.1f} ± {pred_std:.1f} yards (n_samples={len(yards_pred_filtered) if len(yards_pred_filtered) > n_samples * 0.5 else n_samples})"
+        )
 
         return pred_mean, pred_std
 
@@ -304,30 +305,53 @@ class StateSpacePredictor:
                 n_samples=n_samples,
             )
 
-            results.append({
-                'player_id': pid,
-                'season': seas,
-                'week': wk,
-                'pred_mean': pred_mean,
-                'pred_std': pred_std,
-            })
+            results.append(
+                {
+                    "player_id": pid,
+                    "season": seas,
+                    "week": wk,
+                    "pred_mean": pred_mean,
+                    "pred_std": pred_std,
+                }
+            )
 
         return pd.DataFrame(results)
 
 
 def demo():
     """Demo state-space predictions"""
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("State-Space Predictor Demo")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     predictor = StateSpacePredictor()
 
     # Test cases
     test_cases = [
-        {"player_id": "00-0033873", "name": "Patrick Mahomes", "season": 2024, "week": 1, "attempts": 35, "is_home": 1},
-        {"player_id": "00-0036389", "name": "Jalen Hurts", "season": 2024, "week": 1, "attempts": 30, "is_home": 0},
-        {"player_id": "00-0019596", "name": "Tom Brady", "season": 2022, "week": 1, "attempts": 40, "is_home": 1},
+        {
+            "player_id": "00-0033873",
+            "name": "Patrick Mahomes",
+            "season": 2024,
+            "week": 1,
+            "attempts": 35,
+            "is_home": 1,
+        },
+        {
+            "player_id": "00-0036389",
+            "name": "Jalen Hurts",
+            "season": 2024,
+            "week": 1,
+            "attempts": 30,
+            "is_home": 0,
+        },
+        {
+            "player_id": "00-0019596",
+            "name": "Tom Brady",
+            "season": 2022,
+            "week": 1,
+            "attempts": 40,
+            "is_home": 1,
+        },
     ]
 
     for test in test_cases:
@@ -335,19 +359,21 @@ def demo():
         logger.info("-" * 60)
 
         pred_mean, pred_std = predictor.predict(
-            player_id=test['player_id'],
-            season=test['season'],
-            week=test['week'],
-            attempts=test['attempts'],
-            is_home=test['is_home'],
+            player_id=test["player_id"],
+            season=test["season"],
+            week=test["week"],
+            attempts=test["attempts"],
+            is_home=test["is_home"],
         )
 
         logger.info(f"  Prediction: {pred_mean:.1f} ± {pred_std:.1f} yards")
-        logger.info(f"  90% CI: [{pred_mean - 1.645*pred_std:.1f}, {pred_mean + 1.645*pred_std:.1f}]")
+        logger.info(
+            f"  90% CI: [{pred_mean - 1.645*pred_std:.1f}, {pred_mean + 1.645*pred_std:.1f}]"
+        )
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("✓ State-space predictor demo complete")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
 
 if __name__ == "__main__":

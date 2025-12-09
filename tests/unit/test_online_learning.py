@@ -13,30 +13,29 @@ Author: Claude Code (Phase 4 Dissertation Enhancement)
 Created: November 9, 2025
 """
 
-import sys
 import os
-import unittest
-from unittest.mock import Mock, patch, MagicMock
+import sys
 import tempfile
-import json
+import unittest
 
 # Add project root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
 
 from py.online.online_learning_adapter import (
+    AdaptiveRetrainer,
     DriftDetector,
     DriftEvent,
     OnlineModelAdapter,
     OnlinePredictionPipeline,
-    AdaptiveRetrainer,
     PerformanceMetrics,
+    calculate_adaptation_speed,
     compare_online_vs_static,
     detect_known_drift_events,
-    calculate_adaptation_speed,
 )
 
 
@@ -54,16 +53,16 @@ class TestDriftDetector(unittest.TestCase):
     def test_initialization(self):
         """Test drift detector initialization"""
         self.assertEqual(len(self.detector.detectors), 3)
-        self.assertIn('ADWIN', self.detector.detectors)
-        self.assertIn('KSWIN', self.detector.detectors)
-        self.assertIn('PageHinkley', self.detector.detectors)
+        self.assertIn("ADWIN", self.detector.detectors)
+        self.assertIn("KSWIN", self.detector.detectors)
+        self.assertIn("PageHinkley", self.detector.detectors)
 
     def test_no_drift_stable_data(self):
         """Test no drift detection on stable data"""
         # Feed stable data (mean = 50, std = 5)
         for _ in range(100):
             value = np.random.normal(50, 5)
-            drift = self.detector.update(value)
+            self.detector.update(value)
             # Should not detect drift (very unlikely with stable data)
 
         # Drift counts should be low
@@ -78,11 +77,9 @@ class TestDriftDetector(unittest.TestCase):
             self.detector.update(value)
 
         # Introduce drift (mean shifts to 70)
-        drift_detected = False
         for _ in range(50):
             value = np.random.normal(70, 5)
             if self.detector.update(value):
-                drift_detected = True
                 break
 
         # Should detect drift (at least one detector)
@@ -106,10 +103,10 @@ class TestDriftDetector(unittest.TestCase):
         """Test status reporting"""
         status = self.detector.get_status()
 
-        self.assertIn('drift_counts', status)
-        self.assertIn('last_drift_time', status)
-        self.assertIn('detectors', status)
-        self.assertEqual(len(status['detectors']), 3)
+        self.assertIn("drift_counts", status)
+        self.assertIn("last_drift_time", status)
+        self.assertIn("detectors", status)
+        self.assertEqual(len(status["detectors"]), 3)
 
 
 class TestOnlineModelAdapter(unittest.TestCase):
@@ -118,19 +115,19 @@ class TestOnlineModelAdapter(unittest.TestCase):
     def setUp(self):
         """Initialize online model for tests"""
         self.model = OnlineModelAdapter(
-            model_type='adaptive_random_forest',
+            model_type="adaptive_random_forest",
             n_models=5,
         )
 
     def test_initialization(self):
         """Test model initialization"""
-        self.assertEqual(self.model.model_type, 'adaptive_random_forest')
+        self.assertEqual(self.model.model_type, "adaptive_random_forest")
         self.assertEqual(self.model.n_models, 5)
         self.assertEqual(self.model.n_samples, 0)
 
     def test_predict_before_training(self):
         """Test prediction before any training"""
-        x = {'feature1': 1.0, 'feature2': 2.0}
+        x = {"feature1": 1.0, "feature2": 2.0}
         pred = self.model.predict(x)
 
         # Should return default value (0.0)
@@ -138,7 +135,7 @@ class TestOnlineModelAdapter(unittest.TestCase):
 
     def test_partial_fit(self):
         """Test partial fit (online learning)"""
-        x = {'feature1': 1.0, 'feature2': 2.0}
+        x = {"feature1": 1.0, "feature2": 2.0}
         y = 50.0
 
         # Fit model
@@ -149,10 +146,12 @@ class TestOnlineModelAdapter(unittest.TestCase):
 
     def test_batch_predict(self):
         """Test batch prediction"""
-        X = pd.DataFrame({
-            'feature1': [1.0, 2.0, 3.0],
-            'feature2': [2.0, 3.0, 4.0],
-        })
+        X = pd.DataFrame(
+            {
+                "feature1": [1.0, 2.0, 3.0],
+                "feature2": [2.0, 3.0, 4.0],
+            }
+        )
 
         predictions = self.model.batch_predict(X)
 
@@ -161,10 +160,12 @@ class TestOnlineModelAdapter(unittest.TestCase):
 
     def test_batch_partial_fit(self):
         """Test batch partial fit"""
-        X = pd.DataFrame({
-            'feature1': [1.0, 2.0, 3.0],
-            'feature2': [2.0, 3.0, 4.0],
-        })
+        X = pd.DataFrame(
+            {
+                "feature1": [1.0, 2.0, 3.0],
+                "feature2": [2.0, 3.0, 4.0],
+            }
+        )
         y = pd.Series([50.0, 55.0, 60.0])
 
         self.model.batch_partial_fit(X, y)
@@ -175,28 +176,32 @@ class TestOnlineModelAdapter(unittest.TestCase):
     def test_get_metrics(self):
         """Test metrics retrieval"""
         # Train model
-        X = pd.DataFrame({
-            'feature1': [1.0, 2.0, 3.0],
-            'feature2': [2.0, 3.0, 4.0],
-        })
+        X = pd.DataFrame(
+            {
+                "feature1": [1.0, 2.0, 3.0],
+                "feature2": [2.0, 3.0, 4.0],
+            }
+        )
         y = pd.Series([50.0, 55.0, 60.0])
 
         self.model.batch_partial_fit(X, y)
 
         metrics = self.model.get_metrics()
 
-        self.assertIn('mae', metrics)
-        self.assertIn('rmse', metrics)
-        self.assertIn('n_samples', metrics)
-        self.assertEqual(metrics['n_samples'], 3)
+        self.assertIn("mae", metrics)
+        self.assertIn("rmse", metrics)
+        self.assertIn("n_samples", metrics)
+        self.assertEqual(metrics["n_samples"], 3)
 
     def test_reset_metrics(self):
         """Test metrics reset"""
         # Train model
-        X = pd.DataFrame({
-            'feature1': [1.0, 2.0, 3.0],
-            'feature2': [2.0, 3.0, 4.0],
-        })
+        X = pd.DataFrame(
+            {
+                "feature1": [1.0, 2.0, 3.0],
+                "feature2": [2.0, 3.0, 4.0],
+            }
+        )
         y = pd.Series([50.0, 55.0, 60.0])
 
         self.model.batch_partial_fit(X, y)
@@ -207,8 +212,8 @@ class TestOnlineModelAdapter(unittest.TestCase):
         metrics = self.model.get_metrics()
 
         # Metrics should be reset (MAE/RMSE = 0)
-        self.assertEqual(metrics['mae'], 0.0)
-        self.assertEqual(metrics['rmse'], 0.0)
+        self.assertEqual(metrics["mae"], 0.0)
+        self.assertEqual(metrics["rmse"], 0.0)
 
 
 class TestOnlinePredictionPipeline(unittest.TestCase):
@@ -217,8 +222,8 @@ class TestOnlinePredictionPipeline(unittest.TestCase):
     def setUp(self):
         """Initialize pipeline for tests"""
         self.pipeline = OnlinePredictionPipeline(
-            online_model_type='adaptive_random_forest',
-            drift_sensitivity='medium',
+            online_model_type="adaptive_random_forest",
+            drift_sensitivity="medium",
         )
 
     def test_initialization(self):
@@ -229,10 +234,12 @@ class TestOnlinePredictionPipeline(unittest.TestCase):
 
     def test_predict_without_batch_models(self):
         """Test prediction without batch models"""
-        X = pd.DataFrame({
-            'feature1': [1.0, 2.0, 3.0],
-            'feature2': [2.0, 3.0, 4.0],
-        })
+        X = pd.DataFrame(
+            {
+                "feature1": [1.0, 2.0, 3.0],
+                "feature2": [2.0, 3.0, 4.0],
+            }
+        )
 
         predictions, uncertainties = self.pipeline.predict(X, use_batch=False, use_online=True)
 
@@ -241,10 +248,12 @@ class TestOnlinePredictionPipeline(unittest.TestCase):
 
     def test_partial_fit(self):
         """Test partial fit updates"""
-        X = pd.DataFrame({
-            'feature1': [1.0, 2.0, 3.0],
-            'feature2': [2.0, 3.0, 4.0],
-        })
+        X = pd.DataFrame(
+            {
+                "feature1": [1.0, 2.0, 3.0],
+                "feature2": [2.0, 3.0, 4.0],
+            }
+        )
         y = pd.Series([50.0, 55.0, 60.0])
 
         self.pipeline.partial_fit(X, y)
@@ -257,7 +266,7 @@ class TestOnlinePredictionPipeline(unittest.TestCase):
         self.pipeline.current_week = 10
         self.pipeline.current_season = 2024
 
-        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json') as f:
+        with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".json") as f:
             temp_path = f.name
 
         try:
@@ -285,23 +294,25 @@ class TestOnlinePredictionPipeline(unittest.TestCase):
         np.random.seed(42)
         n = 200
 
-        df = pd.DataFrame({
-            'feature1': np.random.randn(n),
-            'feature2': np.random.randn(n),
-            'passing_yards': 50 + np.random.randn(n) * 10,
-            'kickoff': pd.date_range('2024-09-01', periods=n, freq='D'),
-        })
+        df = pd.DataFrame(
+            {
+                "feature1": np.random.randn(n),
+                "feature2": np.random.randn(n),
+                "passing_yards": 50 + np.random.randn(n) * 10,
+                "kickoff": pd.date_range("2024-09-01", periods=n, freq="D"),
+            }
+        )
 
         results = self.pipeline.evaluate_prequential(
             df=df,
-            target_col='passing_yards',
-            date_col='kickoff',
+            target_col="passing_yards",
+            date_col="kickoff",
             window_size=50,
         )
 
-        self.assertIn('mean_mae', results)
-        self.assertIn('num_drift_events', results)
-        self.assertGreater(results['mean_mae'], 0)
+        self.assertIn("mean_mae", results)
+        self.assertIn("num_drift_events", results)
+        self.assertGreater(results["mean_mae"], 0)
 
 
 class TestAdaptiveRetrainer(unittest.TestCase):
@@ -310,7 +321,7 @@ class TestAdaptiveRetrainer(unittest.TestCase):
     def setUp(self):
         """Initialize retrainer for tests"""
         self.retrainer = AdaptiveRetrainer(
-            strategy='hybrid',
+            strategy="hybrid",
             periodic_interval=8,
             performance_threshold=0.15,
             drift_threshold=3,
@@ -318,7 +329,7 @@ class TestAdaptiveRetrainer(unittest.TestCase):
 
     def test_initialization(self):
         """Test retrainer initialization"""
-        self.assertEqual(self.retrainer.strategy, 'hybrid')
+        self.assertEqual(self.retrainer.strategy, "hybrid")
         self.assertEqual(self.retrainer.periodic_interval, 8)
         self.assertEqual(self.retrainer.weeks_since_retrain, 0)
 
@@ -341,7 +352,7 @@ class TestAdaptiveRetrainer(unittest.TestCase):
         should_retrain, reason = self.retrainer.should_retrain(50.0, False)
 
         self.assertTrue(should_retrain)
-        self.assertIn('periodic', reason)
+        self.assertIn("periodic", reason)
 
     def test_performance_trigger(self):
         """Test performance degradation trigger"""
@@ -352,7 +363,7 @@ class TestAdaptiveRetrainer(unittest.TestCase):
         should_retrain, reason = self.retrainer.should_retrain(60.0, False)
 
         self.assertTrue(should_retrain)
-        self.assertIn('performance', reason)
+        self.assertIn("performance", reason)
 
     def test_drift_trigger(self):
         """Test drift event trigger"""
@@ -366,7 +377,7 @@ class TestAdaptiveRetrainer(unittest.TestCase):
         should_retrain, reason = self.retrainer.should_retrain(50.0, True)
 
         self.assertTrue(should_retrain)
-        self.assertIn('drift', reason)
+        self.assertIn("drift", reason)
 
 
 class TestUtilityFunctions(unittest.TestCase):
@@ -374,25 +385,27 @@ class TestUtilityFunctions(unittest.TestCase):
 
     def test_compare_online_vs_static(self):
         """Test online vs static comparison"""
-        online_results = {'mae': 45.0, 'rmse': 55.0}
-        static_results = {'mae': 50.0, 'rmse': 60.0}
+        online_results = {"mae": 45.0, "rmse": 55.0}
+        static_results = {"mae": 50.0, "rmse": 60.0}
 
         comparison = compare_online_vs_static(online_results, static_results)
 
         self.assertIsInstance(comparison, pd.DataFrame)
-        self.assertIn('Online', comparison.columns)
-        self.assertIn('Static', comparison.columns)
-        self.assertIn('Improvement', comparison.columns)
+        self.assertIn("Online", comparison.columns)
+        self.assertIn("Static", comparison.columns)
+        self.assertIn("Improvement", comparison.columns)
 
         # Online should be better (positive improvement)
-        self.assertGreater(comparison.loc['mae', 'Improvement'], 0)
+        self.assertGreater(comparison.loc["mae", "Improvement"], 0)
 
     def test_detect_known_drift_events(self):
         """Test known drift event detection"""
         # Create dataset spanning 2018-2024
-        df = pd.DataFrame({
-            'kickoff': pd.date_range('2018-01-01', '2024-12-31', freq='W'),
-        })
+        df = pd.DataFrame(
+            {
+                "kickoff": pd.date_range("2018-01-01", "2024-12-31", freq="W"),
+            }
+        )
 
         events = detect_known_drift_events(df)
 
@@ -401,9 +414,9 @@ class TestUtilityFunctions(unittest.TestCase):
 
         # All events should have required fields
         for event in events:
-            self.assertIn('date', event)
-            self.assertIn('name', event)
-            self.assertIn('description', event)
+            self.assertIn("date", event)
+            self.assertIn("name", event)
+            self.assertIn("description", event)
 
     def test_calculate_adaptation_speed(self):
         """Test adaptation speed calculation"""
@@ -461,9 +474,9 @@ class TestPerformanceMetrics(unittest.TestCase):
 
         summary = self.metrics.get_summary()
 
-        self.assertIn('mean_mae', summary)
-        self.assertIn('mean_rmse', summary)
-        self.assertEqual(summary['mean_mae'], 45.5)
+        self.assertIn("mean_mae", summary)
+        self.assertIn("mean_rmse", summary)
+        self.assertEqual(summary["mean_mae"], 45.5)
 
 
 class TestDriftEvent(unittest.TestCase):
@@ -475,9 +488,9 @@ class TestDriftEvent(unittest.TestCase):
             timestamp=datetime.now(),
             week=10,
             season=2024,
-            detector_name='ADWIN',
+            detector_name="ADWIN",
             drift_magnitude=0.5,
-            affected_features=['feature1', 'feature2'],
+            affected_features=["feature1", "feature2"],
         )
 
         self.assertEqual(event.week, 10)
@@ -489,49 +502,52 @@ class TestDriftEvent(unittest.TestCase):
             timestamp=datetime.now(),
             week=10,
             season=2024,
-            detector_name='ADWIN',
+            detector_name="ADWIN",
             drift_magnitude=0.5,
-            affected_features=['feature1'],
-            suspected_cause='COVID-19',
+            affected_features=["feature1"],
+            suspected_cause="COVID-19",
         )
 
         event_dict = event.to_dict()
 
-        self.assertIn('week', event_dict)
-        self.assertIn('season', event_dict)
-        self.assertIn('suspected_cause', event_dict)
-        self.assertEqual(event_dict['suspected_cause'], 'COVID-19')
+        self.assertIn("week", event_dict)
+        self.assertIn("season", event_dict)
+        self.assertIn("suspected_cause", event_dict)
+        self.assertEqual(event_dict["suspected_cause"], "COVID-19")
 
 
 # =============================================================================
 # Property-Based Tests
 # =============================================================================
 
+
 class TestPropertyBasedTests(unittest.TestCase):
     """Property-based tests for online learning"""
 
     def test_property_predictions_improve_over_time(self):
         """Property: Online model MAE should improve (or stabilize) as it sees more data"""
-        model = OnlineModelAdapter(model_type='adaptive_random_forest')
+        model = OnlineModelAdapter(model_type="adaptive_random_forest")
 
         # Generate synthetic data
         np.random.seed(42)
         n = 200
-        X = pd.DataFrame({
-            'feature1': np.random.randn(n),
-            'feature2': np.random.randn(n),
-        })
-        y = pd.Series(50 + X['feature1'] * 5 + X['feature2'] * 3 + np.random.randn(n) * 2)
+        X = pd.DataFrame(
+            {
+                "feature1": np.random.randn(n),
+                "feature2": np.random.randn(n),
+            }
+        )
+        y = pd.Series(50 + X["feature1"] * 5 + X["feature2"] * 3 + np.random.randn(n) * 2)
 
         mae_checkpoints = []
 
         # Train incrementally and track MAE
         for i in range(0, n, 50):
-            X_batch = X.iloc[i:i+50]
-            y_batch = y.iloc[i:i+50]
+            X_batch = X.iloc[i : i + 50]
+            y_batch = y.iloc[i : i + 50]
 
             model.batch_partial_fit(X_batch, y_batch)
-            mae_checkpoints.append(model.get_metrics()['mae'])
+            mae_checkpoints.append(model.get_metrics()["mae"])
 
         # MAE should generally decrease (or at least not increase significantly)
         # Allow some variance due to random data
@@ -550,10 +566,8 @@ class TestPropertyBasedTests(unittest.TestCase):
             detector.update(np.random.normal(50, 5))
 
         # Change distribution dramatically
-        drift_detected = False
         for _ in range(100):
             if detector.update(np.random.normal(100, 5)):
-                drift_detected = True
                 break
 
         # Should detect drift (at least one detector)
@@ -561,5 +575,5 @@ class TestPropertyBasedTests(unittest.TestCase):
         self.assertGreater(total_drifts, 0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

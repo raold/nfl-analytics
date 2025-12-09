@@ -22,23 +22,27 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 22, 2025
 """
 
-import os
 import logging
+import os
+from collections.abc import Generator
 from contextlib import contextmanager
-from typing import Generator
+
 import streamlit as st
 
 # Try to import psycopg3 and connection pooling
 try:
     import psycopg
+
     PSYCOPG_AVAILABLE = True
 except ImportError:
     PSYCOPG_AVAILABLE = False
 
 try:
     import sys
+
     sys.path.append("/Users/dro/rice/nfl-analytics")
     from py.utils.psycopg_pool import get_connection_pool
+
     POOL_AVAILABLE = True
 except ImportError:
     POOL_AVAILABLE = False

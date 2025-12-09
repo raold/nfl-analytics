@@ -60,24 +60,22 @@ import time
 import warnings
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 import numpy as np
 import pandas as pd
 import psycopg2
 import shap
 import xgboost as xgb
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 from py.features.game_feature_extractor import GameFeatureExtractor
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class GameOutcomeModel:
@@ -110,17 +108,17 @@ class GameOutcomeModel:
 
     # XGBoost hyperparameters (tuned for game outcomes)
     DEFAULT_PARAMS = {
-        'max_depth': 6,
-        'learning_rate': 0.05,
-        'n_estimators': 300,
-        'subsample': 0.8,
-        'colsample_bytree': 0.8,
-        'reg_alpha': 0.1,
-        'reg_lambda': 1.0,
-        'min_child_weight': 3,
-        'objective': 'reg:squarederror',
-        'random_state': 42,
-        'n_jobs': -1
+        "max_depth": 6,
+        "learning_rate": 0.05,
+        "n_estimators": 300,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "reg_alpha": 0.1,
+        "reg_lambda": 1.0,
+        "min_child_weight": 3,
+        "objective": "reg:squarederror",
+        "random_state": 42,
+        "n_jobs": -1,
     }
 
     def __init__(
@@ -129,8 +127,8 @@ class GameOutcomeModel:
         db_port: int = 5544,
         db_name: str = "devdb01",
         db_user: str = "dro",
-        db_password: Optional[str] = None,
-        model_dir: Optional[str] = None
+        db_password: str | None = None,
+        model_dir: str | None = None,
     ):
         """
         Initialize game outcome model.
@@ -153,11 +151,11 @@ class GameOutcomeModel:
                 )
 
         self.db_config = {
-            'host': db_host,
-            'port': db_port,
-            'dbname': db_name,
-            'user': db_user,
-            'password': db_password
+            "host": db_host,
+            "port": db_port,
+            "dbname": db_name,
+            "user": db_user,
+            "password": db_password,
         }
 
         # Initialize feature extractor
@@ -165,25 +163,27 @@ class GameOutcomeModel:
 
         # Model directory
         self.project_root = Path(__file__).parent.parent.parent
-        self.model_dir = Path(model_dir) if model_dir else self.project_root / "models" / "game_outcome"
+        self.model_dir = (
+            Path(model_dir) if model_dir else self.project_root / "models" / "game_outcome"
+        )
         self.model_dir.mkdir(parents=True, exist_ok=True)
 
         # Model objects (lazy loaded)
-        self.spread_model = None
-        self.total_model = None
-        self.win_prob_model = None
-        self.feature_scaler = None
-        self.feature_names = None
+        self.spread_model: Optional[xgb.XGBRegressor] = None
+        self.total_model: Optional[xgb.XGBRegressor] = None
+        self.win_prob_model: Optional[xgb.XGBClassifier] = None
+        self.feature_scaler: Optional[StandardScaler] = None
+        self.feature_names: Optional[list[str]] = None
         self.models_trained = False
 
         # SHAP explainer (computed after training)
-        self.spread_explainer = None
-        self.total_explainer = None
-        self.win_prob_explainer = None
+        self.spread_explainer: Optional[shap.Explainer] = None
+        self.total_explainer: Optional[shap.Explainer] = None
+        self.win_prob_explainer: Optional[shap.Explainer] = None
 
         logger.info(f"GameOutcomeModel initialized (models dir: {self.model_dir})")
 
-    def _fetch_training_data(self, seasons: List[int]) -> pd.DataFrame:
+    def _fetch_training_data(self, seasons: list[int]) -> pd.DataFrame:
         """
         Fetch training data from database for specified seasons.
 
@@ -245,16 +245,16 @@ class GameOutcomeModel:
 
                 # Add game metadata and targets
                 record = {
-                    'season': season,
-                    'week': week,
-                    'home_team': home_team,
-                    'away_team': away_team,
-                    'home_score': home_score,
-                    'away_score': away_score,
-                    'home_win': home_win,
-                    'spread': home_score - away_score,  # Positive = home won by more
-                    'total': home_score + away_score,
-                    **features  # Unpack all features
+                    "season": season,
+                    "week": week,
+                    "home_team": home_team,
+                    "away_team": away_team,
+                    "home_score": home_score,
+                    "away_score": away_score,
+                    "home_win": home_win,
+                    "spread": home_score - away_score,  # Positive = home won by more
+                    "total": home_score + away_score,
+                    **features,  # Unpack all features
                 }
 
                 data.append(record)
@@ -289,11 +289,8 @@ class GameOutcomeModel:
         return df
 
     def train(
-        self,
-        seasons: List[int],
-        validation_split: float = 0.2,
-        tune_hyperparameters: bool = False
-    ) -> Dict[str, float]:
+        self, seasons: list[int], validation_split: float = 0.2, tune_hyperparameters: bool = False
+    ) -> dict[str, float]:
         """
         Train XGBoost models on historical game data.
 
@@ -322,23 +319,32 @@ class GameOutcomeModel:
 
         # 2. Prepare features and targets
         # Exclude metadata columns
-        exclude_cols = ['season', 'week', 'home_team', 'away_team',
-                       'home_score', 'away_score', 'home_win', 'spread', 'total']
+        exclude_cols = [
+            "season",
+            "week",
+            "home_team",
+            "away_team",
+            "home_score",
+            "away_score",
+            "home_win",
+            "spread",
+            "total",
+        ]
 
         feature_cols = [col for col in df.columns if col not in exclude_cols]
         self.feature_names = feature_cols
 
         X = df[feature_cols].values
-        y_spread = df['spread'].values
-        y_total = df['total'].values
-        y_win_prob = df['home_win'].values
+        y_spread = df["spread"].values
+        y_total = df["total"].values
+        y_win_prob = df["home_win"].values
 
         logger.info(f"Feature matrix: {X.shape[0]} samples × {X.shape[1]} features")
         logger.info(f"Feature names: {feature_cols[:5]}... (showing first 5)")
 
         # 3. Train-validation split (temporal: later games in validation)
         # Sort by (season, week) and split chronologically
-        df_sorted = df.sort_values(['season', 'week'])
+        df_sorted = df.sort_values(["season", "week"])
         split_idx = int(len(df_sorted) * (1 - validation_split))
 
         train_idx = df_sorted.index[:split_idx]
@@ -361,9 +367,7 @@ class GameOutcomeModel:
         logger.info("Training spread model...")
         self.spread_model = xgb.XGBRegressor(**self.DEFAULT_PARAMS)
         self.spread_model.fit(
-            X_train_scaled, y_spread_train,
-            eval_set=[(X_val_scaled, y_spread_val)],
-            verbose=False
+            X_train_scaled, y_spread_train, eval_set=[(X_val_scaled, y_spread_val)], verbose=False
         )
         spread_preds = self.spread_model.predict(X_val_scaled)
         spread_mae = np.mean(np.abs(spread_preds - y_spread_val))
@@ -373,9 +377,7 @@ class GameOutcomeModel:
         logger.info("Training total model...")
         self.total_model = xgb.XGBRegressor(**self.DEFAULT_PARAMS)
         self.total_model.fit(
-            X_train_scaled, y_total_train,
-            eval_set=[(X_val_scaled, y_total_val)],
-            verbose=False
+            X_train_scaled, y_total_train, eval_set=[(X_val_scaled, y_total_val)], verbose=False
         )
         total_preds = self.total_model.predict(X_val_scaled)
         total_mae = np.mean(np.abs(total_preds - y_total_val))
@@ -384,12 +386,10 @@ class GameOutcomeModel:
         # 7. Train win probability model (binary classification)
         logger.info("Training win probability model...")
         win_prob_params = self.DEFAULT_PARAMS.copy()
-        win_prob_params['objective'] = 'binary:logistic'
+        win_prob_params["objective"] = "binary:logistic"
         self.win_prob_model = xgb.XGBClassifier(**win_prob_params)
         self.win_prob_model.fit(
-            X_train_scaled, y_win_train,
-            eval_set=[(X_val_scaled, y_win_val)],
-            verbose=False
+            X_train_scaled, y_win_train, eval_set=[(X_val_scaled, y_win_val)], verbose=False
         )
         win_prob_preds = self.win_prob_model.predict_proba(X_val_scaled)[:, 1]
 
@@ -410,19 +410,13 @@ class GameOutcomeModel:
         self.save_models()
 
         return {
-            'spread_mae': float(spread_mae),
-            'total_mae': float(total_mae),
-            'win_prob_calibration': float(win_prob_calibration),
-            'training_time_seconds': float(elapsed)
+            "spread_mae": float(spread_mae),
+            "total_mae": float(total_mae),
+            "win_prob_calibration": float(win_prob_calibration),
+            "training_time_seconds": float(elapsed),
         }
 
-    def predict(
-        self,
-        home_team: str,
-        away_team: str,
-        season: int,
-        week: int
-    ) -> Dict[str, float]:
+    def predict(self, home_team: str, away_team: str, season: int, week: int) -> dict[str, float]:
         """
         Predict game outcome (spread, total, win probability).
 
@@ -447,16 +441,12 @@ class GameOutcomeModel:
             RuntimeError: If models not trained or loaded
         """
         if not self.models_trained:
-            raise RuntimeError(
-                "Models not trained. Call train() or load_models() first."
-            )
+            raise RuntimeError("Models not trained. Call train() or load_models() first.")
 
         start = time.time()
 
         # 1. Extract features
-        features = self.feature_extractor.extract_game_features(
-            home_team, away_team, season, week
-        )
+        features = self.feature_extractor.extract_game_features(home_team, away_team, season, week)
 
         # 2. Prepare feature vector (match training feature order)
         X = np.array([[features.get(col, 0.0) for col in self.feature_names]])
@@ -470,17 +460,17 @@ class GameOutcomeModel:
         # 4. Estimate uncertainty (use validation MAE as proxy for std)
         # In production, use quantile regression or Bayesian methods for better uncertainty
         spread_std = 3.5  # Default uncertainty (update after training)
-        total_std = 5.0   # Default uncertainty (update after training)
+        total_std = 5.0  # Default uncertainty (update after training)
 
         elapsed_ms = (time.time() - start) * 1000
 
         result = {
-            'home_spread': float(round(home_spread, 1)),
-            'total_points': float(round(total_points, 1)),
-            'home_win_probability': float(round(home_win_probability, 4)),
-            'spread_std': float(spread_std),
-            'total_std': float(total_std),
-            'inference_time_ms': float(round(elapsed_ms, 1))
+            "home_spread": float(round(home_spread, 1)),
+            "total_points": float(round(total_points, 1)),
+            "home_win_probability": float(round(home_win_probability, 4)),
+            "spread_std": float(spread_std),
+            "total_std": float(total_std),
+            "inference_time_ms": float(round(elapsed_ms, 1)),
         }
 
         logger.info(
@@ -491,7 +481,7 @@ class GameOutcomeModel:
 
         return result
 
-    def validate(self, holdout_season: int) -> Dict[str, float]:
+    def validate(self, holdout_season: int) -> dict[str, float]:
         """
         Validate model performance on holdout season.
 
@@ -520,16 +510,25 @@ class GameOutcomeModel:
         df_holdout = self._fetch_training_data(seasons=[holdout_season])
 
         # Prepare features and targets
-        exclude_cols = ['season', 'week', 'home_team', 'away_team',
-                       'home_score', 'away_score', 'home_win', 'spread', 'total']
+        exclude_cols = [
+            "season",
+            "week",
+            "home_team",
+            "away_team",
+            "home_score",
+            "away_score",
+            "home_win",
+            "spread",
+            "total",
+        ]
         feature_cols = [col for col in df_holdout.columns if col not in exclude_cols]
 
         X = df_holdout[feature_cols].values
         X_scaled = self.feature_scaler.transform(X)
 
-        y_spread = df_holdout['spread'].values
-        y_total = df_holdout['total'].values
-        y_win = df_holdout['home_win'].values
+        y_spread = df_holdout["spread"].values
+        y_total = df_holdout["total"].values
+        y_win = df_holdout["home_win"].values
 
         # Predict
         spread_preds = self.spread_model.predict(X_scaled)
@@ -550,18 +549,14 @@ class GameOutcomeModel:
         )
 
         return {
-            'spread_mae': spread_mae,
-            'total_mae': total_mae,
-            'win_prob_accuracy': win_accuracy,
-            'win_prob_calibration': win_calibration,
-            'n_games': len(df_holdout)
+            "spread_mae": spread_mae,
+            "total_mae": total_mae,
+            "win_prob_accuracy": win_accuracy,
+            "win_prob_calibration": win_calibration,
+            "n_games": len(df_holdout),
         }
 
-    def get_feature_importance(
-        self,
-        top_n: int = 20,
-        method: str = 'shap'
-    ) -> pd.DataFrame:
+    def get_feature_importance(self, top_n: int = 20, method: str = "shap") -> pd.DataFrame:
         """
         Get feature importance rankings.
 
@@ -584,10 +579,10 @@ class GameOutcomeModel:
         if not self.models_trained:
             raise RuntimeError("Models not trained. Call train() first.")
 
-        if method not in ['shap', 'gain']:
+        if method not in ["shap", "gain"]:
             raise ValueError(f"Invalid method: {method}. Must be 'shap' or 'gain'.")
 
-        if method == 'shap':
+        if method == "shap":
             if self.spread_explainer is None:
                 raise RuntimeError("SHAP explainers not computed. Call train() first.")
 
@@ -603,25 +598,27 @@ class GameOutcomeModel:
             win_prob_importance = self.win_prob_model.feature_importances_
 
         # Create DataFrame
-        df_importance = pd.DataFrame({
-            'feature': self.feature_names,
-            'spread_importance': spread_importance,
-            'total_importance': total_importance,
-            'win_prob_importance': win_prob_importance
-        })
+        df_importance = pd.DataFrame(
+            {
+                "feature": self.feature_names,
+                "spread_importance": spread_importance,
+                "total_importance": total_importance,
+                "win_prob_importance": win_prob_importance,
+            }
+        )
 
         # Compute average importance
-        df_importance['avg_importance'] = df_importance[
-            ['spread_importance', 'total_importance', 'win_prob_importance']
+        df_importance["avg_importance"] = df_importance[
+            ["spread_importance", "total_importance", "win_prob_importance"]
         ].mean(axis=1)
 
         # Sort by average importance
-        df_importance = df_importance.sort_values('avg_importance', ascending=False)
+        df_importance = df_importance.sort_values("avg_importance", ascending=False)
 
         # Return top N
         return df_importance.head(top_n)
 
-    def save_models(self, suffix: Optional[str] = None):
+    def save_models(self, suffix: str | None = None):
         """
         Save trained models to disk.
 
@@ -646,12 +643,15 @@ class GameOutcomeModel:
 
         # Save feature scaler and metadata
         metadata_path = self.model_dir / f"metadata{suffix_str}.pkl"
-        with open(metadata_path, 'wb') as f:
-            pickle.dump({
-                'feature_scaler': self.feature_scaler,
-                'feature_names': self.feature_names,
-                'model_params': self.DEFAULT_PARAMS
-            }, f)
+        with open(metadata_path, "wb") as f:
+            pickle.dump(
+                {
+                    "feature_scaler": self.feature_scaler,
+                    "feature_names": self.feature_names,
+                    "model_params": self.DEFAULT_PARAMS,
+                },
+                f,
+            )
 
         logger.info(f"Models saved to {self.model_dir}")
         logger.info(f"  - Spread: {spread_path.name}")
@@ -659,7 +659,7 @@ class GameOutcomeModel:
         logger.info(f"  - Win Prob: {win_prob_path.name}")
         logger.info(f"  - Metadata: {metadata_path.name}")
 
-    def load_models(self, suffix: Optional[str] = None):
+    def load_models(self, suffix: str | None = None):
         """
         Load trained models from disk.
 
@@ -675,7 +675,7 @@ class GameOutcomeModel:
             if not metadata_files:
                 raise FileNotFoundError(f"No models found in {self.model_dir}")
             metadata_path = metadata_files[-1]
-            suffix_str = metadata_path.stem.replace('metadata', '')
+            suffix_str = metadata_path.stem.replace("metadata", "")
         else:
             suffix_str = f"_{suffix}"
             metadata_path = self.model_dir / f"metadata{suffix_str}.pkl"
@@ -684,10 +684,10 @@ class GameOutcomeModel:
         if not metadata_path.exists():
             raise FileNotFoundError(f"Metadata file not found: {metadata_path}")
 
-        with open(metadata_path, 'rb') as f:
+        with open(metadata_path, "rb") as f:
             metadata = pickle.load(f)
-            self.feature_scaler = metadata['feature_scaler']
-            self.feature_names = metadata['feature_names']
+            self.feature_scaler = metadata["feature_scaler"]
+            self.feature_names = metadata["feature_names"]
 
         # Load XGBoost models
         spread_path = self.model_dir / f"spread_model{suffix_str}.json"
@@ -715,10 +715,7 @@ class GameOutcomeModel:
         logger.info(f"  - Suffix: {suffix_str}")
 
     def _compute_calibration(
-        self,
-        predicted_probs: np.ndarray,
-        true_labels: np.ndarray,
-        n_bins: int = 10
+        self, predicted_probs: np.ndarray, true_labels: np.ndarray, n_bins: int = 10
     ) -> float:
         """
         Compute Expected Calibration Error (ECE).
@@ -786,30 +783,30 @@ def main():
     model = GameOutcomeModel()
 
     # Train on 2022-2024 seasons
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("TRAINING GAME OUTCOME MODEL")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     metrics = model.train(seasons=[2022, 2023, 2024], validation_split=0.2)
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("TRAINING RESULTS")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info(f"Spread MAE: {metrics['spread_mae']:.2f} points")
     logger.info(f"Total MAE: {metrics['total_mae']:.2f} points")
     logger.info(f"Win Prob Calibration: {metrics['win_prob_calibration']:.1%}")
     logger.info(f"Training Time: {metrics['training_time_seconds']:.1f}s")
 
     # Example prediction
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("EXAMPLE PREDICTION: KC vs BUF (2025 Week 12)")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     prediction = model.predict(
-        home_team='KC',
-        away_team='BUF',
+        home_team="KC",
+        away_team="BUF",
         season=datetime.now().year if datetime.now().month >= 9 else datetime.now().year - 1,
-        week=12
+        week=12,
     )
 
     logger.info(f"Home Spread: {prediction['home_spread']:.1f} ± {prediction['spread_std']:.1f}")
@@ -818,11 +815,11 @@ def main():
     logger.info(f"Inference Time: {prediction['inference_time_ms']:.1f}ms")
 
     # Feature importance
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("TOP 10 FEATURES (SHAP)")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
-    importance = model.get_feature_importance(top_n=10, method='shap')
+    importance = model.get_feature_importance(top_n=10, method="shap")
     for _, row in importance.iterrows():
         logger.info(
             f"{row['feature']:40s} "
@@ -831,9 +828,9 @@ def main():
             f"Win={row['win_prob_importance']:.4f}"
         )
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("✅ ALL CHECKS PASSED")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
 
 if __name__ == "__main__":

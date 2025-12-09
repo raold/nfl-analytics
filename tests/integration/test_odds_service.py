@@ -10,8 +10,6 @@ Version: 1.0
 """
 
 import os
-import time
-from datetime import datetime, timedelta
 
 import psycopg2
 import pytest
@@ -133,12 +131,14 @@ class TestDatabaseSchema:
     def test_odds_history_exists(self, db_conn):
         """Test odds_history table exists."""
         cur = db_conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT EXISTS (
                 SELECT 1 FROM information_schema.tables
                 WHERE table_name = 'odds_history'
             );
-        """)
+        """
+        )
         exists = cur.fetchone()[0]
         cur.close()
 
@@ -148,12 +148,14 @@ class TestDatabaseSchema:
     def test_prop_lines_history_exists(self, db_conn):
         """Test prop_lines_history table exists."""
         cur = db_conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT EXISTS (
                 SELECT 1 FROM information_schema.tables
                 WHERE table_name = 'prop_lines_history'
             );
-        """)
+        """
+        )
         exists = cur.fetchone()[0]
         cur.close()
 
@@ -163,12 +165,14 @@ class TestDatabaseSchema:
     def test_api_usage_tracker_exists(self, db_conn):
         """Test api_usage_tracker table exists."""
         cur = db_conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT EXISTS (
                 SELECT 1 FROM information_schema.tables
                 WHERE table_name = 'api_usage_tracker'
             );
-        """)
+        """
+        )
         exists = cur.fetchone()[0]
         cur.close()
 
@@ -178,12 +182,14 @@ class TestDatabaseSchema:
     def test_odds_history_schema(self, db_conn):
         """Test odds_history table schema."""
         cur = db_conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT column_name, data_type
             FROM information_schema.columns
             WHERE table_name = 'odds_history'
             ORDER BY ordinal_position;
-        """)
+        """
+        )
         columns = cur.fetchall()
         cur.close()
 
@@ -209,12 +215,14 @@ class TestDatabaseSchema:
     def test_prop_lines_history_schema(self, db_conn):
         """Test prop_lines_history table schema."""
         cur = db_conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT column_name, data_type
             FROM information_schema.columns
             WHERE table_name = 'prop_lines_history'
             ORDER BY ordinal_position;
-        """)
+        """
+        )
         columns = cur.fetchall()
         cur.close()
 
@@ -256,11 +264,13 @@ class TestDatabaseData:
     def test_odds_history_recent_data(self, db_conn):
         """Test odds_history has recent data."""
         cur = db_conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT COUNT(*)
             FROM odds_history
             WHERE snapshot_at > NOW() - INTERVAL '7 days';
-        """)
+        """
+        )
         count = cur.fetchone()[0]
         cur.close()
 
@@ -269,11 +279,13 @@ class TestDatabaseData:
     def test_odds_history_bookmakers(self, db_conn):
         """Test number of bookmakers in odds_history."""
         cur = db_conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT COUNT(DISTINCT bookmaker_key)
             FROM odds_history
             WHERE snapshot_at > NOW() - INTERVAL '30 days';
-        """)
+        """
+        )
         count = cur.fetchone()[0]
         cur.close()
 
@@ -283,12 +295,14 @@ class TestDatabaseData:
     def test_api_usage_tracker_current_month(self, db_conn):
         """Test API usage tracker has current month data."""
         cur = db_conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT calls_made, quota_limit, last_call_at
             FROM api_usage_tracker
             WHERE month = DATE_TRUNC('month', CURRENT_DATE)
                 AND api_name = 'the-odds-api';
-        """)
+        """
+        )
         result = cur.fetchone()
         cur.close()
 
@@ -420,7 +434,8 @@ class TestMonitoringQueries:
     def test_api_usage_query(self, db_conn):
         """Test API usage summary query."""
         cur = db_conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT
                 api_name,
                 calls_made,
@@ -429,7 +444,8 @@ class TestMonitoringQueries:
             FROM api_usage_tracker
             WHERE month = DATE_TRUNC('month', CURRENT_DATE)
                 AND api_name = 'the-odds-api';
-        """)
+        """
+        )
         result = cur.fetchone()
         cur.close()
 
@@ -442,13 +458,15 @@ class TestMonitoringQueries:
     def test_odds_coverage_query(self, db_conn):
         """Test odds coverage summary query."""
         cur = db_conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT COUNT(DISTINCT event_id) as unique_events,
                    COUNT(DISTINCT bookmaker_key) as bookmakers,
                    COUNT(*) as total_odds
             FROM odds_history
             WHERE snapshot_at > NOW() - INTERVAL '24 hours';
-        """)
+        """
+        )
         result = cur.fetchone()
         cur.close()
 
@@ -458,13 +476,15 @@ class TestMonitoringQueries:
     def test_line_movement_query(self, db_conn):
         """Test line movement detection query."""
         cur = db_conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT COUNT(*)
             FROM prop_lines_history
             WHERE snapshot_at > NOW() - INTERVAL '24 hours'
                 AND line_move_since_open IS NOT NULL
                 AND ABS(line_move_since_open) >= 5.0;
-        """)
+        """
+        )
         count = cur.fetchone()[0]
         cur.close()
 
@@ -488,7 +508,9 @@ def run_comprehensive_test():
     # Test database connection
     try:
         conn = psycopg2.connect(**DB_CONFIG)
-        print(f"✅ Database: Connected to {DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}")
+        print(
+            f"✅ Database: Connected to {DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['dbname']}"
+        )
         conn.close()
     except Exception as e:
         print(f"❌ Database connection failed: {e}")
@@ -499,12 +521,15 @@ def run_comprehensive_test():
     print("RUNNING PYTEST SUITE")
     print("=" * 80)
 
-    result = pytest.main([
-        __file__,
-        "-v",
-        "--tb=short",
-        "-m", "not slow",
-    ])
+    result = pytest.main(
+        [
+            __file__,
+            "-v",
+            "--tb=short",
+            "-m",
+            "not slow",
+        ]
+    )
 
     print("\n" + "=" * 80)
     print("TEST SUMMARY")
@@ -520,5 +545,6 @@ def run_comprehensive_test():
 
 if __name__ == "__main__":
     import sys
+
     success = run_comprehensive_test()
     sys.exit(0 if success else 1)

@@ -9,20 +9,12 @@ Date: 2025-11-14
 
 import logging
 import os
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 from datetime import datetime
-import json
+from pathlib import Path
 
 import numpy as np
 
-from api.models import (
-    PredictionRequest,
-    PredictionResponse,
-    ModelContribution,
-    ModelInfo,
-    StatType
-)
+from api.models import ModelContribution, ModelInfo, PredictionRequest, PredictionResponse, StatType
 
 # Import production ensemble
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
@@ -43,11 +35,7 @@ class EnsemblePredictor:
     4. Informative Priors v2 (15%)
     """
 
-    def __init__(
-        self,
-        models_dir: Path = Path("/app/models"),
-        device: str = "cpu"
-    ):
+    def __init__(self, models_dir: Path = Path("/app/models"), device: str = "cpu"):
         self.models_dir = Path(models_dir)
         self.device = device
         self.loaded_at = datetime.utcnow()
@@ -68,10 +56,16 @@ class EnsemblePredictor:
         self.ensemble = EnhancedEnsemble4Way(
             db_password=db_password,
             state_space_path=str(self.models_dir / "bayesian" / "simplified_random_walk_v2.rds"),
-            hierarchical_path=str(self.models_dir / "bayesian" / "passing_yards_hierarchical_v2.rds"),
-            informative_path=str(self.models_dir / "bayesian" / "passing_informative_priors_v2.rds"),
+            hierarchical_path=str(
+                self.models_dir / "bayesian" / "passing_yards_hierarchical_v2.rds"
+            ),
+            informative_path=str(
+                self.models_dir / "bayesian" / "passing_informative_priors_v2.rds"
+            ),
             xgboost_path=str(self.models_dir / "xgboost" / "passing_xgboost_v2_canonical.pkl"),
-            temperature_scaler_path=str(self.models_dir / "calibration" / "temperature_scaler_4way.pkl"),
+            temperature_scaler_path=str(
+                self.models_dir / "calibration" / "temperature_scaler_4way.pkl"
+            ),
             db_host=db_host,
             db_port=db_port,
             db_name=db_name,
@@ -79,7 +73,7 @@ class EnsemblePredictor:
         )
         logger.info("✅ Production ensemble initialized")
 
-    def load_models(self) -> Dict[str, ModelInfo]:
+    def load_models(self) -> dict[str, ModelInfo]:
         """
         Load all models in the ensemble.
 
@@ -97,26 +91,26 @@ class EnsemblePredictor:
                 "name": "state_space_v2",
                 "type": "bayesian_state_space",
                 "path": self.ensemble.state_space_path,
-                "version": "2.0"
+                "version": "2.0",
             },
             {
                 "name": "hierarchical_v2",
                 "type": "bayesian_hierarchical",
                 "path": self.ensemble.hierarchical_path,
-                "version": "2.0"
+                "version": "2.0",
             },
             {
                 "name": "informative_priors_v2",
                 "type": "bayesian_informative_priors",
                 "path": self.ensemble.informative_path,
-                "version": "2.0"
+                "version": "2.0",
             },
             {
                 "name": "xgboost_v2",
                 "type": "xgboost",
                 "path": self.ensemble.xgboost_path,
-                "version": "2.0"
-            }
+                "version": "2.0",
+            },
         ]
 
         model_info = {}
@@ -135,7 +129,7 @@ class EnsemblePredictor:
                         file_size_mb=0.0,
                         loaded_at=self.loaded_at,
                         status="unavailable",
-                        metadata={"error": "File not found"}
+                        metadata={"error": "File not found"},
                     )
                     continue
 
@@ -154,11 +148,7 @@ class EnsemblePredictor:
                     file_size_mb=round(file_size_mb, 2),
                     loaded_at=self.loaded_at,
                     status="loaded",
-                    metadata={
-                        "device": self.device,
-                        "weight": weight,
-                        "ensemble_version": "5.0"
-                    }
+                    metadata={"device": self.device, "weight": weight, "ensemble_version": "5.0"},
                 )
 
                 logger.info(f"✓ {config['name']}: {file_size_mb:.1f} MB (weight: {weight:.0%})")
@@ -173,7 +163,7 @@ class EnsemblePredictor:
                     file_size_mb=0.0,
                     loaded_at=self.loaded_at,
                     status="failed",
-                    metadata={"error": str(e)}
+                    metadata={"error": str(e)},
                 )
 
         loaded_count = len([m for m in model_info.values() if m.status == "loaded"])
@@ -197,7 +187,9 @@ class EnsemblePredictor:
 
         # NOTE: Currently only supports passing yards
         if request.stat_type != StatType.PASSING_YARDS:
-            logger.warning(f"Unsupported stat type: {request.stat_type} (only PASSING_YARDS supported)")
+            logger.warning(
+                f"Unsupported stat type: {request.stat_type} (only PASSING_YARDS supported)"
+            )
             return PredictionResponse(
                 game_id=request.game_id,
                 player_id=request.player_id,
@@ -208,7 +200,7 @@ class EnsemblePredictor:
                 upper_bound=None,
                 models_used=[],
                 timestamp=datetime.utcnow(),
-                ensemble_method="production_4way"
+                ensemble_method="production_4way",
             )
 
         # Parse game_id to get season and week (format: "2024_10_KC_BUF")
@@ -228,15 +220,12 @@ class EnsemblePredictor:
                 upper_bound=None,
                 models_used=[],
                 timestamp=datetime.utcnow(),
-                ensemble_method="production_4way"
+                ensemble_method="production_4way",
             )
 
         # Get prediction from production ensemble
         result = self.ensemble.predict(
-            player_id=request.player_id,
-            season=season,
-            week=week,
-            return_individual=True
+            player_id=request.player_id, season=season, week=week, return_individual=True
         )
 
         # Check if prediction succeeded
@@ -252,7 +241,7 @@ class EnsemblePredictor:
                 upper_bound=None,
                 models_used=[],
                 timestamp=datetime.utcnow(),
-                ensemble_method="production_4way"
+                ensemble_method="production_4way",
             )
 
         # Build model contributions from individual predictions
@@ -267,7 +256,7 @@ class EnsemblePredictor:
                         model_name=model_name,
                         prediction=float(pred),
                         uncertainty=float(unc),
-                        weight=float(weight)
+                        weight=float(weight),
                     )
                 )
 
@@ -302,10 +291,10 @@ class EnsemblePredictor:
             upper_bound=round(result["quantile_90"], 1),
             models_used=valid_predictions,
             timestamp=datetime.utcnow(),
-            ensemble_method="production_4way"
+            ensemble_method="production_4way",
         )
 
-    def get_model_info(self) -> Dict[str, ModelInfo]:
+    def get_model_info(self) -> dict[str, ModelInfo]:
         """Get information about all models"""
         return self.load_models()
 

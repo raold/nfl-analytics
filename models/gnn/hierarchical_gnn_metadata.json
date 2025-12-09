@@ -1,43 +1,33 @@
 {
   "model": "HierarchicalGNN",
   "seasons": [
-    2016,
-    2017,
-    2018,
-    2019,
     2020,
     2021,
     2022,
     2023,
-    2024,
-    2025
-  ],
-  "train_seasons": [
-    2016,
-    2017,
-    2018,
-    2019,
-    2020,
-    2021,
-    2022,
-    2023
-  ],
-  "val_seasons": [
     2024
   ],
+  "train_seasons": [
+    2020,
+    2021,
+    2022
+  ],
+  "val_seasons": [
+    2023
+  ],
   "test_seasons": [
-    2025
+    2024
   ],
   "embedding_dim": 64,
   "hidden_dim": 128,
   "num_message_rounds": 3,
-  "epochs": 1,
+  "epochs": 20,
   "learning_rate": 0.001,
-  "best_val_brier": 0.24941249242321314,
+  "best_val_brier": 0.24104412073910744,
   "test_metrics": {
-    "accuracy": 0.24354243542435425,
-    "log_loss": 0.7029942380028035,
-    "auc": 0.4841530054644808,
-    "brier": 0.254922955070371
+    "accuracy": 0.5588235294117647,
+    "log_loss": 0.7090765525972393,
+    "auc": 0.6096117295682867,
+    "brier": 0.25489118418587725
   }
 }

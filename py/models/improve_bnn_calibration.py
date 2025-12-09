@@ -22,23 +22,23 @@ Author: Claude Code
 Date: 2025-11-03
 """
 
-import sys
 import os
+import sys
 
 # Add project root to path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, project_root)
 
 import logging
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
+import arviz as az
+import joblib
 import numpy as np
 import pandas as pd
 import psycopg2
 import pymc as pm
-import arviz as az
-import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -66,7 +66,7 @@ class ImprovedBNN:
         inference_method: str = "advi",
         n_samples: int = 2000,
         prior_std: float = 1.0,
-        temperature: float = 1.0
+        temperature: float = 1.0,
     ):
         self.hidden_dims = hidden_dims
         self.inference_method = inference_method
@@ -109,12 +109,7 @@ class ImprovedBNN:
             for i, hidden_dim in enumerate(self.hidden_dims):
                 # Hierarchical prior on weights (key for calibration!)
                 w_sd = pm.HalfNormal(f"w{i+1}_sd", sigma=self.prior_std)
-                w = pm.Normal(
-                    f"w{i+1}",
-                    mu=0,
-                    sigma=w_sd,
-                    shape=(prev_dim, hidden_dim)
-                )
+                w = pm.Normal(f"w{i+1}", mu=0, sigma=w_sd, shape=(prev_dim, hidden_dim))
                 b = pm.Normal(f"b{i+1}", mu=0, sigma=1, shape=hidden_dim)
 
                 # ReLU activation
@@ -154,10 +149,9 @@ class ImprovedBNN:
                     method="advi",
                     callbacks=[
                         pm.callbacks.CheckParametersConvergence(
-                            tolerance=1e-5,  # Tighter convergence
-                            every=1000
+                            tolerance=1e-5, every=1000  # Tighter convergence
                         )
-                    ]
+                    ],
                 )
 
                 self.trace = approx.sample(self.n_samples)
@@ -172,7 +166,7 @@ class ImprovedBNN:
                     chains=4,
                     cores=4,
                     target_accept=0.95,
-                    return_inferencedata=True
+                    return_inferencedata=True,
                 )
 
                 logger.info(f"✓ NUTS complete: {self.n_samples} posterior samples")
@@ -188,10 +182,7 @@ class ImprovedBNN:
         logger.info("✓ BNN training complete")
 
     def predict(
-        self,
-        X: np.ndarray,
-        return_quantiles: bool = True,
-        n_samples: int | None = None
+        self, X: np.ndarray, return_quantiles: bool = True, n_samples: int | None = None
     ) -> dict[str, np.ndarray]:
         """
         Predict with full uncertainty quantification
@@ -214,9 +205,7 @@ class ImprovedBNN:
 
             # Posterior predictive sampling
             posterior_pred = pm.sample_posterior_predictive(
-                self.trace,
-                var_names=["y_obs"],
-                random_seed=42
+                self.trace, var_names=["y_obs"], random_seed=42
             )
 
         # Extract predictions
@@ -228,11 +217,13 @@ class ImprovedBNN:
         }
 
         if return_quantiles:
-            predictions.update({
-                "q05": np.percentile(pred_samples, 5, axis=0),
-                "q50": np.percentile(pred_samples, 50, axis=0),
-                "q95": np.percentile(pred_samples, 95, axis=0),
-            })
+            predictions.update(
+                {
+                    "q05": np.percentile(pred_samples, 5, axis=0),
+                    "q50": np.percentile(pred_samples, 50, axis=0),
+                    "q95": np.percentile(pred_samples, 95, axis=0),
+                }
+            )
 
         logger.info(
             f"✓ Generated predictions: "
@@ -266,11 +257,7 @@ def load_passing_data():
     logger.info("Loading passing data from database...")
 
     conn = psycopg2.connect(
-        host="localhost",
-        port=5544,
-        user="dro",
-        password="sicillionbillions",
-        database="devdb01"
+        host="localhost", port=5544, user="dro", password="sicillionbillions", database="devdb01"
     )
 
     # Simpler query using just game context features
@@ -318,9 +305,9 @@ def prepare_features(df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
 def run_calibration_experiments():
     """Run systematic calibration improvement experiments"""
 
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("BNN CALIBRATION IMPROVEMENT EXPERIMENTS")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # Setup
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -334,9 +321,7 @@ def run_calibration_experiments():
     X, y = prepare_features(df)
 
     # Train/test split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     logger.info(f"Train: {len(X_train)}, Test: {len(X_test)}")
 
@@ -348,9 +333,9 @@ def run_calibration_experiments():
                 "hidden_dims": (64, 32),
                 "inference_method": "advi",
                 "prior_std": 1.0,
-                "temperature": 1.0
+                "temperature": 1.0,
             },
-            "notes": "Baseline BNN (current architecture)"
+            "notes": "Baseline BNN (current architecture)",
         },
         {
             "name": "deeper",
@@ -358,9 +343,9 @@ def run_calibration_experiments():
                 "hidden_dims": (64, 128, 64),
                 "inference_method": "advi",
                 "prior_std": 1.0,
-                "temperature": 1.0
+                "temperature": 1.0,
             },
-            "notes": "Deeper architecture (3 layers)"
+            "notes": "Deeper architecture (3 layers)",
         },
         {
             "name": "wider",
@@ -368,9 +353,9 @@ def run_calibration_experiments():
                 "hidden_dims": (128, 128),
                 "inference_method": "advi",
                 "prior_std": 1.0,
-                "temperature": 1.0
+                "temperature": 1.0,
             },
-            "notes": "Wider architecture (128 units)"
+            "notes": "Wider architecture (128 units)",
         },
         {
             "name": "temp_1.5",
@@ -378,9 +363,9 @@ def run_calibration_experiments():
                 "hidden_dims": (64, 32),
                 "inference_method": "advi",
                 "prior_std": 1.0,
-                "temperature": 1.5
+                "temperature": 1.5,
             },
-            "notes": "Temperature scaling (T=1.5)"
+            "notes": "Temperature scaling (T=1.5)",
         },
         {
             "name": "temp_2.0",
@@ -388,9 +373,9 @@ def run_calibration_experiments():
                 "hidden_dims": (64, 32),
                 "inference_method": "advi",
                 "prior_std": 1.0,
-                "temperature": 2.0
+                "temperature": 2.0,
             },
-            "notes": "Temperature scaling (T=2.0)"
+            "notes": "Temperature scaling (T=2.0)",
         },
         {
             "name": "stronger_priors",
@@ -398,9 +383,9 @@ def run_calibration_experiments():
                 "hidden_dims": (64, 32),
                 "inference_method": "advi",
                 "prior_std": 0.5,
-                "temperature": 1.0
+                "temperature": 1.0,
             },
-            "notes": "Stronger priors (σ=0.5)"
+            "notes": "Stronger priors (σ=0.5)",
         },
         {
             "name": "nuts",
@@ -408,9 +393,9 @@ def run_calibration_experiments():
                 "hidden_dims": (64, 32),
                 "inference_method": "nuts",
                 "prior_std": 1.0,
-                "temperature": 1.0
+                "temperature": 1.0,
             },
-            "notes": "NUTS (exact inference)"
+            "notes": "NUTS (exact inference)",
         },
     ]
 
@@ -433,10 +418,7 @@ def run_calibration_experiments():
 
         # Log experiment
         exp_logger.log_experiment(
-            experiment_name=exp["name"],
-            config=exp["config"],
-            metrics=metrics,
-            notes=exp["notes"]
+            experiment_name=exp["name"], config=exp["config"], metrics=metrics, notes=exp["notes"]
         )
 
         # Save model if well-calibrated
@@ -473,5 +455,5 @@ def run_calibration_experiments():
 
 if __name__ == "__main__":
     output_dir = run_calibration_experiments()
-    print(f"\n✓ Calibration improvement experiments complete!")
+    print("\n✓ Calibration improvement experiments complete!")
     print(f"  Results: {output_dir}")

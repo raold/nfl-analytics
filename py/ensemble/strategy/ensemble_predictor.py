@@ -9,10 +9,10 @@ Date: November 9, 2025
 """
 
 import logging
-from pathlib import Path
-from typing import List, Dict, Optional, Any
 import pickle
 import sys
+from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -24,16 +24,16 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from .base import (
+    EnsembleConfig,
+    EnsemblePrediction,
     EnsembleStrategy,
     ModelPrediction,
-    EnsemblePrediction,
-    EnsembleConfig,
     ModelType,
 )
 from .simple_average import SimpleAverageStrategy
-from .weighted_average import WeightedAverageStrategy
-from .thompson_sampling import ThompsonSamplingStrategy
 from .stacking import StackingStrategy
+from .thompson_sampling import ThompsonSamplingStrategy
+from .weighted_average import WeightedAverageStrategy
 
 # Import model loading dependencies (lazy import to avoid circular dependencies)
 try:
@@ -49,14 +49,15 @@ except ImportError:
     logger.warning("BNN module not found - BNN predictions will fail")
 
 try:
-    from py.utils.r_service import get_r_service, RServiceError
+    from py.utils.r_service import RServiceError, get_r_service
 except ImportError:
     get_r_service = None
     logger.warning("R Service not found - R model predictions will fail")
 
 try:
-    from py.utils.claude_cache import get_default_cache
     import base64
+
+    from py.utils.claude_cache import get_default_cache
 except ImportError:
     get_default_cache = None
     logger.warning("ClaudeRedisCache not found - model caching disabled")
@@ -125,7 +126,9 @@ class UnifiedEnsemblePredictor:
 
         # Two-level caching: L1 (in-memory) + L2 (Redis)
         self._model_cache = {}  # L1: Fast in-memory cache
-        self._redis_cache = get_default_cache() if get_default_cache else None  # L2: Persistent Redis cache
+        self._redis_cache = (
+            get_default_cache() if get_default_cache else None
+        )  # L2: Persistent Redis cache
 
         if self._redis_cache:
             logger.info("Redis model caching enabled (two-level: in-memory + Redis)")
@@ -163,7 +166,7 @@ class UnifiedEnsemblePredictor:
         player_id: str,
         season: int,
         week: int,
-        features: Optional[Dict] = None,
+        features: dict | None = None,
     ) -> EnsemblePrediction:
         """
         Generate ensemble prediction for a player.
@@ -184,16 +187,12 @@ class UnifiedEnsemblePredictor:
 
         # Get predictions from all available models
         model_predictions = self._get_model_predictions(
-            player_id=player_id,
-            season=season,
-            week=week,
-            features=features
+            player_id=player_id, season=season, week=week, features=features
         )
 
         # Filter by confidence threshold
         filtered = self.strategy.filter_predictions(
-            model_predictions,
-            confidence_threshold=self.config.confidence_threshold
+            model_predictions, confidence_threshold=self.config.confidence_threshold
         )
 
         logger.info(
@@ -223,8 +222,8 @@ class UnifiedEnsemblePredictor:
         player_id: str,
         season: int,
         week: int,
-        features: Optional[Dict] = None,
-    ) -> List[ModelPrediction]:
+        features: dict | None = None,
+    ) -> list[ModelPrediction]:
         """
         Get predictions from all available models.
 
@@ -248,7 +247,7 @@ class UnifiedEnsemblePredictor:
                     player_id=player_id,
                     season=season,
                     week=week,
-                    features=features
+                    features=features,
                 )
                 if pred:
                     predictions.append(pred)
@@ -266,8 +265,8 @@ class UnifiedEnsemblePredictor:
         player_id: str,
         season: int,
         week: int,
-        features: Optional[Dict] = None,
-    ) -> Optional[ModelPrediction]:
+        features: dict | None = None,
+    ) -> ModelPrediction | None:
         """
         Get prediction from a single model.
 
@@ -300,13 +299,7 @@ class UnifiedEnsemblePredictor:
             logger.warning(f"Unknown model format: {path.suffix}")
             return None
 
-    def _load_model_with_redis(
-        self,
-        model_name: str,
-        path: Path,
-        model_type: str,
-        loader_func
-    ):
+    def _load_model_with_redis(self, model_name: str, path: Path, model_type: str, loader_func):
         """
         Load model with two-level caching (L1: in-memory, L2: Redis).
 
@@ -376,7 +369,7 @@ class UnifiedEnsemblePredictor:
             try:
                 # Serialize: model → pickle bytes → base64 string
                 pickle_bytes = pickle.dumps(model)
-                pickle_b64 = base64.b64encode(pickle_bytes).decode('utf-8')
+                pickle_b64 = base64.b64encode(pickle_bytes).decode("utf-8")
 
                 cache_key = f"model:{model_type}:{model_name}:serialized"
                 ttl = 86400  # 24 hours
@@ -394,13 +387,8 @@ class UnifiedEnsemblePredictor:
         return model
 
     def _predict_r_model(
-        self,
-        model_name: str,
-        path: Path,
-        player_id: str,
-        season: int,
-        week: int
-    ) -> Optional[ModelPrediction]:
+        self, model_name: str, path: Path, player_id: str, season: int, week: int
+    ) -> ModelPrediction | None:
         """
         Get prediction from R model (brms/Stan) via RService.
 
@@ -471,11 +459,12 @@ class UnifiedEnsemblePredictor:
                 cache_key=cache_key,
                 cache_ttl=21600,  # 6 hours - predictions change as games progress
                 timeout=60,
-                retry=True
+                retry=True,
             )
 
             # Parse JSON result
             import json
+
             pred_dict = json.loads(result.stdout.strip())
 
             prediction_mean = float(pred_dict["mean"])
@@ -503,7 +492,7 @@ class UnifiedEnsemblePredictor:
                     "r_version": health.r_version,
                     "prediction_method": "posterior_predict",
                     "transform": "exp(log_yards)",
-                }
+                },
             )
 
         except RServiceError as e:
@@ -514,12 +503,8 @@ class UnifiedEnsemblePredictor:
             return None
 
     def _predict_bnn_model(
-        self,
-        model_name: str,
-        path: Path,
-        player_id: str,
-        features: Optional[Dict]
-    ) -> Optional[ModelPrediction]:
+        self, model_name: str, path: Path, player_id: str, features: dict | None
+    ) -> ModelPrediction | None:
         """
         Get prediction from BNN model.
 
@@ -546,7 +531,7 @@ class UnifiedEnsemblePredictor:
                 model_name=model_name,
                 path=path,
                 model_type="bnn",
-                loader_func=lambda p: BayesianNeuralNetwork.load(p)
+                loader_func=lambda p: BayesianNeuralNetwork.load(p),
             )
 
             # Convert features dict to numpy array
@@ -579,7 +564,7 @@ class UnifiedEnsemblePredictor:
                     "model_path": str(path),
                     "hidden_dims": model.hidden_dims,
                     "inference_method": model.inference_method,
-                }
+                },
             )
 
         except Exception as e:
@@ -587,12 +572,8 @@ class UnifiedEnsemblePredictor:
             return None
 
     def _predict_xgboost_model(
-        self,
-        model_name: str,
-        path: Path,
-        player_id: str,
-        features: Optional[Dict]
-    ) -> Optional[ModelPrediction]:
+        self, model_name: str, path: Path, player_id: str, features: dict | None
+    ) -> ModelPrediction | None:
         """
         Get prediction from XGBoost model.
 
@@ -621,10 +602,7 @@ class UnifiedEnsemblePredictor:
                 return booster
 
             model = self._load_model_with_redis(
-                model_name=model_name,
-                path=path,
-                model_type="xgboost",
-                loader_func=load_xgboost
+                model_name=model_name, path=path, model_type="xgboost", loader_func=load_xgboost
             )
 
             # Convert features dict to DMatrix
@@ -661,7 +639,7 @@ class UnifiedEnsemblePredictor:
                     "model_path": str(path),
                     "n_features": actual_features,
                     "uncertainty_method": "heuristic_cv_15pct",
-                }
+                },
             )
 
         except Exception as e:
@@ -669,10 +647,8 @@ class UnifiedEnsemblePredictor:
             return None
 
     def _features_dict_to_array(
-        self,
-        features: Dict[str, Any],
-        model_type: str
-    ) -> Optional[np.ndarray]:
+        self, features: dict[str, Any], model_type: str
+    ) -> np.ndarray | None:
         """
         Convert features dictionary to numpy array for model prediction.
 
@@ -751,11 +727,7 @@ if __name__ == "__main__":
 
     # Generate prediction (uses stub models)
     try:
-        result = predictor.predict(
-            player_id="00-0019596",  # Patrick Mahomes
-            season=2024,
-            week=9
-        )
+        result = predictor.predict(player_id="00-0019596", season=2024, week=9)  # Patrick Mahomes
 
         logger.info(f"\n{'='*60}")
         logger.info(f"Prediction: {result.prediction_mean:.1f} ± {result.prediction_std:.1f} yards")

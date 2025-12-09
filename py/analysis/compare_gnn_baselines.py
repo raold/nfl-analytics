@@ -15,12 +15,8 @@ Outputs:
 """
 
 import json
-import sys
 from pathlib import Path
-from typing import Dict, List, Any
-
-import numpy as np
-import pandas as pd
+from typing import Any
 
 # Set up paths
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -34,19 +30,19 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 ANALYSIS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_gnn_results() -> Dict[str, Any]:
+def load_gnn_results() -> dict[str, Any]:
     """Load GNN ablation results and return best configuration."""
-    with open(GNN_RESULTS_PATH, 'r') as f:
+    with open(GNN_RESULTS_PATH) as f:
         results = json.load(f)
 
     # Find best test Brier score
-    best = min(results, key=lambda x: x['test_brier'])
+    best = min(results, key=lambda x: x["test_brier"])
     return best
 
 
-def load_xgboost_results() -> Dict[str, Any]:
+def load_xgboost_results() -> dict[str, Any]:
     """Load XGBoost metadata."""
-    with open(XGBOOST_METADATA_PATH, 'r') as f:
+    with open(XGBOOST_METADATA_PATH) as f:
         return json.load(f)
 
 
@@ -61,68 +57,76 @@ def create_baseline_comparison_table() -> str:
     models_data = []
 
     # XGBoost v3
-    models_data.append({
-        'Model': 'XGBoost v3',
-        'Type': 'Gradient Boosting',
-        'Val Brier': xgboost['performance']['validation_2024']['brier_score'],
-        'Val Acc': xgboost['performance']['validation_2024']['accuracy'],
-        'Val AUC': xgboost['performance']['validation_2024']['auc'],
-        'Test Brier': None,  # Not available
-        'Test Acc': None,
-        'Test AUC': None,
-        'Params': '~100K',
-        'Train Time': '~5 min',
-        'Features': '63 engineered'
-    })
+    models_data.append(
+        {
+            "Model": "XGBoost v3",
+            "Type": "Gradient Boosting",
+            "Val Brier": xgboost["performance"]["validation_2024"]["brier_score"],
+            "Val Acc": xgboost["performance"]["validation_2024"]["accuracy"],
+            "Val AUC": xgboost["performance"]["validation_2024"]["auc"],
+            "Test Brier": None,  # Not available
+            "Test Acc": None,
+            "Test AUC": None,
+            "Params": "~100K",
+            "Train Time": "~5 min",
+            "Features": "63 engineered",
+        }
+    )
 
     # GNN (Best from ablation - 5 Message Rounds)
-    models_data.append({
-        'Model': 'GNN (5 Msg Rounds)',
-        'Type': 'Graph Neural Network',
-        'Val Brier': gnn_best['best_val_brier'],
-        'Val Acc': None,  # Not tracked in ablation
-        'Val AUC': None,
-        'Test Brier': gnn_best['test_brier'],
-        'Test Acc': gnn_best['test_accuracy'],
-        'Test AUC': gnn_best['test_auc'],
-        'Params': '~50K',
-        'Train Time': '~45 min',
-        'Features': 'Graph structure'
-    })
+    models_data.append(
+        {
+            "Model": "GNN (5 Msg Rounds)",
+            "Type": "Graph Neural Network",
+            "Val Brier": gnn_best["best_val_brier"],
+            "Val Acc": None,  # Not tracked in ablation
+            "Val AUC": None,
+            "Test Brier": gnn_best["test_brier"],
+            "Test Acc": gnn_best["test_accuracy"],
+            "Test AUC": gnn_best["test_auc"],
+            "Params": "~50K",
+            "Train Time": "~45 min",
+            "Features": "Graph structure",
+        }
+    )
 
     # GNN Baseline (3 Message Rounds)
-    gnn_baseline = next(x for x in json.load(open(GNN_RESULTS_PATH))
-                       if x['config_name'] == 'baseline')
-    models_data.append({
-        'Model': 'GNN (Baseline)',
-        'Type': 'Graph Neural Network',
-        'Val Brier': gnn_baseline['best_val_brier'],
-        'Val Acc': None,
-        'Val AUC': None,
-        'Test Brier': gnn_baseline['test_brier'],
-        'Test Acc': gnn_baseline['test_accuracy'],
-        'Test AUC': gnn_baseline['test_auc'],
-        'Params': '~50K',
-        'Train Time': '~35 min',
-        'Features': 'Graph structure'
-    })
+    gnn_baseline = next(
+        x for x in json.load(open(GNN_RESULTS_PATH)) if x["config_name"] == "baseline"
+    )
+    models_data.append(
+        {
+            "Model": "GNN (Baseline)",
+            "Type": "Graph Neural Network",
+            "Val Brier": gnn_baseline["best_val_brier"],
+            "Val Acc": None,
+            "Val AUC": None,
+            "Test Brier": gnn_baseline["test_brier"],
+            "Test Acc": gnn_baseline["test_accuracy"],
+            "Test AUC": gnn_baseline["test_auc"],
+            "Params": "~50K",
+            "Train Time": "~35 min",
+            "Features": "Graph structure",
+        }
+    )
 
     # GNN Small Model (efficiency pick)
-    gnn_small = next(x for x in json.load(open(GNN_RESULTS_PATH))
-                    if x['config_name'] == 'small')
-    models_data.append({
-        'Model': 'GNN (Small)',
-        'Type': 'Graph Neural Network',
-        'Val Brier': gnn_small['best_val_brier'],
-        'Val Acc': None,
-        'Val AUC': None,
-        'Test Brier': gnn_small['test_brier'],
-        'Test Acc': gnn_small['test_accuracy'],
-        'Test AUC': gnn_small['test_auc'],
-        'Params': '~12K',
-        'Train Time': '~10 min',
-        'Features': 'Graph structure'
-    })
+    gnn_small = next(x for x in json.load(open(GNN_RESULTS_PATH)) if x["config_name"] == "small")
+    models_data.append(
+        {
+            "Model": "GNN (Small)",
+            "Type": "Graph Neural Network",
+            "Val Brier": gnn_small["best_val_brier"],
+            "Val Acc": None,
+            "Val AUC": None,
+            "Test Brier": gnn_small["test_brier"],
+            "Test Acc": gnn_small["test_accuracy"],
+            "Test AUC": gnn_small["test_auc"],
+            "Params": "~12K",
+            "Train Time": "~10 min",
+            "Features": "Graph structure",
+        }
+    )
 
     latex = r"""% Baseline Model Comparison Table
 % Generated by compare_gnn_baselines.py
@@ -140,17 +144,19 @@ def create_baseline_comparison_table() -> str:
 """
 
     for model in models_data:
-        val_brier = f"{model['Val Brier']:.4f}" if model['Val Brier'] is not None else "---"
-        val_acc = f"{model['Val Acc']:.3f}" if model['Val Acc'] is not None else "---"
-        val_auc = f"{model['Val AUC']:.4f}" if model['Val AUC'] is not None else "---"
-        test_brier = f"{model['Test Brier']:.4f}" if model['Test Brier'] is not None else "---"
-        test_acc = f"{model['Test Acc']:.3f}" if model['Test Acc'] is not None else "---"
-        test_auc = f"{model['Test AUC']:.4f}" if model['Test AUC'] is not None else "---"
+        val_brier = f"{model['Val Brier']:.4f}" if model["Val Brier"] is not None else "---"
+        val_acc = f"{model['Val Acc']:.3f}" if model["Val Acc"] is not None else "---"
+        val_auc = f"{model['Val AUC']:.4f}" if model["Val AUC"] is not None else "---"
+        test_brier = f"{model['Test Brier']:.4f}" if model["Test Brier"] is not None else "---"
+        test_acc = f"{model['Test Acc']:.3f}" if model["Test Acc"] is not None else "---"
+        test_auc = f"{model['Test AUC']:.4f}" if model["Test AUC"] is not None else "---"
 
         # Highlight best values
-        if model['Test Brier'] is not None:
-            best_test_brier = min(m['Test Brier'] for m in models_data if m['Test Brier'] is not None)
-            if model['Test Brier'] == best_test_brier:
+        if model["Test Brier"] is not None:
+            best_test_brier = min(
+                m["Test Brier"] for m in models_data if m["Test Brier"] is not None
+            )
+            if model["Test Brier"] == best_test_brier:
                 test_brier = r"\textbf{" + test_brier + "}"
 
         latex += (
@@ -204,19 +210,19 @@ def generate_detailed_comparison_text() -> str:
     report.append("-" * 80)
     report.append("")
     report.append("XGBoost v3 Production:")
-    report.append(f"  - Type: Gradient Boosted Trees")
+    report.append("  - Type: Gradient Boosted Trees")
     report.append(f"  - Features: {xgboost['training_data']['num_features']} engineered features")
     report.append(f"  - Trees: {xgboost['hyperparameters']['num_boost_round']}")
     report.append(f"  - Max Depth: {xgboost['hyperparameters']['max_depth']}")
     report.append(f"  - Training Data: {xgboost['training_data']['train_games']} games (2006-2023)")
     report.append("")
     report.append(f"GNN (Best: {gnn_best['name']}):")
-    report.append(f"  - Type: Hierarchical Graph Neural Network")
-    report.append(f"  - Architecture: Player → Position → Team → Game")
+    report.append("  - Type: Hierarchical Graph Neural Network")
+    report.append("  - Architecture: Player → Position → Team → Game")
     report.append(f"  - Embedding Dim: {gnn_best['config']['embedding_dim']}")
     report.append(f"  - Hidden Dim: {gnn_best['config']['hidden_dim']}")
     report.append(f"  - Message Rounds: {gnn_best['config']['num_message_rounds']}")
-    report.append(f"  - Parameters: ~50K (vs ~100K for XGBoost)")
+    report.append("  - Parameters: ~50K (vs ~100K for XGBoost)")
     report.append("")
 
     # Performance comparison
@@ -224,14 +230,18 @@ def generate_detailed_comparison_text() -> str:
     report.append("-" * 80)
     report.append("")
     report.append("Validation (2024 Season):")
-    report.append(f"  XGBoost v3:")
-    report.append(f"    - Brier Score: {xgboost['performance']['validation_2024']['brier_score']:.4f}")
+    report.append("  XGBoost v3:")
+    report.append(
+        f"    - Brier Score: {xgboost['performance']['validation_2024']['brier_score']:.4f}"
+    )
     report.append(f"    - Accuracy: {xgboost['performance']['validation_2024']['accuracy']:.3f}")
     report.append(f"    - AUC: {xgboost['performance']['validation_2024']['auc']:.4f}")
     report.append("")
     report.append(f"  GNN ({gnn_best['name']}):")
     report.append(f"    - Brier Score: {gnn_best['best_val_brier']:.4f}")
-    report.append(f"    - Advantage: +{(gnn_best['best_val_brier'] - xgboost['performance']['validation_2024']['brier_score'])*100:.1f}% worse Brier")
+    report.append(
+        f"    - Advantage: +{(gnn_best['best_val_brier'] - xgboost['performance']['validation_2024']['brier_score'])*100:.1f}% worse Brier"
+    )
     report.append("")
     report.append("Test (2025 Season):")
     report.append(f"  GNN ({gnn_best['name']}):")
@@ -259,9 +269,9 @@ def generate_detailed_comparison_text() -> str:
     report.append("   - Smaller model (50K vs 100K parameters)")
     report.append("")
     report.append("3. Test Performance (GNN only):")
-    report.append(f"   - Best test Brier: 0.2746 (5 message rounds)")
-    report.append(f"   - Test accuracy: 50.2% (slightly better than random)")
-    report.append(f"   - Generalization gap: +0.043 (val to test)")
+    report.append("   - Best test Brier: 0.2746 (5 message rounds)")
+    report.append("   - Test accuracy: 50.2% (slightly better than random)")
+    report.append("   - Generalization gap: +0.043 (val to test)")
     report.append("")
     report.append("4. Efficiency Tradeoffs:")
     report.append("   - XGBoost: 5 min training, 100K params")
@@ -305,7 +315,7 @@ def main():
     print("Generating baseline comparison table...")
     baseline_table = create_baseline_comparison_table()
     baseline_path = OUTPUT_DIR / "baseline_model_comparison_table.tex"
-    with open(baseline_path, 'w') as f:
+    with open(baseline_path, "w") as f:
         f.write(baseline_table)
     print(f"✓ Saved baseline comparison table to: {baseline_path}")
     print()
@@ -314,7 +324,7 @@ def main():
     print("Generating detailed comparison analysis...")
     analysis_text = generate_detailed_comparison_text()
     analysis_path = ANALYSIS_DIR / "model_comparison_report.txt"
-    with open(analysis_path, 'w') as f:
+    with open(analysis_path, "w") as f:
         f.write(analysis_text)
     print(f"✓ Saved detailed analysis to: {analysis_path}")
     print()

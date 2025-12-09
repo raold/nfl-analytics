@@ -23,12 +23,10 @@ Version: 2.0 (Production - No Mock Data)
 
 import logging
 import os
-import pickle
 import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import xgboost as xgb
@@ -63,7 +61,7 @@ class PropsPredictionRequest(BaseModel):
     )
 
     @validator("stat_type")
-    def validate_stat_type(cls, v):
+    def validate_stat_type(self, v):
         valid_stats = {"passing_yards", "rushing_yards", "receiving_yards", "touchdowns"}
         if v not in valid_stats:
             raise ValueError(f"stat_type must be one of {valid_stats}")
@@ -85,7 +83,7 @@ class PropsPredictionResponse(BaseModel):
     """Props prediction response."""
 
     player_id: str
-    player_name: Optional[str] = None
+    player_name: str | None = None
     stat_type: str
     week: int
     season: int
@@ -96,10 +94,8 @@ class PropsPredictionResponse(BaseModel):
     confidence_interval_lower: float
     confidence_interval_upper: float
     model_used: str = Field(..., description="Model version used")
-    ab_group: Optional[str] = Field(None, description="A/B test group (control/treatment)")
-    calibration_score: Optional[float] = Field(
-        None, description="Calibration score (if available)"
-    )
+    ab_group: str | None = Field(None, description="A/B test group (control/treatment)")
+    calibration_score: float | None = Field(None, description="Calibration score (if available)")
     timestamp: str
     processing_ms: float
 
@@ -176,9 +172,7 @@ class PropsModelManager:
         try:
             from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-            self._ensemble = EnhancedEnsemble5Way(
-                db_password=self.db_config["password"]
-            )
+            self._ensemble = EnhancedEnsemble5Way(db_password=self.db_config["password"])
             self._ensemble_available = True
             logger.info("✅ EnhancedEnsemble5Way v6.1 loaded (production)")
             return self._ensemble
@@ -200,7 +194,7 @@ class PropsModelManager:
                 split_ratio=0.5,  # 50/50 split
                 test_name="ensemble_v6_vs_v6.1_dirichlet_props",
                 db_password=self.db_config["password"],
-                enabled=True
+                enabled=True,
             )
             self._ab_router_available = True
             logger.info("✅ DirichletABTestRouter loaded (A/B test enabled)")
@@ -234,7 +228,7 @@ class PropsModelManager:
             self._touchdowns_available = False
             return None
 
-    def _get_player_name(self, player_id: str) -> Optional[str]:
+    def _get_player_name(self, player_id: str) -> str | None:
         """Lookup player name from database."""
         try:
             import psycopg2
@@ -250,7 +244,7 @@ class PropsModelManager:
                 WHERE player_id = %s
                 LIMIT 1
                 """,
-                (player_id,)
+                (player_id,),
             )
             row = cursor.fetchone()
             cursor.close()
@@ -261,12 +255,7 @@ class PropsModelManager:
             logger.warning(f"Could not lookup player name: {e}")
             return None
 
-    def _calculate_ci(
-        self,
-        mean: float,
-        std: float,
-        confidence_level: float
-    ) -> tuple:
+    def _calculate_ci(self, mean: float, std: float, confidence_level: float) -> tuple:
         """Calculate confidence interval from mean and std."""
         from scipy import stats
 
@@ -288,8 +277,8 @@ class PropsModelManager:
         season: int,
         stat_type: str = "passing_yards",
         confidence_level: float = 0.90,
-        use_ab_test: bool = True
-    ) -> Optional[dict]:
+        use_ab_test: bool = True,
+    ) -> dict | None:
         """
         Predict yards using EnhancedEnsemble5Way.
 
@@ -319,7 +308,7 @@ class PropsModelManager:
                         season=season,
                         week=week,
                         stat_type=stat_type,
-                        log_to_db=True
+                        log_to_db=True,
                     )
 
                     # Extract results from A/B test
@@ -336,13 +325,19 @@ class PropsModelManager:
                         "uncertainty": std,
                         "confidence_interval_lower": lower,
                         "confidence_interval_upper": upper,
-                        "model_used": f"ensemble_{model_version}_dirichlet" if result.use_dirichlet else f"ensemble_{model_version}",
+                        "model_used": (
+                            f"ensemble_{model_version}_dirichlet"
+                            if result.use_dirichlet
+                            else f"ensemble_{model_version}"
+                        ),
                         "ab_group": ab_group,
                         "calibration_score": 0.895,  # v6.1 calibration
                     }
 
                 except Exception as e:
-                    logger.warning(f"A/B router prediction failed, falling back to direct ensemble: {e}")
+                    logger.warning(
+                        f"A/B router prediction failed, falling back to direct ensemble: {e}"
+                    )
 
         # Fallback to direct ensemble (no A/B test)
         ensemble = self._load_ensemble()
@@ -357,7 +352,7 @@ class PropsModelManager:
                 season=season,
                 week=week,
                 return_components=False,
-                return_uncertainty=True
+                return_uncertainty=True,
             )
 
             mean = result.get("ensemble_mean", 0.0)
@@ -386,31 +381,31 @@ class PropsModelManager:
 
     def predict_rushing_yards(
         self, player_id: str, week: int, season: int, confidence_level: float = 0.90
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """Predict rushing yards using ensemble."""
         return self.predict_yards(
             player_id=player_id,
             week=week,
             season=season,
             stat_type="rushing_yards",
-            confidence_level=confidence_level
+            confidence_level=confidence_level,
         )
 
     def predict_receiving_yards(
         self, player_id: str, week: int, season: int, confidence_level: float = 0.90
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """Predict receiving yards using ensemble."""
         return self.predict_yards(
             player_id=player_id,
             week=week,
             season=season,
             stat_type="receiving_yards",
-            confidence_level=confidence_level
+            confidence_level=confidence_level,
         )
 
     def predict_passing_yards(
         self, player_id: str, week: int, season: int, confidence_level: float = 0.90
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """Predict passing yards using ensemble with A/B test."""
         return self.predict_yards(
             player_id=player_id,
@@ -418,12 +413,10 @@ class PropsModelManager:
             season=season,
             stat_type="passing_yards",
             confidence_level=confidence_level,
-            use_ab_test=True
+            use_ab_test=True,
         )
 
-    def predict_touchdown_probability(
-        self, player_id: str, week: int, season: int
-    ) -> Optional[dict]:
+    def predict_touchdown_probability(self, player_id: str, week: int, season: int) -> dict | None:
         """
         Predict touchdown probability using XGBoost v1.
 
@@ -458,7 +451,7 @@ class PropsModelManager:
                 AND season = %s
                 AND week < %s
                 """,
-                (player_id, season, week)
+                (player_id, season, week),
             )
 
             row = cursor.fetchone()
@@ -477,15 +470,28 @@ class PropsModelManager:
 
             # Create feature array for XGBoost
             # Features: avg_pass_tds, avg_rush_tds, avg_rec_tds, total_tds, games
-            avg_pass_tds, avg_rush_tds, avg_rec_tds, total_pass_tds, total_rush_tds, total_rec_tds, games = row
+            (
+                avg_pass_tds,
+                avg_rush_tds,
+                avg_rec_tds,
+                total_pass_tds,
+                total_rush_tds,
+                total_rec_tds,
+                games,
+            ) = row
 
-            features = np.array([[
-                float(avg_pass_tds),
-                float(avg_rush_tds),
-                float(avg_rec_tds),
-                float(total_pass_tds + total_rush_tds + total_rec_tds),
-                float(games)
-            ]], dtype=np.float32)
+            features = np.array(
+                [
+                    [
+                        float(avg_pass_tds),
+                        float(avg_rush_tds),
+                        float(avg_rec_tds),
+                        float(total_pass_tds + total_rush_tds + total_rec_tds),
+                        float(games),
+                    ]
+                ],
+                dtype=np.float32,
+            )
 
             # Get prediction from XGBoost
             dmatrix = xgb.DMatrix(features)
@@ -698,7 +704,7 @@ async def predict_receiving_yards(
     if request.stat_type != "receiving_yards":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"stat_type must be 'receiving_yards' for this endpoint",
+            detail="stat_type must be 'receiving_yards' for this endpoint",
         )
 
     # Get REAL prediction
@@ -766,7 +772,7 @@ async def predict_touchdown_probability(
     if request.stat_type != "touchdowns":
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"stat_type must be 'touchdowns' for this endpoint",
+            detail="stat_type must be 'touchdowns' for this endpoint",
         )
 
     # Get REAL prediction

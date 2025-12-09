@@ -28,19 +28,11 @@ Author: Claude + User
 Date: 2025-01-24
 """
 
-import json
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
-import numpy as np
-import pandas as pd
-import psycopg
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
-from torch.utils.data import DataLoader, Dataset
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -61,22 +53,22 @@ class NFLGraph:
 
     def __init__(self):
         # Node storage
-        self.node_features: Dict[str, torch.Tensor] = {}
-        self.node_type_to_ids: Dict[str, List[int]] = {
+        self.node_features: dict[str, torch.Tensor] = {}
+        self.node_type_to_ids: dict[str, list[int]] = {
             "player": [],
             "position": [],
             "team": [],
             "game": [],
         }
-        self.node_id_to_type: Dict[int, str] = {}
+        self.node_id_to_type: dict[int, str] = {}
 
         # Reverse mappings (external ID → internal node ID)
-        self.player_id_map: Dict[str, int] = {}
-        self.team_id_map: Dict[str, int] = {}
-        self.position_id_map: Dict[str, int] = {}
+        self.player_id_map: dict[str, int] = {}
+        self.team_id_map: dict[str, int] = {}
+        self.position_id_map: dict[str, int] = {}
 
         # Edge storage (adjacency lists)
-        self.edges: Dict[str, List[Tuple[int, int]]] = {
+        self.edges: dict[str, list[tuple[int, int]]] = {
             "player_to_position": [],
             "position_to_team": [],
             "player_chemistry": [],  # QB-WR, etc.
@@ -85,15 +77,12 @@ class NFLGraph:
         }
 
         # Edge features
-        self.edge_features: Dict[str, torch.Tensor] = {}
+        self.edge_features: dict[str, torch.Tensor] = {}
 
         self.num_nodes = 0
 
     def add_node(
-        self,
-        node_type: str,
-        features: Optional[torch.Tensor] = None,
-        external_id: Optional[str] = None
+        self, node_type: str, features: torch.Tensor | None = None, external_id: str | None = None
     ) -> int:
         """Add a node and return its internal ID."""
         node_id = self.num_nodes
@@ -118,7 +107,7 @@ class NFLGraph:
 
         return node_id
 
-    def add_edge(self, edge_type: str, src: int, dst: int, features: Optional[torch.Tensor] = None):
+    def add_edge(self, edge_type: str, src: int, dst: int, features: torch.Tensor | None = None):
         """Add an edge between two nodes."""
         self.edges[edge_type].append((src, dst))
 
@@ -174,10 +163,7 @@ class MessagePassingLayer(nn.Module):
         )
 
     def forward(
-        self,
-        src_embeddings: torch.Tensor,
-        dst_embeddings: torch.Tensor,
-        edge_index: torch.Tensor
+        self, src_embeddings: torch.Tensor, dst_embeddings: torch.Tensor, edge_index: torch.Tensor
     ) -> torch.Tensor:
         """
         Args:
@@ -241,7 +227,7 @@ class AttentionLayer(nn.Module):
         self.query = nn.Linear(embed_dim, embed_dim)
         self.key = nn.Linear(embed_dim, embed_dim)
         self.value = nn.Linear(embed_dim, embed_dim)
-        self.scale = embed_dim ** 0.5
+        self.scale = embed_dim**0.5
 
     def forward(self, embeddings: torch.Tensor, edge_index: torch.Tensor) -> torch.Tensor:
         """
@@ -268,7 +254,7 @@ class AttentionLayer(nn.Module):
         messages = attn_weights.unsqueeze(1) * V  # (num_edges, embed_dim)
 
         # Aggregate to destination nodes using scatter (more robust than for-loop)
-        num_nodes = embeddings.size(0)
+        embeddings.size(0)
         aggregated = torch.zeros_like(embeddings)
 
         # Expand dst_indices to match message dimensions for scatter
@@ -316,8 +302,12 @@ class HierarchicalGNN(nn.Module):
         self.team_embedding = nn.Embedding(32, embedding_dim)  # 32 NFL teams
 
         # Message passing layers
-        self.player_to_position = MessagePassingLayer(embedding_dim, embedding_dim, "player_to_position")
-        self.position_to_team = MessagePassingLayer(embedding_dim, embedding_dim, "position_to_team")
+        self.player_to_position = MessagePassingLayer(
+            embedding_dim, embedding_dim, "player_to_position"
+        )
+        self.position_to_team = MessagePassingLayer(
+            embedding_dim, embedding_dim, "position_to_team"
+        )
 
         # Chemistry attention (QB-WR, etc.)
         if use_attention:
@@ -341,9 +331,9 @@ class HierarchicalGNN(nn.Module):
         team_indices: torch.Tensor,
         player_to_position_edges: torch.Tensor,
         position_to_team_edges: torch.Tensor,
-        chemistry_edges: Optional[torch.Tensor] = None,
-        home_team_idx: Optional[torch.Tensor] = None,
-        away_team_idx: Optional[torch.Tensor] = None,
+        chemistry_edges: torch.Tensor | None = None,
+        home_team_idx: torch.Tensor | None = None,
+        away_team_idx: torch.Tensor | None = None,
     ) -> torch.Tensor:
         """
         Forward pass through hierarchical GNN with BATCH SUPPORT.
@@ -369,7 +359,9 @@ class HierarchicalGNN(nn.Module):
             player_embeds = self.chemistry_attention(player_embeds, chemistry_edges)
 
         # Level 2: Position group embeddings (aggregate from players)
-        position_embeds = self.position_embedding(position_indices)  # (num_positions, embedding_dim)
+        position_embeds = self.position_embedding(
+            position_indices
+        )  # (num_positions, embedding_dim)
 
         for _ in range(self.num_message_rounds):
             position_embeds = self.player_to_position(
@@ -400,7 +392,9 @@ class HierarchicalGNN(nn.Module):
                 away_embeds = team_embeds[away_team_idx]  # (batch_size, embedding_dim)
 
                 # Concatenate for each game in batch
-                game_embeds = torch.cat([home_embeds, away_embeds], dim=1)  # (batch_size, 2*embedding_dim)
+                game_embeds = torch.cat(
+                    [home_embeds, away_embeds], dim=1
+                )  # (batch_size, 2*embedding_dim)
 
                 # Predict all games in parallel
                 logits = self.game_predictor(game_embeds)  # (batch_size, 1)

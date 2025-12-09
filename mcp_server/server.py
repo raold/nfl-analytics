@@ -11,41 +11,18 @@ Or as a module:
     python -m mcp_server.server
 """
 
-import logging
-from typing import Optional
 from mcp.server.fastmcp import FastMCP
 
-from mcp_server.tools.database import (
-    query_database,
-    get_recent_games,
-    get_team_stats,
-    close_connection_pool
-)
+from mcp_server.config import MCP_SERVER_PORT, logger
+from mcp_server.tools.database import get_recent_games, get_team_stats, query_database
 from mcp_server.tools.database_write import (
     insert_model_metadata,
+    insert_prediction_batch,
     update_model_status,
-    insert_prediction_batch
 )
-from mcp_server.tools.filesystem import (
-    list_files,
-    read_file,
-    read_json,
-    get_file_info
-)
-from mcp_server.tools.github_ops import (
-    create_issue,
-    list_recent_issues,
-    create_pr,
-    get_pr_status,
-    add_comment,
-    get_repo_stats,
-    search_code
-)
-from mcp_server.tools.news_fetcher import (
-    fetch_espn_news,
-    search_all_nfl_news
-)
-from mcp_server.config import MCP_SERVER_PORT, logger
+from mcp_server.tools.filesystem import get_file_info, list_files, read_file, read_json
+from mcp_server.tools.github_ops import create_issue, create_pr, get_repo_stats, list_recent_issues
+from mcp_server.tools.news_fetcher import fetch_espn_news, search_all_nfl_news
 
 # Initialize FastMCP server
 mcp = FastMCP("nfl-analytics")
@@ -57,8 +34,9 @@ logger.info("NFL Analytics MCP Server initializing...")
 # Database Tools
 # ============================================================================
 
+
 @mcp.tool()
-def query_db(sql: str, params: Optional[str] = None) -> dict:
+def query_db(sql: str, params: str | None = None) -> dict:
     """
     Execute a SQL query against the NFL analytics database.
 
@@ -92,11 +70,7 @@ def query_db(sql: str, params: Optional[str] = None) -> dict:
 
 
 @mcp.tool()
-def get_team_recent_games(
-    team: str,
-    limit: int = 10,
-    season: Optional[int] = None
-) -> dict:
+def get_team_recent_games(team: str, limit: int = 10, season: int | None = None) -> dict:
     """
     Get recent games for an NFL team.
 
@@ -115,7 +89,7 @@ def get_team_recent_games(
 
 
 @mcp.tool()
-def get_team_statistics(team: str, season: Optional[int] = None) -> dict:
+def get_team_statistics(team: str, season: int | None = None) -> dict:
     """
     Get aggregated statistics for an NFL team.
 
@@ -143,6 +117,7 @@ def get_team_statistics(team: str, season: Optional[int] = None) -> dict:
 # Database Write Tools (Model Registry & Predictions)
 # ============================================================================
 
+
 @mcp.tool()
 def register_model(
     model_name: str,
@@ -151,7 +126,7 @@ def register_model(
     framework: str,
     description: str,
     performance_summary: dict,
-    training_config: Optional[dict] = None
+    training_config: dict | None = None,
 ) -> dict:
     """
     Register a trained model in the model registry.
@@ -176,17 +151,18 @@ def register_model(
         )
     """
     return insert_model_metadata(
-        model_name, model_version, model_type, framework,
-        description, performance_summary, training_config
+        model_name,
+        model_version,
+        model_type,
+        framework,
+        description,
+        performance_summary,
+        training_config,
     )
 
 
 @mcp.tool()
-def update_model_registry_status(
-    model_id: int,
-    status: str,
-    notes: Optional[str] = None
-) -> dict:
+def update_model_registry_status(model_id: int, status: str, notes: str | None = None) -> dict:
     """
     Update model status in registry.
 
@@ -205,11 +181,7 @@ def update_model_registry_status(
 
 
 @mcp.tool()
-def save_predictions(
-    model_id: int,
-    game_week: str,
-    predictions: list
-) -> dict:
+def save_predictions(model_id: int, game_week: str, predictions: list) -> dict:
     """
     Save a batch of predictions.
 
@@ -234,12 +206,9 @@ def save_predictions(
 # Filesystem Tools
 # ============================================================================
 
+
 @mcp.tool()
-def list_directory(
-    directory_type: str,
-    relative_path: str = "",
-    pattern: str = "*"
-) -> dict:
+def list_directory(directory_type: str, relative_path: str = "", pattern: str = "*") -> dict:
     """
     List files in a directory.
 
@@ -258,11 +227,7 @@ def list_directory(
 
 
 @mcp.tool()
-def read_text_file(
-    directory_type: str,
-    relative_path: str,
-    max_lines: Optional[int] = None
-) -> dict:
+def read_text_file(directory_type: str, relative_path: str, max_lines: int | None = None) -> dict:
     """
     Read a text file.
 
@@ -320,12 +285,10 @@ def get_file_metadata(directory_type: str, relative_path: str) -> dict:
 # GitHub Tools
 # ============================================================================
 
+
 @mcp.tool()
 def github_create_issue(
-    title: str,
-    body: str,
-    labels: Optional[str] = None,
-    assignees: Optional[str] = None
+    title: str, body: str, labels: str | None = None, assignees: str | None = None
 ) -> dict:
     """
     Create a GitHub issue.
@@ -350,11 +313,7 @@ def github_create_issue(
 
 
 @mcp.tool()
-def github_list_issues(
-    limit: int = 10,
-    state: str = "open",
-    labels: Optional[str] = None
-) -> dict:
+def github_list_issues(limit: int = 10, state: str = "open", labels: str | None = None) -> dict:
     """
     List GitHub issues.
 
@@ -373,11 +332,7 @@ def github_list_issues(
 
 
 @mcp.tool()
-def github_create_pr(
-    title: str,
-    body: str,
-    base: str = "main"
-) -> dict:
+def github_create_pr(title: str, body: str, base: str = "main") -> dict:
     """
     Create a pull request from current branch.
 
@@ -415,6 +370,7 @@ def github_repo_stats() -> dict:
 # ============================================================================
 # News Tools
 # ============================================================================
+
 
 @mcp.tool()
 def get_team_news(team: str, limit: int = 10) -> list:
@@ -466,6 +422,7 @@ def search_nfl_news(keywords: str, hours: int = 24) -> list:
 # ============================================================================
 # Main Entry Point
 # ============================================================================
+
 
 def main():
     """Run the MCP server."""

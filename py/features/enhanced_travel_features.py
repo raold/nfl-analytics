@@ -18,7 +18,6 @@ Date: November 22, 2025
 
 import logging
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -75,16 +74,17 @@ class EnhancedTravelFeatures:
         """
         if self.distance_matrix is None:
             logger.warning("Distance matrix not loaded, skipping travel_distance")
-            df['travel_distance'] = 0
+            df["travel_distance"] = 0
             return df
 
-        df['travel_distance'] = df.apply(
-            lambda row: self.distance_matrix.loc[
-                row['away_team'], row['home_team']
-            ] if row['away_team'] in self.distance_matrix.index
-               and row['home_team'] in self.distance_matrix.columns
-            else 0,
-            axis=1
+        df["travel_distance"] = df.apply(
+            lambda row: (
+                self.distance_matrix.loc[row["away_team"], row["home_team"]]
+                if row["away_team"] in self.distance_matrix.index
+                and row["home_team"] in self.distance_matrix.columns
+                else 0
+            ),
+            axis=1,
         )
 
         return df
@@ -104,30 +104,30 @@ class EnhancedTravelFeatures:
         """
         if self.timezone_matrix is None:
             logger.warning("Timezone matrix not loaded, skipping timezone features")
-            df['timezone_shift'] = 0
-            df['is_westbound_travel'] = 0
-            df['is_eastbound_travel'] = 0
+            df["timezone_shift"] = 0
+            df["is_westbound_travel"] = 0
+            df["is_eastbound_travel"] = 0
             return df
 
         # Get timezone offsets for home and away teams
-        df['home_tz_offset'] = df['home_team'].map(
-            self.timezone_matrix.set_index('team')['timezone_offset']
-            if 'team' in self.timezone_matrix.columns
+        df["home_tz_offset"] = df["home_team"].map(
+            self.timezone_matrix.set_index("team")["timezone_offset"]
+            if "team" in self.timezone_matrix.columns
             else self.timezone_matrix.iloc[:, 0]  # First column if no 'team' column
         )
 
-        df['away_tz_offset'] = df['away_team'].map(
-            self.timezone_matrix.set_index('team')['timezone_offset']
-            if 'team' in self.timezone_matrix.columns
+        df["away_tz_offset"] = df["away_team"].map(
+            self.timezone_matrix.set_index("team")["timezone_offset"]
+            if "team" in self.timezone_matrix.columns
             else self.timezone_matrix.iloc[:, 0]
         )
 
         # Calculate timezone shift (positive = westbound, negative = eastbound)
-        df['timezone_shift'] = (df['home_tz_offset'] - df['away_tz_offset']).fillna(0).astype(int)
+        df["timezone_shift"] = (df["home_tz_offset"] - df["away_tz_offset"]).fillna(0).astype(int)
 
         # Directional flags
-        df['is_westbound_travel'] = (df['timezone_shift'] > 0).astype(int)
-        df['is_eastbound_travel'] = (df['timezone_shift'] < 0).astype(int)
+        df["is_westbound_travel"] = (df["timezone_shift"] > 0).astype(int)
+        df["is_eastbound_travel"] = (df["timezone_shift"] < 0).astype(int)
 
         return df
 
@@ -146,14 +146,14 @@ class EnhancedTravelFeatures:
             DataFrame with 'jet_lag_penalty' column added
         """
         # Asymmetric penalty: westbound = -12 per hour, eastbound = -8 per hour
-        df['jet_lag_penalty'] = np.where(
-            df['timezone_shift'] > 0,  # Westbound (harder)
-            df['timezone_shift'] * -12,
+        df["jet_lag_penalty"] = np.where(
+            df["timezone_shift"] > 0,  # Westbound (harder)
+            df["timezone_shift"] * -12,
             np.where(
-                df['timezone_shift'] < 0,  # Eastbound (easier)
-                df['timezone_shift'].abs() * -8,
-                0  # No travel
-            )
+                df["timezone_shift"] < 0,  # Eastbound (easier)
+                df["timezone_shift"].abs() * -8,
+                0,  # No travel
+            ),
         )
 
         return df
@@ -171,23 +171,23 @@ class EnhancedTravelFeatures:
             - circadian_penalty: Penalty for early morning body clock (3am-6am = -26)
         """
         # Parse kickoff time if not already datetime
-        if not pd.api.types.is_datetime64_any_dtype(df['kickoff']):
-            df['kickoff'] = pd.to_datetime(df['kickoff'])
+        if not pd.api.types.is_datetime64_any_dtype(df["kickoff"]):
+            df["kickoff"] = pd.to_datetime(df["kickoff"])
 
         # Get kickoff hour in UTC
-        df['kickoff_hour_utc'] = df['kickoff'].dt.hour
+        df["kickoff_hour_utc"] = df["kickoff"].dt.hour
 
         # Calculate body clock hour (away team's perception of time)
-        df['body_clock_hour'] = (
-            (df['kickoff_hour_utc'] + df['away_tz_offset']) % 24
-        ).fillna(12).astype(int)  # Default to noon if missing
+        df["body_clock_hour"] = (
+            ((df["kickoff_hour_utc"] + df["away_tz_offset"]) % 24).fillna(12).astype(int)
+        )  # Default to noon if missing
 
         # Circadian penalty for early morning games (3am-6am body clock)
         # Research: Peak performance ~5-8pm, worst 3-6am
-        df['circadian_penalty'] = np.where(
-            (df['body_clock_hour'] >= 3) & (df['body_clock_hour'] <= 6),
+        df["circadian_penalty"] = np.where(
+            (df["body_clock_hour"] >= 3) & (df["body_clock_hour"] <= 6),
             -26,  # Significant penalty for early morning games
-            0
+            0,
         )
 
         return df
@@ -210,55 +210,55 @@ class EnhancedTravelFeatures:
         """
         if self.international_games is None:
             logger.warning("International games not loaded, skipping international features")
-            df['is_international'] = 0
-            df['is_london_game'] = 0
-            df['is_germany_game'] = 0
-            df['is_mexico_city_game'] = 0
-            df['altitude_shock'] = 0
-            df['altitude_penalty'] = 0
+            df["is_international"] = 0
+            df["is_london_game"] = 0
+            df["is_germany_game"] = 0
+            df["is_mexico_city_game"] = 0
+            df["altitude_shock"] = 0
+            df["altitude_penalty"] = 0
             return df
 
         # Extract key international features
-        intl_features = self.international_games[[
-            'game_id',
-            'is_international',
-            'city',
-            'altitude_shock',
-        ]].copy()
+        intl_features = self.international_games[
+            [
+                "game_id",
+                "is_international",
+                "city",
+                "altitude_shock",
+            ]
+        ].copy()
 
         # Add location-specific flags
-        intl_features['is_london_game'] = intl_features['city'].isin([
-            'London'
-        ]).astype(int)
+        intl_features["is_london_game"] = intl_features["city"].isin(["London"]).astype(int)
 
-        intl_features['is_germany_game'] = intl_features['city'].isin([
-            'Munich', 'Frankfurt'
-        ]).astype(int)
+        intl_features["is_germany_game"] = (
+            intl_features["city"].isin(["Munich", "Frankfurt"]).astype(int)
+        )
 
-        intl_features['is_mexico_city_game'] = intl_features['city'].isin([
-            'Mexico City'
-        ]).astype(int)
+        intl_features["is_mexico_city_game"] = (
+            intl_features["city"].isin(["Mexico City"]).astype(int)
+        )
 
         # Calculate altitude penalty (Mexico City gets stronger penalty)
         # Mexico City: 7,200 ft → -0.005 penalty per foot
         # Other stadiums: -0.003 penalty per foot
-        intl_features['altitude_penalty'] = np.where(
-            intl_features['is_mexico_city_game'] == 1,
-            intl_features['altitude_shock'] * -0.005,  # Stronger Mexico penalty
-            intl_features['altitude_shock'] * -0.003   # Standard altitude penalty
+        intl_features["altitude_penalty"] = np.where(
+            intl_features["is_mexico_city_game"] == 1,
+            intl_features["altitude_shock"] * -0.005,  # Stronger Mexico penalty
+            intl_features["altitude_shock"] * -0.003,  # Standard altitude penalty
         )
 
         # Merge with main DataFrame (left join - most games are domestic)
-        df = df.merge(
-            intl_features.drop('city', axis=1),
-            on='game_id',
-            how='left'
-        )
+        df = df.merge(intl_features.drop("city", axis=1), on="game_id", how="left")
 
         # Fill NaN for domestic games
         intl_cols = [
-            'is_international', 'is_london_game', 'is_germany_game',
-            'is_mexico_city_game', 'altitude_shock', 'altitude_penalty'
+            "is_international",
+            "is_london_game",
+            "is_germany_game",
+            "is_mexico_city_game",
+            "altitude_shock",
+            "altitude_penalty",
         ]
         df[intl_cols] = df[intl_cols].fillna(0)
 
@@ -280,15 +280,15 @@ class EnhancedTravelFeatures:
             - tnf_home_advantage: Scaled advantage (default 0.0, XGBoost can learn)
         """
         # Parse kickoff if needed
-        if not pd.api.types.is_datetime64_any_dtype(df['kickoff']):
-            df['kickoff'] = pd.to_datetime(df['kickoff'])
+        if not pd.api.types.is_datetime64_any_dtype(df["kickoff"]):
+            df["kickoff"] = pd.to_datetime(df["kickoff"])
 
         # Thursday Night Football flag
-        df['is_thursday_night'] = (df['kickoff'].dt.dayofweek == 3).astype(int)  # Thursday = 3
+        df["is_thursday_night"] = (df["kickoff"].dt.dayofweek == 3).astype(int)  # Thursday = 3
 
         # TNF home advantage (scaled to 0.0 initially, XGBoost can learn from data)
         # User hypothesis: May have statistically significant impact despite null research findings
-        df['tnf_home_advantage'] = df['is_thursday_night'] * 0.0
+        df["tnf_home_advantage"] = df["is_thursday_night"] * 0.0
 
         return df
 
@@ -336,14 +336,14 @@ class EnhancedTravelFeatures:
         df = self.calculate_thursday_night_features(df)
 
         # Calculate total travel penalty (for reference)
-        df['total_travel_penalty'] = (
-            df['jet_lag_penalty'] +
-            df['circadian_penalty'] +
-            df['altitude_penalty'] +
-            df['tnf_home_advantage']  # Included for completeness
+        df["total_travel_penalty"] = (
+            df["jet_lag_penalty"]
+            + df["circadian_penalty"]
+            + df["altitude_penalty"]
+            + df["tnf_home_advantage"]  # Included for completeness
         )
 
-        logger.info(f"✓ Added 13 travel features")
+        logger.info("✓ Added 13 travel features")
         logger.info(f"  Domestic games: {(df['is_international'] == 0).sum()}")
         logger.info(f"  International games: {(df['is_international'] == 1).sum()}")
         logger.info(f"  Westbound travel: {(df['is_westbound_travel'] == 1).sum()}")
@@ -361,16 +361,16 @@ def main():
     logger.info("=" * 60)
 
     # Create sample data
-    sample_data = pd.DataFrame({
-        'game_id': ['2024_01_SEA_NE', '2024_02_NE_LAR', '2024_03_DEN_MIA'],
-        'home_team': ['NE', 'LAR', 'MIA'],
-        'away_team': ['SEA', 'NE', 'DEN'],
-        'kickoff': pd.to_datetime([
-            '2024-09-08 13:00:00',
-            '2024-09-15 16:00:00',
-            '2024-09-22 13:00:00'
-        ])
-    })
+    sample_data = pd.DataFrame(
+        {
+            "game_id": ["2024_01_SEA_NE", "2024_02_NE_LAR", "2024_03_DEN_MIA"],
+            "home_team": ["NE", "LAR", "MIA"],
+            "away_team": ["SEA", "NE", "DEN"],
+            "kickoff": pd.to_datetime(
+                ["2024-09-08 13:00:00", "2024-09-15 16:00:00", "2024-09-22 13:00:00"]
+            ),
+        }
+    )
 
     # Calculate features
     travel_features = EnhancedTravelFeatures()
@@ -379,10 +379,15 @@ def main():
     # Display results
     logger.info("\nSample Travel Features:")
     display_cols = [
-        'game_id', 'travel_distance', 'timezone_shift',
-        'is_westbound_travel', 'is_eastbound_travel',
-        'jet_lag_penalty', 'body_clock_hour', 'circadian_penalty',
-        'total_travel_penalty'
+        "game_id",
+        "travel_distance",
+        "timezone_shift",
+        "is_westbound_travel",
+        "is_eastbound_travel",
+        "jet_lag_penalty",
+        "body_clock_hour",
+        "circadian_penalty",
+        "total_travel_penalty",
     ]
     print(result[display_cols].to_string(index=False))
 

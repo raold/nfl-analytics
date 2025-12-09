@@ -17,23 +17,22 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 19, 2025
 """
 
-import os
 import sys
 from pathlib import Path
-from unittest.mock import Mock, MagicMock, patch
-import pytest
+from unittest.mock import Mock, patch
+
 import numpy as np
-import pandas as pd
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-
 # ============================================================================
 # FIXTURES
 # ============================================================================
+
 
 @pytest.fixture
 def mock_db_config():
@@ -43,7 +42,7 @@ def mock_db_config():
         "port": 5544,
         "dbname": "devdb01",
         "user": "dro",
-        "password": "test_password_123"
+        "password": "test_password_123",
     }
 
 
@@ -79,8 +78,10 @@ def mock_ensemble_v6_all_components(mock_db_config):
     - Informative Priors v2: 13%
     - Hybrid Static-Incremental: 10%
     """
-    with patch("py.ensemble.enhanced_ensemble_v6_production.RModelInterface"), \
-         patch("py.ensemble.enhanced_ensemble_v6_production.HybridStaticIncrementalXGBoost"):
+    with (
+        patch("py.ensemble.enhanced_ensemble_v6_production.RModelInterface"),
+        patch("py.ensemble.enhanced_ensemble_v6_production.HybridStaticIncrementalXGBoost"),
+    ):
 
         ensemble = EnhancedEnsemble5Way(
             db_password="test_password_123",
@@ -112,8 +113,10 @@ def mock_ensemble_v6_partial_components(mock_db_config):
 
     Scenario: Hierarchical and Informative Priors fail.
     """
-    with patch("py.ensemble.enhanced_ensemble_v6_production.RModelInterface"), \
-         patch("py.ensemble.enhanced_ensemble_v6_production.HybridStaticIncrementalXGBoost"):
+    with (
+        patch("py.ensemble.enhanced_ensemble_v6_production.RModelInterface"),
+        patch("py.ensemble.enhanced_ensemble_v6_production.HybridStaticIncrementalXGBoost"),
+    ):
 
         ensemble = EnhancedEnsemble5Way(
             db_password="test_password_123",
@@ -133,23 +136,20 @@ def mock_ensemble_v6_partial_components(mock_db_config):
 # UNIT TESTS: Component Validation
 # ============================================================================
 
+
 class TestStateSpaceComponent:
     """Test State-Space v2 predictions (27% weight)."""
 
     def test_state_space_not_placeholder(self, mock_ensemble_v6_all_components):
         """State-space should not return placeholder value of 250."""
-        mean, std = mock_ensemble_v6_all_components._predict_state_space(
-            "00-0033873", 2024, 10, {}
-        )
+        mean, std = mock_ensemble_v6_all_components._predict_state_space("00-0033873", 2024, 10, {})
         assert mean != 250.0, "State-space returned placeholder (250), should be realistic"
         assert mean is not None and not np.isnan(mean)
         assert std is not None and std > 0
 
     def test_state_space_returns_tuple(self, mock_ensemble_v6_all_components):
         """State-space should return (mean, std) tuple."""
-        result = mock_ensemble_v6_all_components._predict_state_space(
-            "00-0033873", 2024, 10, {}
-        )
+        result = mock_ensemble_v6_all_components._predict_state_space("00-0033873", 2024, 10, {})
         assert isinstance(result, tuple)
         assert len(result) == 2
         mean, std = result
@@ -158,16 +158,12 @@ class TestStateSpaceComponent:
 
     def test_state_space_uncertainty_positive(self, mock_ensemble_v6_all_components):
         """State-space uncertainty should be positive."""
-        mean, std = mock_ensemble_v6_all_components._predict_state_space(
-            "00-0033873", 2024, 10, {}
-        )
+        mean, std = mock_ensemble_v6_all_components._predict_state_space("00-0033873", 2024, 10, {})
         assert std > 0, f"State-space std should be positive, got {std}"
 
     def test_state_space_prediction_in_reasonable_range(self, mock_ensemble_v6_all_components):
         """State-space prediction should be in reasonable range (100-400 yards)."""
-        mean, std = mock_ensemble_v6_all_components._predict_state_space(
-            "00-0033873", 2024, 10, {}
-        )
+        mean, std = mock_ensemble_v6_all_components._predict_state_space("00-0033873", 2024, 10, {})
         assert 100 <= mean <= 400, f"State-space mean {mean} outside reasonable range"
 
 
@@ -185,9 +181,7 @@ class TestHierarchicalComponent:
 
     def test_hierarchical_returns_tuple(self, mock_ensemble_v6_all_components):
         """Hierarchical should return (mean, std) tuple."""
-        result = mock_ensemble_v6_all_components._predict_hierarchical(
-            "00-0033873", 2024, 10, {}
-        )
+        result = mock_ensemble_v6_all_components._predict_hierarchical("00-0033873", 2024, 10, {})
         assert isinstance(result, tuple)
         assert len(result) == 2
 
@@ -269,9 +263,11 @@ class TestComponentDiversity:
     def test_minimum_3_components_required(self, mock_ensemble_v6_partial_components):
         """Ensemble should work with minimum 3 components."""
         # Mock feature fetch
-        mock_ensemble_v6_partial_components._fetch_features = Mock(return_value={
-            "pass_yards_l3": 250.0,
-        })
+        mock_ensemble_v6_partial_components._fetch_features = Mock(
+            return_value={
+                "pass_yards_l3": 250.0,
+            }
+        )
 
         result = mock_ensemble_v6_partial_components.predict("00-0033873", 2024, 10)
 
@@ -285,10 +281,16 @@ class TestComponentDiversity:
         mock_ensemble_v6_all_components._fetch_features = Mock(return_value={})
 
         # Get component predictions
-        ss_mean, _ = mock_ensemble_v6_all_components._predict_state_space("00-0033873", 2024, 10, {})
-        hier_mean, _ = mock_ensemble_v6_all_components._predict_hierarchical("00-0033873", 2024, 10, {})
+        ss_mean, _ = mock_ensemble_v6_all_components._predict_state_space(
+            "00-0033873", 2024, 10, {}
+        )
+        hier_mean, _ = mock_ensemble_v6_all_components._predict_hierarchical(
+            "00-0033873", 2024, 10, {}
+        )
         xgb_mean, _ = mock_ensemble_v6_all_components._predict_xgboost_v4({})
-        ip_mean, _ = mock_ensemble_v6_all_components._predict_informative_priors("00-0033873", 2024, 10, {})
+        ip_mean, _ = mock_ensemble_v6_all_components._predict_informative_priors(
+            "00-0033873", 2024, 10, {}
+        )
         hybrid_mean, _ = mock_ensemble_v6_all_components._predict_hybrid({})
 
         predictions = [ss_mean, hier_mean, xgb_mean, ip_mean, hybrid_mean]
@@ -316,8 +318,9 @@ class TestWeightValidation:
     def test_default_weights_sum_to_one(self, mock_ensemble_v6_all_components):
         """Default component weights should sum to 1.0."""
         weights = mock_ensemble_v6_all_components.weights
-        assert abs(sum(weights.values()) - 1.0) < 1e-6, \
-            f"Weights sum to {sum(weights.values()):.6f}, expected 1.0"
+        assert (
+            abs(sum(weights.values()) - 1.0) < 1e-6
+        ), f"Weights sum to {sum(weights.values()):.6f}, expected 1.0"
 
     def test_canonical_weights_structure(self, mock_ensemble_v6_all_components):
         """Weights should have 5 components (v6.0)."""
@@ -329,8 +332,9 @@ class TestWeightValidation:
             "informative_priors_v2",
             "hybrid_static_incremental",
         }
-        assert set(weights.keys()) == expected_keys, \
-            f"Weight keys mismatch. Got: {set(weights.keys())}"
+        assert (
+            set(weights.keys()) == expected_keys
+        ), f"Weight keys mismatch. Got: {set(weights.keys())}"
 
     def test_canonical_weight_values(self, mock_ensemble_v6_all_components):
         """Weights should match v6.0 canonical values."""
@@ -347,8 +351,9 @@ class TestWeightValidation:
 
         for component, expected_weight in expected.items():
             actual_weight = weights[component]
-            assert abs(actual_weight - expected_weight) < 0.01, \
-                f"{component} weight {actual_weight:.2f} ≠ expected {expected_weight:.2f}"
+            assert (
+                abs(actual_weight - expected_weight) < 0.01
+            ), f"{component} weight {actual_weight:.2f} ≠ expected {expected_weight:.2f}"
 
 
 # ============================================================================

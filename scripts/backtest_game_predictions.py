@@ -25,10 +25,9 @@ import json
 import logging
 import os
 import sys
-import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -112,7 +111,7 @@ class SimpleGamePredictor:
 
     def _get_team_stats(
         self, team: str, season: int, week: int, lookback_weeks: int = 8
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Get rolling team statistics (offense and defense).
 
@@ -185,7 +184,7 @@ class SimpleGamePredictor:
 
     def predict_game(
         self, home_team: str, away_team: str, season: int, week: int
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Predict game outcome (spread, total, win probability).
 
@@ -209,9 +208,7 @@ class SimpleGamePredictor:
         ) / 2 + self.home_field_advantage
 
         # Away score = away offense vs home defense
-        predicted_away_score = (
-            away_stats["avg_points_for"] + home_stats["avg_points_against"]
-        ) / 2
+        predicted_away_score = (away_stats["avg_points_for"] + home_stats["avg_points_against"]) / 2
 
         # Derive spread and total
         predicted_spread = predicted_home_score - predicted_away_score  # Positive = home favored
@@ -280,11 +277,9 @@ class GamePredictionBacktest:
         self.conn = get_db_connection()
         self.predictor = SimpleGamePredictor(self.conn)
 
-        logger.info(
-            f"Initialized GamePredictionBacktest: seasons {start_season}-{end_season}"
-        )
+        logger.info(f"Initialized GamePredictionBacktest: seasons {start_season}-{end_season}")
 
-    def _fetch_completed_games(self) -> List[Dict[str, Any]]:
+    def _fetch_completed_games(self) -> list[dict[str, Any]]:
         """
         Fetch all completed games in backtest period.
 
@@ -325,7 +320,7 @@ class GamePredictionBacktest:
         return games
 
     def _store_prediction(
-        self, game: Dict[str, Any], prediction: Dict[str, float], errors: Dict[str, float]
+        self, game: dict[str, Any], prediction: dict[str, float], errors: dict[str, float]
     ):
         """
         Store prediction in ml.game_predictions table.
@@ -442,10 +437,18 @@ class GamePredictionBacktest:
             "total_std": float(prediction["total_std"]),
             "home_score_std": float(prediction["home_score_std"]),
             "away_score_std": float(prediction["away_score_std"]),
-            "sportsbook_spread": float(game["spread_close"]) if game["spread_close"] is not None else None,
-            "sportsbook_total": float(game["total_close"]) if game["total_close"] is not None else None,
-            "sportsbook_home_ml": float(game["home_moneyline"]) if game["home_moneyline"] is not None else None,
-            "sportsbook_away_ml": float(game["away_moneyline"]) if game["away_moneyline"] is not None else None,
+            "sportsbook_spread": (
+                float(game["spread_close"]) if game["spread_close"] is not None else None
+            ),
+            "sportsbook_total": (
+                float(game["total_close"]) if game["total_close"] is not None else None
+            ),
+            "sportsbook_home_ml": (
+                float(game["home_moneyline"]) if game["home_moneyline"] is not None else None
+            ),
+            "sportsbook_away_ml": (
+                float(game["away_moneyline"]) if game["away_moneyline"] is not None else None
+            ),
             "spread_edge": spread_edge,
             "total_edge": total_edge,
             "ml_edge": ml_edge,
@@ -468,7 +471,7 @@ class GamePredictionBacktest:
         self.conn.commit()
         cursor.close()
 
-    def run_backtest(self) -> List[Dict[str, Any]]:
+    def run_backtest(self) -> list[dict[str, Any]]:
         """
         Run backtest on all completed games.
 
@@ -559,15 +562,13 @@ class GamePredictionBacktest:
             except Exception as e:
                 # Rollback failed transaction
                 self.conn.rollback()
-                logger.error(
-                    f"Error processing game {game['game_id']}: {e}", exc_info=True
-                )
+                logger.error(f"Error processing game {game['game_id']}: {e}", exc_info=True)
                 continue
 
         logger.info(f"Backtest complete: {len(results)} games processed")
         return results
 
-    def calculate_metrics(self, results: List[Dict[str, Any]]) -> Dict[str, Any]:
+    def calculate_metrics(self, results: list[dict[str, Any]]) -> dict[str, Any]:
         """
         Calculate aggregate performance metrics.
 
@@ -590,11 +591,7 @@ class GamePredictionBacktest:
 
         # Over/Under rate (only games with totals)
         total_correct_df = df[df["total_correct"].notna()]
-        ou_rate = (
-            total_correct_df["total_correct"].mean()
-            if len(total_correct_df) > 0
-            else None
-        )
+        ou_rate = total_correct_df["total_correct"].mean() if len(total_correct_df) > 0 else None
 
         # Edge analysis (games with >4 point edge - optimized via grid search Nov 27, 2025)
         # Grid search results: 2pt=36% ROI, 4pt=48% ROI, 5.5pt=58% ROI
@@ -652,7 +649,7 @@ class GamePredictionBacktest:
 
         return metrics
 
-    def _calculate_calibration(self, df: pd.DataFrame) -> List[Dict[str, float]]:
+    def _calculate_calibration(self, df: pd.DataFrame) -> list[dict[str, float]]:
         """
         Calculate calibration bins for win probability.
 
@@ -666,7 +663,7 @@ class GamePredictionBacktest:
         # Placeholder for now - implement once predictions are stored
         return []
 
-    def generate_report(self, metrics: Dict[str, Any], output_path: str):
+    def generate_report(self, metrics: dict[str, Any], output_path: str):
         """
         Generate markdown backtest report.
 
@@ -689,27 +686,23 @@ class GamePredictionBacktest:
             "| Metric | Value | Target | Status |",
             "|--------|-------|--------|--------|",
             f"| Spread MAE | {metrics['overall']['spread_mae']:.2f} pts | <10 pts | "
-            + ("✅ PASS" if metrics['overall']['spread_mae'] < 10 else "❌ FAIL")
+            + ("✅ PASS" if metrics["overall"]["spread_mae"] < 10 else "❌ FAIL")
             + " |",
             f"| Total MAE | {metrics['overall']['total_mae']:.2f} pts | <12 pts | "
-            + ("✅ PASS" if metrics['overall']['total_mae'] < 12 else "❌ FAIL")
+            + ("✅ PASS" if metrics["overall"]["total_mae"] < 12 else "❌ FAIL")
             + " |",
             f"| Brier Score | {metrics['overall']['brier_score']:.4f} | <0.25 | "
-            + ("✅ PASS" if metrics['overall']['brier_score'] < 0.25 else "❌ FAIL")
+            + ("✅ PASS" if metrics["overall"]["brier_score"] < 0.25 else "❌ FAIL")
             + " |",
             f"| Cover Rate | {metrics['overall']['cover_rate']:.1%} | >52% | "
-            + ("✅ PASS" if metrics['overall']['cover_rate'] > 0.52 else "❌ FAIL")
+            + ("✅ PASS" if metrics["overall"]["cover_rate"] > 0.52 else "❌ FAIL")
             + " |",
         ]
 
         if metrics["overall"]["ou_rate"] is not None:
             report_lines.append(
                 f"| O/U Rate | {metrics['overall']['ou_rate']:.1%} | >52% | "
-                + (
-                    "✅ PASS"
-                    if metrics["overall"]["ou_rate"] > 0.52
-                    else "❌ FAIL"
-                )
+                + ("✅ PASS" if metrics["overall"]["ou_rate"] > 0.52 else "❌ FAIL")
                 + " |"
             )
 
@@ -747,7 +740,7 @@ class GamePredictionBacktest:
                     f"- **Estimated ROI:** {metrics['edge_analysis']['estimated_roi']:+.1f}% "
                     + (
                         "(✅ Profitable!)"
-                        if metrics['edge_analysis']['estimated_roi'] > 0
+                        if metrics["edge_analysis"]["estimated_roi"] > 0
                         else "(❌ Unprofitable)"
                     ),
                 ]

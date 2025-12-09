@@ -50,10 +50,10 @@ try:
     size_mb = output_file.stat().st_size / (1024 * 1024)
     print(f"✓ Export complete: {output_file}")
     print(f"✓ File size: {size_mb:.2f} MB")
-    print(f"\nNext steps:")
+    print("\nNext steps:")
     print(f"  git add {output_file}")
-    print(f"  git commit -m \"chore: database snapshot for Mac transition ({timestamp})\"")
-    print(f"  git push origin main")
+    print(f'  git commit -m "chore: database snapshot for Mac transition ({timestamp})"')
+    print("  git push origin main")
 
 except FileNotFoundError:
     print("ERROR: pg_dump not found in PATH")
@@ -64,7 +64,7 @@ except FileNotFoundError:
     sys.exit(1)
 
 except subprocess.CalledProcessError as e:
-    print(f"ERROR: pg_dump failed")
+    print("ERROR: pg_dump failed")
     print(f"stdout: {e.stdout}")
     print(f"stderr: {e.stderr}")
     sys.exit(1)

@@ -23,24 +23,21 @@ Usage:
 """
 
 import argparse
-import sys
-import time
-import json
 import os
+import sys
 from pathlib import Path
-from datetime import datetime
-from typing import List, Optional
 
 # Add to path for imports
 sys.path.insert(0, "py/compute")
 
-from task_queue import TaskQueue, TaskPriority, load_standard_tasks
+from task_queue import TaskPriority, TaskQueue, load_standard_tasks
 from worker import ComputeWorker
+
 
 # Check for Redis dependencies before importing
 def check_redis_dependencies():
     """Check if Redis dependencies are installed."""
-    required = {'redis': 'redis>=4.5.0', 'psutil': 'psutil>=5.9.0'}
+    required = {"redis": "redis>=4.5.0", "psutil": "psutil>=5.9.0"}
     missing = []
 
     for module_name, package_spec in required.items():
@@ -55,14 +52,16 @@ def check_redis_dependencies():
         return False
     return True
 
+
 # Redis-based imports with smart checking
 REDIS_AVAILABLE = False
 if check_redis_dependencies():
     try:
-        from redis_task_queue import RedisTaskQueue, HardwareProfile
-        from sync_manager import GoogleDriveSyncManager
-        from redis_worker import RedisComputeWorker
         import redis
+        from redis_task_queue import HardwareProfile, RedisTaskQueue
+        from redis_worker import RedisComputeWorker
+        from sync_manager import GoogleDriveSyncManager
+
         REDIS_AVAILABLE = True
         print("✅ Redis mode available")
     except ImportError as e:
@@ -70,15 +69,16 @@ if check_redis_dependencies():
         REDIS_AVAILABLE = False
 
 
-def detect_hardware_profile() -> Optional[HardwareProfile]:
+def detect_hardware_profile() -> HardwareProfile | None:
     """Detect current hardware capabilities."""
     if not REDIS_AVAILABLE:
         return None
 
-    import platform
-    import psutil
-    import socket
     import hashlib
+    import platform
+    import socket
+
+    import psutil
 
     try:
         # Generate machine ID
@@ -93,6 +93,7 @@ def detect_hardware_profile() -> Optional[HardwareProfile]:
 
         try:
             import torch
+
             if torch.cuda.is_available():
                 gpu_name = torch.cuda.get_device_name(0)
                 gpu_memory = torch.cuda.get_device_properties(0).total_memory
@@ -106,20 +107,21 @@ def detect_hardware_profile() -> Optional[HardwareProfile]:
             gpu_memory=gpu_memory,
             gpu_name=gpu_name,
             platform=platform.system(),
-            capabilities=_detect_capabilities()
+            capabilities=_detect_capabilities(),
         )
     except Exception as e:
         print(f"⚠️ Hardware detection failed: {e}")
         return None
 
 
-def _detect_capabilities() -> List[str]:
+def _detect_capabilities() -> list[str]:
     """Detect software capabilities."""
     capabilities = []
 
     # Check for ML frameworks
     try:
         import torch
+
         capabilities.append("pytorch")
         if torch.cuda.is_available():
             capabilities.append("cuda")
@@ -128,6 +130,7 @@ def _detect_capabilities() -> List[str]:
 
     try:
         import tensorflow as tf
+
         capabilities.append("tensorflow")
     except ImportError:
         pass
@@ -159,7 +162,9 @@ def init_queue(redis_mode: bool = False):
             print(f"   CPU: {hardware_profile.cpu_cores} cores")
             print(f"   Memory: {hardware_profile.total_memory / (1024**3):.1f} GB")
             if hardware_profile.gpu_memory > 0:
-                print(f"   GPU: {hardware_profile.gpu_name} ({hardware_profile.gpu_memory / (1024**3):.1f} GB)")
+                print(
+                    f"   GPU: {hardware_profile.gpu_name} ({hardware_profile.gpu_memory / (1024**3):.1f} GB)"
+                )
 
         # Load standard tasks into Redis
         load_standard_tasks_redis(queue)
@@ -179,16 +184,16 @@ def init_queue(redis_mode: bool = False):
     stats = queue.get_queue_status()
     if redis_mode:
         # Redis queue status format is different
-        total = sum(v.get('count', 0) if isinstance(v, dict) else 0 for v in stats.values())
-        print(f"\n✅ Queue initialized with Redis backend")
+        total = sum(v.get("count", 0) if isinstance(v, dict) else 0 for v in stats.values())
+        print("\n✅ Queue initialized with Redis backend")
         for queue_name, info in stats.items():
-            if isinstance(info, dict) and info.get('pending', 0) > 0:
+            if isinstance(info, dict) and info.get("pending", 0) > 0:
                 print(f"  {queue_name}: {info['pending']} pending tasks")
     else:
-        total = sum(s['count'] for s in stats.values())
+        total = sum(s["count"] for s in stats.values())
         print(f"\n✅ Loaded {total} compute tasks")
         for status, info in stats.items():
-            if info['count'] > 0:
+            if info["count"] > 0:
                 print(f"  {status}: {info['count']} tasks")
 
     queue.close()
@@ -246,14 +251,14 @@ def load_standard_tasks_redis(queue: RedisTaskQueue):
     tasks_added = 0
 
     for task_config in standard_tasks:
-        task_id = queue.add_task(
+        queue.add_task(
             name=task_config["name"],
             task_type=task_config["type"],
             config=task_config["config"],
             priority=TaskPriority[task_config.get("priority", "medium").upper()],
             estimated_hours=task_config.get("estimated_hours", 1.0),
             requires_gpu=task_config.get("requires_gpu", False),
-            min_gpu_memory=task_config.get("min_gpu_memory", 0)
+            min_gpu_memory=task_config.get("min_gpu_memory", 0),
         )
         tasks_added += 1
 
@@ -276,11 +281,11 @@ def show_status_redis(redis_mode: bool = True):
         stats = queue.get_queue_status()
 
         # Redis queue stats by type
-        print(f"\n📈 Queue Status by Type:")
+        print("\n📈 Queue Status by Type:")
         total_pending = 0
         for queue_name, info in stats.items():
-            if isinstance(info, dict) and 'pending' in info:
-                pending = info['pending']
+            if isinstance(info, dict) and "pending" in info:
+                pending = info["pending"]
                 total_pending += pending
                 if pending > 0:
                     print(f"  {queue_name}: {pending} pending")
@@ -288,10 +293,10 @@ def show_status_redis(redis_mode: bool = True):
         # Status summary
         status_counts = {}
         for status_key, info in stats.items():
-            if isinstance(info, dict) and 'count' in info:
-                status_counts[status_key] = info['count']
+            if isinstance(info, dict) and "count" in info:
+                status_counts[status_key] = info["count"]
 
-        print(f"\n📊 Overall Status:")
+        print("\n📊 Overall Status:")
         print(f"  Total Pending: {total_pending} ⏳")
         for status, count in status_counts.items():
             if count > 0:
@@ -299,15 +304,15 @@ def show_status_redis(redis_mode: bool = True):
                 print(f"  {status.title()}: {count} {emoji}")
 
         # Machine information
-        if 'machines' in stats:
-            machine_info = stats['machines']
-            print(f"\n🖥️ Cluster Status:")
+        if "machines" in stats:
+            machine_info = stats["machines"]
+            print("\n🖥️ Cluster Status:")
             print(f"  Active Machines: {machine_info.get('active', 0)}")
             print(f"  Current Machine: {machine_info.get('current', 'unknown')}")
 
         # Redis information
         redis_info = queue.redis_client.info()
-        print(f"\n🔧 Redis Status:")
+        print("\n🔧 Redis Status:")
         print(f"  Memory Usage: {redis_info.get('used_memory_human', 'unknown')}")
         print(f"  Connected Clients: {redis_info.get('connected_clients', 0)}")
         print(f"  Uptime: {redis_info.get('uptime_in_seconds', 0) // 3600}h")
@@ -322,8 +327,8 @@ def show_status_redis(redis_mode: bool = True):
 
 def show_performance_scoreboard():
     """Show performance scoreboard."""
-    from py.compute.performance_tracker import PerformanceTracker
     from py.compute.adaptive_scheduler import AdaptiveScheduler
+    from py.compute.performance_tracker import PerformanceTracker
 
     tracker = PerformanceTracker()
     scheduler = AdaptiveScheduler()
@@ -340,30 +345,31 @@ def show_performance_scoreboard():
     print(f"{'Model':<20} {'Metric':<10} {'Value':<10} {'Compute':<10} {'Trend':<12}")
     print("-" * 60)
 
-    for model_id, data in list(summary.get('top_models', {}).items())[:10]:
-        metric = 'accuracy' if data.get('accuracy') else 'loss' if data.get('loss') else 'sharpe'
-        value = data.get('accuracy') or data.get('loss') or data.get('sharpe') or 0
-        hours = data.get('compute_hours', 0)
-        trend = summary.get('trends', {}).get(model_id.split('_')[0], {}).get('direction', 'unknown')
+    for model_id, data in list(summary.get("top_models", {}).items())[:10]:
+        metric = "accuracy" if data.get("accuracy") else "loss" if data.get("loss") else "sharpe"
+        value = data.get("accuracy") or data.get("loss") or data.get("sharpe") or 0
+        hours = data.get("compute_hours", 0)
+        trend = (
+            summary.get("trends", {}).get(model_id.split("_")[0], {}).get("direction", "unknown")
+        )
 
-        trend_symbol = {
-            'improving': '📈',
-            'regressing': '📉',
-            'plateau': '➡️',
-            'unknown': '❓'
-        }.get(trend, '❓')
+        trend_symbol = {"improving": "📈", "regressing": "📉", "plateau": "➡️", "unknown": "❓"}.get(
+            trend, "❓"
+        )
 
-        print(f"{model_id:<20} {metric:<10} {value:<10.3f} {hours:<10.1f} {trend_symbol} {trend:<10}")
+        print(
+            f"{model_id:<20} {metric:<10} {value:<10.3f} {hours:<10.1f} {trend_symbol} {trend:<10}"
+        )
 
     # Display milestones
     print("\n🏅 Recent Milestones:")
-    for milestone in summary.get('recent_milestones', [])[:5]:
+    for milestone in summary.get("recent_milestones", [])[:5]:
         print(f"  • {milestone['type']}: {milestone['description']} ({milestone['model']})")
 
     # Display recommendations
     print("\n💡 Compute Recommendations:")
     report = scheduler.get_compute_allocation_report()
-    for rec in report.get('recommendations', [])[:5]:
+    for rec in report.get("recommendations", [])[:5]:
         print(f"  {rec}")
 
     # Display suggested new tasks
@@ -388,13 +394,13 @@ def show_status():
     stats = queue.get_queue_status()
 
     # Overall stats
-    total = sum(s.get('count', 0) for s in stats.values())
-    pending = stats.get('pending', {}).get('count', 0)
-    running = stats.get('running', {}).get('count', 0)
-    completed = stats.get('completed', {}).get('count', 0)
-    failed = stats.get('failed', {}).get('count', 0)
+    total = sum(s.get("count", 0) for s in stats.values())
+    pending = stats.get("pending", {}).get("count", 0)
+    running = stats.get("running", {}).get("count", 0)
+    completed = stats.get("completed", {}).get("count", 0)
+    failed = stats.get("failed", {}).get("count", 0)
 
-    print(f"\n📈 Queue Overview:")
+    print("\n📈 Queue Overview:")
     print(f"  Total tasks: {total}")
     print(f"  Pending: {pending} ⏳")
     print(f"  Running: {running} 🔥")
@@ -402,35 +408,37 @@ def show_status():
     print(f"  Failed: {failed} ❌")
 
     # Resource usage
-    total_cpu = sum(s.get('cpu_hours', 0) for s in stats.values())
-    total_gpu = sum(s.get('gpu_hours', 0) for s in stats.values())
+    total_cpu = sum(s.get("cpu_hours", 0) for s in stats.values())
+    total_gpu = sum(s.get("gpu_hours", 0) for s in stats.values())
 
-    print(f"\n⚡ Resource Usage:")
+    print("\n⚡ Resource Usage:")
     print(f"  CPU hours: {total_cpu:.1f}")
     print(f"  GPU hours: {total_gpu:.1f}")
 
     # Running tasks
     running_tasks = queue.get_running_tasks()
     if running_tasks:
-        print(f"\n🔥 Currently Running:")
+        print("\n🔥 Currently Running:")
         for task in running_tasks:
-            progress = task['progress'] * 100
+            progress = task["progress"] * 100
             print(f"  • {task['name']}: {progress:.1f}% complete")
 
     # Recent compute stats
-    cursor = queue.conn.execute("""
+    cursor = queue.conn.execute(
+        """
         SELECT * FROM compute_stats
         ORDER BY timestamp DESC
         LIMIT 1
-    """)
+    """
+    )
     row = cursor.fetchone()
 
     if row:
-        print(f"\n🌡️ System Stats (latest):")
+        print("\n🌡️ System Stats (latest):")
         print(f"  CPU usage: {row['cpu_usage']:.1f}%")
         print(f"  Memory usage: {row['memory_usage']:.1f}%")
         print(f"  Temperature: {row['temperature']:.1f}°C")
-        if row['gpu_usage'] > 0:
+        if row["gpu_usage"] > 0:
             print(f"  GPU usage: {row['gpu_usage']:.1f}%")
 
     queue.close()
@@ -449,72 +457,40 @@ def run_dashboard():
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="NFL Analytics Distributed Compute System"
-    )
+    parser = argparse.ArgumentParser(description="NFL Analytics Distributed Compute System")
+    parser.add_argument("--init", action="store_true", help="Initialize queue with standard tasks")
+    parser.add_argument("--status", action="store_true", help="Show queue status")
+    parser.add_argument("--scoreboard", action="store_true", help="Show performance scoreboard")
+    parser.add_argument("--dashboard", action="store_true", help="Run web dashboard")
     parser.add_argument(
-        "--init",
-        action="store_true",
-        help="Initialize queue with standard tasks"
-    )
-    parser.add_argument(
-        "--status",
-        action="store_true",
-        help="Show queue status"
-    )
-    parser.add_argument(
-        "--scoreboard",
-        action="store_true",
-        help="Show performance scoreboard"
-    )
-    parser.add_argument(
-        "--dashboard",
-        action="store_true",
-        help="Run web dashboard"
-    )
-    parser.add_argument(
-        "--rebalance",
-        action="store_true",
-        help="Rebalance queue based on performance"
+        "--rebalance", action="store_true", help="Rebalance queue based on performance"
     )
     parser.add_argument(
         "--adaptive",
         action="store_true",
         default=True,
-        help="Use adaptive scheduling (default: True)"
+        help="Use adaptive scheduling (default: True)",
     )
     parser.add_argument(
         "--intensity",
         choices=["low", "medium", "high", "inferno"],
         default="medium",
-        help="Compute intensity (heat generation level)"
+        help="Compute intensity (heat generation level)",
+    )
+    parser.add_argument("--workers", type=int, default=1, help="Number of parallel workers")
+    parser.add_argument(
+        "--redis-mode", action="store_true", help="Use Redis-based distributed task queue"
     )
     parser.add_argument(
-        "--workers",
-        type=int,
-        default=1,
-        help="Number of parallel workers"
-    )
-    parser.add_argument(
-        "--redis-mode",
-        action="store_true",
-        help="Use Redis-based distributed task queue"
-    )
-    parser.add_argument(
-        "--machine-id",
-        type=str,
-        help="Machine identifier for distributed computing"
+        "--machine-id", type=str, help="Machine identifier for distributed computing"
     )
     parser.add_argument(
         "--hardware-profile",
         type=str,
-        help="Hardware profile (gpu_high, gpu_standard, cpu_arm_high, cpu_x86)"
+        help="Hardware profile (gpu_high, gpu_standard, cpu_arm_high, cpu_x86)",
     )
     parser.add_argument(
-        "--sync-interval",
-        type=int,
-        default=300,
-        help="Google Drive sync interval in seconds"
+        "--sync-interval", type=int, default=300, help="Google Drive sync interval in seconds"
     )
 
     args = parser.parse_args()
@@ -530,6 +506,7 @@ def main():
         show_performance_scoreboard()
     elif args.rebalance:
         from py.compute.adaptive_scheduler import AdaptiveScheduler
+
         scheduler = AdaptiveScheduler()
         scheduler.rebalance_queue()
         print("✅ Queue rebalanced based on performance data")
@@ -540,7 +517,8 @@ def main():
         backend_name = "Redis" if redis_mode else "SQLite"
         machine_info = f" ({args.machine_id})" if args.machine_id else ""
 
-        print(f"""
+        print(
+            f"""
 ╔══════════════════════════════════════════════════════════╗
 ║     🫀 NFL ANALYTICS DISTRIBUTED COMPUTE SYSTEM 🫀       ║
 ║                                                          ║
@@ -552,26 +530,30 @@ def main():
 ║                                                          ║
 ║  Press Ctrl+C to stop                                   ║
 ╚══════════════════════════════════════════════════════════╝
-        """)
+        """
+        )
 
         if args.workers > 1:
-            print(f"⚠️  Multi-worker mode not yet implemented. Running single worker.")
+            print("⚠️  Multi-worker mode not yet implemented. Running single worker.")
 
         # Start sync manager if in Redis mode
         sync_manager = None
         if redis_mode and REDIS_AVAILABLE:
             try:
-                redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+                redis_client = redis.Redis(host="localhost", port=6379, decode_responses=True)
                 sync_manager = GoogleDriveSyncManager(
                     redis_client=redis_client,
                     sync_directory=Path("/data"),
                     machine_id=args.machine_id,
-                    sync_interval=args.sync_interval
+                    sync_interval=args.sync_interval,
                 )
 
                 # Start background sync in a separate thread
                 import threading
-                sync_thread = threading.Thread(target=sync_manager.start_background_sync, daemon=True)
+
+                sync_thread = threading.Thread(
+                    target=sync_manager.start_background_sync, daemon=True
+                )
                 sync_thread.start()
                 print("🔄 Started Google Drive sync manager")
 
@@ -584,7 +566,7 @@ def main():
                 intensity=args.intensity,
                 use_adaptive=args.adaptive,
                 machine_id=args.machine_id,
-                hardware_profile=args.hardware_profile
+                hardware_profile=args.hardware_profile,
             )
         else:
             worker = ComputeWorker(intensity=args.intensity, use_adaptive=args.adaptive)

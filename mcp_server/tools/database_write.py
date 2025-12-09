@@ -3,11 +3,11 @@ Database write operations for NFL analytics MCP server.
 Provides safe INSERT/UPDATE operations for model registry and predictions.
 """
 
-import psycopg2
 import json
-from typing import Dict, Any, Optional
 import logging
-from datetime import datetime
+from typing import Any
+
+import psycopg2
 
 from mcp_server.tools.database import get_db_connection
 
@@ -20,10 +20,10 @@ def insert_model_metadata(
     model_type: str,
     model_family: str,
     model_path: str,
-    description: Optional[str] = None,
-    notes: Optional[str] = None,
-    **kwargs
-) -> Dict[str, Any]:
+    description: str | None = None,
+    notes: str | None = None,
+    **kwargs,
+) -> dict[str, Any]:
     """
     Insert model metadata into ml.model_registry.
 
@@ -63,7 +63,7 @@ def insert_model_metadata(
                     model_family,
                     model_path,
                     description,
-                    notes
+                    notes,
                 )
 
                 cursor.execute(sql, params)
@@ -75,39 +75,26 @@ def insert_model_metadata(
                 return {
                     "success": True,
                     "model_id": model_id,
-                    "message": f"Model {model_name} v{version} registered with ID {model_id}"
+                    "message": f"Model {model_name} v{version} registered with ID {model_id}",
                 }
 
     except psycopg2.errors.UniqueViolation:
         error_msg = f"Model {model_name} v{version} already exists"
         logger.warning(error_msg)
-        return {
-            "success": False,
-            "error": error_msg
-        }
+        return {"success": False, "error": error_msg}
 
     except psycopg2.Error as e:
         error_msg = f"Database error: {str(e)}"
         logger.error(error_msg)
-        return {
-            "success": False,
-            "error": error_msg
-        }
+        return {"success": False, "error": error_msg}
 
     except Exception as e:
         error_msg = f"Unexpected error: {str(e)}"
         logger.error(error_msg, exc_info=True)
-        return {
-            "success": False,
-            "error": error_msg
-        }
+        return {"success": False, "error": error_msg}
 
 
-def update_model_status(
-    model_id: int,
-    status: str,
-    notes: Optional[str] = None
-) -> Dict[str, Any]:
+def update_model_status(model_id: int, status: str, notes: str | None = None) -> dict[str, Any]:
     """
     Update model status in registry.
 
@@ -119,13 +106,10 @@ def update_model_status(
     Returns:
         Success/error dictionary
     """
-    valid_statuses = {'trained', 'validated', 'deployed', 'deprecated', 'failed'}
+    valid_statuses = {"trained", "validated", "deployed", "deprecated", "failed"}
 
     if status not in valid_statuses:
-        return {
-            "success": False,
-            "error": f"Invalid status. Must be one of: {valid_statuses}"
-        }
+        return {"success": False, "error": f"Invalid status. Must be one of: {valid_statuses}"}
 
     try:
         logger.info(f"Updating model {model_id} status to: {status}")
@@ -144,10 +128,7 @@ def update_model_status(
                 result = cursor.fetchone()
 
                 if not result:
-                    return {
-                        "success": False,
-                        "error": f"Model ID {model_id} not found"
-                    }
+                    return {"success": False, "error": f"Model ID {model_id} not found"}
 
                 model_name, version = result
 
@@ -158,11 +139,8 @@ def update_model_status(
                     (model_id, action, details, created_at)
                     VALUES (%s, %s, %s, NOW())
                     """
-                    log_details = json.dumps({
-                        "status_change": status,
-                        "notes": notes
-                    })
-                    cursor.execute(sql_log, (model_id, 'status_change', log_details))
+                    log_details = json.dumps({"status_change": status, "notes": notes})
+                    cursor.execute(sql_log, (model_id, "status_change", log_details))
 
                 conn.commit()
 
@@ -170,23 +148,16 @@ def update_model_status(
 
                 return {
                     "success": True,
-                    "message": f"Model {model_name} v{version} status updated to {status}"
+                    "message": f"Model {model_name} v{version} status updated to {status}",
                 }
 
     except psycopg2.Error as e:
         error_msg = f"Database error: {str(e)}"
         logger.error(error_msg)
-        return {
-            "success": False,
-            "error": error_msg
-        }
+        return {"success": False, "error": error_msg}
 
 
-def insert_prediction_batch(
-    model_id: int,
-    game_week: str,
-    predictions: list
-) -> Dict[str, Any]:
+def insert_prediction_batch(model_id: int, game_week: str, predictions: list) -> dict[str, Any]:
     """
     Insert a batch of predictions for a game week.
 
@@ -219,13 +190,13 @@ def insert_prediction_batch(
                 for pred in predictions:
                     params = (
                         model_id,
-                        pred['game_id'],
-                        pred['player_id'],
-                        pred['prop_type'],
-                        pred['prediction'],
-                        pred.get('uncertainty_lower'),
-                        pred.get('uncertainty_upper'),
-                        game_week
+                        pred["game_id"],
+                        pred["player_id"],
+                        pred["prop_type"],
+                        pred["prediction"],
+                        pred.get("uncertainty_lower"),
+                        pred.get("uncertainty_upper"),
+                        game_week,
                     )
                     cursor.execute(sql, params)
 
@@ -236,13 +207,10 @@ def insert_prediction_batch(
                 return {
                     "success": True,
                     "count": len(predictions),
-                    "message": f"Inserted {len(predictions)} predictions for week {game_week}"
+                    "message": f"Inserted {len(predictions)} predictions for week {game_week}",
                 }
 
     except psycopg2.Error as e:
         error_msg = f"Database error: {str(e)}"
         logger.error(error_msg)
-        return {
-            "success": False,
-            "error": error_msg
-        }
+        return {"success": False, "error": error_msg}

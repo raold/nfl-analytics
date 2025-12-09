@@ -42,24 +42,41 @@ for (yr in 2010:2024) {
 
   # Simulate playoff probabilities for each week
   # nflseedR simulates thousands of seasons to estimate playoff odds
-  sim <- nflseedR::simulate_nfl(
-    nfl_season = yr,
-    process_games = TRUE,
-    playoff_seeds = TRUE,
-    fresh_season = TRUE,
-    simulations = 1000 # 1000 simulations per week (balance speed/accuracy)
+  sim <- tryCatch(
+    {
+      result <- nflseedR::simulate_nfl(
+        nfl_season = yr,
+        playoff_seeds = 7, # 7 playoff seeds per conference (post-2020 format)
+        fresh_season = TRUE,
+        sims = 1000 # 1000 simulations (balance speed/accuracy)
+      )
+      # Extract teams data from the simulation result object
+      result$teams
+    },
+    error = function(e) {
+      cat(sprintf("  Warning: Simulation failed for %d: %s\n", yr, e$message))
+      return(NULL)
+    }
   )
 
-  # Extract team-level playoff probabilities by week
+  if (is.null(sim) || nrow(sim) == 0) {
+    cat(sprintf("  Skipping season %d (no simulation data)\n", yr))
+    next
+  }
+
+  # Extract team-level playoff probabilities
+  # nflseedR::simulate_nfl returns a summary with columns like 'make_playoffs', 'win_division'
   team_probs <- sim %>%
-    group_by(season, week, team) %>%
-    summarise(
-      playoff_prob = mean(made_playoffs, na.rm = TRUE),
-      div_winner_prob = mean(div_winner, na.rm = TRUE),
-      one_seed_prob = mean(seed == 1, na.rm = TRUE),
-      avg_wins = mean(wins, na.rm = TRUE),
-      .groups = "drop"
-    )
+    mutate(
+      season = yr, # Add season explicitly
+      playoff_prob = ifelse("make_playoffs" %in% names(.), make_playoffs, NA_real_),
+      div_winner_prob = ifelse("win_division" %in% names(.), win_division, NA_real_),
+      one_seed_prob = ifelse("first_seed" %in% names(.), first_seed, NA_real_),
+      avg_wins = ifelse("wins" %in% names(.), wins, NA_real_)
+    ) %>%
+    select(season, team, playoff_prob, div_winner_prob, one_seed_prob, avg_wins) %>%
+    # nflseedR returns season-level probabilities, we'll expand to weeks later
+    mutate(week = NA_integer_)
 
   all_playoff_probs <- bind_rows(all_playoff_probs, team_probs)
 

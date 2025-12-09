@@ -21,31 +21,32 @@ Date: November 26, 2025
 
 import argparse
 import json
+
+# Add project root to path
+import sys
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any
 
 import numpy as np
 import pandas as pd
 import torch
 
-# Add project root to path
-import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from py.rl.cql_agent import CQLAgent
 from py.rl.fourth_down_mdp import (
-    STATE_DIM,
     ACTION_DIM,
-    ACTION_GO,
-    ACTION_PUNT,
     ACTION_FIELD_GOAL,
+    ACTION_GO,
     ACTION_NAMES,
+    ACTION_PUNT,
+    STATE_DIM,
 )
-
 
 # ============================================================================
 # NYT 4th Down Bot Implementation (Simplified)
 # ============================================================================
+
 
 class NYT4thDownBot:
     """
@@ -71,15 +72,15 @@ class NYT4thDownBot:
         # Conversion probabilities by distance (from historical NFL data)
         # These are approximate values - actual NYT bot uses more granular data
         self.conversion_probs = {
-            1: 0.70,   # 4th and 1
-            2: 0.60,   # 4th and 2
-            3: 0.53,   # 4th and 3
-            4: 0.48,   # 4th and 4
-            5: 0.44,   # 4th and 5
-            6: 0.40,   # 4th and 6
-            7: 0.37,   # 4th and 7
-            8: 0.34,   # 4th and 8
-            9: 0.31,   # 4th and 9
+            1: 0.70,  # 4th and 1
+            2: 0.60,  # 4th and 2
+            3: 0.53,  # 4th and 3
+            4: 0.48,  # 4th and 4
+            5: 0.44,  # 4th and 5
+            6: 0.40,  # 4th and 6
+            7: 0.37,  # 4th and 7
+            8: 0.34,  # 4th and 8
+            9: 0.31,  # 4th and 9
             10: 0.28,  # 4th and 10
             # Beyond 10 yards
             15: 0.20,
@@ -108,7 +109,7 @@ class NYT4thDownBot:
         # From opponent's goal line
         self.expected_points_by_position = self._build_expected_points_model()
 
-    def _build_expected_points_model(self) -> Dict[int, float]:
+    def _build_expected_points_model(self) -> dict[int, float]:
         """
         Build expected points model by field position.
 
@@ -141,11 +142,13 @@ class NYT4thDownBot:
             # Interpolate for distances not in table
             keys = sorted(self.conversion_probs.keys())
             for i, k in enumerate(keys[:-1]):
-                if keys[i] < distance < keys[i+1]:
+                if keys[i] < distance < keys[i + 1]:
                     # Linear interpolation
-                    frac = (distance - keys[i]) / (keys[i+1] - keys[i])
-                    return self.conversion_probs[keys[i]] * (1 - frac) + \
-                           self.conversion_probs[keys[i+1]] * frac
+                    frac = (distance - keys[i]) / (keys[i + 1] - keys[i])
+                    return (
+                        self.conversion_probs[keys[i]] * (1 - frac)
+                        + self.conversion_probs[keys[i + 1]] * frac
+                    )
             return 0.10  # Very long distance
 
     def get_fg_prob(self, distance_to_goal: int) -> float:
@@ -160,10 +163,12 @@ class NYT4thDownBot:
         # Interpolate
         keys = sorted(self.fg_success_by_distance.keys())
         for i, k in enumerate(keys[:-1]):
-            if keys[i] <= fg_distance <= keys[i+1]:
-                frac = (fg_distance - keys[i]) / (keys[i+1] - keys[i])
-                return self.fg_success_by_distance[keys[i]] * (1 - frac) + \
-                       self.fg_success_by_distance[keys[i+1]] * frac
+            if keys[i] <= fg_distance <= keys[i + 1]:
+                frac = (fg_distance - keys[i]) / (keys[i + 1] - keys[i])
+                return (
+                    self.fg_success_by_distance[keys[i]] * (1 - frac)
+                    + self.fg_success_by_distance[keys[i + 1]] * frac
+                )
         return 0.0
 
     def recommend(
@@ -238,6 +243,7 @@ class NYT4thDownBot:
 # Comparison Analysis
 # ============================================================================
 
+
 def load_test_data(csv_path: str) -> tuple:
     """Load test dataset."""
     df = pd.read_csv(csv_path)
@@ -250,7 +256,7 @@ def load_test_data(csv_path: str) -> tuple:
     return states, actions, rewards, df
 
 
-def decode_state_features(state: np.ndarray) -> Dict[str, float]:
+def decode_state_features(state: np.ndarray) -> dict[str, float]:
     """
     Decode normalized state features back to original values.
 
@@ -281,7 +287,7 @@ def compare_agents(
     states: np.ndarray,
     actions: np.ndarray,
     rewards: np.ndarray,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Compare CQL agent vs NYT Bot on test set.
 
@@ -328,9 +334,15 @@ def compare_agents(
     nyt_coach_agree = (nyt_actions == actions).mean()
     cql_nyt_agree = (cql_actions == nyt_actions).mean()
 
-    print(f"CQL vs Coach agreement:  {cql_coach_agree:.2%} ({(cql_actions == actions).sum():,}/{n_samples:,})")
-    print(f"NYT vs Coach agreement:  {nyt_coach_agree:.2%} ({(nyt_actions == actions).sum():,}/{n_samples:,})")
-    print(f"CQL vs NYT agreement:    {cql_nyt_agree:.2%} ({(cql_actions == nyt_actions).sum():,}/{n_samples:,})")
+    print(
+        f"CQL vs Coach agreement:  {cql_coach_agree:.2%} ({(cql_actions == actions).sum():,}/{n_samples:,})"
+    )
+    print(
+        f"NYT vs Coach agreement:  {nyt_coach_agree:.2%} ({(nyt_actions == actions).sum():,}/{n_samples:,})"
+    )
+    print(
+        f"CQL vs NYT agreement:    {cql_nyt_agree:.2%} ({(cql_actions == nyt_actions).sum():,}/{n_samples:,})"
+    )
 
     # ========== Action Distribution ==========
     print("\n--- Action Distribution ---")
@@ -347,13 +359,21 @@ def compare_agents(
     print("\n--- Reward Analysis ---")
 
     # When each agent agrees with coach (we know the outcome)
-    cql_matched_reward = np.mean([rewards[i] if cql_actions[i] == actions[i] else np.nan for i in range(n_samples)])
-    nyt_matched_reward = np.mean([rewards[i] if nyt_actions[i] == actions[i] else np.nan for i in range(n_samples)])
+    cql_matched_reward = np.mean(
+        [rewards[i] if cql_actions[i] == actions[i] else np.nan for i in range(n_samples)]
+    )
+    nyt_matched_reward = np.mean(
+        [rewards[i] if nyt_actions[i] == actions[i] else np.nan for i in range(n_samples)]
+    )
     actual_reward = rewards.mean()
 
     print(f"Average actual reward:       {actual_reward:.4f}")
-    print(f"CQL (when matched) reward:   {np.nanmean([rewards[i] if cql_actions[i] == actions[i] else np.nan for i in range(n_samples)]):.4f}")
-    print(f"NYT (when matched) reward:   {np.nanmean([rewards[i] if nyt_actions[i] == actions[i] else np.nan for i in range(n_samples)]):.4f}")
+    print(
+        f"CQL (when matched) reward:   {np.nanmean([rewards[i] if cql_actions[i] == actions[i] else np.nan for i in range(n_samples)]):.4f}"
+    )
+    print(
+        f"NYT (when matched) reward:   {np.nanmean([rewards[i] if nyt_actions[i] == actions[i] else np.nan for i in range(n_samples)]):.4f}"
+    )
 
     # Reward lift calculation
     cql_lift = cql_matched_reward - actual_reward if not np.isnan(cql_matched_reward) else 0
@@ -378,7 +398,9 @@ def compare_agents(
             cql_nyt = (cql_actions[mask] == nyt_actions[mask]).mean()
 
             dist_label = f"{dist_min}-{dist_max}" if dist_max < 99 else f"{dist_min}+"
-            print(f"{dist_label:<12} {cql_agree:>11.1%} {nyt_agree:>11.1%} {cql_nyt:>9.1%} {mask.sum():>8,}")
+            print(
+                f"{dist_label:<12} {cql_agree:>11.1%} {nyt_agree:>11.1%} {cql_nyt:>9.1%} {mask.sum():>8,}"
+            )
 
             agreement_by_distance[dist_label] = {
                 "cql_coach": float(cql_agree),
@@ -399,19 +421,21 @@ def compare_agents(
         cql_right = (cql_actions[disagree_mask] == actions[disagree_mask]).sum()
         nyt_right = (nyt_actions[disagree_mask] == actions[disagree_mask]).sum()
 
-        print(f"When they disagree:")
+        print("When they disagree:")
         print(f"  CQL agrees with coach: {cql_right:,} ({cql_right/n_disagree:.1%})")
         print(f"  NYT agrees with coach: {nyt_right:,} ({nyt_right/n_disagree:.1%})")
 
         # What type of disagreements?
-        print(f"\nDisagreement patterns (CQL→NYT):")
+        print("\nDisagreement patterns (CQL→NYT):")
         for cql_act in range(ACTION_DIM):
             for nyt_act in range(ACTION_DIM):
                 if cql_act != nyt_act:
                     pattern_mask = (cql_actions == cql_act) & (nyt_actions == nyt_act)
                     count = pattern_mask.sum()
                     if count > 0:
-                        print(f"  {ACTION_NAMES[cql_act]} → {ACTION_NAMES[nyt_act]}: {count:,} ({count/n_samples:.1%})")
+                        print(
+                            f"  {ACTION_NAMES[cql_act]} → {ACTION_NAMES[nyt_act]}: {count:,} ({count/n_samples:.1%})"
+                        )
 
     # ========== Compile Results ==========
     results = {
@@ -443,17 +467,15 @@ def main():
     parser.add_argument(
         "--model",
         default="models/fourth_down_grid_20251126_112610/trial_018/cql_agent_final.pth",
-        help="Path to trained CQL model"
+        help="Path to trained CQL model",
     )
     parser.add_argument(
-        "--test-data",
-        default="data/fourth_down_dataset_test.csv",
-        help="Test dataset CSV"
+        "--test-data", default="data/fourth_down_dataset_test.csv", help="Test dataset CSV"
     )
     parser.add_argument(
         "--output",
         default="models/fourth_down_grid_20251126_112610/cql_vs_nyt_comparison.json",
-        help="Output JSON path"
+        help="Output JSON path",
     )
     args = parser.parse_args()
 
@@ -503,7 +525,9 @@ def main():
     print(f"CQL agreement with coaches: {results['agreement']['cql_coach']:.1%}")
     print(f"NYT agreement with coaches: {results['agreement']['nyt_coach']:.1%}")
     print(f"CQL vs NYT agreement:       {results['agreement']['cql_nyt']:.1%}")
-    print(f"\nCQL advantage over NYT:     {results['agreement']['cql_coach'] - results['agreement']['nyt_coach']:+.1%}")
+    print(
+        f"\nCQL advantage over NYT:     {results['agreement']['cql_coach'] - results['agreement']['nyt_coach']:+.1%}"
+    )
 
 
 if __name__ == "__main__":

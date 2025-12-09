@@ -5,16 +5,15 @@ validation data has LOWER average than training?
 """
 
 import pandas as pd
-import numpy as np
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
 # Load ensemble predictions
-df = pd.read_csv('analysis/results/ensemble_4way_backtest_2022_2024_FIXED.csv')
+df = pd.read_csv("analysis/results/ensemble_4way_backtest_2022_2024_FIXED.csv")
 
-print("="*80)
+print("=" * 80)
 print("BIAS CALCULATION VERIFICATION")
-print("="*80)
+print("=" * 80)
 print()
 
 print("1. ENSEMBLE PREDICTIONS (2022-2024)")
@@ -26,8 +25,8 @@ print()
 
 print("2. INDIVIDUAL MODEL PREDICTIONS")
 print("-" * 80)
-for model in ['state_space', 'hierarchical', 'xgboost', 'informative_priors']:
-    mean_col = f'{model}_mean'
+for model in ["state_space", "hierarchical", "xgboost", "informative_priors"]:
+    mean_col = f"{model}_mean"
     if mean_col in df.columns:
         valid = df[df[mean_col].notna()]
         if len(valid) > 0:
@@ -40,11 +39,7 @@ print()
 print("\n3. CROSS-CHECK WITH DATABASE")
 print("-" * 80)
 conn = psycopg2.connect(
-    host="localhost",
-    port=5544,
-    dbname="devdb01",
-    user="dro",
-    password="sicillionbillions"
+    host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
 )
 cursor = conn.cursor(cursor_factory=RealDictCursor)
 
@@ -72,7 +67,7 @@ print("Database QB passing yards (2022-2024):")
 for _, row in db_data.iterrows():
     print(f"  Season {row['season']}: {row['avg_yards']:.2f} yards ({row['n_games']} games)")
 
-overall_avg = db_data['avg_yards'].mean()
+overall_avg = db_data["avg_yards"].mean()
 print(f"\nOverall average: {overall_avg:.2f} yards")
 
 # Compare to ensemble predictions
@@ -84,7 +79,9 @@ print(f"Validation data average: {df['actual_yards'].mean():.2f} yards")
 print(f"Ensemble predictions average: {df['ensemble_mean'].mean():.2f} yards")
 print()
 print(f"Ensemble bias vs database: {overall_avg - df['ensemble_mean'].mean():.2f} yards")
-print(f"Ensemble bias vs validation: {df['actual_yards'].mean() - df['ensemble_mean'].mean():.2f} yards")
+print(
+    f"Ensemble bias vs validation: {df['actual_yards'].mean() - df['ensemble_mean'].mean():.2f} yards"
+)
 
 print()
 print("\n5. HYPOTHESIS: SAMPLE SELECTION BIAS?")
@@ -105,7 +102,7 @@ WHERE stat_category = 'passing'
     AND ph.position_group = 'QB'
 """
 cursor.execute(total_qb_games_query)
-total_games = cursor.fetchone()['total_games']
+total_games = cursor.fetchone()["total_games"]
 
 print(f"Total QB games in database (2022-2024): {total_games:,}")
 print(f"Games in validation data: {len(df):,}")
@@ -120,6 +117,6 @@ cursor.close()
 conn.close()
 
 print()
-print("="*80)
+print("=" * 80)
 print("ANALYSIS COMPLETE")
-print("="*80)
+print("=" * 80)

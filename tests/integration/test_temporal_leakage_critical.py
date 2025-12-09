@@ -28,13 +28,12 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-import pytest
-import psycopg2
+import logging
+
 import numpy as np
 import pandas as pd
-import logging
-from datetime import datetime, timedelta
-from typing import List, Tuple
+import psycopg2
+import pytest
 
 from py.utils.data_leakage_detector import DataLeakageDetector, LeakageSeverity
 
@@ -74,7 +73,7 @@ def leakage_detector():
 
 
 @pytest.fixture(scope="module")
-def sample_train_test_split(db_connection) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def sample_train_test_split(db_connection) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Create realistic train/test split for 2024 season.
 
@@ -156,9 +155,9 @@ def test_train_test_split_no_overlap(sample_train_test_split, leakage_detector):
     train_max_date = train["kickoff"].max()
     test_min_date = test["kickoff"].min()
 
-    assert test_min_date > train_max_date, (
-        f"Test games ({test_min_date}) not after train games ({train_max_date})"
-    )
+    assert (
+        test_min_date > train_max_date
+    ), f"Test games ({test_min_date}) not after train games ({train_max_date})"
 
     logger.info("✅ Train/test split has no overlap")
 
@@ -383,9 +382,9 @@ def test_backtest_temporal_order(db_connection):
         train_max = train_df["kickoff"].max()
         test_min = test_df["kickoff"].min()
 
-        assert test_min > train_max, (
-            f"Fold {i+1}: Test games ({test_min}) not after train games ({train_max})"
-        )
+        assert (
+            test_min > train_max
+        ), f"Fold {i+1}: Test games ({test_min}) not after train games ({train_max})"
 
     logger.info(f"✅ Backtest respects temporal order ({len(folds)} folds validated)")
 
@@ -432,7 +431,7 @@ def test_feature_code_patterns():
             warnings.append(f"{message}: {count} occurrences")
 
     if warnings:
-        logger.warning(f"⚠️ Potential leakage patterns detected:\n" + "\n".join(warnings))
+        logger.warning("⚠️ Potential leakage patterns detected:\n" + "\n".join(warnings))
 
     logger.info("✅ Feature code patterns checked")
 
@@ -455,7 +454,7 @@ def test_leakage_detection_speed(sample_train_test_split, leakage_detector, benc
     def detect_leakage():
         return leakage_detector.validate_split(train, test, date_col="kickoff")
 
-    result = benchmark(detect_leakage)
+    benchmark(detect_leakage)
 
     logger.info(f"✅ Leakage detection: {benchmark.stats.mean:.2f}s")
 

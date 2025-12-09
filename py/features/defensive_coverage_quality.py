@@ -29,11 +29,11 @@ Author: NFL Analytics Research Team
 Date: 2025-10-30
 """
 
-import pandas as pd
-import numpy as np
 import logging
 import sys
-from typing import Optional, Tuple
+
+import numpy as np
+import pandas as pd
 from sqlalchemy import create_engine
 
 # Configure logging
@@ -57,10 +57,7 @@ class DefensiveCoverageQualityEngine:
     - Situational coverage strength
     """
 
-    def __init__(
-        self,
-        db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-    ):
+    def __init__(self, db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"):
         """
         Initialize the coverage quality engine.
 
@@ -70,11 +67,7 @@ class DefensiveCoverageQualityEngine:
         self.engine = create_engine(db_url)
         logger.info(f"Connected to database: {db_url}")
 
-    def load_passing_plays(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
-    ) -> pd.DataFrame:
+    def load_passing_plays(self, start_season: int = 2024, end_season: int = 2025) -> pd.DataFrame:
         """
         Load passing plays with coverage context for defensive analysis.
 
@@ -153,16 +146,14 @@ class DefensiveCoverageQualityEngine:
         # (since defenders_in_box and shotgun might not be available)
 
         # Zone coverage indicators (prevent/zone situations)
-        zone_mask = (
-            ((plays["down"] == 3) & (plays["ydstogo"] >= 10)) |
-            ((plays["down"] == 4) & (plays["ydstogo"] >= 10))
+        zone_mask = ((plays["down"] == 3) & (plays["ydstogo"] >= 10)) | (
+            (plays["down"] == 4) & (plays["ydstogo"] >= 10)
         )
         plays.loc[zone_mask, "inferred_coverage"] = "zone"
 
         # Man coverage indicators (press/man situations)
-        man_mask = (
-            ((plays["down"].isin([3, 4])) & (plays["ydstogo"] <= 2)) |
-            ((plays["down"] == 1) & (plays["ydstogo"] <= 3))
+        man_mask = ((plays["down"].isin([3, 4])) & (plays["ydstogo"] <= 2)) | (
+            (plays["down"] == 1) & (plays["ydstogo"] <= 3)
         )
         plays.loc[man_mask & ~zone_mask, "inferred_coverage"] = "man"
 
@@ -175,10 +166,7 @@ class DefensiveCoverageQualityEngine:
 
         return plays
 
-    def calculate_team_coverage_metrics(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_team_coverage_metrics(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate team-level coverage quality metrics.
 
@@ -219,28 +207,22 @@ class DefensiveCoverageQualityEngine:
                 "defense_team": defense_team,
                 "coverage_type": coverage,
                 "n_plays": n_plays,
-
                 # Completion metrics
                 "completion_pct_allowed": group["complete_pass"].mean() * 100,
                 "incompletion_rate": group["incomplete_pass"].mean() * 100,
-
                 # Yardage metrics
                 "yards_per_attempt_allowed": group["yards_gained"].mean(),
                 "air_yards_per_attempt_allowed": group["air_yards"].mean(),
                 "yac_per_attempt_allowed": group["yards_after_catch"].mean(),
-
                 # Efficiency metrics
                 "epa_per_play_allowed": group["epa"].mean(),
                 "cpoe_allowed": group["cpoe"].mean(),
                 "success_rate_allowed": group["success"].mean() * 100,
-
                 # Big play prevention
                 "explosive_play_rate_allowed": (group["yards_gained"] >= 20).mean() * 100,
                 "touchdown_rate_allowed": group["touchdown"].mean() * 100,
-
                 # Takeaways
                 "interception_rate": group["interception"].mean() * 100,
-
                 # Game context
                 "avg_down": group["down"].mean(),
                 "avg_distance": group["ydstogo"].mean(),
@@ -253,10 +235,7 @@ class DefensiveCoverageQualityEngine:
 
         return df
 
-    def calculate_overall_team_metrics(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_overall_team_metrics(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate overall team coverage metrics (aggregated across all coverage types).
 
@@ -270,9 +249,7 @@ class DefensiveCoverageQualityEngine:
 
         results = []
 
-        for (game_id, defense_team), group in plays.groupby(
-            ["game_id", "defense_team"]
-        ):
+        for (game_id, defense_team), group in plays.groupby(["game_id", "defense_team"]):
             n_plays = len(group)
             if n_plays == 0:
                 continue
@@ -281,7 +258,6 @@ class DefensiveCoverageQualityEngine:
                 "game_id": game_id,
                 "defense_team": defense_team,
                 "n_plays_overall": n_plays,
-
                 # Overall coverage metrics
                 "completion_pct_allowed_overall": group["complete_pass"].mean() * 100,
                 "yards_per_attempt_allowed_overall": group["yards_gained"].mean(),
@@ -300,10 +276,7 @@ class DefensiveCoverageQualityEngine:
 
         return df
 
-    def calculate_situational_coverage_quality(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_situational_coverage_quality(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate coverage quality by game situation.
 
@@ -325,15 +298,13 @@ class DefensiveCoverageQualityEngine:
 
         # Add situational indicators
         plays["distance_category"] = pd.cut(
-            plays["ydstogo"],
-            bins=[-np.inf, 4, 9, np.inf],
-            labels=["short", "medium", "long"]
+            plays["ydstogo"], bins=[-np.inf, 4, 9, np.inf], labels=["short", "medium", "long"]
         )
 
         plays["game_script_category"] = pd.cut(
             plays["score_differential"],
             bins=[-np.inf, -7, 7, np.inf],
-            labels=["losing", "close", "winning"]
+            labels=["losing", "close", "winning"],
         )
 
         results = []
@@ -400,10 +371,7 @@ class DefensiveCoverageQualityEngine:
 
         return df
 
-    def calculate_coverage_differential(
-        self,
-        coverage_metrics: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_coverage_differential(self, coverage_metrics: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate zone vs man coverage differentials.
 
@@ -418,13 +386,13 @@ class DefensiveCoverageQualityEngine:
         logger.info("Calculating coverage differentials...")
 
         # Pivot to get zone and man metrics side by side
-        zone_metrics = coverage_metrics[
-            coverage_metrics["coverage_type"] == "zone"
-        ].set_index(["game_id", "defense_team"])
+        zone_metrics = coverage_metrics[coverage_metrics["coverage_type"] == "zone"].set_index(
+            ["game_id", "defense_team"]
+        )
 
-        man_metrics = coverage_metrics[
-            coverage_metrics["coverage_type"] == "man"
-        ].set_index(["game_id", "defense_team"])
+        man_metrics = coverage_metrics[coverage_metrics["coverage_type"] == "man"].set_index(
+            ["game_id", "defense_team"]
+        )
 
         # Calculate differentials
         results = []
@@ -438,14 +406,15 @@ class DefensiveCoverageQualityEngine:
             diff = {
                 "game_id": game_id,
                 "defense_team": defense_team,
-
                 # Zone vs Man differentials (positive = better in zone)
-                "completion_pct_diff": zone["completion_pct_allowed"] - man["completion_pct_allowed"],
-                "yards_per_attempt_diff": zone["yards_per_attempt_allowed"] - man["yards_per_attempt_allowed"],
+                "completion_pct_diff": zone["completion_pct_allowed"]
+                - man["completion_pct_allowed"],
+                "yards_per_attempt_diff": zone["yards_per_attempt_allowed"]
+                - man["yards_per_attempt_allowed"],
                 "epa_per_play_diff": zone["epa_per_play_allowed"] - man["epa_per_play_allowed"],
                 "success_rate_diff": zone["success_rate_allowed"] - man["success_rate_allowed"],
-                "explosive_play_rate_diff": zone["explosive_play_rate_allowed"] - man["explosive_play_rate_allowed"],
-
+                "explosive_play_rate_diff": zone["explosive_play_rate_allowed"]
+                - man["explosive_play_rate_allowed"],
                 # Play counts
                 "n_plays_zone": zone["n_plays"],
                 "n_plays_man": man["n_plays"],
@@ -454,14 +423,16 @@ class DefensiveCoverageQualityEngine:
 
             # Flag significant differentials (>10% difference or >0.1 EPA)
             diff["prefers_zone_coverage"] = (
-                (diff["epa_per_play_diff"] < -0.1) |  # Better EPA in zone
-                (diff["success_rate_diff"] < -10)      # Better success rate in zone
-            )
+                diff["epa_per_play_diff"] < -0.1
+            ) | (  # Better EPA in zone
+                diff["success_rate_diff"] < -10
+            )  # Better success rate in zone
 
             diff["prefers_man_coverage"] = (
-                (diff["epa_per_play_diff"] > 0.1) |   # Better EPA in man
-                (diff["success_rate_diff"] > 10)       # Better success rate in man
-            )
+                diff["epa_per_play_diff"] > 0.1
+            ) | (  # Better EPA in man
+                diff["success_rate_diff"] > 10
+            )  # Better success rate in man
 
             results.append(diff)
 
@@ -471,10 +442,7 @@ class DefensiveCoverageQualityEngine:
         return df
 
     def add_rolling_averages(
-        self,
-        metrics: pd.DataFrame,
-        value_cols: list,
-        window: int = 4
+        self, metrics: pd.DataFrame, value_cols: list, window: int = 4
     ) -> pd.DataFrame:
         """
         Add rolling average features for coverage metrics.
@@ -509,8 +477,8 @@ class DefensiveCoverageQualityEngine:
         self,
         start_season: int = 2024,
         end_season: int = 2025,
-        output_dir: str = "data/features/coverage_quality"
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        output_dir: str = "data/features/coverage_quality",
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Run complete coverage quality feature engineering pipeline.
 
@@ -547,9 +515,7 @@ class DefensiveCoverageQualityEngine:
             "explosive_play_rate_allowed",
         ]
         coverage_metrics = self.add_rolling_averages(
-            coverage_metrics,
-            coverage_value_cols,
-            window=4
+            coverage_metrics, coverage_value_cols, window=4
         )
 
         overall_value_cols = [
@@ -558,11 +524,7 @@ class DefensiveCoverageQualityEngine:
             "epa_per_play_allowed_overall",
             "success_rate_allowed_overall",
         ]
-        overall_metrics = self.add_rolling_averages(
-            overall_metrics,
-            overall_value_cols,
-            window=4
-        )
+        overall_metrics = self.add_rolling_averages(overall_metrics, overall_value_cols, window=4)
 
         # Summary statistics
         logger.info("=" * 70)
@@ -606,10 +568,7 @@ def main():
 
     # Run full pipeline
     coverage_metrics, overall_metrics, situational_metrics, differentials = (
-        engine.run_full_pipeline(
-            start_season=2024,
-            end_season=2025
-        )
+        engine.run_full_pipeline(start_season=2024, end_season=2025)
     )
 
     # Display sample output

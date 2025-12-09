@@ -14,14 +14,12 @@ Date: November 22, 2025
 Version: 2.0 (Refactored)
 """
 
-import streamlit as st
-import pandas as pd
-import psycopg
-from datetime import datetime
-import os
 import logging
+import os
 import sys
 from pathlib import Path
+
+import streamlit as st
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -31,40 +29,31 @@ logger = logging.getLogger(__name__)
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Import query modules
-from dashboard.queries import (
-    PredictionQueries,
-    GameQueries,
-    ModelQueries,
-    SystemQueries
-)
-
 # Import component modules
 from dashboard.components import (
-    # Charts
-    plot_win_rate_over_time,
-    plot_mae_over_time,
-    plot_calibration,
-    plot_error_distribution,
-    plot_pnl_over_time,
-    plot_model_comparison_mae,
-    plot_edge_distribution,
-    # Metrics
-    display_summary_metrics,
     display_advanced_metrics,
     display_edge_statistics,
-    # Tables
-    format_predictions_table,
+    # Metrics
+    display_summary_metrics,
     format_model_comparison_table,
-    format_performance_table,
-    # Cards
-    service_health_card,
+    format_predictions_table,
     game_prediction_card,
-    section_banner
+    plot_calibration,
+    plot_edge_distribution,
+    plot_error_distribution,
+    plot_mae_over_time,
+    plot_model_comparison_mae,
+    plot_pnl_over_time,
+    # Charts
+    plot_win_rate_over_time,
+    service_health_card,
 )
+from dashboard.queries import GameQueries, ModelQueries, PredictionQueries, SystemQueries
 
 # Import utility functions
 try:
     from dashboard.utils.db import get_db_connection
+
     POOLING_AVAILABLE = True
 except ImportError:
     POOLING_AVAILABLE = False
@@ -76,7 +65,7 @@ DB_CONFIG = {
     "port": int(os.getenv("DB_PORT", "5544")),
     "dbname": os.getenv("DB_NAME", "devdb01"),
     "user": os.getenv("DB_USER", "dro"),
-    "password": os.getenv("DB_PASSWORD")
+    "password": os.getenv("DB_PASSWORD"),
 }
 
 # Page configuration
@@ -84,12 +73,13 @@ st.set_page_config(
     page_title="NFL Analytics Dashboard",
     page_icon="🏈",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded",
 )
 
 # ============================================================================
 # PAGE RENDERING FUNCTIONS
 # ============================================================================
+
 
 def render_predictions_page():
     """Render the main predictions analytics page."""
@@ -106,9 +96,11 @@ def render_predictions_page():
     try:
         with get_db_connection() as conn:
             # Get production/staging models
-            df_models = ModelQueries.models_by_status(conn, status='production')
-            model_versions = df_models['model_version'].unique().tolist() if not df_models.empty else []
-    except:
+            df_models = ModelQueries.models_by_status(conn, status="production")
+            model_versions = (
+                df_models["model_version"].unique().tolist() if not df_models.empty else []
+            )
+    except Exception:
         model_versions = []
 
     selected_model = st.sidebar.selectbox("Model Version", ["All"] + model_versions, index=0)
@@ -122,16 +114,14 @@ def render_predictions_page():
             with get_db_connection() as conn:
                 # Get retrospective metrics
                 df_predictions = PredictionQueries.retrospective_metrics(
-                    conn,
-                    model_version=model_filter,
-                    season=season_filter
+                    conn, model_version=model_filter, season=season_filter
                 )
 
                 # Get performance over time
                 df_performance = PredictionQueries.weekly_performance_metrics(conn)
 
                 # Get model comparison
-                df_comparison = PredictionQueries.model_comparison(conn)
+                PredictionQueries.model_comparison(conn)
 
         except Exception as e:
             st.error(f"Error fetching data: {str(e)}")
@@ -272,7 +262,7 @@ def render_system_status_page():
         {"name": "Redis", "host": "localhost", "port": 6379},
         {"name": "FastAPI", "host": "localhost", "port": 8000},
         {"name": "Prometheus", "host": "localhost", "port": 9090},
-        {"name": "Grafana", "host": "localhost", "port": 3000}
+        {"name": "Grafana", "host": "localhost", "port": 3000},
     ]
 
     col1, col2, col3 = st.columns(3)
@@ -349,6 +339,7 @@ def render_data_summary_page():
 # MAIN APPLICATION
 # ============================================================================
 
+
 def main():
     """Main application entry point."""
     st.title("🏈 NFL Analytics Monitoring Dashboard")
@@ -364,9 +355,9 @@ def main():
             "🎯 Game Predictions",
             "🤖 Model Status",
             "⚙️ System Status",
-            "📊 Data Summary"
+            "📊 Data Summary",
         ],
-        index=0
+        index=0,
     )
 
     # Route to appropriate page

@@ -18,9 +18,7 @@ import logging
 import os
 import sys
 import time
-from datetime import datetime
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import psycopg2
@@ -32,13 +30,17 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
-from py.config.settings import get_settings
 
 logger = logging.getLogger(__name__)
-settings = get_settings()
 
 # Database configuration
-DB_CONFIG = settings.database.psycopg_kwargs()
+DB_CONFIG = {
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", "5544")),
+    "dbname": os.getenv("DB_NAME", "devdb01"),
+    "user": os.getenv("DB_USER", "dro"),
+    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),  # pragma: allowlist secret
+}
 
 # Default values
 DEFAULT_QB_YARDS = 240.0  # Average QB passing yards
@@ -59,24 +61,14 @@ class GameOutcomePredictor:
     def __init__(self):
         """Initialize predictor with Ensemble v6.1."""
         logger.info("Initializing GameOutcomePredictor with Ensemble v6.1")
-        fallback_password = DB_CONFIG["password"]
-        db_password = os.getenv("DB_PASSWORD") or fallback_password
-        self.ensemble = EnhancedEnsemble5Way(
-            db_password=db_password,
-            db_host=DB_CONFIG["host"],
-            db_port=DB_CONFIG["port"],
-            db_name=DB_CONFIG["dbname"],
-            db_user=DB_CONFIG["user"],
-        )
+        self.ensemble = EnhancedEnsemble5Way()
         logger.info("Ensemble v6.1 loaded successfully")
 
     def _get_db_connection(self):
         """Get database connection."""
         return psycopg2.connect(**DB_CONFIG)
 
-    def _get_starting_qb(
-        self, team: str, season: int, week: int, conn
-    ) -> Optional[Dict[str, any]]:
+    def _get_starting_qb(self, team: str, season: int, week: int, conn) -> dict[str, any] | None:
         """
         Get starting QB for a team in a given week.
 
@@ -164,9 +156,7 @@ class GameOutcomePredictor:
             logger.error(f"No QB data found for {team} in current or previous season")
             return None
 
-    def _get_defensive_epa(
-        self, team: str, season: int, week: int, conn
-    ) -> float:
+    def _get_defensive_epa(self, team: str, season: int, week: int, conn) -> float:
         """
         Get defensive EPA per play for a team (from previous games).
 
@@ -259,9 +249,7 @@ class GameOutcomePredictor:
             logger.warning(f"No defensive EPA data for {team}, using default {DEFAULT_DEF_EPA}")
             return DEFAULT_DEF_EPA
 
-    def _predict_qb_yards(
-        self, player_id: str, season: int, week: int
-    ) -> Tuple[float, float]:
+    def _predict_qb_yards(self, player_id: str, season: int, week: int) -> tuple[float, float]:
         """
         Predict QB passing yards using Ensemble v6.1.
 
@@ -275,23 +263,11 @@ class GameOutcomePredictor:
         """
         try:
             start = time.time()
-            result = self.ensemble.predict(
-                player_id=player_id,
-                season=season,
-                week=week
-            )
+            result = self.ensemble.predict(player_id=player_id, season=season, week=week)
             elapsed = time.time() - start
 
-            predictions = result.get('predictions') or {}
-            valid_predictions = [
-                pred for pred in predictions.values()
-                if pred and pred[0] is not None
-            ]
-            if len(valid_predictions) < 3:
-                raise RuntimeError("Ensemble requires at least 3 component predictions")
-
-            pred_yards = result['ensemble_mean']
-            pred_std = result['ensemble_std']
+            pred_yards = result["ensemble_mean"]
+            pred_std = result["ensemble_std"]
 
             logger.info(
                 f"Ensemble prediction for {player_id}: "
@@ -306,9 +282,7 @@ class GameOutcomePredictor:
             logger.warning(f"Using default QB yards: {DEFAULT_QB_YARDS}")
             return DEFAULT_QB_YARDS, 50.0  # Default uncertainty
 
-    def _yards_to_score(
-        self, qb_yards: float, opponent_def_epa: float
-    ) -> float:
+    def _yards_to_score(self, qb_yards: float, opponent_def_epa: float) -> float:
         """
         Convert QB passing yards to team score.
 
@@ -336,9 +310,7 @@ class GameOutcomePredictor:
 
         return team_score
 
-    def _propagate_uncertainty(
-        self, qb_std: float
-    ) -> float:
+    def _propagate_uncertainty(self, qb_std: float) -> float:
         """
         Propagate uncertainty from QB prediction to score prediction.
 
@@ -358,7 +330,7 @@ class GameOutcomePredictor:
 
     def predict_game(
         self, home_team: str, away_team: str, season: int, week: int
-    ) -> Dict[str, any]:
+    ) -> dict[str, any]:
         """
         Predict full game outcome.
 
@@ -380,9 +352,7 @@ class GameOutcomePredictor:
                 - home_qb_id, home_qb_name
                 - away_qb_id, away_qb_name
         """
-        logger.info(
-            f"Predicting game: {away_team} @ {home_team} ({season} Week {week})"
-        )
+        logger.info(f"Predicting game: {away_team} @ {home_team} ({season} Week {week})")
         start = time.time()
 
         conn = self._get_db_connection()
@@ -399,7 +369,7 @@ class GameOutcomePredictor:
             # 3. Predict QB passing yards
             if home_qb:
                 home_qb_yards, home_qb_std = self._predict_qb_yards(
-                    home_qb['player_id'], season, week
+                    home_qb["player_id"], season, week
                 )
             else:
                 logger.warning(f"No home QB found, using default {DEFAULT_QB_YARDS} yards")
@@ -407,7 +377,7 @@ class GameOutcomePredictor:
 
             if away_qb:
                 away_qb_yards, away_qb_std = self._predict_qb_yards(
-                    away_qb['player_id'], season, week
+                    away_qb["player_id"], season, week
                 )
             else:
                 logger.warning(f"No away QB found, using default {DEFAULT_QB_YARDS} yards")
@@ -436,18 +406,18 @@ class GameOutcomePredictor:
             elapsed = time.time() - start
 
             result = {
-                'predicted_home_score': float(round(home_score, 1)),
-                'predicted_away_score': float(round(away_score, 1)),
-                'predicted_total': float(round(predicted_total, 1)),
-                'predicted_spread': float(round(predicted_spread, 1)),
-                'predicted_home_win_prob': float(round(predicted_home_win_prob, 4)),
-                'spread_std': float(round(spread_std, 1)),
-                'total_std': float(round(total_std, 1)),
-                'home_qb_id': home_qb['player_id'] if home_qb else None,
-                'home_qb_name': home_qb['player_display_name'] if home_qb else None,
-                'away_qb_id': away_qb['player_id'] if away_qb else None,
-                'away_qb_name': away_qb['player_display_name'] if away_qb else None,
-                'processing_time_ms': float(round(elapsed * 1000, 1)),
+                "predicted_home_score": float(round(home_score, 1)),
+                "predicted_away_score": float(round(away_score, 1)),
+                "predicted_total": float(round(predicted_total, 1)),
+                "predicted_spread": float(round(predicted_spread, 1)),
+                "predicted_home_win_prob": float(round(predicted_home_win_prob, 4)),
+                "spread_std": float(round(spread_std, 1)),
+                "total_std": float(round(total_std, 1)),
+                "home_qb_id": home_qb["player_id"] if home_qb else None,
+                "home_qb_name": home_qb["player_display_name"] if home_qb else None,
+                "away_qb_id": away_qb["player_id"] if away_qb else None,
+                "away_qb_name": away_qb["player_display_name"] if away_qb else None,
+                "processing_time_ms": float(round(elapsed * 1000, 1)),
             }
 
             logger.info(
@@ -467,23 +437,17 @@ class GameOutcomePredictor:
 if __name__ == "__main__":
     # Test prediction
     logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     predictor = GameOutcomePredictor()
 
-    sample_year = datetime.now().year
-    result = predictor.predict_game(
-        home_team="HOU",
-        away_team="BUF",
-        season=sample_year,
-        week=12
-    )
+    # Test with 2025 Week 12: BUF @ HOU
+    result = predictor.predict_game(home_team="HOU", away_team="BUF", season=2025, week=12)
 
-    print("\n" + "="*60)
-    print(f"GAME PREDICTION TEST: BUF @ HOU ({sample_year} Week 12)")
-    print("="*60)
+    print("\n" + "=" * 60)
+    print("GAME PREDICTION TEST: BUF @ HOU (2025 Week 12)")
+    print("=" * 60)
     print(f"Home Score (HOU): {result['predicted_home_score']:.1f}")
     print(f"Away Score (BUF): {result['predicted_away_score']:.1f}")
     print(f"Total: {result['predicted_total']:.1f} ± {result['total_std']:.1f}")
@@ -492,4 +456,4 @@ if __name__ == "__main__":
     print(f"\nHome QB: {result['home_qb_name']} (id={result['home_qb_id']})")
     print(f"Away QB: {result['away_qb_name']} (id={result['away_qb_id']})")
     print(f"\nProcessing Time: {result['processing_time_ms']:.1f}ms")
-    print("="*60)
+    print("=" * 60)

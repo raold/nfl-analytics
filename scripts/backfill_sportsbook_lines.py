@@ -18,8 +18,6 @@ Date: November 21, 2025
 
 import logging
 import sys
-from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import psycopg2
@@ -88,7 +86,7 @@ def spread_to_moneyline(spread: float) -> int:
 
 def get_team_recent_epa(
     conn, team: str, season: int, week: int, lookback_games: int = 8
-) -> Optional[float]:
+) -> float | None:
     """
     Get team's recent EPA per play performance.
 
@@ -147,7 +145,7 @@ def get_team_recent_epa(
 
 def generate_placeholder_line(
     conn, home_team: str, away_team: str, season: int, week: int
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Generate realistic placeholder betting lines.
 
@@ -220,7 +218,7 @@ def generate_placeholder_line(
     }
 
 
-def get_missing_games(conn, season: Optional[int] = None, week: Optional[int] = None):
+def get_missing_games(conn, season: int | None = None, week: int | None = None):
     """
     Get games missing sportsbook data.
 
@@ -254,7 +252,7 @@ def get_missing_games(conn, season: Optional[int] = None, week: Optional[int] = 
         return cur.fetchall()
 
 
-def update_game_lines(conn, game_id: str, lines: Dict[str, float]):
+def update_game_lines(conn, game_id: str, lines: dict[str, float]):
     """
     Update betting lines for a game.
 
@@ -292,7 +290,7 @@ def update_game_lines(conn, game_id: str, lines: Dict[str, float]):
 
 
 def backfill_sportsbook_lines(
-    season: Optional[int] = None, week: Optional[int] = None, dry_run: bool = False
+    season: int | None = None, week: int | None = None, dry_run: bool = False
 ):
     """
     Backfill missing sportsbook lines.
@@ -356,9 +354,7 @@ def main():
     """Main entry point."""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Backfill missing sportsbook betting lines"
-    )
+    parser = argparse.ArgumentParser(description="Backfill missing sportsbook betting lines")
     parser.add_argument("--season", type=int, help="Filter to specific season")
     parser.add_argument("--week", type=int, help="Filter to specific week")
     parser.add_argument(
@@ -369,9 +365,7 @@ def main():
 
     args = parser.parse_args()
 
-    backfill_sportsbook_lines(
-        season=args.season, week=args.week, dry_run=args.dry_run
-    )
+    backfill_sportsbook_lines(season=args.season, week=args.week, dry_run=args.dry_run)
 
 
 if __name__ == "__main__":

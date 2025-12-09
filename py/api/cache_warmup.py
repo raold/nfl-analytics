@@ -11,17 +11,15 @@ Date: November 9, 2025
 
 import asyncio
 import logging
-from pathlib import Path
-from typing import List, Dict, Optional
 import sys
 from datetime import datetime
+from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.ensemble.strategy.ensemble_predictor import UnifiedEnsemblePredictor
 from py.ensemble.strategy.base import EnsembleConfig
-from py.utils.r_service import get_r_service
+from py.ensemble.strategy.ensemble_predictor import UnifiedEnsemblePredictor
 from py.utils.claude_cache import get_default_cache
 
 logger = logging.getLogger(__name__)
@@ -47,10 +45,7 @@ class CacheWarmer:
         if not self.redis_cache:
             logger.warning("Redis cache not available - cache warming disabled")
 
-    async def warm_ensemble_models(
-        self,
-        config: Optional[EnsembleConfig] = None
-    ) -> int:
+    async def warm_ensemble_models(self, config: EnsembleConfig | None = None) -> int:
         """
         Pre-load ensemble models into Redis cache.
 
@@ -115,9 +110,13 @@ class CacheWarmer:
                         # This populates Redis cache via _load_model_with_redis()
                         if path.suffix == ".pkl":
                             from py.models.bayesian_neural_network import BayesianNeuralNetwork
-                            loader = lambda p: BayesianNeuralNetwork.load(p)
+
+                            def loader(p):
+                                return BayesianNeuralNetwork.load(p)
+
                         elif path.suffix == ".json":
                             import xgboost as xgb
+
                             def loader(p):
                                 booster = xgb.Booster()
                                 booster.load_model(str(p))
@@ -129,7 +128,7 @@ class CacheWarmer:
                             model_name=model_name,
                             path=path,
                             model_type=model_type,
-                            loader_func=loader
+                            loader_func=loader,
                         )
 
                         models_loaded += 1
@@ -148,10 +147,7 @@ class CacheWarmer:
             return 0
 
     async def warm_player_features(
-        self,
-        top_n: int = 50,
-        season: int = 2024,
-        week: Optional[int] = None
+        self, top_n: int = 50, season: int = 2024, week: int | None = None
     ) -> int:
         """
         Pre-load top N players' features for current week.
@@ -178,7 +174,6 @@ class CacheWarmer:
         try:
             # Determine current week if not specified
             if week is None:
-                from datetime import datetime
                 # Simple heuristic: assume Week 10 in November
                 week = 10
                 logger.info(f"  Using current week: {week}")
@@ -209,15 +204,11 @@ class CacheWarmer:
                         "season": season,
                         "week": week,
                         "placeholder": True,
-                        "note": "Real features loaded on first prediction"
+                        "note": "Real features loaded on first prediction",
                     }
 
                     # Cache with 6-hour TTL
-                    self.redis_cache.set(
-                        cache_key,
-                        placeholder_features,
-                        ttl=21600  # 6 hours
-                    )
+                    self.redis_cache.set(cache_key, placeholder_features, ttl=21600)  # 6 hours
 
                     features_cached += 1
                     logger.debug(f"  ✓ Cached features: {player_id}")
@@ -280,7 +271,7 @@ class CacheWarmer:
             logger.error(f"Dashboard cache warming failed: {e}")
             return 0
 
-    def _get_top_players(self, top_n: int) -> List[str]:
+    def _get_top_players(self, top_n: int) -> list[str]:
         """
         Get list of top N players by recent performance.
 
@@ -332,15 +323,15 @@ class CacheWarmer:
         ]
 
         # Return top_n players
-        return star_players[:min(top_n, len(star_players))]
+        return star_players[: min(top_n, len(star_players))]
 
     async def warm_all(
         self,
         warm_models: bool = True,
         warm_features: bool = True,
         warm_queries: bool = False,
-        top_players: int = 50
-    ) -> Dict[str, int]:
+        top_players: int = 50,
+    ) -> dict[str, int]:
         """
         Warm all caches on API startup.
 
@@ -412,8 +403,8 @@ async def warm_cache_on_startup(
     warm_models: bool = True,
     warm_features: bool = True,
     warm_queries: bool = False,
-    top_players: int = 50
-) -> Dict[str, int]:
+    top_players: int = 50,
+) -> dict[str, int]:
     """
     Convenience function to warm cache on API startup.
 
@@ -445,16 +436,16 @@ async def warm_cache_on_startup(
         warm_models=warm_models,
         warm_features=warm_features,
         warm_queries=warm_queries,
-        top_players=top_players
+        top_players=top_players,
     )
 
 
 if __name__ == "__main__":
     """Test cache warming locally."""
     import asyncio
+
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     async def test_warming():
@@ -462,35 +453,32 @@ if __name__ == "__main__":
         warmer = CacheWarmer()
 
         # Test model warming
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("TEST 1: Model Cache Warming")
-        print("="*60)
+        print("=" * 60)
         models = await warmer.warm_ensemble_models()
         print(f"Result: {models} models warmed\n")
 
         # Test feature warming
-        print("="*60)
+        print("=" * 60)
         print("TEST 2: Player Features Cache Warming")
-        print("="*60)
+        print("=" * 60)
         features = await warmer.warm_player_features(top_n=10)
         print(f"Result: {features} player features warmed\n")
 
         # Test dashboard warming
-        print("="*60)
+        print("=" * 60)
         print("TEST 3: Dashboard Query Cache Warming")
-        print("="*60)
+        print("=" * 60)
         queries = await warmer.warm_dashboard_queries()
         print(f"Result: {queries} queries warmed\n")
 
         # Test full warming
-        print("="*60)
+        print("=" * 60)
         print("TEST 4: Full Cache Warming")
-        print("="*60)
+        print("=" * 60)
         results = await warmer.warm_all(
-            warm_models=True,
-            warm_features=True,
-            warm_queries=True,
-            top_players=50
+            warm_models=True, warm_features=True, warm_queries=True, top_players=50
         )
         print(f"Results: {results}\n")
 

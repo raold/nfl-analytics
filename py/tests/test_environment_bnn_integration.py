@@ -11,14 +11,16 @@ This validates the model is production-ready for ensemble systems.
 """
 
 import sys
+
 sys.path.append("/Users/dro/rice/nfl-analytics")
 
+import logging
 import pickle
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import psycopg2
-from pathlib import Path
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -63,13 +65,20 @@ class EnvironmentBNNIntegrationTest:
                 model_data = pickle.load(f)
 
             # Verify expected keys
-            required_keys = ["trace", "scaler", "player_encoder", "hidden_dim", "activation", "prior_std"]
+            required_keys = [
+                "trace",
+                "scaler",
+                "player_encoder",
+                "hidden_dim",
+                "activation",
+                "prior_std",
+            ]
             for key in required_keys:
                 if key not in model_data:
                     logger.error(f"✗ Missing required key: {key}")
                     return False
 
-            logger.info(f"✓ Model loaded successfully")
+            logger.info("✓ Model loaded successfully")
             logger.info(f"  Hidden dim: {model_data['hidden_dim']}")
             logger.info(f"  Activation: {model_data['activation']}")
             logger.info(f"  Prior std: {model_data['prior_std']}")
@@ -81,6 +90,7 @@ class EnvironmentBNNIntegrationTest:
         except Exception as e:
             logger.error(f"✗ Model loading failed: {e}")
             import traceback
+
             traceback.print_exc()
             return False
 
@@ -165,9 +175,16 @@ class EnvironmentBNNIntegrationTest:
 
             # Prepare features (same as training)
             feature_cols = [
-                "carries", "avg_rushing_l3", "season_avg", "week",
-                "spread_close", "total_close",
-                "is_dome", "is_turf", "temp", "wind"
+                "carries",
+                "avg_rushing_l3",
+                "season_avg",
+                "week",
+                "spread_close",
+                "total_close",
+                "is_dome",
+                "is_turf",
+                "temp",
+                "wind",
             ]
 
             df[feature_cols] = df[feature_cols].fillna(0)
@@ -177,8 +194,8 @@ class EnvironmentBNNIntegrationTest:
             logger.info(f"  Features: {', '.join(feature_cols)}")
 
             # Transform using saved scaler
-            X_test_scaled = model_data["scaler"].transform(X_test)
-            logger.info(f"✓ Features standardized")
+            model_data["scaler"].transform(X_test)
+            logger.info("✓ Features standardized")
 
             # Create dummy predictions to validate the interface
             # In a real ensemble, we'd use the actual PyMC model.predict()
@@ -195,16 +212,21 @@ class EnvironmentBNNIntegrationTest:
                 "q95": np.random.uniform(60, 100, n_samples),
             }
 
-            logger.info(f"✓ Predictions generated (simulated for test)")
-            logger.info(f"  Mean prediction range: {predictions['mean'].min():.1f} - {predictions['mean'].max():.1f} yards")
+            logger.info("✓ Predictions generated (simulated for test)")
+            logger.info(
+                f"  Mean prediction range: {predictions['mean'].min():.1f} - {predictions['mean'].max():.1f} yards"
+            )
             logger.info(f"  Mean uncertainty: {predictions['std'].mean():.1f} yards")
-            logger.info(f"  90% CI width: {(predictions['q95'] - predictions['q05']).mean():.1f} yards")
+            logger.info(
+                f"  90% CI width: {(predictions['q95'] - predictions['q05']).mean():.1f} yards"
+            )
 
             return True
 
         except Exception as e:
             logger.error(f"✗ Prediction generation failed: {e}")
             import traceback
+
             traceback.print_exc()
             return False
 
@@ -223,12 +245,11 @@ class EnvironmentBNNIntegrationTest:
 
             # Load Environment BNN
             with open(self.model_path, "rb") as f:
-                env_model = pickle.load(f)
+                pickle.load(f)
 
-            logger.info(f"✓ Environment BNN loaded")
+            logger.info("✓ Environment BNN loaded")
 
             # Simulate predictions from all 3 models
-            n_samples = 5
 
             # Model 1: Baseline
             baseline_preds = np.array([45.2, 62.1, 38.5, 71.3, 55.8])
@@ -249,16 +270,16 @@ class EnvironmentBNNIntegrationTest:
 
             # Ensemble combination (weighted average by inverse uncertainty)
             # Weight by 1/variance (more confident models get higher weight)
-            baseline_weights = 1 / (baseline_uncertainty ** 2)
-            vegas_weights = 1 / (vegas_uncertainty ** 2)
-            env_weights = 1 / (env_uncertainty ** 2)
+            baseline_weights = 1 / (baseline_uncertainty**2)
+            vegas_weights = 1 / (vegas_uncertainty**2)
+            env_weights = 1 / (env_uncertainty**2)
 
             total_weights = baseline_weights + vegas_weights + env_weights
 
             ensemble_preds = (
-                baseline_preds * baseline_weights +
-                vegas_preds * vegas_weights +
-                env_preds * env_weights
+                baseline_preds * baseline_weights
+                + vegas_preds * vegas_weights
+                + env_preds * env_weights
             ) / total_weights
 
             logger.info(f"\n✓ Ensemble predictions: {ensemble_preds}")
@@ -267,13 +288,16 @@ class EnvironmentBNNIntegrationTest:
             # Calculate contribution of Environment BNN
             env_contribution = (env_weights / total_weights).mean()
             logger.info(f"  Environment BNN weight: {env_contribution:.1%}")
-            logger.info(f"  → Environment features improve uncertainty by {(1 - env_uncertainty.mean() / baseline_uncertainty.mean()) * 100:.1f}%")
+            logger.info(
+                f"  → Environment features improve uncertainty by {(1 - env_uncertainty.mean() / baseline_uncertainty.mean()) * 100:.1f}%"
+            )
 
             return True
 
         except Exception as e:
             logger.error(f"✗ Ensemble integration failed: {e}")
             import traceback
+
             traceback.print_exc()
             return False
 

@@ -33,17 +33,15 @@ import argparse
 import logging
 import os
 import smtplib
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from email.mime.text import MIMEText
-from typing import Dict, List, Optional
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -70,19 +68,15 @@ class PaperTradeSettler:
     def _connect_db(self) -> psycopg2.extensions.connection:
         """Connect to PostgreSQL database."""
         conn = psycopg2.connect(
-            host=os.getenv('DB_HOST', 'localhost'),
-            port=int(os.getenv('DB_PORT', 5544)),
-            database=os.getenv('DB_NAME', 'devdb01'),
-            user=os.getenv('DB_USER', 'dro'),
-            password=os.getenv('DB_PASSWORD', 'sicillionbillions')
+            host=os.getenv("DB_HOST", "localhost"),
+            port=int(os.getenv("DB_PORT", 5544)),
+            database=os.getenv("DB_NAME", "devdb01"),
+            user=os.getenv("DB_USER", "dro"),
+            password=os.getenv("DB_PASSWORD", "sicillionbillions"),
         )
         return conn
 
-    def get_pending_trades(
-        self,
-        session_id: Optional[str] = None,
-        days_back: int = 7
-    ) -> List[Dict]:
+    def get_pending_trades(self, session_id: str | None = None, days_back: int = 7) -> list[dict]:
         """
         Get pending paper trades that need settlement.
 
@@ -112,7 +106,7 @@ class PaperTradeSettler:
                   AND pt.trade_timestamp >= %s
             """
 
-            params = [datetime.now(timezone.utc) - timedelta(days=days_back)]
+            params = [datetime.now(UTC) - timedelta(days=days_back)]
 
             if session_id:
                 query += " AND pt.session_id = %s"
@@ -123,12 +117,7 @@ class PaperTradeSettler:
             cur.execute(query, params)
             return cur.fetchall()
 
-    def get_actual_player_stat(
-        self,
-        player_id: str,
-        game_id: str,
-        prop_type: str
-    ) -> Optional[float]:
+    def get_actual_player_stat(self, player_id: str, game_id: str, prop_type: str) -> float | None:
         """
         Get actual player stat from database.
 
@@ -142,15 +131,15 @@ class PaperTradeSettler:
         """
         # Map prop_type to column name in player_game_stats
         stat_column_map = {
-            'passing_yards': 'stat_yards',
-            'rushing_yards': 'stat_yards',
-            'receiving_yards': 'stat_yards',
-            'passing_tds': 'stat_tds',
-            'rushing_tds': 'stat_tds',
-            'receiving_tds': 'stat_tds',
-            'receptions': 'stat_rec',
-            'completions': 'stat_comp',
-            'attempts': 'stat_att'
+            "passing_yards": "stat_yards",
+            "rushing_yards": "stat_yards",
+            "receiving_yards": "stat_yards",
+            "passing_tds": "stat_tds",
+            "rushing_tds": "stat_tds",
+            "receiving_tds": "stat_tds",
+            "receptions": "stat_rec",
+            "completions": "stat_comp",
+            "attempts": "stat_att",
         }
 
         stat_column = stat_column_map.get(prop_type)
@@ -159,24 +148,27 @@ class PaperTradeSettler:
             return None
 
         # Determine stat_type for filtering
-        if 'passing' in prop_type:
-            stat_type = 'passing'
-        elif 'rushing' in prop_type:
-            stat_type = 'rushing'
-        elif 'receiving' in prop_type or prop_type == 'receptions':
-            stat_type = 'receiving'
+        if "passing" in prop_type:
+            stat_type = "passing"
+        elif "rushing" in prop_type:
+            stat_type = "rushing"
+        elif "receiving" in prop_type or prop_type == "receptions":
+            stat_type = "receiving"
         else:
-            stat_type = 'passing'  # default
+            stat_type = "passing"  # default
 
         with self.db_conn.cursor() as cur:
-            cur.execute(f"""
+            cur.execute(
+                f"""
                 SELECT {stat_column}
                 FROM mart.player_game_stats
                 WHERE player_id = %s
                   AND game_id = %s
                   AND stat_type = %s
                 LIMIT 1
-            """, (player_id, game_id, stat_type))
+            """,
+                (player_id, game_id, stat_type),
+            )
 
             result = cur.fetchone()
             return result[0] if result else None
@@ -188,7 +180,7 @@ class PaperTradeSettler:
         bet_side: str,
         bet_amount: float,
         odds: float,
-        actual_result: float
+        actual_result: float,
     ) -> tuple[str, float]:
         """
         Settle a single paper trade.
@@ -207,20 +199,20 @@ class PaperTradeSettler:
         """
         # Determine outcome
         if actual_result > line_value:
-            outcome = 'win' if bet_side == 'over' else 'loss'
+            outcome = "win" if bet_side == "over" else "loss"
         elif actual_result < line_value:
-            outcome = 'win' if bet_side == 'under' else 'loss'
+            outcome = "win" if bet_side == "under" else "loss"
         else:
-            outcome = 'push'
+            outcome = "push"
 
         # Calculate profit/loss
-        if outcome == 'win':
+        if outcome == "win":
             if odds > 0:
                 winnings = bet_amount * (odds / 100.0)
             else:
                 winnings = bet_amount * (100.0 / abs(odds))
             profit_loss = winnings
-        elif outcome == 'loss':
+        elif outcome == "loss":
             profit_loss = -bet_amount
         else:  # push
             profit_loss = 0.0
@@ -228,28 +220,22 @@ class PaperTradeSettler:
         # Update database
         if not self.dry_run:
             with self.db_conn.cursor() as cur:
-                cur.execute("""
+                cur.execute(
+                    """
                     UPDATE paper_trades
                     SET actual_result = %s,
                         outcome = %s,
                         settled_at = %s,
                         profit_loss = %s
                     WHERE paper_trade_id = %s
-                """, (
-                    actual_result,
-                    outcome,
-                    datetime.now(timezone.utc),
-                    profit_loss,
-                    paper_trade_id
-                ))
+                """,
+                    (actual_result, outcome, datetime.now(UTC), profit_loss, paper_trade_id),
+                )
                 self.db_conn.commit()
 
         return outcome, profit_loss
 
-    def settle_all_pending(
-        self,
-        session_id: Optional[str] = None
-    ) -> Dict:
+    def settle_all_pending(self, session_id: str | None = None) -> dict:
         """
         Settle all pending paper trades that have results available.
 
@@ -271,9 +257,9 @@ class PaperTradeSettler:
             try:
                 # Get actual result
                 actual_result = self.get_actual_player_stat(
-                    player_id=trade['player_id'],
-                    game_id=trade['game_id'],
-                    prop_type=trade['prop_type']
+                    player_id=trade["player_id"],
+                    game_id=trade["game_id"],
+                    prop_type=trade["prop_type"],
                 )
 
                 if actual_result is None:
@@ -286,12 +272,12 @@ class PaperTradeSettler:
 
                 # Settle trade
                 outcome, profit_loss = self.settle_trade(
-                    paper_trade_id=trade['paper_trade_id'],
-                    line_value=trade['line_value'],
-                    bet_side=trade['bet_side'],
-                    bet_amount=trade['bet_amount'],
-                    odds=trade['odds'],
-                    actual_result=actual_result
+                    paper_trade_id=trade["paper_trade_id"],
+                    line_value=trade["line_value"],
+                    bet_side=trade["bet_side"],
+                    bet_amount=trade["bet_amount"],
+                    odds=trade["odds"],
+                    actual_result=actual_result,
                 )
 
                 logger.info(
@@ -305,16 +291,14 @@ class PaperTradeSettler:
                 settled += 1
 
             except Exception as e:
-                logger.error(
-                    f"Error settling trade {trade['paper_trade_id']}: {e}"
-                )
+                logger.error(f"Error settling trade {trade['paper_trade_id']}: {e}")
                 errors += 1
 
         summary = {
-            'total_pending': len(pending_trades),
-            'settled': settled,
-            'not_found': not_found,
-            'errors': errors
+            "total_pending": len(pending_trades),
+            "settled": settled,
+            "not_found": not_found,
+            "errors": errors,
         }
 
         logger.info(
@@ -333,7 +317,8 @@ class PaperTradeSettler:
         """
         with self.db_conn.cursor(cursor_factory=RealDictCursor) as cur:
             # Get settled trades for this session
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT
                     outcome,
                     bet_amount,
@@ -341,7 +326,9 @@ class PaperTradeSettler:
                 FROM paper_trades
                 WHERE session_id = %s
                   AND outcome IN ('win', 'loss', 'push')
-            """, (session_id,))
+            """,
+                (session_id,),
+            )
 
             settled_bets = cur.fetchall()
 
@@ -351,16 +338,17 @@ class PaperTradeSettler:
 
             # Calculate metrics
             num_settled = len(settled_bets)
-            num_wins = sum(1 for bet in settled_bets if bet['outcome'] == 'win')
+            num_wins = sum(1 for bet in settled_bets if bet["outcome"] == "win")
             win_rate = num_wins / num_settled if num_settled > 0 else 0.0
 
-            total_wagered = sum(bet['bet_amount'] for bet in settled_bets)
-            total_profit_loss = sum(bet['profit_loss'] for bet in settled_bets)
+            total_wagered = sum(bet["bet_amount"] for bet in settled_bets)
+            total_profit_loss = sum(bet["profit_loss"] for bet in settled_bets)
             roi = total_profit_loss / total_wagered if total_wagered > 0 else 0.0
 
             # Sharpe ratio
             import numpy as np
-            returns = [bet['profit_loss'] / bet['bet_amount'] for bet in settled_bets]
+
+            returns = [bet["profit_loss"] / bet["bet_amount"] for bet in settled_bets]
             if len(returns) > 1:
                 sharpe = np.mean(returns) / np.std(returns) if np.std(returns) > 0 else 0.0
             else:
@@ -370,7 +358,7 @@ class PaperTradeSettler:
             cumulative_pnl = []
             cumulative = 0.0
             for bet in settled_bets:
-                cumulative += bet['profit_loss']
+                cumulative += bet["profit_loss"]
                 cumulative_pnl.append(cumulative)
 
             peak = cumulative_pnl[0] if cumulative_pnl else 0.0
@@ -378,23 +366,27 @@ class PaperTradeSettler:
             for value in cumulative_pnl:
                 if value > peak:
                     peak = value
-                dd = (peak - value)
+                dd = peak - value
                 if dd > max_dd:
                     max_dd = dd
 
             # Get initial bankroll
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT initial_bankroll
                 FROM paper_trading_sessions
                 WHERE session_id = %s
-            """, (session_id,))
-            initial_bankroll = cur.fetchone()['initial_bankroll']
+            """,
+                (session_id,),
+            )
+            initial_bankroll = cur.fetchone()["initial_bankroll"]
 
             max_drawdown = max_dd / initial_bankroll if initial_bankroll > 0 else 0.0
 
             # Update session
             if not self.dry_run:
-                cur.execute("""
+                cur.execute(
+                    """
                     UPDATE paper_trading_sessions
                     SET total_bets = %s,
                         win_rate = %s,
@@ -403,15 +395,17 @@ class PaperTradeSettler:
                         max_drawdown = %s,
                         final_bankroll = %s
                     WHERE session_id = %s
-                """, (
-                    num_settled,
-                    win_rate,
-                    roi,
-                    sharpe,
-                    max_drawdown,
-                    initial_bankroll + total_profit_loss,
-                    session_id
-                ))
+                """,
+                    (
+                        num_settled,
+                        win_rate,
+                        roi,
+                        sharpe,
+                        max_drawdown,
+                        initial_bankroll + total_profit_loss,
+                        session_id,
+                    ),
+                )
                 self.db_conn.commit()
 
             logger.info(
@@ -422,7 +416,7 @@ class PaperTradeSettler:
                 f"{sharpe:.2f} Sharpe"
             )
 
-    def send_alert_email(self, summary: Dict, session_id: Optional[str] = None):
+    def send_alert_email(self, summary: dict, session_id: str | None = None):
         """
         Send email alert with settlement summary.
 
@@ -431,11 +425,11 @@ class PaperTradeSettler:
             session_id: Optional session ID
         """
         # Email configuration (optional)
-        smtp_host = os.getenv('SMTP_HOST')
-        smtp_port = int(os.getenv('SMTP_PORT', 587))
-        smtp_user = os.getenv('SMTP_USER')
-        smtp_password = os.getenv('SMTP_PASSWORD')
-        email_to = os.getenv('ALERT_EMAIL', 'dro@example.com')
+        smtp_host = os.getenv("SMTP_HOST")
+        smtp_port = int(os.getenv("SMTP_PORT", 587))
+        smtp_user = os.getenv("SMTP_USER")
+        smtp_password = os.getenv("SMTP_PASSWORD")
+        email_to = os.getenv("ALERT_EMAIL", "dro@example.com")
 
         if not all([smtp_host, smtp_user, smtp_password]):
             logger.info("Email not configured, skipping alert")
@@ -445,7 +439,7 @@ class PaperTradeSettler:
 
         body = f"""
 Paper Trading Settlement Report
-Generated: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}
+Generated: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M:%S UTC')}
 
 Summary:
 - Total pending trades: {summary['total_pending']}
@@ -459,9 +453,9 @@ This is an automated message from the paper trading settlement system.
         """
 
         msg = MIMEText(body)
-        msg['Subject'] = subject
-        msg['From'] = smtp_user
-        msg['To'] = email_to
+        msg["Subject"] = subject
+        msg["From"] = smtp_user
+        msg["To"] = email_to
 
         try:
             with smtplib.SMTP(smtp_host, smtp_port) as server:
@@ -481,29 +475,11 @@ This is an automated message from the paper trading settlement system.
 
 def main():
     """Main entry point for automated settlement."""
-    parser = argparse.ArgumentParser(
-        description='Settle pending paper trades automatically'
-    )
-    parser.add_argument(
-        '--session-id',
-        type=str,
-        help='Only settle trades for specific session'
-    )
-    parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help='Dry run (no database updates)'
-    )
-    parser.add_argument(
-        '--no-email',
-        action='store_true',
-        help='Skip email alerts'
-    )
-    parser.add_argument(
-        '--verbose',
-        action='store_true',
-        help='Verbose logging'
-    )
+    parser = argparse.ArgumentParser(description="Settle pending paper trades automatically")
+    parser.add_argument("--session-id", type=str, help="Only settle trades for specific session")
+    parser.add_argument("--dry-run", action="store_true", help="Dry run (no database updates)")
+    parser.add_argument("--no-email", action="store_true", help="Skip email alerts")
+    parser.add_argument("--verbose", action="store_true", help="Verbose logging")
 
     args = parser.parse_args()
 
@@ -532,5 +508,5 @@ def main():
         settler.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

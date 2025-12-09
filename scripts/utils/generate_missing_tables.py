@@ -4,14 +4,14 @@ Generate all missing LaTeX tables for dissertation.
 This script generates the four commented-out tables in main.tex.
 """
 
-import os
 import sys
-import pandas as pd
-import numpy as np
 from pathlib import Path
+
+import pandas as pd
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent))
+
 
 def ensure_output_dir():
     """Ensure output directory exists."""
@@ -19,18 +19,19 @@ def ensure_output_dir():
     output_dir.mkdir(parents=True, exist_ok=True)
     return output_dir
 
+
 def generate_rl_vs_baseline_table():
     """Generate RL vs Baseline comparison table."""
 
     # Create synthetic but realistic data
     data = {
-        'Model': ['GLM Baseline', 'State-Space', 'XGBoost', 'DQN', 'PPO', 'CQL (Conservative)'],
-        'Brier Score': [0.248, 0.242, 0.239, 0.235, 0.233, 0.231],
-        'Log Loss': [0.682, 0.674, 0.668, 0.661, 0.658, 0.655],
-        'ATS %': [51.2, 51.8, 52.3, 52.9, 53.2, 53.5],
-        'ROI %': [1.8, 2.4, 3.1, 4.2, 4.8, 5.3],
-        'Sharpe': [0.42, 0.51, 0.58, 0.67, 0.73, 0.79],
-        'Max DD %': [18.2, 16.4, 14.8, 12.3, 11.1, 9.8]
+        "Model": ["GLM Baseline", "State-Space", "XGBoost", "DQN", "PPO", "CQL (Conservative)"],
+        "Brier Score": [0.248, 0.242, 0.239, 0.235, 0.233, 0.231],
+        "Log Loss": [0.682, 0.674, 0.668, 0.661, 0.658, 0.655],
+        "ATS %": [51.2, 51.8, 52.3, 52.9, 53.2, 53.5],
+        "ROI %": [1.8, 2.4, 3.1, 4.2, 4.8, 5.3],
+        "Sharpe": [0.42, 0.51, 0.58, 0.67, 0.73, 0.79],
+        "Max DD %": [18.2, 16.4, 14.8, 12.3, 11.1, 9.8],
     }
 
     df = pd.DataFrame(data)
@@ -48,8 +49,8 @@ Model & Brier & Log Loss & ATS\% & ROI\% & Sharpe & Max DD\% \\
 """
 
     for _, row in df.iterrows():
-        model = row['Model']
-        if 'CQL' in model:
+        model = row["Model"]
+        if "CQL" in model:
             # Highlight best performer
             latex += f"\\textbf{{{model}}} & \\textbf{{{row['Brier Score']:.3f}}} & \\textbf{{{row['Log Loss']:.3f}}} & "
             latex += f"\\textbf{{{row['ATS %']:.1f}}} & \\textbf{{{row['ROI %']:.1f}}} & "
@@ -71,15 +72,16 @@ Model & Brier & Log Loss & ATS\% & ROI\% & Sharpe & Max DD\% \\
 
     return latex
 
+
 def generate_ope_grid_table():
     """Generate Off-Policy Evaluation grid table."""
 
     data = {
-        'Method': ['IS', 'SNIS', 'DR', 'HCOPE'],
-        'Clip 1': [0.142, 0.138, 0.134, 0.128],
-        'Clip 5': [0.156, 0.149, 0.141, 0.133],
-        'Clip 10': [0.168, 0.161, 0.152, 0.145],
-        'No Clip': [0.189, 0.178, 0.165, 0.157]
+        "Method": ["IS", "SNIS", "DR", "HCOPE"],
+        "Clip 1": [0.142, 0.138, 0.134, 0.128],
+        "Clip 5": [0.156, 0.149, 0.141, 0.133],
+        "Clip 10": [0.168, 0.161, 0.152, 0.145],
+        "No Clip": [0.189, 0.178, 0.165, 0.157],
     }
 
     df = pd.DataFrame(data)
@@ -111,15 +113,22 @@ Method & Clip=1 & Clip=5 & Clip=10 & No Clip \\
 
     return latex
 
+
 def generate_utilization_sharpe_table():
     """Generate Utilization-Adjusted Sharpe ratio table."""
 
     data = {
-        'Strategy': ['Buy \& Hold SPY', 'Static Kelly', 'Dynamic Kelly', 'RL Policy', 'RL + Risk Gates'],
-        'Raw Sharpe': [0.95, 1.42, 1.58, 1.73, 1.65],
-        'Utilization %': [100.0, 42.3, 38.7, 35.2, 31.8],
-        'Adj. Sharpe': [0.95, 0.60, 0.61, 0.61, 0.52],
-        'Max DD %': [33.7, 24.3, 19.8, 16.2, 12.4]
+        "Strategy": [
+            r"Buy \& Hold SPY",
+            "Static Kelly",
+            "Dynamic Kelly",
+            "RL Policy",
+            "RL + Risk Gates",
+        ],
+        "Raw Sharpe": [0.95, 1.42, 1.58, 1.73, 1.65],
+        "Utilization %": [100.0, 42.3, 38.7, 35.2, 31.8],
+        "Adj. Sharpe": [0.95, 0.60, 0.61, 0.61, 0.52],
+        "Max DD %": [33.7, 24.3, 19.8, 16.2, 12.4],
     }
 
     df = pd.DataFrame(data)
@@ -136,7 +145,7 @@ Strategy & Raw Sharpe & Utilization\% & Adj. Sharpe & Max DD\% \\
 """
 
     for _, row in df.iterrows():
-        if 'Risk Gates' in row['Strategy']:
+        if "Risk Gates" in row["Strategy"]:
             latex += f"\\textbf{{{row['Strategy']}}} & {row['Raw Sharpe']:.2f} & {row['Utilization %']:.1f} & "
             latex += f"{row['Adj. Sharpe']:.2f} & \\textbf{{{row['Max DD %']:.1f}}} \\\\\n"
         else:
@@ -155,16 +164,17 @@ Strategy & Raw Sharpe & Utilization\% & Adj. Sharpe & Max DD\% \\
 
     return latex
 
+
 def generate_cvar_benchmark_table():
     """Generate CVaR benchmark comparison table."""
 
     data = {
-        'Portfolio': ['Equal Weight', 'Min Variance', 'Max Sharpe', 'Risk Parity', 'CVaR Optimal'],
-        'Expected Return %': [5.2, 3.8, 6.4, 4.7, 5.1],
-        'Volatility %': [14.3, 8.7, 16.2, 10.1, 11.8],
-        'CVaR 95%': [-18.2, -11.3, -21.4, -13.2, -9.8],
-        'CVaR 99%': [-24.7, -15.8, -28.3, -17.9, -13.4],
-        'Worst Week %': [-12.3, -7.8, -14.7, -8.9, -6.2]
+        "Portfolio": ["Equal Weight", "Min Variance", "Max Sharpe", "Risk Parity", "CVaR Optimal"],
+        "Expected Return %": [5.2, 3.8, 6.4, 4.7, 5.1],
+        "Volatility %": [14.3, 8.7, 16.2, 10.1, 11.8],
+        "CVaR 95%": [-18.2, -11.3, -21.4, -13.2, -9.8],
+        "CVaR 99%": [-24.7, -15.8, -28.3, -17.9, -13.4],
+        "Worst Week %": [-12.3, -7.8, -14.7, -8.9, -6.2],
     }
 
     df = pd.DataFrame(data)
@@ -181,7 +191,7 @@ Portfolio & E[R]\% & Vol\% & CVaR$_{95}$\% & CVaR$_{99}$\% & Worst\% \\
 """
 
     for _, row in df.iterrows():
-        if 'CVaR Optimal' in row['Portfolio']:
+        if "CVaR Optimal" in row["Portfolio"]:
             latex += f"\\textbf{{{row['Portfolio']}}} & {row['Expected Return %']:.1f} & {row['Volatility %']:.1f} & "
             latex += f"\\textbf{{{row['CVaR 95%']:.1f}}} & \\textbf{{{row['CVaR 99%']:.1f}}} & "
             latex += f"\\textbf{{{row['Worst Week %']:.1f}}} \\\\\n"
@@ -202,16 +212,17 @@ Portfolio & E[R]\% & Vol\% & CVaR$_{95}$\% & CVaR$_{99}$\% & Worst\% \\
 
     return latex
 
+
 def main():
     """Generate all missing tables."""
 
     output_dir = ensure_output_dir()
 
     tables = [
-        ('rl_vs_baseline_table.tex', generate_rl_vs_baseline_table),
-        ('ope_grid_table.tex', generate_ope_grid_table),
-        ('utilization_adjusted_sharpe_table.tex', generate_utilization_sharpe_table),
-        ('cvar_benchmark_table.tex', generate_cvar_benchmark_table)
+        ("rl_vs_baseline_table.tex", generate_rl_vs_baseline_table),
+        ("ope_grid_table.tex", generate_ope_grid_table),
+        ("utilization_adjusted_sharpe_table.tex", generate_utilization_sharpe_table),
+        ("cvar_benchmark_table.tex", generate_cvar_benchmark_table),
     ]
 
     print("Generating missing LaTeX tables...")
@@ -220,7 +231,7 @@ def main():
         filepath = output_dir / filename
         content = generator()
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             f.write(content)
 
         print(f"  ✓ Generated {filename}")
@@ -234,30 +245,39 @@ def main():
     if main_tex_path.exists():
         print("\nUncommenting table includes in main.tex...")
 
-        with open(main_tex_path, 'r') as f:
+        with open(main_tex_path) as f:
             content = f.read()
 
         # Uncomment the table includes
         replacements = [
-            ('% \\IfFileExists{../figures/out/rl_vs_baseline_table.tex}',
-             '\\IfFileExists{../figures/out/rl_vs_baseline_table.tex}'),
-            ('% \\IfFileExists{../figures/out/ope_grid_table.tex}',
-             '\\IfFileExists{../figures/out/ope_grid_table.tex}'),
-            ('% \\IfFileExists{../figures/out/utilization_adjusted_sharpe_table.tex}',
-             '\\IfFileExists{../figures/out/utilization_adjusted_sharpe_table.tex}'),
-            ('% \\IfFileExists{../figures/out/cvar_benchmark_table.tex}',
-             '\\IfFileExists{../figures/out/cvar_benchmark_table.tex}')
+            (
+                "% \\IfFileExists{../figures/out/rl_vs_baseline_table.tex}",
+                "\\IfFileExists{../figures/out/rl_vs_baseline_table.tex}",
+            ),
+            (
+                "% \\IfFileExists{../figures/out/ope_grid_table.tex}",
+                "\\IfFileExists{../figures/out/ope_grid_table.tex}",
+            ),
+            (
+                "% \\IfFileExists{../figures/out/utilization_adjusted_sharpe_table.tex}",
+                "\\IfFileExists{../figures/out/utilization_adjusted_sharpe_table.tex}",
+            ),
+            (
+                "% \\IfFileExists{../figures/out/cvar_benchmark_table.tex}",
+                "\\IfFileExists{../figures/out/cvar_benchmark_table.tex}",
+            ),
         ]
 
         for old, new in replacements:
             content = content.replace(old, new)
 
-        with open(main_tex_path, 'w') as f:
+        with open(main_tex_path, "w") as f:
             f.write(content)
 
         print("  ✓ Uncommented table includes in main.tex")
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

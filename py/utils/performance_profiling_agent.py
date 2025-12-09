@@ -53,17 +53,15 @@ import json
 import logging
 import os
 import pstats
-import re
 import subprocess
-import sys
 import time
 import tracemalloc
-from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -71,42 +69,46 @@ from psycopg2.extras import RealDictCursor
 # Optional imports
 try:
     import memory_profiler
+
     MEMORY_PROFILER_AVAILABLE = True
 except ImportError:
     MEMORY_PROFILER_AVAILABLE = False
 
 try:
     import line_profiler
+
     LINE_PROFILER_AVAILABLE = True
 except ImportError:
     LINE_PROFILER_AVAILABLE = False
 
 try:
-    import pandas as pd
     import numpy as np
+    import pandas as pd
+
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 
 class BottleneckSeverity(Enum):
     """Bottleneck severity levels."""
+
     CRITICAL = "CRITICAL"  # >10s, blocking production
-    HIGH = "HIGH"          # >3s, significant impact
-    MEDIUM = "MEDIUM"      # >1s, noticeable impact
-    LOW = "LOW"            # >0.5s, minor impact
-    INFO = "INFO"          # Optimization opportunity
+    HIGH = "HIGH"  # >3s, significant impact
+    MEDIUM = "MEDIUM"  # >1s, noticeable impact
+    LOW = "LOW"  # >0.5s, minor impact
+    INFO = "INFO"  # Optimization opportunity
 
 
 class BottleneckType(Enum):
     """Types of performance bottlenecks."""
+
     DATABASE_QUERY = "database_query"
     N_PLUS_ONE = "n_plus_one"
     MEMORY_LEAK = "memory_leak"
@@ -122,6 +124,7 @@ class BottleneckType(Enum):
 @dataclass
 class Bottleneck:
     """Represents a performance bottleneck."""
+
     severity: BottleneckSeverity
     bottleneck_type: BottleneckType
     title: str
@@ -130,27 +133,29 @@ class Bottleneck:
     current_time_ms: float
     impact: str
     detected_at: str = field(default_factory=lambda: datetime.now().isoformat())
-    details: Dict[str, Any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class Recommendation:
     """Performance optimization recommendation."""
+
     bottleneck: Bottleneck
     priority: int  # 1-5 (1=highest)
     recommendation: str
     expected_improvement: str
     implementation_difficulty: str  # Easy, Medium, Hard
-    code_example: Optional[str] = None
-    reference_docs: Optional[List[str]] = None
+    code_example: str | None = None
+    reference_docs: list[str] | None = None
 
 
 @dataclass
 class QueryReport:
     """Database query profiling report."""
-    slow_queries: List[Dict[str, Any]] = field(default_factory=list)
-    n_plus_one_queries: List[Dict[str, Any]] = field(default_factory=list)
-    missing_indexes: List[Dict[str, Any]] = field(default_factory=list)
+
+    slow_queries: list[dict[str, Any]] = field(default_factory=list)
+    n_plus_one_queries: list[dict[str, Any]] = field(default_factory=list)
+    missing_indexes: list[dict[str, Any]] = field(default_factory=list)
     total_queries: int = 0
     avg_query_time_ms: float = 0.0
     p95_query_time_ms: float = 0.0
@@ -160,19 +165,21 @@ class QueryReport:
 @dataclass
 class ProfileReport:
     """Python code profiling report."""
+
     total_time_s: float = 0.0
-    function_stats: List[Dict[str, Any]] = field(default_factory=list)
-    hot_paths: List[str] = field(default_factory=list)
+    function_stats: list[dict[str, Any]] = field(default_factory=list)
+    hot_paths: list[str] = field(default_factory=list)
     memory_usage_mb: float = 0.0
     peak_memory_mb: float = 0.0
-    memory_leaks: List[Dict[str, Any]] = field(default_factory=list)
+    memory_leaks: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass
 class EndpointReport:
     """API endpoint profiling report."""
-    endpoints: List[Dict[str, Any]] = field(default_factory=list)
-    slow_endpoints: List[Dict[str, Any]] = field(default_factory=list)
+
+    endpoints: list[dict[str, Any]] = field(default_factory=list)
+    slow_endpoints: list[dict[str, Any]] = field(default_factory=list)
     total_requests: int = 0
     avg_latency_ms: float = 0.0
     p95_latency_ms: float = 0.0
@@ -193,9 +200,9 @@ class PerformanceProfilingAgent:
 
     def __init__(
         self,
-        project_root: Optional[Path] = None,
-        db_connection_string: Optional[str] = None,
-        prometheus_url: Optional[str] = None,
+        project_root: Path | None = None,
+        db_connection_string: str | None = None,
+        prometheus_url: str | None = None,
     ):
         """
         Initialize performance profiling agent.
@@ -218,14 +225,13 @@ class PerformanceProfilingAgent:
 
         self.project_root = project_root
         self.db_connection_string = db_connection_string or os.getenv(
-            "DATABASE_URL",
-            "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
+            "DATABASE_URL", "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
         )
         self.prometheus_url = prometheus_url or "http://localhost:9090"
 
         # Storage for profiling data
-        self.bottlenecks: List[Bottleneck] = []
-        self.profile_data: Dict[str, Any] = {}
+        self.bottlenecks: list[Bottleneck] = []
+        self.profile_data: dict[str, Any] = {}
 
         logger.info(f"PerformanceProfilingAgent initialized for {project_root}")
 
@@ -255,21 +261,26 @@ class PerformanceProfilingAgent:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
 
             # Check if pg_stat_statements is enabled
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT EXISTS (
                     SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements'
                 ) AS enabled
-            """)
-            enabled = cursor.fetchone()['enabled']
+            """
+            )
+            enabled = cursor.fetchone()["enabled"]
 
             if not enabled:
-                logger.warning("pg_stat_statements not enabled. Run: CREATE EXTENSION pg_stat_statements;")
+                logger.warning(
+                    "pg_stat_statements not enabled. Run: CREATE EXTENSION pg_stat_statements;"
+                )
                 cursor.close()
                 conn.close()
                 return report
 
             # Get slow queries from pg_stat_statements
-            cursor.execute(f"""
+            cursor.execute(
+                """
                 SELECT
                     query,
                     calls,
@@ -281,7 +292,9 @@ class PerformanceProfilingAgent:
                 WHERE mean_exec_time >= %s
                 ORDER BY total_exec_time DESC
                 LIMIT %s
-            """, (min_duration_ms, top_n))
+            """,
+                (min_duration_ms, top_n),
+            )
 
             slow_queries = cursor.fetchall()
             report.slow_queries = [dict(q) for q in slow_queries]
@@ -289,14 +302,19 @@ class PerformanceProfilingAgent:
 
             # Calculate percentiles
             if slow_queries:
-                avg_times = [float(q['avg_time_ms']) for q in slow_queries]
+                avg_times = [float(q["avg_time_ms"]) for q in slow_queries]
                 avg_times.sort()
                 report.avg_query_time_ms = sum(avg_times) / len(avg_times)
-                report.p95_query_time_ms = avg_times[int(len(avg_times) * 0.95)] if avg_times else 0.0
-                report.p99_query_time_ms = avg_times[int(len(avg_times) * 0.99)] if avg_times else 0.0
+                report.p95_query_time_ms = (
+                    avg_times[int(len(avg_times) * 0.95)] if avg_times else 0.0
+                )
+                report.p99_query_time_ms = (
+                    avg_times[int(len(avg_times) * 0.99)] if avg_times else 0.0
+                )
 
             # Detect N+1 query patterns (high call count, low average time)
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     query,
                     calls,
@@ -306,13 +324,15 @@ class PerformanceProfilingAgent:
                 WHERE calls > 100 AND mean_exec_time < 10
                 ORDER BY calls DESC
                 LIMIT 20
-            """)
+            """
+            )
 
             n_plus_one = cursor.fetchall()
             report.n_plus_one_queries = [dict(q) for q in n_plus_one]
 
             # Detect missing indexes (sequential scans on large tables)
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     schemaname,
                     tablename,
@@ -324,7 +344,8 @@ class PerformanceProfilingAgent:
                 WHERE seq_scan > 0
                 ORDER BY seq_tup_read DESC
                 LIMIT 20
-            """)
+            """
+            )
 
             missing_indexes = cursor.fetchall()
             report.missing_indexes = [dict(m) for m in missing_indexes]
@@ -334,35 +355,41 @@ class PerformanceProfilingAgent:
 
             # Create bottlenecks from slow queries
             for query in report.slow_queries[:10]:  # Top 10 slowest
-                avg_time_ms = float(query['avg_time_ms'])
+                avg_time_ms = float(query["avg_time_ms"])
                 severity = self._classify_query_severity(avg_time_ms)
 
-                self.bottlenecks.append(Bottleneck(
-                    severity=severity,
-                    bottleneck_type=BottleneckType.DATABASE_QUERY,
-                    title=f"Slow query: {avg_time_ms:.1f}ms average",
-                    description=f"Query called {query['calls']} times, total {float(query['total_time_ms']):.1f}ms",
-                    location="PostgreSQL",
-                    current_time_ms=avg_time_ms,
-                    impact=f"{float(query['total_time_ms']) / 1000:.1f}s total time",
-                    details=dict(query),
-                ))
+                self.bottlenecks.append(
+                    Bottleneck(
+                        severity=severity,
+                        bottleneck_type=BottleneckType.DATABASE_QUERY,
+                        title=f"Slow query: {avg_time_ms:.1f}ms average",
+                        description=f"Query called {query['calls']} times, total {float(query['total_time_ms']):.1f}ms",
+                        location="PostgreSQL",
+                        current_time_ms=avg_time_ms,
+                        impact=f"{float(query['total_time_ms']) / 1000:.1f}s total time",
+                        details=dict(query),
+                    )
+                )
 
             # Create bottlenecks from N+1 queries
             for query in report.n_plus_one_queries[:5]:
-                self.bottlenecks.append(Bottleneck(
-                    severity=BottleneckSeverity.HIGH,
-                    bottleneck_type=BottleneckType.N_PLUS_ONE,
-                    title=f"N+1 query pattern: {query['calls']} calls",
-                    description=f"High call count suggests N+1 query pattern",
-                    location="PostgreSQL",
-                    current_time_ms=float(query['avg_time_ms']),
-                    impact=f"{float(query['total_time_ms']) / 1000:.1f}s total time from {query['calls']} calls",
-                    details=dict(query),
-                ))
+                self.bottlenecks.append(
+                    Bottleneck(
+                        severity=BottleneckSeverity.HIGH,
+                        bottleneck_type=BottleneckType.N_PLUS_ONE,
+                        title=f"N+1 query pattern: {query['calls']} calls",
+                        description="High call count suggests N+1 query pattern",
+                        location="PostgreSQL",
+                        current_time_ms=float(query["avg_time_ms"]),
+                        impact=f"{float(query['total_time_ms']) / 1000:.1f}s total time from {query['calls']} calls",
+                        details=dict(query),
+                    )
+                )
 
-            logger.info(f"Database profiling complete: {len(report.slow_queries)} slow queries, "
-                       f"{len(report.n_plus_one_queries)} N+1 patterns")
+            logger.info(
+                f"Database profiling complete: {len(report.slow_queries)} slow queries, "
+                f"{len(report.n_plus_one_queries)} N+1 patterns"
+            )
 
         except psycopg2.Error as e:
             logger.error(f"Database profiling error: {e}")
@@ -382,7 +409,7 @@ class PerformanceProfilingAgent:
         else:
             return BottleneckSeverity.INFO
 
-    def explain_query(self, query: str, analyze: bool = True) -> Dict[str, Any]:
+    def explain_query(self, query: str, analyze: bool = True) -> dict[str, Any]:
         """
         Run EXPLAIN (ANALYZE) on a query.
 
@@ -397,7 +424,9 @@ class PerformanceProfilingAgent:
             conn = psycopg2.connect(self.db_connection_string)
             cursor = conn.cursor(cursor_factory=RealDictCursor)
 
-            explain_cmd = "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)" if analyze else "EXPLAIN (FORMAT JSON)"
+            explain_cmd = (
+                "EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON)" if analyze else "EXPLAIN (FORMAT JSON)"
+            )
             cursor.execute(f"{explain_cmd} {query}")
             plan = cursor.fetchone()
 
@@ -417,7 +446,7 @@ class PerformanceProfilingAgent:
     def profile_python_code(
         self,
         file_path: str,
-        function: Optional[str] = None,
+        function: str | None = None,
         track_memory: bool = True,
     ) -> ProfileReport:
         """
@@ -471,21 +500,26 @@ class PerformanceProfilingAgent:
 
                 # Check for memory leaks (repeated execution)
                 if report.memory_usage_mb > 100:  # >100MB
-                    self.bottlenecks.append(Bottleneck(
-                        severity=BottleneckSeverity.HIGH,
-                        bottleneck_type=BottleneckType.MEMORY_LEAK,
-                        title=f"High memory usage: {report.memory_usage_mb:.1f}MB",
-                        description=f"Code uses {report.memory_usage_mb:.1f}MB, peak {report.peak_memory_mb:.1f}MB",
-                        location=file_path,
-                        current_time_ms=elapsed * 1000,
-                        impact=f"{report.memory_usage_mb:.1f}MB memory",
-                        details={"memory_mb": report.memory_usage_mb, "peak_mb": report.peak_memory_mb},
-                    ))
+                    self.bottlenecks.append(
+                        Bottleneck(
+                            severity=BottleneckSeverity.HIGH,
+                            bottleneck_type=BottleneckType.MEMORY_LEAK,
+                            title=f"High memory usage: {report.memory_usage_mb:.1f}MB",
+                            description=f"Code uses {report.memory_usage_mb:.1f}MB, peak {report.peak_memory_mb:.1f}MB",
+                            location=file_path,
+                            current_time_ms=elapsed * 1000,
+                            impact=f"{report.memory_usage_mb:.1f}MB memory",
+                            details={
+                                "memory_mb": report.memory_usage_mb,
+                                "peak_mb": report.peak_memory_mb,
+                            },
+                        )
+                    )
 
             # Parse profiler stats
             stream = io.StringIO()
             stats = pstats.Stats(profiler, stream=stream)
-            stats.sort_stats('cumulative')
+            stats.sort_stats("cumulative")
             stats.print_stats(50)  # Top 50 functions
 
             output = stream.getvalue()
@@ -504,34 +538,44 @@ class PerformanceProfilingAgent:
                         cumtime = float(parts[3])
                         funcname = " ".join(parts[5:])
 
-                        report.function_stats.append({
-                            "function": funcname,
-                            "ncalls": ncalls,
-                            "tottime": tottime,
-                            "cumtime": cumtime,
-                        })
+                        report.function_stats.append(
+                            {
+                                "function": funcname,
+                                "ncalls": ncalls,
+                                "tottime": tottime,
+                                "cumtime": cumtime,
+                            }
+                        )
 
                         # Identify hot paths (>1s cumulative time)
                         if cumtime > 1.0:
                             report.hot_paths.append(funcname)
 
                             severity = self._classify_computation_severity(cumtime * 1000)
-                            self.bottlenecks.append(Bottleneck(
-                                severity=severity,
-                                bottleneck_type=BottleneckType.EXPENSIVE_COMPUTATION,
-                                title=f"Expensive computation: {cumtime:.2f}s",
-                                description=f"Function {funcname} takes {cumtime:.2f}s cumulative",
-                                location=file_path,
-                                current_time_ms=cumtime * 1000,
-                                impact=f"{cumtime:.2f}s execution time",
-                                details={"function": funcname, "cumtime": cumtime, "tottime": tottime},
-                            ))
+                            self.bottlenecks.append(
+                                Bottleneck(
+                                    severity=severity,
+                                    bottleneck_type=BottleneckType.EXPENSIVE_COMPUTATION,
+                                    title=f"Expensive computation: {cumtime:.2f}s",
+                                    description=f"Function {funcname} takes {cumtime:.2f}s cumulative",
+                                    location=file_path,
+                                    current_time_ms=cumtime * 1000,
+                                    impact=f"{cumtime:.2f}s execution time",
+                                    details={
+                                        "function": funcname,
+                                        "cumtime": cumtime,
+                                        "tottime": tottime,
+                                    },
+                                )
+                            )
 
                     except (ValueError, IndexError):
                         continue
 
-            logger.info(f"Python profiling complete: {elapsed:.2f}s total, "
-                       f"{len(report.hot_paths)} hot paths, {report.memory_usage_mb:.1f}MB memory")
+            logger.info(
+                f"Python profiling complete: {elapsed:.2f}s total, "
+                f"{len(report.hot_paths)} hot paths, {report.memory_usage_mb:.1f}MB memory"
+            )
 
         except Exception as e:
             logger.error(f"Python profiling error: {e}")
@@ -575,7 +619,7 @@ class PerformanceProfilingAgent:
         start_time = time.time()
         profiler.enable()
 
-        result = func(*args, **kwargs)
+        func(*args, **kwargs)
 
         profiler.disable()
         elapsed = time.time() - start_time
@@ -592,11 +636,13 @@ class PerformanceProfilingAgent:
         # Get stats
         stream = io.StringIO()
         stats = pstats.Stats(profiler, stream=stream)
-        stats.sort_stats('cumulative')
+        stats.sort_stats("cumulative")
         stats.print_stats(20)
 
-        logger.info(f"Function profiling: {func.__name__} took {elapsed:.2f}s, "
-                   f"used {report.memory_usage_mb:.1f}MB")
+        logger.info(
+            f"Function profiling: {func.__name__} took {elapsed:.2f}s, "
+            f"used {report.memory_usage_mb:.1f}MB"
+        )
 
         self.profile_data[func.__name__] = {
             "elapsed_s": elapsed,
@@ -610,7 +656,7 @@ class PerformanceProfilingAgent:
     # R CODE PROFILING
     # =============================================================================
 
-    def profile_r_code(self, r_script: str, output_file: Optional[str] = None) -> Dict[str, Any]:
+    def profile_r_code(self, r_script: str, output_file: str | None = None) -> dict[str, Any]:
         """
         Profile R code using Rprof.
 
@@ -724,33 +770,41 @@ class PerformanceProfilingAgent:
                     endpoint = metric.get("endpoint", "unknown")
                     method = metric.get("method", "unknown")
 
-                    report.endpoints.append({
-                        "endpoint": endpoint,
-                        "method": method,
-                        "avg_latency_ms": avg_latency_ms,
-                    })
-
-                    if avg_latency_ms >= min_latency_ms:
-                        report.slow_endpoints.append({
+                    report.endpoints.append(
+                        {
                             "endpoint": endpoint,
                             "method": method,
                             "avg_latency_ms": avg_latency_ms,
-                        })
+                        }
+                    )
+
+                    if avg_latency_ms >= min_latency_ms:
+                        report.slow_endpoints.append(
+                            {
+                                "endpoint": endpoint,
+                                "method": method,
+                                "avg_latency_ms": avg_latency_ms,
+                            }
+                        )
 
                         severity = self._classify_query_severity(avg_latency_ms)
-                        self.bottlenecks.append(Bottleneck(
-                            severity=severity,
-                            bottleneck_type=BottleneckType.IO_BOUND,
-                            title=f"Slow API endpoint: {method} {endpoint}",
-                            description=f"Average latency {avg_latency_ms:.1f}ms",
-                            location=f"API: {method} {endpoint}",
-                            current_time_ms=avg_latency_ms,
-                            impact=f"{avg_latency_ms:.1f}ms average latency",
-                            details={"endpoint": endpoint, "method": method},
-                        ))
+                        self.bottlenecks.append(
+                            Bottleneck(
+                                severity=severity,
+                                bottleneck_type=BottleneckType.IO_BOUND,
+                                title=f"Slow API endpoint: {method} {endpoint}",
+                                description=f"Average latency {avg_latency_ms:.1f}ms",
+                                location=f"API: {method} {endpoint}",
+                                current_time_ms=avg_latency_ms,
+                                impact=f"{avg_latency_ms:.1f}ms average latency",
+                                details={"endpoint": endpoint, "method": method},
+                            )
+                        )
 
-                logger.info(f"API profiling complete: {len(report.endpoints)} endpoints, "
-                           f"{len(report.slow_endpoints)} slow")
+                logger.info(
+                    f"API profiling complete: {len(report.endpoints)} endpoints, "
+                    f"{len(report.slow_endpoints)} slow"
+                )
 
             else:
                 logger.warning(f"Prometheus query failed: {response.status_code}")
@@ -769,7 +823,7 @@ class PerformanceProfilingAgent:
         profile_database: bool = True,
         profile_python: bool = True,
         profile_api: bool = True,
-    ) -> List[Bottleneck]:
+    ) -> list[Bottleneck]:
         """
         Detect all bottlenecks across the stack.
 
@@ -818,8 +872,8 @@ class PerformanceProfilingAgent:
 
     def generate_recommendations(
         self,
-        bottlenecks: Optional[List[Bottleneck]] = None,
-    ) -> List[Recommendation]:
+        bottlenecks: list[Bottleneck] | None = None,
+    ) -> list[Recommendation]:
         """
         Generate optimization recommendations for bottlenecks.
 
@@ -845,7 +899,7 @@ class PerformanceProfilingAgent:
         logger.info(f"Generated {len(recommendations)} recommendations")
         return recommendations
 
-    def _generate_recommendation(self, bottleneck: Bottleneck) -> Optional[Recommendation]:
+    def _generate_recommendation(self, bottleneck: Bottleneck) -> Recommendation | None:
         """Generate recommendation for a specific bottleneck."""
         if bottleneck.bottleneck_type == BottleneckType.DATABASE_QUERY:
             return Recommendation(
@@ -1053,7 +1107,7 @@ class PerformanceProfilingAgent:
         medium = sum(1 for b in self.bottlenecks if b.severity == BottleneckSeverity.MEDIUM)
         low = sum(1 for b in self.bottlenecks if b.severity == BottleneckSeverity.LOW)
 
-        lines.append(f"\nBottlenecks Found:")
+        lines.append("\nBottlenecks Found:")
         lines.append(f"  🔴 CRITICAL: {critical} (>10s)")
         lines.append(f"  🟠 HIGH:     {high} (>3s)")
         lines.append(f"  🟡 MEDIUM:   {medium} (>1s)")
@@ -1063,7 +1117,7 @@ class PerformanceProfilingAgent:
             lines.append(f"\n⚠️  {critical} CRITICAL ISSUES - IMMEDIATE ACTION REQUIRED")
 
         # Top 10 bottlenecks
-        lines.append(f"\nTop 10 Bottlenecks:")
+        lines.append("\nTop 10 Bottlenecks:")
         lines.append("-" * 80)
 
         for i, bottleneck in enumerate(self.bottlenecks[:10], 1):
@@ -1084,9 +1138,9 @@ if __name__ == "__main__":
 
     agent = PerformanceProfilingAgent()
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("PERFORMANCE PROFILING AGENT - DEMO")
-    print("="*70)
+    print("=" * 70)
 
     # 1. Profile database queries
     print("\n1. Profiling database queries...")

@@ -14,38 +14,87 @@ Date: November 19, 2025
 """
 
 import argparse
+import logging
 import time
-from typing import Dict, List, Optional, Tuple
+
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-import logging
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Pro Football Reference team abbreviations (32 teams)
 PFR_TEAMS = [
-    'crd', 'atl', 'rav', 'buf', 'car', 'chi', 'cin', 'cle',
-    'dal', 'den', 'det', 'gnb', 'htx', 'clt', 'jax', 'kan',
-    'sdg', 'ram', 'mia', 'min', 'nwe', 'nor', 'nyg', 'nyj',
-    'rai', 'phi', 'pit', 'sfo', 'sea', 'tam', 'oti', 'was'
+    "crd",
+    "atl",
+    "rav",
+    "buf",
+    "car",
+    "chi",
+    "cin",
+    "cle",
+    "dal",
+    "den",
+    "det",
+    "gnb",
+    "htx",
+    "clt",
+    "jax",
+    "kan",
+    "sdg",
+    "ram",
+    "mia",
+    "min",
+    "nwe",
+    "nor",
+    "nyg",
+    "nyj",
+    "rai",
+    "phi",
+    "pit",
+    "sfo",
+    "sea",
+    "tam",
+    "oti",
+    "was",
 ]
 
 # Mapping from PFR abbreviations to standard NFL abbreviations
 PFR_TO_NFL_TEAM_MAP = {
-    'crd': 'ARI', 'atl': 'ATL', 'rav': 'BAL', 'buf': 'BUF',
-    'car': 'CAR', 'chi': 'CHI', 'cin': 'CIN', 'cle': 'CLE',
-    'dal': 'DAL', 'den': 'DEN', 'det': 'DET', 'gnb': 'GB',
-    'htx': 'HOU', 'clt': 'IND', 'jax': 'JAX', 'kan': 'KC',
-    'sdg': 'LAC', 'ram': 'LAR', 'mia': 'MIA', 'min': 'MIN',
-    'nwe': 'NE', 'nor': 'NO', 'nyg': 'NYG', 'nyj': 'NYJ',
-    'rai': 'LV', 'phi': 'PHI', 'pit': 'PIT', 'sfo': 'SF',
-    'sea': 'SEA', 'tam': 'TB', 'oti': 'TEN', 'was': 'WAS'
+    "crd": "ARI",
+    "atl": "ATL",
+    "rav": "BAL",
+    "buf": "BUF",
+    "car": "CAR",
+    "chi": "CHI",
+    "cin": "CIN",
+    "cle": "CLE",
+    "dal": "DAL",
+    "den": "DEN",
+    "det": "DET",
+    "gnb": "GB",
+    "htx": "HOU",
+    "clt": "IND",
+    "jax": "JAX",
+    "kan": "KC",
+    "sdg": "LAC",
+    "ram": "LAR",
+    "mia": "MIA",
+    "min": "MIN",
+    "nwe": "NE",
+    "nor": "NO",
+    "nyg": "NYG",
+    "nyj": "NYJ",
+    "rai": "LV",
+    "phi": "PHI",
+    "pit": "PIT",
+    "sfo": "SF",
+    "sea": "SEA",
+    "tam": "TB",
+    "oti": "TEN",
+    "was": "WAS",
 }
 
 
@@ -58,13 +107,13 @@ class CoachingScraper:
         self.end_season = end_season
         self.base_url = "https://www.pro-football-reference.com"
         self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
-        })
+        self.session.headers.update(
+            {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"}
+        )
 
     def scrape_team_season(
         self, pfr_team: str, season: int, retry_count: int = 3
-    ) -> Optional[Dict[str, str]]:
+    ) -> dict[str, str] | None:
         """
         Scrape coaching staff for a single team-season.
 
@@ -86,47 +135,55 @@ class CoachingScraper:
                 response = self.session.get(url, timeout=10)
                 response.raise_for_status()
 
-                soup = BeautifulSoup(response.content, 'html.parser')
+                soup = BeautifulSoup(response.content, "html.parser")
 
                 # Find the coaching staff section
                 # Method 1: Look for div with id="all_coaches" or "coaches"
-                coaches_div = soup.find('div', id='all_coaches')
+                coaches_div = soup.find("div", id="all_coaches")
                 if not coaches_div:
-                    coaches_div = soup.find('div', id='coaches')
+                    coaches_div = soup.find("div", id="coaches")
 
                 if not coaches_div:
                     # Method 2: Search for section containing "Coaches" heading
-                    coaches_heading = soup.find('h2', string=lambda s: s and 'Coaches' in s)
+                    coaches_heading = soup.find("h2", string=lambda s: s and "Coaches" in s)
                     if coaches_heading:
-                        coaches_div = coaches_heading.find_next('div')
+                        coaches_div = coaches_heading.find_next("div")
 
                 if not coaches_div:
                     logger.warning(f"Could not find coaches section for {nfl_team} {season}")
                     return None
 
                 # Extract coaching staff text
-                coaches_text = coaches_div.get_text(separator='\n', strip=True)
+                coaches_text = coaches_div.get_text(separator="\n", strip=True)
 
                 # Parse coaches from text
                 coaches_data = {
-                    'team': nfl_team,
-                    'season': season,
-                    'head_coach': self._extract_coach(coaches_text, 'Head Coach'),
-                    'offensive_coordinator': self._extract_coach(coaches_text, 'Offensive Coordinator'),
-                    'defensive_coordinator': self._extract_coach(coaches_text, 'Defensive Coordinator'),
-                    'special_teams_coordinator': self._extract_coach(coaches_text, 'Special Teams Coordinator'),
+                    "team": nfl_team,
+                    "season": season,
+                    "head_coach": self._extract_coach(coaches_text, "Head Coach"),
+                    "offensive_coordinator": self._extract_coach(
+                        coaches_text, "Offensive Coordinator"
+                    ),
+                    "defensive_coordinator": self._extract_coach(
+                        coaches_text, "Defensive Coordinator"
+                    ),
+                    "special_teams_coordinator": self._extract_coach(
+                        coaches_text, "Special Teams Coordinator"
+                    ),
                 }
 
                 # Validate: Head coach should always be present
-                if not coaches_data['head_coach']:
+                if not coaches_data["head_coach"]:
                     logger.warning(f"No head coach found for {nfl_team} {season}")
                     # Try alternative parsing method
-                    coaches_data['head_coach'] = self._extract_coach_alternative(soup, 'Head Coach')
+                    coaches_data["head_coach"] = self._extract_coach_alternative(soup, "Head Coach")
 
                 # Success
-                logger.info(f"✓ {nfl_team} {season}: HC={coaches_data['head_coach']}, "
-                           f"OC={coaches_data['offensive_coordinator']}, "
-                           f"DC={coaches_data['defensive_coordinator']}")
+                logger.info(
+                    f"✓ {nfl_team} {season}: HC={coaches_data['head_coach']}, "
+                    f"OC={coaches_data['offensive_coordinator']}, "
+                    f"DC={coaches_data['defensive_coordinator']}"
+                )
 
                 # Rate limiting: 3 seconds between requests
                 time.sleep(3)
@@ -144,7 +201,7 @@ class CoachingScraper:
 
         return None
 
-    def _extract_coach(self, text: str, position: str) -> Optional[str]:
+    def _extract_coach(self, text: str, position: str) -> str | None:
         """
         Extract coach name for a given position from coaches text.
 
@@ -155,22 +212,23 @@ class CoachingScraper:
         Returns:
             Coach name (e.g., "Eric Bieniemy") or None if not found
         """
-        lines = text.split('\n')
+        lines = text.split("\n")
         for i, line in enumerate(lines):
             if position in line:
                 # Coach name is typically on the next line
                 if i + 1 < len(lines):
                     name = lines[i + 1].strip()
                     # Clean up: remove years in parentheses, extra whitespace
-                    name = name.split('(')[0].strip()
+                    name = name.split("(")[0].strip()
                     # Skip if name is empty or looks like another position
-                    if name and not any(keyword in name.lower() for keyword in [
-                        'coordinator', 'coach', 'assistant', 'director'
-                    ]):
+                    if name and not any(
+                        keyword in name.lower()
+                        for keyword in ["coordinator", "coach", "assistant", "director"]
+                    ):
                         return name
         return None
 
-    def _extract_coach_alternative(self, soup: BeautifulSoup, position: str) -> Optional[str]:
+    def _extract_coach_alternative(self, soup: BeautifulSoup, position: str) -> str | None:
         """
         Alternative method to extract coach name using HTML structure.
 
@@ -190,7 +248,7 @@ class CoachingScraper:
                 next_elem = parent.find_next_sibling()
                 if next_elem:
                     name = next_elem.get_text(strip=True)
-                    name = name.split('(')[0].strip()
+                    name = name.split("(")[0].strip()
                     if name and len(name) > 3:
                         return name
         return None
@@ -214,23 +272,27 @@ class CoachingScraper:
                     all_data.append(coaches_data)
                 else:
                     # Still add row with NULLs to track missing data
-                    all_data.append({
-                        'team': PFR_TO_NFL_TEAM_MAP[pfr_team],
-                        'season': season,
-                        'head_coach': None,
-                        'offensive_coordinator': None,
-                        'defensive_coordinator': None,
-                        'special_teams_coordinator': None,
-                    })
+                    all_data.append(
+                        {
+                            "team": PFR_TO_NFL_TEAM_MAP[pfr_team],
+                            "season": season,
+                            "head_coach": None,
+                            "offensive_coordinator": None,
+                            "defensive_coordinator": None,
+                            "special_teams_coordinator": None,
+                        }
+                    )
 
                 completed += 1
-                logger.info(f"Progress: {completed}/{total_teams} team-seasons complete "
-                           f"({100*completed/total_teams:.1f}%)")
+                logger.info(
+                    f"Progress: {completed}/{total_teams} team-seasons complete "
+                    f"({100*completed/total_teams:.1f}%)"
+                )
 
         df = pd.DataFrame(all_data)
         return df
 
-    def validate_data(self, df: pd.DataFrame) -> Tuple[bool, List[str]]:
+    def validate_data(self, df: pd.DataFrame) -> tuple[bool, list[str]]:
         """
         Validate scraped coaching data.
 
@@ -243,35 +305,39 @@ class CoachingScraper:
         warnings = []
 
         # Check for missing head coaches (should be rare)
-        missing_hc = df[df['head_coach'].isna()]
+        missing_hc = df[df["head_coach"].isna()]
         if len(missing_hc) > 0:
             warnings.append(f"Missing head coach for {len(missing_hc)} team-seasons:")
             for _, row in missing_hc.iterrows():
                 warnings.append(f"  - {row['team']} {row['season']}")
 
         # Check for missing OCs (more common, but should be < 5%)
-        missing_oc = df[df['offensive_coordinator'].isna()]
+        missing_oc = df[df["offensive_coordinator"].isna()]
         missing_oc_pct = 100 * len(missing_oc) / len(df)
         if missing_oc_pct > 5:
-            warnings.append(f"Missing OC for {len(missing_oc)} team-seasons ({missing_oc_pct:.1f}%)")
+            warnings.append(
+                f"Missing OC for {len(missing_oc)} team-seasons ({missing_oc_pct:.1f}%)"
+            )
 
         # Check for missing DCs
-        missing_dc = df[df['defensive_coordinator'].isna()]
+        missing_dc = df[df["defensive_coordinator"].isna()]
         missing_dc_pct = 100 * len(missing_dc) / len(df)
         if missing_dc_pct > 5:
-            warnings.append(f"Missing DC for {len(missing_dc)} team-seasons ({missing_dc_pct:.1f}%)")
+            warnings.append(
+                f"Missing DC for {len(missing_dc)} team-seasons ({missing_dc_pct:.1f}%)"
+            )
 
         # Check for duplicate team-seasons
-        duplicates = df[df.duplicated(subset=['team', 'season'], keep=False)]
+        duplicates = df[df.duplicated(subset=["team", "season"], keep=False)]
         if len(duplicates) > 0:
             warnings.append(f"Duplicate team-seasons found: {len(duplicates)} rows")
 
         # Overall validation
         is_valid = (
-            len(missing_hc) < 5 and  # Allow up to 5 missing HCs
-            missing_oc_pct < 10 and  # Allow up to 10% missing OCs
-            missing_dc_pct < 10 and  # Allow up to 10% missing DCs
-            len(duplicates) == 0
+            len(missing_hc) < 5  # Allow up to 5 missing HCs
+            and missing_oc_pct < 10  # Allow up to 10% missing OCs
+            and missing_dc_pct < 10  # Allow up to 10% missing DCs
+            and len(duplicates) == 0
         )
 
         return is_valid, warnings
@@ -279,30 +345,24 @@ class CoachingScraper:
 
 def main():
     """Main execution function."""
-    parser = argparse.ArgumentParser(description='Scrape NFL coaching staff data from Pro Football Reference')
+    parser = argparse.ArgumentParser(
+        description="Scrape NFL coaching staff data from Pro Football Reference"
+    )
     parser.add_argument(
-        '--output',
+        "--output",
         type=str,
-        default='data/coaching_staff_2018_2024.csv',
-        help='Output CSV file path'
+        default="data/coaching_staff_2018_2024.csv",
+        help="Output CSV file path",
     )
     parser.add_argument(
-        '--start-season',
-        type=int,
-        default=2018,
-        help='Start season (default: 2018)'
+        "--start-season", type=int, default=2018, help="Start season (default: 2018)"
     )
+    parser.add_argument("--end-season", type=int, default=2024, help="End season (default: 2024)")
     parser.add_argument(
-        '--end-season',
-        type=int,
-        default=2024,
-        help='End season (default: 2024)'
-    )
-    parser.add_argument(
-        '--teams',
+        "--teams",
         type=str,
-        nargs='+',
-        help='Scrape only specific teams (NFL abbreviations, e.g., KC BUF)'
+        nargs="+",
+        help="Scrape only specific teams (NFL abbreviations, e.g., KC BUF)",
     )
     args = parser.parse_args()
 
@@ -353,17 +413,23 @@ def main():
     # Summary statistics
     logger.info("\n=== SUMMARY ===")
     logger.info(f"Total team-seasons scraped: {len(df)}")
-    logger.info(f"Head coaches found: {df['head_coach'].notna().sum()} / {len(df)} "
-               f"({100*df['head_coach'].notna().sum()/len(df):.1f}%)")
-    logger.info(f"Offensive coordinators found: {df['offensive_coordinator'].notna().sum()} / {len(df)} "
-               f"({100*df['offensive_coordinator'].notna().sum()/len(df):.1f}%)")
-    logger.info(f"Defensive coordinators found: {df['defensive_coordinator'].notna().sum()} / {len(df)} "
-               f"({100*df['defensive_coordinator'].notna().sum()/len(df):.1f}%)")
+    logger.info(
+        f"Head coaches found: {df['head_coach'].notna().sum()} / {len(df)} "
+        f"({100*df['head_coach'].notna().sum()/len(df):.1f}%)"
+    )
+    logger.info(
+        f"Offensive coordinators found: {df['offensive_coordinator'].notna().sum()} / {len(df)} "
+        f"({100*df['offensive_coordinator'].notna().sum()/len(df):.1f}%)"
+    )
+    logger.info(
+        f"Defensive coordinators found: {df['defensive_coordinator'].notna().sum()} / {len(df)} "
+        f"({100*df['defensive_coordinator'].notna().sum()/len(df):.1f}%)"
+    )
 
     # Sample output
     logger.info("\n=== SAMPLE DATA (first 10 rows) ===")
     print(df.head(10).to_string())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

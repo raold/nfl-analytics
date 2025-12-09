@@ -19,7 +19,6 @@ Database: PostgreSQL (devdb01)
 import logging
 import os
 import sys
-from typing import Dict, List, Tuple
 
 import pandas as pd
 import psycopg2
@@ -51,7 +50,7 @@ def get_db_connection():
     return psycopg2.connect(DB_URL)
 
 
-def fetch_qb_baseline(player_id: str, season_start: int = 2022, season_end: int = 2024) -> Dict:
+def fetch_qb_baseline(player_id: str, season_start: int = 2022, season_end: int = 2024) -> dict:
     """
     Fetch QB baseline using the FIXED query (no current_team filtering).
 
@@ -109,8 +108,8 @@ def fetch_qb_baseline(player_id: str, season_start: int = 2022, season_end: int 
 
 
 def validate_baseline(
-    calculated: Dict, expected_name: str, expected_avg: float, tolerance: float
-) -> Tuple[bool, str]:
+    calculated: dict, expected_name: str, expected_avg: float, tolerance: float
+) -> tuple[bool, str]:
     """
     Validate a QB baseline against expected values.
 

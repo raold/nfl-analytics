@@ -9,24 +9,25 @@ Redis Phase 2 Enhancement:
 - Graceful fallback to uncached execution if Redis unavailable
 """
 
-import requests
-from bs4 import BeautifulSoup
-from typing import List, Dict, Any, Optional
+import json
 import logging
 import time
-import json
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any
+
+import requests
+from bs4 import BeautifulSoup
 
 from mcp_server.config import (
-    ESPN_API_BASE_URL,
     MAX_NEWS_ARTICLES,
+    MCP_CACHE_DIR,
     NEWS_CACHE_SECONDS,
-    MCP_CACHE_DIR
 )
 
 try:
     from mcp_server.tools.cache_wrapper import cache_news
+
     CACHE_AVAILABLE = True
 except ImportError:
     CACHE_AVAILABLE = False
@@ -35,14 +36,38 @@ logger = logging.getLogger(__name__)
 
 # Team abbreviation mapping (NFL standard codes to full names)
 TEAM_MAPPING = {
-    "ARI": "Cardinals", "ATL": "Falcons", "BAL": "Ravens", "BUF": "Bills",
-    "CAR": "Panthers", "CHI": "Bears", "CIN": "Bengals", "CLE": "Browns",
-    "DAL": "Cowboys", "DEN": "Broncos", "DET": "Lions", "GB": "Packers",
-    "HOU": "Texans", "IND": "Colts", "JAX": "Jaguars", "KC": "Chiefs",
-    "LAC": "Chargers", "LAR": "Rams", "LV": "Raiders", "MIA": "Dolphins",
-    "MIN": "Vikings", "NE": "Patriots", "NO": "Saints", "NYG": "Giants",
-    "NYJ": "Jets", "PHI": "Eagles", "PIT": "Steelers", "SEA": "Seahawks",
-    "SF": "49ers", "TB": "Buccaneers", "TEN": "Titans", "WAS": "Commanders"
+    "ARI": "Cardinals",
+    "ATL": "Falcons",
+    "BAL": "Ravens",
+    "BUF": "Bills",
+    "CAR": "Panthers",
+    "CHI": "Bears",
+    "CIN": "Bengals",
+    "CLE": "Browns",
+    "DAL": "Cowboys",
+    "DEN": "Broncos",
+    "DET": "Lions",
+    "GB": "Packers",
+    "HOU": "Texans",
+    "IND": "Colts",
+    "JAX": "Jaguars",
+    "KC": "Chiefs",
+    "LAC": "Chargers",
+    "LAR": "Rams",
+    "LV": "Raiders",
+    "MIA": "Dolphins",
+    "MIN": "Vikings",
+    "NE": "Patriots",
+    "NO": "Saints",
+    "NYG": "Giants",
+    "NYJ": "Jets",
+    "PHI": "Eagles",
+    "PIT": "Steelers",
+    "SEA": "Seahawks",
+    "SF": "49ers",
+    "TB": "Buccaneers",
+    "TEN": "Titans",
+    "WAS": "Commanders",
 }
 
 # Reverse mapping (full names to abbreviations)
@@ -85,7 +110,7 @@ def _get_cache_path(team: str) -> Path:
     return MCP_CACHE_DIR / f"news_{team.lower()}.json"
 
 
-def _load_cache(team: str) -> Optional[List[Dict[str, Any]]]:
+def _load_cache(team: str) -> list[dict[str, Any]] | None:
     """
     Load cached news if available and not expired.
 
@@ -101,24 +126,24 @@ def _load_cache(team: str) -> Optional[List[Dict[str, Any]]]:
         return None
 
     try:
-        with open(cache_path, 'r') as f:
+        with open(cache_path) as f:
             cache_data = json.load(f)
 
         # Check if cache is expired
-        cached_time = datetime.fromisoformat(cache_data['timestamp'])
+        cached_time = datetime.fromisoformat(cache_data["timestamp"])
         if datetime.now() - cached_time > timedelta(seconds=NEWS_CACHE_SECONDS):
             logger.info(f"Cache expired for {team}")
             return None
 
         logger.info(f"Using cached news for {team}")
-        return cache_data['articles']
+        return cache_data["articles"]
 
     except Exception as e:
         logger.error(f"Error loading cache for {team}: {e}")
         return None
 
 
-def _save_cache(team: str, articles: List[Dict[str, Any]]) -> None:
+def _save_cache(team: str, articles: list[dict[str, Any]]) -> None:
     """
     Save articles to cache.
 
@@ -129,12 +154,9 @@ def _save_cache(team: str, articles: List[Dict[str, Any]]) -> None:
     cache_path = _get_cache_path(team)
 
     try:
-        cache_data = {
-            'timestamp': datetime.now().isoformat(),
-            'articles': articles
-        }
+        cache_data = {"timestamp": datetime.now().isoformat(), "articles": articles}
 
-        with open(cache_path, 'w') as f:
+        with open(cache_path, "w") as f:
             json.dump(cache_data, f, indent=2)
 
         logger.info(f"Cached {len(articles)} articles for {team}")
@@ -156,7 +178,7 @@ def _rate_limit() -> None:
     _last_request_time = time.time()
 
 
-def _fetch_espn_news_uncached(team: str, limit: int = 10) -> List[Dict[str, Any]]:
+def _fetch_espn_news_uncached(team: str, limit: int = 10) -> list[dict[str, Any]]:
     """
     Fetch ESPN news without caching (internal implementation).
 
@@ -181,43 +203,47 @@ def _fetch_espn_news_uncached(team: str, limit: int = 10) -> List[Dict[str, Any]
         response.raise_for_status()
 
         # Parse HTML
-        soup = BeautifulSoup(response.content, 'lxml')
+        soup = BeautifulSoup(response.content, "lxml")
 
         articles = []
 
         # Find news articles in the page
         # ESPN structure: look for article links in news sections
-        for article_elem in soup.find_all(['article', 'div'], class_=lambda x: x and 'article' in x.lower() if x else False):
+        for article_elem in soup.find_all(
+            ["article", "div"], class_=lambda x: x and "article" in x.lower() if x else False
+        ):
             if len(articles) >= limit:
                 break
 
             # Extract title
-            title_elem = article_elem.find(['h1', 'h2', 'h3', 'a'])
+            title_elem = article_elem.find(["h1", "h2", "h3", "a"])
             if not title_elem:
                 continue
 
             title = title_elem.get_text(strip=True)
 
             # Extract URL
-            link_elem = article_elem.find('a', href=True)
+            link_elem = article_elem.find("a", href=True)
             if not link_elem:
                 continue
 
-            url = link_elem['href']
-            if not url.startswith('http'):
+            url = link_elem["href"]
+            if not url.startswith("http"):
                 url = f"https://www.espn.com{url}"
 
             # Extract description if available
-            description_elem = article_elem.find('p')
+            description_elem = article_elem.find("p")
             description = description_elem.get_text(strip=True) if description_elem else ""
 
-            articles.append({
-                'title': title,
-                'url': url,
-                'description': description,
-                'published': None,  # ESPN doesn't always provide timestamps in listings
-                'source': 'ESPN'
-            })
+            articles.append(
+                {
+                    "title": title,
+                    "url": url,
+                    "description": description,
+                    "published": None,  # ESPN doesn't always provide timestamps in listings
+                    "source": "ESPN",
+                }
+            )
 
         # If we didn't find articles, try the main NFL news page
         if not articles:
@@ -295,7 +321,9 @@ def _get_team_slug(team_name: str) -> str:
     return team_name[:3].lower()
 
 
-def _fetch_nfl_news_generic(team_filter: Optional[str] = None, limit: int = 10) -> List[Dict[str, Any]]:
+def _fetch_nfl_news_generic(
+    team_filter: str | None = None, limit: int = 10
+) -> list[dict[str, Any]]:
     """
     Fetch general NFL news from ESPN main page.
 
@@ -313,17 +341,17 @@ def _fetch_nfl_news_generic(team_filter: Optional[str] = None, limit: int = 10) 
         response = requests.get(url, timeout=10)
         response.raise_for_status()
 
-        soup = BeautifulSoup(response.content, 'lxml')
+        soup = BeautifulSoup(response.content, "lxml")
 
         articles = []
 
         # Find news articles
-        for article_elem in soup.find_all('article', limit=limit * 2):  # Get extra to filter
+        for article_elem in soup.find_all("article", limit=limit * 2):  # Get extra to filter
             if len(articles) >= limit:
                 break
 
             # Extract title
-            title_elem = article_elem.find(['h1', 'h2'])
+            title_elem = article_elem.find(["h1", "h2"])
             if not title_elem:
                 continue
 
@@ -334,21 +362,17 @@ def _fetch_nfl_news_generic(team_filter: Optional[str] = None, limit: int = 10) 
                 continue
 
             # Extract URL
-            link_elem = article_elem.find('a', href=True)
+            link_elem = article_elem.find("a", href=True)
             if not link_elem:
                 continue
 
-            url = link_elem['href']
-            if not url.startswith('http'):
+            url = link_elem["href"]
+            if not url.startswith("http"):
                 url = f"https://www.espn.com{url}"
 
-            articles.append({
-                'title': title,
-                'url': url,
-                'description': '',
-                'published': None,
-                'source': 'ESPN'
-            })
+            articles.append(
+                {"title": title, "url": url, "description": "", "published": None, "source": "ESPN"}
+            )
 
         return articles
 
@@ -357,7 +381,7 @@ def _fetch_nfl_news_generic(team_filter: Optional[str] = None, limit: int = 10) 
         return []
 
 
-def search_all_nfl_news(keywords: List[str], hours: int = 24) -> List[Dict[str, Any]]:
+def search_all_nfl_news(keywords: list[str], hours: int = 24) -> list[dict[str, Any]]:
     """
     Search all NFL news for keywords.
 
@@ -381,8 +405,8 @@ def search_all_nfl_news(keywords: List[str], hours: int = 24) -> List[Dict[str, 
         # Filter by keywords
         filtered = []
         for article in articles:
-            title_lower = article['title'].lower()
-            desc_lower = article.get('description', '').lower()
+            title_lower = article["title"].lower()
+            desc_lower = article.get("description", "").lower()
 
             # Check if any keyword matches
             for keyword in keywords:

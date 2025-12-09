@@ -29,51 +29,47 @@ Author: Claude Code (Phase 4 Debugging - November 12, 2025)
 Based on: validate_online_learning.py (November 9, 2025)
 """
 
-import sys
 import os
+import sys
 
 # Add project root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import argparse
-import logging
-from pathlib import Path
-from typing import Dict, List, Tuple
 import json
+import logging
 import time
 from datetime import datetime
+from pathlib import Path
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import psycopg2
-from scipy import stats
-import matplotlib.pyplot as plt
 import seaborn as sns
 
 from py.online.online_learning_adapter import (
     OnlinePredictionPipeline,
-    AdaptiveRetrainer,
-    compare_online_vs_static,
-    detect_known_drift_events,
     calculate_adaptation_speed,
+    detect_known_drift_events,
 )
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
-sns.set_style('whitegrid')
+sns.set_style("whitegrid")
 
 
 # =============================================================================
 # Data Loading
 # =============================================================================
 
+
 def load_player_stats_by_week(
     season: int,
-    db_params: Dict[str, str],
+    db_params: dict[str, str],
     min_passing_yards: int = 100,
 ) -> pd.DataFrame:
     """
@@ -157,42 +153,50 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
 
     # Lag features (rolling averages)
-    df = df.sort_values(['player_id', 'kickoff'])
+    df = df.sort_values(["player_id", "kickoff"])
 
     # FIX #1: Only use L3 window (not L5, L10) to preserve data
     for window in [3]:  # CHANGED: Was [3, 5, 10]
-        df[f'passing_yards_L{window}'] = df.groupby('player_id')['passing_yards'].shift(1).rolling(window).mean()
-        df[f'attempts_L{window}'] = df.groupby('player_id')['attempts'].shift(1).rolling(window).mean()
-        df[f'completions_L{window}'] = df.groupby('player_id')['completions'].shift(1).rolling(window).mean()
+        df[f"passing_yards_L{window}"] = (
+            df.groupby("player_id")["passing_yards"].shift(1).rolling(window).mean()
+        )
+        df[f"attempts_L{window}"] = (
+            df.groupby("player_id")["attempts"].shift(1).rolling(window).mean()
+        )
+        df[f"completions_L{window}"] = (
+            df.groupby("player_id")["completions"].shift(1).rolling(window).mean()
+        )
 
     # FIX #2: Lagged completion percentage (no target leakage)
     # CHANGED: Was df['completion_pct'] = df['completions'] / df['attempts']
-    df['completion_pct_L3'] = (
-        df.groupby('player_id')['completions'].shift(1).rolling(3).sum() /
-        df.groupby('player_id')['attempts'].shift(1).rolling(3).sum()
+    df["completion_pct_L3"] = (
+        df.groupby("player_id")["completions"].shift(1).rolling(3).sum()
+        / df.groupby("player_id")["attempts"].shift(1).rolling(3).sum()
     )
 
     # FIX #3: Lagged yards per attempt (no target leakage)
     # CHANGED: Was df['yards_per_attempt'] = df['passing_yards'] / df['attempts']
-    df['yards_per_attempt_L3'] = (
-        df.groupby('player_id')['passing_yards'].shift(1).rolling(3).sum() /
-        df.groupby('player_id')['attempts'].shift(1).rolling(3).sum()
+    df["yards_per_attempt_L3"] = (
+        df.groupby("player_id")["passing_yards"].shift(1).rolling(3).sum()
+        / df.groupby("player_id")["attempts"].shift(1).rolling(3).sum()
     )
 
     # Game context features (these are clean - betting lines don't leak target)
-    df['home_favorite'] = (df['spread_close'] < 0).astype(int)
-    df['high_total'] = (df['total_close'] > 47).astype(int)
+    df["home_favorite"] = (df["spread_close"] < 0).astype(int)
+    df["high_total"] = (df["total_close"] > 47).astype(int)
 
     logger.info(f"Before dropna: {len(df)} records")
 
     # FIX #4: Only drop rows with NaN in critical features (not ALL features)
     # CHANGED: Was df.dropna() which dropped 77% of data
-    critical_features = ['passing_yards_L3', 'attempts_L3', 'completions_L3']
+    critical_features = ["passing_yards_L3", "attempts_L3", "completions_L3"]
     df = df.dropna(subset=critical_features)
 
     # Fill remaining NaN with median (for completion_pct_L3, yards_per_attempt_L3)
-    df['completion_pct_L3'] = df['completion_pct_L3'].fillna(df['completion_pct_L3'].median())
-    df['yards_per_attempt_L3'] = df['yards_per_attempt_L3'].fillna(df['yards_per_attempt_L3'].median())
+    df["completion_pct_L3"] = df["completion_pct_L3"].fillna(df["completion_pct_L3"].median())
+    df["yards_per_attempt_L3"] = df["yards_per_attempt_L3"].fillna(
+        df["yards_per_attempt_L3"].median()
+    )
 
     logger.info(f"After dropna: {len(df)} records")
     logger.info(f"Data retention: {len(df) / 532 * 100:.1f}% (target: >85%)")
@@ -204,11 +208,12 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
 # Experiment 1: Prequential Evaluation
 # =============================================================================
 
+
 def run_prequential_evaluation(
     df: pd.DataFrame,
     pipeline: OnlinePredictionPipeline,
-    target_col: str = 'passing_yards',
-) -> Dict[str, any]:
+    target_col: str = "passing_yards",
+) -> dict[str, any]:
     """
     Run prequential evaluation (test-then-train) on 2024 season
 
@@ -225,7 +230,7 @@ def run_prequential_evaluation(
     results = pipeline.evaluate_prequential(
         df=df,
         target_col=target_col,
-        date_col='kickoff',
+        date_col="kickoff",
         window_size=50,  # Warm-up period
     )
 
@@ -239,11 +244,12 @@ def run_prequential_evaluation(
 # Experiment 2: Drift Detection Accuracy
 # =============================================================================
 
+
 def evaluate_drift_detection(
     df: pd.DataFrame,
-    detected_indices: List[int],
-    known_events: List[Dict],
-) -> Dict[str, float]:
+    detected_indices: list[int],
+    known_events: list[dict],
+) -> dict[str, float]:
     """
     Evaluate drift detection accuracy
 
@@ -258,7 +264,7 @@ def evaluate_drift_detection(
     logger.info("Evaluating drift detection accuracy...")
 
     # Convert detected indices to dates
-    detected_dates = df.iloc[detected_indices]['kickoff'].values if detected_indices else []
+    detected_dates = df.iloc[detected_indices]["kickoff"].values if detected_indices else []
 
     # Calculate temporal distance to known events
     true_positives = 0
@@ -266,10 +272,11 @@ def evaluate_drift_detection(
 
     for detected_date in detected_dates:
         # Check if within 2 weeks of known event
-        min_distance = min([
-            abs((detected_date - event['date']).days)
-            for event in known_events
-        ]) if known_events else 999
+        min_distance = (
+            min([abs((detected_date - event["date"]).days) for event in known_events])
+            if known_events
+            else 999
+        )
 
         if min_distance <= 14:  # Within 2 weeks
             true_positives += 1
@@ -278,17 +285,25 @@ def evaluate_drift_detection(
 
     false_negatives = len(known_events) - true_positives
 
-    precision = true_positives / (true_positives + false_positives) if (true_positives + false_positives) > 0 else 0
-    recall = true_positives / (true_positives + false_negatives) if (true_positives + false_negatives) > 0 else 0
+    precision = (
+        true_positives / (true_positives + false_positives)
+        if (true_positives + false_positives) > 0
+        else 0
+    )
+    recall = (
+        true_positives / (true_positives + false_negatives)
+        if (true_positives + false_negatives) > 0
+        else 0
+    )
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0
 
     results = {
-        'true_positives': true_positives,
-        'false_positives': false_positives,
-        'false_negatives': false_negatives,
-        'precision': precision,
-        'recall': recall,
-        'f1_score': f1,
+        "true_positives": true_positives,
+        "false_positives": false_positives,
+        "false_negatives": false_negatives,
+        "precision": precision,
+        "recall": recall,
+        "f1_score": f1,
     }
 
     logger.info(f"Drift detection - Precision: {precision:.2%}, Recall: {recall:.2%}, F1: {f1:.2%}")
@@ -300,10 +315,11 @@ def evaluate_drift_detection(
 # Experiment 3: Adaptation Speed
 # =============================================================================
 
+
 def measure_adaptation_speed(
-    mae_history: List[float],
-    drift_indices: List[int],
-) -> Dict[str, float]:
+    mae_history: list[float],
+    drift_indices: list[int],
+) -> dict[str, float]:
     """
     Measure how fast model adapts after drift
 
@@ -329,17 +345,17 @@ def measure_adaptation_speed(
 
     if recovery_times:
         results = {
-            'mean_recovery_time': np.mean(recovery_times),
-            'median_recovery_time': np.median(recovery_times),
-            'max_recovery_time': np.max(recovery_times),
-            'num_drifts_analyzed': len(recovery_times),
+            "mean_recovery_time": np.mean(recovery_times),
+            "median_recovery_time": np.median(recovery_times),
+            "max_recovery_time": np.max(recovery_times),
+            "num_drifts_analyzed": len(recovery_times),
         }
     else:
         results = {
-            'mean_recovery_time': 0.0,
-            'median_recovery_time': 0.0,
-            'max_recovery_time': 0.0,
-            'num_drifts_analyzed': 0,
+            "mean_recovery_time": 0.0,
+            "median_recovery_time": 0.0,
+            "max_recovery_time": 0.0,
+            "num_drifts_analyzed": 0,
         }
 
     logger.info(f"Mean recovery time: {results['mean_recovery_time']:.1f} games")
@@ -350,6 +366,7 @@ def measure_adaptation_speed(
 # =============================================================================
 # Experiment 4: Static vs Online Comparison
 # =============================================================================
+
 
 def compare_static_vs_online(
     df: pd.DataFrame,
@@ -368,17 +385,31 @@ def compare_static_vs_online(
     logger.info("Comparing static vs online models...")
 
     # Select only numeric feature columns, excluding target and identifiers
-    exclude_cols = ['passing_yards', 'kickoff', 'player_id', 'player_name', 'game_id', 'season', 'week',
-                    'home_team', 'away_team', 'home_score', 'away_score', 'num_plays']
-    feature_cols = [c for c in df.columns if c not in exclude_cols and df[c].dtype in ['int64', 'float64']]
+    exclude_cols = [
+        "passing_yards",
+        "kickoff",
+        "player_id",
+        "player_name",
+        "game_id",
+        "season",
+        "week",
+        "home_team",
+        "away_team",
+        "home_score",
+        "away_score",
+        "num_plays",
+    ]
+    feature_cols = [
+        c for c in df.columns if c not in exclude_cols and df[c].dtype in ["int64", "float64"]
+    ]
     X = df[feature_cols]
-    y = df['passing_yards']
+    y = df["passing_yards"]
 
     # Static model: Train once on first 50% of data
     split_idx = len(df) // 2
-    X_train_static = X.iloc[:split_idx]
+    X.iloc[:split_idx]
     y_train_static = y.iloc[:split_idx]
-    X_test_static = X.iloc[split_idx:]
+    X.iloc[split_idx:]
     y_test_static = y.iloc[split_idx:]
 
     # Train static model (simple baseline: mean)
@@ -389,19 +420,24 @@ def compare_static_vs_online(
     # Online model: Prequential evaluation
     online_results = online_pipeline.evaluate_prequential(
         df=df.iloc[split_idx:],
-        target_col='passing_yards',
-        date_col='kickoff',
+        target_col="passing_yards",
+        date_col="kickoff",
         window_size=10,
     )
 
     # Compare
-    comparison = pd.DataFrame({
-        'MAE': [static_mae, online_results['mean_mae']],
-        'RMSE': [static_rmse, np.nan],  # RMSE not computed for online
-    }, index=['Static', 'Online'])
+    comparison = pd.DataFrame(
+        {
+            "MAE": [static_mae, online_results["mean_mae"]],
+            "RMSE": [static_rmse, np.nan],  # RMSE not computed for online
+        },
+        index=["Static", "Online"],
+    )
 
-    comparison['Improvement %'] = (
-        (comparison.loc['Static', 'MAE'] - comparison.loc['Online', 'MAE']) / comparison.loc['Static', 'MAE'] * 100
+    comparison["Improvement %"] = (
+        (comparison.loc["Static", "MAE"] - comparison.loc["Online", "MAE"])
+        / comparison.loc["Static", "MAE"]
+        * 100
     )
 
     logger.info(f"Static MAE: {static_mae:.2f}, Online MAE: {online_results['mean_mae']:.2f}")
@@ -414,9 +450,10 @@ def compare_static_vs_online(
 # Visualization
 # =============================================================================
 
+
 def plot_prequential_results(
-    mae_history: List[float],
-    drift_indices: List[int],
+    mae_history: list[float],
+    drift_indices: list[int],
     output_path: str,
 ):
     """
@@ -432,20 +469,22 @@ def plot_prequential_results(
     fig, ax = plt.subplots(figsize=(12, 6))
 
     # Plot MAE history
-    ax.plot(mae_history, label='MAE', color='steelblue', linewidth=2)
+    ax.plot(mae_history, label="MAE", color="steelblue", linewidth=2)
 
     # Mark drift events
     for idx in drift_indices:
-        ax.axvline(x=idx, color='red', linestyle='--', alpha=0.5, linewidth=1)
+        ax.axvline(x=idx, color="red", linestyle="--", alpha=0.5, linewidth=1)
 
-    ax.set_xlabel('Game Number', fontsize=12)
-    ax.set_ylabel('Mean Absolute Error (yards)', fontsize=12)
-    ax.set_title('Prequential Evaluation: Online Learning Performance', fontsize=14, fontweight='bold')
+    ax.set_xlabel("Game Number", fontsize=12)
+    ax.set_ylabel("Mean Absolute Error (yards)", fontsize=12)
+    ax.set_title(
+        "Prequential Evaluation: Online Learning Performance", fontsize=14, fontweight="bold"
+    )
     ax.legend()
     ax.grid(True, alpha=0.3)
 
     plt.tight_layout()
-    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close()
 
     logger.info(f"Plot saved to {output_path}")
@@ -466,16 +505,16 @@ def plot_static_vs_online(
 
     fig, ax = plt.subplots(figsize=(8, 6))
 
-    comparison_df['MAE'].plot(kind='bar', ax=ax, color=['steelblue', 'darkorange'])
+    comparison_df["MAE"].plot(kind="bar", ax=ax, color=["steelblue", "darkorange"])
 
-    ax.set_xlabel('Model Type', fontsize=12)
-    ax.set_ylabel('Mean Absolute Error (yards)', fontsize=12)
-    ax.set_title('Static vs Online Model Performance', fontsize=14, fontweight='bold')
+    ax.set_xlabel("Model Type", fontsize=12)
+    ax.set_ylabel("Mean Absolute Error (yards)", fontsize=12)
+    ax.set_title("Static vs Online Model Performance", fontsize=14, fontweight="bold")
     ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
-    ax.grid(True, alpha=0.3, axis='y')
+    ax.grid(True, alpha=0.3, axis="y")
 
     plt.tight_layout()
-    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
     plt.close()
 
     logger.info(f"Plot saved to {output_path}")
@@ -485,14 +524,27 @@ def plot_static_vs_online(
 # Main Validation Workflow
 # =============================================================================
 
+
 def main():
     """Run complete online learning validation (FIXED VERSION)"""
-    parser = argparse.ArgumentParser(description='Validate online learning system (fixed)')
-    parser.add_argument('--season', type=int, default=2024, help='NFL season to validate')
-    parser.add_argument('--output', type=str, default='results/online_learning_validation_fixed.json', help='Output file')
-    parser.add_argument('--plot-dir', type=str, default='results/plots', help='Plot output directory')
-    parser.add_argument('--drift-sensitivity', type=str, default='nfl_tuned', choices=['low', 'medium', 'high', 'nfl_tuned'],
-                        help='Drift detector sensitivity (use nfl_tuned for NFL data)')
+    parser = argparse.ArgumentParser(description="Validate online learning system (fixed)")
+    parser.add_argument("--season", type=int, default=2024, help="NFL season to validate")
+    parser.add_argument(
+        "--output",
+        type=str,
+        default="results/online_learning_validation_fixed.json",
+        help="Output file",
+    )
+    parser.add_argument(
+        "--plot-dir", type=str, default="results/plots", help="Plot output directory"
+    )
+    parser.add_argument(
+        "--drift-sensitivity",
+        type=str,
+        default="nfl_tuned",
+        choices=["low", "medium", "high", "nfl_tuned"],
+        help="Drift detector sensitivity (use nfl_tuned for NFL data)",
+    )
     args = parser.parse_args()
 
     logger.info(f"Starting FIXED online learning validation for {args.season} season")
@@ -501,11 +553,11 @@ def main():
 
     # Database connection
     db_params = {
-        'host': 'localhost',
-        'port': 5544,
-        'dbname': 'devdb01',
-        'user': 'dro',
-        'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
+        "host": "localhost",
+        "port": 5544,
+        "dbname": "devdb01",
+        "user": "dro",
+        "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
     }
 
     # Create output directories
@@ -519,11 +571,11 @@ def main():
     logger.info(f"Data loaded and processed: {len(df)} records")
 
     # FIX #5: NFL-tuned drift sensitivity (if requested)
-    if args.drift_sensitivity == 'nfl_tuned':
+    if args.drift_sensitivity == "nfl_tuned":
         logger.info("Using NFL-tuned drift detector configuration")
         # Note: OnlinePredictionPipeline needs to be updated to accept custom drift params
         # For now, we'll use 'medium' and document the need for tuning
-        drift_sensitivity = 'medium'
+        drift_sensitivity = "medium"
         logger.warning("NFL-tuned configuration not yet implemented in OnlinePredictionPipeline")
         logger.warning("Using 'medium' sensitivity - expect suboptimal drift detection")
     else:
@@ -531,7 +583,7 @@ def main():
 
     # Initialize pipeline
     pipeline = OnlinePredictionPipeline(
-        online_model_type='adaptive_random_forest',
+        online_model_type="adaptive_random_forest",
         drift_sensitivity=drift_sensitivity,
     )
 
@@ -544,7 +596,7 @@ def main():
     known_events = detect_known_drift_events(df)
     drift_accuracy = evaluate_drift_detection(
         df=df,
-        detected_indices=prequential_results['drift_event_indices'],
+        detected_indices=prequential_results["drift_event_indices"],
         known_events=known_events,
     )
 
@@ -554,7 +606,7 @@ def main():
     mae_history = [50 + np.random.randn() * 5 for _ in range(len(df))]
     adaptation_speed = measure_adaptation_speed(
         mae_history=mae_history,
-        drift_indices=prequential_results['drift_event_indices'],
+        drift_indices=prequential_results["drift_event_indices"],
     )
 
     # Experiment 4: Static vs online comparison
@@ -565,7 +617,7 @@ def main():
     logger.info("\n=== Generating Visualizations ===")
     plot_prequential_results(
         mae_history=mae_history,
-        drift_indices=prequential_results['drift_event_indices'][:10],  # Limit for clarity
+        drift_indices=prequential_results["drift_event_indices"][:10],  # Limit for clarity
         output_path=f"{args.plot_dir}/prequential_evaluation_fixed.pdf",
     )
     plot_static_vs_online(
@@ -575,27 +627,27 @@ def main():
 
     # Compile results
     results = {
-        'metadata': {
-            'season': args.season,
-            'timestamp': datetime.now().isoformat(),
-            'num_records': len(df),
-            'validation_time_seconds': time.time() - start_time,
-            'fixes_applied': [
-                'Reduced rolling window L10 → L3 (data retention: 85%+)',
-                'Removed target leakage features (completion_pct, yards_per_attempt)',
-                'Added lagged features (completion_pct_L3, yards_per_attempt_L3)',
-                'Forward-filled missing betting lines',
-                'NFL-tuned drift sensitivity (pending implementation)',
+        "metadata": {
+            "season": args.season,
+            "timestamp": datetime.now().isoformat(),
+            "num_records": len(df),
+            "validation_time_seconds": time.time() - start_time,
+            "fixes_applied": [
+                "Reduced rolling window L10 → L3 (data retention: 85%+)",
+                "Removed target leakage features (completion_pct, yards_per_attempt)",
+                "Added lagged features (completion_pct_L3, yards_per_attempt_L3)",
+                "Forward-filled missing betting lines",
+                "NFL-tuned drift sensitivity (pending implementation)",
             ],
         },
-        'prequential_evaluation': prequential_results,
-        'drift_detection_accuracy': drift_accuracy,
-        'adaptation_speed': adaptation_speed,
-        'static_vs_online': comparison.to_dict(),
+        "prequential_evaluation": prequential_results,
+        "drift_detection_accuracy": drift_accuracy,
+        "adaptation_speed": adaptation_speed,
+        "static_vs_online": comparison.to_dict(),
     }
 
     # Save results
-    with open(args.output, 'w') as f:
+    with open(args.output, "w") as f:
         json.dump(results, f, indent=2, default=str)
 
     logger.info(f"\nValidation complete! Results saved to {args.output}")
@@ -607,21 +659,25 @@ def main():
     print("=" * 60)
     print(f"Season: {args.season}")
     print(f"Records analyzed: {len(df)} (target: >450)")
-    print(f"\nPrequential Evaluation:")
+    print("\nPrequential Evaluation:")
     print(f"  MAE: {prequential_results['mean_mae']:.2f} yards (target: <60)")
     print(f"  Drift events: {prequential_results['num_drift_events']} (target: 5-10)")
-    print(f"\nDrift Detection Accuracy:")
+    print("\nDrift Detection Accuracy:")
     print(f"  Precision: {drift_accuracy['precision']:.2%} (target: >80%)")
     print(f"  Recall: {drift_accuracy['recall']:.2%} (target: >80%)")
     print(f"  F1 Score: {drift_accuracy['f1_score']:.2%}")
-    print(f"\nAdaptation Speed:")
+    print("\nAdaptation Speed:")
     print(f"  Mean recovery: {adaptation_speed['mean_recovery_time']:.1f} games (target: <5)")
-    print(f"\nStatic vs Online:")
+    print("\nStatic vs Online:")
     print(comparison)
     print("\nRisk Gates:")
     print(f"  [{'✓' if len(df) > 400 else '✗'}] Sample count >400: {len(df)}")
-    print(f"  [{'✓' if prequential_results['mean_mae'] < 60 else '✗'}] Prequential MAE <60: {prequential_results['mean_mae']:.2f}")
-    print(f"  [{'✓' if prequential_results['num_drift_events'] >= 5 else '✗'}] Drift events ≥5: {prequential_results['num_drift_events']}")
+    print(
+        f"  [{'✓' if prequential_results['mean_mae'] < 60 else '✗'}] Prequential MAE <60: {prequential_results['mean_mae']:.2f}"
+    )
+    print(
+        f"  [{'✓' if prequential_results['num_drift_events'] >= 5 else '✗'}] Drift events ≥5: {prequential_results['num_drift_events']}"
+    )
     print("=" * 60)
 
 

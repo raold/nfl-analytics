@@ -33,17 +33,13 @@ def test_game_prediction_api():
     - ensemble_version = "v6.1"
     - Prediction stored in database
     """
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("INTEGRATION TEST: Game Outcome API (Ensemble v6.1)")
-    print("="*70)
+    print("=" * 70)
 
     # Test endpoint
     url = "http://localhost:8000/api/v1/predict/game/full"
-    payload = {
-        "game_id": "2025_12_BUF_HOU",
-        "season": 2025,
-        "week": 12
-    }
+    payload = {"game_id": "2025_12_BUF_HOU", "season": 2025, "week": 12}
 
     print(f"\n1. Sending POST request to: {url}")
     print(f"   Payload: {json.dumps(payload, indent=2)}")
@@ -72,24 +68,24 @@ def test_game_prediction_api():
         # Validation
         print("\n4. Validation:")
         checks = {
-            "game_id matches": data.get('game_id') == payload['game_id'],
-            "season matches": data.get('season') == payload['season'],
-            "week matches": data.get('week') == payload['week'],
-            "has predicted_home_score": 'predicted_home_score' in data,
-            "has predicted_away_score": 'predicted_away_score' in data,
-            "has predicted_total": 'predicted_total' in data,
-            "has predicted_spread": 'predicted_spread' in data,
-            "has predicted_home_win_prob": 'predicted_home_win_prob' in data,
-            "has spread_std": 'spread_std' in data,
-            "has total_std": 'total_std' in data,
-            "ensemble_version is v6.1": data.get('ensemble_version') == 'v6.1',
-            "home_score reasonable": 10 <= data.get('predicted_home_score', 0) <= 50,
-            "away_score reasonable": 10 <= data.get('predicted_away_score', 0) <= 50,
-            "total reasonable": 20 <= data.get('predicted_total', 0) <= 100,
-            "spread reasonable": -30 <= data.get('predicted_spread', 0) <= 30,
-            "win_prob valid": 0 <= data.get('predicted_home_win_prob', 0) <= 1,
-            "spread_std > 0": data.get('spread_std', 0) > 0,
-            "total_std > 0": data.get('total_std', 0) > 0,
+            "game_id matches": data.get("game_id") == payload["game_id"],
+            "season matches": data.get("season") == payload["season"],
+            "week matches": data.get("week") == payload["week"],
+            "has predicted_home_score": "predicted_home_score" in data,
+            "has predicted_away_score": "predicted_away_score" in data,
+            "has predicted_total": "predicted_total" in data,
+            "has predicted_spread": "predicted_spread" in data,
+            "has predicted_home_win_prob": "predicted_home_win_prob" in data,
+            "has spread_std": "spread_std" in data,
+            "has total_std": "total_std" in data,
+            "ensemble_version is v6.1": data.get("ensemble_version") == "v6.1",
+            "home_score reasonable": 10 <= data.get("predicted_home_score", 0) <= 50,
+            "away_score reasonable": 10 <= data.get("predicted_away_score", 0) <= 50,
+            "total reasonable": 20 <= data.get("predicted_total", 0) <= 100,
+            "spread reasonable": -30 <= data.get("predicted_spread", 0) <= 30,
+            "win_prob valid": 0 <= data.get("predicted_home_win_prob", 0) <= 1,
+            "spread_std > 0": data.get("spread_std", 0) > 0,
+            "total_std > 0": data.get("total_std", 0) > 0,
         }
 
         all_passed = True
@@ -99,14 +95,14 @@ def test_game_prediction_api():
             if not passed:
                 all_passed = False
 
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         if all_passed:
             print("RESULT: ✅ ALL CHECKS PASSED")
-            print("="*70)
+            print("=" * 70)
             return True
         else:
             print("RESULT: ❌ SOME CHECKS FAILED")
-            print("="*70)
+            print("=" * 70)
             return False
 
     except requests.exceptions.Timeout:
@@ -118,6 +114,7 @@ def test_game_prediction_api():
     except Exception as e:
         print(f"\n❌ ERROR: {str(e)}")
         import traceback
+
         traceback.print_exc()
         return False
 

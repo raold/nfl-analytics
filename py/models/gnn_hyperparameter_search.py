@@ -24,7 +24,6 @@ import json
 import logging
 import sys
 from pathlib import Path
-from typing import Dict, Any
 
 import optuna
 from optuna.pruners import MedianPruner
@@ -38,8 +37,7 @@ from train_hierarchical_gnn import train_gnn_single_config
 
 # Set up logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -53,12 +51,12 @@ def objective(trial: optuna.Trial, args: argparse.Namespace) -> float:
     """
 
     # Sample hyperparameters
-    embedding_dim = trial.suggest_categorical('embedding_dim', [16, 32, 64, 96, 128])
-    hidden_dim = trial.suggest_categorical('hidden_dim', [32, 64, 128, 192, 256])
-    num_message_rounds = trial.suggest_int('num_message_rounds', 1, 5)
-    learning_rate = trial.suggest_float('learning_rate', 1e-4, 1e-2, log=True)
-    batch_size = trial.suggest_categorical('batch_size', [32, 64, 128, 256])
-    use_chemistry = trial.suggest_categorical('use_chemistry', [True, False])
+    embedding_dim = trial.suggest_categorical("embedding_dim", [16, 32, 64, 96, 128])
+    hidden_dim = trial.suggest_categorical("hidden_dim", [32, 64, 128, 192, 256])
+    num_message_rounds = trial.suggest_int("num_message_rounds", 1, 5)
+    learning_rate = trial.suggest_float("learning_rate", 1e-4, 1e-2, log=True)
+    batch_size = trial.suggest_categorical("batch_size", [32, 64, 128, 256])
+    use_chemistry = trial.suggest_categorical("use_chemistry", [True, False])
 
     # Pruning constraint: skip if hidden_dim < embedding_dim (unstable)
     if hidden_dim < embedding_dim:
@@ -84,11 +82,11 @@ def objective(trial: optuna.Trial, args: argparse.Namespace) -> float:
             batch_size=batch_size,
             use_chemistry=use_chemistry,
             device=args.device,
-            output_dir=Path(args.output_dir) / f"trial_{trial.number}"
+            output_dir=Path(args.output_dir) / f"trial_{trial.number}",
         )
 
-        val_brier = result['best_val_brier']
-        test_brier = result['test_metrics']['brier']
+        val_brier = result["best_val_brier"]
+        test_brier = result["test_metrics"]["brier"]
 
         logger.info(f"  ✓ Completed: val_brier={val_brier:.4f}, test_brier={test_brier:.4f}")
 
@@ -128,14 +126,12 @@ def run_hyperparameter_search(args: argparse.Namespace):
         study_name="gnn_hyperparameter_search",
         direction="minimize",  # Minimize validation Brier score
         sampler=TPESampler(seed=42),
-        pruner=MedianPruner(n_startup_trials=5, n_warmup_steps=5)
+        pruner=MedianPruner(n_startup_trials=5, n_warmup_steps=5),
     )
 
     # Run optimization
     study.optimize(
-        lambda trial: objective(trial, args),
-        n_trials=args.trials,
-        show_progress_bar=True
+        lambda trial: objective(trial, args), n_trials=args.trials, show_progress_bar=True
     )
 
     # Print results
@@ -146,8 +142,12 @@ def run_hyperparameter_search(args: argparse.Namespace):
     logger.info("")
 
     logger.info(f"Number of finished trials: {len(study.trials)}")
-    logger.info(f"Number of pruned trials: {len([t for t in study.trials if t.state == optuna.trial.TrialState.PRUNED])}")
-    logger.info(f"Number of complete trials: {len([t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE])}")
+    logger.info(
+        f"Number of pruned trials: {len([t for t in study.trials if t.state == optuna.trial.TrialState.PRUNED])}"
+    )
+    logger.info(
+        f"Number of complete trials: {len([t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE])}"
+    )
     logger.info("")
 
     # Best trial
@@ -164,7 +164,7 @@ def run_hyperparameter_search(args: argparse.Namespace):
     logger.info("Top 5 trials:")
     sorted_trials = sorted(
         [t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE],
-        key=lambda t: t.value
+        key=lambda t: t.value,
     )[:5]
 
     for i, trial in enumerate(sorted_trials, 1):
@@ -178,25 +178,22 @@ def run_hyperparameter_search(args: argparse.Namespace):
         "best_trial": {
             "number": best_trial.number,
             "val_brier": best_trial.value,
-            "params": best_trial.params
+            "params": best_trial.params,
         },
         "top_5_trials": [
-            {
-                "number": t.number,
-                "val_brier": t.value,
-                "params": t.params
-            }
-            for t in sorted_trials
+            {"number": t.number, "val_brier": t.value, "params": t.params} for t in sorted_trials
         ],
         "study_stats": {
             "n_trials": len(study.trials),
-            "n_complete": len([t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE]),
-            "n_pruned": len([t for t in study.trials if t.state == optuna.trial.TrialState.PRUNED])
-        }
+            "n_complete": len(
+                [t for t in study.trials if t.state == optuna.trial.TrialState.COMPLETE]
+            ),
+            "n_pruned": len([t for t in study.trials if t.state == optuna.trial.TrialState.PRUNED]),
+        },
     }
 
     results_path = output_dir / "optuna_results.json"
-    with open(results_path, 'w') as f:
+    with open(results_path, "w") as f:
         json.dump(results, f, indent=2)
 
     logger.info(f"✓ Saved results to: {results_path}")
@@ -204,22 +201,21 @@ def run_hyperparameter_search(args: argparse.Namespace):
 
     # Plot optimization history
     try:
-        import matplotlib.pyplot as plt
 
         # Optimization history
         fig = optuna.visualization.matplotlib.plot_optimization_history(study)
-        fig.savefig(output_dir / "optimization_history.png", dpi=300, bbox_inches='tight')
-        logger.info(f"✓ Saved optimization history plot")
+        fig.savefig(output_dir / "optimization_history.png", dpi=300, bbox_inches="tight")
+        logger.info("✓ Saved optimization history plot")
 
         # Parallel coordinate plot
         fig = optuna.visualization.matplotlib.plot_parallel_coordinate(study)
-        fig.savefig(output_dir / "parallel_coordinate.png", dpi=300, bbox_inches='tight')
-        logger.info(f"✓ Saved parallel coordinate plot")
+        fig.savefig(output_dir / "parallel_coordinate.png", dpi=300, bbox_inches="tight")
+        logger.info("✓ Saved parallel coordinate plot")
 
         # Parameter importances
         fig = optuna.visualization.matplotlib.plot_param_importances(study)
-        fig.savefig(output_dir / "param_importances.png", dpi=300, bbox_inches='tight')
-        logger.info(f"✓ Saved parameter importances plot")
+        fig.savefig(output_dir / "param_importances.png", dpi=300, bbox_inches="tight")
+        logger.info("✓ Saved parameter importances plot")
 
     except Exception as e:
         logger.warning(f"Failed to generate plots: {e}")
@@ -234,45 +230,34 @@ def run_hyperparameter_search(args: argparse.Namespace):
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="GNN Hyperparameter Search with Optuna"
+    parser = argparse.ArgumentParser(description="GNN Hyperparameter Search with Optuna")
+
+    parser.add_argument(
+        "--trials", type=int, default=50, help="Number of Optuna trials (default: 50)"
     )
 
     parser.add_argument(
-        '--trials',
-        type=int,
-        default=50,
-        help='Number of Optuna trials (default: 50)'
-    )
-
-    parser.add_argument(
-        '--seasons',
-        nargs='+',
+        "--seasons",
+        nargs="+",
         type=int,
         default=[2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
-        help='Seasons to include (default: 2016-2025)'
+        help="Seasons to include (default: 2016-2025)",
     )
 
     parser.add_argument(
-        '--epochs',
-        type=int,
-        default=10,
-        help='Epochs per trial (default: 10 for speed)'
+        "--epochs", type=int, default=10, help="Epochs per trial (default: 10 for speed)"
     )
 
     parser.add_argument(
-        '--device',
+        "--device",
         type=str,
-        choices=['cpu', 'cuda', 'mps'],
-        default='cpu',
-        help='Device for training (default: cpu)'
+        choices=["cpu", "cuda", "mps"],
+        default="cpu",
+        help="Device for training (default: cpu)",
     )
 
     parser.add_argument(
-        '--output-dir',
-        type=str,
-        default='models/gnn/optuna',
-        help='Output directory for results'
+        "--output-dir", type=str, default="models/gnn/optuna", help="Output directory for results"
     )
 
     args = parser.parse_args()

@@ -4,11 +4,11 @@ Synthetic Control Method
 Constructs synthetic controls for causal inference when only one unit is treated.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, Dict, List
-from scipy.optimize import minimize
 import logging
+
+import numpy as np
+import pandas as pd
+from scipy.optimize import minimize
 
 logger = logging.getLogger(__name__)
 
@@ -26,11 +26,11 @@ class SyntheticControl:
         df: pd.DataFrame,
         treated_unit: str,
         outcome: str,
-        time_var: str = 'week',
-        unit_var: str = 'team',
+        time_var: str = "week",
+        unit_var: str = "team",
         treatment_time: int = None,
-        predictors: Optional[List[str]] = None
-    ) -> Dict:
+        predictors: list[str] | None = None,
+    ) -> dict:
         """
         Fit synthetic control by finding optimal weights for control units.
 
@@ -50,11 +50,13 @@ class SyntheticControl:
 
         # Split into pre and post treatment
         pre_treatment = df[df[time_var] < treatment_time]
-        post_treatment = df[df[time_var] >= treatment_time]
+        df[df[time_var] >= treatment_time]
 
         # Get treated and control outcomes
         treated_pre = pre_treatment[pre_treatment[unit_var] == treated_unit][outcome].values
-        control_units_list = pre_treatment[pre_treatment[unit_var] != treated_unit][unit_var].unique()
+        control_units_list = pre_treatment[pre_treatment[unit_var] != treated_unit][
+            unit_var
+        ].unique()
         self.control_units = control_units_list
 
         # Build control matrix (time x units)
@@ -72,11 +74,11 @@ class SyntheticControl:
             return np.sum((treated_pre - synthetic) ** 2)
 
         # Constraints: weights sum to 1 and are non-negative
-        constraints = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
+        constraints = {"type": "eq", "fun": lambda w: np.sum(w) - 1}
         bounds = [(0, 1) for _ in range(len(control_units_list))]
         x0 = np.ones(len(control_units_list)) / len(control_units_list)
 
-        result = minimize(objective, x0, method='SLSQP', bounds=bounds, constraints=constraints)
+        result = minimize(objective, x0, method="SLSQP", bounds=bounds, constraints=constraints)
 
         self.weights = dict(zip(control_units_list, result.x))
 
@@ -88,18 +90,13 @@ class SyntheticControl:
         logger.info(f"Non-zero weights: {sum(result.x > 0.01)}/{len(control_units_list)}")
 
         return {
-            'weights': self.weights,
-            'rmspe_pre': rmspe_pre,
-            'optimization_success': result.success
+            "weights": self.weights,
+            "rmspe_pre": rmspe_pre,
+            "optimization_success": result.success,
         }
 
     def estimate_treatment_effect(
-        self,
-        df: pd.DataFrame,
-        outcome: str,
-        time_var: str,
-        unit_var: str,
-        treatment_time: int
+        self, df: pd.DataFrame, outcome: str, time_var: str, unit_var: str, treatment_time: int
     ) -> pd.DataFrame:
         """
         Estimate treatment effects post-treatment.
@@ -113,21 +110,25 @@ class SyntheticControl:
         post_treatment = df[df[time_var] >= treatment_time]
 
         # Get treated outcomes
-        treated_post = post_treatment[post_treatment[unit_var] == self.treated_unit][[time_var, outcome]]
-        treated_post = treated_post.rename(columns={outcome: 'actual'})
+        treated_post = post_treatment[post_treatment[unit_var] == self.treated_unit][
+            [time_var, outcome]
+        ]
+        treated_post = treated_post.rename(columns={outcome: "actual"})
 
         # Build synthetic control
         synthetic_vals = []
         for t in treated_post[time_var]:
             synthetic_t = 0
             for unit, weight in self.weights.items():
-                unit_val = post_treatment[(post_treatment[unit_var] == unit) & (post_treatment[time_var] == t)][outcome]
+                unit_val = post_treatment[
+                    (post_treatment[unit_var] == unit) & (post_treatment[time_var] == t)
+                ][outcome]
                 if len(unit_val) > 0:
                     synthetic_t += weight * unit_val.values[0]
             synthetic_vals.append(synthetic_t)
 
-        treated_post['synthetic'] = synthetic_vals
-        treated_post['treatment_effect'] = treated_post['actual'] - treated_post['synthetic']
+        treated_post["synthetic"] = synthetic_vals
+        treated_post["treatment_effect"] = treated_post["actual"] - treated_post["synthetic"]
 
         logger.info(f"Average treatment effect: {treated_post['treatment_effect'].mean():.3f}")
 

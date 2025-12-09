@@ -10,8 +10,8 @@ Date: November 15, 2025
 """
 
 import inspect
+
 import pytest
-from typing import Dict
 
 
 class TestEnsembleV6API:
@@ -31,21 +31,21 @@ class TestEnsembleV6API:
         params = list(sig.parameters.keys())
 
         # Required parameters
-        assert 'self' in params
-        assert 'state_space_path' in params
-        assert 'hierarchical_path' in params
-        assert 'informative_path' in params
-        assert 'ridge_path' in params  # XGBoost v4 Ridge Residuals
-        assert 'xgboost_path' in params
+        assert "self" in params
+        assert "state_space_path" in params
+        assert "hierarchical_path" in params
+        assert "informative_path" in params
+        assert "ridge_path" in params  # XGBoost v4 Ridge Residuals
+        assert "xgboost_path" in params
 
         # Optional parameters
-        assert 'weights' in params
-        assert 'temperature_scaler_path' in params
-        assert 'db_host' in params
-        assert 'db_port' in params
-        assert 'db_name' in params
-        assert 'db_user' in params
-        assert 'db_password' in params
+        assert "weights" in params
+        assert "temperature_scaler_path" in params
+        assert "db_host" in params
+        assert "db_port" in params
+        assert "db_name" in params
+        assert "db_user" in params
+        assert "db_password" in params
 
     def test_no_deprecated_params(self):
         """Test that deprecated parameters have been removed."""
@@ -55,10 +55,10 @@ class TestEnsembleV6API:
         params = list(sig.parameters.keys())
 
         # Should NOT have deprecated params from old versions
-        assert 'bnn_path' not in params  # Removed in v6
-        assert 'hybrid_xgboost_path' not in params  # Replaced by ridge_path
-        assert 'use_adaptive_weights' not in params  # Never existed (TypeError source)
-        assert 'adaptive_weights_path' not in params  # Research version only
+        assert "bnn_path" not in params  # Removed in v6
+        assert "hybrid_xgboost_path" not in params  # Replaced by ridge_path
+        assert "use_adaptive_weights" not in params  # Never existed (TypeError source)
+        assert "adaptive_weights_path" not in params  # Research version only
 
     def test_default_weights_structure(self):
         """Test DEFAULT_WEIGHTS has correct structure."""
@@ -73,10 +73,10 @@ class TestEnsembleV6API:
         assert len(weights) == 4
 
         # Should have correct model names
-        assert 'state_space_v2' in weights
-        assert 'hierarchical_v2' in weights
-        assert 'xgboost_v4_ridge' in weights
-        assert 'informative_priors_v2' in weights
+        assert "state_space_v2" in weights
+        assert "hierarchical_v2" in weights
+        assert "xgboost_v4_ridge" in weights
+        assert "informative_priors_v2" in weights
 
         # Weights should sum to 1.0 (within tolerance)
         total = sum(weights.values())
@@ -90,16 +90,16 @@ class TestEnsembleV6API:
         """Test that predict method exists with correct signature."""
         from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
 
-        assert hasattr(EnhancedEnsemble4Way, 'predict')
+        assert hasattr(EnhancedEnsemble4Way, "predict")
 
         sig = inspect.signature(EnhancedEnsemble4Way.predict)
         params = list(sig.parameters.keys())
 
         # Required parameters
-        assert 'self' in params
-        assert 'player_id' in params
-        assert 'season' in params
-        assert 'week' in params
+        assert "self" in params
+        assert "player_id" in params
+        assert "season" in params
+        assert "week" in params
 
     def test_return_type_annotations(self):
         """Test that predict method has return type annotation."""
@@ -113,7 +113,7 @@ class TestEnsembleV6API:
         # Return type should be Dict
         return_type = sig.return_annotation
         # Handle both typing.Dict and dict (Python 3.9+)
-        assert 'Dict' in str(return_type) or 'dict' in str(return_type)
+        assert "Dict" in str(return_type) or "dict" in str(return_type)
 
 
 class TestEnsembleV6ELO_API:
@@ -133,8 +133,8 @@ class TestEnsembleV6ELO_API:
         params = list(sig.parameters.keys())
 
         # ELO version should have these extra params
-        assert 'adaptive_weights_path' in params
-        assert 'elo_ratings_path' in params
+        assert "adaptive_weights_path" in params
+        assert "elo_ratings_path" in params
 
     def test_elo_default_weights_has_5_models(self):
         """Test that ELO version has 5 models (including ELO)."""
@@ -146,7 +146,7 @@ class TestEnsembleV6ELO_API:
         assert len(weights) == 5
 
         # Should include ELO
-        assert 'elo' in weights
+        assert "elo" in weights
 
 
 class TestAPIDocumentation:

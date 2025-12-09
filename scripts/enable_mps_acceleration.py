@@ -23,7 +23,6 @@ import argparse
 import re
 import shutil
 from pathlib import Path
-from typing import List, Tuple
 
 # File patterns to search
 PYTORCH_PATTERNS = [
@@ -49,7 +48,7 @@ IMPORT_STATEMENT = "from py.utils.device_utils import get_best_device"
 REPLACEMENT_CODE = "device = get_best_device()"
 
 
-def find_pytorch_files() -> List[Path]:
+def find_pytorch_files() -> list[Path]:
     """Find all PyTorch files in the project"""
     files = []
     for pattern in PYTORCH_PATTERNS:
@@ -57,7 +56,7 @@ def find_pytorch_files() -> List[Path]:
     return sorted(set(files))
 
 
-def scan_file_for_device_patterns(file_path: Path) -> List[Tuple[int, str, str]]:
+def scan_file_for_device_patterns(file_path: Path) -> list[tuple[int, str, str]]:
     """
     Scan file for device assignment patterns
 
@@ -67,9 +66,9 @@ def scan_file_for_device_patterns(file_path: Path) -> List[Tuple[int, str, str]]
     matches = []
 
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             content = f.read()
-            lines = content.split('\n')
+            lines = content.split("\n")
 
         for line_num, line in enumerate(lines, start=1):
             for pattern, pattern_type in DEVICE_PATTERNS:
@@ -85,10 +84,10 @@ def scan_file_for_device_patterns(file_path: Path) -> List[Tuple[int, str, str]]
 def has_device_utils_import(file_path: Path) -> bool:
     """Check if file already imports get_best_device"""
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             content = f.read()
         return "get_best_device" in content
-    except:
+    except Exception:
         return False
 
 
@@ -100,7 +99,7 @@ def update_file_with_mps_support(file_path: Path, dry_run: bool = False) -> bool
         bool: True if file was modified
     """
     try:
-        with open(file_path, 'r') as f:
+        with open(file_path) as f:
             content = f.read()
 
         original_content = content
@@ -126,11 +125,11 @@ def update_file_with_mps_support(file_path: Path, dry_run: bool = False) -> bool
 
         if not dry_run:
             # Create backup
-            backup_path = file_path.with_suffix(file_path.suffix + '.bak')
+            backup_path = file_path.with_suffix(file_path.suffix + ".bak")
             shutil.copy(file_path, backup_path)
 
             # Write updated content
-            with open(file_path, 'w') as f:
+            with open(file_path, "w") as f:
                 f.write(content)
 
             print(f"✅ Updated: {file_path}")
@@ -148,7 +147,7 @@ def update_file_with_mps_support(file_path: Path, dry_run: bool = False) -> bool
 
 def revert_file(file_path: Path) -> bool:
     """Revert file from backup"""
-    backup_path = file_path.with_suffix(file_path.suffix + '.bak')
+    backup_path = file_path.with_suffix(file_path.suffix + ".bak")
 
     if not backup_path.exists():
         print(f"⚠️  No backup found for {file_path}")
@@ -164,30 +163,20 @@ def revert_file(file_path: Path) -> bool:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Enable MPS GPU acceleration in PyTorch models"
-    )
+    parser = argparse.ArgumentParser(description="Enable MPS GPU acceleration in PyTorch models")
     parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help="Preview changes without modifying files"
+        "--dry-run", action="store_true", help="Preview changes without modifying files"
     )
+    parser.add_argument("--revert", action="store_true", help="Revert changes from backup files")
     parser.add_argument(
-        '--revert',
-        action='store_true',
-        help="Revert changes from backup files"
-    )
-    parser.add_argument(
-        '--scan-only',
-        action='store_true',
-        help="Only scan for device patterns (no modifications)"
+        "--scan-only", action="store_true", help="Only scan for device patterns (no modifications)"
     )
 
     args = parser.parse_args()
 
-    print("="*70)
+    print("=" * 70)
     print("MPS GPU ACCELERATION - IMPLEMENTATION SCRIPT")
-    print("="*70)
+    print("=" * 70)
     print()
 
     # Find PyTorch files
@@ -233,12 +222,12 @@ def main():
 
     # Update mode
     if not args.dry_run:
-        print("="*70)
+        print("=" * 70)
         print("⚠️  WARNING: This will modify source files")
         print("   Backups will be created (.bak files)")
-        print("="*70)
+        print("=" * 70)
         response = input("Continue? (y/N): ")
-        if response.lower() != 'y':
+        if response.lower() != "y":
             print("Aborted.")
             return
         print()
@@ -252,9 +241,9 @@ def main():
             updated += 1
 
     print()
-    print("="*70)
+    print("=" * 70)
     print("SUMMARY")
-    print("="*70)
+    print("=" * 70)
     print(f"Files scanned: {len(files)}")
     print(f"Files with device patterns: {len(files_with_patterns)}")
     print(f"Files {'would be ' if args.dry_run else ''}updated: {updated}")

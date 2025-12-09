@@ -13,23 +13,22 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 16, 2025
 """
 
-import os
 import sys
 from pathlib import Path
-from unittest.mock import Mock, MagicMock, patch
-import pytest
+from unittest.mock import Mock, patch
+
 import numpy as np
-import pandas as pd
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from py.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way
 
-
 # ============================================================================
 # FIXTURES
 # ============================================================================
+
 
 @pytest.fixture
 def mock_db_config():
@@ -39,7 +38,7 @@ def mock_db_config():
         "port": 5544,
         "dbname": "devdb01",
         "user": "dro",
-        "password": "test_password_123"
+        "password": "test_password_123",
     }
 
 
@@ -75,9 +74,11 @@ def mock_ensemble_with_all_components(mock_db_config):
     - Informative Priors v2: 13%
     - Hybrid Static-Incremental: 10%
     """
-    with patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1"), \
-         patch("py.ensemble.enhanced_ensemble_v7.RModelInterface"), \
-         patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"):
+    with (
+        patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1"),
+        patch("py.ensemble.enhanced_ensemble_v7.RModelInterface"),
+        patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
+    ):
 
         ensemble = EnhancedEnsemble5Way(
             db_password="test_password_123",
@@ -109,9 +110,11 @@ def mock_ensemble_with_partial_components(mock_db_config):
 
     Scenario: Hierarchical and Informative Priors fail.
     """
-    with patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1"), \
-         patch("py.ensemble.enhanced_ensemble_v7.RModelInterface"), \
-         patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"):
+    with (
+        patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1"),
+        patch("py.ensemble.enhanced_ensemble_v7.RModelInterface"),
+        patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
+    ):
 
         ensemble = EnhancedEnsemble5Way(
             db_password="test_password_123",
@@ -131,6 +134,7 @@ def mock_ensemble_with_partial_components(mock_db_config):
 # UNIT TESTS: Component Validation
 # ============================================================================
 
+
 class TestStateSpaceComponent:
     """Test State-Space v2 predictions (27% weight)."""
 
@@ -145,9 +149,7 @@ class TestStateSpaceComponent:
 
     def test_state_space_returns_tuple(self, mock_ensemble_with_all_components):
         """State-space should return (mean, std) tuple."""
-        result = mock_ensemble_with_all_components._predict_state_space(
-            "00-0033873", 2024, 10, {}
-        )
+        result = mock_ensemble_with_all_components._predict_state_space("00-0033873", 2024, 10, {})
         assert isinstance(result, tuple)
         assert len(result) == 2
         mean, std = result
@@ -183,9 +185,7 @@ class TestHierarchicalComponent:
 
     def test_hierarchical_returns_tuple(self, mock_ensemble_with_all_components):
         """Hierarchical should return (mean, std) tuple."""
-        result = mock_ensemble_with_all_components._predict_hierarchical(
-            "00-0033873", 2024, 10, {}
-        )
+        result = mock_ensemble_with_all_components._predict_hierarchical("00-0033873", 2024, 10, {})
         assert isinstance(result, tuple)
         assert len(result) == 2
 
@@ -251,9 +251,7 @@ class TestXGBoostComponent:
             return_value=np.array([[0.1, 0.2, 0.3]])
         )
         mock_ensemble_with_all_components.ridge_model = Mock()
-        mock_ensemble_with_all_components.ridge_model.predict = Mock(
-            return_value=np.array([220.0])
-        )
+        mock_ensemble_with_all_components.ridge_model.predict = Mock(return_value=np.array([220.0]))
 
         # XGBoost should integrate ridge prediction
         mean, std = mock_ensemble_with_all_components._predict_xgboost_v4(features)
@@ -343,20 +341,12 @@ class TestHybridComponent:
 # TESTS: Component Diversity & Variance
 # ============================================================================
 
+
 class TestComponentDiversity:
     """Test that components produce diverse predictions."""
 
     def test_minimum_3_components_required(self, mock_ensemble_with_partial_components):
         """Ensemble requires minimum 3 components to work."""
-        features = {
-            "pass_yards_l3": 200.0,
-            "pass_attempts_l3": 30.0,
-            "completions_l3": 20.0,
-            "completions_pct_l3": 0.65,
-            "opponent_epa": 0.0,
-            "opponent_points_allowed": 22.0,
-            "home_away_encoded": 0,
-        }
 
         # Mock causal features
         mock_ensemble_with_partial_components.causal_features = Mock()
@@ -382,19 +372,24 @@ class TestComponentDiversity:
 
     def test_insufficient_components_raises_error(self, mock_ensemble_with_all_components):
         """Should raise error if fewer than 3 components available."""
-        features = {}
 
         # Mock all components to fail
         mock_ensemble_with_all_components._predict_state_space = Mock(return_value=(None, None))
         mock_ensemble_with_all_components._predict_hierarchical = Mock(return_value=(None, None))
         mock_ensemble_with_all_components._predict_xgboost_v4 = Mock(return_value=(None, None))
-        mock_ensemble_with_all_components._predict_informative_priors = Mock(return_value=(None, None))
+        mock_ensemble_with_all_components._predict_informative_priors = Mock(
+            return_value=(None, None)
+        )
         mock_ensemble_with_all_components._predict_hybrid = Mock(return_value=(None, None))
 
         mock_ensemble_with_all_components.causal_features = Mock()
         mock_ensemble_with_all_components.causal_features.calculate_features = Mock(
-            return_value={"causal_total_yards": 0.0, "did_roughing_yards": 0.0,
-                         "psm_travel_yards": 0.0, "psm_weather_yards": 0.0}
+            return_value={
+                "causal_total_yards": 0.0,
+                "did_roughing_yards": 0.0,
+                "psm_travel_yards": 0.0,
+                "psm_weather_yards": 0.0,
+            }
         )
 
         with pytest.raises(RuntimeError, match="Insufficient ensemble components"):
@@ -406,19 +401,24 @@ class TestComponentDiversity:
 
     def test_component_variance_check(self, mock_ensemble_with_all_components):
         """Components should have variance >= 5 yards."""
-        features = {}
 
         # All components predict same value (no variance)
         mock_ensemble_with_all_components._predict_state_space = Mock(return_value=(240.0, 50.0))
         mock_ensemble_with_all_components._predict_hierarchical = Mock(return_value=(240.0, 50.0))
         mock_ensemble_with_all_components._predict_xgboost_v4 = Mock(return_value=(240.0, 50.0))
-        mock_ensemble_with_all_components._predict_informative_priors = Mock(return_value=(240.0, 50.0))
+        mock_ensemble_with_all_components._predict_informative_priors = Mock(
+            return_value=(240.0, 50.0)
+        )
         mock_ensemble_with_all_components._predict_hybrid = Mock(return_value=(240.0, 50.0))
 
         mock_ensemble_with_all_components.causal_features = Mock()
         mock_ensemble_with_all_components.causal_features.calculate_features = Mock(
-            return_value={"causal_total_yards": 0.0, "did_roughing_yards": 0.0,
-                         "psm_travel_yards": 0.0, "psm_weather_yards": 0.0}
+            return_value={
+                "causal_total_yards": 0.0,
+                "did_roughing_yards": 0.0,
+                "psm_travel_yards": 0.0,
+                "psm_weather_yards": 0.0,
+            }
         )
 
         result = mock_ensemble_with_all_components.predict(
@@ -432,18 +432,23 @@ class TestComponentDiversity:
 
     def test_component_mean_not_placeholder(self, mock_ensemble_with_all_components):
         """Ensemble mean should not be 250 (placeholder)."""
-        features = {}
 
         mock_ensemble_with_all_components._predict_state_space = Mock(return_value=(240.0, 50.0))
         mock_ensemble_with_all_components._predict_hierarchical = Mock(return_value=(235.0, 50.0))
         mock_ensemble_with_all_components._predict_xgboost_v4 = Mock(return_value=(245.0, 50.0))
-        mock_ensemble_with_all_components._predict_informative_priors = Mock(return_value=(230.0, 50.0))
+        mock_ensemble_with_all_components._predict_informative_priors = Mock(
+            return_value=(230.0, 50.0)
+        )
         mock_ensemble_with_all_components._predict_hybrid = Mock(return_value=(250.0, 50.0))
 
         mock_ensemble_with_all_components.causal_features = Mock()
         mock_ensemble_with_all_components.causal_features.calculate_features = Mock(
-            return_value={"causal_total_yards": 0.0, "did_roughing_yards": 0.0,
-                         "psm_travel_yards": 0.0, "psm_weather_yards": 0.0}
+            return_value={
+                "causal_total_yards": 0.0,
+                "did_roughing_yards": 0.0,
+                "psm_travel_yards": 0.0,
+                "psm_weather_yards": 0.0,
+            }
         )
 
         result = mock_ensemble_with_all_components.predict(
@@ -459,6 +464,7 @@ class TestComponentDiversity:
 # ============================================================================
 # TESTS: Weight Validation
 # ============================================================================
+
 
 class TestWeightValidation:
     """Test that ensemble weights are properly configured."""
@@ -491,8 +497,9 @@ class TestWeightValidation:
 
         for key, expected_val in expected_weights.items():
             actual_val = mock_ensemble_with_all_components.weights[key]
-            assert np.isclose(actual_val, expected_val, atol=0.01), \
-                f"Weight {key}: expected {expected_val}, got {actual_val}"
+            assert np.isclose(
+                actual_val, expected_val, atol=0.01
+            ), f"Weight {key}: expected {expected_val}, got {actual_val}"
 
 
 if __name__ == "__main__":

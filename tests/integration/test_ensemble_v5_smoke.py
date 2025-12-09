@@ -28,12 +28,12 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-import os
-import pytest
-import numpy as np
 import logging
+import os
 import time
-from typing import Dict
+
+import numpy as np
+import pytest
 
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
@@ -73,7 +73,7 @@ def loaded_ensemble(ensemble):
 
 
 @pytest.fixture
-def test_player() -> Dict:
+def test_player() -> dict:
     """
     Sample player for testing.
 
@@ -251,9 +251,7 @@ def test_single_prediction_e2e(loaded_ensemble, test_player):
     assert 5 <= std <= 100, f"Unrealistic uncertainty: {std:.1f} yards"
 
     # Log results
-    logger.info(
-        f"✅ Prediction: {mean:.1f} ± {std:.1f} yards (latency: {latency:.1f}ms)"
-    )
+    logger.info(f"✅ Prediction: {mean:.1f} ± {std:.1f} yards (latency: {latency:.1f}ms)")
 
     # Warn if latency too high
     if latency > 400:
@@ -368,7 +366,9 @@ def test_batch_prediction_smoke():
         logger.warning(f"⚠️ {len(errors)} prediction errors: {errors[:3]}")
 
     success_rate = len(predictions) / len(test_cases) * 100
-    logger.info(f"✅ Batch prediction: {len(predictions)}/{len(test_cases)} succeeded ({success_rate:.1f}%)")
+    logger.info(
+        f"✅ Batch prediction: {len(predictions)}/{len(test_cases)} succeeded ({success_rate:.1f}%)"
+    )
 
     # Validate minimum success rate
     assert success_rate >= 70, f"Success rate too low: {success_rate:.1f}%"
@@ -443,12 +443,13 @@ def test_ensemble_load_time(benchmark):
 
     Target: < 10 seconds
     """
+
     def load_ensemble():
         ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
         ensemble.load_models()
         return ensemble
 
-    result = benchmark(load_ensemble)
+    benchmark(load_ensemble)
 
     logger.info(f"✅ Ensemble load time: {benchmark.stats.mean:.2f}s")
 
@@ -464,6 +465,7 @@ def test_prediction_latency(loaded_ensemble, test_player, benchmark):
 
     Target: < 400ms
     """
+
     def predict_once():
         return loaded_ensemble.predict(
             player_id=test_player["player_id"],
@@ -471,7 +473,7 @@ def test_prediction_latency(loaded_ensemble, test_player, benchmark):
             week=test_player["week"],
         )
 
-    result = benchmark(predict_once)
+    benchmark(predict_once)
 
     latency_ms = benchmark.stats.mean * 1000
     logger.info(f"✅ Prediction latency: {latency_ms:.1f}ms")

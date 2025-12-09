@@ -29,24 +29,23 @@ Date: November 22, 2025
 import argparse
 import json
 import logging
+
+# Import XGBoost v5 training class
+import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-from sklearn.model_selection import KFold
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import KFold
 
-# Import XGBoost v5 training class
-import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
+sys.path.append("/Users/dro/rice/nfl-analytics")
 from scripts.train_xgboost_v5_integrated import XGBoostV5Integrated
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -59,11 +58,7 @@ class XGBoostV5HyperparameterTuner:
     that minimize MAE on 2022-2024 validation data.
     """
 
-    def __init__(
-        self,
-        n_folds: int = 5,
-        quick_search: bool = False
-    ):
+    def __init__(self, n_folds: int = 5, quick_search: bool = False):
         """
         Initialize hyperparameter tuner.
 
@@ -75,41 +70,38 @@ class XGBoostV5HyperparameterTuner:
         self.quick_search = quick_search
 
         # Initialize XGBoost v5 trainer
-        self.trainer = XGBoostV5Integrated(
-            start_season=2020,
-            end_season=2024
-        )
+        self.trainer = XGBoostV5Integrated(start_season=2020, end_season=2024)
 
         # Define search space
         if quick_search:
             # Quick search: 18 configurations (30 min - 1 hour)
             self.param_grid = {
-                'max_depth': [6, 8],
-                'learning_rate': [0.05, 0.1],
-                'n_estimators': [500],
-                'subsample': [0.8, 1.0],
-                'colsample_bytree': [0.8],
-                'reg_alpha': [0, 0.1],
-                'reg_lambda': [1.0, 10.0]
+                "max_depth": [6, 8],
+                "learning_rate": [0.05, 0.1],
+                "n_estimators": [500],
+                "subsample": [0.8, 1.0],
+                "colsample_bytree": [0.8],
+                "reg_alpha": [0, 0.1],
+                "reg_lambda": [1.0, 10.0],
             }
         else:
             # Full search: 162 configurations (4-8 hours)
             self.param_grid = {
-                'max_depth': [4, 6, 8, 10],
-                'learning_rate': [0.01, 0.05, 0.1],
-                'n_estimators': [300, 500, 1000],
-                'subsample': [0.8, 1.0],
-                'colsample_bytree': [0.8, 1.0],
-                'reg_alpha': [0, 0.1, 1.0],
-                'reg_lambda': [1.0, 10.0, 100.0]
+                "max_depth": [4, 6, 8, 10],
+                "learning_rate": [0.01, 0.05, 0.1],
+                "n_estimators": [300, 500, 1000],
+                "subsample": [0.8, 1.0],
+                "colsample_bytree": [0.8, 1.0],
+                "reg_alpha": [0, 0.1, 1.0],
+                "reg_lambda": [1.0, 10.0, 100.0],
             }
 
         # Results storage
         self.results = []
         self.best_params = None
-        self.best_score = float('inf')
+        self.best_score = float("inf")
 
-    def generate_param_combinations(self) -> List[Dict]:
+    def generate_param_combinations(self) -> list[dict]:
         """
         Generate all combinations of hyperparameters from grid.
 
@@ -133,12 +125,12 @@ class XGBoostV5HyperparameterTuner:
 
     def train_and_evaluate(
         self,
-        params: Dict,
+        params: dict,
         X_train: pd.DataFrame,
         y_train: pd.Series,
         X_val: pd.DataFrame,
-        y_val: pd.Series
-    ) -> Tuple[float, float, float]:
+        y_val: pd.Series,
+    ) -> tuple[float, float, float]:
         """
         Train XGBoost model with given parameters and evaluate on validation set.
 
@@ -152,19 +144,11 @@ class XGBoostV5HyperparameterTuner:
         """
         # Create XGBoost model
         model = xgb.XGBRegressor(
-            objective='reg:squarederror',
-            tree_method='hist',
-            random_state=42,
-            n_jobs=-1,
-            **params
+            objective="reg:squarederror", tree_method="hist", random_state=42, n_jobs=-1, **params
         )
 
         # Train model
-        model.fit(
-            X_train, y_train,
-            eval_set=[(X_val, y_val)],
-            verbose=False
-        )
+        model.fit(X_train, y_train, eval_set=[(X_val, y_val)], verbose=False)
 
         # Make predictions
         y_pred = model.predict(X_val)
@@ -176,12 +160,7 @@ class XGBoostV5HyperparameterTuner:
 
         return mae, rmse, r2
 
-    def cross_validate(
-        self,
-        params: Dict,
-        X: pd.DataFrame,
-        y: pd.Series
-    ) -> Dict:
+    def cross_validate(self, params: dict, X: pd.DataFrame, y: pd.Series) -> dict:
         """
         Perform K-fold cross-validation with given parameters.
 
@@ -205,25 +184,23 @@ class XGBoostV5HyperparameterTuner:
             y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
 
             # Train and evaluate
-            mae, rmse, r2 = self.train_and_evaluate(
-                params, X_train, y_train, X_val, y_val
-            )
+            mae, rmse, r2 = self.train_and_evaluate(params, X_train, y_train, X_val, y_val)
 
             mae_scores.append(mae)
             rmse_scores.append(rmse)
             r2_scores.append(r2)
 
         return {
-            'mae_mean': np.mean(mae_scores),
-            'mae_std': np.std(mae_scores),
-            'rmse_mean': np.mean(rmse_scores),
-            'rmse_std': np.std(rmse_scores),
-            'r2_mean': np.mean(r2_scores),
-            'r2_std': np.std(r2_scores),
-            'mae_scores': mae_scores
+            "mae_mean": np.mean(mae_scores),
+            "mae_std": np.std(mae_scores),
+            "rmse_mean": np.mean(rmse_scores),
+            "rmse_std": np.std(rmse_scores),
+            "r2_mean": np.mean(r2_scores),
+            "r2_std": np.std(r2_scores),
+            "mae_scores": mae_scores,
         }
 
-    def run_grid_search(self) -> Dict:
+    def run_grid_search(self) -> dict:
         """
         Run grid search with cross-validation.
 
@@ -247,12 +224,12 @@ class XGBoostV5HyperparameterTuner:
         logger.info(f"Selected {len(feature_cols)} features for training")
 
         # Filter to 2022-2024 for cross-validation (Track A data only exists here)
-        df_cv = df_features[df_features['season'].isin([2022, 2023, 2024])].copy()
+        df_cv = df_features[df_features["season"].isin([2022, 2023, 2024])].copy()
         logger.info(f"Cross-validation data: {len(df_cv)} samples (2022-2024)")
 
         # Prepare features and target
         X = df_cv[feature_cols]
-        y = df_cv['passing_yards']
+        y = df_cv["passing_yards"]
 
         # Generate parameter combinations
         param_combinations = self.generate_param_combinations()
@@ -262,13 +239,15 @@ class XGBoostV5HyperparameterTuner:
         # Grid search
         for idx, params in enumerate(param_combinations, 1):
             logger.info(f"[{idx}/{len(param_combinations)}] Testing parameters:")
-            logger.info(f"  max_depth={params['max_depth']}, "
-                       f"lr={params['learning_rate']}, "
-                       f"n_est={params['n_estimators']}, "
-                       f"subsample={params['subsample']}, "
-                       f"colsample={params['colsample_bytree']}, "
-                       f"L1={params['reg_alpha']}, "
-                       f"L2={params['reg_lambda']}")
+            logger.info(
+                f"  max_depth={params['max_depth']}, "
+                f"lr={params['learning_rate']}, "
+                f"n_est={params['n_estimators']}, "
+                f"subsample={params['subsample']}, "
+                f"colsample={params['colsample_bytree']}, "
+                f"L1={params['reg_alpha']}, "
+                f"L2={params['reg_lambda']}"
+            )
 
             # Cross-validate
             cv_results = self.cross_validate(params, X, y)
@@ -279,15 +258,15 @@ class XGBoostV5HyperparameterTuner:
 
             # Store results
             result = {
-                'params': params,
-                'cv_results': cv_results,
-                'timestamp': datetime.now().isoformat()
+                "params": params,
+                "cv_results": cv_results,
+                "timestamp": datetime.now().isoformat(),
             }
             self.results.append(result)
 
             # Update best parameters
-            if cv_results['mae_mean'] < self.best_score:
-                self.best_score = cv_results['mae_mean']
+            if cv_results["mae_mean"] < self.best_score:
+                self.best_score = cv_results["mae_mean"]
                 self.best_params = params
                 logger.info(f"  ✓ NEW BEST: MAE={self.best_score:.2f}")
 
@@ -297,15 +276,15 @@ class XGBoostV5HyperparameterTuner:
         logger.info("GRID SEARCH COMPLETE")
         logger.info("=" * 80)
         logger.info(f"Best MAE: {self.best_score:.2f} yards")
-        logger.info(f"Best parameters:")
+        logger.info("Best parameters:")
         for param, value in self.best_params.items():
             logger.info(f"  {param}: {value}")
         logger.info("")
 
         return {
-            'best_params': self.best_params,
-            'best_score': self.best_score,
-            'all_results': self.results
+            "best_params": self.best_params,
+            "best_score": self.best_score,
+            "all_results": self.results,
         }
 
     def save_results(self, output_path: str = None):
@@ -321,17 +300,17 @@ class XGBoostV5HyperparameterTuner:
             output_path = f"models/xgboost/xgboost_v5_tuning_{search_type}_{timestamp}.json"
 
         results_data = {
-            'search_type': 'quick' if self.quick_search else 'full',
-            'n_folds': self.n_folds,
-            'best_params': self.best_params,
-            'best_score': self.best_score,
-            'param_grid': self.param_grid,
-            'all_results': self.results,
-            'timestamp': datetime.now().isoformat()
+            "search_type": "quick" if self.quick_search else "full",
+            "n_folds": self.n_folds,
+            "best_params": self.best_params,
+            "best_score": self.best_score,
+            "param_grid": self.param_grid,
+            "all_results": self.results,
+            "timestamp": datetime.now().isoformat(),
         }
 
         Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(results_data, f, indent=2)
 
         logger.info(f"Results saved to: {output_path}")
@@ -358,31 +337,27 @@ class XGBoostV5HyperparameterTuner:
         feature_cols = self.trainer.select_feature_columns(df_features)
 
         # Train/test split (2020-2023 train, 2024 test)
-        train_mask = df_features['season'].isin([2020, 2021, 2022, 2023])
-        test_mask = df_features['season'] == 2024
+        train_mask = df_features["season"].isin([2020, 2021, 2022, 2023])
+        test_mask = df_features["season"] == 2024
 
         X_train = df_features.loc[train_mask, feature_cols]
-        y_train = df_features.loc[train_mask, 'passing_yards']
+        y_train = df_features.loc[train_mask, "passing_yards"]
         X_test = df_features.loc[test_mask, feature_cols]
-        y_test = df_features.loc[test_mask, 'passing_yards']
+        y_test = df_features.loc[test_mask, "passing_yards"]
 
         logger.info(f"Training: {len(X_train)} samples (2020-2023)")
         logger.info(f"Test: {len(X_test)} samples (2024)")
 
         # Train model with best parameters
         model = xgb.XGBRegressor(
-            objective='reg:squarederror',
-            tree_method='hist',
+            objective="reg:squarederror",
+            tree_method="hist",
             random_state=42,
             n_jobs=-1,
-            **self.best_params
+            **self.best_params,
         )
 
-        model.fit(
-            X_train, y_train,
-            eval_set=[(X_train, y_train), (X_test, y_test)],
-            verbose=True
-        )
+        model.fit(X_train, y_train, eval_set=[(X_train, y_train), (X_test, y_test)], verbose=True)
 
         # Evaluate
         y_pred_test = model.predict(X_test)
@@ -406,18 +381,18 @@ class XGBoostV5HyperparameterTuner:
 
         # Save metadata
         metadata = {
-            'best_params': self.best_params,
-            'test_mae': mae,
-            'test_rmse': rmse,
-            'test_r2': r2,
-            'n_features': len(feature_cols),
-            'training_samples': len(X_train),
-            'test_samples': len(X_test),
-            'timestamp': datetime.now().isoformat()
+            "best_params": self.best_params,
+            "test_mae": mae,
+            "test_rmse": rmse,
+            "test_r2": r2,
+            "n_features": len(feature_cols),
+            "training_samples": len(X_train),
+            "test_samples": len(X_test),
+            "timestamp": datetime.now().isoformat(),
         }
 
-        metadata_path = output_path.replace('.json', '_metadata.json')
-        with open(metadata_path, 'w') as f:
+        metadata_path = output_path.replace(".json", "_metadata.json")
+        with open(metadata_path, "w") as f:
             json.dump(metadata, f, indent=2)
 
         logger.info(f"  ✓ Metadata saved: {metadata_path}")
@@ -428,30 +403,22 @@ class XGBoostV5HyperparameterTuner:
 
 def main():
     """Main execution function."""
-    parser = argparse.ArgumentParser(
-        description='XGBoost v5 Hyperparameter Tuning'
+    parser = argparse.ArgumentParser(description="XGBoost v5 Hyperparameter Tuning")
+    parser.add_argument(
+        "--quick",
+        action="store_true",
+        help="Quick search with reduced parameter space (18 configs, ~1 hour)",
     )
     parser.add_argument(
-        '--quick',
-        action='store_true',
-        help='Quick search with reduced parameter space (18 configs, ~1 hour)'
-    )
-    parser.add_argument(
-        '--n-folds',
-        type=int,
-        default=5,
-        help='Number of cross-validation folds (default: 5)'
+        "--n-folds", type=int, default=5, help="Number of cross-validation folds (default: 5)"
     )
     args = parser.parse_args()
 
     # Initialize tuner
-    tuner = XGBoostV5HyperparameterTuner(
-        n_folds=args.n_folds,
-        quick_search=args.quick
-    )
+    tuner = XGBoostV5HyperparameterTuner(n_folds=args.n_folds, quick_search=args.quick)
 
     # Run grid search
-    results = tuner.run_grid_search()
+    tuner.run_grid_search()
 
     # Save results
     tuner.save_results()
@@ -462,5 +429,5 @@ def main():
     logger.info("✓ HYPERPARAMETER TUNING COMPLETE")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

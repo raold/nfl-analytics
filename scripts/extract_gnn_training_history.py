@@ -17,10 +17,11 @@ Author: Claude Code (Sonnet 4.5)
 Date: 2025-11-03
 """
 
-import torch
-import pandas as pd
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import pandas as pd
+import torch
 
 # Checkpoint epochs (from training script checkpoint_every=5 setting)
 CHECKPOINT_EPOCHS = [4, 9, 14, 19, 24, 29, 34, 39, 44, 49]
@@ -52,10 +53,7 @@ def extract_metrics_from_checkpoints():
             # Extract validation Brier score
             if "best_val_brier" in checkpoint:
                 val_brier = float(checkpoint["best_val_brier"])
-                history.append({
-                    "epoch": epoch,
-                    "val_brier": val_brier
-                })
+                history.append({"epoch": epoch, "val_brier": val_brier})
                 print(f"✅ Epoch {epoch:2d}: val_brier = {val_brier:.6f}")
             else:
                 print(f"⚠️  WARNING: No 'best_val_brier' key in checkpoint for epoch {epoch}")
@@ -77,7 +75,9 @@ def validate_data(df):
 
     # Check for sufficient data points
     if len(df) < 3:
-        print(f"❌ FAIL: Insufficient data points ({len(df)}). Need at least 3 for convergence plot.")
+        print(
+            f"❌ FAIL: Insufficient data points ({len(df)}). Need at least 3 for convergence plot."
+        )
         return False
 
     print(f"✅ PASS: {len(df)} data points extracted")
@@ -91,7 +91,7 @@ def validate_data(df):
         print(f"   Values: {dup_values}")
         print("   This may indicate synthetic/placeholder data (real training shows variation)")
     else:
-        print(f"✅ PASS: No duplicate values (all scores unique)")
+        print("✅ PASS: No duplicate values (all scores unique)")
 
     # Check for monotonicity (validation should generally decrease)
     diffs = df["val_brier"].diff().dropna()
@@ -100,7 +100,7 @@ def validate_data(df):
         print(f"⚠️  WARNING: Validation scores increase {increasing_count}/{len(diffs)} times")
         print("   Real training typically shows decreasing trend (occasional increases are normal)")
     else:
-        print(f"✅ PASS: Validation shows expected convergence pattern")
+        print("✅ PASS: Validation shows expected convergence pattern")
 
     # Statistical summary
     print(f"\n{'='*70}")
@@ -109,8 +109,12 @@ def validate_data(df):
     print(f"Initial val_brier (epoch {df['epoch'].iloc[0]}): {df['val_brier'].iloc[0]:.6f}")
     print(f"Final val_brier (epoch {df['epoch'].iloc[-1]}):   {df['val_brier'].iloc[-1]:.6f}")
     print(f"Improvement: {df['val_brier'].iloc[0] - df['val_brier'].iloc[-1]:.6f}")
-    print(f"Min val_brier: {df['val_brier'].min():.6f} (epoch {df.loc[df['val_brier'].idxmin(), 'epoch']:.0f})")
-    print(f"Max val_brier: {df['val_brier'].max():.6f} (epoch {df.loc[df['val_brier'].idxmax(), 'epoch']:.0f})")
+    print(
+        f"Min val_brier: {df['val_brier'].min():.6f} (epoch {df.loc[df['val_brier'].idxmin(), 'epoch']:.0f})"
+    )
+    print(
+        f"Max val_brier: {df['val_brier'].max():.6f} (epoch {df.loc[df['val_brier'].idxmax(), 'epoch']:.0f})"
+    )
     print(f"Mean: {df['val_brier'].mean():.6f}")
     print(f"Std:  {df['val_brier'].std():.6f}")
 
@@ -150,19 +154,21 @@ def main():
     print("EXTRACTION COMPLETE")
     print(f"{'='*70}")
     print(f"✅ Saved {len(df)} data points to: {OUTPUT_CSV}")
-    print(f"\nOutput CSV contents:")
+    print("\nOutput CSV contents:")
     print(df.to_string(index=False))
 
     if is_valid:
-        print(f"\n✅ Data quality validation PASSED")
-        print(f"   Ready for figure generation in R script")
+        print("\n✅ Data quality validation PASSED")
+        print("   Ready for figure generation in R script")
     else:
-        print(f"\n⚠️  Data quality concerns detected - review warnings above")
+        print("\n⚠️  Data quality concerns detected - review warnings above")
 
     print(f"\n{'='*70}")
     print("NEXT STEPS")
     print(f"{'='*70}")
-    print("1. Regenerate figure: Rscript analysis/dissertation/figures/R/gnn_optimization_figures.R")
+    print(
+        "1. Regenerate figure: Rscript analysis/dissertation/figures/R/gnn_optimization_figures.R"
+    )
     print("2. Verify figure shows real convergence (no duplicate points)")
     print("3. Update dissertation LaTeX if needed")
     print("4. Recompile dissertation PDF")

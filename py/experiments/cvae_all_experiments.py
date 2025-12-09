@@ -7,8 +7,8 @@ Each experiment leverages recent advances (Environment BNN, BNN calibration,
 Causal framework, GNN embeddings, Hierarchical models).
 """
 
-import sys
 import os
+import sys
 
 # Add project root to path
 project_root = "/Users/dro/rice/nfl-analytics"
@@ -19,28 +19,24 @@ import json
 import logging
 import pickle
 from pathlib import Path
-from typing import Dict, List
 
 import numpy as np
-import pandas as pd
-import psycopg2
 import torch
-from sklearn.preprocessing import StandardScaler
 
 # Change directory to project root for imports to work
 os.chdir(project_root)
 
 # Import cVAE model using absolute import from project root
 import importlib.util
+
 spec = importlib.util.spec_from_file_location(
-    "game_trajectory_cvae",
-    os.path.join(project_root, "py/models/game_trajectory_cvae.py")
+    "game_trajectory_cvae", os.path.join(project_root, "py/models/game_trajectory_cvae.py")
 )
 game_trajectory_cvae_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(game_trajectory_cvae_module)
 ConditionalVAE = game_trajectory_cvae_module.ConditionalVAE
 
-logging.basicConfig(level=logging.INFO, format='%(levelname)s:%(name)s:%(message)s')
+logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -65,19 +61,19 @@ class cVAEExperimentSuite:
             condition_dim=20,  # 20 pre-game features
             latent_dim=32,
             hidden_dims=[256, 128, 64],
-            beta=1.0
+            beta=1.0,
         )
 
-        self.cvae_model.load_state_dict(checkpoint['model_state_dict'])
+        self.cvae_model.load_state_dict(checkpoint["model_state_dict"])
         self.cvae_model.eval()
 
         # Load scaler separately (it was created separately, not saved in checkpoint)
         scaler_path = Path("models/cvae/scaler_conditions.pkl")
-        with open(scaler_path, 'rb') as f:
+        with open(scaler_path, "rb") as f:
             self.cvae_scaler = pickle.load(f)
 
-        logger.info(f"✓ cVAE model loaded successfully")
-        logger.info(f"✓ cVAE scaler loaded successfully")
+        logger.info("✓ cVAE model loaded successfully")
+        logger.info("✓ cVAE scaler loaded successfully")
 
     def exp1_environment_bnn_ensemble(self):
         """Experiment 1: cVAE + Environment BNN Ensemble"""
@@ -92,25 +88,25 @@ class cVAEExperimentSuite:
         trajectory_features = 7  # cVAE-derived features
 
         results = {
-            'experiment': 'exp1_environment_bnn_ensemble',
-            'baseline_features': baseline_features,
-            'enhanced_features': baseline_features + trajectory_features,
-            'baseline_mae': 18.37,  # From environment_bnn_10features.json
-            'enhanced_mae_expected': 18.37 * 0.95,  # 5% improvement expected
-            'expected_improvement_pct': 5.0,
-            'status': 'PROOF_OF_CONCEPT',
-            'next_steps': [
-                'Retrain Environment BNN with 17 features (10 env + 7 trajectory)',
-                'Validate on 2024 test set',
-                'Measure actual MAE improvement'
-            ]
+            "experiment": "exp1_environment_bnn_ensemble",
+            "baseline_features": baseline_features,
+            "enhanced_features": baseline_features + trajectory_features,
+            "baseline_mae": 18.37,  # From environment_bnn_10features.json
+            "enhanced_mae_expected": 18.37 * 0.95,  # 5% improvement expected
+            "expected_improvement_pct": 5.0,
+            "status": "PROOF_OF_CONCEPT",
+            "next_steps": [
+                "Retrain Environment BNN with 17 features (10 env + 7 trajectory)",
+                "Validate on 2024 test set",
+                "Measure actual MAE improvement",
+            ],
         }
 
         logger.info(f"✓ Baseline MAE: {results['baseline_mae']:.2f} yards (10 features)")
         logger.info(f"✓ Expected MAE: {results['enhanced_mae_expected']:.2f} yards (17 features)")
         logger.info(f"✓ Expected improvement: {results['expected_improvement_pct']:.1f}%")
 
-        self.results['exp1'] = results
+        self.results["exp1"] = results
         return results
 
     def exp2_same_game_parlay_pricing(self):
@@ -147,16 +143,20 @@ class cVAEExperimentSuite:
         fair_odds = 1 / prob_parlay if prob_parlay > 0 else 999
 
         results = {
-            'experiment': 'exp2_same_game_parlay',
-            'parlay_type': 'Team wins AND game goes over',
-            'n_samples': 10000,
-            'prob_win': float(prob_win),
-            'prob_over': float(prob_over),
-            'prob_parlay': float(prob_parlay),
-            'fair_odds': float(fair_odds),
-            'correlation': float((prob_parlay - prob_win * prob_over) / (prob_win * prob_over)) if prob_win * prob_over > 0 else 0,
-            'status': 'COMPLETED',
-            'validation': 'BNN Mixture Experts v2 has exact 90% calibration'
+            "experiment": "exp2_same_game_parlay",
+            "parlay_type": "Team wins AND game goes over",
+            "n_samples": 10000,
+            "prob_win": float(prob_win),
+            "prob_over": float(prob_over),
+            "prob_parlay": float(prob_parlay),
+            "fair_odds": float(fair_odds),
+            "correlation": (
+                float((prob_parlay - prob_win * prob_over) / (prob_win * prob_over))
+                if prob_win * prob_over > 0
+                else 0
+            ),
+            "status": "COMPLETED",
+            "validation": "BNN Mixture Experts v2 has exact 90% calibration",
         }
 
         logger.info(f"✓ P(Win) = {prob_win:.3f}")
@@ -165,7 +165,7 @@ class cVAEExperimentSuite:
         logger.info(f"✓ Fair Odds: {fair_odds:.2f}")
         logger.info(f"✓ Correlation: {results['correlation']:.3f}")
 
-        self.results['exp2'] = results
+        self.results["exp2"] = results
         return results
 
     def exp3_causal_counterfactuals(self):
@@ -187,8 +187,12 @@ class cVAEExperimentSuite:
         cf_scaled = self.cvae_scaler.transform(counterfactual_conditions)
 
         with torch.no_grad():
-            base_trajs = self.cvae_model.generate(torch.tensor(base_scaled, dtype=torch.float32), n_samples=5000)
-            cf_trajs = self.cvae_model.generate(torch.tensor(cf_scaled, dtype=torch.float32), n_samples=5000)
+            base_trajs = self.cvae_model.generate(
+                torch.tensor(base_scaled, dtype=torch.float32), n_samples=5000
+            )
+            cf_trajs = self.cvae_model.generate(
+                torch.tensor(cf_scaled, dtype=torch.float32), n_samples=5000
+            )
 
         # Causal effect: change in outcome distribution
         base_margin = np.mean([t.margin for t in base_trajs])
@@ -197,21 +201,21 @@ class cVAEExperimentSuite:
         causal_effect = cf_margin - base_margin
 
         results = {
-            'experiment': 'exp3_causal_counterfactuals',
-            'intervention': 'spread: -3 → +7',
-            'n_samples': 5000,
-            'base_margin': float(base_margin),
-            'counterfactual_margin': float(cf_margin),
-            'causal_effect': float(causal_effect),
-            'interpretation': f'Making team a {abs(causal_effect):.1f}-point bigger underdog changes expected margin by {causal_effect:.1f} points',
-            'status': 'COMPLETED'
+            "experiment": "exp3_causal_counterfactuals",
+            "intervention": "spread: -3 → +7",
+            "n_samples": 5000,
+            "base_margin": float(base_margin),
+            "counterfactual_margin": float(cf_margin),
+            "causal_effect": float(causal_effect),
+            "interpretation": f"Making team a {abs(causal_effect):.1f}-point bigger underdog changes expected margin by {causal_effect:.1f} points",
+            "status": "COMPLETED",
         }
 
         logger.info(f"✓ Baseline margin: {base_margin:.2f}")
         logger.info(f"✓ Counterfactual margin: {cf_margin:.2f}")
         logger.info(f"✓ Causal effect: {causal_effect:.2f} points")
 
-        self.results['exp3'] = results
+        self.results["exp3"] = results
         return results
 
     def exp4_live_trajectories(self):
@@ -232,27 +236,29 @@ class cVAEExperimentSuite:
         conditions_scaled = self.cvae_scaler.transform(conditions)
 
         with torch.no_grad():
-            trajs = self.cvae_model.generate(torch.tensor(conditions_scaled, dtype=torch.float32), n_samples=5000)
+            trajs = self.cvae_model.generate(
+                torch.tensor(conditions_scaled, dtype=torch.float32), n_samples=5000
+            )
 
         # Estimate remainder-of-game outcomes (Q3 + Q4 + OT)
         final_margins = [t.margin for t in trajs]
         prob_comeback = np.mean([m > 0 for m in final_margins])  # Home team wins from 17-14
 
         results = {
-            'experiment': 'exp4_live_trajectories',
-            'game_state': 'Q2 complete, Home 17-14 Away',
-            'n_samples': 5000,
-            'prob_home_wins': float(prob_comeback),
-            'mean_final_margin': float(np.mean(final_margins)),
-            'std_final_margin': float(np.std(final_margins)),
-            'status': 'PROOF_OF_CONCEPT',
-            'note': 'Full implementation requires conditioning on current game state'
+            "experiment": "exp4_live_trajectories",
+            "game_state": "Q2 complete, Home 17-14 Away",
+            "n_samples": 5000,
+            "prob_home_wins": float(prob_comeback),
+            "mean_final_margin": float(np.mean(final_margins)),
+            "std_final_margin": float(np.std(final_margins)),
+            "status": "PROOF_OF_CONCEPT",
+            "note": "Full implementation requires conditioning on current game state",
         }
 
         logger.info(f"✓ P(Home wins from 17-14): {prob_comeback:.3f}")
         logger.info(f"✓ Expected final margin: {results['mean_final_margin']:.2f}")
 
-        self.results['exp4'] = results
+        self.results["exp4"] = results
         return results
 
     def exp5_key_numbers(self):
@@ -268,14 +274,14 @@ class cVAEExperimentSuite:
 
         # Vary spread and total
         conditions[:, 0] = np.random.uniform(-14, 14, 100)  # spread
-        conditions[:, 1] = np.random.uniform(40, 55, 100)   # total
+        conditions[:, 1] = np.random.uniform(40, 55, 100)  # total
 
         conditions_scaled = self.cvae_scaler.transform(conditions)
 
         all_margins = []
         with torch.no_grad():
             for i in range(100):
-                cond_tensor = torch.tensor(conditions_scaled[i:i+1], dtype=torch.float32)
+                cond_tensor = torch.tensor(conditions_scaled[i : i + 1], dtype=torch.float32)
                 trajs = self.cvae_model.generate(cond_tensor, n_samples=100)
                 all_margins.extend([abs(t.margin) for t in trajs])
 
@@ -291,22 +297,22 @@ class cVAEExperimentSuite:
             key_number_probs[key] = float(prob_key)
 
         results = {
-            'experiment': 'exp5_key_numbers',
-            'n_games': 100,
-            'n_samples_per_game': 100,
-            'total_margins': len(all_margins),
-            'key_number_probs': key_number_probs,
-            'mean_margin': float(np.mean(all_margins)),
-            'std_margin': float(np.std(all_margins)),
-            'status': 'COMPLETED',
-            'validation': 'Check if key number probabilities align with empirical NFL data'
+            "experiment": "exp5_key_numbers",
+            "n_games": 100,
+            "n_samples_per_game": 100,
+            "total_margins": len(all_margins),
+            "key_number_probs": key_number_probs,
+            "mean_margin": float(np.mean(all_margins)),
+            "std_margin": float(np.std(all_margins)),
+            "status": "COMPLETED",
+            "validation": "Check if key number probabilities align with empirical NFL data",
         }
 
         logger.info(f"✓ Generated {len(all_margins)} margin samples")
         for key, prob in key_number_probs.items():
             logger.info(f"  P(margin ≈ {key}): {prob:.4f}")
 
-        self.results['exp5'] = results
+        self.results["exp5"] = results
         return results
 
     def exp6_gnn_enhanced(self):
@@ -324,28 +330,31 @@ class cVAEExperimentSuite:
         enhanced_condition_dim = baseline_condition_dim + gnn_embedding_dim
 
         results = {
-            'experiment': 'exp6_gnn_enhanced',
-            'baseline_condition_dim': baseline_condition_dim,
-            'gnn_embedding_dim': gnn_embedding_dim,
-            'enhanced_condition_dim': enhanced_condition_dim,
-            'gnn_features': [
-                'team_chemistry', 'player_interactions', 'roster_depth',
-                'historical_matchups', 'coach_pairings'
+            "experiment": "exp6_gnn_enhanced",
+            "baseline_condition_dim": baseline_condition_dim,
+            "gnn_embedding_dim": gnn_embedding_dim,
+            "enhanced_condition_dim": enhanced_condition_dim,
+            "gnn_features": [
+                "team_chemistry",
+                "player_interactions",
+                "roster_depth",
+                "historical_matchups",
+                "coach_pairings",
             ],
-            'expected_improvement': 'Better capture of team dynamics and player chemistry',
-            'status': 'DESIGN',
-            'next_steps': [
-                'Train GNN model to generate team embeddings',
-                'Retrain cVAE with enhanced 84-dim conditions',
-                'Compare trajectory quality vs baseline'
-            ]
+            "expected_improvement": "Better capture of team dynamics and player chemistry",
+            "status": "DESIGN",
+            "next_steps": [
+                "Train GNN model to generate team embeddings",
+                "Retrain cVAE with enhanced 84-dim conditions",
+                "Compare trajectory quality vs baseline",
+            ],
         }
 
         logger.info(f"✓ Baseline conditions: {baseline_condition_dim}-dim")
         logger.info(f"✓ Enhanced conditions: {enhanced_condition_dim}-dim (+ GNN embeddings)")
         logger.info(f"✓ GNN features: {', '.join(results['gnn_features'])}")
 
-        self.results['exp6'] = results
+        self.results["exp6"] = results
         return results
 
     def exp7_hierarchical_player(self):
@@ -359,27 +368,27 @@ class cVAEExperimentSuite:
         # Environment BNN has 177 players encoded
 
         results = {
-            'experiment': 'exp7_hierarchical_player',
-            'architecture': 'Two-level hierarchy',
-            'level_1': 'cVAE generates game-level trajectories',
-            'level_2': 'Hierarchical BNN generates player performances within game context',
-            'n_players_encoded': 177,  # From Environment BNN
-            'use_case': 'Player prop pricing conditional on game trajectory',
-            'example': 'P(RB rushes 100+ yards | game is high-scoring blowout)',
-            'status': 'DESIGN',
-            'next_steps': [
-                'Generate game trajectory from cVAE',
-                'Condition hierarchical BNN on trajectory features',
-                'Price player props with game context'
-            ]
+            "experiment": "exp7_hierarchical_player",
+            "architecture": "Two-level hierarchy",
+            "level_1": "cVAE generates game-level trajectories",
+            "level_2": "Hierarchical BNN generates player performances within game context",
+            "n_players_encoded": 177,  # From Environment BNN
+            "use_case": "Player prop pricing conditional on game trajectory",
+            "example": "P(RB rushes 100+ yards | game is high-scoring blowout)",
+            "status": "DESIGN",
+            "next_steps": [
+                "Generate game trajectory from cVAE",
+                "Condition hierarchical BNN on trajectory features",
+                "Price player props with game context",
+            ],
         }
 
-        logger.info(f"✓ Level 1 (cVAE): Game trajectories")
-        logger.info(f"✓ Level 2 (Hierarchical BNN): Player performances")
+        logger.info("✓ Level 1 (cVAE): Game trajectories")
+        logger.info("✓ Level 2 (Hierarchical BNN): Player performances")
         logger.info(f"✓ Players encoded: {results['n_players_encoded']}")
         logger.info(f"✓ Use case: {results['use_case']}")
 
-        self.results['exp7'] = results
+        self.results["exp7"] = results
         return results
 
     def run_all_experiments(self):
@@ -414,7 +423,7 @@ class cVAEExperimentSuite:
         logger.info("")
 
         for exp_name, exp_data in self.results.items():
-            status = exp_data.get('status', 'UNKNOWN')
+            status = exp_data.get("status", "UNKNOWN")
             logger.info(f"✓ {exp_data['experiment']}: {status}")
 
         logger.info("")

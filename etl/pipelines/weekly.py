@@ -13,7 +13,6 @@ Expected runtime: ~15 minutes
 
 import logging
 from datetime import datetime
-from typing import Dict, Optional
 
 import pandas as pd
 import psycopg
@@ -48,7 +47,7 @@ class WeeklyPipeline(BasePipeline):
         db_conn: psycopg.Connection,
         collector=None,
         alert_manager=None,
-        config: Optional[Dict] = None
+        config: dict | None = None,
     ):
         """
         Initialize weekly pipeline.
@@ -66,19 +65,21 @@ class WeeklyPipeline(BasePipeline):
             db_conn=db_conn,
             collector=collector,
             alert_manager=alert_manager,
-            config=config or {}
+            config=config or {},
         )
 
         # Configuration
-        self.current_season = self.config.get('current_season', datetime.now().year)
-        self.refresh_views = self.config.get('refresh_views', True)
+        self.current_season = self.config.get("current_season", datetime.now().year)
+        self.refresh_views = self.config.get("refresh_views", True)
 
         # Initialize extractors
-        self.nflverse_extractor = NFLVerseExtractor(config={
-            'r_scripts_path': 'R/ingestion',
-            'rscript_bin': 'Rscript',
-            'timeout': 900  # 15 minutes for full season
-        })
+        self.nflverse_extractor = NFLVerseExtractor(
+            config={
+                "r_scripts_path": "R/ingestion",
+                "rscript_bin": "Rscript",
+                "timeout": 900,  # 15 minutes for full season
+            }
+        )
 
         # Team name standardizer
         self.team_standardizer = TeamNameStandardizer()
@@ -130,10 +131,10 @@ class WeeklyPipeline(BasePipeline):
                 source="nflverse",
                 endpoint="weekly_full_season",
                 metadata={
-                    'season': self.current_season,
-                    'pbp_success': pbp_result.success,
-                    'rosters_success': rosters_result.success
-                }
+                    "season": self.current_season,
+                    "pbp_success": pbp_result.success,
+                    "rosters_success": rosters_result.success,
+                },
             )
 
         except Exception as e:
@@ -146,7 +147,7 @@ class WeeklyPipeline(BasePipeline):
                 duration_seconds=duration,
                 source="nflverse",
                 endpoint="weekly_full_season",
-                error=str(e)
+                error=str(e),
             )
 
     def _query_current_season(self) -> pd.DataFrame:
@@ -181,32 +182,33 @@ class WeeklyPipeline(BasePipeline):
         df = data.copy()
 
         # 1. Handle column aliases
-        df = self.cleaner.handle_column_aliases(df, {
-            'quarter': ['qtr', 'quarter'],
-            'time_seconds': ['game_seconds_remaining', 'time_seconds']
-        })
+        df = self.cleaner.handle_column_aliases(
+            df,
+            {
+                "quarter": ["qtr", "quarter"],
+                "time_seconds": ["game_seconds_remaining", "time_seconds"],
+            },
+        )
 
         # 2. Standardize team names
         df = self.team_standardizer.standardize_dataframe(
-            df,
-            team_columns=['home_team', 'away_team'],
-            season_column='season'
+            df, team_columns=["home_team", "away_team"], season_column="season"
         )
 
         # 3. Remove duplicates
-        df = self.cleaner.remove_duplicates(df, subset=['game_id'], keep='last')
+        df = self.cleaner.remove_duplicates(df, subset=["game_id"], keep="last")
 
         # 4. Standardize datetimes
-        datetime_cols = [col for col in ['kickoff'] if col in df.columns]
+        datetime_cols = [col for col in ["kickoff"] if col in df.columns]
         if datetime_cols:
-            df = self.cleaner.standardize_datetimes(df, datetime_cols, target_tz='UTC')
+            df = self.cleaner.standardize_datetimes(df, datetime_cols, target_tz="UTC")
 
         # 5. Data quality checks
-        if 'game_id' in df.columns:
-            null_count = df['game_id'].isna().sum()
+        if "game_id" in df.columns:
+            null_count = df["game_id"].isna().sum()
             if null_count > 0:
                 self.logger.error(f"Found {null_count} null game_ids - dropping")
-                df = df.dropna(subset=['game_id'])
+                df = df.dropna(subset=["game_id"])
 
         self.logger.info(f"Transformation complete: {len(df)} rows")
 
@@ -233,15 +235,12 @@ class WeeklyPipeline(BasePipeline):
                     rows_failed=0,
                     load_time=datetime.now(),
                     duration_seconds=0.0,
-                    table_name="games"
+                    table_name="games",
                 )
 
             # Upsert to games table
             load_result = self.loader.upsert(
-                data,
-                table_name='games',
-                conflict_columns=['game_id'],
-                update_columns=None
+                data, table_name="games", conflict_columns=["game_id"], update_columns=None
             )
 
             if not load_result.success:
@@ -266,7 +265,7 @@ class WeeklyPipeline(BasePipeline):
                 load_time=start_time,
                 duration_seconds=duration,
                 table_name="games",
-                error=str(e)
+                error=str(e),
             )
 
     def _refresh_materialized_views(self):
@@ -274,11 +273,13 @@ class WeeklyPipeline(BasePipeline):
         try:
             with self.db_conn.cursor() as cur:
                 # Get list of materialized views
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT schemaname, matviewname
                     FROM pg_matviews
                     WHERE schemaname IN ('public', 'mart')
-                """)
+                """
+                )
 
                 views = cur.fetchall()
 
@@ -294,16 +295,21 @@ class WeeklyPipeline(BasePipeline):
             self.db_conn.rollback()
             # Don't fail the pipeline for view refresh errors
             self.alert_manager.send(
-                level=self.alert_manager.AlertLevel.WARNING if hasattr(self.alert_manager, 'AlertLevel') else "WARNING",
+                level=(
+                    self.alert_manager.AlertLevel.WARNING
+                    if hasattr(self.alert_manager, "AlertLevel")
+                    else "WARNING"
+                ),
                 title="Materialized View Refresh Failed",
-                message=str(e)
+                message=str(e),
             )
 
 
 # Example usage
 if __name__ == "__main__":
     import os
-    from etl.monitoring import MetricsCollector, AlertManager
+
+    from etl.monitoring import AlertManager, MetricsCollector
 
     # Setup
     conn = psycopg.connect(
@@ -311,7 +317,7 @@ if __name__ == "__main__":
         port=os.environ.get("POSTGRES_PORT", "5544"),
         dbname=os.environ.get("POSTGRES_DB", "devdb01"),
         user=os.environ.get("POSTGRES_USER", "dro"),
-        password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions")
+        password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions"),
     )
 
     collector = MetricsCollector(db_conn=conn)
@@ -323,10 +329,7 @@ if __name__ == "__main__":
             db_conn=conn,
             collector=collector,
             alert_manager=alerts,
-            config={
-                'current_season': 2025,
-                'refresh_views': True
-            }
+            config={"current_season": 2025, "refresh_views": True},
         ) as pipeline:
             result = pipeline.run()
             print(result.summary())

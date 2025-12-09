@@ -14,13 +14,13 @@ Created: November 9, 2025
 
 import os
 import sys
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Any
 
 import psycopg2
-from psycopg2.extras import RealDictCursor
 import yaml
+from psycopg2.extras import RealDictCursor
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
@@ -28,23 +28,23 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 # Database connection
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5544,
-    'database': 'devdb01',
-    'user': 'dro',
-    'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
+    "host": "localhost",
+    "port": 5544,
+    "database": "devdb01",
+    "user": "dro",
+    "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
 }
 
 # Paths
-MODEL_REGISTRY_YAML = PROJECT_ROOT / 'models' / 'MODEL_REGISTRY.yaml'
+MODEL_REGISTRY_YAML = PROJECT_ROOT / "models" / "MODEL_REGISTRY.yaml"
 
 
-def load_model_registry() -> Dict[str, Any]:
+def load_model_registry() -> dict[str, Any]:
     """Load MODEL_REGISTRY.yaml and return parsed data."""
     if not MODEL_REGISTRY_YAML.exists():
         raise FileNotFoundError(f"MODEL_REGISTRY.yaml not found at {MODEL_REGISTRY_YAML}")
 
-    with open(MODEL_REGISTRY_YAML, 'r') as f:
+    with open(MODEL_REGISTRY_YAML) as f:
         registry = yaml.safe_load(f)
 
     print(f"✓ Loaded MODEL_REGISTRY.yaml (version {registry.get('version', 'unknown')})")
@@ -63,10 +63,7 @@ def validate_model_file(file_path: str) -> bool:
 
 
 def insert_or_update_model(
-    cursor,
-    model_key: str,
-    model_data: Dict[str, Any],
-    status: str = 'production'
+    cursor, model_key: str, model_data: dict[str, Any], status: str = "production"
 ) -> int:
     """
     Insert or update a model in ml.model_registry.
@@ -75,61 +72,65 @@ def insert_or_update_model(
         model_id (int): ID of inserted/updated model
     """
     # Extract metadata
-    model_name = model_data.get('name', model_key)
-    model_type = model_data.get('model_type', 'unknown')
-    file_path = model_data.get('file_path', '')
-    training_window = model_data.get('training_window', '')
-    framework = model_data.get('framework', '')
+    model_data.get("name", model_key)
+    model_type = model_data.get("model_type", "unknown")
+    file_path = model_data.get("file_path", "")
+    model_data.get("training_window", "")
+    model_data.get("framework", "")
 
     # Performance metrics
-    performance = model_data.get('performance', {})
-    mae_holdout = performance.get('mae_yards')
-    rmse_holdout = performance.get('rmse_yards')
-    calibration_90 = performance.get('calibration_90pct')
+    performance = model_data.get("performance", {})
+    mae_holdout = performance.get("mae_yards")
+    performance.get("rmse_yards")
+    calibration_90 = performance.get("calibration_90pct")
 
     # Ensemble weight
-    ensemble_weight = model_data.get('ensemble_weight')
-    if ensemble_weight == 'N/A (post-prediction)':
+    ensemble_weight = model_data.get("ensemble_weight")
+    if ensemble_weight == "N/A (post-prediction)":
         ensemble_weight = None
 
     # Training metadata
-    approved_date = model_data.get('approved_date')
+    approved_date = model_data.get("approved_date")
     if approved_date:
         try:
-            trained_at = datetime.strptime(approved_date, '%Y-%m-%d')
+            datetime.strptime(approved_date, "%Y-%m-%d")
         except ValueError:
-            trained_at = datetime.now()
+            datetime.now()
     else:
-        trained_at = datetime.now()
+        datetime.now()
 
     # Model version (extract from model_key or use 'v1')
-    version = model_key.split('_')[-1] if '_v' in model_key else 'v1'
+    version = model_key.split("_")[-1] if "_v" in model_key else "v1"
 
     # Validate file path
     file_exists = validate_model_file(file_path) if file_path else False
 
     # Build notes
     notes_parts = []
-    if model_data.get('notes'):
-        notes_parts.append(model_data['notes'])
-    if model_data.get('use_cases'):
+    if model_data.get("notes"):
+        notes_parts.append(model_data["notes"])
+    if model_data.get("use_cases"):
         notes_parts.append(f"Use cases: {', '.join(model_data['use_cases'])}")
     if not file_exists and file_path:
         notes_parts.append(f"⚠️ File not found: {file_path}")
 
-    notes = '\n\n'.join(notes_parts) if notes_parts else None
+    notes = "\n\n".join(notes_parts) if notes_parts else None
 
     # Check if model exists
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT model_id FROM ml.model_registry WHERE model_name = %s
-    """, (model_key,))
+    """,
+        (model_key,),
+    )
 
     existing = cursor.fetchone()
 
     if existing:
         # Update existing model
-        model_id = existing['model_id']
-        cursor.execute("""
+        model_id = existing["model_id"]
+        cursor.execute(
+            """
             UPDATE ml.model_registry
             SET
                 model_type = %s,
@@ -139,29 +140,28 @@ def insert_or_update_model(
                 description = %s,
                 updated_at = NOW()
             WHERE model_id = %s
-        """, (
-            model_type, version, file_path,
-            status, notes, model_id
-        ))
-        action = 'Updated'
+        """,
+            (model_type, version, file_path, status, notes, model_id),
+        )
+        action = "Updated"
     else:
         # Insert new model
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO ml.model_registry (
                 model_name, model_type, model_family, version,
                 model_path, status, description, created_at
             )
             VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
             RETURNING model_id
-        """, (
-            model_key, model_type, 'bayesian', version,
-            file_path, status, notes
-        ))
-        model_id = cursor.fetchone()['model_id']
-        action = 'Inserted'
+        """,
+            (model_key, model_type, "bayesian", version, file_path, status, notes),
+        )
+        model_id = cursor.fetchone()["model_id"]
+        action = "Inserted"
 
     # Print summary
-    status_icon = '✓' if file_exists else '⚠️'
+    status_icon = "✓" if file_exists else "⚠️"
     print(f"  {status_icon} {action}: {model_key} (ID: {model_id})")
     if mae_holdout:
         print(f"      MAE: {mae_holdout:.2f}")
@@ -174,13 +174,13 @@ def insert_or_update_model(
 def register_production_models(cursor) -> int:
     """Register all production models from MODEL_REGISTRY.yaml."""
     registry = load_model_registry()
-    production_models = registry.get('production_models', {})
+    production_models = registry.get("production_models", {})
 
     print(f"\n📊 Registering {len(production_models)} production models...")
 
     count = 0
     for model_key, model_data in production_models.items():
-        insert_or_update_model(cursor, model_key, model_data, status='production')
+        insert_or_update_model(cursor, model_key, model_data, status="production")
         count += 1
 
     return count
@@ -189,7 +189,7 @@ def register_production_models(cursor) -> int:
 def register_development_models(cursor) -> int:
     """Register all development/staging models from MODEL_REGISTRY.yaml."""
     registry = load_model_registry()
-    development_models = registry.get('development_models', {})
+    development_models = registry.get("development_models", {})
 
     if not development_models:
         print("\n📊 No development models to register.")
@@ -199,7 +199,7 @@ def register_development_models(cursor) -> int:
 
     count = 0
     for model_key, model_data in development_models.items():
-        insert_or_update_model(cursor, model_key, model_data, status='staging')
+        insert_or_update_model(cursor, model_key, model_data, status="staging")
         count += 1
 
     return count
@@ -208,7 +208,7 @@ def register_development_models(cursor) -> int:
 def register_archived_models(cursor) -> int:
     """Register archived models (for historical tracking)."""
     registry = load_model_registry()
-    archived_models = registry.get('archived_models', {})
+    archived_models = registry.get("archived_models", {})
 
     if not archived_models:
         print("\n📊 No archived models to register.")
@@ -220,12 +220,12 @@ def register_archived_models(cursor) -> int:
     for model_key, model_data in archived_models.items():
         # Build minimal model_data for archived models
         archived_data = {
-            'name': model_key,
-            'model_type': 'archived',
-            'file_path': model_data.get('file_path', ''),
-            'notes': f"Archived {model_data.get('archived_date', 'unknown')}: {model_data.get('reason', 'unknown')}"
+            "name": model_key,
+            "model_type": "archived",
+            "file_path": model_data.get("file_path", ""),
+            "notes": f"Archived {model_data.get('archived_date', 'unknown')}: {model_data.get('reason', 'unknown')}",
         }
-        insert_or_update_model(cursor, model_key, archived_data, status='archived')
+        insert_or_update_model(cursor, model_key, archived_data, status="archived")
         count += 1
 
     return count
@@ -233,24 +233,27 @@ def register_archived_models(cursor) -> int:
 
 def verify_registration(cursor):
     """Verify models were registered successfully."""
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT
             status,
             COUNT(*) as count
         FROM ml.model_registry
         GROUP BY status
         ORDER BY status
-    """)
+    """
+    )
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("REGISTRATION SUMMARY")
-    print("="*60)
+    print("=" * 60)
 
     for row in cursor.fetchall():
         print(f"{row['status']:15s}: {row['count']:2d} models")
 
     # List all registered models
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT
             model_id,
             model_name,
@@ -260,27 +263,32 @@ def verify_registration(cursor):
             status
         FROM ml.model_registry
         ORDER BY status, model_id
-    """)
+    """
+    )
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("REGISTERED MODELS")
-    print("="*60)
-    print(f"{'ID':4s} {'Model Name':30s} {'Type':20s} {'Family':20s} {'Version':10s} {'Status':12s}")
-    print("-"*100)
+    print("=" * 60)
+    print(
+        f"{'ID':4s} {'Model Name':30s} {'Type':20s} {'Family':20s} {'Version':10s} {'Status':12s}"
+    )
+    print("-" * 100)
 
     for row in cursor.fetchall():
-        print(f"{row['model_id']:4d} {row['model_name']:30s} {row['model_type']:20s} "
-              f"{row['model_family']:20s} {row['version']:10s} {row['status']:12s}")
+        print(
+            f"{row['model_id']:4d} {row['model_name']:30s} {row['model_type']:20s} "
+            f"{row['model_family']:20s} {row['version']:10s} {row['status']:12s}"
+        )
 
 
 def main():
     """Main registration workflow."""
-    print("="*60)
+    print("=" * 60)
     print("ENSEMBLE MODEL REGISTRATION")
-    print("="*60)
+    print("=" * 60)
     print(f"Database: {DB_CONFIG['database']}@{DB_CONFIG['host']}:{DB_CONFIG['port']}")
     print(f"Registry: {MODEL_REGISTRY_YAML}")
-    print("="*60)
+    print("=" * 60)
 
     try:
         # Connect to database
@@ -300,9 +308,9 @@ def main():
         # Commit
         conn.commit()
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print(f"✓ Successfully registered {total_count} models!")
-        print("="*60)
+        print("=" * 60)
 
         cursor.close()
         conn.close()
@@ -312,9 +320,10 @@ def main():
     except Exception as e:
         print(f"\n❌ ERROR: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

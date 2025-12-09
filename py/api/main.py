@@ -87,10 +87,9 @@ import time
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
-from typing import List, Optional
 
 import numpy as np
-from fastapi import FastAPI, HTTPException, Query, status
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, validator
 
@@ -99,9 +98,9 @@ project_root = str(Path(__file__).parent.parent.parent)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
 from py.api.cache_warmup import warm_cache_on_startup
 from py.api.routes import game_predictions
+from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
 
 # ============================================================================
 # Logging Configuration
@@ -120,13 +119,12 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 
 try:
-    from prometheus_client import Counter, Histogram, Gauge, generate_latest
+    from prometheus_client import Counter, Gauge, Histogram, generate_latest
+
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
-    logger.warning(
-        "Prometheus not available. Install with: pip install prometheus-client"
-    )
+    logger.warning("Prometheus not available. Install with: pip install prometheus-client")
 
 if PROMETHEUS_AVAILABLE:
     # Request metrics
@@ -192,18 +190,14 @@ if PROMETHEUS_AVAILABLE:
 class PredictionRequest(BaseModel):
     """NFL player prop prediction request."""
 
-    player_id: str = Field(
-        ..., description="Player ID (e.g., '00-0036355' for Patrick Mahomes)"
-    )
+    player_id: str = Field(..., description="Player ID (e.g., '00-0036355' for Patrick Mahomes)")
     stat_type: str = Field(
         ...,
         description="Statistic type",
         pattern="^(passing_yards|passing_tds|interceptions|rushing_yards|rushing_tds|receiving_yards|receptions|receiving_tds|field_goals|extra_points)$",
     )
     week: int = Field(..., ge=1, le=18, description="NFL week (1-18)")
-    season: int = Field(
-        ..., ge=1999, le=2099, description="NFL season year"
-    )
+    season: int = Field(..., ge=1999, le=2099, description="NFL season year")
     confidence_level: float = Field(
         default=0.90,
         ge=0.50,
@@ -212,7 +206,7 @@ class PredictionRequest(BaseModel):
     )
 
     @validator("stat_type")
-    def validate_stat_type(cls, v):
+    def validate_stat_type(self, v):
         valid_stats = {
             "passing_yards",
             "passing_tds",
@@ -268,7 +262,7 @@ class EnsembleWeights(BaseModel):
     state_space: float = Field(..., ge=0.0, le=1.0)
 
     @validator("*")
-    def weights_sum_to_one(cls, v):
+    def weights_sum_to_one(self, v):
         # Note: This validates individual fields; sum check in model
         if not (0.0 <= v <= 1.0):
             raise ValueError("Weight must be between 0.0 and 1.0")
@@ -279,24 +273,18 @@ class PredictionResponse(BaseModel):
     """NFL player prop prediction response."""
 
     player_id: str
-    player_name: Optional[str] = None
+    player_name: str | None = None
     stat_type: str
     week: int
     season: int
     prediction: float = Field(..., description="Point prediction (yards/count)")
     prediction_unit: str = Field(default="yards", description="Unit of prediction")
-    uncertainty: float = Field(
-        ..., description="Prediction standard deviation (yards/count)"
-    )
+    uncertainty: float = Field(..., description="Prediction standard deviation (yards/count)")
     confidence_level: float = Field(ge=0.5, le=0.99)
-    confidence_interval: ConfidenceInterval = Field(
-        ..., description="Confidence interval bounds"
-    )
+    confidence_interval: ConfidenceInterval = Field(..., description="Confidence interval bounds")
     model_versions: ModelVersions
     ensemble_weights: EnsembleWeights
-    timestamp: str = Field(
-        default_factory=lambda: datetime.utcnow().isoformat() + "Z"
-    )
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
     cache_hit: bool = Field(default=False, description="Whether result was cached")
     processing_ms: float = Field(..., description="Processing time in milliseconds")
 
@@ -319,10 +307,7 @@ class PredictionResponse(BaseModel):
     @property
     def models_used(self) -> list:
         """Convert ensemble_weights to models_used format (dashboard compatibility)."""
-        return [
-            {"model_name": k, "weight": v}
-            for k, v in self.ensemble_weights.dict().items()
-        ]
+        return [{"model_name": k, "weight": v} for k, v in self.ensemble_weights.dict().items()]
 
     class Config:
         schema_extra = {
@@ -369,7 +354,7 @@ class HealthResponse(BaseModel):
     version: str = Field(default="1.0.0")
     models_loaded: int
     cache_available: bool
-    cache_stats: Optional[dict] = None
+    cache_stats: dict | None = None
     uptime_seconds: float
 
 
@@ -393,13 +378,13 @@ class ModelInfo(BaseModel):
     file_size_mb: float = Field(..., description="Model file size in MB")
     loaded_at: str = Field(..., description="ISO timestamp of when model was loaded")
     status: str = Field(..., description="Status: loaded, failed, unavailable")
-    metadata: Optional[dict] = Field(None, description="Additional model metadata")
+    metadata: dict | None = Field(None, description="Additional model metadata")
 
 
 class ModelsListResponse(BaseModel):
     """Response listing all loaded models."""
 
-    models: List[ModelInfo] = Field(..., description="List of model information")
+    models: list[ModelInfo] = Field(..., description="List of model information")
     total_models: int = Field(..., description="Total number of models configured")
     loaded_models: int = Field(..., description="Number of successfully loaded models")
     ensemble_ready: bool = Field(..., description="Whether ensemble is ready for predictions")
@@ -426,10 +411,10 @@ class TeamPrediction(BaseModel):
     """Team prediction for a game."""
 
     team: str
-    qb_id: Optional[str] = None
-    qb_name: Optional[str] = None
-    predicted_passing_yards: Optional[float] = None
-    predicted_passing_yards_std: Optional[float] = None
+    qb_id: str | None = None
+    qb_name: str | None = None
+    predicted_passing_yards: float | None = None
+    predicted_passing_yards_std: float | None = None
 
 
 class GamePredictionResponse(BaseModel):
@@ -442,10 +427,8 @@ class GamePredictionResponse(BaseModel):
     away_team: str
     home_prediction: TeamPrediction
     away_prediction: TeamPrediction
-    total_predicted_yards: Optional[float] = None
-    timestamp: str = Field(
-        default_factory=lambda: datetime.utcnow().isoformat() + "Z"
-    )
+    total_predicted_yards: float | None = None
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
     processing_ms: float
 
 
@@ -531,7 +514,6 @@ class ModelManager:
                 MODEL_LOAD_STATUS.labels(model_name="ensemble_v6_1").set(0)
             return False
 
-
     def predict(
         self,
         player_id: str,
@@ -540,7 +522,7 @@ class ModelManager:
         season: int,
         confidence_level: float = 0.90,
         use_dirichlet: bool = True,
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """
         Generate ensemble prediction for player stat using Enhanced Ensemble v6.1.
 
@@ -576,10 +558,7 @@ class ModelManager:
                 logger.debug("Using DEFAULT weights")
             # Get ensemble prediction
             result = self.ensemble.predict(
-                player_id=player_id,
-                season=season,
-                week=week,
-                return_individual=True
+                player_id=player_id, season=season, week=week, return_individual=True
             )
 
             # Check if prediction succeeded
@@ -590,7 +569,8 @@ class ModelManager:
             # Validate minimum ensemble components (Nov 15 bug: only 2/4 models loaded)
             individual_predictions = result.get("predictions", {})
             valid_predictions = {
-                k: v for k, v in individual_predictions.items()
+                k: v
+                for k, v in individual_predictions.items()
                 if v is not None and not (isinstance(v, float) and np.isnan(v))
             }
             if len(valid_predictions) < 3:
@@ -637,8 +617,8 @@ class ModelManager:
 # Global State
 # ============================================================================
 
-model_manager: Optional[ModelManager] = None
-redis_cache: Optional[ClaudeRedisCache] = None
+model_manager: ModelManager | None = None
+redis_cache: ClaudeRedisCache | None = None
 start_time: float = time.time()
 
 
@@ -679,14 +659,19 @@ async def lifespan(app: FastAPI):
         try:
             logger.info("Pre-warming ensemble with test prediction...")
             import pandas as pd
-            test_features = pd.DataFrame([{
-                'yards_per_attempt_l3': 7.5,
-                'completions_l3': 25,
-                'attempts_l3': 35,
-                'passing_yards_l3': 260,
-                'opponent_def_rank': 15,
-                'is_home': 1,
-            }])
+
+            test_features = pd.DataFrame(
+                [
+                    {
+                        "yards_per_attempt_l3": 7.5,
+                        "completions_l3": 25,
+                        "attempts_l3": 35,
+                        "passing_yards_l3": 260,
+                        "opponent_def_rank": 15,
+                        "is_home": 1,
+                    }
+                ]
+            )
             _ = model_manager.ensemble.predict(test_features)
             logger.info("✅ Ensemble pre-warmed successfully (cold start eliminated)")
         except Exception as e:
@@ -710,12 +695,15 @@ async def lifespan(app: FastAPI):
     # This reduces cold start from 8-12s to 5-8s on container restarts
     if redis_cache:
         import asyncio
-        asyncio.create_task(warm_cache_on_startup(
-            warm_models=True,      # Pre-load BNN + XGBoost models
-            warm_features=True,    # Pre-load top 50 players
-            warm_queries=False,    # Skip dashboard queries (lower priority)
-            top_players=50
-        ))
+
+        asyncio.create_task(
+            warm_cache_on_startup(
+                warm_models=True,  # Pre-load BNN + XGBoost models
+                warm_features=True,  # Pre-load top 50 players
+                warm_queries=False,  # Skip dashboard queries (lower priority)
+                top_players=50,
+            )
+        )
         logger.info("Cache warming started in background")
     else:
         logger.warning("Skipping cache warming - Redis unavailable")
@@ -742,7 +730,7 @@ async def lifespan(app: FastAPI):
 # FastAPI Application
 # ============================================================================
 
-print(f"[DEBUG main.py:716] About to create FastAPI app")
+print("[DEBUG main.py:716] About to create FastAPI app")
 app = FastAPI(
     title="NFL Props Prediction API",
     description="Production-grade NFL player prop predictions with Bayesian uncertainty quantification",
@@ -751,7 +739,7 @@ app = FastAPI(
     openapi_url="/openapi.json",
     lifespan=lifespan,
 )
-print(f"[DEBUG main.py:725] FastAPI app created successfully")
+print("[DEBUG main.py:725] FastAPI app created successfully")
 
 # Add CORS middleware
 app.add_middleware(
@@ -763,7 +751,9 @@ app.add_middleware(
 )
 
 # Include routers
-print(f"[DEBUG main.py:{735}] About to register game_predictions router")  # Direct output for debugging
+print(
+    f"[DEBUG main.py:{735}] About to register game_predictions router"
+)  # Direct output for debugging
 try:
     print(f"[DEBUG main.py:{737}] game_predictions.router = {game_predictions.router}")
     app.include_router(game_predictions.router, prefix="/api/v1", tags=["game_predictions"])
@@ -776,6 +766,7 @@ except Exception as e:
 # Import and include props predictions router
 try:
     from py.api.routes import props_predictions
+
     app.include_router(props_predictions.router, prefix="/api/v1", tags=["props_predictions"])
     logger.info("Props predictions router loaded successfully")
 except Exception as e:
@@ -873,8 +864,7 @@ async def get_models() -> ModelsListResponse:
     """
     if not model_manager:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Model manager not initialized"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Model manager not initialized"
         )
 
     # Build model information list
@@ -882,7 +872,6 @@ async def get_models() -> ModelsListResponse:
     loaded_count = 0
 
     # Get ensemble model versions
-    model_versions = model_manager.model_versions if model_manager else {}
 
     # Define model metadata
     model_configs = [
@@ -891,29 +880,29 @@ async def get_models() -> ModelsListResponse:
             "type": "bayesian",
             "version": "v2",
             "path": "models/bayesian/simplified_random_walk_v2.rds",
-            "metadata": {"mae": 47.77, "training_window": "2018-2024", "method": "Stan"}
+            "metadata": {"mae": 47.77, "training_window": "2018-2024", "method": "Stan"},
         },
         {
             "name": "hierarchical_v2",
             "type": "bayesian",
             "version": "v2",
             "path": "models/bayesian/passing_yards_hierarchical_v2.rds",
-            "metadata": {"training_window": "2018-2024", "method": "brms"}
+            "metadata": {"training_window": "2018-2024", "method": "brms"},
         },
         {
             "name": "hybrid_xgboost_v1",
             "type": "xgboost",
             "version": "v1",
             "path": "models/xgboost/hybrid_static_incremental_v1",
-            "metadata": {"mae": 38.03, "blend": "70% static + 30% incremental"}
+            "metadata": {"mae": 38.03, "blend": "70% static + 30% incremental"},
         },
         {
             "name": "informative_priors_v2",
             "type": "bayesian",
             "version": "v2",
             "path": "models/bayesian/passing_informative_priors_v2.rds",
-            "metadata": {"training_window": "2018-2024", "method": "brms"}
-        }
+            "metadata": {"training_window": "2018-2024", "method": "brms"},
+        },
     ]
 
     for config in model_configs:
@@ -927,16 +916,18 @@ async def get_models() -> ModelsListResponse:
         if status_str == "loaded":
             loaded_count += 1
 
-        models_info.append(ModelInfo(
-            model_name=config["name"],
-            model_type=config["type"],
-            version=config["version"],
-            file_path=config["path"],
-            file_size_mb=round(file_size_mb, 2),
-            loaded_at=datetime.utcnow().isoformat() + "Z",
-            status=status_str,
-            metadata=config.get("metadata")
-        ))
+        models_info.append(
+            ModelInfo(
+                model_name=config["name"],
+                model_type=config["type"],
+                version=config["version"],
+                file_path=config["path"],
+                file_size_mb=round(file_size_mb, 2),
+                loaded_at=datetime.utcnow().isoformat() + "Z",
+                status=status_str,
+                metadata=config.get("metadata"),
+            )
+        )
 
     ensemble_ready = model_manager.ensemble is not None and loaded_count >= 3
 
@@ -944,7 +935,7 @@ async def get_models() -> ModelsListResponse:
         models=models_info,
         total_models=len(model_configs),
         loaded_models=loaded_count,
-        ensemble_ready=ensemble_ready
+        ensemble_ready=ensemble_ready,
     )
 
 
@@ -1027,25 +1018,25 @@ async def predict(request: PredictionRequest) -> PredictionResponse:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Failed to generate prediction for {request.player_id} "
-                       f"(stat_type={request.stat_type}, week={request.week}, season={request.season}). "
-                       f"Player may not exist in database or stat_type not supported.",
+                f"(stat_type={request.stat_type}, week={request.week}, season={request.season}). "
+                f"Player may not exist in database or stat_type not supported.",
             )
 
         # Get player name from database
         player_name = f"Player-{request.player_id[-6:]}"  # Default fallback
         try:
             import psycopg2
+
             conn = psycopg2.connect(
                 host="localhost",
                 port=5544,
                 dbname="devdb01",
                 user="dro",
-                password="sicillionbillions"
+                password="sicillionbillions",
             )
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT player_name FROM players WHERE player_id = %s",
-                (request.player_id,)
+                "SELECT player_name FROM players WHERE player_id = %s", (request.player_id,)
             )
             result = cursor.fetchone()
             if result:
@@ -1098,15 +1089,11 @@ async def predict(request: PredictionRequest) -> PredictionResponse:
 
         # Record metrics
         if PROMETHEUS_AVAILABLE:
-            PREDICTIONS_MADE.labels(
-                stat_type=request.stat_type, cache_hit=cache_hit
-            ).inc()
+            PREDICTIONS_MADE.labels(stat_type=request.stat_type, cache_hit=cache_hit).inc()
             PREDICTION_DURATION.labels(stat_type=request.stat_type).observe(
                 response.processing_ms / 1000
             )
-            PREDICTION_UNCERTAINTY.labels(stat_type=request.stat_type).observe(
-                response.uncertainty
-            )
+            PREDICTION_UNCERTAINTY.labels(stat_type=request.stat_type).observe(response.uncertainty)
 
         logger.info(
             f"Prediction generated for {request.player_id} ({request.stat_type}, "
@@ -1165,11 +1152,7 @@ async def predict_game(request: GamePredictionRequest) -> GamePredictionResponse
 
         # Get game details and QBs from database
         conn = psycopg2.connect(
-            host="localhost",
-            port=5544,
-            dbname="devdb01",
-            user="dro",
-            password="sicillionbillions"
+            host="localhost", port=5544, dbname="devdb01", user="dro", password="sicillionbillions"
         )
 
         # Query to get game info and starting QBs
@@ -1222,7 +1205,7 @@ async def predict_game(request: GamePredictionRequest) -> GamePredictionResponse
         if not game_data:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Game not found: {request.game_id} (season={request.season}, week={request.week})"
+                detail=f"Game not found: {request.game_id} (season={request.season}, week={request.week})",
             )
 
         # Get predictions for both QBs
@@ -1282,7 +1265,9 @@ async def predict_game(request: GamePredictionRequest) -> GamePredictionResponse
         logger.info(
             f"Game prediction generated for {request.game_id}: "
             f"{game_data['away_team']}@{game_data['home_team']} "
-            f"(total: {total_yards:.1f} yards)" if total_yards else "incomplete"
+            f"(total: {total_yards:.1f} yards)"
+            if total_yards
+            else "incomplete"
         )
 
         return response

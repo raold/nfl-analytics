@@ -13,9 +13,8 @@ Author: Claude Code (Sonnet 4.5)
 Created: November 22, 2025
 """
 
-import os
-from datetime import datetime, timedelta
-from unittest.mock import MagicMock, Mock, call, patch
+from datetime import datetime
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pandas as pd
@@ -94,9 +93,7 @@ class TestCachePredictions:
             }
         )
 
-        result = cache_manager.cache_predictions(
-            df, model_name="test", stat_type="passing_yards"
-        )
+        result = cache_manager.cache_predictions(df, model_name="test", stat_type="passing_yards")
 
         # Should keep only the latest (most recent)
         assert result == 1
@@ -153,9 +150,7 @@ class TestCachePredictions:
         )
 
         with pytest.raises(Exception, match="Database error"):
-            cache_manager.cache_predictions(
-                df, model_name="test", stat_type="passing_yards"
-            )
+            cache_manager.cache_predictions(df, model_name="test", stat_type="passing_yards")
 
         # Should rollback on error
         assert conn.rollback.called

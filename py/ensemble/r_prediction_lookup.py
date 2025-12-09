@@ -36,10 +36,10 @@ Usage:
 """
 
 import logging
-from typing import Dict, Optional, List, Tuple
-from datetime import datetime, timedelta, timezone
-import psycopg2
+from datetime import UTC, datetime
 from functools import lru_cache
+
+import psycopg2
 
 logger = logging.getLogger(__name__)
 
@@ -60,11 +60,11 @@ class RModelPredictionLookup:
 
     # Database connection parameters
     DB_CONFIG = {
-        'host': 'localhost',
-        'port': 5544,
-        'dbname': 'devdb01',
-        'user': 'dro',
-        'password': 'sicillionbillions'
+        "host": "localhost",
+        "port": 5544,
+        "dbname": "devdb01",
+        "user": "dro",
+        "password": "sicillionbillions",
     }
 
     # League average fallback (if prediction missing)
@@ -75,7 +75,7 @@ class RModelPredictionLookup:
     STALENESS_THRESHOLD_DAYS = 7
 
     # Supported R models
-    R_MODELS = ['state_space_v2', 'hierarchical_v2', 'informative_priors_v2']
+    R_MODELS = ["state_space_v2", "hierarchical_v2", "informative_priors_v2"]
 
     def __init__(self, cache_size: int = 10000):
         """
@@ -107,12 +107,8 @@ class RModelPredictionLookup:
 
     @lru_cache(maxsize=10000)
     def get_prediction(
-        self,
-        model_name: str,
-        player_id: str,
-        season: int,
-        week: int
-    ) -> Optional[Dict]:
+        self, model_name: str, player_id: str, season: int, week: int
+    ) -> dict | None:
         """
         Get prediction from PostgreSQL lookup table (cached).
 
@@ -175,23 +171,23 @@ class RModelPredictionLookup:
 
             # Check staleness
             generated_at = result[6]
-            is_stale = (datetime.now(timezone.utc) - generated_at).days > self.STALENESS_THRESHOLD_DAYS
+            is_stale = (datetime.now(UTC) - generated_at).days > self.STALENESS_THRESHOLD_DAYS
 
             if is_stale:
                 logger.warning(
-                    f"Stale prediction ({(datetime.now(timezone.utc) - generated_at).days} days old): "
+                    f"Stale prediction ({(datetime.now(UTC) - generated_at).days} days old): "
                     f"{model_name} | {player_id} | S{season}W{week}"
                 )
 
             return {
-                'mean': float(result[0]),
-                'median': float(result[1]) if result[1] is not None else float(result[0]),
-                'std': float(result[2]),
-                'q05': float(result[3]) if result[3] is not None else None,
-                'q95': float(result[4]) if result[4] is not None else None,
-                'n_draws': int(result[5]),
-                'generated_at': result[6],
-                'is_stale': is_stale
+                "mean": float(result[0]),
+                "median": float(result[1]) if result[1] is not None else float(result[0]),
+                "std": float(result[2]),
+                "q05": float(result[3]) if result[3] is not None else None,
+                "q95": float(result[4]) if result[4] is not None else None,
+                "n_draws": int(result[5]),
+                "generated_at": result[6],
+                "is_stale": is_stale,
             }
 
         except Exception as e:
@@ -199,11 +195,8 @@ class RModelPredictionLookup:
             return None
 
     def get_all_r_predictions(
-        self,
-        player_id: str,
-        season: int,
-        week: int
-    ) -> Dict[str, Optional[Dict]]:
+        self, player_id: str, season: int, week: int
+    ) -> dict[str, dict | None]:
         """
         Get predictions from all R models for a player-game (batch query).
 
@@ -255,17 +248,17 @@ class RModelPredictionLookup:
             for row in rows:
                 model_name = row[0]
                 generated_at = row[7]
-                is_stale = (datetime.now(timezone.utc) - generated_at).days > self.STALENESS_THRESHOLD_DAYS
+                is_stale = (datetime.now(UTC) - generated_at).days > self.STALENESS_THRESHOLD_DAYS
 
                 results[model_name] = {
-                    'mean': float(row[1]),
-                    'median': float(row[2]) if row[2] is not None else float(row[1]),
-                    'std': float(row[3]),
-                    'q05': float(row[4]) if row[4] is not None else None,
-                    'q95': float(row[5]) if row[5] is not None else None,
-                    'n_draws': int(row[6]),
-                    'generated_at': generated_at,
-                    'is_stale': is_stale
+                    "mean": float(row[1]),
+                    "median": float(row[2]) if row[2] is not None else float(row[1]),
+                    "std": float(row[3]),
+                    "q05": float(row[4]) if row[4] is not None else None,
+                    "q95": float(row[5]) if row[5] is not None else None,
+                    "n_draws": int(row[6]),
+                    "generated_at": generated_at,
+                    "is_stale": is_stale,
                 }
 
             # Fill in missing models with None
@@ -283,12 +276,8 @@ class RModelPredictionLookup:
             return {model: None for model in self.R_MODELS}
 
     def get_prediction_with_fallback(
-        self,
-        model_name: str,
-        player_id: str,
-        season: int,
-        week: int
-    ) -> Dict:
+        self, model_name: str, player_id: str, season: int, week: int
+    ) -> dict:
         """
         Get prediction with fallback to league average if missing.
 
@@ -317,7 +306,7 @@ class RModelPredictionLookup:
         pred = self.get_prediction(model_name, player_id, season, week)
 
         if pred is not None:
-            pred['is_fallback'] = False
+            pred["is_fallback"] = False
             return pred
 
         # Fallback to league average
@@ -327,22 +316,18 @@ class RModelPredictionLookup:
         )
 
         return {
-            'mean': self.LEAGUE_AVG_PASSING_YARDS,
-            'median': self.LEAGUE_AVG_PASSING_YARDS,
-            'std': self.LEAGUE_AVG_PASSING_STD,
-            'q05': self.LEAGUE_AVG_PASSING_YARDS - 1.645 * self.LEAGUE_AVG_PASSING_STD,
-            'q95': self.LEAGUE_AVG_PASSING_YARDS + 1.645 * self.LEAGUE_AVG_PASSING_STD,
-            'n_draws': 1000,
-            'generated_at': None,
-            'is_stale': False,
-            'is_fallback': True
+            "mean": self.LEAGUE_AVG_PASSING_YARDS,
+            "median": self.LEAGUE_AVG_PASSING_YARDS,
+            "std": self.LEAGUE_AVG_PASSING_STD,
+            "q05": self.LEAGUE_AVG_PASSING_YARDS - 1.645 * self.LEAGUE_AVG_PASSING_STD,
+            "q95": self.LEAGUE_AVG_PASSING_YARDS + 1.645 * self.LEAGUE_AVG_PASSING_STD,
+            "n_draws": 1000,
+            "generated_at": None,
+            "is_stale": False,
+            "is_fallback": True,
         }
 
-    def check_coverage(
-        self,
-        season: int,
-        week: Optional[int] = None
-    ) -> Dict[str, Dict]:
+    def check_coverage(self, season: int, week: int | None = None) -> dict[str, dict]:
         """
         Check prediction coverage for a season/week.
 
@@ -401,10 +386,10 @@ class RModelPredictionLookup:
             results = {}
             for row in rows:
                 results[row[0]] = {
-                    'n_players': row[1],
-                    'n_predictions': row[2],
-                    'oldest_prediction': row[3],
-                    'newest_prediction': row[4]
+                    "n_players": row[1],
+                    "n_predictions": row[2],
+                    "oldest_prediction": row[3],
+                    "newest_prediction": row[4],
                 }
 
             return results
@@ -413,7 +398,7 @@ class RModelPredictionLookup:
             logger.error(f"Database error in check_coverage: {e}")
             return {}
 
-    def get_cache_stats(self) -> Dict[str, int]:
+    def get_cache_stats(self) -> dict[str, int]:
         """
         Get cache performance statistics.
 
@@ -430,11 +415,11 @@ class RModelPredictionLookup:
         hit_rate = self._cache_hits / total_requests if total_requests > 0 else 0.0
 
         return {
-            'cache_hits': self._cache_hits,
-            'cache_misses': self._cache_misses,
-            'hit_rate': hit_rate,
-            'db_queries': self._db_queries,
-            'fallbacks': self._fallbacks
+            "cache_hits": self._cache_hits,
+            "cache_misses": self._cache_misses,
+            "hit_rate": hit_rate,
+            "db_queries": self._db_queries,
+            "fallbacks": self._fallbacks,
         }
 
     def clear_cache(self):
@@ -453,13 +438,10 @@ class RModelPredictionLookup:
 # Convenience Functions
 # ==============================================================================
 
+
 def get_r_model_prediction(
-    model_name: str,
-    player_id: str,
-    season: int,
-    week: int,
-    use_fallback: bool = True
-) -> Dict:
+    model_name: str, player_id: str, season: int, week: int, use_fallback: bool = True
+) -> dict:
     """
     Convenience function for getting a single R model prediction.
 
@@ -481,11 +463,7 @@ def get_r_model_prediction(
         return lookup.get_prediction(model_name, player_id, season, week)
 
 
-def get_all_r_model_predictions(
-    player_id: str,
-    season: int,
-    week: int
-) -> Dict[str, Optional[Dict]]:
+def get_all_r_model_predictions(player_id: str, season: int, week: int) -> dict[str, dict | None]:
     """
     Convenience function for getting all R model predictions.
 
@@ -504,6 +482,7 @@ def get_all_r_model_predictions(
 # ==============================================================================
 # RModelInterface Compatibility Layer (Drop-in rpy2 Replacement)
 # ==============================================================================
+
 
 class RPredictionLookup:
     """
@@ -528,7 +507,7 @@ class RPredictionLookup:
         - PostgreSQL: <10ms per prediction (200-400x faster)
     """
 
-    def __init__(self, db_config: Dict, db_pool=None):
+    def __init__(self, db_config: dict, db_pool=None):
         """
         Initialize PostgreSQL lookup (compatible with RModelInterface constructor).
 
@@ -544,9 +523,9 @@ class RPredictionLookup:
         player_id: str,
         season: int,
         week: int,
-        model_path: Optional[str] = None,  # Ignored (for API compatibility)
-        ndraws: int = 1000  # Ignored (for API compatibility)
-    ) -> Tuple[float, float]:
+        model_path: str | None = None,  # Ignored (for API compatibility)
+        ndraws: int = 1000,  # Ignored (for API compatibility)
+    ) -> tuple[float, float]:
         """
         Get hierarchical v2 prediction (compatible with RModelInterface.predict_hierarchical).
 
@@ -563,7 +542,7 @@ class RPredictionLookup:
         Raises:
             RuntimeError: If prediction not found in database
         """
-        pred = self._lookup.get_prediction('hierarchical_v2', player_id, season, week)
+        pred = self._lookup.get_prediction("hierarchical_v2", player_id, season, week)
 
         if pred is None:
             raise RuntimeError(
@@ -571,16 +550,16 @@ class RPredictionLookup:
                 f"Run: Rscript R/batch_generate_r_predictions_optimized.R --seasons {season}"
             )
 
-        return (pred['mean'], pred['std'])
+        return (pred["mean"], pred["std"])
 
     def predict_informative_priors(
         self,
         player_id: str,
         season: int,
         week: int,
-        model_path: Optional[str] = None,  # Ignored (for API compatibility)
-        ndraws: int = 1000  # Ignored (for API compatibility)
-    ) -> Tuple[float, float]:
+        model_path: str | None = None,  # Ignored (for API compatibility)
+        ndraws: int = 1000,  # Ignored (for API compatibility)
+    ) -> tuple[float, float]:
         """
         Get informative priors v2 prediction (compatible with RModelInterface.predict_informative_priors).
 
@@ -597,7 +576,7 @@ class RPredictionLookup:
         Raises:
             RuntimeError: If prediction not found in database
         """
-        pred = self._lookup.get_prediction('informative_priors_v2', player_id, season, week)
+        pred = self._lookup.get_prediction("informative_priors_v2", player_id, season, week)
 
         if pred is None:
             raise RuntimeError(
@@ -605,17 +584,17 @@ class RPredictionLookup:
                 f"Run: Rscript R/batch_generate_r_predictions_optimized.R --seasons {season}"
             )
 
-        return (pred['mean'], pred['std'])
+        return (pred["mean"], pred["std"])
 
     def predict_state_space(
         self,
         player_id: str,
         season: int,
         week: int,
-        skills_df: Optional[object] = None,  # Ignored (for API compatibility)
-        model_path: Optional[str] = None,  # Ignored (for API compatibility)
-        ndraws: int = 1000  # Ignored (for API compatibility)
-    ) -> Tuple[float, float]:
+        skills_df: object | None = None,  # Ignored (for API compatibility)
+        model_path: str | None = None,  # Ignored (for API compatibility)
+        ndraws: int = 1000,  # Ignored (for API compatibility)
+    ) -> tuple[float, float]:
         """
         Get state-space v2 prediction (compatible with RModelInterface.predict_state_space).
 
@@ -633,7 +612,7 @@ class RPredictionLookup:
         Raises:
             RuntimeError: If prediction not found in database
         """
-        pred = self._lookup.get_prediction('state_space_v2', player_id, season, week)
+        pred = self._lookup.get_prediction("state_space_v2", player_id, season, week)
 
         if pred is None:
             raise RuntimeError(
@@ -641,4 +620,4 @@ class RPredictionLookup:
                 f"Run: Rscript R/batch_generate_r_predictions_optimized.R --seasons {season}"
             )
 
-        return (pred['mean'], pred['std'])
+        return (pred["mean"], pred["std"])

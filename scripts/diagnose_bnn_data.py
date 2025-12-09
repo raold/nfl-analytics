@@ -4,6 +4,7 @@ Diagnose BNN Receiving data quality issues causing -inf log probability.
 """
 
 import sys
+
 sys.path.append("/Users/dro/rice/nfl-analytics")
 
 import numpy as np
@@ -71,9 +72,9 @@ print(f"  Players: {df['player_id'].nunique()}")
 print(f"  Date range: {df['season'].min()}-{df['season'].max()}")
 
 # Calculate rolling averages
-df["avg_receiving_l3"] = df[
-    ["prev_game_yards", "prev2_game_yards", "prev3_game_yards"]
-].mean(axis=1)
+df["avg_receiving_l3"] = df[["prev_game_yards", "prev2_game_yards", "prev3_game_yards"]].mean(
+    axis=1
+)
 
 # Check for NaN and inf
 print("\n" + "=" * 60)
@@ -151,8 +152,12 @@ test_mask = (df["season"] == 2024) & (df["week"] > 6)
 
 print(f"Training samples: {train_mask.sum()}")
 print(f"Test samples: {test_mask.sum()}")
-print(f"Training yards: min={df.loc[train_mask, 'receiving_yards'].min()}, max={df.loc[train_mask, 'receiving_yards'].max()}")
-print(f"Test yards: min={df.loc[test_mask, 'receiving_yards'].min()}, max={df.loc[test_mask, 'receiving_yards'].max()}")
+print(
+    f"Training yards: min={df.loc[train_mask, 'receiving_yards'].min()}, max={df.loc[train_mask, 'receiving_yards'].max()}"
+)
+print(
+    f"Test yards: min={df.loc[test_mask, 'receiving_yards'].min()}, max={df.loc[test_mask, 'receiving_yards'].max()}"
+)
 
 print("\n" + "=" * 60)
 print("DIAGNOSTIC COMPLETE")

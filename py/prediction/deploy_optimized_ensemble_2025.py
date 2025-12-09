@@ -63,28 +63,28 @@ def create_optimized_ensemble() -> RealisticGameOutcomeEnsemble:
         RealisticGameOutcomeEnsemble configured with optimal hyperparameters
     """
     xgb_params = {
-        'objective': 'binary:logistic',
-        'eval_metric': 'logloss',
-        'tree_method': 'hist',
-        'n_estimators': 100,
-        'max_depth': 4,
-        'learning_rate': 0.1,
-        'subsample': 0.8,
-        'colsample_bytree': 0.8,
+        "objective": "binary:logistic",
+        "eval_metric": "logloss",
+        "tree_method": "hist",
+        "n_estimators": 100,
+        "max_depth": 4,
+        "learning_rate": 0.1,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
         # OPTIMIZED regularization
-        'alpha': 5.0,  # L1 regularization (increased from 2.0)
-        'lambda': 5.0,  # L2 regularization (increased from 2.0)
-        'min_child_weight': 5,
-        'gamma': 0.5,
-        'n_jobs': -1,
+        "alpha": 5.0,  # L1 regularization (increased from 2.0)
+        "lambda": 5.0,  # L2 regularization (increased from 2.0)
+        "min_child_weight": 5,
+        "gamma": 0.5,
+        "n_jobs": -1,
     }
 
     ensemble = RealisticGameOutcomeEnsemble(xgb_params=xgb_params)
 
     # OPTIMIZED feature set: only beneficial Phase 5 features
     ensemble.legitimate_phase5_features = [
-        "away_short_rest",      # Provides measurable benefit
-        "is_conference_game",   # Minimal but positive benefit
+        "away_short_rest",  # Provides measurable benefit
+        "is_conference_game",  # Minimal but positive benefit
     ]
 
     return ensemble
@@ -111,33 +111,29 @@ def apply_betting_criteria(
         DataFrame with betting recommendations
     """
     # Clip probabilities
-    predictions['home_win_prob_clipped'] = predictions['home_win_prob_calibrated'].clip(
+    predictions["home_win_prob_clipped"] = predictions["home_win_prob_calibrated"].clip(
         prob_clip_low, prob_clip_high
     )
 
     # Calculate edge (assuming fair odds for simplicity)
-    predictions['implied_prob'] = 0.5  # Placeholder - would use actual market odds
-    predictions['edge'] = predictions['home_win_prob_clipped'] - predictions['implied_prob']
+    predictions["implied_prob"] = 0.5  # Placeholder - would use actual market odds
+    predictions["edge"] = predictions["home_win_prob_clipped"] - predictions["implied_prob"]
 
     # Calculate Kelly fraction
-    predictions['kelly_fraction'] = (
-        predictions['home_win_prob_clipped'] * 2 - 1
+    predictions["kelly_fraction"] = (
+        predictions["home_win_prob_clipped"] * 2 - 1
     )  # For even money bets
-    predictions['kelly_fraction'] = predictions['kelly_fraction'].clip(0, max_kelly_fraction)
+    predictions["kelly_fraction"] = predictions["kelly_fraction"].clip(0, max_kelly_fraction)
 
     # Betting recommendation
-    predictions['bet_recommended'] = (
-        (predictions['edge'].abs() >= min_edge) & (predictions['kelly_fraction'] > 0)
+    predictions["bet_recommended"] = (predictions["edge"].abs() >= min_edge) & (
+        predictions["kelly_fraction"] > 0
     )
 
     # Betting side
-    predictions['bet_side'] = 'none'
-    predictions.loc[
-        predictions['bet_recommended'] & (predictions['edge'] > 0), 'bet_side'
-    ] = 'home'
-    predictions.loc[
-        predictions['bet_recommended'] & (predictions['edge'] < 0), 'bet_side'
-    ] = 'away'
+    predictions["bet_side"] = "none"
+    predictions.loc[predictions["bet_recommended"] & (predictions["edge"] > 0), "bet_side"] = "home"
+    predictions.loc[predictions["bet_recommended"] & (predictions["edge"] < 0), "bet_side"] = "away"
 
     return predictions
 
@@ -216,13 +212,15 @@ def main():
     prediction_preds_calibrated = calibrator.transform(prediction_preds_uncalibrated)
 
     # Create predictions DataFrame
-    predictions = pd.DataFrame({
-        'week': prediction_df['week'].values,
-        'home_team': prediction_df['home_team'].values,
-        'away_team': prediction_df['away_team'].values,
-        'home_win_prob_uncalibrated': prediction_preds_uncalibrated,
-        'home_win_prob_calibrated': prediction_preds_calibrated,
-    })
+    predictions = pd.DataFrame(
+        {
+            "week": prediction_df["week"].values,
+            "home_team": prediction_df["home_team"].values,
+            "away_team": prediction_df["away_team"].values,
+            "home_win_prob_uncalibrated": prediction_preds_uncalibrated,
+            "home_win_prob_calibrated": prediction_preds_calibrated,
+        }
+    )
 
     # Apply betting criteria
     predictions = apply_betting_criteria(
@@ -244,27 +242,33 @@ def main():
 
     # Overall distribution
     print("\nProbability Distribution (Calibrated):")
-    print(predictions['home_win_prob_calibrated'].describe())
+    print(predictions["home_win_prob_calibrated"].describe())
 
     # Betting recommendations
-    n_bets = predictions['bet_recommended'].sum()
-    print(f"\nBetting Recommendations:")
+    n_bets = predictions["bet_recommended"].sum()
+    print("\nBetting Recommendations:")
     print(f"  Total games:        {len(predictions)}")
     print(f"  Bets recommended:   {n_bets} ({n_bets/len(predictions):.1%})")
 
     if n_bets > 0:
-        print(f"\nBetting Breakdown:")
+        print("\nBetting Breakdown:")
         print(f"  Home bets: {(predictions['bet_side'] == 'home').sum()}")
         print(f"  Away bets: {(predictions['bet_side'] == 'away').sum()}")
-        print(f"\n  Average edge:        {predictions[predictions['bet_recommended']]['edge'].abs().mean():.1%}")
-        print(f"  Average Kelly:       {predictions[predictions['bet_recommended']]['kelly_fraction'].mean():.1%}")
+        print(
+            f"\n  Average edge:        {predictions[predictions['bet_recommended']]['edge'].abs().mean():.1%}"
+        )
+        print(
+            f"  Average Kelly:       {predictions[predictions['bet_recommended']]['kelly_fraction'].mean():.1%}"
+        )
 
     # By week
     print("\nPredictions by Week:")
-    weekly_summary = predictions.groupby('week').agg({
-        'home_win_prob_calibrated': 'mean',
-        'bet_recommended': 'sum',
-    })
+    weekly_summary = predictions.groupby("week").agg(
+        {
+            "home_win_prob_calibrated": "mean",
+            "bet_recommended": "sum",
+        }
+    )
     print(weekly_summary)
 
     # -------------------------------------------------------------------------
@@ -284,7 +288,7 @@ def main():
     # Save recommended bets only
     if n_bets > 0:
         bets_file = output_dir / "recommended_bets_2025.csv"
-        recommended_bets = predictions[predictions['bet_recommended']].copy()
+        recommended_bets = predictions[predictions["bet_recommended"]].copy()
         recommended_bets.to_csv(bets_file, index=False)
         print(f"  ✓ Recommended bets saved to {bets_file}")
 
@@ -306,7 +310,7 @@ def main():
             "max_kelly_fraction": 0.10,
             "prob_clip": [0.15, 0.85],
         },
-        "train_accuracy": train_metrics['ensemble']['accuracy'],
+        "train_accuracy": train_metrics["ensemble"]["accuracy"],
     }
 
     metadata_file = output_dir / "deployment_metadata_2025.json"

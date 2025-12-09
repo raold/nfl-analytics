@@ -67,13 +67,11 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -97,11 +95,11 @@ class DirichletBayesianStacking:
 
     def __init__(
         self,
-        component_names: List[str],
-        prior_weights: Dict[str, float],
+        component_names: list[str],
+        prior_weights: dict[str, float],
         prior_strength: float = 10.0,
         likelihood_scale: float = 40.0,
-        scoring_rule: str = "exponential"
+        scoring_rule: str = "exponential",
     ):
         """
         Initialize Dirichlet Bayesian stacking.
@@ -146,10 +144,7 @@ class DirichletBayesianStacking:
 
         # Initialize Dirichlet parameters: α = prior_strength * prior_weights
         # Intuition: α_i represents pseudo-counts of good predictions for component i
-        self.alpha = {
-            name: prior_strength * prior_weights[name]
-            for name in component_names
-        }
+        self.alpha = {name: prior_strength * prior_weights[name] for name in component_names}
 
         self.prior_strength = prior_strength
         self.likelihood_scale = likelihood_scale
@@ -166,7 +161,7 @@ class DirichletBayesianStacking:
         logger.info(f"Prior strength: {prior_strength}, Likelihood scale: {likelihood_scale}")
         logger.info(f"Initial weights: {self.get_weights()}")
 
-    def get_weights(self) -> Dict[str, float]:
+    def get_weights(self) -> dict[str, float]:
         """
         Get current ensemble weights (posterior mean of Dirichlet).
 
@@ -175,16 +170,10 @@ class DirichletBayesianStacking:
             w_i = α_i / Σα_j (posterior mean)
         """
         alpha_sum = sum(self.alpha.values())
-        weights = {
-            name: self.alpha[name] / alpha_sum
-            for name in self.component_names
-        }
+        weights = {name: self.alpha[name] / alpha_sum for name in self.component_names}
         return weights
 
-    def predict(
-        self,
-        component_predictions: Dict[str, float]
-    ) -> Tuple[float, Dict[str, float]]:
+    def predict(self, component_predictions: dict[str, float]) -> tuple[float, dict[str, float]]:
         """
         Make ensemble prediction using current weights.
 
@@ -212,17 +201,12 @@ class DirichletBayesianStacking:
 
         # Weighted average: ŷ = Σ w_i * ŷ_i
         ensemble_pred = sum(
-            weights[name] * component_predictions[name]
-            for name in self.component_names
+            weights[name] * component_predictions[name] for name in self.component_names
         )
 
         return ensemble_pred, weights
 
-    def update(
-        self,
-        component_predictions: Dict[str, float],
-        actual_outcome: float
-    ):
+    def update(self, component_predictions: dict[str, float], actual_outcome: float):
         """
         Update Dirichlet parameters after observing actual outcome.
 
@@ -257,7 +241,7 @@ class DirichletBayesianStacking:
             elif self.scoring_rule == "squared":
                 # Gaussian likelihood: exp(-(y-ŷ)²/(2σ²))
                 # More sensitive to large errors (squared penalty)
-                likelihood = np.exp(-(error ** 2) / (2 * self.likelihood_scale ** 2))
+                likelihood = np.exp(-(error**2) / (2 * self.likelihood_scale**2))
             elif self.scoring_rule == "log":
                 # Log scoring: 1 / (1 + |y-ŷ|/σ)
                 # Gentle penalty, never goes to zero
@@ -275,22 +259,23 @@ class DirichletBayesianStacking:
             self.alpha[name] += likelihoods[name]
 
         # Store history (for diagnostics and analysis)
-        self.prediction_history.append({
-            "predictions": component_predictions,
-            "actual": actual_outcome,
-            "weights_before": weights_before,
-            "weights_after": self.get_weights(),
-            "likelihoods": likelihoods,
-            "num_updates": self.num_updates
-        })
+        self.prediction_history.append(
+            {
+                "predictions": component_predictions,
+                "actual": actual_outcome,
+                "weights_before": weights_before,
+                "weights_after": self.get_weights(),
+                "likelihoods": likelihoods,
+                "num_updates": self.num_updates,
+            }
+        )
 
         self.num_updates += 1
 
         # Log significant weight changes (>5% for any component)
         weights_after = self.get_weights()
         max_change = max(
-            abs(weights_after[name] - weights_before[name])
-            for name in self.component_names
+            abs(weights_after[name] - weights_before[name]) for name in self.component_names
         )
         if max_change > 0.05:
             logger.info(
@@ -300,9 +285,7 @@ class DirichletBayesianStacking:
             logger.debug(f"  Weights after:  {weights_after}")
 
     def predict_and_update(
-        self,
-        component_predictions: Dict[str, float],
-        actual_outcome: float
+        self, component_predictions: dict[str, float], actual_outcome: float
     ) -> float:
         """
         Convenience method: predict, then update after outcome observed.
@@ -321,7 +304,7 @@ class DirichletBayesianStacking:
         self.update(component_predictions, actual_outcome)
         return ensemble_pred
 
-    def get_diagnostics(self) -> Dict:
+    def get_diagnostics(self) -> dict:
         """
         Get diagnostic information for monitoring and analysis.
 
@@ -347,10 +330,10 @@ class DirichletBayesianStacking:
             "alpha_concentration": alpha_sum / self.K,
             "scoring_rule": self.scoring_rule,
             "prior_strength": self.prior_strength,
-            "likelihood_scale": self.likelihood_scale
+            "likelihood_scale": self.likelihood_scale,
         }
 
-    def get_weight_history(self) -> List[Dict[str, float]]:
+    def get_weight_history(self) -> list[dict[str, float]]:
         """
         Get history of weights over time.
 
@@ -358,12 +341,9 @@ class DirichletBayesianStacking:
             List of weight dictionaries (one per update)
             Useful for plotting weight evolution
         """
-        return [
-            entry["weights_after"]
-            for entry in self.prediction_history
-        ]
+        return [entry["weights_after"] for entry in self.prediction_history]
 
-    def get_prediction_history(self) -> List[Dict]:
+    def get_prediction_history(self) -> list[dict]:
         """
         Get full prediction history (predictions, actuals, weights, likelihoods).
 
@@ -374,7 +354,7 @@ class DirichletBayesianStacking:
         """
         return self.prediction_history
 
-    def reset(self, prior_weights: Optional[Dict[str, float]] = None):
+    def reset(self, prior_weights: dict[str, float] | None = None):
         """
         Reset Dirichlet parameters to initial state.
 
@@ -398,8 +378,7 @@ class DirichletBayesianStacking:
 
         # Reset alpha
         self.alpha = {
-            name: self.prior_strength * prior_weights[name]
-            for name in self.component_names
+            name: self.prior_strength * prior_weights[name] for name in self.component_names
         }
 
         # Update stored prior if new weights provided
@@ -430,7 +409,7 @@ class DirichletBayesianStacking:
             "likelihood_scale": self.likelihood_scale,
             "scoring_rule": self.scoring_rule,
             "num_updates": self.num_updates,
-            "prediction_history": self.prediction_history
+            "prediction_history": self.prediction_history,
         }
 
         filepath = Path(filepath)
@@ -460,7 +439,7 @@ class DirichletBayesianStacking:
         if not filepath.exists():
             raise FileNotFoundError(f"File not found: {filepath}")
 
-        with open(filepath, "r") as f:
+        with open(filepath) as f:
             state = json.load(f)
 
         # Get prior weights from saved state (for backward compatibility, fall back to computing from alpha)
@@ -479,7 +458,7 @@ class DirichletBayesianStacking:
             prior_weights=prior_weights,
             prior_strength=state["prior_strength"],
             likelihood_scale=state["likelihood_scale"],
-            scoring_rule=state.get("scoring_rule", "exponential")
+            scoring_rule=state.get("scoring_rule", "exponential"),
         )
 
         # Restore state
@@ -518,51 +497,51 @@ class DirichletBayesianStackingByStatType:
     # Default weights from CLAUDE.md
     DEFAULT_WEIGHTS_V6 = {
         # v6.0 weights for game outcomes
-        'state_space': 0.27,
-        'hierarchical': 0.27,
-        'xgboost': 0.23,
-        'informative_priors': 0.13,
-        'hybrid': 0.10,
+        "state_space": 0.27,
+        "hierarchical": 0.27,
+        "xgboost": 0.23,
+        "informative_priors": 0.13,
+        "hybrid": 0.10,
     }
 
     DIRICHLET_WEIGHTS_V8 = {
         # v8.0 weights for player props
-        'hierarchical': 0.396,
-        'informative_priors': 0.395,
-        'hybrid': 0.101,
-        'state_space': 0.082,
-        'xgboost': 0.026,
+        "hierarchical": 0.396,
+        "informative_priors": 0.395,
+        "hybrid": 0.101,
+        "state_space": 0.082,
+        "xgboost": 0.026,
     }
 
     STAT_TYPE_DEFAULTS = {
-        'passing_yards': DIRICHLET_WEIGHTS_V8,
-        'rushing_yards': DIRICHLET_WEIGHTS_V8,
-        'receiving_yards': DIRICHLET_WEIGHTS_V8,
-        'receptions': DIRICHLET_WEIGHTS_V8,
-        'passing_tds': DIRICHLET_WEIGHTS_V8,
-        'rushing_tds': DIRICHLET_WEIGHTS_V8,
-        'spread': DEFAULT_WEIGHTS_V6,
-        'total': DEFAULT_WEIGHTS_V6,
-        'win_prob': DEFAULT_WEIGHTS_V6,
+        "passing_yards": DIRICHLET_WEIGHTS_V8,
+        "rushing_yards": DIRICHLET_WEIGHTS_V8,
+        "receiving_yards": DIRICHLET_WEIGHTS_V8,
+        "receptions": DIRICHLET_WEIGHTS_V8,
+        "passing_tds": DIRICHLET_WEIGHTS_V8,
+        "rushing_tds": DIRICHLET_WEIGHTS_V8,
+        "spread": DEFAULT_WEIGHTS_V6,
+        "total": DEFAULT_WEIGHTS_V6,
+        "win_prob": DEFAULT_WEIGHTS_V6,
     }
 
-    COMPONENT_NAMES = ['hierarchical', 'informative_priors', 'state_space', 'xgboost', 'hybrid']
+    COMPONENT_NAMES = ["hierarchical", "informative_priors", "state_space", "xgboost", "hybrid"]
 
     LIKELIHOOD_SCALES = {
-        'passing_yards': 50.0,
-        'rushing_yards': 25.0,
-        'receiving_yards': 25.0,
-        'receptions': 3.0,
-        'passing_tds': 0.8,
-        'rushing_tds': 0.5,
-        'spread': 7.0,
-        'total': 7.0,
-        'win_prob': 0.15,
+        "passing_yards": 50.0,
+        "rushing_yards": 25.0,
+        "receiving_yards": 25.0,
+        "receptions": 3.0,
+        "passing_tds": 0.8,
+        "rushing_tds": 0.5,
+        "spread": 7.0,
+        "total": 7.0,
+        "win_prob": 0.15,
     }
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         use_db: bool = True,
         prior_strength: float = 10.0,
     ):
@@ -575,19 +554,19 @@ class DirichletBayesianStackingByStatType:
             prior_strength: Base strength for Dirichlet priors.
         """
         self.db_config = db_config or {
-            'host': os.getenv('DB_HOST', 'localhost'),
-            'port': int(os.getenv('DB_PORT', '5544')),
-            'database': os.getenv('DB_NAME', 'devdb01'),
-            'user': os.getenv('DB_USER', 'dro'),
-            'password': os.getenv('DB_PASSWORD'),
+            "host": os.getenv("DB_HOST", "localhost"),
+            "port": int(os.getenv("DB_PORT", "5544")),
+            "database": os.getenv("DB_NAME", "devdb01"),
+            "user": os.getenv("DB_USER", "dro"),
+            "password": os.getenv("DB_PASSWORD"),
         }
-        if not self.db_config['password']:
+        if not self.db_config["password"]:
             logger.warning("DB_PASSWORD not set - database operations may fail")
         self.use_db = use_db
         self.prior_strength = prior_strength
 
         # Cache of DirichletBayesianStacking instances per stat type
-        self._stackers: Dict[str, DirichletBayesianStacking] = {}
+        self._stackers: dict[str, DirichletBayesianStacking] = {}
 
         # Load from database on init
         if use_db:
@@ -599,6 +578,7 @@ class DirichletBayesianStackingByStatType:
         """Get database connection."""
         try:
             import psycopg2
+
             return psycopg2.connect(**self.db_config)
         except ImportError:
             logger.warning("psycopg2 not available, using in-memory only")
@@ -612,18 +592,20 @@ class DirichletBayesianStackingByStatType:
 
         try:
             cur = conn.cursor()
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT stat_type, component_name, alpha, prior_alpha
                 FROM ml.dirichlet_alpha_by_stat_type
                 ORDER BY stat_type, component_order
-            """)
+            """
+            )
 
             rows = cur.fetchall()
             conn.close()
 
             # Group by stat_type
-            by_stat_type: Dict[str, Dict[str, float]] = {}
-            prior_by_stat_type: Dict[str, Dict[str, float]] = {}
+            by_stat_type: dict[str, dict[str, float]] = {}
+            prior_by_stat_type: dict[str, dict[str, float]] = {}
 
             for row in rows:
                 stat_type, component, alpha, prior_alpha = row
@@ -676,27 +658,25 @@ class DirichletBayesianStackingByStatType:
         self._stackers[stat_type] = stacker
         return stacker
 
-    def get_weights(self, stat_type: str) -> Dict[str, float]:
+    def get_weights(self, stat_type: str) -> dict[str, float]:
         """Get current ensemble weights for a stat type."""
         return self.get_stacker(stat_type).get_weights()
 
     def predict(
-        self,
-        stat_type: str,
-        component_predictions: Dict[str, float]
-    ) -> Tuple[float, Dict[str, float]]:
+        self, stat_type: str, component_predictions: dict[str, float]
+    ) -> tuple[float, dict[str, float]]:
         """Make ensemble prediction using current weights for stat type."""
         return self.get_stacker(stat_type).predict(component_predictions)
 
     def update(
         self,
         stat_type: str,
-        component_predictions: Dict[str, float],
+        component_predictions: dict[str, float],
         actual: float,
-        game_id: Optional[str] = None,
-        player_id: Optional[str] = None,
-        season: Optional[int] = None,
-        week: Optional[int] = None,
+        game_id: str | None = None,
+        player_id: str | None = None,
+        season: int | None = None,
+        week: int | None = None,
     ):
         """
         Update Dirichlet alphas based on prediction outcomes.
@@ -744,13 +724,16 @@ class DirichletBayesianStackingByStatType:
         try:
             cur = conn.cursor()
             for component, alpha in stacker.alpha.items():
-                cur.execute("""
+                cur.execute(
+                    """
                     UPDATE ml.dirichlet_alpha_by_stat_type
                     SET alpha = %s,
                         n_updates = n_updates + 1,
                         updated_at = NOW()
                     WHERE stat_type = %s AND component_name = %s
-                """, (alpha, stat_type, component))
+                """,
+                    (alpha, stat_type, component),
+                )
 
             conn.commit()
             conn.close()
@@ -763,15 +746,15 @@ class DirichletBayesianStackingByStatType:
     def _log_bayesian_update(
         self,
         stat_type: str,
-        prior_alphas: Dict,
-        posterior_alphas: Dict,
+        prior_alphas: dict,
+        posterior_alphas: dict,
         actual: float,
-        component_predictions: Dict,
-        weights_before: Dict,
-        game_id: Optional[str] = None,
-        player_id: Optional[str] = None,
-        season: Optional[int] = None,
-        week: Optional[int] = None,
+        component_predictions: dict,
+        weights_before: dict,
+        game_id: str | None = None,
+        player_id: str | None = None,
+        season: int | None = None,
+        week: int | None = None,
     ):
         """Log the Bayesian update to audit table."""
         conn = self._get_connection()
@@ -780,21 +763,19 @@ class DirichletBayesianStackingByStatType:
 
         try:
             import json
+
             cur = conn.cursor()
 
             # Compute ensemble prediction (weighted average using prior weights)
             ensemble_pred = sum(
-                weights_before.get(c, 0) * component_predictions.get(c, 0)
-                for c in prior_alphas
+                weights_before.get(c, 0) * component_predictions.get(c, 0) for c in prior_alphas
             )
 
             # Compute likelihoods from alpha changes
-            likelihoods = {
-                c: posterior_alphas[c] - prior_alphas[c]
-                for c in prior_alphas
-            }
+            likelihoods = {c: posterior_alphas[c] - prior_alphas[c] for c in prior_alphas}
 
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO ml.bayesian_update_log (
                     update_type, stat_type, season, week,
                     prior_params, likelihoods, posterior_params,
@@ -805,19 +786,21 @@ class DirichletBayesianStackingByStatType:
                     %s::jsonb, %s::jsonb, %s::jsonb,
                     %s, %s, %s::jsonb, %s, %s
                 )
-            """, (
-                stat_type,
-                season or 2024,
-                week or 1,
-                json.dumps(prior_alphas),
-                json.dumps(likelihoods),
-                json.dumps(posterior_alphas),
-                actual,
-                ensemble_pred,
-                json.dumps(component_predictions),
-                player_id,
-                game_id,
-            ))
+            """,
+                (
+                    stat_type,
+                    season or 2024,
+                    week or 1,
+                    json.dumps(prior_alphas),
+                    json.dumps(likelihoods),
+                    json.dumps(posterior_alphas),
+                    actual,
+                    ensemble_pred,
+                    json.dumps(component_predictions),
+                    player_id,
+                    game_id,
+                ),
+            )
 
             conn.commit()
             conn.close()
@@ -827,7 +810,7 @@ class DirichletBayesianStackingByStatType:
             if conn:
                 conn.close()
 
-    def reset_to_priors(self, stat_type: Optional[str] = None):
+    def reset_to_priors(self, stat_type: str | None = None):
         """Reset alphas to prior values."""
         if stat_type:
             if stat_type in self._stackers:
@@ -854,15 +837,15 @@ class DirichletBayesianStackingByStatType:
 
         logger.info(f"Reset Dirichlet alphas to priors (stat_type={stat_type})")
 
-    def get_summary(self) -> Dict:
+    def get_summary(self) -> dict:
         """Get summary of all Dirichlet states."""
         summary = {}
         for stat_type, stacker in self._stackers.items():
             diag = stacker.get_diagnostics()
             summary[stat_type] = {
-                'weights': diag['weights'],
-                'alpha_sum': diag['alpha_sum'],
-                'num_updates': diag['num_updates'],
+                "weights": diag["weights"],
+                "alpha_sum": diag["alpha_sum"],
+                "num_updates": diag["num_updates"],
             }
         return summary
 
@@ -894,7 +877,7 @@ if __name__ == "__main__":
         component_names=component_names,
         prior_weights=prior_weights,
         prior_strength=10.0,
-        likelihood_scale=40.0
+        likelihood_scale=40.0,
     )
 
     print(f"\nInitial weights: {stacker.get_weights()}")
@@ -916,7 +899,7 @@ if __name__ == "__main__":
     actual = 267.0  # State-Space closest (error = 2)
 
     ensemble_pred, weights = stacker.predict(component_preds)
-    print(f"\nWeek 1, Game 1:")
+    print("\nWeek 1, Game 1:")
     print(f"  Ensemble: {ensemble_pred:.1f} yards (actual: {actual:.1f})")
     print(f"  Weights: {weights}")
 
@@ -934,17 +917,14 @@ if __name__ == "__main__":
     actual = 280.0  # XGBoost closest (error = 2)
 
     ensemble_pred = stacker.predict_and_update(component_preds, actual)
-    print(f"\nWeek 1, Game 2:")
+    print("\nWeek 1, Game 2:")
     print(f"  Ensemble: {ensemble_pred:.1f} yards (actual: {actual:.1f})")
     print(f"  Updated weights: {stacker.get_weights()}")
 
     # Continue for 3 more games...
     for i in range(3, 6):
         # Random predictions
-        component_preds = {
-            name: np.random.uniform(220, 300)
-            for name in component_names
-        }
+        component_preds = {name: np.random.uniform(220, 300) for name in component_names}
         actual = np.random.uniform(240, 280)
 
         ensemble_pred = stacker.predict_and_update(component_preds, actual)

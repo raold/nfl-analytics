@@ -19,34 +19,32 @@ Date: 2025-11-15 (Updated with authentication)
 """
 
 import logging
-import time
 import os
+import time
 from datetime import datetime
-from typing import Dict
 
-from fastapi import FastAPI, HTTPException, status, Depends, Request
-from fastapi.responses import PlainTextResponse
-from fastapi.middleware.cors import CORSMiddleware
 import psycopg
+from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import PlainTextResponse
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Gauge, Histogram, generate_latest
 from redis import Redis
-from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
 
+from api.auth import APIKey, get_authenticator, require_api_key
 from api.models import (
+    ErrorResponse,
+    HealthResponse,
+    ModelsListResponse,
     PredictionRequest,
     PredictionResponse,
-    ModelsListResponse,
-    HealthResponse,
-    ErrorResponse
 )
 from api.prediction import EnsemblePredictor
-from api.auth import require_api_key, APIKey, get_authenticator
-from api.middleware import RateLimitMiddleware
-from py.api.routes import game_predictions, game_outcome_predictions
+from py.api.routes import game_predictions
 
 # Setup logging
 logging.basicConfig(
     level=os.getenv("LOG_LEVEL", "INFO"),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
 )
 logger = logging.getLogger(__name__)
 
@@ -56,7 +54,7 @@ app = FastAPI(
     description="Production API for ensemble NFL player props predictions with authentication",
     version="1.1.0",  # Updated for security features
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
 
 # CORS middleware
@@ -72,10 +70,8 @@ app.add_middleware(
 try:
     app.include_router(game_predictions.router, prefix="/api/v1", tags=["game_predictions"])
     logger.info("✓ Game predictions router loaded successfully")
-    app.include_router(game_outcome_predictions.router, prefix="/api/v1", tags=["game_outcome_predictions"])
-    logger.info("✓ GameOutcomeModel router loaded successfully")
 except Exception as e:
-    logger.error(f"Failed to load prediction routers: {e}", exc_info=True)
+    logger.error(f"Failed to load game predictions router: {e}", exc_info=True)
 
 # Global state
 START_TIME = time.time()
@@ -85,29 +81,16 @@ redis_client: Redis | None = None
 
 # Prometheus metrics
 prediction_counter = Counter(
-    "predictions_total",
-    "Total number of predictions made",
-    ["stat_type", "status"]
+    "predictions_total", "Total number of predictions made", ["stat_type", "status"]
 )
 prediction_latency = Histogram(
     "prediction_latency_seconds",
     "Time to generate prediction",
-    buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 2.0, 5.0]
+    buckets=[0.01, 0.05, 0.1, 0.5, 1.0, 2.0, 5.0],
 )
-models_loaded = Gauge(
-    "models_loaded_total",
-    "Number of models successfully loaded"
-)
-api_requests = Counter(
-    "api_requests_total",
-    "Total API requests",
-    ["endpoint", "method", "status"]
-)
-auth_failures = Counter(
-    "auth_failures_total",
-    "Total authentication failures",
-    ["reason"]
-)
+models_loaded = Gauge("models_loaded_total", "Number of models successfully loaded")
+api_requests = Counter("api_requests_total", "Total API requests", ["endpoint", "method", "status"])
+auth_failures = Counter("auth_failures_total", "Total authentication failures", ["reason"])
 
 
 @app.on_event("startup")
@@ -115,13 +98,15 @@ async def startup_event():
     """Initialize services on startup"""
     global predictor, db_conn, redis_client
 
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("NFL ANALYTICS PREDICTION API - STARTING UP")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # Initialize database connection
     try:
-        db_url = os.getenv("DATABASE_URL", "postgresql://dro:sicillionbillions@localhost:5544/devdb01")  # pragma: allowlist secret
+        db_url = os.getenv(
+            "DATABASE_URL", "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
+        )  # pragma: allowlist secret
         logger.info(f"Connecting to database: {db_url.split('@')[1] if '@' in db_url else db_url}")
         db_conn = psycopg.connect(db_url)
         logger.info("✓ Database connected")
@@ -143,11 +128,8 @@ async def startup_event():
     # Add rate limiting middleware (must be done at startup)
     if redis_client:
         from api.middleware import create_rate_limiter
-        rate_limiter = create_rate_limiter(
-            redis_client=redis_client,
-            default_limit=100,
-            window_seconds=3600
-        )
+
+        create_rate_limiter(redis_client=redis_client, default_limit=100, window_seconds=3600)
         # Note: Middleware added via app.add_middleware() in production setup
         logger.info("✓ Rate limiting enabled (Redis-backed)")
     else:
@@ -171,14 +153,14 @@ async def startup_event():
 
     # Initialize authenticator
     try:
-        authenticator = get_authenticator()
+        get_authenticator()
         logger.info("✓ API key authenticator initialized")
     except Exception as e:
         logger.error(f"Authenticator initialization failed: {e}")
 
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("API READY - Authentication Enabled")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
 
 @app.on_event("shutdown")
@@ -257,15 +239,12 @@ async def health_check():
         redis_connected=redis_connected,
         models_loaded=models_count,
         uptime_seconds=round(uptime, 2),
-        version="1.1.0"
+        version="1.1.0",
     )
 
 
 @app.post("/predict", response_model=PredictionResponse, tags=["Predictions"])
-async def predict(
-    request: PredictionRequest,
-    api_key: APIKey = Depends(require_api_key)
-):
+async def predict(request: PredictionRequest, api_key: APIKey = Depends(require_api_key)):
     """
     Generate ensemble prediction (requires API key)
 
@@ -293,8 +272,7 @@ async def predict(
             api_requests.labels(endpoint="/predict", method="POST", status="error").inc()
             prediction_counter.labels(stat_type=request.stat_type.value, status="error").inc()
             raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Predictor not initialized"
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Predictor not initialized"
             )
 
         if not predictor.is_ready:
@@ -302,7 +280,7 @@ async def predict(
             prediction_counter.labels(stat_type=request.stat_type.value, status="error").inc()
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail="Insufficient models loaded (need at least 2)"
+                detail="Insufficient models loaded (need at least 2)",
             )
 
         # Generate prediction
@@ -329,8 +307,7 @@ async def predict(
         prediction_counter.labels(stat_type=request.stat_type.value, status="error").inc()
         logger.error(f"Prediction failed: {e}", exc_info=True)
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Prediction failed: {str(e)}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Prediction failed: {str(e)}"
         )
 
 
@@ -349,8 +326,7 @@ async def list_models():
 
     if not predictor:
         raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Predictor not initialized"
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Predictor not initialized"
         )
 
     model_info = predictor.get_model_info()
@@ -363,7 +339,7 @@ async def list_models():
         models=models_list,
         total_models=len(models_list),
         loaded_models=loaded_count,
-        ensemble_ready=loaded_count >= 2
+        ensemble_ready=loaded_count >= 2,
     )
 
 
@@ -379,10 +355,7 @@ async def metrics():
     - api_requests_total - Total API requests by endpoint
     - auth_failures_total - Authentication failures by reason
     """
-    return PlainTextResponse(
-        content=generate_latest(),
-        media_type=CONTENT_TYPE_LATEST
-    )
+    return PlainTextResponse(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
 @app.get("/", tags=["Root"])
@@ -395,7 +368,7 @@ async def root():
         "authentication": "required",
         "docs": "/docs",
         "health": "/health",
-        "metrics": "/metrics"
+        "metrics": "/metrics",
     }
 
 
@@ -416,16 +389,17 @@ async def http_exception_handler(request, exc):
         error=exc.__class__.__name__,
         message=exc.detail,
         details={"status_code": exc.status_code},
-        timestamp=datetime.utcnow()
+        timestamp=datetime.utcnow(),
     )
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(
         "api.main:app",
         host=os.getenv("API_HOST", "0.0.0.0"),
         port=int(os.getenv("API_PORT", 8000)),
         reload=os.getenv("API_RELOAD", "false").lower() == "true",
-        log_level=os.getenv("LOG_LEVEL", "info").lower()
+        log_level=os.getenv("LOG_LEVEL", "info").lower(),
     )

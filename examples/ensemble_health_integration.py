@@ -14,13 +14,13 @@ Date: November 14, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,9 @@ def example_1_pre_backtest_validation():
     # Check if healthy
     if report.is_healthy:
         logger.info("\n✅ ENSEMBLE HEALTHY - Safe to run backtest")
-        logger.info(f"   Components loaded: {sum(1 for h in report.components.values() if h.rpy2_test_passed)}/4")
+        logger.info(
+            f"   Components loaded: {sum(1 for h in report.components.values() if h.rpy2_test_passed)}/4"
+        )
         logger.info(f"   Warnings: {len(report.warnings)}")
         return True
     else:
@@ -63,10 +65,10 @@ def example_2_integrated_backtest():
 
     Shows how to integrate health monitoring into backtest workflow.
     """
-    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
-    from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
     import pandas as pd
-    import numpy as np
+
+    from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
     logger.info("=" * 80)
     logger.info("EXAMPLE 2: Integrated Backtest with Health Monitoring")
@@ -86,12 +88,14 @@ def example_2_integrated_backtest():
     ensemble = EnhancedEnsemble4Way()
 
     # Simulate backtest (replace with real data)
-    test_data = pd.DataFrame({
-        'player_id': ['00-0019596', '00-0033077', '00-0036212'],  # Mahomes, Allen, Herbert
-        'season': [2024, 2024, 2024],
-        'week': [1, 1, 1],
-        'actual_yards': [275, 301, 254],  # Simulated actuals
-    })
+    test_data = pd.DataFrame(
+        {
+            "player_id": ["00-0019596", "00-0033077", "00-0036212"],  # Mahomes, Allen, Herbert
+            "season": [2024, 2024, 2024],
+            "week": [1, 1, 1],
+            "actual_yards": [275, 301, 254],  # Simulated actuals
+        }
+    )
 
     logger.info(f"\nRunning backtest on {len(test_data)} games...")
 
@@ -99,25 +103,25 @@ def example_2_integrated_backtest():
         # Get predictions (this would fail if R models not loaded)
         try:
             result = ensemble.predict(
-                player_id=row['player_id'],
-                season=row['season'],
-                week=row['week']
+                player_id=row["player_id"], season=row["season"], week=row["week"]
             )
 
             # Track prediction
             monitor.track_prediction(
-                player_id=row['player_id'],
-                season=row['season'],
-                week=row['week'],
-                component_predictions=result.get('component_predictions', {}),
-                actual_yards=row['actual_yards'],
+                player_id=row["player_id"],
+                season=row["season"],
+                week=row["week"],
+                component_predictions=result.get("component_predictions", {}),
+                actual_yards=row["actual_yards"],
                 ensemble_prediction=(
-                    result.get('ensemble_mean', 0.0),
-                    result.get('ensemble_std', 0.0)
-                )
+                    result.get("ensemble_mean", 0.0),
+                    result.get("ensemble_std", 0.0),
+                ),
             )
 
-            logger.info(f"  {row['player_id']} W{row['week']}: {result.get('ensemble_mean', 0):.1f} yards (actual: {row['actual_yards']})")
+            logger.info(
+                f"  {row['player_id']} W{row['week']}: {result.get('ensemble_mean', 0):.1f} yards (actual: {row['actual_yards']})"
+            )
 
         except Exception as e:
             logger.error(f"⚠️  Prediction failed for {row['player_id']}: {e}")
@@ -131,8 +135,12 @@ def example_2_integrated_backtest():
     logger.info("=" * 80)
 
     if final_report.ensemble_calibration:
-        logger.info(f"Calibration (90% CI): {final_report.ensemble_calibration.coverage_90pct:.1f}%")
-        logger.info(f"Mean interval width: {final_report.ensemble_calibration.mean_interval_width_90pct:.1f} yards")
+        logger.info(
+            f"Calibration (90% CI): {final_report.ensemble_calibration.coverage_90pct:.1f}%"
+        )
+        logger.info(
+            f"Mean interval width: {final_report.ensemble_calibration.mean_interval_width_90pct:.1f} yards"
+        )
 
     if final_report.ensemble_mae:
         logger.info(f"Ensemble MAE: {final_report.ensemble_mae:.1f} yards")
@@ -147,8 +155,9 @@ def example_3_continuous_monitoring():
 
     Shows how to track predictions in production for drift detection.
     """
-    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
     import numpy as np
+
+    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
     logger.info("=" * 80)
     logger.info("EXAMPLE 3: Continuous Monitoring")
@@ -169,7 +178,7 @@ def example_3_continuous_monitoring():
                 "xgboost_v2": (np.random.normal(252, 42), 37),
                 "informative_priors_v2": (np.random.normal(249, 39), 34),
             },
-            actual_yards=np.random.normal(250, 50)
+            actual_yards=np.random.normal(250, 50),
         )
 
     baseline_preds = monitor.prediction_history[:50]
@@ -188,7 +197,7 @@ def example_3_continuous_monitoring():
                 "xgboost_v2": (np.random.normal(252, 42), 37),
                 "informative_priors_v2": (np.random.normal(249, 39), 34),
             },
-            actual_yards=np.random.normal(250, 50)
+            actual_yards=np.random.normal(250, 50),
         )
 
     current_preds = monitor.prediction_history[50:]
@@ -199,12 +208,12 @@ def example_3_continuous_monitoring():
     logger.info("\n" + "=" * 80)
     logger.info("DRIFT DETECTION RESULTS")
     logger.info("=" * 80)
-    logger.info(f"Component: hierarchical_v2")
+    logger.info("Component: hierarchical_v2")
     logger.info(f"Mean shift: {drift.mean_shift:+.1f} yards")
     logger.info(f"Std shift: {drift.std_shift:+.1f}")
     logger.info(f"MAE drift: {drift.mae_drift:+.1f}%")
 
-    if abs(drift.mean_shift) > monitor.DRIFT_THRESHOLDS['mean_shift_yards']:
+    if abs(drift.mean_shift) > monitor.DRIFT_THRESHOLDS["mean_shift_yards"]:
         logger.warning(f"⚠️  DRIFT DETECTED: Mean shifted by {drift.mean_shift:+.1f} yards")
         logger.warning("   Recommended action: Retrain hierarchical_v2 model")
 
@@ -248,11 +257,11 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Ensemble Health Monitor Integration Examples")
     parser.add_argument(
-        '--example',
+        "--example",
         type=int,
         choices=[1, 2, 3, 4],
         default=1,
-        help="Example to run (1: pre-backtest, 2: integrated, 3: monitoring, 4: CI/CD)"
+        help="Example to run (1: pre-backtest, 2: integrated, 3: monitoring, 4: CI/CD)",
     )
 
     args = parser.parse_args()

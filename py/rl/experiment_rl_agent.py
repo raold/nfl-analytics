@@ -10,15 +10,15 @@ Agents support:
 - Kelly-aware reward shaping for proper bet sizing
 """
 
+import random
+from collections import deque
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Categorical
-import numpy as np
-from typing import Dict, List, Tuple, Optional
-from collections import deque
-import random
 
 
 class DQNNetwork(nn.Module):
@@ -28,9 +28,10 @@ class DQNNetwork(nn.Module):
     Architecture: 44-dim input → 128 → 128 → 64 → 5-dim output (Q-values)
     """
 
-    def __init__(self, state_dim: int = 44, action_dim: int = 5,
-                 hidden_dims: List[int] = [128, 128, 64]):
-        super(DQNNetwork, self).__init__()
+    def __init__(
+        self, state_dim: int = 44, action_dim: int = 5, hidden_dims: list[int] = [128, 128, 64]
+    ):
+        super().__init__()
 
         layers = []
         prev_dim = state_dim
@@ -60,7 +61,7 @@ class ReplayBuffer:
         """Add experience to buffer"""
         self.buffer.append((state, action, reward, next_state, done))
 
-    def sample(self, batch_size: int) -> Tuple:
+    def sample(self, batch_size: int) -> tuple:
         """Sample random batch from buffer"""
         batch = random.sample(self.buffer, batch_size)
 
@@ -71,7 +72,7 @@ class ReplayBuffer:
             torch.LongTensor(actions),
             torch.FloatTensor(rewards),
             torch.FloatTensor(np.array(next_states)),
-            torch.FloatTensor(dones)
+            torch.FloatTensor(dones),
         )
 
     def __len__(self):
@@ -86,18 +87,20 @@ class DQNAgent:
     Tracks feature importance via gradient analysis.
     """
 
-    def __init__(self,
-                 state_dim: int = 44,
-                 action_dim: int = 5,
-                 hidden_dims: List[int] = [128, 128, 64],
-                 learning_rate: float = 1e-4,
-                 gamma: float = 0.99,
-                 epsilon_start: float = 1.0,
-                 epsilon_end: float = 0.01,
-                 epsilon_decay: float = 0.995,
-                 buffer_capacity: int = 10000,
-                 batch_size: int = 64,
-                 target_update_freq: int = 10):
+    def __init__(
+        self,
+        state_dim: int = 44,
+        action_dim: int = 5,
+        hidden_dims: list[int] = [128, 128, 64],
+        learning_rate: float = 1e-4,
+        gamma: float = 0.99,
+        epsilon_start: float = 1.0,
+        epsilon_end: float = 0.01,
+        epsilon_decay: float = 0.995,
+        buffer_capacity: int = 10000,
+        batch_size: int = 64,
+        target_update_freq: int = 10,
+    ):
 
         self.state_dim = state_dim
         self.action_dim = action_dim
@@ -149,7 +152,7 @@ class DQNAgent:
         """Store experience in replay buffer"""
         self.replay_buffer.push(state, action, reward, next_state, done)
 
-    def train_step(self) -> Optional[float]:
+    def train_step(self) -> float | None:
         """
         Perform one training step using experience replay.
 
@@ -225,28 +228,31 @@ class DQNAgent:
 
     def save(self, path: str):
         """Save agent state"""
-        torch.save({
-            'policy_net': self.policy_net.state_dict(),
-            'target_net': self.target_net.state_dict(),
-            'optimizer': self.optimizer.state_dict(),
-            'epsilon': self.epsilon,
-            'update_count': self.update_count,
-            'feature_gradients': self.feature_gradients,
-            'feature_usage_counts': self.feature_usage_counts,
-            'losses': self.losses
-        }, path)
+        torch.save(
+            {
+                "policy_net": self.policy_net.state_dict(),
+                "target_net": self.target_net.state_dict(),
+                "optimizer": self.optimizer.state_dict(),
+                "epsilon": self.epsilon,
+                "update_count": self.update_count,
+                "feature_gradients": self.feature_gradients,
+                "feature_usage_counts": self.feature_usage_counts,
+                "losses": self.losses,
+            },
+            path,
+        )
 
     def load(self, path: str):
         """Load agent state"""
         checkpoint = torch.load(path)
-        self.policy_net.load_state_dict(checkpoint['policy_net'])
-        self.target_net.load_state_dict(checkpoint['target_net'])
-        self.optimizer.load_state_dict(checkpoint['optimizer'])
-        self.epsilon = checkpoint['epsilon']
-        self.update_count = checkpoint['update_count']
-        self.feature_gradients = checkpoint['feature_gradients']
-        self.feature_usage_counts = checkpoint['feature_usage_counts']
-        self.losses = checkpoint['losses']
+        self.policy_net.load_state_dict(checkpoint["policy_net"])
+        self.target_net.load_state_dict(checkpoint["target_net"])
+        self.optimizer.load_state_dict(checkpoint["optimizer"])
+        self.epsilon = checkpoint["epsilon"]
+        self.update_count = checkpoint["update_count"]
+        self.feature_gradients = checkpoint["feature_gradients"]
+        self.feature_usage_counts = checkpoint["feature_usage_counts"]
+        self.losses = checkpoint["losses"]
 
 
 class PPOActorCritic(nn.Module):
@@ -256,9 +262,10 @@ class PPOActorCritic(nn.Module):
     Shares base network, splits into actor (policy) and critic (value) heads.
     """
 
-    def __init__(self, state_dim: int = 44, action_dim: int = 5,
-                 hidden_dims: List[int] = [128, 128]):
-        super(PPOActorCritic, self).__init__()
+    def __init__(
+        self, state_dim: int = 44, action_dim: int = 5, hidden_dims: list[int] = [128, 128]
+    ):
+        super().__init__()
 
         # Shared base network
         base_layers = []
@@ -277,7 +284,7 @@ class PPOActorCritic(nn.Module):
         # Critic head (value function)
         self.critic = nn.Linear(prev_dim, 1)
 
-    def forward(self, state: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, state: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """
         Forward pass.
 
@@ -304,16 +311,18 @@ class PPOAgent:
     Uses clipped objective to prevent destructive policy updates.
     """
 
-    def __init__(self,
-                 state_dim: int = 44,
-                 action_dim: int = 5,
-                 hidden_dims: List[int] = [128, 128],
-                 learning_rate: float = 3e-4,
-                 gamma: float = 0.99,
-                 gae_lambda: float = 0.95,
-                 clip_epsilon: float = 0.2,
-                 epochs_per_update: int = 4,
-                 batch_size: int = 64):
+    def __init__(
+        self,
+        state_dim: int = 44,
+        action_dim: int = 5,
+        hidden_dims: list[int] = [128, 128],
+        learning_rate: float = 3e-4,
+        gamma: float = 0.99,
+        gae_lambda: float = 0.95,
+        clip_epsilon: float = 0.2,
+        epochs_per_update: int = 4,
+        batch_size: int = 64,
+    ):
 
         self.state_dim = state_dim
         self.action_dim = action_dim
@@ -343,7 +352,7 @@ class PPOAgent:
         self.policy_losses = []
         self.value_losses = []
 
-    def select_action(self, state: np.ndarray, training: bool = True) -> Tuple[int, float, float]:
+    def select_action(self, state: np.ndarray, training: bool = True) -> tuple[int, float, float]:
         """
         Select action using current policy.
 
@@ -378,7 +387,7 @@ class PPOAgent:
         self.values.append(value)
         self.dones.append(done)
 
-    def compute_gae(self) -> Tuple[np.ndarray, np.ndarray]:
+    def compute_gae(self) -> tuple[np.ndarray, np.ndarray]:
         """
         Compute Generalized Advantage Estimation.
 
@@ -409,7 +418,7 @@ class PPOAgent:
 
         return advantages, returns
 
-    def train_step(self) -> Tuple[float, float]:
+    def train_step(self) -> tuple[float, float]:
         """
         Perform PPO update using collected experiences.
 
@@ -447,7 +456,9 @@ class PPOAgent:
             # Policy loss with clipping
             ratio = torch.exp(new_log_probs - old_log_probs)
             surr1 = ratio * advantages_tensor
-            surr2 = torch.clamp(ratio, 1 - self.clip_epsilon, 1 + self.clip_epsilon) * advantages_tensor
+            surr2 = (
+                torch.clamp(ratio, 1 - self.clip_epsilon, 1 + self.clip_epsilon) * advantages_tensor
+            )
             policy_loss = -torch.min(surr1, surr2).mean()
 
             # Value loss
@@ -502,24 +513,27 @@ class PPOAgent:
 
     def save(self, path: str):
         """Save agent state"""
-        torch.save({
-            'network': self.network.state_dict(),
-            'optimizer': self.optimizer.state_dict(),
-            'feature_gradients': self.feature_gradients,
-            'feature_usage_counts': self.feature_usage_counts,
-            'policy_losses': self.policy_losses,
-            'value_losses': self.value_losses
-        }, path)
+        torch.save(
+            {
+                "network": self.network.state_dict(),
+                "optimizer": self.optimizer.state_dict(),
+                "feature_gradients": self.feature_gradients,
+                "feature_usage_counts": self.feature_usage_counts,
+                "policy_losses": self.policy_losses,
+                "value_losses": self.value_losses,
+            },
+            path,
+        )
 
     def load(self, path: str):
         """Load agent state"""
         checkpoint = torch.load(path)
-        self.network.load_state_dict(checkpoint['network'])
-        self.optimizer.load_state_dict(checkpoint['optimizer'])
-        self.feature_gradients = checkpoint['feature_gradients']
-        self.feature_usage_counts = checkpoint['feature_usage_counts']
-        self.policy_losses = checkpoint['policy_losses']
-        self.value_losses = checkpoint['value_losses']
+        self.network.load_state_dict(checkpoint["network"])
+        self.optimizer.load_state_dict(checkpoint["optimizer"])
+        self.feature_gradients = checkpoint["feature_gradients"]
+        self.feature_usage_counts = checkpoint["feature_usage_counts"]
+        self.policy_losses = checkpoint["policy_losses"]
+        self.value_losses = checkpoint["value_losses"]
 
 
 class AblationStudyRunner:
@@ -529,15 +543,17 @@ class AblationStudyRunner:
     Trains agents with different feature subsets to isolate experiment impact.
     """
 
-    def __init__(self, base_agent_class, base_agent_params: Dict):
+    def __init__(self, base_agent_class, base_agent_params: dict):
         self.base_agent_class = base_agent_class
         self.base_agent_params = base_agent_params
 
-    def run_ablation(self,
-                     env,
-                     experiment_indices: List[int],
-                     num_episodes: int = 100,
-                     experiment_name: str = "ablation") -> Dict:
+    def run_ablation(
+        self,
+        env,
+        experiment_indices: list[int],
+        num_episodes: int = 100,
+        experiment_name: str = "ablation",
+    ) -> dict:
         """
         Run ablation study by training agent with specific features removed.
 
@@ -592,11 +608,11 @@ class AblationStudyRunner:
             episode_returns.append(episode_return)
 
         return {
-            'experiment_name': experiment_name,
-            'removed_features': experiment_indices,
-            'mean_return': np.mean(episode_returns),
-            'std_return': np.std(episode_returns),
-            'final_bankroll': env.current_bankroll,
-            'roi': (env.current_bankroll - env.initial_bankroll) / env.initial_bankroll,
-            'sharpe': np.mean(episode_returns) / (np.std(episode_returns) + 1e-8)
+            "experiment_name": experiment_name,
+            "removed_features": experiment_indices,
+            "mean_return": np.mean(episode_returns),
+            "std_return": np.std(episode_returns),
+            "final_bankroll": env.current_bankroll,
+            "roi": (env.current_bankroll - env.initial_bankroll) / env.initial_bankroll,
+            "sharpe": np.mean(episode_returns) / (np.std(episode_returns) + 1e-8),
         }

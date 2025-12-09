@@ -9,7 +9,6 @@ Validates end-to-end functionality:
 4. EWB deployment script
 """
 
-import json
 import sys
 from pathlib import Path
 
@@ -93,7 +92,7 @@ def test_line_movement_tracker():
     assert movement.closing_spread == -4.5
     assert movement.movement == -1.5
     assert movement.ewb_edge > 0  # Should have edge from line movement
-    assert 'significant_move' in movement.sharp_indicators
+    assert "significant_move" in movement.sharp_indicators
 
     print("\n✅ Line Movement Tracker: PASS")
     return tracker
@@ -134,7 +133,7 @@ def test_clv_analysis():
     # Analyze CLV
     clv = tracker.analyze_clv()
 
-    print(f"\nCLV Results:")
+    print("\nCLV Results:")
     print(f"Total bets: {clv.total_bets}")
     print(f"EWB wins: {clv.ewb_wins} ({clv.ewb_wins/clv.total_bets*100:.1f}%)")
     print(f"EWB losses: {clv.ewb_losses}")
@@ -163,13 +162,15 @@ def test_edge_calculation():
     scenarios = [
         ("Large move", -3.0, -5.0, 0.08),  # 2 points = 8% edge
         ("Small move", -3.0, -3.5, 0.02),  # 0.5 points = 2% edge
-        ("No move", -3.0, -3.0, 0.0),      # 0 points = 0% edge
-        ("Reverse", -3.0, -2.0, 0.04),     # 1 point = 4% edge
+        ("No move", -3.0, -3.0, 0.0),  # 0 points = 0% edge
+        ("Reverse", -3.0, -2.0, 0.04),  # 1 point = 4% edge
     ]
 
     for name, opening, closing, expected_edge in scenarios:
         edge = tracker.calculate_ewb_edge(opening, closing)
-        print(f"{name}: Opening={opening}, Closing={closing}, Edge={edge:.2%} (expected {expected_edge:.2%})")
+        print(
+            f"{name}: Opening={opening}, Closing={closing}, Edge={edge:.2%} (expected {expected_edge:.2%})"
+        )
         assert abs(edge - expected_edge) < 0.01, f"Edge mismatch for {name}"
 
     print("\n✅ Edge Calculation: PASS")
@@ -185,12 +186,46 @@ def test_integration_with_csv():
     csv_path = Path("tests/data/sample_line_movements.csv")
     csv_path.parent.mkdir(parents=True, exist_ok=True)
 
-    sample_data = pd.DataFrame([
-        {"game_id": "2024_07_KC_BUF", "timestamp": "2024-10-08T09:00:00", "book": "pinnacle", "spread": -3.0, "total": 52.5, "moneyline_home": -155, "moneyline_away": 135},
-        {"game_id": "2024_07_KC_BUF", "timestamp": "2024-10-13T12:30:00", "book": "pinnacle", "spread": -4.5, "total": 53.5, "moneyline_home": -195, "moneyline_away": 175},
-        {"game_id": "2024_07_SF_DAL", "timestamp": "2024-10-08T09:00:00", "book": "pinnacle", "spread": 7.0, "total": 48.5, "moneyline_home": 240, "moneyline_away": -280},
-        {"game_id": "2024_07_SF_DAL", "timestamp": "2024-10-13T12:30:00", "book": "pinnacle", "spread": 6.0, "total": 47.5, "moneyline_home": 210, "moneyline_away": -245},
-    ])
+    sample_data = pd.DataFrame(
+        [
+            {
+                "game_id": "2024_07_KC_BUF",
+                "timestamp": "2024-10-08T09:00:00",
+                "book": "pinnacle",
+                "spread": -3.0,
+                "total": 52.5,
+                "moneyline_home": -155,
+                "moneyline_away": 135,
+            },
+            {
+                "game_id": "2024_07_KC_BUF",
+                "timestamp": "2024-10-13T12:30:00",
+                "book": "pinnacle",
+                "spread": -4.5,
+                "total": 53.5,
+                "moneyline_home": -195,
+                "moneyline_away": 175,
+            },
+            {
+                "game_id": "2024_07_SF_DAL",
+                "timestamp": "2024-10-08T09:00:00",
+                "book": "pinnacle",
+                "spread": 7.0,
+                "total": 48.5,
+                "moneyline_home": 240,
+                "moneyline_away": -280,
+            },
+            {
+                "game_id": "2024_07_SF_DAL",
+                "timestamp": "2024-10-13T12:30:00",
+                "book": "pinnacle",
+                "spread": 6.0,
+                "total": 47.5,
+                "moneyline_home": 210,
+                "moneyline_away": -245,
+            },
+        ]
+    )
 
     sample_data.to_csv(csv_path, index=False)
 
@@ -208,7 +243,7 @@ def test_integration_with_csv():
 
     # Get summary stats
     stats = tracker.get_summary_stats()
-    print(f"\nSummary:")
+    print("\nSummary:")
     print(f"  Total games: {stats['total_games']}")
     print(f"  Avg movement: {stats['avg_spread_movement']:+.2f} points")
     print(f"  Avg EWB edge: {stats['avg_ewb_edge']:.2%}")
@@ -248,6 +283,7 @@ def run_all_tests():
     except Exception as e:
         print(f"\n❌ ERROR: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

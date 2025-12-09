@@ -10,8 +10,6 @@ Phase 5: torchuncertainty (evidential deep learning)
 
 import subprocess
 import sys
-from pathlib import Path
-from packaging import version
 
 # Required packages with details
 PACKAGES = {
@@ -71,9 +69,7 @@ def get_package_version(package_name):
 
 def install_package(package_name):
     """Install a package using uv pip install."""
-    success, stdout, stderr = run_command(
-        f"uv pip install {package_name} -q", check=False
-    )
+    success, stdout, stderr = run_command(f"uv pip install {package_name} -q", check=False)
     return success, stdout, stderr
 
 
@@ -85,7 +81,7 @@ def check_conflicts():
 
 def test_import(package_name):
     """Test if a package can be imported."""
-    cmd = f"python3 -c \"import {package_name}\""
+    cmd = f'python3 -c "import {package_name}"'
     success, _, stderr = run_command(cmd, check=False)
     return success, stderr
 
@@ -107,9 +103,7 @@ def main():
 
     success, uv_version, _ = run_command("uv --version", check=False)
     if not success:
-        print(
-            "ERROR: uv not found. Install with: curl -LsSf https://astral.sh/uv/install.sh | sh"
-        )
+        print("ERROR: uv not found. Install with: curl -LsSf https://astral.sh/uv/install.sh | sh")
         sys.exit(1)
     print(f"uv: {uv_version.strip()}")
     print()

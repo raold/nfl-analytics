@@ -6,13 +6,14 @@ Expected: 52-53% win rate (random + market info, minus vig)
 If >55%: Confirms data leakage in feature pipeline
 """
 
-import numpy as np
-import pandas as pd
+import warnings
 from pathlib import Path
+
+import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
-import warnings
-warnings.filterwarnings('ignore')
+
+warnings.filterwarnings("ignore")
 
 print("=" * 70)
 print(" DIAGNOSTIC TEST 1: SPREAD-ONLY BASELINE ".center(70))
@@ -23,18 +24,18 @@ features_path = Path("data/processed/features/asof_clean_backtest.csv")
 df = pd.read_csv(features_path)
 
 # Filter to games with betting lines and outcomes
-df = df[df['spread_close'].notna() & df['home_cover'].notna()].copy()
+df = df[df["spread_close"].notna() & df["home_cover"].notna()].copy()
 print(f"\n[OK] Loaded {len(df):,} games with spreads")
 print(f"[OK] Years: {df.season.min()}-{df.season.max()}")
 
 # SPREAD ONLY - no other features
-X_spread = df[['spread_close']].fillna(0).values
-y_cover = df['home_cover'].astype(int).values
+X_spread = df[["spread_close"]].fillna(0).values
+y_cover = df["home_cover"].astype(int).values
 
 # Train/test split
 test_start_season = 2020
-train_mask = df['season'] < test_start_season
-test_mask = df['season'] >= test_start_season
+train_mask = df["season"] < test_start_season
+test_mask = df["season"] >= test_start_season
 
 print(f"\n[OK] Train: {train_mask.sum():,} games (pre-{test_start_season})")
 print(f"[OK] Test:  {test_mask.sum():,} games ({test_start_season}+)")
@@ -84,6 +85,6 @@ print(f"[INFO] Intercept:   {model.intercept_[0]:.4f}")
 # Baseline comparison
 baseline_acc = y_cover[test_mask].mean()  # Home team cover rate
 print(f"\n[BASELINE] Home team covers spread: {baseline_acc:.1%}")
-print(f"[BASELINE] Random guessing: 50.0%")
+print("[BASELINE] Random guessing: 50.0%")
 
 print("\n" + "=" * 70)

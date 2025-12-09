@@ -9,18 +9,19 @@ Author: Claude Code
 Date: November 22, 2025
 """
 
-from functools import wraps
-from typing import Optional, List, Dict, Any, Callable
 import hashlib
 import json
 import logging
-from datetime import datetime, timedelta
+from collections.abc import Callable
+from functools import wraps
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 # Import Redis cache infrastructure
 try:
     from py.utils.claude_cache import get_default_cache
+
     REDIS_AVAILABLE = True
 except ImportError:
     logger.warning("Redis cache not available - predictions will not be cached")
@@ -68,9 +69,10 @@ def cache_game_prediction(ttl_seconds: int = DEFAULT_TTL_SECONDS):
     Returns:
         Decorated function with Redis caching
     """
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        def wrapper(game_id: str, season: int, week: int, **kwargs) -> Dict[str, Any]:
+        def wrapper(game_id: str, season: int, week: int, **kwargs) -> dict[str, Any]:
             # Skip caching if Redis unavailable
             if not REDIS_AVAILABLE:
                 logger.debug(f"Cache disabled, executing: {game_id}")
@@ -90,8 +92,8 @@ def cache_game_prediction(ttl_seconds: int = DEFAULT_TTL_SECONDS):
                 if cached:
                     logger.info(f"✅ Cache HIT: {game_id} (key={cache_key[:16]}...)")
                     result = json.loads(cached)
-                    result['_cached'] = True
-                    result['_cache_key'] = cache_key
+                    result["_cached"] = True
+                    result["_cache_key"] = cache_key
                     return result
             except Exception as e:
                 logger.warning(f"Cache read failed for {game_id}: {e}")
@@ -106,22 +108,24 @@ def cache_game_prediction(ttl_seconds: int = DEFAULT_TTL_SECONDS):
                 cache_value = json.dumps(result)
                 cache.set(cache_key, cache_value, ttl=ttl_seconds)
                 logger.info(f"💾 Cached: {game_id} (TTL={ttl_seconds}s, key={cache_key[:16]}...)")
-                result['_cached'] = False
-                result['_cache_key'] = cache_key
+                result["_cached"] = False
+                result["_cache_key"] = cache_key
             except Exception as e:
                 logger.error(f"Cache write failed for {game_id}: {e}")
                 # Non-fatal - return result anyway
 
             return result
+
         return wrapper
+
     return decorator
 
 
 def invalidate_game_cache(
-    game_id: Optional[str] = None,
-    season: Optional[int] = None,
-    week: Optional[int] = None,
-    pattern: Optional[str] = None
+    game_id: str | None = None,
+    season: int | None = None,
+    week: int | None = None,
+    pattern: str | None = None,
 ) -> int:
     """
     Invalidate cached game predictions.
@@ -146,7 +150,7 @@ def invalidate_game_cache(
         return 0
 
     cache = get_default_cache()
-    if not cache or not hasattr(cache, 'redis_client'):
+    if not cache or not hasattr(cache, "redis_client"):
         logger.warning("Redis client unavailable - cannot invalidate cache")
         return 0
 
@@ -164,10 +168,10 @@ def invalidate_game_cache(
     elif season and week:
         # Invalidate all games in a specific week
         # Pattern: game_pred:*_{season}_{week}_*
-        scan_pattern = f"game_pred:*"  # Must scan all (hash prevents pattern matching)
+        scan_pattern = "game_pred:*"  # Must scan all (hash prevents pattern matching)
     elif season:
         # Invalidate all games in a season
-        scan_pattern = f"game_pred:*"  # Must scan all
+        scan_pattern = "game_pred:*"  # Must scan all
     else:
         # Invalidate all game predictions
         scan_pattern = "game_pred:*"
@@ -178,11 +182,7 @@ def invalidate_game_cache(
         # Use SCAN for production safety (non-blocking)
         cursor = 0
         while True:
-            cursor, keys = cache.redis_client.scan(
-                cursor=cursor,
-                match=scan_pattern,
-                count=100
-            )
+            cursor, keys = cache.redis_client.scan(cursor=cursor, match=scan_pattern, count=100)
 
             # Filter keys if season/week specified (hash prevents pattern matching)
             if keys:
@@ -212,7 +212,7 @@ def invalidate_game_cache(
         return 0
 
 
-def get_cache_stats() -> Dict[str, Any]:
+def get_cache_stats() -> dict[str, Any]:
     """
     Get cache statistics for monitoring.
 
@@ -227,7 +227,7 @@ def get_cache_stats() -> Dict[str, Any]:
         return {"error": "Redis unavailable"}
 
     cache = get_default_cache()
-    if not cache or not hasattr(cache, 'redis_client'):
+    if not cache or not hasattr(cache, "redis_client"):
         return {"error": "Redis client unavailable"}
 
     try:
@@ -235,25 +235,21 @@ def get_cache_stats() -> Dict[str, Any]:
         total_keys = 0
         cursor = 0
         while True:
-            cursor, keys = cache.redis_client.scan(
-                cursor=cursor,
-                match="game_pred:*",
-                count=1000
-            )
+            cursor, keys = cache.redis_client.scan(cursor=cursor, match="game_pred:*", count=1000)
             total_keys += len(keys)
             if cursor == 0:
                 break
 
         # Get Redis info
-        redis_info = cache.redis_client.info('memory')
-        memory_mb = redis_info.get('used_memory', 0) / (1024 * 1024)
+        redis_info = cache.redis_client.info("memory")
+        memory_mb = redis_info.get("used_memory", 0) / (1024 * 1024)
 
         return {
             "total_keys": total_keys,
             "redis_memory_mb": round(memory_mb, 2),
             "cache_available": True,
             "ensemble_version": ENSEMBLE_VERSION,
-            "default_ttl_seconds": DEFAULT_TTL_SECONDS
+            "default_ttl_seconds": DEFAULT_TTL_SECONDS,
         }
 
     except Exception as e:
@@ -266,25 +262,16 @@ try:
     from prometheus_client import Counter, Gauge, Histogram
 
     CACHE_HITS = Counter(
-        "game_prediction_cache_hits_total",
-        "Total number of game prediction cache hits"
+        "game_prediction_cache_hits_total", "Total number of game prediction cache hits"
     )
     CACHE_MISSES = Counter(
-        "game_prediction_cache_misses_total",
-        "Total number of game prediction cache misses"
+        "game_prediction_cache_misses_total", "Total number of game prediction cache misses"
     )
     CACHE_ERRORS = Counter(
-        "game_prediction_cache_errors_total",
-        "Total number of game prediction cache errors"
+        "game_prediction_cache_errors_total", "Total number of game prediction cache errors"
     )
-    CACHE_SIZE = Gauge(
-        "game_prediction_cache_size_keys",
-        "Number of cached game predictions"
-    )
-    CACHE_MEMORY = Gauge(
-        "game_prediction_cache_memory_mb",
-        "Redis memory usage in MB"
-    )
+    CACHE_SIZE = Gauge("game_prediction_cache_size_keys", "Number of cached game predictions")
+    CACHE_MEMORY = Gauge("game_prediction_cache_memory_mb", "Redis memory usage in MB")
 
     PROMETHEUS_AVAILABLE = True
 except ImportError:
@@ -298,6 +285,6 @@ def update_cache_metrics():
         return
 
     stats = get_cache_stats()
-    if 'error' not in stats:
-        CACHE_SIZE.set(stats['total_keys'])
-        CACHE_MEMORY.set(stats['redis_memory_mb'])
+    if "error" not in stats:
+        CACHE_SIZE.set(stats["total_keys"])
+        CACHE_MEMORY.set(stats["redis_memory_mb"])

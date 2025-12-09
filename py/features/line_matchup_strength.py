@@ -36,7 +36,6 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -127,9 +126,7 @@ class LineMatchupStrengthEngine:
 
         return plays
 
-    def calculate_offensive_line_rankings(
-        self, plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_offensive_line_rankings(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate offensive line run blocking quality rankings by team/season/week.
 
@@ -152,9 +149,9 @@ class LineMatchupStrengthEngine:
         # Classify play outcomes
         plays["stuffed"] = (plays["yards_gained"] <= 0).astype(int)
         plays["explosive_run"] = (plays["yards_gained"] >= 10).astype(int)
-        plays["short_yardage"] = (
-            (plays["down"].isin([3, 4])) & (plays["ydstogo"] <= 2)
-        ).astype(int)
+        plays["short_yardage"] = ((plays["down"].isin([3, 4])) & (plays["ydstogo"] <= 2)).astype(
+            int
+        )
 
         # Aggregate by offensive team
         ol_stats = (
@@ -166,34 +163,31 @@ class LineMatchupStrengthEngine:
                 explosive_runs=("explosive_run", "sum"),
                 successful_runs=("success", "sum"),
                 first_downs=("first_down", "sum"),
-                touchdowns=("touchdown", lambda x: ((x == 1) & (plays.loc[x.index, "td_team"] == plays.loc[x.index, "posteam"])).sum()),
+                touchdowns=(
+                    "touchdown",
+                    lambda x: (
+                        (x == 1) & (plays.loc[x.index, "td_team"] == plays.loc[x.index, "posteam"])
+                    ).sum(),
+                ),
                 epa=("epa", "sum"),
                 short_yardage_attempts=("short_yardage", "sum"),
-                short_yardage_conversions=("first_down", lambda x: x[plays.loc[x.index, "short_yardage"] == 1].sum()),
+                short_yardage_conversions=(
+                    "first_down",
+                    lambda x: x[plays.loc[x.index, "short_yardage"] == 1].sum(),
+                ),
             )
             .reset_index()
         )
 
         # Calculate rate stats
-        ol_stats["yards_per_carry"] = (
-            ol_stats["rushing_yards"] / ol_stats["rush_attempts"]
-        )
-        ol_stats["stuff_rate"] = (
-            ol_stats["stuffed_runs"] / ol_stats["rush_attempts"]
-        )
-        ol_stats["explosive_rate"] = (
-            ol_stats["explosive_runs"] / ol_stats["rush_attempts"]
-        )
-        ol_stats["success_rate"] = (
-            ol_stats["successful_runs"] / ol_stats["rush_attempts"]
-        )
-        ol_stats["epa_per_rush"] = (
-            ol_stats["epa"] / ol_stats["rush_attempts"]
-        )
-        ol_stats["short_yardage_conversion_rate"] = (
-            ol_stats["short_yardage_conversions"]
-            / ol_stats["short_yardage_attempts"].replace(0, np.nan)
-        )
+        ol_stats["yards_per_carry"] = ol_stats["rushing_yards"] / ol_stats["rush_attempts"]
+        ol_stats["stuff_rate"] = ol_stats["stuffed_runs"] / ol_stats["rush_attempts"]
+        ol_stats["explosive_rate"] = ol_stats["explosive_runs"] / ol_stats["rush_attempts"]
+        ol_stats["success_rate"] = ol_stats["successful_runs"] / ol_stats["rush_attempts"]
+        ol_stats["epa_per_rush"] = ol_stats["epa"] / ol_stats["rush_attempts"]
+        ol_stats["short_yardage_conversion_rate"] = ol_stats[
+            "short_yardage_conversions"
+        ] / ol_stats["short_yardage_attempts"].replace(0, np.nan)
 
         # Calculate rolling averages (5-game window)
         ol_stats = ol_stats.sort_values(["posteam", "season", "week"])
@@ -208,9 +202,9 @@ class LineMatchupStrengthEngine:
         ]
 
         for col in rolling_cols:
-            ol_stats[f"{col}_rolling"] = ol_stats.groupby("posteam")[
-                col
-            ].transform(lambda x: x.shift(1).rolling(5, min_periods=1).mean())
+            ol_stats[f"{col}_rolling"] = ol_stats.groupby("posteam")[col].transform(
+                lambda x: x.shift(1).rolling(5, min_periods=1).mean()
+            )
 
         # Calculate percentile ranks (higher = better OL)
         # Need to invert stuff_rate (lower is better)
@@ -224,14 +218,10 @@ class LineMatchupStrengthEngine:
         ranking_cols_inverted = ["stuff_rate_rolling"]
 
         for col in ranking_cols_normal:
-            ol_stats[f"{col}_pct"] = ol_stats.groupby(["season", "week"])[
-                col
-            ].rank(pct=True)
+            ol_stats[f"{col}_pct"] = ol_stats.groupby(["season", "week"])[col].rank(pct=True)
 
         for col in ranking_cols_inverted:
-            ol_stats[f"{col}_pct"] = 1 - ol_stats.groupby(["season", "week"])[
-                col
-            ].rank(pct=True)
+            ol_stats[f"{col}_pct"] = 1 - ol_stats.groupby(["season", "week"])[col].rank(pct=True)
 
         # Composite OL quality score (0-100, higher = better blocking)
         ol_stats["ol_run_block_quality"] = (
@@ -253,9 +243,7 @@ class LineMatchupStrengthEngine:
 
         return ol_stats
 
-    def calculate_defensive_line_rankings(
-        self, plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_defensive_line_rankings(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate defensive line run defense quality rankings by team/season/week.
 
@@ -292,7 +280,10 @@ class LineMatchupStrengthEngine:
                 explosive_runs_allowed=("explosive_run", "sum"),
                 successful_runs_allowed=("success", "sum"),
                 epa_allowed=("epa", "sum"),
-                short_yardage_stops=("stuffed", lambda x: x[plays.loc[x.index, "short_yardage"] == 1].sum()),
+                short_yardage_stops=(
+                    "stuffed",
+                    lambda x: x[plays.loc[x.index, "short_yardage"] == 1].sum(),
+                ),
                 short_yardage_attempts_faced=("short_yardage", "sum"),
             )
             .reset_index()
@@ -302,22 +293,17 @@ class LineMatchupStrengthEngine:
         dl_stats["yards_per_carry_allowed"] = (
             dl_stats["rushing_yards_allowed"] / dl_stats["rush_attempts_faced"]
         )
-        dl_stats["stuff_rate"] = (
-            dl_stats["stuffs"] / dl_stats["rush_attempts_faced"]
-        )
+        dl_stats["stuff_rate"] = dl_stats["stuffs"] / dl_stats["rush_attempts_faced"]
         dl_stats["explosive_rate_allowed"] = (
             dl_stats["explosive_runs_allowed"] / dl_stats["rush_attempts_faced"]
         )
         dl_stats["success_rate_allowed"] = (
             dl_stats["successful_runs_allowed"] / dl_stats["rush_attempts_faced"]
         )
-        dl_stats["epa_per_rush_allowed"] = (
-            dl_stats["epa_allowed"] / dl_stats["rush_attempts_faced"]
-        )
-        dl_stats["short_yardage_stop_rate"] = (
-            dl_stats["short_yardage_stops"]
-            / dl_stats["short_yardage_attempts_faced"].replace(0, np.nan)
-        )
+        dl_stats["epa_per_rush_allowed"] = dl_stats["epa_allowed"] / dl_stats["rush_attempts_faced"]
+        dl_stats["short_yardage_stop_rate"] = dl_stats["short_yardage_stops"] / dl_stats[
+            "short_yardage_attempts_faced"
+        ].replace(0, np.nan)
 
         # Calculate rolling averages (5-game window)
         dl_stats = dl_stats.sort_values(["defteam", "season", "week"])
@@ -332,9 +318,9 @@ class LineMatchupStrengthEngine:
         ]
 
         for col in rolling_cols:
-            dl_stats[f"{col}_rolling"] = dl_stats.groupby("defteam")[
-                col
-            ].transform(lambda x: x.shift(1).rolling(5, min_periods=1).mean())
+            dl_stats[f"{col}_rolling"] = dl_stats.groupby("defteam")[col].transform(
+                lambda x: x.shift(1).rolling(5, min_periods=1).mean()
+            )
 
         # Calculate percentile ranks (higher = better DL)
         # Invert metrics where lower is better for defense
@@ -350,14 +336,10 @@ class LineMatchupStrengthEngine:
         ]
 
         for col in ranking_cols_normal:
-            dl_stats[f"{col}_pct"] = dl_stats.groupby(["season", "week"])[
-                col
-            ].rank(pct=True)
+            dl_stats[f"{col}_pct"] = dl_stats.groupby(["season", "week"])[col].rank(pct=True)
 
         for col in ranking_cols_inverted:
-            dl_stats[f"{col}_pct"] = 1 - dl_stats.groupby(["season", "week"])[
-                col
-            ].rank(pct=True)
+            dl_stats[f"{col}_pct"] = 1 - dl_stats.groupby(["season", "week"])[col].rank(pct=True)
 
         # Composite DL quality score (0-100, higher = better run defense)
         dl_stats["dl_run_defense_quality"] = (
@@ -379,9 +361,7 @@ class LineMatchupStrengthEngine:
 
         return dl_stats
 
-    def calculate_directional_tendencies(
-        self, plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_directional_tendencies(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate run direction and gap tendencies by team.
 
@@ -412,11 +392,13 @@ class LineMatchupStrengthEngine:
             index=["season", "week", "posteam"],
             columns="run_location",
             values=["ypc", "success_rate"],
-            fill_value=0
+            fill_value=0,
         )
 
         # Flatten column names
-        direction_wide.columns = [f"{stat}_{direction}" for stat, direction in direction_wide.columns]
+        direction_wide.columns = [
+            f"{stat}_{direction}" for stat, direction in direction_wide.columns
+        ]
         direction_wide = direction_wide.reset_index()
 
         logger.info(f"Calculated directional tendencies for {len(direction_wide):,} team-weeks")
@@ -509,7 +491,12 @@ class LineMatchupStrengthEngine:
                 # Overall production
                 rush_attempts=("rusher_player_id", "count"),
                 rushing_yards=("yards_gained", "sum"),
-                touchdowns=("touchdown", lambda x: ((x == 1) & (plays.loc[x.index, "td_team"] == plays.loc[x.index, "posteam"])).sum()),
+                touchdowns=(
+                    "touchdown",
+                    lambda x: (
+                        (x == 1) & (plays.loc[x.index, "td_team"] == plays.loc[x.index, "posteam"])
+                    ).sum(),
+                ),
                 first_downs=("first_down", "sum"),
                 epa=("epa", "sum"),
                 # Quality metrics
@@ -528,21 +515,11 @@ class LineMatchupStrengthEngine:
         )
 
         # Calculate rate stats
-        rb_games["yards_per_carry"] = (
-            rb_games["rushing_yards"] / rb_games["rush_attempts"]
-        )
-        rb_games["stuff_rate"] = (
-            rb_games["stuffed_runs"] / rb_games["rush_attempts"]
-        )
-        rb_games["explosive_rate"] = (
-            rb_games["explosive_runs"] / rb_games["rush_attempts"]
-        )
-        rb_games["success_rate"] = (
-            rb_games["successful_runs"] / rb_games["rush_attempts"]
-        )
-        rb_games["epa_per_rush"] = (
-            rb_games["epa"] / rb_games["rush_attempts"]
-        )
+        rb_games["yards_per_carry"] = rb_games["rushing_yards"] / rb_games["rush_attempts"]
+        rb_games["stuff_rate"] = rb_games["stuffed_runs"] / rb_games["rush_attempts"]
+        rb_games["explosive_rate"] = rb_games["explosive_runs"] / rb_games["rush_attempts"]
+        rb_games["success_rate"] = rb_games["successful_runs"] / rb_games["rush_attempts"]
+        rb_games["epa_per_rush"] = rb_games["epa"] / rb_games["rush_attempts"]
 
         # Direction preferences
         rb_games["left_run_pct"] = rb_games["left_runs"] / rb_games["rush_attempts"]
@@ -559,9 +536,7 @@ class LineMatchupStrengthEngine:
 
         return rb_games
 
-    def add_rolling_line_features(
-        self, rb_games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def add_rolling_line_features(self, rb_games: pd.DataFrame) -> pd.DataFrame:
         """
         Add rolling averages for line-adjusted performance.
 
@@ -574,9 +549,7 @@ class LineMatchupStrengthEngine:
         logger.info("Adding rolling line matchup features...")
 
         # Sort by player and date
-        rb_games = rb_games.sort_values(
-            ["rusher_player_id", "season", "week"]
-        )
+        rb_games = rb_games.sort_values(["rusher_player_id", "season", "week"])
 
         # Rolling windows (3, 5 games)
         windows = [3, 5]
@@ -592,26 +565,20 @@ class LineMatchupStrengthEngine:
 
         for window in windows:
             for col in rolling_cols:
-                rb_games[f"{col}_L{window}"] = rb_games.groupby(
-                    "rusher_player_id"
-                )[col].transform(lambda x: x.shift(1).rolling(window, min_periods=1).mean())
+                rb_games[f"{col}_L{window}"] = rb_games.groupby("rusher_player_id")[col].transform(
+                    lambda x: x.shift(1).rolling(window, min_periods=1).mean()
+                )
 
         # Matchup-adjusted features
         # Compare current OL quality to recent average
-        rb_games["ol_quality_vs_avg"] = (
-            rb_games["ol_run_block_quality"]
-            - rb_games.groupby("rusher_player_id")["ol_run_block_quality"].transform(
-                lambda x: x.shift(1).rolling(5, min_periods=1).mean()
-            )
-        )
+        rb_games["ol_quality_vs_avg"] = rb_games["ol_run_block_quality"] - rb_games.groupby(
+            "rusher_player_id"
+        )["ol_run_block_quality"].transform(lambda x: x.shift(1).rolling(5, min_periods=1).mean())
 
         # Compare current DL quality to recent average
-        rb_games["dl_quality_vs_avg"] = (
-            rb_games["dl_run_defense_quality"]
-            - rb_games.groupby("rusher_player_id")["dl_run_defense_quality"].transform(
-                lambda x: x.shift(1).rolling(5, min_periods=1).mean()
-            )
-        )
+        rb_games["dl_quality_vs_avg"] = rb_games["dl_run_defense_quality"] - rb_games.groupby(
+            "rusher_player_id"
+        )["dl_run_defense_quality"].transform(lambda x: x.shift(1).rolling(5, min_periods=1).mean())
 
         # Favorable matchup (better OL, worse DL than usual)
         rb_games["favorable_line_matchup"] = (
@@ -660,9 +627,7 @@ class LineMatchupStrengthEngine:
         rb_features = self.add_rolling_line_features(rb_features)
 
         # Sort by date
-        rb_features = rb_features.sort_values(
-            ["season", "week", "game_id", "rusher_player_id"]
-        )
+        rb_features = rb_features.sort_values(["season", "week", "game_id", "rusher_player_id"])
 
         logger.info(f"Generated {len(rb_features):,} line matchup features")
         logger.info(f"Unique RBs: {rb_features['rusher_player_id'].nunique()}")
@@ -676,9 +641,7 @@ class LineMatchupStrengthEngine:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Generate OL-DL line matchup features"
-    )
+    parser = argparse.ArgumentParser(description="Generate OL-DL line matchup features")
     parser.add_argument(
         "--season",
         type=int,

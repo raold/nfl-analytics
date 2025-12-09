@@ -9,12 +9,12 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-import pytest
-import numpy as np
-from typing import Dict, List
 
-from py.ensemble.strategy.weighted_average import WeightedAverageStrategy
+import numpy as np
+import pytest
+
 from py.ensemble.strategy.base import ModelPrediction, ModelType
+from py.ensemble.strategy.weighted_average import WeightedAverageStrategy
 
 
 class TestWeightedAverageStrategy:
@@ -82,9 +82,7 @@ class TestWeightedAverageStrategy:
         """Test uncertainty calculation with zero correlation (independent models)."""
         weights = {"model1": 0.5, "model2": 0.5}
         correlations = {("model1", "model2"): 0.0}  # Independent
-        strategy = WeightedAverageStrategy(
-            weights=weights, model_correlations=correlations
-        )
+        strategy = WeightedAverageStrategy(weights=weights, model_correlations=correlations)
 
         predictions = [
             ModelPrediction("model1", ModelType.STATE_SPACE, 250.0, 20.0, 0.9),
@@ -102,9 +100,7 @@ class TestWeightedAverageStrategy:
         """Test uncertainty calculation with perfect correlation (ρ=1.0)."""
         weights = {"model1": 0.5, "model2": 0.5}
         correlations = {("model1", "model2"): 1.0}  # Perfect correlation
-        strategy = WeightedAverageStrategy(
-            weights=weights, model_correlations=correlations
-        )
+        strategy = WeightedAverageStrategy(weights=weights, model_correlations=correlations)
 
         predictions = [
             ModelPrediction("model1", ModelType.STATE_SPACE, 250.0, 20.0, 0.9),
@@ -118,9 +114,7 @@ class TestWeightedAverageStrategy:
         # = 0.5^2 * 20^2 + 0.5^2 * 20^2 + 2 * 0.5 * 0.5 * 1.0 * 20 * 20
         # = 100 + 100 + 200 = 400
         # σ = 20
-        expected_variance = (
-            0.5**2 * 20**2 + 0.5**2 * 20**2 + 2 * 0.5 * 0.5 * 1.0 * 20 * 20
-        )
+        expected_variance = 0.5**2 * 20**2 + 0.5**2 * 20**2 + 2 * 0.5 * 0.5 * 1.0 * 20 * 20
         expected_std = np.sqrt(expected_variance)
         assert np.isclose(result.prediction_std, expected_std, rtol=0.01)
         assert np.isclose(result.prediction_std, 20.0, rtol=0.01)
@@ -144,9 +138,7 @@ class TestWeightedAverageStrategy:
             ("bnn_v1", "xgboost_v1"): 0.42,
         }
 
-        strategy = WeightedAverageStrategy(
-            weights=weights, model_correlations=correlations
-        )
+        strategy = WeightedAverageStrategy(weights=weights, model_correlations=correlations)
 
         predictions = [
             ModelPrediction("state_space_v2", ModelType.STATE_SPACE, 250.0, 20.0, 0.90),
@@ -237,9 +229,7 @@ class TestWeightedAverageStrategy:
         weights = {"model_new": 0.5, "model_old": 0.5}
         correlations = {}  # No correlations specified
 
-        strategy = WeightedAverageStrategy(
-            weights=weights, model_correlations=correlations
-        )
+        strategy = WeightedAverageStrategy(weights=weights, model_correlations=correlations)
 
         predictions = [
             ModelPrediction("model_new", ModelType.STATE_SPACE, 250.0, 20.0, 0.9),
@@ -251,17 +241,13 @@ class TestWeightedAverageStrategy:
         # Should use default correlation of 0.5
         # σ² = 0.5^2 * 20^2 + 0.5^2 * 20^2 + 2 * 0.5 * 0.5 * 0.5 * 20 * 20
         # = 100 + 100 + 100 = 300
-        expected_variance = (
-            0.5**2 * 20**2 + 0.5**2 * 20**2 + 2 * 0.5 * 0.5 * 0.5 * 20 * 20
-        )
+        expected_variance = 0.5**2 * 20**2 + 0.5**2 * 20**2 + 2 * 0.5 * 0.5 * 0.5 * 20 * 20
         expected_std = np.sqrt(expected_variance)
         assert np.isclose(result.prediction_std, expected_std, rtol=0.01)
 
     def test_metadata_includes_num_models(self):
         """Test that metadata includes number of models."""
-        strategy = WeightedAverageStrategy(
-            weights={"m1": 0.5, "m2": 0.3, "m3": 0.2}
-        )
+        strategy = WeightedAverageStrategy(weights={"m1": 0.5, "m2": 0.3, "m3": 0.2})
 
         predictions = [
             ModelPrediction("m1", ModelType.STATE_SPACE, 250.0, 20.0, 0.9),
@@ -299,9 +285,7 @@ class TestCorrelationAwareUncertaintyEdgeCases:
         # Provide correlation with sorted key (as per implementation)
         correlations = {("model1", "model2"): 0.7}  # Sorted alphabetically
 
-        strategy = WeightedAverageStrategy(
-            weights=weights, model_correlations=correlations
-        )
+        strategy = WeightedAverageStrategy(weights=weights, model_correlations=correlations)
 
         predictions = [
             ModelPrediction("model1", ModelType.STATE_SPACE, 250.0, 20.0, 0.9),
@@ -312,9 +296,7 @@ class TestCorrelationAwareUncertaintyEdgeCases:
 
         # Should find correlation regardless of prediction order
         # σ² = 100 + 100 + 2 * 0.5 * 0.5 * 0.7 * 20 * 20 = 200 + 140 = 340
-        expected_variance = (
-            0.5**2 * 20**2 + 0.5**2 * 20**2 + 2 * 0.5 * 0.5 * 0.7 * 20 * 20
-        )
+        expected_variance = 0.5**2 * 20**2 + 0.5**2 * 20**2 + 2 * 0.5 * 0.5 * 0.7 * 20 * 20
         expected_std = np.sqrt(expected_variance)
         assert np.isclose(result.prediction_std, expected_std, rtol=0.01)
 
@@ -326,7 +308,9 @@ class TestCorrelationAwareUncertaintyEdgeCases:
         predictions = [
             ModelPrediction("model1", ModelType.STATE_SPACE, 250.0, 20.0, 0.9),
             ModelPrediction("model2", ModelType.BNN, 260.0, 20.0, 0.9),
-            ModelPrediction("model3", ModelType.XGBOOST, 1000.0, 100.0, 0.5),  # Should not affect result
+            ModelPrediction(
+                "model3", ModelType.XGBOOST, 1000.0, 100.0, 0.5
+            ),  # Should not affect result
         ]
 
         result = strategy.combine(predictions)

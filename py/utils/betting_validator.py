@@ -43,16 +43,17 @@ Integration:
 """
 
 import json
-import numpy as np
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
-import logging
+from typing import Any
+
+import numpy as np
 
 try:
     import pandas as pd
+
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
@@ -63,15 +64,17 @@ logger = logging.getLogger(__name__)
 
 class ValidationSeverity(Enum):
     """Validation issue severity levels."""
+
     CRITICAL = "CRITICAL"  # Cannot deploy
-    HIGH = "HIGH"          # Should not deploy
-    MEDIUM = "MEDIUM"      # Risky to deploy
-    LOW = "LOW"            # Minor concern
-    INFO = "INFO"          # Informational
+    HIGH = "HIGH"  # Should not deploy
+    MEDIUM = "MEDIUM"  # Risky to deploy
+    LOW = "LOW"  # Minor concern
+    INFO = "INFO"  # Informational
 
 
 class ValidationCategory(Enum):
     """Categories of betting validation."""
+
     RISK_GATES = "risk_gates"
     KELLY_CRITERION = "kelly_criterion"
     ROI_METRICS = "roi_metrics"
@@ -83,6 +86,7 @@ class ValidationCategory(Enum):
 @dataclass
 class ValidationIssue:
     """Represents a betting strategy validation finding."""
+
     severity: ValidationSeverity
     category: ValidationCategory
     title: str
@@ -90,15 +94,16 @@ class ValidationIssue:
     metric_value: str
     threshold: str
     recommendation: str
-    financial_impact: Optional[str] = None
+    financial_impact: str | None = None
 
 
 @dataclass
 class ValidationReport:
     """Betting strategy validation report."""
+
     strategy_name: str
     validation_date: str = field(default_factory=lambda: datetime.now().isoformat())
-    issues: List[ValidationIssue] = field(default_factory=list)
+    issues: list[ValidationIssue] = field(default_factory=list)
     critical_count: int = 0
     high_count: int = 0
     medium_count: int = 0
@@ -123,30 +128,33 @@ class ValidationReport:
 
     def to_json(self) -> str:
         """Export report to JSON."""
-        return json.dumps({
-            "strategy_name": self.strategy_name,
-            "validation_date": self.validation_date,
-            "approved": self.approved_for_deployment,
-            "summary": {
-                "critical": self.critical_count,
-                "high": self.high_count,
-                "medium": self.medium_count,
-                "low": self.low_count,
+        return json.dumps(
+            {
+                "strategy_name": self.strategy_name,
+                "validation_date": self.validation_date,
+                "approved": self.approved_for_deployment,
+                "summary": {
+                    "critical": self.critical_count,
+                    "high": self.high_count,
+                    "medium": self.medium_count,
+                    "low": self.low_count,
+                },
+                "issues": [
+                    {
+                        "severity": i.severity.value,
+                        "category": i.category.value,
+                        "title": i.title,
+                        "description": i.description,
+                        "metric_value": i.metric_value,
+                        "threshold": i.threshold,
+                        "recommendation": i.recommendation,
+                        "financial_impact": i.financial_impact,
+                    }
+                    for i in self.issues
+                ],
             },
-            "issues": [
-                {
-                    "severity": i.severity.value,
-                    "category": i.category.value,
-                    "title": i.title,
-                    "description": i.description,
-                    "metric_value": i.metric_value,
-                    "threshold": i.threshold,
-                    "recommendation": i.recommendation,
-                    "financial_impact": i.financial_impact,
-                }
-                for i in self.issues
-            ]
-        }, indent=2)
+            indent=2,
+        )
 
 
 class BettingValidator:
@@ -184,11 +192,8 @@ class BettingValidator:
         logger.info("BettingValidator initialized")
 
     def validate_risk_gates(
-        self,
-        edge: float,
-        confidence: float,
-        bankroll_fraction: float
-    ) -> List[ValidationIssue]:
+        self, edge: float, confidence: float, bankroll_fraction: float
+    ) -> list[ValidationIssue]:
         """
         Validate risk gate thresholds.
 
@@ -204,63 +209,68 @@ class BettingValidator:
 
         # Check edge
         if edge < self.MIN_EDGE:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.CRITICAL,
-                category=ValidationCategory.RISK_GATES,
-                title="Insufficient edge",
-                description=f"Edge {edge:.2%} below minimum threshold",
-                metric_value=f"{edge:.2%}",
-                threshold=f">{self.MIN_EDGE:.2%}",
-                recommendation="Do not bet - edge too small",
-                financial_impact="Expected loss if betting continues",
-            ))
+            issues.append(
+                ValidationIssue(
+                    severity=ValidationSeverity.CRITICAL,
+                    category=ValidationCategory.RISK_GATES,
+                    title="Insufficient edge",
+                    description=f"Edge {edge:.2%} below minimum threshold",
+                    metric_value=f"{edge:.2%}",
+                    threshold=f">{self.MIN_EDGE:.2%}",
+                    recommendation="Do not bet - edge too small",
+                    financial_impact="Expected loss if betting continues",
+                )
+            )
 
         # Check confidence
         if confidence < self.MIN_CONFIDENCE:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.HIGH,
-                category=ValidationCategory.RISK_GATES,
-                title="Low confidence",
-                description=f"Confidence {confidence:.1%} below threshold",
-                metric_value=f"{confidence:.1%}",
-                threshold=f">{self.MIN_CONFIDENCE:.1%}",
-                recommendation="Consider skipping this bet",
-                financial_impact="Higher risk of loss",
-            ))
+            issues.append(
+                ValidationIssue(
+                    severity=ValidationSeverity.HIGH,
+                    category=ValidationCategory.RISK_GATES,
+                    title="Low confidence",
+                    description=f"Confidence {confidence:.1%} below threshold",
+                    metric_value=f"{confidence:.1%}",
+                    threshold=f">{self.MIN_CONFIDENCE:.1%}",
+                    recommendation="Consider skipping this bet",
+                    financial_impact="Higher risk of loss",
+                )
+            )
 
         # Check bankroll fraction
         if bankroll_fraction > self.MAX_BANKROLL_FRACTION:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.CRITICAL,
-                category=ValidationCategory.BANKROLL,
-                title="Bet size too large",
-                description=f"Betting {bankroll_fraction:.1%} of bankroll",
-                metric_value=f"{bankroll_fraction:.1%}",
-                threshold=f"<{self.MAX_BANKROLL_FRACTION:.1%}",
-                recommendation="Reduce bet size to manage risk",
-                financial_impact="Excessive risk of ruin",
-            ))
+            issues.append(
+                ValidationIssue(
+                    severity=ValidationSeverity.CRITICAL,
+                    category=ValidationCategory.BANKROLL,
+                    title="Bet size too large",
+                    description=f"Betting {bankroll_fraction:.1%} of bankroll",
+                    metric_value=f"{bankroll_fraction:.1%}",
+                    threshold=f"<{self.MAX_BANKROLL_FRACTION:.1%}",
+                    recommendation="Reduce bet size to manage risk",
+                    financial_impact="Excessive risk of ruin",
+                )
+            )
 
         if bankroll_fraction < self.MIN_BANKROLL_FRACTION:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.LOW,
-                category=ValidationCategory.BANKROLL,
-                title="Bet size very small",
-                description=f"Betting only {bankroll_fraction:.2%} of bankroll",
-                metric_value=f"{bankroll_fraction:.2%}",
-                threshold=f">{self.MIN_BANKROLL_FRACTION:.2%}",
-                recommendation="Consider increasing bet size if confident",
-                financial_impact="Low profit potential",
-            ))
+            issues.append(
+                ValidationIssue(
+                    severity=ValidationSeverity.LOW,
+                    category=ValidationCategory.BANKROLL,
+                    title="Bet size very small",
+                    description=f"Betting only {bankroll_fraction:.2%} of bankroll",
+                    metric_value=f"{bankroll_fraction:.2%}",
+                    threshold=f">{self.MIN_BANKROLL_FRACTION:.2%}",
+                    recommendation="Consider increasing bet size if confident",
+                    financial_impact="Low profit potential",
+                )
+            )
 
         return issues
 
     def validate_kelly_criterion(
-        self,
-        edge: float,
-        odds: float,
-        fraction: float = None
-    ) -> Tuple[float, List[ValidationIssue]]:
+        self, edge: float, odds: float, fraction: float = None
+    ) -> tuple[float, list[ValidationIssue]]:
         """
         Validate Kelly criterion bet sizing.
 
@@ -289,48 +299,52 @@ class BettingValidator:
 
         # Validate full Kelly
         if kelly_full <= 0:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.CRITICAL,
-                category=ValidationCategory.KELLY_CRITERION,
-                title="Negative Kelly bet size",
-                description="Kelly criterion suggests not betting",
-                metric_value=f"{kelly_full:.2%}",
-                threshold=">0%",
-                recommendation="Do not bet - negative expected value",
-                financial_impact="Expected loss",
-            ))
+            issues.append(
+                ValidationIssue(
+                    severity=ValidationSeverity.CRITICAL,
+                    category=ValidationCategory.KELLY_CRITERION,
+                    title="Negative Kelly bet size",
+                    description="Kelly criterion suggests not betting",
+                    metric_value=f"{kelly_full:.2%}",
+                    threshold=">0%",
+                    recommendation="Do not bet - negative expected value",
+                    financial_impact="Expected loss",
+                )
+            )
 
         if kelly_full > 0.5:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.HIGH,
-                category=ValidationCategory.KELLY_CRITERION,
-                title="Very large Kelly bet size",
-                description=f"Full Kelly {kelly_full:.1%} is very aggressive",
-                metric_value=f"{kelly_full:.1%}",
-                threshold="<50%",
-                recommendation=f"Use fractional Kelly ({self.KELLY_FRACTION:.0%})",
-                financial_impact="High volatility risk",
-            ))
+            issues.append(
+                ValidationIssue(
+                    severity=ValidationSeverity.HIGH,
+                    category=ValidationCategory.KELLY_CRITERION,
+                    title="Very large Kelly bet size",
+                    description=f"Full Kelly {kelly_full:.1%} is very aggressive",
+                    metric_value=f"{kelly_full:.1%}",
+                    threshold="<50%",
+                    recommendation=f"Use fractional Kelly ({self.KELLY_FRACTION:.0%})",
+                    financial_impact="High volatility risk",
+                )
+            )
 
         # Validate fractional Kelly
         if fraction > self.MAX_KELLY:
-            issues.append(ValidationIssue(
-                severity=ValidationSeverity.MEDIUM,
-                category=ValidationCategory.KELLY_CRITERION,
-                title="Kelly fraction too aggressive",
-                description=f"Using {fraction:.0%} Kelly is risky",
-                metric_value=f"{fraction:.0%}",
-                threshold=f"<{self.MAX_KELLY:.0%}",
-                recommendation=f"Use {self.KELLY_FRACTION:.0%} Kelly for safety",
-                financial_impact="Increased drawdown risk",
-            ))
+            issues.append(
+                ValidationIssue(
+                    severity=ValidationSeverity.MEDIUM,
+                    category=ValidationCategory.KELLY_CRITERION,
+                    title="Kelly fraction too aggressive",
+                    description=f"Using {fraction:.0%} Kelly is risky",
+                    metric_value=f"{fraction:.0%}",
+                    threshold=f"<{self.MAX_KELLY:.0%}",
+                    recommendation=f"Use {self.KELLY_FRACTION:.0%} Kelly for safety",
+                    financial_impact="Increased drawdown risk",
+                )
+            )
 
         return max(kelly_fractional, 0), issues
 
     def validate_backtest_results(
-        self,
-        returns: np.ndarray,
-        initial_bankroll: float = 10000.0
+        self, returns: np.ndarray, initial_bankroll: float = 10000.0
     ) -> ValidationReport:
         """
         Validate backtest results against targets.
@@ -362,55 +376,63 @@ class BettingValidator:
 
         # Validate ROI
         if roi < self.TARGET_ROI:
-            report.add_issue(ValidationIssue(
-                severity=ValidationSeverity.CRITICAL,
-                category=ValidationCategory.ROI_METRICS,
-                title="ROI below target",
-                description=f"ROI {roi:.2%} below {self.TARGET_ROI:.2%} minimum",
-                metric_value=f"{roi:.2%}",
-                threshold=f">{self.TARGET_ROI:.2%}",
-                recommendation="Improve model accuracy or edge detection",
-                financial_impact=f"${(self.TARGET_ROI - roi) * initial_bankroll:.0f} below target",
-            ))
+            report.add_issue(
+                ValidationIssue(
+                    severity=ValidationSeverity.CRITICAL,
+                    category=ValidationCategory.ROI_METRICS,
+                    title="ROI below target",
+                    description=f"ROI {roi:.2%} below {self.TARGET_ROI:.2%} minimum",
+                    metric_value=f"{roi:.2%}",
+                    threshold=f">{self.TARGET_ROI:.2%}",
+                    recommendation="Improve model accuracy or edge detection",
+                    financial_impact=f"${(self.TARGET_ROI - roi) * initial_bankroll:.0f} below target",
+                )
+            )
 
         # Validate win rate
         if win_rate < self.TARGET_WIN_RATE:
-            report.add_issue(ValidationIssue(
-                severity=ValidationSeverity.HIGH,
-                category=ValidationCategory.ROI_METRICS,
-                title="Win rate below target",
-                description=f"Win rate {win_rate:.1%} below {self.TARGET_WIN_RATE:.1%}",
-                metric_value=f"{win_rate:.1%}",
-                threshold=f">{self.TARGET_WIN_RATE:.1%}",
-                recommendation="Improve prediction accuracy",
-                financial_impact="Lower consistency, higher variance",
-            ))
+            report.add_issue(
+                ValidationIssue(
+                    severity=ValidationSeverity.HIGH,
+                    category=ValidationCategory.ROI_METRICS,
+                    title="Win rate below target",
+                    description=f"Win rate {win_rate:.1%} below {self.TARGET_WIN_RATE:.1%}",
+                    metric_value=f"{win_rate:.1%}",
+                    threshold=f">{self.TARGET_WIN_RATE:.1%}",
+                    recommendation="Improve prediction accuracy",
+                    financial_impact="Lower consistency, higher variance",
+                )
+            )
 
         # Validate Sharpe ratio
         if sharpe < self.TARGET_SHARPE:
-            report.add_issue(ValidationIssue(
-                severity=ValidationSeverity.MEDIUM,
-                category=ValidationCategory.ROI_METRICS,
-                title="Sharpe ratio below target",
-                description=f"Sharpe {sharpe:.2f} below {self.TARGET_SHARPE:.2f}",
-                metric_value=f"{sharpe:.2f}",
-                threshold=f">{self.TARGET_SHARPE:.2f}",
-                recommendation="Reduce volatility or increase returns",
-                financial_impact="Poor risk-adjusted returns",
-            ))
+            report.add_issue(
+                ValidationIssue(
+                    severity=ValidationSeverity.MEDIUM,
+                    category=ValidationCategory.ROI_METRICS,
+                    title="Sharpe ratio below target",
+                    description=f"Sharpe {sharpe:.2f} below {self.TARGET_SHARPE:.2f}",
+                    metric_value=f"{sharpe:.2f}",
+                    threshold=f">{self.TARGET_SHARPE:.2f}",
+                    recommendation="Reduce volatility or increase returns",
+                    financial_impact="Poor risk-adjusted returns",
+                )
+            )
 
         # Validate max drawdown
         if max_drawdown < self.MAX_DRAWDOWN:
-            report.add_issue(ValidationIssue(
-                severity=ValidationSeverity.CRITICAL,
-                category=ValidationCategory.DRAWDOWN,
-                title="Maximum drawdown exceeded",
-                description=f"Drawdown {max_drawdown:.1%} exceeds {self.MAX_DRAWDOWN:.1%}",
-                metric_value=f"{max_drawdown:.1%}",
-                threshold=f">{self.MAX_DRAWDOWN:.1%}",
-                recommendation="Reduce bet sizes or improve risk management",
-                financial_impact=f"Max loss ${abs(max_drawdown) * initial_bankroll:.0f}",
-            ))
+            report.add_issue(
+                ValidationIssue(
+                    severity=ValidationSeverity.CRITICAL,
+                    category=ValidationCategory.DRAWDOWN,
+                    title="Maximum drawdown exceeded",
+                    description=f"Drawdown {max_drawdown:.1%} exceeds {self.MAX_DRAWDOWN:.1%}",
+                    metric_value=f"{max_drawdown:.1%}",
+                    threshold=f">{self.MAX_DRAWDOWN:.1%}",
+                    recommendation="Reduce bet sizes or improve risk management",
+                    financial_impact=f"Max loss ${abs(max_drawdown) * initial_bankroll:.0f}",
+                )
+            )
 
         # Approve if no critical/high issues
         report.approved_for_deployment = not report.has_critical_issues()
@@ -418,10 +440,8 @@ class BettingValidator:
         return report
 
     def run_stress_tests(
-        self,
-        returns: np.ndarray,
-        scenarios: Optional[List[str]] = None
-    ) -> Dict[str, Any]:
+        self, returns: np.ndarray, scenarios: list[str] | None = None
+    ) -> dict[str, Any]:
         """
         Run stress tests on betting strategy.
 
@@ -459,7 +479,7 @@ class BettingValidator:
             # Double the volatility
             mean_return = np.mean(returns)
             std_return = np.std(returns)
-            stressed_returns = np.random.normal(mean_return, std_return * 2, len(returns))
+            np.random.normal(mean_return, std_return * 2, len(returns))
 
             stressed_sharpe = mean_return / (std_return * 2) * np.sqrt(252)
 
@@ -480,23 +500,27 @@ class BettingValidator:
         lines.append("=" * 80)
         lines.append(f"\nStrategy: {report.strategy_name}")
         lines.append(f"Validation Date: {report.validation_date}")
-        lines.append(f"Deployment Status: {'✅ APPROVED' if report.approved_for_deployment else '⛔ REJECTED'}")
-        lines.append(f"\nIssues Summary:")
+        lines.append(
+            f"Deployment Status: {'✅ APPROVED' if report.approved_for_deployment else '⛔ REJECTED'}"
+        )
+        lines.append("\nIssues Summary:")
         lines.append(f"  🔴 CRITICAL: {report.critical_count} (blocking)")
         lines.append(f"  🟠 HIGH:     {report.high_count} (strongly discouraged)")
         lines.append(f"  🟡 MEDIUM:   {report.medium_count} (caution advised)")
         lines.append(f"  🟢 LOW:      {report.low_count} (minor)")
 
         if report.has_critical_issues():
-            lines.append(f"\n⛔ DEPLOYMENT BLOCKED")
-            lines.append(f"   Strategy does not meet safety/profitability requirements")
+            lines.append("\n⛔ DEPLOYMENT BLOCKED")
+            lines.append("   Strategy does not meet safety/profitability requirements")
 
         # Group by category
         for category in ValidationCategory:
             category_issues = [i for i in report.issues if i.category == category]
 
             if category_issues:
-                lines.append(f"\n{category.value.upper().replace('_', ' ')} ({len(category_issues)} issues):")
+                lines.append(
+                    f"\n{category.value.upper().replace('_', ' ')} ({len(category_issues)} issues):"
+                )
                 lines.append("-" * 80)
 
                 for issue in category_issues:

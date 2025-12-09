@@ -19,15 +19,15 @@ Output:
     - models/xgboost/passing_xgboost_v2_canonical_metadata.json
 """
 
-import sys
-import os
-from pathlib import Path
-import time
 import json
 import logging
+import os
+import sys
+import time
+from pathlib import Path
 
 # Add project root to path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import numpy as np
 import pandas as pd
@@ -36,41 +36,40 @@ import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Database connection
 DB_CONFIG = {
-    'host': os.getenv('DB_HOST', 'localhost'),
-    'port': int(os.getenv('DB_PORT', '5544')),
-    'user': os.getenv('DB_USER', 'dro'),
-    'password': os.getenv('DB_PASSWORD'),  # Set DB_PASSWORD env variable
-    'database': os.getenv('DB_NAME', 'devdb01')
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", "5544")),
+    "user": os.getenv("DB_USER", "dro"),
+    "password": os.getenv("DB_PASSWORD"),  # Set DB_PASSWORD env variable
+    "database": os.getenv("DB_NAME", "devdb01"),
 }
 
 # Canonical training window configuration
 CANONICAL_WINDOW = {
-    'full_weight_years': list(range(2018, 2025)),  # 2018-2024
-    'decay_years': [2015, 2016, 2017],
-    'decay_parameter': 4.0,  # H=4
+    "full_weight_years": list(range(2018, 2025)),  # 2018-2024
+    "decay_years": [2015, 2016, 2017],
+    "decay_parameter": 4.0,  # H=4
 }
 
 # XGBoost hyperparameters (optimized for passing yards)
 XGBOOST_PARAMS = {
-    'objective': 'reg:squarederror',
-    'eval_metric': 'mae',
-    'max_depth': 7,  # Slightly deeper than baseline
-    'learning_rate': 0.05,  # Lower for better generalization
-    'subsample': 0.85,
-    'colsample_bytree': 0.85,
-    'min_child_weight': 3,
-    'gamma': 0.05,
-    'reg_alpha': 0.15,  # L1 regularization
-    'reg_lambda': 1.5,  # L2 regularization
-    'seed': 42,
-    'n_jobs': -1,
+    "objective": "reg:squarederror",
+    "eval_metric": "mae",
+    "max_depth": 7,  # Slightly deeper than baseline
+    "learning_rate": 0.05,  # Lower for better generalization
+    "subsample": 0.85,
+    "colsample_bytree": 0.85,
+    "min_child_weight": 3,
+    "gamma": 0.05,
+    "reg_alpha": 0.15,  # L1 regularization
+    "reg_lambda": 1.5,  # L2 regularization
+    "seed": 42,
+    "n_jobs": -1,
 }
 
 NUM_BOOST_ROUNDS = 1000
@@ -207,41 +206,41 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     logger.info("=" * 70)
 
     # Sort for rolling windows
-    df = df.sort_values(['player_id', 'season', 'week']).copy()
+    df = df.sort_values(["player_id", "season", "week"]).copy()
 
     # ===== BASIC EFFICIENCY METRICS (3 features) =====
     logger.info("Creating basic efficiency metrics...")
-    df['yards_per_attempt'] = df['yards'] / df['attempts'].replace(0, np.nan)
-    df['td_rate'] = df['touchdowns'] / df['attempts'].replace(0, np.nan)
-    df['log_attempts'] = np.log1p(df['attempts'])
+    df["yards_per_attempt"] = df["yards"] / df["attempts"].replace(0, np.nan)
+    df["td_rate"] = df["touchdowns"] / df["attempts"].replace(0, np.nan)
+    df["log_attempts"] = np.log1p(df["attempts"])
 
     # ===== WEATHER FEATURES (3 features) =====
     logger.info("Creating weather features...")
-    df['temp'] = pd.to_numeric(df['temp'], errors='coerce')
-    df['wind'] = pd.to_numeric(df['wind'], errors='coerce')
+    df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
+    df["wind"] = pd.to_numeric(df["wind"], errors="coerce")
 
     # is_bad_weather: cold (<32°F) OR windy (>15 mph), accounting for domes
-    df['is_dome'] = (df['roof'].isin(['dome', 'closed'])).astype(int)
-    df['is_cold'] = ((df['temp'] < 32) & (~df['is_dome'].astype(bool))).astype(int)
-    df['is_windy'] = ((df['wind'] > 15) & (~df['is_dome'].astype(bool))).astype(int)
-    df['is_bad_weather'] = (df['is_cold'] | df['is_windy']).astype(int)
+    df["is_dome"] = (df["roof"].isin(["dome", "closed"])).astype(int)
+    df["is_cold"] = ((df["temp"] < 32) & (~df["is_dome"].astype(bool))).astype(int)
+    df["is_windy"] = ((df["wind"] > 15) & (~df["is_dome"].astype(bool))).astype(int)
+    df["is_bad_weather"] = (df["is_cold"] | df["is_windy"]).astype(int)
 
     # ===== GAME SCRIPT FEATURES (2 features) =====
     logger.info("Creating game script features...")
-    df['spread_abs'] = df['spread_close'].abs()
-    df['total_line'] = df['total_close']  # Rename for ensemble compatibility
+    df["spread_abs"] = df["spread_close"].abs()
+    df["total_line"] = df["total_close"]  # Rename for ensemble compatibility
 
     # ===== SCHEDULE FACTORS (1 feature) =====
     logger.info("Creating schedule factors...")
-    df['week_in_season'] = df['week'].astype(float)
+    df["week_in_season"] = df["week"].astype(float)
 
     # ===== ROLLING AVERAGES (3 features - ANTI-LEAKAGE) =====
     logger.info("Creating rolling averages (L3 only)...")
 
     # Last 3 games (shifted to avoid lookahead bias)
-    for col in ['yards', 'yards_per_attempt', 'td_rate']:
-        df[f'{col}_L3'] = (
-            df.groupby('player_id')[col]
+    for col in ["yards", "yards_per_attempt", "td_rate"]:
+        df[f"{col}_L3"] = (
+            df.groupby("player_id")[col]
             .transform(lambda x: x.rolling(window=3, min_periods=1).mean())
             .shift(1)  # CRITICAL: Shift to avoid lookahead bias
         )
@@ -252,8 +251,8 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
         if df[col].isna().any():
             df[col].fillna(df[col].median(), inplace=True)
 
-    logger.info(f"✓ Feature engineering complete")
-    logger.info(f"  Total features created: 13 (ensemble-compatible)")
+    logger.info("✓ Feature engineering complete")
+    logger.info("  Total features created: 13 (ensemble-compatible)")
     logger.info(f"  Samples: {len(df):,}")
 
     return df
@@ -279,20 +278,20 @@ def apply_exponential_decay_weights(df: pd.DataFrame) -> np.ndarray:
     logger.info("APPLYING EXPONENTIAL DECAY WEIGHTS")
     logger.info("=" * 70)
 
-    H = CANONICAL_WINDOW['decay_parameter']
-    full_weight_years = CANONICAL_WINDOW['full_weight_years']
+    H = CANONICAL_WINDOW["decay_parameter"]
+    full_weight_years = CANONICAL_WINDOW["full_weight_years"]
 
     weights = np.ones(len(df))
 
-    for year in CANONICAL_WINDOW['decay_years']:
-        mask = df['season'] == year
+    for year in CANONICAL_WINDOW["decay_years"]:
+        mask = df["season"] == year
         decay_weight = np.exp(-(2018 - year) / H)
         weights[mask] = decay_weight
 
         logger.info(f"  {year}: {mask.sum():,} games, weight={decay_weight:.3f}")
 
     # Full weight years
-    full_mask = df['season'].isin(full_weight_years)
+    full_mask = df["season"].isin(full_weight_years)
     logger.info(f"  2018-2024: {full_mask.sum():,} games, weight=1.000")
 
     logger.info(f"\n✓ Weights applied to {len(weights):,} samples")
@@ -321,19 +320,19 @@ def prepare_train_test_split(df: pd.DataFrame):
 
     # EXPLICIT: Only use the 13 ensemble-compatible features
     feature_cols = [
-        'log_attempts',
-        'yards_per_attempt',
-        'td_rate',
-        'is_home',
-        'spread_abs',
-        'total_line',
-        'is_bad_weather',
-        'yards_L3',
-        'yards_per_attempt_L3',
-        'td_rate_L3',
-        'week_in_season',
-        'temp',
-        'wind'
+        "log_attempts",
+        "yards_per_attempt",
+        "td_rate",
+        "is_home",
+        "spread_abs",
+        "total_line",
+        "is_bad_weather",
+        "yards_L3",
+        "yards_per_attempt_L3",
+        "td_rate_L3",
+        "week_in_season",
+        "temp",
+        "wind",
     ]
 
     # Verify all features exist
@@ -342,23 +341,23 @@ def prepare_train_test_split(df: pd.DataFrame):
         raise ValueError(f"Missing features: {missing_features}")
 
     # Train/test split
-    train_df = df[df['season'] <= 2024].copy()
-    test_df = df[df['season'] == 2025].copy()
+    train_df = df[df["season"] <= 2024].copy()
+    test_df = df[df["season"] == 2025].copy()
 
     X_train = train_df[feature_cols].values
-    y_train = train_df['yards'].values
+    y_train = train_df["yards"].values
 
     X_test = test_df[feature_cols].values
-    y_test = test_df['yards'].values
+    y_test = test_df["yards"].values
 
     # Apply exponential decay weights to training set
     sample_weights = apply_exponential_decay_weights(train_df)
 
-    logger.info(f"\n✓ Train/test split complete")
+    logger.info("\n✓ Train/test split complete")
     logger.info(f"  Train: {len(X_train):,} samples (2015-2024)")
     logger.info(f"  Test: {len(X_test):,} samples (2025)")
     logger.info(f"  Features: {len(feature_cols)} (ensemble-compatible)")
-    logger.info(f"\n13 Ensemble-Compatible Features:")
+    logger.info("\n13 Ensemble-Compatible Features:")
     for i, col in enumerate(feature_cols, 1):
         logger.info(f"  {i:2d}. {col}")
 
@@ -387,22 +386,17 @@ def train_xgboost_model(X_train, y_train, X_test, y_test, feature_cols, sample_w
     start_time = time.time()
 
     # Create DMatrix with sample weights
-    dtrain = xgb.DMatrix(
-        X_train,
-        label=y_train,
-        feature_names=feature_cols,
-        weight=sample_weights
-    )
+    dtrain = xgb.DMatrix(X_train, label=y_train, feature_names=feature_cols, weight=sample_weights)
     dtest = xgb.DMatrix(X_test, label=y_test, feature_names=feature_cols)
 
     logger.info(f"Training with {NUM_BOOST_ROUNDS} boost rounds...")
     logger.info(f"Early stopping: {EARLY_STOPPING_ROUNDS} rounds")
-    logger.info(f"Hyperparameters:")
+    logger.info("Hyperparameters:")
     for key, val in XGBOOST_PARAMS.items():
         logger.info(f"  {key}: {val}")
 
     # Training
-    evals = [(dtrain, 'train'), (dtest, 'test')]
+    evals = [(dtrain, "train"), (dtest, "test")]
     evals_result = {}
 
     model = xgb.train(
@@ -412,7 +406,7 @@ def train_xgboost_model(X_train, y_train, X_test, y_test, feature_cols, sample_w
         evals=evals,
         evals_result=evals_result,
         early_stopping_rounds=EARLY_STOPPING_ROUNDS,
-        verbose_eval=50
+        verbose_eval=50,
     )
 
     training_time = time.time() - start_time
@@ -434,16 +428,16 @@ def train_xgboost_model(X_train, y_train, X_test, y_test, feature_cols, sample_w
     baseline_mae = mean_absolute_error(y_test, np.full_like(y_test, y_train.mean()))
 
     metrics = {
-        'mae': mae,
-        'rmse': rmse,
-        'r2': r2,
-        'baseline_mae': baseline_mae,
-        'improvement_pct': (1 - mae / baseline_mae) * 100,
-        'training_time_minutes': training_time / 60,
-        'best_iteration': model.best_iteration,
-        'num_features': len(feature_cols),
-        'train_samples': len(X_train),
-        'test_samples': len(X_test),
+        "mae": mae,
+        "rmse": rmse,
+        "r2": r2,
+        "baseline_mae": baseline_mae,
+        "improvement_pct": (1 - mae / baseline_mae) * 100,
+        "training_time_minutes": training_time / 60,
+        "best_iteration": model.best_iteration,
+        "num_features": len(feature_cols),
+        "train_samples": len(X_train),
+        "test_samples": len(X_test),
     }
 
     return model, y_pred, metrics
@@ -464,16 +458,16 @@ def evaluate_and_save(model, y_test, y_pred, metrics, feature_cols):
     logger.info("MODEL EVALUATION - 2025 HOLDOUT SET")
     logger.info("=" * 70)
 
-    logger.info(f"\nPerformance Metrics:")
+    logger.info("\nPerformance Metrics:")
     logger.info(f"  MAE: {metrics['mae']:.2f} yards")
     logger.info(f"  RMSE: {metrics['rmse']:.2f} yards")
     logger.info(f"  R²: {metrics['r2']:.4f}")
     logger.info(f"  Mean Prediction: {y_pred.mean():.1f} yards")
     logger.info(f"  Mean Actual: {y_test.mean():.1f} yards")
-    logger.info(f"\nBaseline Comparison:")
+    logger.info("\nBaseline Comparison:")
     logger.info(f"  Baseline MAE: {metrics['baseline_mae']:.2f} yards")
     logger.info(f"  Improvement: {metrics['improvement_pct']:.1f}%")
-    logger.info(f"\nTraining Info:")
+    logger.info("\nTraining Info:")
     logger.info(f"  Training time: {metrics['training_time_minutes']:.2f} minutes")
     logger.info(f"  Best iteration: {metrics['best_iteration']}")
     logger.info(f"  Features: {metrics['num_features']}")
@@ -481,7 +475,7 @@ def evaluate_and_save(model, y_test, y_pred, metrics, feature_cols):
     logger.info(f"  Test samples: {metrics['test_samples']:,}")
 
     # Feature importance
-    importance = model.get_score(importance_type='gain')
+    importance = model.get_score(importance_type="gain")
     sorted_importance = sorted(importance.items(), key=lambda x: x[1], reverse=True)
 
     logger.info("\n" + "=" * 70)
@@ -491,32 +485,33 @@ def evaluate_and_save(model, y_test, y_pred, metrics, feature_cols):
         logger.info(f"  {i:2d}. {feat:30s} {score:10.1f}")
 
     # Save model
-    model_dir = Path('models/xgboost')
+    model_dir = Path("models/xgboost")
     model_dir.mkdir(parents=True, exist_ok=True)
 
-    model_path = model_dir / 'passing_xgboost_v2_canonical.pkl'
+    model_path = model_dir / "passing_xgboost_v2_canonical.pkl"
     model.save_model(str(model_path))
 
     # Save metadata
     metadata = {
-        'model_name': 'XGBoost Passing v2 (Canonical Window, 13 Features)',
-        'training_date': pd.Timestamp.now().isoformat(),
-        'canonical_window': CANONICAL_WINDOW,
-        'hyperparameters': XGBOOST_PARAMS,
-        'metrics': {k: float(v) if isinstance(v, (int, float, np.number)) else v
-                   for k, v in metrics.items()},
-        'feature_cols': feature_cols,
-        'num_features': len(feature_cols),
-        'ensemble_compatible': True,
-        'feature_importance_top10': {k: float(v) for k, v in sorted_importance[:10]},
-        'ensemble_weight': 0.30,
-        'test_season': 2025,
-        'train_seasons': '2015-2024 (with H=4 decay on 2015-2017)',
-        'note': 'Retrained with 13 ensemble-compatible features for 4-way ensemble integration',
+        "model_name": "XGBoost Passing v2 (Canonical Window, 13 Features)",
+        "training_date": pd.Timestamp.now().isoformat(),
+        "canonical_window": CANONICAL_WINDOW,
+        "hyperparameters": XGBOOST_PARAMS,
+        "metrics": {
+            k: float(v) if isinstance(v, (int, float, np.number)) else v for k, v in metrics.items()
+        },
+        "feature_cols": feature_cols,
+        "num_features": len(feature_cols),
+        "ensemble_compatible": True,
+        "feature_importance_top10": {k: float(v) for k, v in sorted_importance[:10]},
+        "ensemble_weight": 0.30,
+        "test_season": 2025,
+        "train_seasons": "2015-2024 (with H=4 decay on 2015-2017)",
+        "note": "Retrained with 13 ensemble-compatible features for 4-way ensemble integration",
     }
 
-    metadata_path = model_dir / 'passing_xgboost_v2_canonical_metadata.json'
-    with open(metadata_path, 'w') as f:
+    metadata_path = model_dir / "passing_xgboost_v2_canonical_metadata.json"
+    with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
     logger.info("\n" + "=" * 70)
@@ -535,9 +530,9 @@ def main():
     logger.info("\n" + "=" * 70)
     logger.info("XGBOOST v2 CANONICAL WINDOW TRAINING")
     logger.info("=" * 70)
-    logger.info(f"Training Window: 2018-2024 + H=4 decay (2015-2017)")
-    logger.info(f"Test Set: 2025 season")
-    logger.info(f"Target: MAE < 54 yards")
+    logger.info("Training Window: 2018-2024 + H=4 decay (2015-2017)")
+    logger.info("Test Set: 2025 season")
+    logger.info("Target: MAE < 54 yards")
     logger.info("=" * 70 + "\n")
 
     pipeline_start = time.time()
@@ -557,9 +552,7 @@ def main():
     )
 
     # 5. Evaluate and save
-    model_path, metadata_path = evaluate_and_save(
-        model, y_test, y_pred, metrics, feature_cols
-    )
+    model_path, metadata_path = evaluate_and_save(model, y_test, y_pred, metrics, feature_cols)
 
     pipeline_time = time.time() - pipeline_start
 
@@ -568,12 +561,12 @@ def main():
     logger.info("=" * 70)
     logger.info(f"Total time: {pipeline_time/60:.2f} minutes")
     logger.info(f"MAE: {metrics['mae']:.2f} yards (Target: <54.0)")
-    logger.info(f"Features: 13 (ensemble-compatible)")
+    logger.info("Features: 13 (ensemble-compatible)")
     logger.info(f"Status: {'✓ PASS' if metrics['mae'] < 54.0 else '✗ NEEDS IMPROVEMENT'}")
-    logger.info(f"\nModel ready for 4-way ensemble integration (30% weight)")
-    logger.info(f"Ensemble compatibility: ✓ VERIFIED (13 features match all models)")
+    logger.info("\nModel ready for 4-way ensemble integration (30% weight)")
+    logger.info("Ensemble compatibility: ✓ VERIFIED (13 features match all models)")
     logger.info("=" * 70 + "\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

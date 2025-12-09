@@ -18,11 +18,12 @@ import hashlib
 import json
 import logging
 import os
-from datetime import datetime, timedelta
-from typing import Any, Optional
+from datetime import datetime
+from typing import Any
 
 try:
     import redis
+
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
@@ -49,8 +50,8 @@ class ClaudeRedisCache:
         host: str = "localhost",
         port: int = 6379,
         db: int = 0,
-        password: Optional[str] = None,
-        default_ttl: Optional[int] = None,
+        password: str | None = None,
+        default_ttl: int | None = None,
         enable_stats: bool = True,
     ):
         """
@@ -70,8 +71,7 @@ class ClaudeRedisCache:
         """
         if not REDIS_AVAILABLE:
             raise ImportError(
-                "redis package required for ClaudeRedisCache. "
-                "Install with: pip install redis"
+                "redis package required for ClaudeRedisCache. " "Install with: pip install redis"
             )
 
         self.host = host
@@ -133,7 +133,7 @@ class ClaudeRedisCache:
         if self.enable_stats:
             self.stats[stat_type] = self.stats.get(stat_type, 0) + 1
 
-    def get(self, key: str) -> Optional[Any]:
+    def get(self, key: str) -> Any | None:
         """
         Retrieve cached value by key.
 
@@ -175,7 +175,7 @@ class ClaudeRedisCache:
         self,
         key: str,
         value: Any,
-        ttl: Optional[int] = None,
+        ttl: int | None = None,
     ) -> bool:
         """
         Store value in cache with optional TTL override.
@@ -204,9 +204,7 @@ class ClaudeRedisCache:
 
             # Set with TTL
             self.redis_client.setex(hashed_key, ttl_seconds, json_value)
-            logger.debug(
-                f"Cached {key}: {len(json_value)} bytes, TTL={ttl_seconds}s"
-            )
+            logger.debug(f"Cached {key}: {len(json_value)} bytes, TTL={ttl_seconds}s")
 
             return True
 
@@ -258,7 +256,7 @@ class ClaudeRedisCache:
         self,
         key: str,
         default_value: Any,
-        ttl: Optional[int] = None,
+        ttl: int | None = None,
     ) -> Any:
         """
         Get value from cache or set default if not found.
@@ -334,7 +332,11 @@ class ClaudeRedisCache:
             "hit_rate": hit_rate,
             "hit_rate_percent": f"{hit_rate * 100:.1f}%",
             "target_hit_rate_percent": f"{self.TARGET_HIT_RATE * 100:.1f}%",
-            "performance": "EXCELLENT" if hit_rate >= self.TARGET_HIT_RATE else "GOOD" if hit_rate >= 0.5 else "FAIR",
+            "performance": (
+                "EXCELLENT"
+                if hit_rate >= self.TARGET_HIT_RATE
+                else "GOOD" if hit_rate >= 0.5 else "FAIR"
+            ),
             "uptime_seconds": uptime.total_seconds(),
             "created_at": self.stats["created_at"],
             "redis_server": f"{self.host}:{self.port}/db={self.db}",
@@ -373,7 +375,7 @@ class ClaudeRedisCache:
         self.close()
 
 
-def get_default_cache() -> Optional[ClaudeRedisCache]:
+def get_default_cache() -> ClaudeRedisCache | None:
     """
     Factory function to create cache client from environment variables.
 
@@ -393,9 +395,7 @@ def get_default_cache() -> Optional[ClaudeRedisCache]:
         ...     value = cache.get("my_key")
     """
     if not REDIS_AVAILABLE:
-        logger.warning(
-            "Redis not available. Install with: pip install redis"
-        )
+        logger.warning("Redis not available. Install with: pip install redis")
         return None
 
     try:

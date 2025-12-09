@@ -12,7 +12,6 @@ Date: 2025-10-26
 
 import json
 from pathlib import Path
-from datetime import datetime
 
 
 class BaselineModelComparator:
@@ -108,10 +107,7 @@ class BaselineModelComparator:
 """
 
         # Sort by test Brier (lower is better)
-        sorted_models = sorted(
-            self.results.keys(),
-            key=lambda m: self.results[m]["test_brier"]
-        )
+        sorted_models = sorted(self.results.keys(), key=lambda m: self.results[m]["test_brier"])
 
         for rank, model in enumerate(sorted_models, 1):
             r = self.results[model]
@@ -169,10 +165,7 @@ class BaselineModelComparator:
         print("-" * 80)
 
         # Sort by test Brier
-        sorted_models = sorted(
-            self.results.keys(),
-            key=lambda m: self.results[m]["test_brier"]
-        )
+        sorted_models = sorted(self.results.keys(), key=lambda m: self.results[m]["test_brier"])
 
         for rank, model in enumerate(sorted_models, 1):
             r = self.results[model]
@@ -189,8 +182,10 @@ class BaselineModelComparator:
 
             gap_indicator = "✅" if abs_gap < 0.02 else ("⚠️" if abs_gap < 0.05 else "❌")
 
-            print(f"{model_name:<35} {r['val_brier']:<12.4f} {r['test_brier']:<12.4f} "
-                  f"{gap_indicator} +{abs_gap:.4f} ({rel_gap:+.1f}%)  #{rank}")
+            print(
+                f"{model_name:<35} {r['val_brier']:<12.4f} {r['test_brier']:<12.4f} "
+                f"{gap_indicator} +{abs_gap:.4f} ({rel_gap:+.1f}%)  #{rank}"
+            )
 
         print("\n📊 KEY FINDINGS:")
 
@@ -205,7 +200,9 @@ class BaselineModelComparator:
             "player_to_game": "Player-to-Game",
         }[best_model]
 
-        print(f"  • Best test performance: {best_name} (Brier {self.results[best_model]['test_brier']:.4f})")
+        print(
+            f"  • Best test performance: {best_name} (Brier {self.results[best_model]['test_brier']:.4f})"
+        )
 
         # Most robust (smallest gap)
         gaps = {m: self.calculate_generalization_gap(m)[0] for m in self.results.keys()}
@@ -233,7 +230,9 @@ class BaselineModelComparator:
         }[worst_overfit]
 
         _, worst_rel_gap = self.calculate_generalization_gap(worst_overfit)
-        print(f"  • Worst overfitting: {overfit_name} (gap {gaps[worst_overfit]:+.4f}, {worst_rel_gap:+.1f}% relative)")
+        print(
+            f"  • Worst overfitting: {overfit_name} (gap {gaps[worst_overfit]:+.4f}, {worst_rel_gap:+.1f}% relative)"
+        )
 
         print("\n" + "=" * 80)
 
@@ -247,10 +246,12 @@ def main():
         comparator.print_summary()
 
         # Generate LaTeX table
-        output_path = Path("/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/baseline_comparison_table.tex")
+        output_path = Path(
+            "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/baseline_comparison_table.tex"
+        )
         comparator.generate_latex_table(output_path)
 
-        print(f"\n✓ Baseline comparison table generated successfully")
+        print("\n✓ Baseline comparison table generated successfully")
         print(f"\nOutput: {output_path}")
 
         return 0
@@ -258,6 +259,7 @@ def main():
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

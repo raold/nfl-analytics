@@ -16,12 +16,12 @@ Expected Performance:
 Author: Claude Code (River Optimization - November 12, 2025)
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import logging
-from typing import Dict
 from collections import deque
 
 import numpy as np
@@ -61,11 +61,11 @@ class IncrementalXGBoost:
 
         # XGBoost parameters
         self.params = {
-            'n_estimators': n_estimators,
-            'max_depth': max_depth,
-            'learning_rate': learning_rate,
-            'objective': 'reg:squarederror',
-            'random_state': 42,
+            "n_estimators": n_estimators,
+            "max_depth": max_depth,
+            "learning_rate": learning_rate,
+            "objective": "reg:squarederror",
+            "random_state": 42,
         }
 
         # Sliding window buffer
@@ -76,12 +76,12 @@ class IncrementalXGBoost:
         self.counter = 0
         self.is_trained = False
 
-        logger.info(f"Initialized IncrementalXGBoost:")
+        logger.info("Initialized IncrementalXGBoost:")
         logger.info(f"  Window size: {window_size}")
         logger.info(f"  Retrain every: {retrain_every} samples")
         logger.info(f"  XGBoost params: {self.params}")
 
-    def learn_one(self, x: Dict[str, float], y: float):
+    def learn_one(self, x: dict[str, float], y: float):
         """
         Update with single sample
 
@@ -97,7 +97,7 @@ class IncrementalXGBoost:
         if self.counter % self.retrain_every == 0 and len(self.window) >= 50:
             self._retrain()
 
-    def predict_one(self, x: Dict[str, float]) -> float:
+    def predict_one(self, x: dict[str, float]) -> float:
         """
         Predict for single sample
 
@@ -138,13 +138,13 @@ class IncrementalXGBoost:
 
         logger.info(f"XGBoost retrained on {len(self.window)} samples (counter={self.counter})")
 
-    def get_metrics(self) -> Dict[str, any]:
+    def get_metrics(self) -> dict[str, any]:
         """Get model metrics"""
         return {
-            'window_size': len(self.window),
-            'counter': self.counter,
-            'is_trained': self.is_trained,
-            'retrains': self.counter // self.retrain_every,
+            "window_size": len(self.window),
+            "counter": self.counter,
+            "is_trained": self.is_trained,
+            "retrains": self.counter // self.retrain_every,
         }
 
     def save(self, path: str):
@@ -157,16 +157,16 @@ class IncrementalXGBoost:
         import pickle
 
         state = {
-            'window_size': self.window_size,
-            'retrain_every': self.retrain_every,
-            'params': self.params,
-            'window': list(self.window),
-            'counter': self.counter,
-            'is_trained': self.is_trained,
-            'model': self.model,
+            "window_size": self.window_size,
+            "retrain_every": self.retrain_every,
+            "params": self.params,
+            "window": list(self.window),
+            "counter": self.counter,
+            "is_trained": self.is_trained,
+            "model": self.model,
         }
 
-        with open(path, 'wb') as f:
+        with open(path, "wb") as f:
             pickle.dump(state, f)
 
         logger.info(f"IncrementalXGBoost saved to {path}")
@@ -180,16 +180,16 @@ class IncrementalXGBoost:
         """
         import pickle
 
-        with open(path, 'rb') as f:
+        with open(path, "rb") as f:
             state = pickle.load(f)
 
-        self.window_size = state['window_size']
-        self.retrain_every = state['retrain_every']
-        self.params = state['params']
-        self.window = deque(state['window'], maxlen=self.window_size)
-        self.counter = state['counter']
-        self.is_trained = state['is_trained']
-        self.model = state['model']
+        self.window_size = state["window_size"]
+        self.retrain_every = state["retrain_every"]
+        self.params = state["params"]
+        self.window = deque(state["window"], maxlen=self.window_size)
+        self.counter = state["counter"]
+        self.is_trained = state["is_trained"]
+        self.model = state["model"]
 
         logger.info(f"IncrementalXGBoost loaded from {path}")
 
@@ -206,13 +206,13 @@ if __name__ == "__main__":
     for i in range(200):
         # Synthetic features
         x = {
-            'passing_yards_L3': np.random.randn() * 50 + 250,
-            'attempts_L3': np.random.randn() * 5 + 35,
-            'completion_pct_L3': np.random.randn() * 0.05 + 0.65,
+            "passing_yards_L3": np.random.randn() * 50 + 250,
+            "attempts_L3": np.random.randn() * 5 + 35,
+            "completion_pct_L3": np.random.randn() * 0.05 + 0.65,
         }
 
         # Synthetic target
-        y = x['passing_yards_L3'] + np.random.randn() * 30
+        y = x["passing_yards_L3"] + np.random.randn() * 30
 
         # Predict, then train
         pred = model.predict_one(x)

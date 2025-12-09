@@ -20,8 +20,9 @@ Author: Claude Code
 Date: 2025-11-03
 """
 
-import sys
 import os
+import sys
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, project_root)
 
@@ -77,16 +78,16 @@ class CalibratedBNN:
         self.trace = None
         self.is_fitted = False
 
-        logger.info(f"CalibratedBNN v2.0 initialized")
+        logger.info("CalibratedBNN v2.0 initialized")
         logger.info(f"  Architecture: {' → '.join(map(str, hidden_dims))} → 1")
         logger.info(f"  Temperature: {temperature:.2f} (validated calibration)")
-        logger.info(f"  Expected coverage: 89.5% ✓")
+        logger.info("  Expected coverage: 89.5% ✓")
 
     def _build_network(self, X: np.ndarray, y: np.ndarray) -> pm.Model:
         """Build BNN with calibrated temperature"""
 
         n_samples, n_features = X.shape
-        n_layers = len(self.hidden_dims)
+        len(self.hidden_dims)
 
         with pm.Model() as model:
             X_data = pm.Data("X", X)
@@ -130,12 +131,7 @@ class CalibratedBNN:
                 approx = pm.fit(
                     n=30000,
                     method="advi",
-                    callbacks=[
-                        pm.callbacks.CheckParametersConvergence(
-                            tolerance=1e-5,
-                            every=1000
-                        )
-                    ]
+                    callbacks=[pm.callbacks.CheckParametersConvergence(tolerance=1e-5, every=1000)],
                 )
 
                 self.trace = approx.sample(self.n_samples)
@@ -150,7 +146,7 @@ class CalibratedBNN:
                     chains=4,
                     cores=4,
                     target_accept=0.95,
-                    return_inferencedata=True
+                    return_inferencedata=True,
                 )
 
                 logger.info(f"✓ NUTS complete: {self.n_samples} samples")
@@ -163,10 +159,7 @@ class CalibratedBNN:
         logger.info("✓ Calibrated BNN training complete")
 
     def predict(
-        self,
-        X: np.ndarray,
-        return_quantiles: bool = True,
-        check_calibration: bool = True
+        self, X: np.ndarray, return_quantiles: bool = True, check_calibration: bool = True
     ) -> dict[str, np.ndarray]:
         """
         Predict with calibrated uncertainties
@@ -187,9 +180,7 @@ class CalibratedBNN:
 
             # Posterior predictive
             posterior_pred = pm.sample_posterior_predictive(
-                self.trace,
-                var_names=["y_obs"],
-                random_seed=42
+                self.trace, var_names=["y_obs"], random_seed=42
             )
 
         # Extract predictions
@@ -201,11 +192,13 @@ class CalibratedBNN:
         }
 
         if return_quantiles:
-            predictions.update({
-                "q05": np.percentile(pred_samples, 5, axis=0),
-                "q50": np.percentile(pred_samples, 50, axis=0),
-                "q95": np.percentile(pred_samples, 95, axis=0),
-            })
+            predictions.update(
+                {
+                    "q05": np.percentile(pred_samples, 5, axis=0),
+                    "q50": np.percentile(pred_samples, 50, axis=0),
+                    "q95": np.percentile(pred_samples, 95, axis=0),
+                }
+            )
 
         if check_calibration:
             # Log calibration metrics for monitoring
@@ -246,7 +239,7 @@ class CalibratedBNN:
             hidden_dims=save_dict["hidden_dims"],
             inference_method=save_dict["inference_method"],
             temperature=save_dict.get("temperature", 0.75),  # Default to calibrated
-            prior_std=save_dict.get("prior_std", 1.0)
+            prior_std=save_dict.get("prior_std", 1.0),
         )
 
         bnn.trace = save_dict["trace"]
@@ -264,21 +257,19 @@ class CalibratedBNN:
 def main():
     """Example usage of calibrated BNN"""
 
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("CALIBRATED BNN v2.0 - PRODUCTION EXAMPLE")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # Initialize calibrated BNN
-    bnn = CalibratedBNN(
-        hidden_dims=(64, 32),
-        temperature=0.75,  # Validated calibration
-        inference_method="advi"
+    CalibratedBNN(
+        hidden_dims=(64, 32), temperature=0.75, inference_method="advi"  # Validated calibration
     )
 
     logger.info("\n✓ Calibrated BNN v2.0 ready for production")
-    logger.info(f"  Expected coverage: 89.5% (validated)")
-    logger.info(f"  Interval sharpness: 86.4 yards (optimized)")
-    logger.info(f"  Status: ✅ PRODUCTION-READY")
+    logger.info("  Expected coverage: 89.5% (validated)")
+    logger.info("  Interval sharpness: 86.4 yards (optimized)")
+    logger.info("  Status: ✅ PRODUCTION-READY")
 
 
 if __name__ == "__main__":

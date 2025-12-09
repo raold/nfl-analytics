@@ -29,20 +29,19 @@ Integration:
 """
 
 import ast
-import inspect
-import re
+import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
-import logging
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
 class TestType(Enum):
     """Types of tests to generate."""
+
     UNIT = "unit"
     INTEGRATION = "integration"
     PROPERTY = "property"
@@ -53,21 +52,23 @@ class TestType(Enum):
 @dataclass
 class TestCase:
     """Represents a generated test case."""
+
     test_type: TestType
     function_name: str
     test_name: str
     test_code: str
     description: str
-    dependencies: List[str] = field(default_factory=list)
+    dependencies: list[str] = field(default_factory=list)
 
 
 @dataclass
 class TestSuite:
     """Collection of test cases."""
+
     module_name: str
-    test_cases: List[TestCase] = field(default_factory=list)
-    imports: Set[str] = field(default_factory=set)
-    fixtures: List[str] = field(default_factory=list)
+    test_cases: list[TestCase] = field(default_factory=list)
+    imports: set[str] = field(default_factory=set)
+    fixtures: list[str] = field(default_factory=list)
 
     def add_test(self, test: TestCase):
         """Add test case to suite."""
@@ -132,7 +133,7 @@ def test_{function_name}_no_temporal_leakage():
         "Temporal leakage detected"
 """
 
-    def __init__(self, project_root: Optional[Path] = None):
+    def __init__(self, project_root: Path | None = None):
         """
         Initialize test generator.
 
@@ -153,7 +154,7 @@ def test_{function_name}_no_temporal_leakage():
         self.project_root = project_root
         logger.info(f"TestGenerator initialized for {project_root}")
 
-    def analyze_function(self, func_node: ast.FunctionDef) -> Dict[str, Any]:
+    def analyze_function(self, func_node: ast.FunctionDef) -> dict[str, Any]:
         """
         Analyze function AST node to extract metadata.
 
@@ -192,11 +193,7 @@ def test_{function_name}_no_temporal_leakage():
             "line_number": func_node.lineno,
         }
 
-    def generate_unit_test(
-        self,
-        func_metadata: Dict[str, Any],
-        module_name: str
-    ) -> List[TestCase]:
+    def generate_unit_test(self, func_metadata: dict[str, Any], module_name: str) -> list[TestCase]:
         """
         Generate unit tests for a function.
 
@@ -211,61 +208,65 @@ def test_{function_name}_no_temporal_leakage():
         func_name = func_metadata["name"]
 
         # Test case 1: Basic functionality
-        tests.append(TestCase(
-            test_type=TestType.UNIT,
-            function_name=func_name,
-            test_name=f"test_{func_name}_basic",
-            test_code=self.UNIT_TEST_TEMPLATE.format(
+        tests.append(
+            TestCase(
+                test_type=TestType.UNIT,
                 function_name=func_name,
-                test_case="basic",
-                description="basic functionality",
-                arrange=f"    # TODO: Set up test data",
-                act=f"    result = {func_name}()",
-                assertions=f"    assert result is not None"
-            ),
-            description=f"Test {func_name} basic functionality",
-            dependencies=[module_name],
-        ))
+                test_name=f"test_{func_name}_basic",
+                test_code=self.UNIT_TEST_TEMPLATE.format(
+                    function_name=func_name,
+                    test_case="basic",
+                    description="basic functionality",
+                    arrange="    # TODO: Set up test data",
+                    act=f"    result = {func_name}()",
+                    assertions="    assert result is not None",
+                ),
+                description=f"Test {func_name} basic functionality",
+                dependencies=[module_name],
+            )
+        )
 
         # Test case 2: Edge cases
-        tests.append(TestCase(
-            test_type=TestType.UNIT,
-            function_name=func_name,
-            test_name=f"test_{func_name}_edge_cases",
-            test_code=self.UNIT_TEST_TEMPLATE.format(
+        tests.append(
+            TestCase(
+                test_type=TestType.UNIT,
                 function_name=func_name,
-                test_case="edge_cases",
-                description="edge cases",
-                arrange=f"    # TODO: Set up edge case data",
-                act=f"    result = {func_name}()",
-                assertions=f"    assert result is not None"
-            ),
-            description=f"Test {func_name} edge cases",
-            dependencies=[module_name],
-        ))
+                test_name=f"test_{func_name}_edge_cases",
+                test_code=self.UNIT_TEST_TEMPLATE.format(
+                    function_name=func_name,
+                    test_case="edge_cases",
+                    description="edge cases",
+                    arrange="    # TODO: Set up edge case data",
+                    act=f"    result = {func_name}()",
+                    assertions="    assert result is not None",
+                ),
+                description=f"Test {func_name} edge cases",
+                dependencies=[module_name],
+            )
+        )
 
         # Test case 3: Error handling
-        tests.append(TestCase(
-            test_type=TestType.UNIT,
-            function_name=func_name,
-            test_name=f"test_{func_name}_error_handling",
-            test_code=f"""
+        tests.append(
+            TestCase(
+                test_type=TestType.UNIT,
+                function_name=func_name,
+                test_name=f"test_{func_name}_error_handling",
+                test_code=f"""
 def test_{func_name}_error_handling():
     \"\"\"Test {func_name} error handling.\"\"\"
     with pytest.raises(ValueError):
         {func_name}(invalid_input)
 """,
-            description=f"Test {func_name} error handling",
-            dependencies=[module_name, "pytest"],
-        ))
+                description=f"Test {func_name} error handling",
+                dependencies=[module_name, "pytest"],
+            )
+        )
 
         return tests
 
     def generate_property_tests(
-        self,
-        func_metadata: Dict[str, Any],
-        module_name: str
-    ) -> List[TestCase]:
+        self, func_metadata: dict[str, Any], module_name: str
+    ) -> list[TestCase]:
         """
         Generate property-based tests using Hypothesis.
 
@@ -286,46 +287,46 @@ def test_{func_name}_error_handling():
 
         for arg in args:
             if "date" in arg.lower() or "time" in arg.lower():
-                strategies.append(f"st.datetimes()")
+                strategies.append("st.datetimes()")
                 params.append(arg)
             elif "id" in arg.lower():
-                strategies.append(f"st.integers(min_value=1, max_value=1000)")
+                strategies.append("st.integers(min_value=1, max_value=1000)")
                 params.append(arg)
             elif "name" in arg.lower() or "str" in arg.lower():
-                strategies.append(f"st.text(min_size=1, max_size=100)")
+                strategies.append("st.text(min_size=1, max_size=100)")
                 params.append(arg)
             else:
-                strategies.append(f"st.integers()")
+                strategies.append("st.integers()")
                 params.append(arg)
 
         if strategies:
             strategy_str = ", ".join(strategies)
             param_str = ", ".join(params)
 
-            tests.append(TestCase(
-                test_type=TestType.PROPERTY,
-                function_name=func_name,
-                test_name=f"test_{func_name}_property_idempotent",
-                test_code=self.PROPERTY_TEST_TEMPLATE.format(
+            tests.append(
+                TestCase(
+                    test_type=TestType.PROPERTY,
                     function_name=func_name,
-                    property_name="idempotent",
-                    description="function is idempotent",
-                    strategies=strategy_str,
-                    params=param_str,
-                    function_call=f"{func_name}({param_str})",
-                    property_assertion=f"{func_name}({param_str}) == result"
-                ),
-                description=f"Property test: {func_name} is idempotent",
-                dependencies=[module_name, "hypothesis"],
-            ))
+                    test_name=f"test_{func_name}_property_idempotent",
+                    test_code=self.PROPERTY_TEST_TEMPLATE.format(
+                        function_name=func_name,
+                        property_name="idempotent",
+                        description="function is idempotent",
+                        strategies=strategy_str,
+                        params=param_str,
+                        function_call=f"{func_name}({param_str})",
+                        property_assertion=f"{func_name}({param_str}) == result",
+                    ),
+                    description=f"Property test: {func_name} is idempotent",
+                    dependencies=[module_name, "hypothesis"],
+                )
+            )
 
         return tests
 
     def generate_temporal_tests(
-        self,
-        func_metadata: Dict[str, Any],
-        module_name: str
-    ) -> List[TestCase]:
+        self, func_metadata: dict[str, Any], module_name: str
+    ) -> list[TestCase]:
         """
         Generate temporal validation tests for sports betting.
 
@@ -343,17 +344,18 @@ def test_{func_name}_error_handling():
         temporal_keywords = ["date", "time", "temporal", "asof", "merge", "join"]
 
         if any(kw in func_name.lower() for kw in temporal_keywords):
-            tests.append(TestCase(
-                test_type=TestType.TEMPORAL,
-                function_name=func_name,
-                test_name=f"test_{func_name}_no_temporal_leakage",
-                test_code=self.TEMPORAL_TEST_TEMPLATE.format(
+            tests.append(
+                TestCase(
+                    test_type=TestType.TEMPORAL,
                     function_name=func_name,
-                    function_call=f"{func_name}(train, test)"
-                ),
-                description=f"Ensure {func_name} doesn't use future data",
-                dependencies=[module_name, "pandas"],
-            ))
+                    test_name=f"test_{func_name}_no_temporal_leakage",
+                    test_code=self.TEMPORAL_TEST_TEMPLATE.format(
+                        function_name=func_name, function_call=f"{func_name}(train, test)"
+                    ),
+                    description=f"Ensure {func_name} doesn't use future data",
+                    dependencies=[module_name, "pandas"],
+                )
+            )
 
         return tests
 
@@ -399,17 +401,11 @@ def test_{func_name}_error_handling():
                 func_metadata = self.analyze_function(node)
 
                 # Generate different types of tests
-                suite.test_cases.extend(
-                    self.generate_unit_test(func_metadata, module_name)
-                )
+                suite.test_cases.extend(self.generate_unit_test(func_metadata, module_name))
 
-                suite.test_cases.extend(
-                    self.generate_property_tests(func_metadata, module_name)
-                )
+                suite.test_cases.extend(self.generate_property_tests(func_metadata, module_name))
 
-                suite.test_cases.extend(
-                    self.generate_temporal_tests(func_metadata, module_name)
-                )
+                suite.test_cases.extend(self.generate_temporal_tests(func_metadata, module_name))
 
         return suite
 
@@ -427,37 +423,35 @@ def test_{func_name}_error_handling():
         lines = []
 
         # Header
-        lines.append(f'"""')
-        lines.append(f'Generated tests for {suite.module_name}')
-        lines.append(f'')
-        lines.append(f'Generated: {datetime.now().isoformat()}')
-        lines.append(f'Test count: {len(suite.test_cases)}')
-        lines.append(f'"""')
-        lines.append('')
+        lines.append('"""')
+        lines.append(f"Generated tests for {suite.module_name}")
+        lines.append("")
+        lines.append(f"Generated: {datetime.now().isoformat()}")
+        lines.append(f"Test count: {len(suite.test_cases)}")
+        lines.append('"""')
+        lines.append("")
 
         # Imports
         for imp in sorted(suite.imports):
             lines.append(imp)
-        lines.append('')
+        lines.append("")
 
         # Fixtures
         for fixture in suite.fixtures:
             lines.append(fixture)
-            lines.append('')
+            lines.append("")
 
         # Test cases
         for test in suite.test_cases:
             lines.append(test.test_code)
-            lines.append('')
+            lines.append("")
 
         # Write to file
         output.write_text("\n".join(lines))
         logger.info(f"Wrote {len(suite.test_cases)} tests to {output_path}")
 
     def generate_full_suite(
-        self,
-        target_coverage: float = 0.80,
-        source_dirs: Optional[List[str]] = None
+        self, target_coverage: float = 0.80, source_dirs: list[str] | None = None
     ):
         """
         Generate full test suite for project.

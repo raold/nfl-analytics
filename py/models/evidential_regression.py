@@ -50,10 +50,8 @@ Date: November 9, 2025
 import json
 import logging
 import os
-import pickle
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -63,8 +61,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.preprocessing import StandardScaler
-from torch.utils.data import DataLoader, TensorDataset
 from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.utils.data import DataLoader, TensorDataset
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -82,10 +80,7 @@ class EvidentialNeuralNetwork(nn.Module):
     """
 
     def __init__(
-        self,
-        input_dim: int,
-        hidden_dims: Tuple[int, ...] = (128, 64),
-        dropout_rate: float = 0.2
+        self, input_dim: int, hidden_dims: tuple[int, ...] = (128, 64), dropout_rate: float = 0.2
     ):
         """
         Initialize evidential neural network.
@@ -148,7 +143,9 @@ class EvidentialNeuralNetwork(nn.Module):
         nn.init.xavier_normal_(self.beta_head.weight)
         nn.init.constant_(self.beta_head.bias, 1.0)  # softplus(1) ≈ 1.3
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    def forward(
+        self, x: torch.Tensor
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """
         Forward pass to predict NIG parameters.
 
@@ -176,10 +173,7 @@ class EvidentialNeuralNetwork(nn.Module):
 
         return gamma, nu, alpha, beta
 
-    def predict_with_uncertainty(
-        self,
-        x: torch.Tensor
-    ) -> Dict[str, torch.Tensor]:
+    def predict_with_uncertainty(self, x: torch.Tensor) -> dict[str, torch.Tensor]:
         """
         Predict with aleatoric and epistemic uncertainty.
 
@@ -205,17 +199,17 @@ class EvidentialNeuralNetwork(nn.Module):
         epistemic_std = torch.sqrt(epistemic_var)
 
         # Total uncertainty: σ²_total = β/(α-1) * (1 + 1/ν)
-        total_var = aleatoric_var * (1 + 1/nu)
+        total_var = aleatoric_var * (1 + 1 / nu)
         total_std = torch.sqrt(total_var)
 
         return {
-            'mean': gamma,
-            'aleatoric_std': aleatoric_std,
-            'epistemic_std': epistemic_std,
-            'total_std': total_std,
-            'alpha': alpha,
-            'beta': beta,
-            'nu': nu
+            "mean": gamma,
+            "aleatoric_std": aleatoric_std,
+            "epistemic_std": epistemic_std,
+            "total_std": total_std,
+            "alpha": alpha,
+            "beta": beta,
+            "nu": nu,
         }
 
 
@@ -249,7 +243,7 @@ class EvidentialLoss(nn.Module):
         gamma: torch.Tensor,
         nu: torch.Tensor,
         alpha: torch.Tensor,
-        beta: torch.Tensor
+        beta: torch.Tensor,
     ) -> torch.Tensor:
         """
         Compute NIG loss.
@@ -283,7 +277,7 @@ class EvidentialLoss(nn.Module):
         gamma: torch.Tensor,
         nu: torch.Tensor,
         alpha: torch.Tensor,
-        beta: torch.Tensor
+        beta: torch.Tensor,
     ) -> torch.Tensor:
         """
         Compute negative log-likelihood of Normal Inverse-Gamma distribution.
@@ -313,9 +307,7 @@ class EvidentialLoss(nn.Module):
 
         # Term 3: (α+0.5) * log(ν(y-γ)² + 2β(1+ν))
         error_squared = (y_true - gamma) ** 2
-        term3 = (alpha + 0.5) * torch.log(
-            nu * error_squared + 2 * beta * (1 + nu) + eps
-        )
+        term3 = (alpha + 0.5) * torch.log(nu * error_squared + 2 * beta * (1 + nu) + eps)
 
         # Term 4: loggamma(α) - loggamma(α+0.5)
         # Use torch.lgamma for numerical stability
@@ -336,15 +328,15 @@ class EvidentialRegressor(BaseEstimator, RegressorMixin):
 
     def __init__(
         self,
-        hidden_dims: Tuple[int, ...] = (128, 64),
+        hidden_dims: tuple[int, ...] = (128, 64),
         dropout_rate: float = 0.2,
         lambda_reg: float = 0.01,
         learning_rate: float = 1e-3,
         batch_size: int = 128,
         max_epochs: int = 100,
         patience: int = 10,
-        device: str = 'cpu',
-        random_state: Optional[int] = None
+        device: str = "cpu",
+        random_state: int | None = None,
     ):
         """
         Initialize evidential regressor.
@@ -385,9 +377,9 @@ class EvidentialRegressor(BaseEstimator, RegressorMixin):
         self,
         X: np.ndarray,
         y: np.ndarray,
-        X_val: Optional[np.ndarray] = None,
-        y_val: Optional[np.ndarray] = None,
-        verbose: bool = True
+        X_val: np.ndarray | None = None,
+        y_val: np.ndarray | None = None,
+        verbose: bool = True,
     ):
         """
         Fit evidential regressor.
@@ -408,51 +400,27 @@ class EvidentialRegressor(BaseEstimator, RegressorMixin):
         # Initialize model
         input_dim = X.shape[1]
         self.model_ = EvidentialNeuralNetwork(
-            input_dim=input_dim,
-            hidden_dims=self.hidden_dims,
-            dropout_rate=self.dropout_rate
+            input_dim=input_dim, hidden_dims=self.hidden_dims, dropout_rate=self.dropout_rate
         ).to(self.device)
 
         # Loss and optimizer
         criterion = EvidentialLoss(lambda_reg=self.lambda_reg)
-        optimizer = torch.optim.Adam(
-            self.model_.parameters(),
-            lr=self.learning_rate
-        )
-        scheduler = ReduceLROnPlateau(
-            optimizer,
-            mode='min',
-            factor=0.5,
-            patience=5
-        )
+        optimizer = torch.optim.Adam(self.model_.parameters(), lr=self.learning_rate)
+        scheduler = ReduceLROnPlateau(optimizer, mode="min", factor=0.5, patience=5)
 
         # Create data loaders
-        train_dataset = TensorDataset(
-            torch.FloatTensor(X_scaled),
-            torch.FloatTensor(y)
-        )
-        train_loader = DataLoader(
-            train_dataset,
-            batch_size=self.batch_size,
-            shuffle=True
-        )
+        train_dataset = TensorDataset(torch.FloatTensor(X_scaled), torch.FloatTensor(y))
+        train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True)
 
         # Validation loader (if provided)
         val_loader = None
         if X_val is not None and y_val is not None:
             X_val_scaled = self.scaler_.transform(X_val)
-            val_dataset = TensorDataset(
-                torch.FloatTensor(X_val_scaled),
-                torch.FloatTensor(y_val)
-            )
-            val_loader = DataLoader(
-                val_dataset,
-                batch_size=self.batch_size,
-                shuffle=False
-            )
+            val_dataset = TensorDataset(torch.FloatTensor(X_val_scaled), torch.FloatTensor(y_val))
+            val_loader = DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False)
 
         # Training loop
-        best_val_loss = float('inf')
+        best_val_loss = float("inf")
         patience_counter = 0
 
         for epoch in range(self.max_epochs):
@@ -521,31 +489,21 @@ class EvidentialRegressor(BaseEstimator, RegressorMixin):
                         f"Train Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}"
                     )
 
-                self.training_history_.append({
-                    'epoch': epoch + 1,
-                    'train_loss': train_loss,
-                    'val_loss': val_loss
-                })
+                self.training_history_.append(
+                    {"epoch": epoch + 1, "train_loss": train_loss, "val_loss": val_loss}
+                )
             else:
                 if verbose and (epoch + 1) % 10 == 0:
                     logger.info(
-                        f"Epoch {epoch+1}/{self.max_epochs} - "
-                        f"Train Loss: {train_loss:.4f}"
+                        f"Epoch {epoch+1}/{self.max_epochs} - " f"Train Loss: {train_loss:.4f}"
                     )
 
-                self.training_history_.append({
-                    'epoch': epoch + 1,
-                    'train_loss': train_loss
-                })
+                self.training_history_.append({"epoch": epoch + 1, "train_loss": train_loss})
 
         self.is_fitted_ = True
         return self
 
-    def predict(
-        self,
-        X: np.ndarray,
-        return_uncertainty: bool = False
-    ) -> np.ndarray:
+    def predict(self, X: np.ndarray, return_uncertainty: bool = False) -> np.ndarray:
         """
         Make predictions.
 
@@ -568,9 +526,7 @@ class EvidentialRegressor(BaseEstimator, RegressorMixin):
             if return_uncertainty:
                 predictions = self.model_.predict_with_uncertainty(X_tensor)
                 # Convert to numpy
-                return {
-                    k: v.cpu().numpy() for k, v in predictions.items()
-                }
+                return {k: v.cpu().numpy() for k, v in predictions.items()}
             else:
                 gamma, _, _, _ = self.model_(X_tensor)
                 return gamma.cpu().numpy()
@@ -585,40 +541,40 @@ class EvidentialRegressor(BaseEstimator, RegressorMixin):
 
         # Save model state
         model_data = {
-            'model_state': self.model_.state_dict(),
-            'scaler': self.scaler_,
-            'config': {
-                'hidden_dims': self.hidden_dims,
-                'dropout_rate': self.dropout_rate,
-                'lambda_reg': self.lambda_reg,
-                'learning_rate': self.learning_rate,
-                'batch_size': self.batch_size,
-                'max_epochs': self.max_epochs,
-                'patience': self.patience
+            "model_state": self.model_.state_dict(),
+            "scaler": self.scaler_,
+            "config": {
+                "hidden_dims": self.hidden_dims,
+                "dropout_rate": self.dropout_rate,
+                "lambda_reg": self.lambda_reg,
+                "learning_rate": self.learning_rate,
+                "batch_size": self.batch_size,
+                "max_epochs": self.max_epochs,
+                "patience": self.patience,
             },
-            'training_history': self.training_history_,
-            'input_dim': self.model_.input_dim,
-            'timestamp': datetime.now().isoformat()
+            "training_history": self.training_history_,
+            "input_dim": self.model_.input_dim,
+            "timestamp": datetime.now().isoformat(),
         }
 
         torch.save(model_data, filepath)
 
         # Save metadata as JSON
         metadata = {
-            'architecture': 'evidential_regression',
-            'hidden_dims': list(self.hidden_dims),
-            'dropout_rate': self.dropout_rate,
-            'lambda_reg': self.lambda_reg,
-            'n_epochs_trained': len(self.training_history_),
-            'final_train_loss': self.training_history_[-1]['train_loss'],
-            'timestamp': datetime.now().isoformat()
+            "architecture": "evidential_regression",
+            "hidden_dims": list(self.hidden_dims),
+            "dropout_rate": self.dropout_rate,
+            "lambda_reg": self.lambda_reg,
+            "n_epochs_trained": len(self.training_history_),
+            "final_train_loss": self.training_history_[-1]["train_loss"],
+            "timestamp": datetime.now().isoformat(),
         }
 
-        if 'val_loss' in self.training_history_[-1]:
-            metadata['final_val_loss'] = self.training_history_[-1]['val_loss']
+        if "val_loss" in self.training_history_[-1]:
+            metadata["final_val_loss"] = self.training_history_[-1]["val_loss"]
 
-        metadata_path = filepath.with_suffix('.json')
-        with open(metadata_path, 'w') as f:
+        metadata_path = filepath.with_suffix(".json")
+        with open(metadata_path, "w") as f:
             json.dump(metadata, f, indent=2)
 
         logger.info(f"Model saved to {filepath}")
@@ -632,29 +588,27 @@ class EvidentialRegressor(BaseEstimator, RegressorMixin):
         model_data = torch.load(filepath, map_location=self.device)
 
         # Restore config
-        config = model_data['config']
-        self.hidden_dims = config['hidden_dims']
-        self.dropout_rate = config['dropout_rate']
-        self.lambda_reg = config['lambda_reg']
-        self.learning_rate = config['learning_rate']
-        self.batch_size = config['batch_size']
-        self.max_epochs = config['max_epochs']
-        self.patience = config['patience']
+        config = model_data["config"]
+        self.hidden_dims = config["hidden_dims"]
+        self.dropout_rate = config["dropout_rate"]
+        self.lambda_reg = config["lambda_reg"]
+        self.learning_rate = config["learning_rate"]
+        self.batch_size = config["batch_size"]
+        self.max_epochs = config["max_epochs"]
+        self.patience = config["patience"]
 
         # Restore scaler
-        self.scaler_ = model_data['scaler']
+        self.scaler_ = model_data["scaler"]
 
         # Restore model
-        input_dim = model_data['input_dim']
+        input_dim = model_data["input_dim"]
         self.model_ = EvidentialNeuralNetwork(
-            input_dim=input_dim,
-            hidden_dims=self.hidden_dims,
-            dropout_rate=self.dropout_rate
+            input_dim=input_dim, hidden_dims=self.hidden_dims, dropout_rate=self.dropout_rate
         ).to(self.device)
-        self.model_.load_state_dict(model_data['model_state'])
+        self.model_.load_state_dict(model_data["model_state"])
 
         # Restore training history
-        self.training_history_ = model_data['training_history']
+        self.training_history_ = model_data["training_history"]
 
         self.is_fitted_ = True
         logger.info(f"Model loaded from {filepath}")
@@ -662,10 +616,7 @@ class EvidentialRegressor(BaseEstimator, RegressorMixin):
         return self
 
 
-def load_rushing_data_from_db(
-    start_season: int = 2020,
-    end_season: int = 2024
-) -> pd.DataFrame:
+def load_rushing_data_from_db(start_season: int = 2020, end_season: int = 2024) -> pd.DataFrame:
     """
     Load rushing yards data from database.
 
@@ -679,11 +630,11 @@ def load_rushing_data_from_db(
     logger.info(f"Loading rushing data from seasons {start_season}-{end_season}")
 
     conn = psycopg2.connect(
-        host='localhost',
+        host="localhost",
         port=5544,
-        dbname='devdb01',
-        user='dro',
-        password=os.getenv('DB_PASSWORD', 'sicillionbillions')
+        dbname="devdb01",
+        user="dro",
+        password=os.getenv("DB_PASSWORD", "sicillionbillions"),
     )
 
     query = """
@@ -740,14 +691,14 @@ def load_rushing_data_from_db(
     conn.close()
 
     # Handle missing values
-    df['avg_rushing_l3'] = df['avg_rushing_l3'].fillna(
-        df.groupby('season')['rushing_yards'].transform('median')
+    df["avg_rushing_l3"] = df["avg_rushing_l3"].fillna(
+        df.groupby("season")["rushing_yards"].transform("median")
     )
-    df['avg_carries_l3'] = df['avg_carries_l3'].fillna(
-        df.groupby('season')['carries'].transform('median')
+    df["avg_carries_l3"] = df["avg_carries_l3"].fillna(
+        df.groupby("season")["carries"].transform("median")
     )
-    df['season_avg'] = df['season_avg'].fillna(
-        df.groupby('season')['rushing_yards'].transform('median')
+    df["season_avg"] = df["season_avg"].fillna(
+        df.groupby("season")["rushing_yards"].transform("median")
     )
 
     logger.info(f"Loaded {len(df)} rushing performances from {df['player_id'].nunique()} players")
@@ -765,13 +716,13 @@ if __name__ == "__main__":
     df = load_rushing_data_from_db(start_season=2020, end_season=2024)
 
     # Prepare features
-    feature_cols = ['carries', 'avg_rushing_l3', 'avg_carries_l3', 'season_avg']
+    feature_cols = ["carries", "avg_rushing_l3", "avg_carries_l3", "season_avg"]
     X = df[feature_cols].values
-    y = df['rushing_yards'].values
+    y = df["rushing_yards"].values
 
     # Train/test split
-    train_mask = df['season'] <= 2023
-    test_mask = df['season'] == 2024
+    train_mask = df["season"] <= 2023
+    test_mask = df["season"] == 2024
 
     X_train, y_train = X[train_mask], y[train_mask]
     X_test, y_test = X[test_mask], y[test_mask]
@@ -789,7 +740,7 @@ if __name__ == "__main__":
         batch_size=128,
         max_epochs=50,
         patience=5,
-        device='cpu'
+        device="cpu",
     )
 
     model.fit(X_train, y_train, verbose=True)
@@ -799,8 +750,8 @@ if __name__ == "__main__":
     predictions = model.predict(X_test, return_uncertainty=True)
 
     # Evaluate
-    mae = np.mean(np.abs(predictions['mean'] - y_test))
-    rmse = np.sqrt(np.mean((predictions['mean'] - y_test) ** 2))
+    mae = np.mean(np.abs(predictions["mean"] - y_test))
+    rmse = np.sqrt(np.mean((predictions["mean"] - y_test) ** 2))
 
     logger.info(f"\nTest MAE: {mae:.2f} yards")
     logger.info(f"Test RMSE: {rmse:.2f} yards")

@@ -17,26 +17,22 @@ Date: November 26, 2025
 import argparse
 import logging
 from pathlib import Path
-from typing import Dict, Set
 
 import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_values
 
 # Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 # Database connection
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5544,
-    'database': 'devdb01',
-    'user': 'dro',
-    'password': 'sicillionbillions'  # pragma: allowlist secret
+    "host": "localhost",
+    "port": 5544,
+    "database": "devdb01",
+    "user": "dro",
+    "password": "sicillionbillions",  # pragma: allowlist secret
 }
 
 
@@ -53,9 +49,20 @@ def clean_coach_name(name: str) -> str:
 
     # Known bad parses from Wikipedia
     bad_names = {
-        '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024', '2025',
-        'Oakland Raiders', 'Cincinnati Bengals', 'Los Angeles Chargers',
-        'Super Bowl LII', 'None'
+        "2017",
+        "2018",
+        "2019",
+        "2020",
+        "2021",
+        "2022",
+        "2023",
+        "2024",
+        "2025",
+        "Oakland Raiders",
+        "Cincinnati Bengals",
+        "Los Angeles Chargers",
+        "Super Bowl LII",
+        "None",
     }
 
     if name in bad_names:
@@ -71,14 +78,19 @@ def load_coaching_data(csv_path: Path) -> pd.DataFrame:
     df = pd.read_csv(csv_path)
 
     # Clean coach names
-    for col in ['head_coach', 'offensive_coordinator', 'defensive_coordinator', 'special_teams_coordinator']:
+    for col in [
+        "head_coach",
+        "offensive_coordinator",
+        "defensive_coordinator",
+        "special_teams_coordinator",
+    ]:
         df[col] = df[col].apply(clean_coach_name)
 
     # Count data quality
     total = len(df)
-    hc_count = df['head_coach'].notna().sum()
-    oc_count = df['offensive_coordinator'].notna().sum()
-    dc_count = df['defensive_coordinator'].notna().sum()
+    hc_count = df["head_coach"].notna().sum()
+    oc_count = df["offensive_coordinator"].notna().sum()
+    dc_count = df["defensive_coordinator"].notna().sum()
 
     logger.info(f"Loaded {total} team-seasons")
     logger.info(f"  Head coaches: {hc_count}/{total} ({100*hc_count/total:.1f}%)")
@@ -88,17 +100,22 @@ def load_coaching_data(csv_path: Path) -> pd.DataFrame:
     return df
 
 
-def get_unique_coaches(df: pd.DataFrame) -> Set[str]:
+def get_unique_coaches(df: pd.DataFrame) -> set[str]:
     """Extract unique coach names from dataframe."""
     coaches = set()
 
-    for col in ['head_coach', 'offensive_coordinator', 'defensive_coordinator', 'special_teams_coordinator']:
+    for col in [
+        "head_coach",
+        "offensive_coordinator",
+        "defensive_coordinator",
+        "special_teams_coordinator",
+    ]:
         coaches.update(df[col].dropna().unique())
 
     return coaches
 
 
-def insert_coach_metadata(conn, coaches: Set[str]):
+def insert_coach_metadata(conn, coaches: set[str]):
     """Insert coach metadata records."""
     logger.info(f"Inserting {len(coaches)} coaches into coach_metadata")
 
@@ -122,7 +139,7 @@ def insert_coach_metadata(conn, coaches: Set[str]):
     ON CONFLICT (coach_name) DO NOTHING
     """
 
-    values = [(name, 'unknown', 'Unknown') for name in new_coaches]
+    values = [(name, "unknown", "Unknown") for name in new_coaches]
 
     execute_values(cur, insert_query, values)
     conn.commit()
@@ -142,15 +159,17 @@ def insert_coaching_staff(conn, df: pd.DataFrame):
     # Prepare records - schema is: team, season, week, head_coach, offensive_coordinator, defensive_coordinator, special_teams_coordinator
     records = []
     for _, row in df.iterrows():
-        records.append((
-            row['team'],
-            int(row['season']),
-            None,  # week = NULL for season-level records
-            row['head_coach'],
-            row['offensive_coordinator'],
-            row['defensive_coordinator'],
-            row.get('special_teams_coordinator')  # May not exist in all rows
-        ))
+        records.append(
+            (
+                row["team"],
+                int(row["season"]),
+                None,  # week = NULL for season-level records
+                row["head_coach"],
+                row["offensive_coordinator"],
+                row["defensive_coordinator"],
+                row.get("special_teams_coordinator"),  # May not exist in all rows
+            )
+        )
 
     # Insert all records
     insert_query = """
@@ -191,7 +210,8 @@ def validate_load(conn):
     print(f"\n=== COACHING STAFF LOADED: {total} team-seasons ===")
 
     # Count non-null coaches
-    cur.execute("""
+    cur.execute(
+        """
         SELECT
             COUNT(*) as total,
             COUNT(head_coach) as hc_count,
@@ -199,7 +219,8 @@ def validate_load(conn):
             COUNT(defensive_coordinator) as dc_count,
             COUNT(special_teams_coordinator) as st_count
         FROM coaching_staff
-    """)
+    """
+    )
     row = cur.fetchone()
     print(f"  Head coaches: {row[1]}/{row[0]}")
     print(f"  Offensive coordinators: {row[2]}/{row[0]}")
@@ -207,23 +228,27 @@ def validate_load(conn):
     print(f"  Special teams coordinators: {row[4]}/{row[0]}")
 
     # Sample recent data
-    cur.execute("""
+    cur.execute(
+        """
         SELECT team, season, head_coach, offensive_coordinator, defensive_coordinator
         FROM coaching_staff
         WHERE season = 2024
         ORDER BY team
         LIMIT 10
-    """)
+    """
+    )
 
     print("\n=== SAMPLE 2024 COACHING DATA ===")
     for row in cur.fetchall():
         print(f"  {row[0]} {row[1]}: HC={row[2]}, OC={row[3]}, DC={row[4]}")
 
     # Check if materialized view exists and has data
-    cur.execute("""
+    cur.execute(
+        """
         SELECT COUNT(*) FROM information_schema.tables
         WHERE table_name = 'coaching_continuity'
-    """)
+    """
+    )
     if cur.fetchone()[0] > 0:
         cur.execute("SELECT COUNT(*) FROM coaching_continuity")
         continuity_count = cur.fetchone()[0]
@@ -235,13 +260,13 @@ def validate_load(conn):
 def main():
     """Main execution function."""
     parser = argparse.ArgumentParser(
-        description='Load coaching staff data from Wikipedia CSV into PostgreSQL'
+        description="Load coaching staff data from Wikipedia CSV into PostgreSQL"
     )
     parser.add_argument(
-        '--input',
+        "--input",
         type=str,
-        default='data/coaching_staff_2018_2025_wikipedia_full.csv',
-        help='Input CSV file path'
+        default="data/coaching_staff_2018_2025_wikipedia_full.csv",
+        help="Input CSV file path",
     )
     args = parser.parse_args()
 
@@ -286,5 +311,5 @@ def main():
         conn.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     exit(main())

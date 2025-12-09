@@ -39,20 +39,15 @@ References:
 
 from __future__ import annotations
 
-import argparse
-import json
 import random
 from collections import deque
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 import torch.optim as optim
-
 
 # ============================================================================
 # Utilities
@@ -107,7 +102,7 @@ class FeatureQNetwork(nn.Module):
         self,
         state_dim: int,
         n_actions: int,
-        hidden_dims: List[int] = None,
+        hidden_dims: list[int] = None,
         use_attention: bool = False,
     ):
         super().__init__()
@@ -213,14 +208,16 @@ class PrioritizedReplayBuffer:
 
     def sample(
         self, batch_size: int
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, np.ndarray, np.ndarray]:
+    ) -> tuple[
+        torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, np.ndarray, np.ndarray
+    ]:
         """Sample batch with importance sampling weights."""
         if self.size < batch_size:
             batch_size = self.size
 
         # Compute sampling probabilities
         priorities = self.priorities[: self.size]
-        probs = priorities ** self.alpha
+        probs = priorities**self.alpha
         probs /= probs.sum()
 
         # Sample indices
@@ -296,7 +293,7 @@ class CQLFeatureSelector:
         batch_size: int = 64,
         target_update_freq: int = 1000,
         buffer_capacity: int = 100000,
-        hidden_dims: List[int] = None,
+        hidden_dims: list[int] = None,
         use_attention: bool = False,
         prioritized_replay: bool = True,
     ):
@@ -313,12 +310,12 @@ class CQLFeatureSelector:
             hidden_dims = [256, 256]
 
         # Q-networks
-        self.q_network = FeatureQNetwork(
-            state_dim, action_dim, hidden_dims, use_attention
-        ).to(self.device)
-        self.target_network = FeatureQNetwork(
-            state_dim, action_dim, hidden_dims, use_attention
-        ).to(self.device)
+        self.q_network = FeatureQNetwork(state_dim, action_dim, hidden_dims, use_attention).to(
+            self.device
+        )
+        self.target_network = FeatureQNetwork(state_dim, action_dim, hidden_dims, use_attention).to(
+            self.device
+        )
         self.target_network.load_state_dict(self.q_network.state_dict())
         self.target_network.eval()
 
@@ -404,7 +401,7 @@ class CQLFeatureSelector:
 
         return cql_penalty
 
-    def update(self) -> Dict[str, float]:
+    def update(self) -> dict[str, float]:
         """
         Perform one gradient update step.
 
@@ -505,7 +502,7 @@ class CQLFeatureSelector:
         """Store transition in replay buffer."""
         self.replay_buffer.push(state, action, reward, next_state, done)
 
-    def save(self, path: str, metadata: Dict = None):
+    def save(self, path: str, metadata: dict = None):
         """
         Save model checkpoint with metadata.
 
@@ -545,7 +542,7 @@ class CQLFeatureSelector:
         torch.save(checkpoint, path)
 
     @classmethod
-    def load(cls, path: str, device: torch.device = None) -> "CQLFeatureSelector":
+    def load(cls, path: str, device: torch.device = None) -> CQLFeatureSelector:
         """
         Load model checkpoint.
 
@@ -587,7 +584,7 @@ class CQLFeatureSelector:
 
     def select_features(
         self,
-        base_features: List[str],
+        base_features: list[str],
         feature_budget: int = 100,
         epsilon: float = 0.0,
     ) -> np.ndarray:
@@ -654,7 +651,7 @@ class ReplayBuffer:
 
     def sample(
         self, batch_size: int
-    ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
         """Sample random batch."""
         batch = random.sample(self.buffer, min(batch_size, len(self.buffer)))
         states, actions, rewards, next_states, dones = zip(*batch)
@@ -680,7 +677,7 @@ def train_cql_feature_selector(
     train_data: pd.DataFrame,
     epochs: int = 500,
     log_freq: int = 20,
-) -> List[Dict[str, float]]:
+) -> list[dict[str, float]]:
     """
     Train CQL feature selector on offline dataset.
 
@@ -704,9 +701,7 @@ def train_cql_feature_selector(
             done=row["done"],
         )
 
-    print(
-        f"\nTraining CQL Feature Selector (α={agent.alpha}) for {epochs} epochs..."
-    )
+    print(f"\nTraining CQL Feature Selector (α={agent.alpha}) for {epochs} epochs...")
     print(f"Device: {agent.device}, Batch size: {agent.batch_size}")
     print(f"Buffer size: {len(agent.replay_buffer)}, State dim: {agent.state_dim}")
 
@@ -823,9 +818,7 @@ if __name__ == "__main__":
         ideal_count = 40
         mae = abs(n_selected - ideal_count) * 0.5 + np.random.randn() * 2.0
         calibration = max(0.5, 1.0 - abs(n_selected - ideal_count) / 100.0)
-        metrics = np.array(
-            [mae, calibration] + [np.random.randn() for _ in range(n_metrics - 2)]
-        )
+        metrics = np.array([mae, calibration] + [np.random.randn() for _ in range(n_metrics - 2)])
 
         budget_indicator = n_selected / n_features
         state = np.concatenate([feature_mask, metrics, [budget_indicator]])
@@ -845,9 +838,7 @@ if __name__ == "__main__":
         next_metrics = metrics.copy()
         next_metrics[0] = new_mae  # Update MAE
         next_metrics[1] = max(0.5, 1.0 - abs(new_count - ideal_count) / 100.0)
-        next_state = np.concatenate(
-            [new_mask, next_metrics, [new_count / n_features]]
-        )
+        next_state = np.concatenate([new_mask, next_metrics, [new_count / n_features]])
 
         # Done flag (episode ends when budget exhausted)
         done = new_count >= 50
@@ -872,9 +863,7 @@ if __name__ == "__main__":
     print("Training...")
     print("=" * 80)
 
-    metrics = train_cql_feature_selector(
-        agent=agent, train_data=train_df, epochs=100, log_freq=10
-    )
+    metrics = train_cql_feature_selector(agent=agent, train_data=train_df, epochs=100, log_freq=10)
 
     # Test feature selection
     print("\n" + "=" * 80)
@@ -888,7 +877,7 @@ if __name__ == "__main__":
 
     selected_features = [f for f, m in zip(base_features, selected_mask) if m == 1]
     print(f"\nSelected {len(selected_features)}/{n_features} features")
-    print(f"Optimal range: 30-50 features (synthetic ground truth)")
+    print("Optimal range: 30-50 features (synthetic ground truth)")
     print(f"Performance: {'GOOD' if 30 <= len(selected_features) <= 50 else 'SUBOPTIMAL'}")
 
     # Save model

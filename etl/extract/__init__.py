@@ -7,14 +7,28 @@ Provides extractors for all data sources:
 - OddsAPIExtractor: The Odds API historical data
 """
 
-from .base import BaseExtractor, ExtractionResult, SourceType, RetryConfig, RateLimiter
+from .base import BaseExtractor, ExtractionResult, RateLimiter, RetryConfig, SourceType
 from .nflverse import NFLVerseExtractor
 
 # Odds API extractor will be imported when implemented
 try:
     from .odds_api import OddsAPIExtractor
-    __all__ = ['BaseExtractor', 'ExtractionResult', 'SourceType', 'RetryConfig',
-               'RateLimiter', 'NFLVerseExtractor', 'OddsAPIExtractor']
+
+    __all__ = [
+        "BaseExtractor",
+        "ExtractionResult",
+        "SourceType",
+        "RetryConfig",
+        "RateLimiter",
+        "NFLVerseExtractor",
+        "OddsAPIExtractor",
+    ]
 except ImportError:
-    __all__ = ['BaseExtractor', 'ExtractionResult', 'SourceType', 'RetryConfig',
-               'RateLimiter', 'NFLVerseExtractor']
+    __all__ = [
+        "BaseExtractor",
+        "ExtractionResult",
+        "SourceType",
+        "RetryConfig",
+        "RateLimiter",
+        "NFLVerseExtractor",
+    ]

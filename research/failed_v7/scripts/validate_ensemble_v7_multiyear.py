@@ -18,12 +18,10 @@ Author: Enhanced Ensemble v7.0
 Date: November 17, 2025
 """
 
-import sys
-from pathlib import Path
 import logging
-from typing import Dict, List, Tuple
+import sys
 from datetime import datetime
-import json
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -34,31 +32,29 @@ from scipy import stats
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from py.ensemble.enhanced_ensemble_v7_production import (
-    EnhancedEnsemble7Way,
     load_ensemble_v7,
-    DEFAULT_WEIGHTS_V6,
 )
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Database configuration
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5544,
-    'database': 'devdb01',
-    'user': 'dro',
-    'password': 'sicillionbillions',
+    "host": "localhost",
+    "port": 5544,
+    "database": "devdb01",
+    "user": "dro",
+    "password": "sicillionbillions",
 }
 
 
 # ============================================================================
 # DATA EXTRACTION
 # ============================================================================
+
 
 def get_test_data(season: int, week_start: int = 1, week_end: int = 18) -> pd.DataFrame:
     """
@@ -123,7 +119,8 @@ def get_test_data(season: int, week_start: int = 1, week_end: int = 18) -> pd.Da
 # ENSEMBLE CONFIGURATIONS
 # ============================================================================
 
-def get_ensemble_configurations() -> Dict[str, Dict]:
+
+def get_ensemble_configurations() -> dict[str, dict]:
     """
     Return 4 ensemble configurations for ablation study.
 
@@ -131,26 +128,26 @@ def get_ensemble_configurations() -> Dict[str, Dict]:
         Dictionary mapping config name to initialization parameters
     """
     configs = {
-        'v6_baseline': {
-            'use_meta_learning': False,
-            'use_wls_recency': False,
-            'description': 'v6.0 Static Weights (30% SS, 27% Hier, 23% XGB, 12% IP, 8% ELO)',
+        "v6_baseline": {
+            "use_meta_learning": False,
+            "use_wls_recency": False,
+            "description": "v6.0 Static Weights (30% SS, 27% Hier, 23% XGB, 12% IP, 8% ELO)",
         },
-        'v7_wls_only': {
-            'use_meta_learning': False,
-            'use_wls_recency': True,
-            'description': 'v7.0 WLS Recency Only (adaptive weekly weights)',
+        "v7_wls_only": {
+            "use_meta_learning": False,
+            "use_wls_recency": True,
+            "description": "v7.0 WLS Recency Only (adaptive weekly weights)",
         },
-        'v7_meta_only': {
-            'use_meta_learning': True,
-            'use_wls_recency': False,
-            'description': 'v7.0 Meta-Learning Only (context-aware weights)',
+        "v7_meta_only": {
+            "use_meta_learning": True,
+            "use_wls_recency": False,
+            "description": "v7.0 Meta-Learning Only (context-aware weights)",
         },
-        'v7_full': {
-            'use_meta_learning': True,
-            'use_wls_recency': True,
-            'meta_wls_blend': 0.6,  # 60% meta, 40% WLS
-            'description': 'v7.0 Full (meta + WLS blended 60/40)',
+        "v7_full": {
+            "use_meta_learning": True,
+            "use_wls_recency": True,
+            "meta_wls_blend": 0.6,  # 60% meta, 40% WLS
+            "description": "v7.0 Full (meta + WLS blended 60/40)",
         },
     }
 
@@ -161,9 +158,10 @@ def get_ensemble_configurations() -> Dict[str, Dict]:
 # BACKTESTING
 # ============================================================================
 
+
 def backtest_configuration(
     config_name: str,
-    config_params: Dict,
+    config_params: dict,
     test_df: pd.DataFrame,
     season: int,
 ) -> pd.DataFrame:
@@ -183,13 +181,13 @@ def backtest_configuration(
 
     # Initialize ensemble with configuration
     init_params = {
-        'use_meta_learning': config_params['use_meta_learning'],
-        'use_wls_recency': config_params['use_wls_recency'],
+        "use_meta_learning": config_params["use_meta_learning"],
+        "use_wls_recency": config_params["use_wls_recency"],
     }
 
     # Only pass meta_wls_blend if both meta and WLS are enabled
-    if config_params['use_meta_learning'] and config_params['use_wls_recency']:
-        init_params['meta_wls_blend'] = config_params.get('meta_wls_blend', 0.6)
+    if config_params["use_meta_learning"] and config_params["use_wls_recency"]:
+        init_params["meta_wls_blend"] = config_params.get("meta_wls_blend", 0.6)
 
     ensemble = load_ensemble_v7(**init_params)
 
@@ -199,24 +197,26 @@ def backtest_configuration(
         try:
             # Generate prediction
             prediction = ensemble.predict(
-                player_id=row['player_id'],
-                season=row['season'],
-                week=row['week'],
+                player_id=row["player_id"],
+                season=row["season"],
+                week=row["week"],
                 return_components=False,  # Skip components for speed
             )
 
-            results.append({
-                'player_id': row['player_id'],
-                'season': row['season'],
-                'week': row['week'],
-                'actual': row['actual'],
-                'prediction': prediction['ensemble_mean'],
-                'prediction_std': prediction['ensemble_std'],
-                'ci_lower': prediction['ensemble_ci_lower'],
-                'ci_upper': prediction['ensemble_ci_upper'],
-                'weight_source': prediction['metadata']['source'],
-                'error': abs(prediction['ensemble_mean'] - row['actual']),
-            })
+            results.append(
+                {
+                    "player_id": row["player_id"],
+                    "season": row["season"],
+                    "week": row["week"],
+                    "actual": row["actual"],
+                    "prediction": prediction["ensemble_mean"],
+                    "prediction_std": prediction["ensemble_std"],
+                    "ci_lower": prediction["ensemble_ci_lower"],
+                    "ci_upper": prediction["ensemble_ci_upper"],
+                    "weight_source": prediction["metadata"]["source"],
+                    "error": abs(prediction["ensemble_mean"] - row["actual"]),
+                }
+            )
 
         except Exception as e:
             logger.warning(f"    Failed for {row['player_id']} W{row['week']}: {e}")
@@ -225,13 +225,13 @@ def backtest_configuration(
     results_df = pd.DataFrame(results)
 
     # Calculate metrics
-    mae = results_df['error'].mean()
-    rmse = np.sqrt((results_df['error'] ** 2).mean())
+    mae = results_df["error"].mean()
+    rmse = np.sqrt((results_df["error"] ** 2).mean())
 
     # Calibration: % of actuals within 90% CI
     in_ci = (
-        (results_df['actual'] >= results_df['ci_lower']) &
-        (results_df['actual'] <= results_df['ci_upper'])
+        (results_df["actual"] >= results_df["ci_lower"])
+        & (results_df["actual"] <= results_df["ci_upper"])
     ).mean() * 100
 
     logger.info(f"    MAE: {mae:.2f} yards")
@@ -246,11 +246,12 @@ def backtest_configuration(
 # STATISTICAL TESTING
 # ============================================================================
 
+
 def diebold_mariano_test(
     errors_1: np.ndarray,
     errors_2: np.ndarray,
     h: int = 1,
-) -> Tuple[float, float]:
+) -> tuple[float, float]:
     """
     Diebold-Mariano test for predictive accuracy.
 
@@ -284,7 +285,7 @@ def diebold_mariano_test(
     return dm_stat, p_value
 
 
-def compare_configurations(results: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+def compare_configurations(results: dict[str, pd.DataFrame]) -> pd.DataFrame:
     """
     Compare all configurations pairwise using Diebold-Mariano test.
 
@@ -299,19 +300,21 @@ def compare_configurations(results: Dict[str, pd.DataFrame]) -> pd.DataFrame:
     configs = list(results.keys())
 
     for i, config_1 in enumerate(configs):
-        for config_2 in configs[i+1:]:
+        for config_2 in configs[i + 1 :]:
             # Align on common games
-            df1 = results[config_1].set_index(['player_id', 'season', 'week'])
-            df2 = results[config_2].set_index(['player_id', 'season', 'week'])
+            df1 = results[config_1].set_index(["player_id", "season", "week"])
+            df2 = results[config_2].set_index(["player_id", "season", "week"])
 
             common_idx = df1.index.intersection(df2.index)
 
             if len(common_idx) < 30:
-                logger.warning(f"  Skipping {config_1} vs {config_2}: only {len(common_idx)} common games")
+                logger.warning(
+                    f"  Skipping {config_1} vs {config_2}: only {len(common_idx)} common games"
+                )
                 continue
 
-            errors_1 = df1.loc[common_idx, 'error'].values
-            errors_2 = df2.loc[common_idx, 'error'].values
+            errors_1 = df1.loc[common_idx, "error"].values
+            errors_2 = df2.loc[common_idx, "error"].values
 
             # DM test
             dm_stat, p_value = diebold_mariano_test(errors_1, errors_2)
@@ -321,19 +324,21 @@ def compare_configurations(results: Dict[str, pd.DataFrame]) -> pd.DataFrame:
             mae_2 = errors_2.mean()
             mae_diff = mae_1 - mae_2
 
-            comparisons.append({
-                'config_1': config_1,
-                'config_2': config_2,
-                'n_games': len(common_idx),
-                'mae_1': mae_1,
-                'mae_2': mae_2,
-                'mae_diff': mae_diff,  # Negative if config_1 better
-                'mae_pct_improvement': (mae_diff / mae_2) * 100 if mae_2 > 0 else 0,
-                'dm_statistic': dm_stat,
-                'p_value': p_value,
-                'significant_05': p_value < 0.05,
-                'significant_01': p_value < 0.01,
-            })
+            comparisons.append(
+                {
+                    "config_1": config_1,
+                    "config_2": config_2,
+                    "n_games": len(common_idx),
+                    "mae_1": mae_1,
+                    "mae_2": mae_2,
+                    "mae_diff": mae_diff,  # Negative if config_1 better
+                    "mae_pct_improvement": (mae_diff / mae_2) * 100 if mae_2 > 0 else 0,
+                    "dm_statistic": dm_stat,
+                    "p_value": p_value,
+                    "significant_05": p_value < 0.05,
+                    "significant_01": p_value < 0.01,
+                }
+            )
 
     return pd.DataFrame(comparisons)
 
@@ -342,9 +347,10 @@ def compare_configurations(results: Dict[str, pd.DataFrame]) -> pd.DataFrame:
 # REPORTING
 # ============================================================================
 
+
 def generate_summary_report(
-    results_by_season: Dict[int, Dict[str, pd.DataFrame]],
-    comparisons_by_season: Dict[int, pd.DataFrame],
+    results_by_season: dict[int, dict[str, pd.DataFrame]],
+    comparisons_by_season: dict[int, pd.DataFrame],
 ) -> str:
     """
     Generate comprehensive summary report.
@@ -380,18 +386,24 @@ def generate_summary_report(
         # Performance table
         lines.append("Performance Metrics:")
         lines.append("-" * 80)
-        lines.append(f"{'Configuration':<20} {'MAE':>8} {'RMSE':>8} {'Calibration':>12} {'N Games':>10}")
+        lines.append(
+            f"{'Configuration':<20} {'MAE':>8} {'RMSE':>8} {'Calibration':>12} {'N Games':>10}"
+        )
         lines.append("-" * 80)
 
         for config_name in configs.keys():
             if config_name in season_results:
                 df = season_results[config_name]
-                mae = df['error'].mean()
-                rmse = np.sqrt((df['error'] ** 2).mean())
-                calib = ((df['actual'] >= df['ci_lower']) & (df['actual'] <= df['ci_upper'])).mean() * 100
+                mae = df["error"].mean()
+                rmse = np.sqrt((df["error"] ** 2).mean())
+                calib = (
+                    (df["actual"] >= df["ci_lower"]) & (df["actual"] <= df["ci_upper"])
+                ).mean() * 100
                 n_games = len(df)
 
-                lines.append(f"{config_name:<20} {mae:>8.2f} {rmse:>8.2f} {calib:>11.1f}% {n_games:>10,}")
+                lines.append(
+                    f"{config_name:<20} {mae:>8.2f} {rmse:>8.2f} {calib:>11.1f}% {n_games:>10,}"
+                )
 
         lines.append("-" * 80)
         lines.append("")
@@ -402,12 +414,16 @@ def generate_summary_report(
 
             lines.append("Statistical Comparisons (Diebold-Mariano Test):")
             lines.append("-" * 80)
-            lines.append(f"{'Comparison':<35} {'MAE Δ':>10} {'% Improv':>10} {'DM Stat':>10} {'p-value':>10} {'Sig?':>6}")
+            lines.append(
+                f"{'Comparison':<35} {'MAE Δ':>10} {'% Improv':>10} {'DM Stat':>10} {'p-value':>10} {'Sig?':>6}"
+            )
             lines.append("-" * 80)
 
             for _, row in comp_df.iterrows():
                 comp_label = f"{row['config_1']} vs {row['config_2']}"
-                sig_marker = "***" if row['significant_01'] else ("**" if row['significant_05'] else "")
+                sig_marker = (
+                    "***" if row["significant_01"] else ("**" if row["significant_05"] else "")
+                )
 
                 lines.append(
                     f"{comp_label:<35} "
@@ -430,15 +446,17 @@ def generate_summary_report(
     all_results = []
     for season, season_results in results_by_season.items():
         for config_name, df in season_results.items():
-            all_results.append({
-                'season': season,
-                'config': config_name,
-                'mae': df['error'].mean(),
-                'n_games': len(df),
-            })
+            all_results.append(
+                {
+                    "season": season,
+                    "config": config_name,
+                    "mae": df["error"].mean(),
+                    "n_games": len(df),
+                }
+            )
 
     all_results_df = pd.DataFrame(all_results)
-    avg_mae_by_config = all_results_df.groupby('config')['mae'].mean().sort_values()
+    avg_mae_by_config = all_results_df.groupby("config")["mae"].mean().sort_values()
 
     lines.append("Average MAE Across All Seasons:")
     for config, mae in avg_mae_by_config.items():
@@ -449,20 +467,20 @@ def generate_summary_report(
     lines.append(f"   Average MAE: {avg_mae_by_config.iloc[0]:.2f} yards")
 
     # Improvement vs baseline
-    if 'v6_baseline' in avg_mae_by_config.index and 'v7_full' in avg_mae_by_config.index:
-        baseline_mae = avg_mae_by_config['v6_baseline']
-        v7_mae = avg_mae_by_config['v7_full']
+    if "v6_baseline" in avg_mae_by_config.index and "v7_full" in avg_mae_by_config.index:
+        baseline_mae = avg_mae_by_config["v6_baseline"]
+        v7_mae = avg_mae_by_config["v7_full"]
         improvement = baseline_mae - v7_mae
         improvement_pct = (improvement / baseline_mae) * 100
 
         lines.append("")
-        lines.append(f"v7.0 Full vs v6.0 Baseline:")
+        lines.append("v7.0 Full vs v6.0 Baseline:")
         lines.append(f"  Improvement: {improvement:.2f} yards ({improvement_pct:+.1f}%)")
 
         if improvement > 2.0:
-            lines.append(f"  ✅ Target met: >2 yards improvement")
+            lines.append("  ✅ Target met: >2 yards improvement")
         else:
-            lines.append(f"  ⚠️  Target missed: <2 yards improvement")
+            lines.append("  ⚠️  Target missed: <2 yards improvement")
 
     lines.append("")
     lines.append("=" * 80)
@@ -473,6 +491,7 @@ def generate_summary_report(
 # ============================================================================
 # MAIN EXECUTION
 # ============================================================================
+
 
 def main():
     """
@@ -526,7 +545,7 @@ def main():
         results_by_season[season] = season_results
 
         # Statistical comparisons
-        logger.info(f"\n3. Running statistical comparisons...")
+        logger.info("\n3. Running statistical comparisons...")
         try:
             comparisons = compare_configurations(season_results)
             comparisons_by_season[season] = comparisons
@@ -564,7 +583,7 @@ def main():
 
     # Save report
     report_path = output_dir / f"validation_report_{timestamp}.txt"
-    with open(report_path, 'w') as f:
+    with open(report_path, "w") as f:
         f.write(report)
     logger.info(f"Saved validation report: {report_path}")
 
@@ -573,5 +592,5 @@ def main():
     logger.info("=" * 80)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

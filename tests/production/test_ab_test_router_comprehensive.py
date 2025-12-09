@@ -22,17 +22,15 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
+import hashlib
 import os
 import time
-import hashlib
-import pytest
-import numpy as np
-import pandas as pd
-from unittest.mock import Mock, patch, MagicMock, call
 from datetime import datetime
+from unittest.mock import Mock, patch
+
+import pytest
 
 from py.production.ab_test_router import ABTestRouter
-
 
 # ============================================================================
 # UNIT TESTS - Router Logic and Hashing
@@ -60,7 +58,7 @@ class TestABTestRouterUnit:
             test_name="custom_test",
             enabled=False,
             db_host="custom_host",
-            db_port=5555
+            db_port=5555,
         )
 
         assert router.split_ratio == 0.3
@@ -234,8 +232,8 @@ class TestABTestRouterUnit:
             assert group == "B"
             assert version == "v6.0"
 
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_lazy_model_loading(self, mock_v6, mock_v5):
         """Test that models are only loaded when needed."""
         router = ABTestRouter(split_ratio=0.5)
@@ -258,8 +256,8 @@ class TestABTestRouterUnit:
         assert mock_v5.call_count == 1
         assert mock_v6.call_count == 1
 
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_model_loading_disabled_test(self, mock_v6, mock_v5):
         """Test that v6 is not loaded when test is disabled."""
         router = ABTestRouter(split_ratio=0.5, enabled=False)
@@ -279,9 +277,9 @@ class TestABTestRouterUnit:
 class TestABTestRouterIntegration:
     """Integration tests for database logging and model registry."""
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_predict_calls_correct_ensemble_control(self, mock_v6, mock_v5, mock_db):
         """Test that control group predictions use v5 ensemble."""
         # Mock ensemble predictions
@@ -299,12 +297,7 @@ class TestABTestRouterIntegration:
         # Create router with split_ratio=0 (all control)
         router = ABTestRouter(split_ratio=0.0)
 
-        result = router.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10,
-            log_to_db=False
-        )
+        result = router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=False)
 
         # Should have called v5.predict
         mock_v5_instance.predict.assert_called_once()
@@ -314,9 +307,9 @@ class TestABTestRouterIntegration:
         assert result["model_version"] == "v5.0"
         assert result["test_name"] == "ensemble_v5_vs_v6_sagarin"
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_predict_calls_correct_ensemble_treatment(self, mock_v6, mock_v5, mock_db):
         """Test that treatment group predictions use v6 ensemble."""
         # Mock ensemble predictions
@@ -334,12 +327,7 @@ class TestABTestRouterIntegration:
         # Create router with split_ratio=1.0 (all treatment)
         router = ABTestRouter(split_ratio=1.0)
 
-        result = router.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10,
-            log_to_db=False
-        )
+        result = router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=False)
 
         # Should have called v6.predict
         mock_v6_instance.predict.assert_called_once()
@@ -349,9 +337,9 @@ class TestABTestRouterIntegration:
         assert result["model_version"] == "v6.0"
         assert result["test_name"] == "ensemble_v5_vs_v6_sagarin"
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_database_logging_enabled(self, mock_v6, mock_v5, mock_db):
         """Test that predictions are logged to database when log_to_db=True."""
         # Mock ensemble
@@ -368,7 +356,7 @@ class TestABTestRouterIntegration:
         mock_cursor = Mock()
         mock_cursor.fetchone.side_effect = [
             (38,),  # model_id for v5.0
-            ("Patrick Mahomes", "KC", "LAC", True)  # player info
+            ("Patrick Mahomes", "KC", "LAC", True),  # player info
         ]
         mock_conn = Mock()
         mock_conn.cursor.return_value = mock_cursor
@@ -376,27 +364,25 @@ class TestABTestRouterIntegration:
 
         router = ABTestRouter(split_ratio=0.0)
 
-        result = router.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10,
-            log_to_db=True
-        )
+        router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=True)
 
         # Should have executed INSERT query
         assert mock_cursor.execute.call_count == 3  # model_id lookup, player info, insert
 
         # Check INSERT query was called
-        insert_calls = [call for call in mock_cursor.execute.call_args_list
-                       if "INSERT INTO ml.predictions" in str(call)]
+        insert_calls = [
+            call
+            for call in mock_cursor.execute.call_args_list
+            if "INSERT INTO ml.predictions" in str(call)
+        ]
         assert len(insert_calls) == 1, "INSERT query not executed"
 
         # Should have committed
         mock_conn.commit.assert_called_once()
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_database_logging_disabled(self, mock_v6, mock_v5, mock_db):
         """Test that predictions are not logged when log_to_db=False."""
         # Mock ensemble
@@ -411,19 +397,14 @@ class TestABTestRouterIntegration:
 
         router = ABTestRouter(split_ratio=0.0)
 
-        result = router.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10,
-            log_to_db=False
-        )
+        router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=False)
 
         # Database should not be called
         mock_db.assert_not_called()
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_model_registry_lookup_correct_version(self, mock_v6, mock_v5, mock_db):
         """Test that correct model_id is looked up from registry."""
         # Mock ensemble
@@ -440,7 +421,7 @@ class TestABTestRouterIntegration:
         mock_cursor = Mock()
         mock_cursor.fetchone.side_effect = [
             (38,),  # model_id for ensemble_v5.0
-            ("Patrick Mahomes", "KC", "LAC", True)
+            ("Patrick Mahomes", "KC", "LAC", True),
         ]
         mock_conn = Mock()
         mock_conn.cursor.return_value = mock_cursor
@@ -448,25 +429,21 @@ class TestABTestRouterIntegration:
 
         router = ABTestRouter(split_ratio=0.0)
 
-        result = router.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10,
-            log_to_db=True
-        )
+        router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=True)
 
         # Check model registry query
-        registry_calls = [call for call in mock_cursor.execute.call_args_list
-                         if "ml.model_registry" in str(call)]
+        registry_calls = [
+            call for call in mock_cursor.execute.call_args_list if "ml.model_registry" in str(call)
+        ]
         assert len(registry_calls) == 1, "Model registry not queried"
 
         # Should have queried for ensemble_v5.0
         query_args = registry_calls[0][0]
         assert "ensemble_v5.0" in str(query_args), "Wrong model name queried"
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_database_logging_handles_null_prediction(self, mock_v6, mock_v5, mock_db):
         """Test that null predictions are not logged to database."""
         # Mock ensemble with null prediction
@@ -481,19 +458,14 @@ class TestABTestRouterIntegration:
 
         router = ABTestRouter(split_ratio=0.0)
 
-        result = router.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10,
-            log_to_db=True
-        )
+        router.predict(player_id="00-0019596", season=2024, week=10, log_to_db=True)
 
         # Database should not be called (null prediction)
         mock_db.assert_not_called()
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_batch_predictions_split_ratio_accuracy(self, mock_v6, mock_v5, mock_db):
         """Test that batch predictions maintain accurate split ratio."""
         # Mock ensembles
@@ -518,10 +490,7 @@ class TestABTestRouterIntegration:
         router = ABTestRouter(split_ratio=0.5)
 
         # Create batch of 200 games
-        games = [
-            {"player_id": f"player_{i:05d}", "season": 2024, "week": 10}
-            for i in range(200)
-        ]
+        games = [{"player_id": f"player_{i:05d}", "season": 2024, "week": 10} for i in range(200)]
 
         df = router.predict_batch(games, log_to_db=False)
 
@@ -529,7 +498,7 @@ class TestABTestRouterIntegration:
         b_ratio = (df["ab_group"] == "B").sum() / len(df)
         assert 0.40 <= b_ratio <= 0.60, f"Batch split ratio {b_ratio:.3f} outside tolerance"
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_get_test_summary_correct_query(self, mock_db):
         """Test that get_test_summary executes correct SQL query."""
         # Mock database connection
@@ -590,9 +559,9 @@ class TestABTestRouterIntegration:
 class TestABTestRouterE2E:
     """End-to-end tests for complete prediction flow."""
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_full_prediction_flow_control(self, mock_v6, mock_v5, mock_db):
         """Test complete prediction flow for control group."""
         # Mock ensemble
@@ -611,7 +580,7 @@ class TestABTestRouterE2E:
         mock_cursor = Mock()
         mock_cursor.fetchone.side_effect = [
             (38,),  # model_id
-            ("Patrick Mahomes", "KC", "LAC", True)
+            ("Patrick Mahomes", "KC", "LAC", True),
         ]
         mock_conn = Mock()
         mock_conn.cursor.return_value = mock_cursor
@@ -622,11 +591,7 @@ class TestABTestRouterE2E:
 
         # Make prediction
         result = router.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10,
-            return_individual=False,
-            log_to_db=True
+            player_id="00-0019596", season=2024, week=10, return_individual=False, log_to_db=True
         )
 
         # Verify result structure
@@ -647,9 +612,9 @@ class TestABTestRouterE2E:
         # Verify database logging
         mock_conn.commit.assert_called_once()
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_full_prediction_flow_treatment(self, mock_v6, mock_v5, mock_db):
         """Test complete prediction flow for treatment group."""
         # Mock ensemble
@@ -659,7 +624,14 @@ class TestABTestRouterE2E:
             "ensemble_std": 42.0,
             "quantile_10": 218.0,
             "quantile_90": 302.0,
-            "weights": {"state_space": 0.25, "bnn": 0.2, "hierarchical": 0.2, "xgb": 0.15, "elo": 0.1, "adaptive": 0.1},
+            "weights": {
+                "state_space": 0.25,
+                "bnn": 0.2,
+                "hierarchical": 0.2,
+                "xgb": 0.15,
+                "elo": 0.1,
+                "adaptive": 0.1,
+            },
             "inference_time_ms": 105.0,
         }
         mock_v6.return_value = mock_v6_instance
@@ -668,7 +640,7 @@ class TestABTestRouterE2E:
         mock_cursor = Mock()
         mock_cursor.fetchone.side_effect = [
             (39,),  # model_id for v6.0
-            ("Patrick Mahomes", "KC", "LAC", True)
+            ("Patrick Mahomes", "KC", "LAC", True),
         ]
         mock_conn = Mock()
         mock_conn.cursor.return_value = mock_cursor
@@ -679,11 +651,7 @@ class TestABTestRouterE2E:
 
         # Make prediction
         result = router.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10,
-            return_individual=False,
-            log_to_db=True
+            player_id="00-0019596", season=2024, week=10, return_individual=False, log_to_db=True
         )
 
         # Verify result structure
@@ -692,9 +660,9 @@ class TestABTestRouterE2E:
         assert result["ensemble_mean"] == 260.0
         assert result["ensemble_std"] == 42.0
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_batch_predictions_full_flow(self, mock_v6, mock_v5, mock_db):
         """Test batch predictions with database logging."""
         # Mock ensembles
@@ -719,7 +687,8 @@ class TestABTestRouterE2E:
         # Mock database
         mock_cursor = Mock()
         mock_cursor.fetchone.side_effect = [
-            (38,), ("Player", "KC", "LAC", True)
+            (38,),
+            ("Player", "KC", "LAC", True),
         ] * 100  # 100 predictions
         mock_conn = Mock()
         mock_conn.cursor.return_value = mock_cursor
@@ -728,10 +697,7 @@ class TestABTestRouterE2E:
         router = ABTestRouter(split_ratio=0.5)
 
         # Create batch
-        games = [
-            {"player_id": f"player_{i:03d}", "season": 2024, "week": 10}
-            for i in range(100)
-        ]
+        games = [{"player_id": f"player_{i:03d}", "season": 2024, "week": 10} for i in range(100)]
 
         df = router.predict_batch(games, log_to_db=False)
 
@@ -746,9 +712,9 @@ class TestABTestRouterE2E:
         b_ratio = (df["ab_group"] == "B").sum() / len(df)
         assert 0.35 <= b_ratio <= 0.65, f"Split ratio {b_ratio:.3f} outside tolerance"
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_rollback_scenario_disable_test(self, mock_v6, mock_v5, mock_db):
         """Test emergency rollback by disabling test."""
         # Mock ensemble
@@ -780,8 +746,7 @@ class TestABTestRouterE2E:
         # Test AB_TEST_ENABLED
         with patch.dict(os.environ, {"AB_TEST_ENABLED": "false"}):
             router = ABTestRouter(
-                split_ratio=0.5,
-                enabled=os.getenv("AB_TEST_ENABLED", "true").lower() == "true"
+                split_ratio=0.5, enabled=os.getenv("AB_TEST_ENABLED", "true").lower() == "true"
             )
             assert router.enabled is False
 
@@ -800,9 +765,9 @@ class TestABTestRouterE2E:
 class TestABTestRouterPerformance:
     """Performance tests for A/B test router."""
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_assignment_performance(self, mock_v6, mock_v5, mock_db):
         """Test that assignment is fast (<1ms per assignment)."""
         router = ABTestRouter(split_ratio=0.5)
@@ -815,9 +780,9 @@ class TestABTestRouterPerformance:
         avg_time_ms = (elapsed / 10000) * 1000
         assert avg_time_ms < 1.0, f"Assignment too slow: {avg_time_ms:.3f}ms"
 
-    @patch('psycopg2.connect')
-    @patch('py.production.ab_test_router.EnsembleV5')
-    @patch('py.production.ab_test_router.EnsembleV6')
+    @patch("psycopg2.connect")
+    @patch("py.production.ab_test_router.EnsembleV5")
+    @patch("py.production.ab_test_router.EnsembleV6")
     def test_hash_performance(self, mock_v6, mock_v5, mock_db):
         """Test that hash computation is fast."""
         router = ABTestRouter(split_ratio=0.5)
@@ -825,7 +790,7 @@ class TestABTestRouterPerformance:
         start = time.time()
         for i in range(100000):
             hash_input = f"player_{i:05d}_2024_10_{router.test_name}"
-            hash_digest = hashlib.md5(hash_input.encode()).hexdigest()
+            hashlib.md5(hash_input.encode()).hexdigest()
         elapsed = time.time() - start
 
         avg_time_us = (elapsed / 100000) * 1_000_000

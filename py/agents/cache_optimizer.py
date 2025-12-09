@@ -38,15 +38,12 @@ import ast
 import logging
 import time
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
-
-import pandas as pd
-import psycopg2
-from psycopg2.extras import RealDictCursor
+from typing import Any
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -74,8 +71,8 @@ class FunctionCall:
     """Represents a function call with arguments."""
 
     function_name: str
-    args: Tuple[Any, ...]
-    kwargs: Dict[str, Any]
+    args: tuple[Any, ...]
+    kwargs: dict[str, Any]
     timestamp: datetime
     duration_ms: float
 
@@ -106,7 +103,7 @@ class CacheOpportunity:
     avg_duration_ms: float
     potential_savings_ms: float
     recommended_strategy: CacheStrategy
-    recommended_ttl_seconds: Optional[int]
+    recommended_ttl_seconds: int | None
     confidence: float  # 0.0-1.0
 
 
@@ -117,9 +114,9 @@ class CacheRecommendation:
     function_name: str
     file_path: str
     line_number: int
-    current_decorator: Optional[str]
+    current_decorator: str | None
     recommended_decorator: str
-    recommended_ttl: Optional[int]
+    recommended_ttl: int | None
     rationale: str
     estimated_speedup: str
     code_example: str
@@ -136,9 +133,9 @@ class CachePerformanceReport:
     total_cache_hits: int
     total_cache_misses: int
     total_time_saved_ms: float
-    cache_stats: List[CacheStats]
-    opportunities: List[CacheOpportunity]
-    recommendations: List[CacheRecommendation]
+    cache_stats: list[CacheStats]
+    opportunities: list[CacheOpportunity]
+    recommendations: list[CacheRecommendation]
     generated_at: datetime = field(default_factory=datetime.now)
 
 
@@ -152,23 +149,19 @@ class CacheOptimizer:
 
     def __init__(self, dashboard_path: str = "dashboard/"):
         self.dashboard_path = Path(dashboard_path)
-        self.call_log: List[FunctionCall] = []
-        self.cache_stats: Dict[str, CacheStats] = {}
+        self.call_log: list[FunctionCall] = []
+        self.cache_stats: dict[str, CacheStats] = {}
 
         # TTL recommendations based on data update frequency
         self.ttl_mapping = {
-            CacheStrategy.SHORT_TTL: 120,      # 2 minutes
-            CacheStrategy.MEDIUM_TTL: 900,     # 15 minutes
-            CacheStrategy.LONG_TTL: 3600,      # 1 hour
-            CacheStrategy.PERSISTENT: None,    # No expiration
+            CacheStrategy.SHORT_TTL: 120,  # 2 minutes
+            CacheStrategy.MEDIUM_TTL: 900,  # 15 minutes
+            CacheStrategy.LONG_TTL: 3600,  # 1 hour
+            CacheStrategy.PERSISTENT: None,  # No expiration
         }
 
     def track_call(
-        self,
-        function_name: str,
-        args: Tuple[Any, ...],
-        kwargs: Dict[str, Any],
-        duration_ms: float
+        self, function_name: str, args: tuple[Any, ...], kwargs: dict[str, Any], duration_ms: float
     ) -> None:
         """
         Track a function call for analysis.
@@ -184,7 +177,7 @@ class CacheOptimizer:
             args=args,
             kwargs=kwargs,
             timestamp=datetime.now(),
-            duration_ms=duration_ms
+            duration_ms=duration_ms,
         )
         self.call_log.append(call)
 
@@ -197,22 +190,21 @@ class CacheOptimizer:
             def expensive_query(season: int):
                 ...
         """
+
         def wrapper(*args, **kwargs):
             start = time.time()
             result = func(*args, **kwargs)
             duration_ms = (time.time() - start) * 1000
 
             self.track_call(
-                function_name=func.__name__,
-                args=args,
-                kwargs=kwargs,
-                duration_ms=duration_ms
+                function_name=func.__name__, args=args, kwargs=kwargs, duration_ms=duration_ms
             )
 
             return result
+
         return wrapper
 
-    def analyze_call_patterns(self) -> Dict[str, CacheOpportunity]:
+    def analyze_call_patterns(self) -> dict[str, CacheOpportunity]:
         """
         Analyze function call patterns to identify caching opportunities.
 
@@ -224,7 +216,7 @@ class CacheOptimizer:
             return {}
 
         # Group calls by function
-        calls_by_function: Dict[str, List[FunctionCall]] = defaultdict(list)
+        calls_by_function: dict[str, list[FunctionCall]] = defaultdict(list)
         for call in self.call_log:
             calls_by_function[call.function_name].append(call)
 
@@ -272,7 +264,7 @@ class CacheOptimizer:
                 potential_savings_ms=potential_savings_ms,
                 recommended_strategy=strategy,
                 recommended_ttl_seconds=self.ttl_mapping.get(strategy),
-                confidence=confidence
+                confidence=confidence,
             )
 
         return opportunities
@@ -293,9 +285,7 @@ class CacheOptimizer:
 
         # Generate recommendations
         recommendations = self._generate_recommendations(
-            cached_functions,
-            uncached_functions,
-            opportunities
+            cached_functions, uncached_functions, opportunities
         )
 
         # Calculate aggregate stats
@@ -322,10 +312,10 @@ class CacheOptimizer:
             total_time_saved_ms=total_time_saved_ms,
             cache_stats=cache_stats,
             opportunities=list(opportunities.values()),
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
-    def suggest_cache_optimizations(self) -> List[CacheRecommendation]:
+    def suggest_cache_optimizations(self) -> list[CacheRecommendation]:
         """
         Generate specific caching recommendations for dashboard functions.
 
@@ -335,10 +325,7 @@ class CacheOptimizer:
         report = self.analyze_cache_performance()
         return report.recommendations
 
-    def generate_cache_decorators(
-        self,
-        output_path: Optional[str] = None
-    ) -> Dict[str, str]:
+    def generate_cache_decorators(self, output_path: str | None = None) -> dict[str, str]:
         """
         Auto-generate cache decorator code for recommended functions.
 
@@ -374,11 +361,11 @@ class CacheOptimizer:
                     f.write(f"# Estimated speedup: {rec.estimated_speedup}\n")
                     f.write(f"{decorator}\n")
                     f.write(f"def {func_name}(...):\n")
-                    f.write(f"    pass\n\n")
+                    f.write("    pass\n\n")
 
         return decorators
 
-    def detect_cache_misses(self, threshold: float = 0.5) -> List[str]:
+    def detect_cache_misses(self, threshold: float = 0.5) -> list[str]:
         """
         Detect functions with low cache hit rates.
 
@@ -400,7 +387,7 @@ class CacheOptimizer:
 
         return low_hit_rate_functions
 
-    def estimate_cache_size(self) -> Dict[str, Any]:
+    def estimate_cache_size(self) -> dict[str, Any]:
         """
         Estimate memory usage of cached data.
 
@@ -415,7 +402,7 @@ class CacheOptimizer:
         estimates = {
             "total_cached_functions": len(cached_functions),
             "estimated_memory_mb": len(cached_functions) * 10,  # ~10MB per function
-            "recommendations": []
+            "recommendations": [],
         }
 
         if estimates["estimated_memory_mb"] > 500:
@@ -427,7 +414,7 @@ class CacheOptimizer:
 
     # Private helper methods
 
-    def _hash_args(self, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> int:
+    def _hash_args(self, args: tuple[Any, ...], kwargs: dict[str, Any]) -> int:
         """Create a hash of function arguments."""
         return hash((args, tuple(sorted(kwargs.items()))))
 
@@ -446,7 +433,7 @@ class CacheOptimizer:
         frequent_patterns = ["prediction", "live", "score", "current"]
         return any(pattern in func_name.lower() for pattern in frequent_patterns)
 
-    def _find_cached_functions(self) -> List[Dict[str, Any]]:
+    def _find_cached_functions(self) -> list[dict[str, Any]]:
         """Find all functions with cache decorators in dashboard."""
         cached = []
 
@@ -460,18 +447,20 @@ class CacheOptimizer:
                         for decorator in node.decorator_list:
                             if isinstance(decorator, ast.Name):
                                 if "cache" in decorator.id.lower():
-                                    cached.append({
-                                        "function": node.name,
-                                        "file": str(py_file),
-                                        "line": node.lineno,
-                                        "decorator": decorator.id
-                                    })
+                                    cached.append(
+                                        {
+                                            "function": node.name,
+                                            "file": str(py_file),
+                                            "line": node.lineno,
+                                            "decorator": decorator.id,
+                                        }
+                                    )
             except Exception as e:
                 logger.warning(f"Error parsing {py_file}: {e}")
 
         return cached
 
-    def _find_uncached_functions(self) -> List[Dict[str, Any]]:
+    def _find_uncached_functions(self) -> list[dict[str, Any]]:
         """Find functions that might benefit from caching."""
         uncached = []
         cached_names = {f["function"] for f in self._find_cached_functions()}
@@ -487,13 +476,22 @@ class CacheOptimizer:
                             # Heuristic: functions that query data or transform it
                             if any(
                                 keyword in node.name.lower()
-                                for keyword in ["get", "load", "fetch", "query", "compute", "calculate"]
+                                for keyword in [
+                                    "get",
+                                    "load",
+                                    "fetch",
+                                    "query",
+                                    "compute",
+                                    "calculate",
+                                ]
                             ):
-                                uncached.append({
-                                    "function": node.name,
-                                    "file": str(py_file),
-                                    "line": node.lineno
-                                })
+                                uncached.append(
+                                    {
+                                        "function": node.name,
+                                        "file": str(py_file),
+                                        "line": node.lineno,
+                                    }
+                                )
             except Exception as e:
                 logger.warning(f"Error parsing {py_file}: {e}")
 
@@ -501,10 +499,10 @@ class CacheOptimizer:
 
     def _generate_recommendations(
         self,
-        cached_functions: List[Dict[str, Any]],
-        uncached_functions: List[Dict[str, Any]],
-        opportunities: Dict[str, CacheOpportunity]
-    ) -> List[CacheRecommendation]:
+        cached_functions: list[dict[str, Any]],
+        uncached_functions: list[dict[str, Any]],
+        opportunities: dict[str, CacheOpportunity],
+    ) -> list[CacheRecommendation]:
         """Generate specific caching recommendations."""
         recommendations = []
 
@@ -529,34 +527,29 @@ class CacheOptimizer:
 
                 speedup = opp.potential_savings_ms / opp.avg_duration_ms
 
-                recommendations.append(CacheRecommendation(
-                    function_name=func_name,
-                    file_path=func_info["file"],
-                    line_number=func_info["line"],
-                    current_decorator=None,
-                    recommended_decorator=decorator,
-                    recommended_ttl=opp.recommended_ttl_seconds,
-                    rationale=(
-                        f"Function called {opp.call_count} times with "
-                        f"{opp.repeat_rate:.0%} repeat rate. "
-                        f"Average duration: {opp.avg_duration_ms:.1f}ms"
-                    ),
-                    estimated_speedup=f"{speedup:.0f}x faster",
-                    code_example=self._generate_code_example(
-                        func_name,
-                        decorator,
-                        opp.recommended_ttl_seconds
+                recommendations.append(
+                    CacheRecommendation(
+                        function_name=func_name,
+                        file_path=func_info["file"],
+                        line_number=func_info["line"],
+                        current_decorator=None,
+                        recommended_decorator=decorator,
+                        recommended_ttl=opp.recommended_ttl_seconds,
+                        rationale=(
+                            f"Function called {opp.call_count} times with "
+                            f"{opp.repeat_rate:.0%} repeat rate. "
+                            f"Average duration: {opp.avg_duration_ms:.1f}ms"
+                        ),
+                        estimated_speedup=f"{speedup:.0f}x faster",
+                        code_example=self._generate_code_example(
+                            func_name, decorator, opp.recommended_ttl_seconds
+                        ),
                     )
-                ))
+                )
 
         return recommendations
 
-    def _generate_code_example(
-        self,
-        func_name: str,
-        decorator: str,
-        ttl: Optional[int]
-    ) -> str:
+    def _generate_code_example(self, func_name: str, decorator: str, ttl: int | None) -> str:
         """Generate example code with cache decorator."""
         if ttl:
             decorator_line = f"{decorator}(ttl={ttl})"
@@ -582,13 +575,13 @@ if __name__ == "__main__":
     # Analyze performance
     report = optimizer.analyze_cache_performance()
 
-    print(f"\n=== Cache Performance Report ===")
+    print("\n=== Cache Performance Report ===")
     print(f"Total functions: {report.total_functions}")
     print(f"Cached: {report.cached_functions}")
     print(f"Uncached: {report.uncached_functions}")
     print(f"Overall hit rate: {report.overall_hit_rate:.1%}")
 
-    print(f"\n=== Recommendations ===")
+    print("\n=== Recommendations ===")
     for rec in report.recommendations[:5]:
         print(f"\n{rec.function_name} ({rec.file_path}:{rec.line_number})")
         print(f"  Decorator: {rec.recommended_decorator}")

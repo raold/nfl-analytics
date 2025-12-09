@@ -28,9 +28,7 @@ from sklearn.metrics import (
     confusion_matrix,
     precision_recall_curve,
     roc_auc_score,
-    roc_curve,
 )
-from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 
 logging.basicConfig(level=logging.INFO)
@@ -208,9 +206,7 @@ class TouchdownPredictor:
         ORDER BY pgs.season, pgs.week, pgs.scored_td DESC
         """
 
-        df = pd.read_sql(
-            query, conn, params=[start_season, end_season, start_season, end_season]
-        )
+        df = pd.read_sql(query, conn, params=[start_season, end_season, start_season, end_season])
         conn.close()
 
         # Handle missing values
@@ -340,9 +336,7 @@ class TouchdownPredictor:
 
         return {"probabilities": probs, "predictions": preds_binary}
 
-    def evaluate(
-        self, X_test: np.ndarray, y_test: np.ndarray, threshold: float = 0.5
-    ) -> dict:
+    def evaluate(self, X_test: np.ndarray, y_test: np.ndarray, threshold: float = 0.5) -> dict:
         """Evaluate model performance"""
 
         predictions = self.predict(X_test)
@@ -435,9 +429,9 @@ def main():
     logger.info(f"Features: {predictor.feature_names}")
 
     # Train/val/test split
-    train_mask = (df["season"] < 2023)
-    val_mask = (df["season"] == 2023)
-    test_mask = (df["season"] == 2024)
+    train_mask = df["season"] < 2023
+    val_mask = df["season"] == 2023
+    test_mask = df["season"] == 2024
 
     X_train, y_train = X[train_mask], y[train_mask]
     X_val, y_val = X[val_mask], y[val_mask]
@@ -497,7 +491,7 @@ def main():
     )
 
     for _, row in high_prob_tds.iterrows():
-        stat_type_str = "RUSHING" if row['stat_type'] == 0 else "RECEIVING"
+        stat_type_str = "RUSHING" if row["stat_type"] == 0 else "RECEIVING"
         logger.info(
             f"  {row['player_name']:25s} ({stat_type_str:>9s}): "
             f"P(TD)={row['td_probability']:.1%}, Actual={row['scored_td']}"

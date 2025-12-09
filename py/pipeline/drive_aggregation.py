@@ -15,14 +15,12 @@ Author: NFL Analytics Team
 Date: November 22, 2025
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional, Tuple
-from pathlib import Path
 import logging
 from dataclasses import dataclass
+from pathlib import Path
+
+import pandas as pd
 import psycopg2
-from psycopg2.extras import execute_values
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -105,7 +103,7 @@ class DriveAggregator:
             self.conn.close()
             logger.info("Disconnected from database")
 
-    def load_plays(self, seasons: List[int]) -> pd.DataFrame:
+    def load_plays(self, seasons: list[int]) -> pd.DataFrame:
         """
         Load play-by-play data for specified seasons.
 
@@ -177,41 +175,41 @@ class DriveAggregator:
         logger.info("Aggregating plays to drive level")
 
         # Group by drive
-        drive_groups = plays_df.groupby(['game_id', 'drive_id', 'posteam', 'defteam'])
+        drive_groups = plays_df.groupby(["game_id", "drive_id", "posteam", "defteam"])
 
         # Compute drive outcomes
-        drives = drive_groups.agg({
-            # Outcomes (targets)
-            'yards_gained': 'sum',  # Total yards on drive
-            'fixed_drive_result': 'first',  # Drive result
-
-            # Starting context (first play of drive)
-            'quarter': 'first',
-            'game_seconds_remaining': 'first',
-            'yardline_100': 'first',  # Field position (yards to opponent goal)
-            'down': 'first',
-            'ydstogo': 'first',
-            'score_differential': 'first',
-
-            # Drive statistics
-            'drive_play_count': 'max',
-            'drive_first_downs': 'max',
-            'epa': 'sum',
-            'success': 'mean',
-            'first_down': 'sum',
-            'touchdown': 'max',
-            'pass': 'sum',
-            'rush': 'sum'
-        }).reset_index()
+        drives = drive_groups.agg(
+            {
+                # Outcomes (targets)
+                "yards_gained": "sum",  # Total yards on drive
+                "fixed_drive_result": "first",  # Drive result
+                # Starting context (first play of drive)
+                "quarter": "first",
+                "game_seconds_remaining": "first",
+                "yardline_100": "first",  # Field position (yards to opponent goal)
+                "down": "first",
+                "ydstogo": "first",
+                "score_differential": "first",
+                # Drive statistics
+                "drive_play_count": "max",
+                "drive_first_downs": "max",
+                "epa": "sum",
+                "success": "mean",
+                "first_down": "sum",
+                "touchdown": "max",
+                "pass": "sum",
+                "rush": "sum",
+            }
+        ).reset_index()
 
         # Compute points scored on drive
-        drives['points_scored'] = drives.apply(self._compute_points, axis=1)
+        drives["points_scored"] = drives.apply(self._compute_points, axis=1)
 
         # Normalize drive result
-        drives['result'] = drives['fixed_drive_result'].apply(self._normalize_result)
+        drives["result"] = drives["fixed_drive_result"].apply(self._normalize_result)
 
         # Compute field position (yards from own goal)
-        drives['field_position'] = 100 - drives['yardline_100']
+        drives["field_position"] = 100 - drives["yardline_100"]
 
         logger.info(f"Created {len(drives):,} drives")
 
@@ -232,16 +230,16 @@ class DriveAggregator:
         Returns:
             Points scored (0, 3, or 6)
         """
-        result = row['fixed_drive_result']
+        result = row["fixed_drive_result"]
 
         if pd.isna(result):
             return 0
 
         result_lower = result.lower()
 
-        if 'touchdown' in result_lower:
+        if "touchdown" in result_lower:
             return 6
-        elif 'field goal' in result_lower or 'field_goal' in result_lower:
+        elif "field goal" in result_lower or "field_goal" in result_lower:
             return 3
         else:
             return 0
@@ -265,24 +263,24 @@ class DriveAggregator:
             Normalized category
         """
         if pd.isna(result):
-            return 'unknown'
+            return "unknown"
 
         result_lower = result.lower()
 
-        if 'touchdown' in result_lower:
-            return 'touchdown'
-        elif 'field goal' in result_lower or 'field_goal' in result_lower:
-            return 'field_goal'
-        elif 'punt' in result_lower:
-            return 'punt'
-        elif 'turnover' in result_lower and 'downs' not in result_lower:
-            return 'turnover'
-        elif 'turnover on downs' in result_lower or 'turnover_on_downs' in result_lower:
-            return 'turnover_on_downs'
-        elif 'end' in result_lower:
-            return 'end_half'
+        if "touchdown" in result_lower:
+            return "touchdown"
+        elif "field goal" in result_lower or "field_goal" in result_lower:
+            return "field_goal"
+        elif "punt" in result_lower:
+            return "punt"
+        elif "turnover" in result_lower and "downs" not in result_lower:
+            return "turnover"
+        elif "turnover on downs" in result_lower or "turnover_on_downs" in result_lower:
+            return "turnover_on_downs"
+        elif "end" in result_lower:
+            return "end_half"
         else:
-            return 'unknown'
+            return "unknown"
 
     def engineer_features(self, drives_df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -303,10 +301,10 @@ class DriveAggregator:
         logger.info("Engineering drive-level features")
 
         # Sort by game and drive
-        drives_df = drives_df.sort_values(['game_id', 'drive_id']).reset_index(drop=True)
+        drives_df = drives_df.sort_values(["game_id", "drive_id"]).reset_index(drop=True)
 
         # Initialize feature columns
-        drives_df['drive_number'] = drives_df.groupby('game_id').cumcount() + 1
+        drives_df["drive_number"] = drives_df.groupby("game_id").cumcount() + 1
 
         # Rolling team features (last 3 drives)
         drives_df = self._compute_rolling_team_features(drives_df, window=3)
@@ -338,29 +336,28 @@ class DriveAggregator:
             DataFrame with rolling features
         """
         # Group by team (across games)
-        df = df.sort_values(['posteam', 'game_id', 'drive_id'])
+        df = df.sort_values(["posteam", "game_id", "drive_id"])
 
         # Rolling averages
-        df['recent_yards_per_drive'] = (
-            df.groupby('posteam')['yards_gained']
-            .transform(lambda x: x.rolling(window, min_periods=1).mean().shift(1))
+        df["recent_yards_per_drive"] = df.groupby("posteam")["yards_gained"].transform(
+            lambda x: x.rolling(window, min_periods=1).mean().shift(1)
         )
 
-        df['recent_epa_per_play'] = (
-            df.groupby('posteam')['epa']
-            .transform(lambda x: (x / df.loc[x.index, 'drive_play_count'])
-                       .rolling(window, min_periods=1).mean().shift(1))
+        df["recent_epa_per_play"] = df.groupby("posteam")["epa"].transform(
+            lambda x: (x / df.loc[x.index, "drive_play_count"])
+            .rolling(window, min_periods=1)
+            .mean()
+            .shift(1)
         )
 
-        df['recent_success_rate'] = (
-            df.groupby('posteam')['success']
-            .transform(lambda x: x.rolling(window, min_periods=1).mean().shift(1))
+        df["recent_success_rate"] = df.groupby("posteam")["success"].transform(
+            lambda x: x.rolling(window, min_periods=1).mean().shift(1)
         )
 
         # Fill NaNs with season averages
-        df['recent_yards_per_drive'].fillna(df['yards_gained'].mean(), inplace=True)
-        df['recent_epa_per_play'].fillna(0, inplace=True)
-        df['recent_success_rate'].fillna(0.5, inplace=True)
+        df["recent_yards_per_drive"].fillna(df["yards_gained"].mean(), inplace=True)
+        df["recent_epa_per_play"].fillna(0, inplace=True)
+        df["recent_success_rate"].fillna(0.5, inplace=True)
 
         return df
 
@@ -381,28 +378,27 @@ class DriveAggregator:
             DataFrame with opponent features
         """
         # Group by defensive team
-        df = df.sort_values(['defteam', 'game_id', 'drive_id'])
+        df = df.sort_values(["defteam", "game_id", "drive_id"])
 
-        df['opp_recent_yards_allowed_per_drive'] = (
-            df.groupby('defteam')['yards_gained']
-            .transform(lambda x: x.rolling(window, min_periods=1).mean().shift(1))
+        df["opp_recent_yards_allowed_per_drive"] = df.groupby("defteam")["yards_gained"].transform(
+            lambda x: x.rolling(window, min_periods=1).mean().shift(1)
         )
 
-        df['opp_recent_epa_allowed_per_play'] = (
-            df.groupby('defteam')['epa']
-            .transform(lambda x: (x / df.loc[x.index, 'drive_play_count'])
-                       .rolling(window, min_periods=1).mean().shift(1))
+        df["opp_recent_epa_allowed_per_play"] = df.groupby("defteam")["epa"].transform(
+            lambda x: (x / df.loc[x.index, "drive_play_count"])
+            .rolling(window, min_periods=1)
+            .mean()
+            .shift(1)
         )
 
-        df['opp_recent_success_rate_allowed'] = (
-            df.groupby('defteam')['success']
-            .transform(lambda x: x.rolling(window, min_periods=1).mean().shift(1))
+        df["opp_recent_success_rate_allowed"] = df.groupby("defteam")["success"].transform(
+            lambda x: x.rolling(window, min_periods=1).mean().shift(1)
         )
 
         # Fill NaNs
-        df['opp_recent_yards_allowed_per_drive'].fillna(df['yards_gained'].mean(), inplace=True)
-        df['opp_recent_epa_allowed_per_play'].fillna(0, inplace=True)
-        df['opp_recent_success_rate_allowed'].fillna(0.5, inplace=True)
+        df["opp_recent_yards_allowed_per_drive"].fillna(df["yards_gained"].mean(), inplace=True)
+        df["opp_recent_epa_allowed_per_play"].fillna(0, inplace=True)
+        df["opp_recent_success_rate_allowed"].fillna(0.5, inplace=True)
 
         return df
 
@@ -422,22 +418,21 @@ class DriveAggregator:
             DataFrame with momentum features
         """
         # Points in last 2 drives (within game, by team)
-        df['points_in_last_2_drives'] = (
-            df.groupby(['game_id', 'posteam'])['points_scored']
-            .transform(lambda x: x.rolling(2, min_periods=1).sum().shift(1))
-        )
-        df['points_in_last_2_drives'].fillna(0, inplace=True)
+        df["points_in_last_2_drives"] = df.groupby(["game_id", "posteam"])[
+            "points_scored"
+        ].transform(lambda x: x.rolling(2, min_periods=1).sum().shift(1))
+        df["points_in_last_2_drives"].fillna(0, inplace=True)
 
         # Consecutive first downs (use drive_first_downs directly)
-        df['consecutive_first_downs'] = df['drive_first_downs'].fillna(0)
+        df["consecutive_first_downs"] = df["drive_first_downs"].fillna(0)
 
         # Drives since last score (within game, by team)
-        df['scored'] = (df['points_scored'] > 0).astype(int)
-        df['drives_since_score'] = (
-            df.groupby(['game_id', 'posteam'])['scored']
-            .transform(lambda x: (~x.astype(bool)).cumsum() - (~x.astype(bool)).cumsum().where(x.astype(bool)).ffill().fillna(0))
+        df["scored"] = (df["points_scored"] > 0).astype(int)
+        df["drives_since_score"] = df.groupby(["game_id", "posteam"])["scored"].transform(
+            lambda x: (~x.astype(bool)).cumsum()
+            - (~x.astype(bool)).cumsum().where(x.astype(bool)).ffill().fillna(0)
         )
-        df.drop('scored', axis=1, inplace=True)
+        df.drop("scored", axis=1, inplace=True)
 
         return df
 
@@ -460,12 +455,12 @@ class DriveAggregator:
 
         # Check for NaNs in critical features
         critical_features = [
-            'recent_yards_per_drive',
-            'recent_epa_per_play',
-            'recent_success_rate',
-            'opp_recent_yards_allowed_per_drive',
-            'field_position',
-            'quarter'
+            "recent_yards_per_drive",
+            "recent_epa_per_play",
+            "recent_success_rate",
+            "opp_recent_yards_allowed_per_drive",
+            "field_position",
+            "quarter",
         ]
 
         for feat in critical_features:
@@ -475,8 +470,8 @@ class DriveAggregator:
                     logger.warning(f"Feature '{feat}' has {nan_count} NaN values")
 
         # Check for extreme outliers
-        if 'yards_gained' in df.columns:
-            outliers = (df['yards_gained'].abs() > 200).sum()
+        if "yards_gained" in df.columns:
+            outliers = (df["yards_gained"].abs() > 200).sum()
             if outliers > 0:
                 logger.warning(f"Found {outliers} drives with >200 yards (possible errors)")
 
@@ -496,24 +491,34 @@ class DriveAggregator:
         # Select final columns
         columns_to_save = [
             # Identification
-            'game_id', 'drive_id', 'posteam', 'defteam',
-
+            "game_id",
+            "drive_id",
+            "posteam",
+            "defteam",
             # Targets
-            'yards_gained', 'points_scored', 'result',
-
+            "yards_gained",
+            "points_scored",
+            "result",
             # Starting context
-            'field_position', 'down', 'ydstogo', 'quarter',
-            'game_seconds_remaining', 'score_differential', 'drive_number',
-
+            "field_position",
+            "down",
+            "ydstogo",
+            "quarter",
+            "game_seconds_remaining",
+            "score_differential",
+            "drive_number",
             # Team strength
-            'recent_yards_per_drive', 'recent_epa_per_play', 'recent_success_rate',
-
+            "recent_yards_per_drive",
+            "recent_epa_per_play",
+            "recent_success_rate",
             # Opponent strength
-            'opp_recent_yards_allowed_per_drive', 'opp_recent_epa_allowed_per_play',
-            'opp_recent_success_rate_allowed',
-
+            "opp_recent_yards_allowed_per_drive",
+            "opp_recent_epa_allowed_per_play",
+            "opp_recent_success_rate_allowed",
             # Momentum
-            'points_in_last_2_drives', 'consecutive_first_downs', 'drives_since_score'
+            "points_in_last_2_drives",
+            "consecutive_first_downs",
+            "drives_since_score",
         ]
 
         # Filter to available columns
@@ -522,7 +527,7 @@ class DriveAggregator:
         df[available_cols].to_csv(output_path, index=False)
         logger.info(f"Saved {len(available_cols)} features")
 
-    def run_pipeline(self, seasons: List[int], output_path: Path):
+    def run_pipeline(self, seasons: list[int], output_path: Path):
         """
         Run full drive aggregation pipeline.
 
@@ -560,19 +565,19 @@ class DriveAggregator:
 
     def _print_summary(self, df: pd.DataFrame):
         """Print summary statistics."""
-        logger.info("\n" + "="*60)
+        logger.info("\n" + "=" * 60)
         logger.info("DRIVE AGGREGATION SUMMARY")
-        logger.info("="*60)
+        logger.info("=" * 60)
         logger.info(f"Total drives: {len(df):,}")
         logger.info(f"Total games: {df['game_id'].nunique():,}")
         logger.info(f"Avg drives per game: {len(df) / df['game_id'].nunique():.1f}")
-        logger.info(f"\nDrive outcomes:")
-        logger.info(df['result'].value_counts())
-        logger.info(f"\nYards distribution:")
-        logger.info(df['yards_gained'].describe())
-        logger.info(f"\nPoints distribution:")
-        logger.info(df['points_scored'].value_counts().sort_index())
-        logger.info("="*60)
+        logger.info("\nDrive outcomes:")
+        logger.info(df["result"].value_counts())
+        logger.info("\nYards distribution:")
+        logger.info(df["yards_gained"].describe())
+        logger.info("\nPoints distribution:")
+        logger.info(df["points_scored"].value_counts().sort_index())
+        logger.info("=" * 60)
 
 
 if __name__ == "__main__":

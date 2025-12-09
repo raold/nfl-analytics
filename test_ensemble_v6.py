@@ -10,14 +10,17 @@ For PRODUCTION version, see py/ensemble/enhanced_ensemble_v6.py (EnhancedEnsembl
 """
 
 import sys
+
 import numpy as np
+
 from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+
 
 def test_ensemble_initialization():
     """Test ensemble can be initialized with default weights."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 1: Ensemble Initialization")
-    print("="*70)
+    print("=" * 70)
 
     ensemble = EnhancedEnsemble6Way()
 
@@ -33,21 +36,22 @@ def test_ensemble_initialization():
 
     # Verify 5 models
     assert len(ensemble.weights) == 5, f"Expected 5 models, got {len(ensemble.weights)}"
-    print(f"✅ Ensemble has 5 models")
+    print("✅ Ensemble has 5 models")
 
     # Verify ELO is included
     assert "elo" in ensemble.weights, "ELO model not found in weights"
     print(f"✅ ELO model included (weight: {ensemble.weights['elo']:.4f})")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("✅ TEST 1 PASSED: Ensemble Initialization")
-    print("="*70)
+    print("=" * 70)
+
 
 def test_weight_comparison():
     """Compare v5 vs v6 weights."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 2: Weight Comparison (v5 vs v6)")
-    print("="*70)
+    print("=" * 70)
 
     # v5 weights (4-way)
     v5_weights = {
@@ -77,15 +81,16 @@ def test_weight_comparison():
     print(f"  v5 Total: {sum(v5_weights.values()):.4f} (4 models)")
     print(f"  v6 Total: {sum(v6_weights.values()):.4f} (5 models)")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("✅ TEST 2 PASSED: Weight Comparison")
-    print("="*70)
+    print("=" * 70)
+
 
 def test_models_exist():
     """Test that all required model files exist."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 3: Model File Existence")
-    print("="*70)
+    print("=" * 70)
 
     ensemble = EnhancedEnsemble6Way()
 
@@ -109,16 +114,17 @@ def test_models_exist():
         print(f"\n⚠️  ELO ratings not found: {ensemble.elo_ratings_path}")
         print("ELO predictions will be skipped")
     else:
-        print(f"\n✅ ELO ratings found")
+        print("\n✅ ELO ratings found")
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("✅ TEST 3 PASSED: Model File Check")
-    print("="*70)
+    print("=" * 70)
+
 
 def main():
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("ENHANCED ENSEMBLE v6 TEST SUITE")
-    print("="*70)
+    print("=" * 70)
     print("Testing 5-way ensemble with ELO and adaptive weights")
 
     try:
@@ -126,9 +132,9 @@ def main():
         test_weight_comparison()
         test_models_exist()
 
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("✅ ALL TESTS PASSED")
-        print("="*70)
+        print("=" * 70)
         print("\nEnhanced Ensemble v6 is ready to use!")
         print("\nUsage:")
         print("  from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble6Way")
@@ -139,8 +145,10 @@ def main():
     except Exception as e:
         print(f"\n❌ TEST FAILED: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

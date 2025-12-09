@@ -150,24 +150,26 @@ class ReceivingBNN:
             DataFrame with career_avg_yards, career_avg_targets, career_avg_receptions
         """
         # Compute career averages (should only be done on training set)
-        player_stats = df.groupby('player_id').agg({
-            'receiving_yards': 'mean',
-            'targets': 'mean',
-            'receptions': 'mean'
-        }).reset_index()
+        player_stats = (
+            df.groupby("player_id")
+            .agg({"receiving_yards": "mean", "targets": "mean", "receptions": "mean"})
+            .reset_index()
+        )
 
-        player_stats.columns = ['player_id', 'career_avg_yards', 'career_avg_targets', 'career_avg_receptions']
+        player_stats.columns = [
+            "player_id",
+            "career_avg_yards",
+            "career_avg_targets",
+            "career_avg_receptions",
+        ]
 
         # Merge back to original data
-        df = df.merge(player_stats, on='player_id', how='left')
+        df = df.merge(player_stats, on="player_id", how="left")
 
         return df
 
     def prepare_features(
-        self,
-        df: pd.DataFrame,
-        train_df: pd.DataFrame = None,
-        fit_imputer: bool = False
+        self, df: pd.DataFrame, train_df: pd.DataFrame = None, fit_imputer: bool = False
     ) -> tuple[np.ndarray, np.ndarray]:
         """
         Prepare feature matrix and target.
@@ -199,24 +201,30 @@ class ReceivingBNN:
         if fit_imputer:
             # Training set: Learn imputation statistics
             self.imputation_values = {
-                'avg_air_yards': df['avg_air_yards'].median(),
-                'avg_yac': df['avg_yac'].median(),
+                "avg_air_yards": df["avg_air_yards"].median(),
+                "avg_yac": df["avg_yac"].median(),
             }
             logger.info(f"Learned imputation values from training set: {self.imputation_values}")
         else:
             # Test set: Use training set statistics
-            if not hasattr(self, 'imputation_values'):
+            if not hasattr(self, "imputation_values"):
                 raise ValueError(
                     "Imputation values not learned yet. "
                     "Call prepare_features with fit_imputer=True on training set first."
                 )
-            logger.info(f"Applying training set imputation values to test set: {self.imputation_values}")
+            logger.info(
+                f"Applying training set imputation values to test set: {self.imputation_values}"
+            )
 
         # Apply imputation using learned statistics
         df_imputed = df.copy()
-        df_imputed["avg_air_yards"] = df_imputed["avg_air_yards"].fillna(self.imputation_values['avg_air_yards'])
-        df_imputed["avg_yac"] = df_imputed["avg_yac"].fillna(self.imputation_values['avg_yac'])
-        df_imputed["avg_receiving_l3"] = df_imputed["avg_receiving_l3"].fillna(df_imputed["career_avg_yards"])
+        df_imputed["avg_air_yards"] = df_imputed["avg_air_yards"].fillna(
+            self.imputation_values["avg_air_yards"]
+        )
+        df_imputed["avg_yac"] = df_imputed["avg_yac"].fillna(self.imputation_values["avg_yac"])
+        df_imputed["avg_receiving_l3"] = df_imputed["avg_receiving_l3"].fillna(
+            df_imputed["career_avg_yards"]
+        )
 
         # Handle missing values (use 0 as last resort)
         X = df_imputed[feature_cols].fillna(0).values
@@ -422,8 +430,12 @@ def main():
     df_train = df[train_mask].copy()
     df_test = df[test_mask].copy()
 
-    logger.info(f"Training set: {len(df_train)} samples ({df_train['season'].min()}-{df_train['season'].max()})")
-    logger.info(f"Test set: {len(df_test)} samples ({df_test['season'].min()}-{df_test['season'].max()})")
+    logger.info(
+        f"Training set: {len(df_train)} samples ({df_train['season'].min()}-{df_train['season'].max()})"
+    )
+    logger.info(
+        f"Test set: {len(df_test)} samples ({df_test['season'].min()}-{df_test['season'].max()})"
+    )
 
     if len(df_test) == 0:
         logger.warning("No test data available. Using last 10% of training for validation.")
@@ -436,28 +448,36 @@ def main():
     df_train = bnn.compute_career_features(df_train, train_only=True)
 
     # Get training set player stats for test set
-    player_stats = df_train.groupby('player_id')[
-        ['career_avg_yards', 'career_avg_targets', 'career_avg_receptions']
-    ].first().reset_index()
+    player_stats = (
+        df_train.groupby("player_id")[
+            ["career_avg_yards", "career_avg_targets", "career_avg_receptions"]
+        ]
+        .first()
+        .reset_index()
+    )
 
     # Apply training set statistics to test set (no leakage)
-    df_test = df_test.merge(player_stats, on='player_id', how='left')
+    df_test = df_test.merge(player_stats, on="player_id", how="left")
 
     # For new players in test set, use training set global averages
-    train_global_avg_yards = df_train['career_avg_yards'].mean()
-    train_global_avg_targets = df_train['career_avg_targets'].mean()
-    train_global_avg_receptions = df_train['career_avg_receptions'].mean()
+    train_global_avg_yards = df_train["career_avg_yards"].mean()
+    train_global_avg_targets = df_train["career_avg_targets"].mean()
+    train_global_avg_receptions = df_train["career_avg_receptions"].mean()
 
-    df_test['career_avg_yards'].fillna(train_global_avg_yards, inplace=True)
-    df_test['career_avg_targets'].fillna(train_global_avg_targets, inplace=True)
-    df_test['career_avg_receptions'].fillna(train_global_avg_receptions, inplace=True)
+    df_test["career_avg_yards"].fillna(train_global_avg_yards, inplace=True)
+    df_test["career_avg_targets"].fillna(train_global_avg_targets, inplace=True)
+    df_test["career_avg_receptions"].fillna(train_global_avg_receptions, inplace=True)
 
-    logger.info(f"Training set career stats: yards={train_global_avg_yards:.1f}, targets={train_global_avg_targets:.1f}")
+    logger.info(
+        f"Training set career stats: yards={train_global_avg_yards:.1f}, targets={train_global_avg_targets:.1f}"
+    )
 
     # Prepare features with TEMPORAL SAFETY
     logger.info("\nPreparing features with training set imputation...")
     X_train, y_train = bnn.prepare_features(df_train, fit_imputer=True)  # Learn from training
-    X_test, y_test = bnn.prepare_features(df_test, train_df=df_train, fit_imputer=False)  # Apply to test
+    X_test, y_test = bnn.prepare_features(
+        df_test, train_df=df_train, fit_imputer=False
+    )  # Apply to test
 
     logger.info(f"Feature matrix shape: train={X_train.shape}, test={X_test.shape}")
 
@@ -475,7 +495,7 @@ def main():
         X_train,
         y_train,
         n_samples=3000,  # Keep at 3000 for speed (v1 had enough samples)
-        n_chains=8,      # Leverage M4's parallel cores
+        n_chains=8,  # Leverage M4's parallel cores
         target_accept=0.95,  # VERY conservative stepping (v1=0.90)
         max_treedepth=15,  # Increased from default 10 (v1 hit max depth)
     )

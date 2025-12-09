@@ -14,25 +14,16 @@ Author: Claude Code (Sonnet 4.5)
 Created: November 22, 2025
 """
 
-import time
 import logging
+import time
 from datetime import datetime, timedelta
-from typing import Dict, List
 
-import pandas as pd
 import numpy as np
-
-from py.utils.ab_test_monitor import (
-    ABTestMonitor,
-    GuardrailConfig,
-    Decision,
-    TestStatus
-)
+from py.utils.ab_test_monitor import ABTestMonitor, Decision
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -40,6 +31,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # Example 1: Pre-Backtest Guardrail Validation
 # ============================================================================
+
 
 def example_1_pre_backtest_validation():
     """
@@ -68,6 +60,7 @@ def example_1_pre_backtest_validation():
 # ============================================================================
 # Example 2: Real-Time Monitoring Loop
 # ============================================================================
+
 
 def example_2_realtime_monitoring_loop(duration_days: int = 7):
     """
@@ -104,8 +97,8 @@ def example_2_realtime_monitoring_loop(duration_days: int = 7):
         logger.info(f"Treatment MAE: {metrics['treatment'].get('mae', 'N/A'):.2f}")
 
         # 3. Calculate significance (if enough data)
-        if metrics['treatment'].get('sample_size', 0) >= 50:
-            mae_sig = monitor.calculate_significance('mae', test_type='t-test')
+        if metrics["treatment"].get("sample_size", 0) >= 50:
+            mae_sig = monitor.calculate_significance("mae", test_type="t-test")
             logger.info(f"MAE significance: p={mae_sig.p_value:.4f}")
 
             # 4. Get recommendation
@@ -131,6 +124,7 @@ def example_2_realtime_monitoring_loop(duration_days: int = 7):
 # Example 3: Statistical Analysis Workflow
 # ============================================================================
 
+
 def example_3_statistical_analysis():
     """
     Comprehensive statistical analysis across multiple metrics and methods.
@@ -143,8 +137,8 @@ def example_3_statistical_analysis():
 
     # 1. Check sample size
     metrics = monitor.get_current_metrics()
-    control_n = metrics['control'].get('sample_size', 0)
-    treatment_n = metrics['treatment'].get('sample_size', 0)
+    control_n = metrics["control"].get("sample_size", 0)
+    treatment_n = metrics["treatment"].get("sample_size", 0)
 
     logger.info(f"Sample sizes: Control={control_n}, Treatment={treatment_n}")
 
@@ -155,32 +149,37 @@ def example_3_statistical_analysis():
     # 2. Multi-method significance testing
     logger.info("\n=== Statistical Significance Tests ===")
 
-    for metric in ['mae', 'roi', 'win_rate']:
+    for metric in ["mae", "roi", "win_rate"]:
         logger.info(f"\n{metric.upper()}:")
 
         # T-test
-        ttest = monitor.calculate_significance(metric, test_type='t-test')
-        logger.info(f"  T-test: p={ttest.p_value:.4f}, diff={ttest.difference:.2f} "
-                   f"({ttest.difference_pct:+.1f}%)")
+        ttest = monitor.calculate_significance(metric, test_type="t-test")
+        logger.info(
+            f"  T-test: p={ttest.p_value:.4f}, diff={ttest.difference:.2f} "
+            f"({ttest.difference_pct:+.1f}%)"
+        )
 
         # Bootstrap
-        bootstrap = monitor.calculate_significance(metric, test_type='bootstrap')
-        logger.info(f"  Bootstrap: p={bootstrap.p_value:.4f}, "
-                   f"95% CI=[{bootstrap.confidence_interval_95[0]:.2f}, "
-                   f"{bootstrap.confidence_interval_95[1]:.2f}]")
+        bootstrap = monitor.calculate_significance(metric, test_type="bootstrap")
+        logger.info(
+            f"  Bootstrap: p={bootstrap.p_value:.4f}, "
+            f"95% CI=[{bootstrap.confidence_interval_95[0]:.2f}, "
+            f"{bootstrap.confidence_interval_95[1]:.2f}]"
+        )
 
         # Bayesian
-        bayesian = monitor.calculate_significance(metric, test_type='bayesian')
-        logger.info(f"  Bayesian: p={bayesian.p_value:.4f}, "
-                   f"95% credible interval=[{bayesian.confidence_interval_95[0]:.2f}, "
-                   f"{bayesian.confidence_interval_95[1]:.2f}]")
+        bayesian = monitor.calculate_significance(metric, test_type="bayesian")
+        logger.info(
+            f"  Bayesian: p={bayesian.p_value:.4f}, "
+            f"95% credible interval=[{bayesian.confidence_interval_95[0]:.2f}, "
+            f"{bayesian.confidence_interval_95[1]:.2f}]"
+        )
 
         # Effect size
         logger.info(f"  Cohen's d: {ttest.effect_size:.3f}")
 
         # Consensus
-        all_significant = (ttest.significant and bootstrap.significant and
-                          bayesian.significant)
+        all_significant = ttest.significant and bootstrap.significant and bayesian.significant
         logger.info(f"  Consensus: {'✅ SIGNIFICANT' if all_significant else '❌ NOT SIGNIFICANT'}")
 
     # 3. Final recommendation
@@ -197,7 +196,8 @@ def example_3_statistical_analysis():
 # Example 4: Dashboard Integration
 # ============================================================================
 
-def example_4_dashboard_integration() -> Dict:
+
+def example_4_dashboard_integration() -> dict:
     """
     Prepare data for Streamlit/Grafana dashboard.
 
@@ -217,8 +217,8 @@ def example_4_dashboard_integration() -> Dict:
     guardrail_status = monitor.check_guardrails()
 
     # 3. Significance tests
-    mae_sig = monitor.calculate_significance('mae')
-    roi_sig = monitor.calculate_significance('roi')
+    mae_sig = monitor.calculate_significance("mae")
+    roi_sig = monitor.calculate_significance("roi")
 
     # 4. Recommendation
     decision = monitor.recommend_decision()
@@ -228,22 +228,19 @@ def example_4_dashboard_integration() -> Dict:
 
     # Prepare dashboard data
     dashboard_data = {
-        'metrics': {
-            'control': metrics.get('control', {}),
-            'treatment': metrics.get('treatment', {})
+        "metrics": {
+            "control": metrics.get("control", {}),
+            "treatment": metrics.get("treatment", {}),
         },
-        'guardrails': {
-            'violated': guardrail_status.violated,
-            'violations': guardrail_status.violations,
-            'warnings': guardrail_status.warnings
+        "guardrails": {
+            "violated": guardrail_status.violated,
+            "violations": guardrail_status.violations,
+            "warnings": guardrail_status.warnings,
         },
-        'significance': {
-            'mae': mae_sig.to_dict(),
-            'roi': roi_sig.to_dict()
-        },
-        'recommendation': decision.value,
-        'results_df': results_df,
-        'timestamp': datetime.now().isoformat()
+        "significance": {"mae": mae_sig.to_dict(), "roi": roi_sig.to_dict()},
+        "recommendation": decision.value,
+        "results_df": results_df,
+        "timestamp": datetime.now().isoformat(),
     }
 
     logger.info("Dashboard data prepared")
@@ -258,6 +255,7 @@ def example_4_dashboard_integration() -> Dict:
 # ============================================================================
 # Example 5: Production Deployment Gate
 # ============================================================================
+
 
 def example_5_production_deployment_gate() -> bool:
     """
@@ -275,7 +273,7 @@ def example_5_production_deployment_gate() -> bool:
     try:
         # 1. Check sample size
         metrics = monitor.get_current_metrics()
-        if metrics['treatment'].get('sample_size', 0) < 100:
+        if metrics["treatment"].get("sample_size", 0) < 100:
             raise RuntimeError("Insufficient sample size (need ≥100 games)")
 
         # 2. Check guardrails
@@ -289,8 +287,8 @@ def example_5_production_deployment_gate() -> bool:
             raise RuntimeError(f"Not recommended for promotion: {decision.value}")
 
         # 4. Verify statistical significance
-        mae_sig = monitor.calculate_significance('mae')
-        roi_sig = monitor.calculate_significance('roi')
+        mae_sig = monitor.calculate_significance("mae")
+        roi_sig = monitor.calculate_significance("roi")
 
         if not mae_sig.significant:
             raise RuntimeError(f"MAE not significant (p={mae_sig.p_value:.4f})")
@@ -305,8 +303,8 @@ def example_5_production_deployment_gate() -> bool:
         # 6. Final approval
         logger.info("✅ All deployment gates passed:")
         logger.info(f"  ✅ Sample size: {metrics['treatment']['sample_size']} ≥ 100")
-        logger.info(f"  ✅ Guardrails: PASSED")
-        logger.info(f"  ✅ Recommendation: PROMOTE")
+        logger.info("  ✅ Guardrails: PASSED")
+        logger.info("  ✅ Recommendation: PROMOTE")
         logger.info(f"  ✅ MAE significant: p={mae_sig.p_value:.4f} < 0.05")
         logger.info(f"  ✅ ROI significant: p={roi_sig.p_value:.4f} < 0.05")
         logger.info(f"  ✅ Effect size: d={mae_sig.effect_size:.3f}")
@@ -323,6 +321,7 @@ def example_5_production_deployment_gate() -> bool:
 # ============================================================================
 # Example 6: Simulated A/B Test
 # ============================================================================
+
 
 def example_6_simulate_ab_test(n_days: int = 28):
     """
@@ -356,12 +355,12 @@ def example_6_simulate_ab_test(n_days: int = 28):
         logger.info(f"\n--- Day {day + 1} ---")
 
         # Cumulative metrics
-        control_mae_cumulative = control_mae[:day+1].mean()
-        treatment_mae_cumulative = treatment_mae[:day+1].mean()
+        control_mae_cumulative = control_mae[: day + 1].mean()
+        treatment_mae_cumulative = treatment_mae[: day + 1].mean()
         mae_diff = treatment_mae_cumulative - control_mae_cumulative
 
-        control_roi_cumulative = control_roi[:day+1].mean()
-        treatment_roi_cumulative = treatment_roi[:day+1].mean()
+        control_roi_cumulative = control_roi[: day + 1].mean()
+        treatment_roi_cumulative = treatment_roi[: day + 1].mean()
         roi_diff = treatment_roi_cumulative - control_roi_cumulative
 
         logger.info(f"Control MAE: {control_mae_cumulative:.2f}")
@@ -375,7 +374,7 @@ def example_6_simulate_ab_test(n_days: int = 28):
         # Check if we would stop early
         if day >= 13:  # After 2 weeks (min 50 samples)
             # Simulate t-test p-value (would use actual data in production)
-            mae_p_value = np.abs(mae_diff) / (5 / np.sqrt(day+1))  # Rough estimate
+            mae_p_value = np.abs(mae_diff) / (5 / np.sqrt(day + 1))  # Rough estimate
             mae_p_value = 1 - np.clip(mae_p_value, 0, 1)
 
             logger.info(f"Estimated MAE p-value: {mae_p_value:.4f}")
@@ -387,13 +386,16 @@ def example_6_simulate_ab_test(n_days: int = 28):
 
     logger.info("\n=== Final Analysis ===")
     logger.info(f"Total duration: {day+1} days")
-    logger.info(f"Final MAE improvement: {mae_diff:+.2f} yards ({(mae_diff/control_mae_cumulative)*100:+.1f}%)")
+    logger.info(
+        f"Final MAE improvement: {mae_diff:+.2f} yards ({(mae_diff/control_mae_cumulative)*100:+.1f}%)"
+    )
     logger.info(f"Final ROI improvement: {roi_diff:+.2f}pp")
 
 
 # ============================================================================
 # Main
 # ============================================================================
+
 
 def main():
     """Run all examples."""
@@ -411,11 +413,11 @@ def main():
 
     # Example 4: Dashboard integration
     print("\n" + "=" * 80)
-    dashboard_data = example_4_dashboard_integration()
+    example_4_dashboard_integration()
 
     # Example 5: Production deployment gate
     print("\n" + "=" * 80)
-    can_deploy = example_5_production_deployment_gate()
+    example_5_production_deployment_gate()
 
     # Example 6: Simulated A/B test
     print("\n" + "=" * 80)
@@ -426,5 +428,5 @@ def main():
     print("=" * 80)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

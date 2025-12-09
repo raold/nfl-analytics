@@ -17,7 +17,6 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -45,11 +44,7 @@ class XGBoostSpreadPredictor:
     MODEL_VERSION = "v6_advanced"
     DEFAULT_MODEL_PATH = "models/xgboost/xgboost_v6_advanced_spread_20251127_124409.json"
 
-    def __init__(
-        self,
-        model_path: Optional[str] = None,
-        db_config: Optional[Dict] = None
-    ):
+    def __init__(self, model_path: str | None = None, db_config: dict | None = None):
         """Initialize the spread predictor.
 
         Args:
@@ -57,23 +52,21 @@ class XGBoostSpreadPredictor:
             db_config: Database configuration for feature extraction
         """
         self.model_path = Path(model_path or self.DEFAULT_MODEL_PATH)
-        self.metadata_path = self.model_path.with_name(
-            self.model_path.stem + "_metadata.json"
-        )
+        self.metadata_path = self.model_path.with_name(self.model_path.stem + "_metadata.json")
 
         self.db_config = db_config or {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions'
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
         # Load model and metadata
         self._load_model()
         self._parallel_loader = None  # Lazy initialization
 
-        logger.info(f"XGBoostSpreadPredictor initialized")
+        logger.info("XGBoostSpreadPredictor initialized")
         logger.info(f"  Model: {self.model_path}")
         logger.info(f"  Features: {len(self.feature_names)}")
         logger.info(f"  Holdout MAE: {self.metadata['metrics']['mae']:.2f}")
@@ -91,7 +84,7 @@ class XGBoostSpreadPredictor:
         if self.metadata_path.exists():
             with open(self.metadata_path) as f:
                 self.metadata = json.load(f)
-            self.feature_names = self.metadata.get('features', [])
+            self.feature_names = self.metadata.get("features", [])
         else:
             logger.warning(f"Metadata not found: {self.metadata_path}")
             self.metadata = {}
@@ -102,10 +95,9 @@ class XGBoostSpreadPredictor:
         """Lazy-load ParallelFeatureLoader."""
         if self._parallel_loader is None:
             from py.features.feature_loader_parallel import ParallelFeatureLoader
+
             self._parallel_loader = ParallelFeatureLoader(
-                db_config=self.db_config,
-                use_redis=True,
-                n_workers=4
+                db_config=self.db_config, use_redis=True, n_workers=4
             )
         return self._parallel_loader
 
@@ -115,8 +107,8 @@ class XGBoostSpreadPredictor:
         away_team: str,
         season: int,
         week: int,
-        features: Optional[pd.DataFrame] = None
-    ) -> Dict:
+        features: pd.DataFrame | None = None,
+    ) -> dict:
         """Predict game spread.
 
         Args:
@@ -139,34 +131,33 @@ class XGBoostSpreadPredictor:
         # Extract features if not provided
         if features is None:
             features = self.parallel_loader.extract_season_features(
-                season=int(season),
-                weeks=[int(week)]
+                season=int(season), weeks=[int(week)]
             )
 
         # Filter to specific game
         game_features = features[
-            (features['home_team'] == home_team) &
-            (features['away_team'] == away_team) &
-            (features['week'] == week)
+            (features["home_team"] == home_team)
+            & (features["away_team"] == away_team)
+            & (features["week"] == week)
         ]
 
         if len(game_features) == 0:
             return {
-                'predicted_spread': None,
-                'error': f'No features found for {away_team}@{home_team} week {week}',
-                'confidence': 0.0
+                "predicted_spread": None,
+                "error": f"No features found for {away_team}@{home_team} week {week}",
+                "confidence": 0.0,
             }
 
         # Align features
         X = self._align_features(game_features.copy())
         X = X.fillna(0)
-        X = X.apply(pd.to_numeric, errors='coerce').fillna(0)
+        X = X.apply(pd.to_numeric, errors="coerce").fillna(0)
 
         # Predict
         prediction = self.model.predict(X)[0]
 
         # Get market spread if available
-        market_spread = game_features.iloc[0].get('spread_close', np.nan)
+        market_spread = game_features.iloc[0].get("spread_close", np.nan)
         vs_market = prediction - market_spread if pd.notna(market_spread) else np.nan
 
         # Calculate confidence based on feature completeness
@@ -176,25 +167,20 @@ class XGBoostSpreadPredictor:
         inference_time = (datetime.now() - start_time).total_seconds() * 1000
 
         return {
-            'predicted_spread': float(prediction),
-            'market_spread': float(market_spread) if pd.notna(market_spread) else None,
-            'vs_market': float(vs_market) if pd.notna(vs_market) else None,
-            'home_team': home_team,
-            'away_team': away_team,
-            'season': season,
-            'week': week,
-            'confidence': float(confidence),
-            'features_used': int(non_zero_features),
-            'inference_time_ms': float(inference_time),
-            'model_version': self.MODEL_VERSION
+            "predicted_spread": float(prediction),
+            "market_spread": float(market_spread) if pd.notna(market_spread) else None,
+            "vs_market": float(vs_market) if pd.notna(vs_market) else None,
+            "home_team": home_team,
+            "away_team": away_team,
+            "season": season,
+            "week": week,
+            "confidence": float(confidence),
+            "features_used": int(non_zero_features),
+            "inference_time_ms": float(inference_time),
+            "model_version": self.MODEL_VERSION,
         }
 
-    def predict_batch(
-        self,
-        games: List[Dict],
-        season: int,
-        week: int
-    ) -> List[Dict]:
+    def predict_batch(self, games: list[dict], season: int, week: int) -> list[dict]:
         """Predict spreads for multiple games.
 
         Args:
@@ -207,18 +193,17 @@ class XGBoostSpreadPredictor:
         """
         # Extract features for entire week (batch)
         features = self.parallel_loader.extract_season_features(
-            season=int(season),
-            weeks=[int(week)]
+            season=int(season), weeks=[int(week)]
         )
 
         results = []
         for game in games:
             pred = self.predict(
-                home_team=game['home_team'],
-                away_team=game['away_team'],
+                home_team=game["home_team"],
+                away_team=game["away_team"],
                 season=season,
                 week=week,
-                features=features
+                features=features,
             )
             results.append(pred)
 
@@ -228,10 +213,10 @@ class XGBoostSpreadPredictor:
         """Align feature names with model expectations."""
         # Handle feature name mapping from training
         feature_mapping = {
-            'spread_close_x': 'spread_close',
-            'total_close_x': 'total_close',
-            'spread_close_y': 'spread_close',
-            'total_close_y': 'total_close',
+            "spread_close_x": "spread_close",
+            "total_close_x": "total_close",
+            "spread_close_y": "spread_close",
+            "total_close_y": "total_close",
         }
 
         for model_feat, raw_feat in feature_mapping.items():
@@ -255,34 +240,32 @@ class XGBoostSpreadPredictor:
             DataFrame with feature names and importance scores
         """
         importances = self.model.feature_importances_
-        importance_df = pd.DataFrame({
-            'feature': self.feature_names,
-            'importance': importances
-        }).sort_values('importance', ascending=False)
+        importance_df = pd.DataFrame(
+            {"feature": self.feature_names, "importance": importances}
+        ).sort_values("importance", ascending=False)
 
         return importance_df.head(top_n)
 
-    def get_model_info(self) -> Dict:
+    def get_model_info(self) -> dict:
         """Get model information and metrics.
 
         Returns:
             Dict with model metadata
         """
         return {
-            'version': self.MODEL_VERSION,
-            'path': str(self.model_path),
-            'n_features': len(self.feature_names),
-            'metrics': self.metadata.get('metrics', {}),
-            'hyperparameters': self.metadata.get('hyperparameters', {}),
-            'data_range': self.metadata.get('data_range', {}),
-            'warning': 'Model underperforms market on 2024 holdout (10.89 vs 9.61 MAE)'
+            "version": self.MODEL_VERSION,
+            "path": str(self.model_path),
+            "n_features": len(self.feature_names),
+            "metrics": self.metadata.get("metrics", {}),
+            "hyperparameters": self.metadata.get("hyperparameters", {}),
+            "data_range": self.metadata.get("data_range", {}),
+            "warning": "Model underperforms market on 2024 holdout (10.89 vs 9.61 MAE)",
         }
 
 
 # Convenience function for API routes
 def get_spread_predictor(
-    model_path: Optional[str] = None,
-    db_config: Optional[Dict] = None
+    model_path: str | None = None, db_config: dict | None = None
 ) -> XGBoostSpreadPredictor:
     """Factory function to get spread predictor instance.
 
@@ -293,16 +276,13 @@ def get_spread_predictor(
     Returns:
         Initialized XGBoostSpreadPredictor
     """
-    return XGBoostSpreadPredictor(
-        model_path=model_path,
-        db_config=db_config
-    )
+    return XGBoostSpreadPredictor(model_path=model_path, db_config=db_config)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Quick test
     predictor = XGBoostSpreadPredictor()
-    print(f"\nModel Info:")
+    print("\nModel Info:")
     print(json.dumps(predictor.get_model_info(), indent=2))
 
     print("\nFeature Importance (Top 10):")

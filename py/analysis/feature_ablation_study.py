@@ -22,7 +22,6 @@ import json
 import sys
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -58,19 +57,19 @@ class FeatureAblationStudy:
             (ensemble, description)
         """
         xgb_params = {
-            'objective': 'binary:logistic',
-            'eval_metric': 'logloss',
-            'tree_method': 'hist',
-            'n_estimators': 100,
-            'max_depth': 4,
-            'learning_rate': 0.1,
-            'subsample': 0.8,
-            'colsample_bytree': 0.8,
-            'alpha': alpha,
-            'lambda': lambda_,
-            'min_child_weight': 5,
-            'gamma': 0.5,
-            'n_jobs': -1,
+            "objective": "binary:logistic",
+            "eval_metric": "logloss",
+            "tree_method": "hist",
+            "n_estimators": 100,
+            "max_depth": 4,
+            "learning_rate": 0.1,
+            "subsample": 0.8,
+            "colsample_bytree": 0.8,
+            "alpha": alpha,
+            "lambda": lambda_,
+            "min_child_weight": 5,
+            "gamma": 0.5,
+            "n_jobs": -1,
         }
 
         ensemble = RealisticGameOutcomeEnsemble(xgb_params=xgb_params)
@@ -112,19 +111,21 @@ class FeatureAblationStudy:
             "n_features": len(ensemble.legitimate_phase5_features) + 9,  # +9 baseline
         }
 
-        print(f"\nRESULTS:")
+        print("\nRESULTS:")
         print(f"  Train Accuracy: {results['train_accuracy']:.1%}")
         print(f"  Test Accuracy:  {results['test_accuracy']:.1%}")
         print(f"  Test Brier:     {results['test_brier']:.4f}")
-        print(f"  Features:       {results['n_features']} ({len(ensemble.legitimate_phase5_features)} Phase 5)")
+        print(
+            f"  Features:       {results['n_features']} ({len(ensemble.legitimate_phase5_features)} Phase 5)"
+        )
 
         return results
 
     def run_full_study(self) -> dict:
         """Run complete ablation study."""
-        print("="*80)
+        print("=" * 80)
         print("FEATURE ABLATION STUDY")
-        print("="*80)
+        print("=" * 80)
         print(f"Train seasons: {self.train_seasons}")
         print(f"Test seasons:  {self.test_seasons}")
 
@@ -214,46 +215,48 @@ class FeatureAblationStudy:
 
     def print_summary(self):
         """Print summary comparison table."""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("FEATURE ABLATION STUDY - SUMMARY")
-        print("="*80)
+        print("=" * 80)
 
         # Create summary dataframe
         rows = []
         for config_key, result in self.results.items():
-            rows.append({
-                "Configuration": result["config_name"],
-                "Features": result["n_features"],
-                "Train Acc": f"{result['train_accuracy']:.1%}",
-                "Test Acc": f"{result['test_accuracy']:.1%}",
-                "Test Brier": f"{result['test_brier']:.4f}",
-            })
+            rows.append(
+                {
+                    "Configuration": result["config_name"],
+                    "Features": result["n_features"],
+                    "Train Acc": f"{result['train_accuracy']:.1%}",
+                    "Test Acc": f"{result['test_accuracy']:.1%}",
+                    "Test Brier": f"{result['test_brier']:.4f}",
+                }
+            )
 
         df_summary = pd.DataFrame(rows)
         print("\n", df_summary.to_string(index=False))
 
         # Highlight key findings
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("KEY FINDINGS")
-        print("="*80)
+        print("=" * 80)
 
         baseline_acc = self.results["baseline_only"]["test_accuracy"]
         current_acc = self.results["current"]["test_accuracy"]
         increased_reg_acc = self.results["increased_reg"]["test_accuracy"]
 
-        print(f"\n1. BASELINE ONLY (no Phase 5 features):")
+        print("\n1. BASELINE ONLY (no Phase 5 features):")
         print(f"   Test Accuracy: {baseline_acc:.1%}")
 
-        print(f"\n2. CURRENT (5 Phase 5 features):")
+        print("\n2. CURRENT (5 Phase 5 features):")
         print(f"   Test Accuracy: {current_acc:.1%}")
         print(f"   Lift from baseline: {(current_acc - baseline_acc):.1%}")
 
-        print(f"\n3. INCREASED REGULARIZATION:")
+        print("\n3. INCREASED REGULARIZATION:")
         print(f"   Test Accuracy: {increased_reg_acc:.1%}")
         print(f"   Change from current: {(increased_reg_acc - current_acc):.1%}")
 
         # Identify most important features
-        print(f"\n4. INDIVIDUAL FEATURE IMPORTANCE (by ablation):")
+        print("\n4. INDIVIDUAL FEATURE IMPORTANCE (by ablation):")
         all_phase5_features = [
             "extreme_cold",
             "dome_team_outdoor_wind",
@@ -278,7 +281,7 @@ def main():
 
     # Run study
     study = FeatureAblationStudy(train_seasons, test_seasons)
-    results = study.run_full_study()
+    study.run_full_study()
 
     # Print summary
     study.print_summary()
@@ -288,9 +291,9 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
     study.save_results(output_dir / "feature_ablation_results.json")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("FEATURE ABLATION STUDY COMPLETE")
-    print("="*80)
+    print("=" * 80)
 
 
 if __name__ == "__main__":

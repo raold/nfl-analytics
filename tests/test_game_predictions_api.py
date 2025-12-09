@@ -43,13 +43,15 @@ def test_database_table():
     cursor = conn.cursor()
 
     # Check table exists
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT EXISTS (
             SELECT FROM information_schema.tables
             WHERE table_schema = 'ml'
             AND table_name = 'game_predictions'
         );
-    """)
+    """
+    )
     exists = cursor.fetchone()[0]
 
     if not exists:
@@ -57,13 +59,15 @@ def test_database_table():
         return False
 
     # Check columns
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT column_name, data_type
         FROM information_schema.columns
         WHERE table_schema = 'ml'
         AND table_name = 'game_predictions'
         ORDER BY ordinal_position;
-    """)
+    """
+    )
     columns = cursor.fetchall()
 
     print(f"✅ Table exists with {len(columns)} columns:")
@@ -99,13 +103,15 @@ def test_predict_game_full():
     # Find a recent game
     conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT game_id, season, week, home_team, away_team
         FROM games
         WHERE season = 2024
         ORDER BY kickoff DESC
         LIMIT 1;
-    """)
+    """
+    )
     game = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -145,7 +151,9 @@ def test_predict_game_full():
             return False
 
     except requests.exceptions.ConnectionError:
-        print("❌ Connection error - is the API running? (uvicorn py.api.main:app --host 0.0.0.0 --port 8000)")
+        print(
+            "❌ Connection error - is the API running? (uvicorn py.api.main:app --host 0.0.0.0 --port 8000)"
+        )
         return False
     except Exception as e:
         print(f"❌ Error: {e}")
@@ -170,10 +178,12 @@ def test_predict_week():
             print(f"   Avg per Game: {data['processing_ms'] / data['total_games']:.1f}ms")
 
             # Show first 3 predictions
-            print(f"\n   First 3 predictions:")
+            print("\n   First 3 predictions:")
             for i, pred in enumerate(data["predictions"][:3]):
-                print(f"      {i+1}. {pred['game_id']}: {pred['away_team']}@{pred['home_team']} "
-                      f"({pred['predicted_total']:.1f} total, {pred['predicted_spread']:.1f} spread)")
+                print(
+                    f"      {i+1}. {pred['game_id']}: {pred['away_team']}@{pred['home_team']} "
+                    f"({pred['predicted_total']:.1f} total, {pred['predicted_spread']:.1f} spread)"
+                )
 
             return True
         else:
@@ -196,12 +206,14 @@ def test_get_game_prediction():
     # Find a game with stored prediction
     conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT game_id
         FROM ml.game_predictions
         ORDER BY predicted_at DESC
         LIMIT 1;
-    """)
+    """
+    )
     result = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -253,7 +265,7 @@ def main():
     try:
         requests.get(f"{API_BASE_URL}/../health", timeout=2)
         api_running = True
-    except:
+    except Exception:
         api_running = False
         print("\n⚠️  API not running - skipping endpoint tests")
         print("   Start API with: uvicorn py.api.main:app --host 0.0.0.0 --port 8000")

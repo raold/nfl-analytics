@@ -16,10 +16,10 @@ Created: November 19, 2025
 Purpose: Diagnose ensemble performance gap after XGBoost v4 recovery
 """
 
-import sys
 import json
+import sys
 from pathlib import Path
-from typing import Dict, List
+
 import numpy as np
 import pandas as pd
 
@@ -28,33 +28,28 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 
-def calculate_component_mae(df: pd.DataFrame, component_col: str) -> Dict:
+def calculate_component_mae(df: pd.DataFrame, component_col: str) -> dict:
     """Calculate MAE for a single component."""
     # Filter to only games where component made a prediction
     valid = df[df[component_col].notna()].copy()
 
     if len(valid) == 0:
-        return {
-            'mae': None,
-            'rmse': None,
-            'n_games': 0,
-            'coverage': 0.0
-        }
+        return {"mae": None, "rmse": None, "n_games": 0, "coverage": 0.0}
 
     # Calculate MAE
-    errors = np.abs(valid['actual'] - valid[component_col])
+    errors = np.abs(valid["actual"] - valid[component_col])
     mae = errors.mean()
-    rmse = np.sqrt(((valid['actual'] - valid[component_col]) ** 2).mean())
+    rmse = np.sqrt(((valid["actual"] - valid[component_col]) ** 2).mean())
 
     return {
-        'mae': float(mae),
-        'rmse': float(rmse),
-        'n_games': len(valid),
-        'coverage': len(valid) / len(df) * 100
+        "mae": float(mae),
+        "rmse": float(rmse),
+        "n_games": len(valid),
+        "coverage": len(valid) / len(df) * 100,
     }
 
 
-def calculate_theoretical_ensemble_mae(component_metrics: Dict, weights: Dict) -> float:
+def calculate_theoretical_ensemble_mae(component_metrics: dict, weights: dict) -> float:
     """
     Calculate theoretical ensemble MAE using weighted average.
 
@@ -64,8 +59,8 @@ def calculate_theoretical_ensemble_mae(component_metrics: Dict, weights: Dict) -
     total_weight = 0.0
 
     for component, weight in weights.items():
-        if component_metrics[component]['mae'] is not None:
-            weighted_mae += component_metrics[component]['mae'] * weight
+        if component_metrics[component]["mae"] is not None:
+            weighted_mae += component_metrics[component]["mae"] * weight
             total_weight += weight
 
     return weighted_mae / total_weight if total_weight > 0 else None
@@ -110,31 +105,19 @@ def main():
 
     # Define component columns and expected performance
     components = {
-        'state_space_pred': {
-            'name': 'State-Space v2',
-            'expected_mae': 47.77,
-            'weight': 0.27
+        "state_space_pred": {"name": "State-Space v2", "expected_mae": 47.77, "weight": 0.27},
+        "hierarchical_pred": {
+            "name": "Hierarchical v2",
+            "expected_mae": 45.0,  # Approximate
+            "weight": 0.27,
         },
-        'hierarchical_pred': {
-            'name': 'Hierarchical v2',
-            'expected_mae': 45.0,  # Approximate
-            'weight': 0.27
+        "xgboost_v4_pred": {"name": "XGBoost v4 Ridge", "expected_mae": 4.27, "weight": 0.23},
+        "informative_priors_pred": {
+            "name": "Informative Priors v2",
+            "expected_mae": 40.0,  # Approximate
+            "weight": 0.13,
         },
-        'xgboost_v4_pred': {
-            'name': 'XGBoost v4 Ridge',
-            'expected_mae': 4.27,
-            'weight': 0.23
-        },
-        'informative_priors_pred': {
-            'name': 'Informative Priors v2',
-            'expected_mae': 40.0,  # Approximate
-            'weight': 0.13
-        },
-        'hybrid_pred': {
-            'name': 'Hybrid Static-Incremental',
-            'expected_mae': 38.03,
-            'weight': 0.10
-        }
+        "hybrid_pred": {"name": "Hybrid Static-Incremental", "expected_mae": 38.03, "weight": 0.10},
     }
 
     # Calculate actual performance for each component
@@ -151,11 +134,15 @@ def main():
 
         print(f"{info['name']}:")
         print(f"  Expected MAE: {info['expected_mae']:.2f} yards")
-        print(f"  Actual MAE:   {metrics['mae']:.2f} yards" if metrics['mae'] else "  Actual MAE:   N/A")
+        print(
+            f"  Actual MAE:   {metrics['mae']:.2f} yards"
+            if metrics["mae"]
+            else "  Actual MAE:   N/A"
+        )
 
-        if metrics['mae'] is not None and info['expected_mae'] is not None:
-            diff = metrics['mae'] - info['expected_mae']
-            diff_pct = (diff / info['expected_mae']) * 100
+        if metrics["mae"] is not None and info["expected_mae"] is not None:
+            diff = metrics["mae"] - info["expected_mae"]
+            diff_pct = (diff / info["expected_mae"]) * 100
             print(f"  Difference:   {diff:+.2f} yards ({diff_pct:+.1f}%)")
 
         print(f"  Coverage:     {metrics['coverage']:.1f}%")
@@ -163,7 +150,7 @@ def main():
         print()
 
     # Calculate theoretical ensemble MAE
-    weights = {col: info['weight'] for col, info in components.items()}
+    weights = {col: info["weight"] for col, info in components.items()}
 
     print("=" * 80)
     print("ENSEMBLE WEIGHTED AVERAGE ANALYSIS")
@@ -171,23 +158,20 @@ def main():
     print()
 
     # Theoretical MAE (using expected component performance)
-    theoretical_mae = sum(
-        info['expected_mae'] * info['weight']
-        for info in components.values()
-    )
-    print(f"Theoretical MAE (expected component performance):")
+    theoretical_mae = sum(info["expected_mae"] * info["weight"] for info in components.values())
+    print("Theoretical MAE (expected component performance):")
     print(f"  {theoretical_mae:.2f} yards")
     print()
 
     # Theoretical MAE (using actual component performance)
     actual_theoretical_mae = calculate_theoretical_ensemble_mae(component_metrics, weights)
-    print(f"Theoretical MAE (actual component performance):")
+    print("Theoretical MAE (actual component performance):")
     print(f"  {actual_theoretical_mae:.2f} yards" if actual_theoretical_mae else "  N/A")
     print()
 
     # Actual ensemble MAE
-    ensemble_mae = np.mean(np.abs(combined_df['actual'] - combined_df['predicted']))
-    print(f"Actual Ensemble MAE:")
+    ensemble_mae = np.mean(np.abs(combined_df["actual"] - combined_df["predicted"]))
+    print("Actual Ensemble MAE:")
     print(f"  {ensemble_mae:.2f} yards")
     print()
 
@@ -199,14 +183,14 @@ def main():
 
     gap1 = ensemble_mae - theoretical_mae
     gap1_pct = (gap1 / theoretical_mae) * 100
-    print(f"Gap 1 (Actual Ensemble vs Expected Components):")
+    print("Gap 1 (Actual Ensemble vs Expected Components):")
     print(f"  {gap1:+.2f} yards ({gap1_pct:+.1f}%)")
     print()
 
     if actual_theoretical_mae:
         gap2 = ensemble_mae - actual_theoretical_mae
         gap2_pct = (gap2 / actual_theoretical_mae) * 100
-        print(f"Gap 2 (Actual Ensemble vs Theoretical Weighted Average):")
+        print("Gap 2 (Actual Ensemble vs Theoretical Weighted Average):")
         print(f"  {gap2:+.2f} yards ({gap2_pct:+.1f}%)")
         print()
 
@@ -218,11 +202,11 @@ def main():
 
     for col, info in components.items():
         metrics = component_metrics[col]
-        if metrics['mae'] is None:
+        if metrics["mae"] is None:
             status = "❌ NOT WORKING"
-        elif metrics['mae'] > info['expected_mae'] * 1.1:  # More than 10% worse
+        elif metrics["mae"] > info["expected_mae"] * 1.1:  # More than 10% worse
             status = f"⚠️  UNDERPERFORMING ({metrics['mae'] - info['expected_mae']:+.2f} yards)"
-        elif metrics['mae'] < info['expected_mae'] * 0.9:  # More than 10% better
+        elif metrics["mae"] < info["expected_mae"] * 0.9:  # More than 10% better
             status = f"✅ OUTPERFORMING ({metrics['mae'] - info['expected_mae']:+.2f} yards)"
         else:
             status = "✅ MEETING EXPECTATIONS"
@@ -244,28 +228,32 @@ def main():
 
     # Save detailed report
     report = {
-        'audit_date': pd.Timestamp.now().isoformat(),
-        'total_games': len(combined_df),
-        'ensemble_mae': float(ensemble_mae),
-        'theoretical_mae_expected': float(theoretical_mae),
-        'theoretical_mae_actual': float(actual_theoretical_mae) if actual_theoretical_mae else None,
-        'gap_yards': float(gap1),
-        'gap_pct': float(gap1_pct),
-        'component_performance': {
-            info['name']: {
-                'expected_mae': info['expected_mae'],
-                'actual_mae': component_metrics[col]['mae'],
-                'difference': component_metrics[col]['mae'] - info['expected_mae'] if component_metrics[col]['mae'] else None,
-                'weight': info['weight'],
-                'coverage': component_metrics[col]['coverage'],
-                'n_games': component_metrics[col]['n_games']
+        "audit_date": pd.Timestamp.now().isoformat(),
+        "total_games": len(combined_df),
+        "ensemble_mae": float(ensemble_mae),
+        "theoretical_mae_expected": float(theoretical_mae),
+        "theoretical_mae_actual": float(actual_theoretical_mae) if actual_theoretical_mae else None,
+        "gap_yards": float(gap1),
+        "gap_pct": float(gap1_pct),
+        "component_performance": {
+            info["name"]: {
+                "expected_mae": info["expected_mae"],
+                "actual_mae": component_metrics[col]["mae"],
+                "difference": (
+                    component_metrics[col]["mae"] - info["expected_mae"]
+                    if component_metrics[col]["mae"]
+                    else None
+                ),
+                "weight": info["weight"],
+                "coverage": component_metrics[col]["coverage"],
+                "n_games": component_metrics[col]["n_games"],
             }
             for col, info in components.items()
-        }
+        },
     }
 
     report_file = results_dir / "component_performance_audit.json"
-    with open(report_file, 'w') as f:
+    with open(report_file, "w") as f:
         json.dump(report, f, indent=2)
 
     print(f"✅ Detailed report saved: {report_file}")

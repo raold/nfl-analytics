@@ -50,9 +50,9 @@ import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
+from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way as EnsembleV6
 
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way as EnsembleV5
-from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way as EnsembleV6
 
 # Load environment variables
 load_dotenv()
@@ -514,12 +514,12 @@ class ABTestRouter:
                     "n_completed": row["n_completed"],
                     "mae": float(row["mae"]) if row["mae"] else None,
                     "rmse": float(row["rmse"]) if row["rmse"] else None,
-                    "calibration_90_pct": float(row["calibration_90_pct"])
-                    if row["calibration_90_pct"]
-                    else None,
-                    "avg_uncertainty": float(row["avg_uncertainty"])
-                    if row["avg_uncertainty"]
-                    else None,
+                    "calibration_90_pct": (
+                        float(row["calibration_90_pct"]) if row["calibration_90_pct"] else None
+                    ),
+                    "avg_uncertainty": (
+                        float(row["avg_uncertainty"]) if row["avg_uncertainty"] else None
+                    ),
                     "first_prediction": row["first_prediction"],
                     "last_prediction": row["last_prediction"],
                 }

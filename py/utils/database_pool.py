@@ -37,15 +37,13 @@ Date: November 13, 2025
 import logging
 import threading
 from contextlib import contextmanager
-from typing import Dict, Optional
 
 import psycopg2
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -107,7 +105,7 @@ class DatabasePoolManager:
                 password=password,
                 # Performance tuning
                 connect_timeout=10,
-                options="-c statement_timeout=30000"  # 30s query timeout
+                options="-c statement_timeout=30000",  # 30s query timeout
             )
 
             logger.info(
@@ -173,7 +171,7 @@ class DatabasePoolManager:
     def execute_query(
         self,
         query: str,
-        params: Optional[tuple] = None,
+        params: tuple | None = None,
         fetchone: bool = False,
         fetchall: bool = True,
     ):
@@ -206,7 +204,7 @@ class DatabasePoolManager:
     def execute_query_dict(
         self,
         query: str,
-        params: Optional[tuple] = None,
+        params: tuple | None = None,
     ) -> list:
         """
         Execute query and return results as list of dicts.
@@ -235,7 +233,7 @@ class DatabasePoolManager:
             self.pool.closeall()
             logger.info("All connections closed")
 
-    def get_stats(self) -> Dict:
+    def get_stats(self) -> dict:
         """
         Get pool statistics.
 
@@ -262,7 +260,7 @@ class DatabasePoolManager:
 
 
 # Singleton instance for global access
-_global_pool: Optional[DatabasePoolManager] = None
+_global_pool: DatabasePoolManager | None = None
 
 
 def get_default_pool() -> DatabasePoolManager:
@@ -292,9 +290,9 @@ if __name__ == "__main__":
     # Test connection pooling
     import time
 
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("DATABASE CONNECTION POOL TEST")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     pool = DatabasePoolManager(minconn=2, maxconn=5)
 
@@ -332,8 +330,7 @@ if __name__ == "__main__":
     logger.info("\nTest 4: execute_query_dict helper")
     start = time.time()
     games = pool.execute_query_dict(
-        "SELECT game_id, season, week FROM games WHERE season = %s LIMIT 5",
-        params=(2024,)
+        "SELECT game_id, season, week FROM games WHERE season = %s LIMIT 5", params=(2024,)
     )
     elapsed = time.time() - start
     logger.info(f"  Retrieved {len(games)} games ({elapsed*1000:.1f}ms)")

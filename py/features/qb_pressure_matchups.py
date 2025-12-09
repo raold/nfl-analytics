@@ -34,7 +34,6 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -135,9 +134,7 @@ class QBPressureMatchupEngine:
 
         return plays
 
-    def calculate_defensive_pressure_rankings(
-        self, plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_defensive_pressure_rankings(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate defensive pass rush quality rankings by team/season/week.
 
@@ -173,12 +170,8 @@ class QBPressureMatchupEngine:
         )
 
         # Calculate rate stats
-        defense_stats["sack_rate"] = (
-            defense_stats["sacks"] / defense_stats["dropbacks"]
-        )
-        defense_stats["qb_hit_rate"] = (
-            defense_stats["qb_hits"] / defense_stats["dropbacks"]
-        )
+        defense_stats["sack_rate"] = defense_stats["sacks"] / defense_stats["dropbacks"]
+        defense_stats["qb_hit_rate"] = defense_stats["qb_hits"] / defense_stats["dropbacks"]
         defense_stats["pressure_rate"] = (
             defense_stats["sacks"] + defense_stats["qb_hits"]
         ) / defense_stats["dropbacks"]
@@ -199,9 +192,9 @@ class QBPressureMatchupEngine:
         ]
 
         for col in rolling_cols:
-            defense_stats[f"{col}_rolling"] = defense_stats.groupby("defteam")[
-                col
-            ].transform(lambda x: x.shift(1).rolling(5, min_periods=1).mean())
+            defense_stats[f"{col}_rolling"] = defense_stats.groupby("defteam")[col].transform(
+                lambda x: x.shift(1).rolling(5, min_periods=1).mean()
+            )
 
         # Calculate percentile ranks within season/week
         # Higher percentile = better pass rush (more pressure, more negative EPA)
@@ -215,14 +208,14 @@ class QBPressureMatchupEngine:
         ranking_cols_inverted = ["epa_allowed_rolling", "cpoe_allowed_rolling"]
 
         for col in ranking_cols_normal:
-            defense_stats[f"{col}_pct"] = defense_stats.groupby(["season", "week"])[
-                col
-            ].rank(pct=True)
+            defense_stats[f"{col}_pct"] = defense_stats.groupby(["season", "week"])[col].rank(
+                pct=True
+            )
 
         for col in ranking_cols_inverted:
-            defense_stats[f"{col}_pct"] = 1 - defense_stats.groupby(["season", "week"])[
-                col
-            ].rank(pct=True)
+            defense_stats[f"{col}_pct"] = 1 - defense_stats.groupby(["season", "week"])[col].rank(
+                pct=True
+            )
 
         # Composite pass rush quality score (0-100, higher = better rush)
         defense_stats["pass_rush_quality"] = (
@@ -281,26 +274,23 @@ class QBPressureMatchupEngine:
         plays["clean_pocket"] = (plays["under_pressure"] == 0).astype(int)
 
         # Situational context
-        plays["obvious_pass"] = (
-            (plays["down"].isin([3, 4])) & (plays["ydstogo"] >= 7)
-        ).astype(int)
+        plays["obvious_pass"] = ((plays["down"].isin([3, 4])) & (plays["ydstogo"] >= 7)).astype(int)
 
-        plays["short_yardage"] = (
-            (plays["down"].isin([3, 4])) & (plays["ydstogo"] <= 3)
-        ).astype(int)
+        plays["short_yardage"] = ((plays["down"].isin([3, 4])) & (plays["ydstogo"] <= 3)).astype(
+            int
+        )
 
         plays["two_minute_drill"] = (
-            ((plays["quarter"] == 2) | (plays["quarter"] == 4))
-            & (plays["time_seconds"] <= 120)
+            ((plays["quarter"] == 2) | (plays["quarter"] == 4)) & (plays["time_seconds"] <= 120)
         ).astype(int)
 
         plays["trailing"] = (plays["score_differential"] < -7).astype(int)
         plays["leading"] = (plays["score_differential"] > 7).astype(int)
 
         # Quick release proxy (short pass + completion = got ball out fast)
-        plays["quick_release"] = (
-            (plays["air_yards"] < 5) & (plays["complete_pass"] == 1)
-        ).astype(int)
+        plays["quick_release"] = ((plays["air_yards"] < 5) & (plays["complete_pass"] == 1)).astype(
+            int
+        )
 
         # Deep shot (long developing play)
         plays["deep_attempt"] = (plays["air_yards"] > 15).astype(int)
@@ -379,7 +369,12 @@ class QBPressureMatchupEngine:
                 dropbacks=("passer_player_id", "count"),
                 completions=("complete_pass", "sum"),
                 passing_yards=("yards_gained", "sum"),
-                touchdowns=("touchdown", lambda x: ((x == 1) & (plays.loc[x.index, "td_team"] == plays.loc[x.index, "posteam"])).sum()),
+                touchdowns=(
+                    "touchdown",
+                    lambda x: (
+                        (x == 1) & (plays.loc[x.index, "td_team"] == plays.loc[x.index, "posteam"])
+                    ).sum(),
+                ),
                 interceptions=("interception", "sum"),
                 air_yards=("air_yards", "sum"),
                 epa=("epa", "sum"),
@@ -392,22 +387,40 @@ class QBPressureMatchupEngine:
                 scrambles=("scrambled", "sum"),
                 # Clean pocket
                 clean_dropbacks=("clean_pocket", "sum"),
-                clean_completions=("complete_pass", lambda x: x[plays.loc[x.index, "clean_pocket"] == 1].sum()),
-                clean_yards=("yards_gained", lambda x: x[plays.loc[x.index, "clean_pocket"] == 1].sum()),
+                clean_completions=(
+                    "complete_pass",
+                    lambda x: x[plays.loc[x.index, "clean_pocket"] == 1].sum(),
+                ),
+                clean_yards=(
+                    "yards_gained",
+                    lambda x: x[plays.loc[x.index, "clean_pocket"] == 1].sum(),
+                ),
                 clean_epa=("epa", lambda x: x[plays.loc[x.index, "clean_pocket"] == 1].sum()),
                 # Under pressure
                 pressure_dropbacks=("under_pressure", "sum"),
-                pressure_completions=("complete_pass", lambda x: x[plays.loc[x.index, "under_pressure"] == 1].sum()),
-                pressure_yards=("yards_gained", lambda x: x[plays.loc[x.index, "under_pressure"] == 1].sum()),
+                pressure_completions=(
+                    "complete_pass",
+                    lambda x: x[plays.loc[x.index, "under_pressure"] == 1].sum(),
+                ),
+                pressure_yards=(
+                    "yards_gained",
+                    lambda x: x[plays.loc[x.index, "under_pressure"] == 1].sum(),
+                ),
                 pressure_epa=("epa", lambda x: x[plays.loc[x.index, "under_pressure"] == 1].sum()),
                 # Quick release
                 quick_releases=("quick_release", "sum"),
                 # Deep attempts
                 deep_attempts=("deep_attempt", "sum"),
-                deep_completions=("complete_pass", lambda x: x[plays.loc[x.index, "deep_attempt"] == 1].sum()),
+                deep_completions=(
+                    "complete_pass",
+                    lambda x: x[plays.loc[x.index, "deep_attempt"] == 1].sum(),
+                ),
                 # Situational
                 obvious_pass_dropbacks=("obvious_pass", "sum"),
-                obvious_pass_epa=("epa", lambda x: x[plays.loc[x.index, "obvious_pass"] == 1].sum()),
+                obvious_pass_epa=(
+                    "epa",
+                    lambda x: x[plays.loc[x.index, "obvious_pass"] == 1].sum(),
+                ),
                 red_zone_dropbacks=("red_zone", "sum"),
                 red_zone_epa=("epa", lambda x: x[plays.loc[x.index, "red_zone"] == 1].sum()),
             )
@@ -415,63 +428,49 @@ class QBPressureMatchupEngine:
         )
 
         # Calculate rate stats
-        qb_games["completion_pct"] = (
-            qb_games["completions"] / qb_games["dropbacks"]
-        )
-        qb_games["yards_per_attempt"] = (
-            qb_games["passing_yards"] / qb_games["dropbacks"]
-        )
-        qb_games["epa_per_dropback"] = (
-            qb_games["epa"] / qb_games["dropbacks"]
-        )
+        qb_games["completion_pct"] = qb_games["completions"] / qb_games["dropbacks"]
+        qb_games["yards_per_attempt"] = qb_games["passing_yards"] / qb_games["dropbacks"]
+        qb_games["epa_per_dropback"] = qb_games["epa"] / qb_games["dropbacks"]
 
         # Pressure rates
-        qb_games["pressure_rate_faced"] = (
-            qb_games["times_pressured"] / qb_games["dropbacks"]
-        )
-        qb_games["sack_rate"] = (
-            qb_games["times_sacked"] / qb_games["dropbacks"]
-        )
-        qb_games["scramble_rate"] = (
-            qb_games["scrambles"] / qb_games["dropbacks"]
-        )
+        qb_games["pressure_rate_faced"] = qb_games["times_pressured"] / qb_games["dropbacks"]
+        qb_games["sack_rate"] = qb_games["times_sacked"] / qb_games["dropbacks"]
+        qb_games["scramble_rate"] = qb_games["scrambles"] / qb_games["dropbacks"]
 
         # Clean pocket performance
-        qb_games["clean_completion_pct"] = (
-            qb_games["clean_completions"] / qb_games["clean_dropbacks"].replace(0, np.nan)
+        qb_games["clean_completion_pct"] = qb_games["clean_completions"] / qb_games[
+            "clean_dropbacks"
+        ].replace(0, np.nan)
+        qb_games["clean_ypa"] = qb_games["clean_yards"] / qb_games["clean_dropbacks"].replace(
+            0, np.nan
         )
-        qb_games["clean_ypa"] = (
-            qb_games["clean_yards"] / qb_games["clean_dropbacks"].replace(0, np.nan)
-        )
-        qb_games["clean_epa_per_dropback"] = (
-            qb_games["clean_epa"] / qb_games["clean_dropbacks"].replace(0, np.nan)
-        )
+        qb_games["clean_epa_per_dropback"] = qb_games["clean_epa"] / qb_games[
+            "clean_dropbacks"
+        ].replace(0, np.nan)
 
         # Pressure performance
-        qb_games["pressure_completion_pct"] = (
-            qb_games["pressure_completions"] / qb_games["pressure_dropbacks"].replace(0, np.nan)
-        )
-        qb_games["pressure_ypa"] = (
-            qb_games["pressure_yards"] / qb_games["pressure_dropbacks"].replace(0, np.nan)
-        )
-        qb_games["pressure_epa_per_dropback"] = (
-            qb_games["pressure_epa"] / qb_games["pressure_dropbacks"].replace(0, np.nan)
-        )
+        qb_games["pressure_completion_pct"] = qb_games["pressure_completions"] / qb_games[
+            "pressure_dropbacks"
+        ].replace(0, np.nan)
+        qb_games["pressure_ypa"] = qb_games["pressure_yards"] / qb_games[
+            "pressure_dropbacks"
+        ].replace(0, np.nan)
+        qb_games["pressure_epa_per_dropback"] = qb_games["pressure_epa"] / qb_games[
+            "pressure_dropbacks"
+        ].replace(0, np.nan)
 
         # Deep ball
-        qb_games["deep_completion_pct"] = (
-            qb_games["deep_completions"] / qb_games["deep_attempts"].replace(0, np.nan)
-        )
+        qb_games["deep_completion_pct"] = qb_games["deep_completions"] / qb_games[
+            "deep_attempts"
+        ].replace(0, np.nan)
 
         # Quick release rate (getting ball out fast to avoid pressure)
-        qb_games["quick_release_rate"] = (
-            qb_games["quick_releases"] / qb_games["dropbacks"]
-        )
+        qb_games["quick_release_rate"] = qb_games["quick_releases"] / qb_games["dropbacks"]
 
         # Situational
-        qb_games["obvious_pass_epa_per_dropback"] = (
-            qb_games["obvious_pass_epa"] / qb_games["obvious_pass_dropbacks"].replace(0, np.nan)
-        )
+        qb_games["obvious_pass_epa_per_dropback"] = qb_games["obvious_pass_epa"] / qb_games[
+            "obvious_pass_dropbacks"
+        ].replace(0, np.nan)
 
         # Pass rush quality indicators
         qb_games["vs_elite_pass_rush"] = (qb_games["pass_rush_tier"] == "elite").astype(int)
@@ -481,9 +480,7 @@ class QBPressureMatchupEngine:
 
         return qb_games
 
-    def add_rolling_pressure_features(
-        self, qb_games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def add_rolling_pressure_features(self, qb_games: pd.DataFrame) -> pd.DataFrame:
         """
         Add rolling averages for pressure-adjusted performance.
 
@@ -496,9 +493,7 @@ class QBPressureMatchupEngine:
         logger.info("Adding rolling pressure features...")
 
         # Sort by player and date
-        qb_games = qb_games.sort_values(
-            ["passer_player_id", "season", "week"]
-        )
+        qb_games = qb_games.sort_values(["passer_player_id", "season", "week"])
 
         # Rolling windows (3, 5 games)
         windows = [3, 5]
@@ -520,28 +515,22 @@ class QBPressureMatchupEngine:
 
         for window in windows:
             for col in rolling_cols:
-                qb_games[f"{col}_L{window}"] = qb_games.groupby(
-                    "passer_player_id"
-                )[col].transform(lambda x: x.shift(1).rolling(window, min_periods=1).mean())
+                qb_games[f"{col}_L{window}"] = qb_games.groupby("passer_player_id")[col].transform(
+                    lambda x: x.shift(1).rolling(window, min_periods=1).mean()
+                )
 
         # Matchup-adjusted features (performance vs pass rush quality)
         # Compare current game pass rush vs recent average
-        qb_games["pass_rush_vs_avg"] = (
-            qb_games["pass_rush_quality"]
-            - qb_games.groupby("passer_player_id")["pass_rush_quality"].transform(
-                lambda x: x.shift(1).rolling(5, min_periods=1).mean()
-            )
-        )
+        qb_games["pass_rush_vs_avg"] = qb_games["pass_rush_quality"] - qb_games.groupby(
+            "passer_player_id"
+        )["pass_rush_quality"].transform(lambda x: x.shift(1).rolling(5, min_periods=1).mean())
 
         # Difficult matchup indicator (facing better pass rush than usual)
-        qb_games["difficult_pass_rush_matchup"] = (
-            qb_games["pass_rush_vs_avg"] > 10
-        ).astype(int)
+        qb_games["difficult_pass_rush_matchup"] = (qb_games["pass_rush_vs_avg"] > 10).astype(int)
 
         # Pressure delta (facing more/less pressure than expected)
         qb_games["pressure_rate_delta"] = (
-            qb_games["pressure_rate_faced"]
-            - qb_games["pressure_rate_faced_L5"]
+            qb_games["pressure_rate_faced"] - qb_games["pressure_rate_faced_L5"]
         )
 
         logger.info("Rolling pressure features added")
@@ -581,9 +570,7 @@ class QBPressureMatchupEngine:
         qb_features = self.add_rolling_pressure_features(qb_features)
 
         # Sort by date
-        qb_features = qb_features.sort_values(
-            ["season", "week", "game_id", "passer_player_id"]
-        )
+        qb_features = qb_features.sort_values(["season", "week", "game_id", "passer_player_id"])
 
         logger.info(f"Generated {len(qb_features):,} QB pressure matchup features")
         logger.info(f"Unique QBs: {qb_features['passer_player_id'].nunique()}")
@@ -597,9 +584,7 @@ class QBPressureMatchupEngine:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Generate QB-pressure matchup features"
-    )
+    parser = argparse.ArgumentParser(description="Generate QB-pressure matchup features")
     parser.add_argument(
         "--season",
         type=int,

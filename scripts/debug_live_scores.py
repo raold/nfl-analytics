@@ -3,14 +3,16 @@
 Debug script to test live score fetching and matching.
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+import sys
 
-import requests
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+
+from datetime import datetime
+
 import pandas as pd
 import psycopg
-from datetime import datetime
+import requests
 
 # Database configuration
 DB_CONFIG = {

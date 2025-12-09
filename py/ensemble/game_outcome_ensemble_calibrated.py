@@ -64,7 +64,7 @@ class CalibratedGameOutcomeEnsemble(OptimizedGameOutcomeEnsemble):
         super().__init__(state_space_config, xgb_params, nn_params)
 
         # Isotonic regression calibrator (non-parametric, monotonic)
-        self.calibrator = IsotonicRegression(out_of_bounds='clip')
+        self.calibrator = IsotonicRegression(out_of_bounds="clip")
         self.is_calibrated = False
 
     def fit(
@@ -130,28 +130,34 @@ class CalibratedGameOutcomeEnsemble(OptimizedGameOutcomeEnsemble):
             "accuracy": float(np.mean((uncalibrated_preds >= 0.5) == val_target)),
         }
 
-        print(f"  BEFORE Calibration:")
+        print("  BEFORE Calibration:")
         print(f"    Val Brier: {uncalibrated_metrics['brier']:.4f}")
         print(f"    Val LogLoss: {uncalibrated_metrics['logloss']:.4f}")
         print(f"    Val Accuracy: {uncalibrated_metrics['accuracy']:.1%}")
 
-        print(f"\n  AFTER Calibration:")
+        print("\n  AFTER Calibration:")
         print(f"    Val Brier: {calibrated_metrics['brier']:.4f}")
         print(f"    Val LogLoss: {calibrated_metrics['logloss']:.4f}")
         print(f"    Val Accuracy: {calibrated_metrics['accuracy']:.1%}")
 
         # Calculate improvement
-        brier_improvement = uncalibrated_metrics['brier'] - calibrated_metrics['brier']
-        logloss_improvement = uncalibrated_metrics['logloss'] - calibrated_metrics['logloss']
+        brier_improvement = uncalibrated_metrics["brier"] - calibrated_metrics["brier"]
+        logloss_improvement = uncalibrated_metrics["logloss"] - calibrated_metrics["logloss"]
 
-        print(f"\n  Calibration Impact:")
-        print(f"    Brier Improvement: {brier_improvement:+.4f} ({brier_improvement/uncalibrated_metrics['brier']:+.1%})")
-        print(f"    LogLoss Improvement: {logloss_improvement:+.4f} ({logloss_improvement/uncalibrated_metrics['logloss']:+.1%})")
+        print("\n  Calibration Impact:")
+        print(
+            f"    Brier Improvement: {brier_improvement:+.4f} ({brier_improvement/uncalibrated_metrics['brier']:+.1%})"
+        )
+        print(
+            f"    LogLoss Improvement: {logloss_improvement:+.4f} ({logloss_improvement/uncalibrated_metrics['logloss']:+.1%})"
+        )
 
         if brier_improvement < 0:
-            print(f"    ⚠️  Warning: Calibration increased Brier score (may indicate insufficient validation data)")
+            print(
+                "    ⚠️  Warning: Calibration increased Brier score (may indicate insufficient validation data)"
+            )
         else:
-            print(f"    ✓ Calibration improved probability estimates")
+            print("    ✓ Calibration improved probability estimates")
 
         print(f"\n{'='*80}")
         print("CALIBRATED TRAINING COMPLETE")
@@ -239,7 +245,9 @@ if __name__ == "__main__":
     print("=" * 80)
     print("This module provides a calibrated version of the optimized ensemble.")
     print("\nUsage:")
-    print("  from py.ensemble.game_outcome_ensemble_calibrated import CalibratedGameOutcomeEnsemble")
+    print(
+        "  from py.ensemble.game_outcome_ensemble_calibrated import CalibratedGameOutcomeEnsemble"
+    )
     print("")
     print("  ensemble = CalibratedGameOutcomeEnsemble()")
     print("  ensemble.fit(train_df, val_df)  # val_df required for calibration")

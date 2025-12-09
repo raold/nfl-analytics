@@ -15,13 +15,13 @@ Usage:
     python py/models/bnn_grid_search.py
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+import sys
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 import logging
 from pathlib import Path
-import json
 
 import numpy as np
 import pandas as pd
@@ -96,9 +96,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
     df["wind"] = pd.to_numeric(df["wind"], errors="coerce")
 
-    df["is_bad_weather"] = (
-        ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
-    )
+    df["is_bad_weather"] = ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
 
     # Rolling averages (per player)
     df = df.sort_values(["player_id", "season", "week"])
@@ -160,9 +158,9 @@ def prepare_train_test_split(df: pd.DataFrame):
 
 def grid_search():
     """Main grid search pipeline"""
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("BNN GRID SEARCH - Finding Optimal Architecture")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     # Load and prepare data
     df = load_passing_data_from_db()
@@ -186,7 +184,7 @@ def grid_search():
     logger.info("Prior scales (σ): [0.3, 0.4, 0.5]")
     logger.info("Network sizes: [(24,12), (32,16), (48,24)]")
     logger.info("Total: 9 configurations\n")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     config_num = 1
     for prior_scale in prior_scales:
@@ -202,13 +200,11 @@ def grid_search():
                 # Create model with custom priors (will modify BNN class to accept this)
                 # For grid search, use ADVI for speed
                 bnn = BayesianNeuralNetwork(
-                    hidden_dims=hidden_dims,
-                    inference_method="advi",
-                    n_samples=2000
+                    hidden_dims=hidden_dims, inference_method="advi", n_samples=2000
                 )
 
                 # Train
-                logger.info(f"Training with ADVI (fast, ~2-5 min)...")
+                logger.info("Training with ADVI (fast, ~2-5 min)...")
                 bnn.fit(X_train, y_train_norm, verbose=False)
 
                 # Predict
@@ -236,7 +232,7 @@ def grid_search():
                     "rmse": float(rmse),
                     "mean_pred_std": float(pred_std.mean()),
                     "calibration": float(calibration),
-                    "mse": float(mse)
+                    "mse": float(mse),
                 }
                 results.append(result)
 
@@ -248,12 +244,14 @@ def grid_search():
 
             except Exception as e:
                 logger.error(f"✗ CONFIG {config_num} FAILED: {e}")
-                results.append({
-                    "config_num": config_num,
-                    "prior_scale": prior_scale,
-                    "hidden_dims": hidden_dims,
-                    "error": str(e)
-                })
+                results.append(
+                    {
+                        "config_num": config_num,
+                        "prior_scale": prior_scale,
+                        "hidden_dims": hidden_dims,
+                        "error": str(e),
+                    }
+                )
 
             config_num += 1
 
@@ -263,23 +261,23 @@ def grid_search():
     results_path.parent.mkdir(parents=True, exist_ok=True)
     results_df.to_csv(results_path, index=False)
 
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("GRID SEARCH COMPLETE - SUMMARY")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     # Find best model
-    valid_results = results_df[~results_df['mae'].isna()].copy()
+    valid_results = results_df[~results_df["mae"].isna()].copy()
 
     if len(valid_results) > 0:
         # Score based on MAE (70%), calibration (20%), and std (10%)
-        valid_results['calib_score'] = np.abs(valid_results['calibration'] - 0.68)
-        valid_results['composite_score'] = (
-            0.7 * (valid_results['mae'] / valid_results['mae'].min()) +
-            0.2 * (valid_results['calib_score'] / valid_results['calib_score'].min()) +
-            0.1 * (valid_results['mean_pred_std'] / valid_results['mean_pred_std'].min())
+        valid_results["calib_score"] = np.abs(valid_results["calibration"] - 0.68)
+        valid_results["composite_score"] = (
+            0.7 * (valid_results["mae"] / valid_results["mae"].min())
+            + 0.2 * (valid_results["calib_score"] / valid_results["calib_score"].min())
+            + 0.1 * (valid_results["mean_pred_std"] / valid_results["mean_pred_std"].min())
         )
 
-        best_idx = valid_results['composite_score'].idxmin()
+        best_idx = valid_results["composite_score"].idxmin()
         best = valid_results.loc[best_idx]
 
         logger.info(f"BEST CONFIGURATION (Config #{int(best['config_num'])}):")
@@ -290,9 +288,11 @@ def grid_search():
         logger.info(f"  Calibration: {best['calibration']:.1%}")
         logger.info(f"\n✓ Grid search results saved to: {results_path}")
 
-        logger.info(f"\nNEXT STEP: Retrain best model with NUTS for production")
-        logger.info(f"  python py/models/train_bnn_passing_nuts.py --prior-scale {best['prior_scale']} " +
-                   f"--hidden-dims {best['hidden_dims']}")
+        logger.info("\nNEXT STEP: Retrain best model with NUTS for production")
+        logger.info(
+            f"  python py/models/train_bnn_passing_nuts.py --prior-scale {best['prior_scale']} "
+            + f"--hidden-dims {best['hidden_dims']}"
+        )
     else:
         logger.error("✗ No valid results from grid search!")
 

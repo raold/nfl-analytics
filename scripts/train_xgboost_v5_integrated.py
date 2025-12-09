@@ -27,21 +27,17 @@ import pandas as pd
 import psycopg2
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
 
 # Add project root to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from py.features.enhanced_travel_features import EnhancedTravelFeatures
 from py.features.causal_features_v1 import CausalFeaturesV1
-from py.features.player_aggregation_features import (
-    aggregate_player_projections_multi_season
-)
+from py.features.enhanced_travel_features import EnhancedTravelFeatures
 from py.features.oc_features import OCFeatureGenerator
+from py.features.player_aggregation_features import aggregate_player_projections_multi_season
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -88,13 +84,15 @@ class XGBoostV5Integrated:
         # Initialize feature calculators
         self.travel_features = EnhancedTravelFeatures()
         self.causal_features = CausalFeaturesV1(self.db_config)
-        self.oc_features = OCFeatureGenerator(db_config={
-            'host': self.db_config['host'],
-            'port': self.db_config['port'],
-            'database': self.db_config['dbname'],
-            'user': self.db_config['user'],
-            'password': self.db_config['password']
-        })
+        self.oc_features = OCFeatureGenerator(
+            db_config={
+                "host": self.db_config["host"],
+                "port": self.db_config["port"],
+                "database": self.db_config["dbname"],
+                "user": self.db_config["user"],
+                "password": self.db_config["password"],
+            }
+        )
 
         logger.info(f"Initialized XGBoostV5Integrated({start_season}-{end_season})")
 
@@ -179,35 +177,30 @@ class XGBoostV5Integrated:
         agg_features = aggregate_player_projections_multi_season(
             seasons=[2022, 2023, 2024],  # Only seasons with R model predictions
             weeks=list(range(1, 19)),  # Weeks 1-18
-            model_names=['state_space_v2', 'hierarchical_v2', 'informative_priors_v2'],
-            db_host=self.db_config['host'],
-            db_port=self.db_config['port'],
-            db_name=self.db_config['dbname'],
-            db_user=self.db_config['user'],
-            db_password=self.db_config['password']
+            model_names=["state_space_v2", "hierarchical_v2", "informative_priors_v2"],
+            db_host=self.db_config["host"],
+            db_port=self.db_config["port"],
+            db_name=self.db_config["dbname"],
+            db_user=self.db_config["user"],
+            db_password=self.db_config["password"],
         )
 
         # Merge with QB data on game_id
-        df_with_agg = df.merge(
-            agg_features,
-            on='game_id',
-            how='left',
-            suffixes=('', '_agg')
-        )
+        df_with_agg = df.merge(agg_features, on="game_id", how="left", suffixes=("", "_agg"))
 
         # Drop duplicate season/week columns from merge
         df_with_agg = df_with_agg.drop(
-            columns=[col for col in df_with_agg.columns if col.endswith('_agg')]
+            columns=[col for col in df_with_agg.columns if col.endswith("_agg")]
         )
 
-        track_a_count = len([c for c in agg_features.columns if c.startswith(('home_', 'away_'))])
+        track_a_count = len([c for c in agg_features.columns if c.startswith(("home_", "away_"))])
         logger.info(f"   ✓ Added {track_a_count} aggregation features")
         logger.info(f"   Shape after Track A: {df_with_agg.shape}")
 
         # Track C1: Enhanced Travel Features (12 features)
         logger.info("\n2. Track C1: Enhanced Travel Features...")
         df_with_travel = self.travel_features.calculate_all_features(df_with_agg)
-        logger.info(f"   ✓ Added travel features (asymmetric jet lag, body clock, altitude)")
+        logger.info("   ✓ Added travel features (asymmetric jet lag, body clock, altitude)")
         logger.info(f"   Shape after travel: {df_with_travel.shape}")
 
         # Track C2: Causal Features (8 features: DiD + PSM + 5 weather)
@@ -216,38 +209,38 @@ class XGBoostV5Integrated:
         for _, row in df_with_travel.iterrows():
             # Build weather dict from row if available
             game_weather = None
-            if 'temp' in row and pd.notna(row['temp']):
+            if "temp" in row and pd.notna(row["temp"]):
                 game_weather = {
-                    'temp': row['temp'],
-                    'wind': row.get('wind', 5.0),
-                    'precipitation': row.get('precipitation', 0)
+                    "temp": row["temp"],
+                    "wind": row.get("wind", 5.0),
+                    "precipitation": row.get("precipitation", 0),
                 }
 
             # Calculate causal features
             causal_feat = self.causal_features.calculate_features(
-                player_id=row['player_id'],
-                season=row['season'],
-                week=row['week'],
-                opponent_team=row['opponent'],
-                player_team=row['team'],
-                game_weather=game_weather
+                player_id=row["player_id"],
+                season=row["season"],
+                week=row["week"],
+                opponent_team=row["opponent"],
+                player_team=row["team"],
+                game_weather=game_weather,
             )
             causal_features_list.append(causal_feat)
 
         # Merge causal features
         causal_df = pd.DataFrame(causal_features_list)
         df_with_causal = pd.concat([df_with_travel, causal_df], axis=1)
-        logger.info(f"   ✓ Added causal + weather features")
+        logger.info("   ✓ Added causal + weather features")
         logger.info(f"   Shape after causal: {df_with_causal.shape}")
 
         # Add rest features (if not already present)
-        if 'away_rest' not in df_with_causal.columns:
+        if "away_rest" not in df_with_causal.columns:
             logger.info("\n4. Adding rest features...")
             # Calculate rest days from kickoff timestamps (simplified)
-            df_with_causal['away_rest'] = 7  # Default 7 days (weekly games)
-            df_with_causal['home_rest'] = 7
-            df_with_causal['rest_days_difference'] = 0
-            df_with_causal['is_short_week'] = 0
+            df_with_causal["away_rest"] = 7  # Default 7 days (weekly games)
+            df_with_causal["home_rest"] = 7
+            df_with_causal["rest_days_difference"] = 0
+            df_with_causal["is_short_week"] = 0
             logger.info("   ⚠️  Using default rest values (7 days)")
 
         # Track D: OC Coaching Features (4 features)
@@ -255,24 +248,26 @@ class XGBoostV5Integrated:
         oc_features_list = []
         for _, row in df_with_causal.iterrows():
             try:
-                team = row['team']
-                season = int(row['season'])
-                week = int(row['week'])
+                team = row["team"]
+                season = int(row["season"])
+                week = int(row["week"])
                 oc_feat = self.oc_features.get_features(team, season, week)
                 oc_features_list.append(oc_feat)
-            except Exception as e:
+            except Exception:
                 # Fallback to defaults if coaching data not available
-                oc_features_list.append({
-                    'oc_continuity': 0,
-                    'games_with_oc': max(0, int(row['week']) - 1),
-                    'oc_tenure_seasons': 1,
-                    'new_oc_adjustment': 0.4  # Neutral default
-                })
+                oc_features_list.append(
+                    {
+                        "oc_continuity": 0,
+                        "games_with_oc": max(0, int(row["week"]) - 1),
+                        "oc_tenure_seasons": 1,
+                        "new_oc_adjustment": 0.4,  # Neutral default
+                    }
+                )
 
         # Merge OC features
         oc_df = pd.DataFrame(oc_features_list)
         df_with_oc = pd.concat([df_with_causal.reset_index(drop=True), oc_df], axis=1)
-        logger.info(f"   ✓ Added 4 OC coaching features")
+        logger.info("   ✓ Added 4 OC coaching features")
         logger.info(f"   Shape after OC features: {df_with_oc.shape}")
 
         logger.info(f"\n✓ Feature engineering complete: {df_with_oc.shape[1]} total columns")
@@ -288,51 +283,69 @@ class XGBoostV5Integrated:
         """
         # Core QB stats (baseline features)
         core_features = [
-            'attempts', 'completions', 'passing_tds', 'interceptions',
-            'yards_per_completion', 'avg_air_yards'
+            "attempts",
+            "completions",
+            "passing_tds",
+            "interceptions",
+            "yards_per_completion",
+            "avg_air_yards",
         ]
 
         # Track A: Player aggregation features (Bayesian projection aggregations)
         # These have names like: home_state_space_v2_proj_total_mean, away_hierarchical_v2_proj_gini
         # Pattern: (home|away)_(model_name)_proj_(stat)
         agg_features = [
-            col for col in df.columns
-            if ('_proj_' in col and col.startswith(('home_', 'away_'))
-                and col != 'projections')  # Exclude the 'projections' field itself
+            col
+            for col in df.columns
+            if (
+                "_proj_" in col and col.startswith(("home_", "away_")) and col != "projections"
+            )  # Exclude the 'projections' field itself
         ]
 
         # Track C1: Travel features
         travel_features = [
-            'travel_distance', 'timezone_shift',
-            'is_westbound_travel', 'is_eastbound_travel',
-            'jet_lag_penalty', 'body_clock_hour', 'circadian_penalty',
-            'is_international', 'is_mexico_city_game',
-            'altitude_shock', 'altitude_penalty',
-            'is_thursday_night', 'tnf_home_advantage',
-            'total_travel_penalty'
+            "travel_distance",
+            "timezone_shift",
+            "is_westbound_travel",
+            "is_eastbound_travel",
+            "jet_lag_penalty",
+            "body_clock_hour",
+            "circadian_penalty",
+            "is_international",
+            "is_mexico_city_game",
+            "altitude_shock",
+            "altitude_penalty",
+            "is_thursday_night",
+            "tnf_home_advantage",
+            "total_travel_penalty",
         ]
 
         # Track C2: Causal + Weather features
         causal_features = [
-            'did_roughing_yards', 'psm_travel_yards', 'psm_weather_yards',
-            'temp_numeric', 'wind_numeric',
-            'is_bad_weather', 'is_cold_weather', 'is_high_wind'
+            "did_roughing_yards",
+            "psm_travel_yards",
+            "psm_weather_yards",
+            "temp_numeric",
+            "wind_numeric",
+            "is_bad_weather",
+            "is_cold_weather",
+            "is_high_wind",
         ]
 
         # Rest features
-        rest_features = ['away_rest', 'home_rest', 'rest_days_difference', 'is_short_week']
+        rest_features = ["away_rest", "home_rest", "rest_days_difference", "is_short_week"]
 
         # Track D: OC Coaching Features
-        oc_features = ['oc_continuity', 'games_with_oc', 'oc_tenure_seasons', 'new_oc_adjustment']
+        oc_features = ["oc_continuity", "games_with_oc", "oc_tenure_seasons", "new_oc_adjustment"]
 
         # Combine all features (filter for existence)
         all_features = (
-            core_features +
-            [f for f in agg_features if f in df.columns] +
-            [f for f in travel_features if f in df.columns] +
-            [f for f in causal_features if f in df.columns] +
-            [f for f in rest_features if f in df.columns] +
-            [f for f in oc_features if f in df.columns]
+            core_features
+            + [f for f in agg_features if f in df.columns]
+            + [f for f in travel_features if f in df.columns]
+            + [f for f in causal_features if f in df.columns]
+            + [f for f in rest_features if f in df.columns]
+            + [f for f in oc_features if f in df.columns]
         )
 
         # Remove duplicates, preserve order
@@ -342,18 +355,16 @@ class XGBoostV5Integrated:
         logger.info(f"  Core stats: {len(core_features)}")
         logger.info(f"  Track A aggregation: {len([f for f in agg_features if f in df.columns])}")
         logger.info(f"  Track C1 travel: {len([f for f in travel_features if f in df.columns])}")
-        logger.info(f"  Track C2 causal+weather: {len([f for f in causal_features if f in df.columns])}")
+        logger.info(
+            f"  Track C2 causal+weather: {len([f for f in causal_features if f in df.columns])}"
+        )
         logger.info(f"  Rest features: {len([f for f in rest_features if f in df.columns])}")
         logger.info(f"  Track D OC coaching: {len([f for f in oc_features if f in df.columns])}")
 
         return feature_cols
 
     def train_model(
-        self,
-        X_train: pd.DataFrame,
-        y_train: pd.Series,
-        X_test: pd.DataFrame,
-        y_test: pd.Series
+        self, X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.DataFrame, y_test: pd.Series
     ) -> xgb.XGBRegressor:
         """
         Train XGBoost with optimized hyperparameters.
@@ -371,44 +382,39 @@ class XGBoostV5Integrated:
 
         # Optimized hyperparameters (from Track A tuning)
         params = {
-            'objective': 'reg:squarederror',
-            'max_depth': 6,
-            'learning_rate': 0.05,
-            'n_estimators': 500,
-            'subsample': 0.8,
-            'colsample_bytree': 0.8,
-            'min_child_weight': 3,
-            'gamma': 0.1,
-            'reg_alpha': 0.1,
-            'reg_lambda': 1.0,
-            'random_state': 42,
-            'n_jobs': -1,
-            'eval_metric': 'mae',  # Moved from fit() to constructor
+            "objective": "reg:squarederror",
+            "max_depth": 6,
+            "learning_rate": 0.05,
+            "n_estimators": 500,
+            "subsample": 0.8,
+            "colsample_bytree": 0.8,
+            "min_child_weight": 3,
+            "gamma": 0.1,
+            "reg_alpha": 0.1,
+            "reg_lambda": 1.0,
+            "random_state": 42,
+            "n_jobs": -1,
+            "eval_metric": "mae",  # Moved from fit() to constructor
         }
 
         logger.info(f"Training with {len(X_train)} samples...")
         logger.info(f"  Features: {X_train.shape[1]}")
-        logger.info(f"  Hyperparameters: max_depth={params['max_depth']}, lr={params['learning_rate']}")
+        logger.info(
+            f"  Hyperparameters: max_depth={params['max_depth']}, lr={params['learning_rate']}"
+        )
 
         # Train model
         model = xgb.XGBRegressor(**params)
 
         eval_set = [(X_train, y_train), (X_test, y_test)]
-        model.fit(
-            X_train, y_train,
-            eval_set=eval_set,
-            verbose=50
-        )
+        model.fit(X_train, y_train, eval_set=eval_set, verbose=50)
 
         logger.info("\n✓ Training complete")
 
         return model
 
     def evaluate_model(
-        self,
-        model: xgb.XGBRegressor,
-        X_test: pd.DataFrame,
-        y_test: pd.Series
+        self, model: xgb.XGBRegressor, X_test: pd.DataFrame, y_test: pd.Series
     ) -> dict:
         """
         Evaluate model performance on test set.
@@ -433,12 +439,12 @@ class XGBoostV5Integrated:
         improvement = ((baseline_mae - mae) / baseline_mae) * 100
 
         metrics = {
-            'mae': mae,
-            'rmse': rmse,
-            'r2': r2,
-            'baseline_mae': baseline_mae,
-            'improvement_pct': improvement,
-            'n_test': len(y_test)
+            "mae": mae,
+            "rmse": rmse,
+            "r2": r2,
+            "baseline_mae": baseline_mae,
+            "improvement_pct": improvement,
+            "n_test": len(y_test),
         }
 
         logger.info(f"\nTest Set Performance (n={len(y_test)}):")
@@ -449,10 +455,9 @@ class XGBoostV5Integrated:
         logger.info(f"  Improvement: {improvement:.1f}%")
 
         # Feature importance (top 15)
-        feature_importance = pd.DataFrame({
-            'feature': X_test.columns,
-            'importance': model.feature_importances_
-        }).sort_values('importance', ascending=False)
+        feature_importance = pd.DataFrame(
+            {"feature": X_test.columns, "importance": model.feature_importances_}
+        ).sort_values("importance", ascending=False)
 
         logger.info("\nTop 15 Features:")
         for idx, row in feature_importance.head(15).iterrows():
@@ -465,7 +470,7 @@ class XGBoostV5Integrated:
         model: xgb.XGBRegressor,
         metrics: dict,
         feature_cols: list,
-        filepath: str = "models/xgboost/xgboost_v5_integrated.json"
+        filepath: str = "models/xgboost/xgboost_v5_integrated.json",
     ):
         """Save trained model and metadata."""
         logger.info(f"\nSaving model to {filepath}...")
@@ -476,27 +481,30 @@ class XGBoostV5Integrated:
 
         # Save metadata
         metadata = {
-            'model_version': 'v5_integrated',
-            'training_date': datetime.now().isoformat(),
-            'features': feature_cols,
-            'n_features': len(feature_cols),
-            'metrics': {k: float(v) if isinstance(v, (int, float, np.number)) else v
-                       for k, v in metrics.items()},
-            'hyperparameters': {
-                'max_depth': int(model.max_depth),
-                'learning_rate': float(model.learning_rate),
-                'n_estimators': int(model.n_estimators)
+            "model_version": "v5_integrated",
+            "training_date": datetime.now().isoformat(),
+            "features": feature_cols,
+            "n_features": len(feature_cols),
+            "metrics": {
+                k: float(v) if isinstance(v, (int, float, np.number)) else v
+                for k, v in metrics.items()
             },
-            'data_range': {
-                'start_season': self.start_season,
-                'end_season': self.end_season,
-                'test_season': self.test_season
-            }
+            "hyperparameters": {
+                "max_depth": int(model.max_depth),
+                "learning_rate": float(model.learning_rate),
+                "n_estimators": int(model.n_estimators),
+            },
+            "data_range": {
+                "start_season": self.start_season,
+                "end_season": self.end_season,
+                "test_season": self.test_season,
+            },
         }
 
         import json
-        metadata_path = filepath.replace('.json', '_metadata.json')
-        with open(metadata_path, 'w') as f:
+
+        metadata_path = filepath.replace(".json", "_metadata.json")
+        with open(metadata_path, "w") as f:
             json.dump(metadata, f, indent=2)
 
         logger.info(f"  ✓ Model saved: {filepath}")
@@ -511,11 +519,7 @@ def main():
     logger.info(f"Started: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     # Initialize trainer
-    trainer = XGBoostV5Integrated(
-        start_season=2020,
-        end_season=2024,
-        test_season=2024
-    )
+    trainer = XGBoostV5Integrated(start_season=2020, end_season=2024, test_season=2024)
 
     # Load data
     df = trainer.load_data()
@@ -527,15 +531,15 @@ def main():
     feature_cols = trainer.select_feature_columns(df_features)
 
     # Prepare train/test split (temporal)
-    train_mask = df_features['season'] < 2024
-    test_mask = df_features['season'] == 2024
+    train_mask = df_features["season"] < 2024
+    test_mask = df_features["season"] == 2024
 
     X_train = df_features.loc[train_mask, feature_cols]
-    y_train = df_features.loc[train_mask, 'passing_yards']
+    y_train = df_features.loc[train_mask, "passing_yards"]
     X_test = df_features.loc[test_mask, feature_cols]
-    y_test = df_features.loc[test_mask, 'passing_yards']
+    y_test = df_features.loc[test_mask, "passing_yards"]
 
-    logger.info(f"\nTrain/Test Split:")
+    logger.info("\nTrain/Test Split:")
     logger.info(f"  Training: {len(X_train)} samples (2020-2023)")
     logger.info(f"  Test: {len(X_test)} samples (2024)")
 

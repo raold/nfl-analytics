@@ -27,18 +27,17 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 15, 2025
 """
 
-import pytest
-import psycopg2
-from psycopg2.extras import RealDictCursor
-import pandas as pd
-import numpy as np
-from pathlib import Path
-import time
-import pickle
 import logging
-from typing import Dict, List, Optional, Tuple
-from unittest.mock import Mock, patch, MagicMock
+import pickle
 import sys
+import time
+from pathlib import Path
+from unittest.mock import Mock, patch
+
+import numpy as np
+import psycopg2
+import pytest
+from psycopg2.extras import RealDictCursor
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
@@ -51,7 +50,7 @@ DB_CONFIG = {
     "port": 5544,
     "dbname": "devdb01",
     "user": "dro",
-    "password": "sicillionbillions"  # pragma: allowlist secret
+    "password": "sicillionbillions",  # pragma: allowlist secret
 }
 
 
@@ -88,7 +87,9 @@ def ensemble_v5():
     """Load Ensemble v5.1 (baseline) for comparison tests."""
     try:
         import os
+
         from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+
         return EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
     except Exception as e:
         logger.warning(f"Could not load Ensemble v5: {e}")
@@ -110,6 +111,7 @@ def xgboost_v4_model():
 # 1. XGBoost v4 Ridge Residuals Integration Tests
 # ============================================================================
 
+
 @pytest.mark.integration
 @pytest.mark.critical
 class TestXGBoostV4Integration:
@@ -124,9 +126,12 @@ class TestXGBoostV4Integration:
     def test_xgb_v4_feature_names(self, xgboost_v4_model):
         """Verify XGBoost v4 expects correct features including residual_feature."""
         expected_features = [
-            "passing_attempts_L1", "passing_yards_L1", "passing_tds_L1",
-            "opponent_passing_yards_allowed_L3", "home_indicator",
-            "residual_feature"  # CRITICAL: Ridge residual from static XGB
+            "passing_attempts_L1",
+            "passing_yards_L1",
+            "passing_tds_L1",
+            "opponent_passing_yards_allowed_L3",
+            "home_indicator",
+            "residual_feature",  # CRITICAL: Ridge residual from static XGB
         ]
 
         if hasattr(xgboost_v4_model, "feature_names"):
@@ -183,17 +188,20 @@ class TestXGBoostV4Integration:
         X_batch = np.random.rand(100, n_features)  # Batch of 100 predictions
 
         start_time = time.time()
-        predictions = xgboost_v4_model.predict(X_batch)
+        xgboost_v4_model.predict(X_batch)
         elapsed = time.time() - start_time
 
         time_per_prediction_ms = (elapsed / 100) * 1000
-        assert time_per_prediction_ms < 100, f"Too slow: {time_per_prediction_ms:.2f}ms per prediction"
+        assert (
+            time_per_prediction_ms < 100
+        ), f"Too slow: {time_per_prediction_ms:.2f}ms per prediction"
         logger.info(f"✅ XGBoost v4 speed: {time_per_prediction_ms:.2f}ms per prediction")
 
 
 # ============================================================================
 # 2. Ensemble Aggregation Logic Tests
 # ============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.critical
@@ -206,7 +214,7 @@ class TestEnsembleAggregation:
             "state_space_v2": 0.30,
             "hierarchical_v2": 0.30,
             "xgboost_v4": 0.25,
-            "informative_priors_v2": 0.15
+            "informative_priors_v2": 0.15,
         }
 
         total = sum(weights_4way.values())
@@ -219,17 +227,17 @@ class TestEnsembleAggregation:
             "state_space_v2": 280.0,
             "hierarchical_v2": 275.0,
             "xgboost_v4": 265.0,
-            "informative_priors_v2": 270.0
+            "informative_priors_v2": 270.0,
         }
         weights = {
             "state_space_v2": 0.30,
             "hierarchical_v2": 0.30,
             "xgboost_v4": 0.25,
-            "informative_priors_v2": 0.15
+            "informative_priors_v2": 0.15,
         }
 
         weighted_mean = sum(predictions[k] * weights[k] for k in predictions.keys())
-        expected = (280*0.30 + 275*0.30 + 265*0.25 + 270*0.15)
+        expected = 280 * 0.30 + 275 * 0.30 + 265 * 0.25 + 270 * 0.15
 
         assert abs(weighted_mean - expected) < 1e-6
         logger.info(f"✅ Weighted mean: {weighted_mean:.2f} yards (expected: {expected:.2f})")
@@ -241,17 +249,18 @@ class TestEnsembleAggregation:
             "state_space_v2": {"mean": 280.0, "std": 15.0},
             "hierarchical_v2": {"mean": 275.0, "std": 12.0},
             "xgboost_v4": {"mean": 265.0, "std": 18.0},
-            "informative_priors_v2": {"mean": 270.0, "std": 20.0}
+            "informative_priors_v2": {"mean": 270.0, "std": 20.0},
         }
 
         # Weighted variance
-        weights = {"state_space_v2": 0.30, "hierarchical_v2": 0.30,
-                   "xgboost_v4": 0.25, "informative_priors_v2": 0.15}
+        weights = {
+            "state_space_v2": 0.30,
+            "hierarchical_v2": 0.30,
+            "xgboost_v4": 0.25,
+            "informative_priors_v2": 0.15,
+        }
 
-        weighted_variance = sum(
-            weights[k] * (components[k]["std"] ** 2)
-            for k in components.keys()
-        )
+        weighted_variance = sum(weights[k] * (components[k]["std"] ** 2) for k in components.keys())
         ensemble_std = np.sqrt(weighted_variance)
 
         assert ensemble_std > 0
@@ -268,9 +277,7 @@ class TestEnsembleAggregation:
             # Ensemble should still return valid prediction (fallback logic)
             try:
                 result = ensemble_v5.predict(
-                    player_id="00-0019596",  # Patrick Mahomes
-                    season=2024,
-                    week=10
+                    player_id="00-0019596", season=2024, week=10  # Patrick Mahomes
                 )
                 assert result is not None
                 assert "ensemble_mean" in result
@@ -283,6 +290,7 @@ class TestEnsembleAggregation:
 # ============================================================================
 # 3. Temperature Scaling v6 Tests
 # ============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.critical
@@ -354,6 +362,7 @@ class TestTemperatureScalingV6:
 # 4. Component Failure Handling Tests
 # ============================================================================
 
+
 @pytest.mark.integration
 @pytest.mark.critical
 class TestComponentFailureHandling:
@@ -365,14 +374,14 @@ class TestComponentFailureHandling:
             pytest.skip("Ensemble v5 not available")
 
         # Simulate R model failure
-        with patch.object(ensemble_v5, "_predict_state_space_v2", side_effect=Exception("rpy2 failure")):
-            with patch.object(ensemble_v5, "_predict_hierarchical_v2", side_effect=Exception("rpy2 failure")):
+        with patch.object(
+            ensemble_v5, "_predict_state_space_v2", side_effect=Exception("rpy2 failure")
+        ):
+            with patch.object(
+                ensemble_v5, "_predict_hierarchical_v2", side_effect=Exception("rpy2 failure")
+            ):
                 try:
-                    result = ensemble_v5.predict(
-                        player_id="00-0019596",
-                        season=2024,
-                        week=10
-                    )
+                    result = ensemble_v5.predict(player_id="00-0019596", season=2024, week=10)
                     # Should fall back to Python models only
                     assert result is not None
                     logger.info("✅ Ensemble falls back to Python models when R fails")
@@ -386,11 +395,7 @@ class TestComponentFailureHandling:
 
         with patch.object(ensemble_v5, "_predict_xgboost_v2", return_value=None):
             try:
-                result = ensemble_v5.predict(
-                    player_id="00-0019596",
-                    season=2024,
-                    week=10
-                )
+                result = ensemble_v5.predict(player_id="00-0019596", season=2024, week=10)
                 assert result is not None
                 logger.info("✅ Ensemble handles XGBoost failure")
             except Exception as e:
@@ -402,8 +407,10 @@ class TestComponentFailureHandling:
         with patch("psycopg2.connect", side_effect=Exception("Database unavailable")):
             try:
                 import os
+
                 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
-                ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
+
+                EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
                 # Should fail gracefully with informative error
                 assert True  # If we get here, error handling worked
             except Exception as e:
@@ -431,11 +438,7 @@ class TestComponentFailureHandling:
 
         if player:
             try:
-                result = ensemble_v5.predict(
-                    player_id=player["player_id"],
-                    season=2024,
-                    week=1
-                )
+                result = ensemble_v5.predict(player_id=player["player_id"], season=2024, week=1)
                 # Should fall back to league averages or prior models
                 assert result is not None
                 logger.info(f"✅ Handles missing data for {player['player_name']}")
@@ -447,6 +450,7 @@ class TestComponentFailureHandling:
 # 5. Prediction Consistency Tests
 # ============================================================================
 
+
 @pytest.mark.integration
 class TestPredictionConsistency:
     """Test prediction determinism and consistency."""
@@ -457,16 +461,8 @@ class TestPredictionConsistency:
             pytest.skip("Ensemble v5 not available")
 
         # Make same prediction twice
-        result1 = ensemble_v5.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10
-        )
-        result2 = ensemble_v5.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10
-        )
+        result1 = ensemble_v5.predict(player_id="00-0019596", season=2024, week=10)
+        result2 = ensemble_v5.predict(player_id="00-0019596", season=2024, week=10)
 
         if result1 and result2:
             assert abs(result1["ensemble_mean"] - result2["ensemble_mean"]) < 0.01
@@ -478,11 +474,7 @@ class TestPredictionConsistency:
             pytest.skip("Dependencies not available")
 
         for player in sample_player_data[:3]:  # Test 3 players
-            result = ensemble_v5.predict(
-                player_id=player["player_id"],
-                season=2024,
-                week=10
-            )
+            result = ensemble_v5.predict(player_id=player["player_id"], season=2024, week=10)
 
             if result:
                 pred_mean = result["ensemble_mean"]
@@ -495,11 +487,7 @@ class TestPredictionConsistency:
             pytest.skip("Dependencies not available")
 
         for player in sample_player_data[:3]:
-            result = ensemble_v5.predict(
-                player_id=player["player_id"],
-                season=2024,
-                week=10
-            )
+            result = ensemble_v5.predict(player_id=player["player_id"], season=2024, week=10)
 
             if result and "ensemble_std" in result:
                 assert result["ensemble_std"] > 0, "Uncertainty must be positive"
@@ -509,6 +497,7 @@ class TestPredictionConsistency:
 # ============================================================================
 # 6. Performance Benchmarks
 # ============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.slow
@@ -521,11 +510,7 @@ class TestPerformanceBenchmarks:
             pytest.skip("Ensemble v5 not available")
 
         start_time = time.time()
-        result = ensemble_v5.predict(
-            player_id="00-0019596",
-            season=2024,
-            week=10
-        )
+        ensemble_v5.predict(player_id="00-0019596", season=2024, week=10)
         elapsed_ms = (time.time() - start_time) * 1000
 
         assert elapsed_ms < 500, f"Too slow: {elapsed_ms:.2f}ms"
@@ -540,11 +525,7 @@ class TestPerformanceBenchmarks:
         start_time = time.time()
 
         for player in sample_player_data:
-            ensemble_v5.predict(
-                player_id=player["player_id"],
-                season=2024,
-                week=10
-            )
+            ensemble_v5.predict(player_id=player["player_id"], season=2024, week=10)
 
         elapsed = time.time() - start_time
         throughput = n_predictions / elapsed
@@ -556,6 +537,7 @@ class TestPerformanceBenchmarks:
 # ============================================================================
 # 7. Risk Gate Enforcement Tests
 # ============================================================================
+
 
 @pytest.mark.integration
 @pytest.mark.critical
@@ -593,7 +575,7 @@ class TestRiskGateEnforcement:
         # Simulated betting results
         wins = 60
         losses = 40
-        win_rate = wins / (wins + losses)
+        wins / (wins + losses)
         avg_win = 100
         avg_loss = 110  # With -110 juice
 
@@ -606,11 +588,14 @@ class TestRiskGateEnforcement:
 # 8. Extracted Integration Tests from v7 (General Ensemble Tests)
 # ============================================================================
 
+
 @pytest.fixture
 def ensemble_v6_with_mocks():
     """Create v6 ensemble with all components mocked (extracted from v7)."""
-    with patch("py.ensemble.enhanced_ensemble_v6_production.RModelInterface") as mock_r, \
-         patch("py.ensemble.enhanced_ensemble_v6_production.HybridStaticIncrementalXGBoost"):
+    with (
+        patch("py.ensemble.enhanced_ensemble_v6_production.RModelInterface"),
+        patch("py.ensemble.enhanced_ensemble_v6_production.HybridStaticIncrementalXGBoost"),
+    ):
 
         from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
@@ -630,15 +615,17 @@ def ensemble_v6_with_mocks():
         ensemble._predict_hybrid = Mock(return_value=(250.0, 51.0))
 
         # Mock database feature fetch
-        ensemble._fetch_features = Mock(return_value={
-            "pass_yards_l3": 250.0,
-            "pass_attempts_l3": 35.0,
-            "completions_l3": 24.0,
-            "completions_pct_l3": 0.686,
-            "opponent_epa": -0.05,
-            "opponent_points_allowed": 20.0,
-            "home_away_encoded": 1,
-        })
+        ensemble._fetch_features = Mock(
+            return_value={
+                "pass_yards_l3": 250.0,
+                "pass_attempts_l3": 35.0,
+                "completions_l3": 24.0,
+                "completions_pct_l3": 0.686,
+                "opponent_epa": -0.05,
+                "opponent_points_allowed": 20.0,
+                "home_away_encoded": 1,
+            }
+        )
 
         return ensemble
 
@@ -658,7 +645,9 @@ def mahomes_2024_week10():
 class TestEnsembleE2EPrediction:
     """Test full prediction pipeline (extracted from v7)."""
 
-    def test_all_5_components_generate_predictions(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+    def test_all_5_components_generate_predictions(
+        self, ensemble_v6_with_mocks, mahomes_2024_week10
+    ):
         """All 5 components should generate valid predictions."""
         result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
 
@@ -671,8 +660,9 @@ class TestEnsembleE2EPrediction:
         result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
         ensemble_mean = result["ensemble_mean"]
 
-        assert 180 <= ensemble_mean <= 350, \
-            f"Ensemble mean {ensemble_mean:.1f} outside reasonable range"
+        assert (
+            180 <= ensemble_mean <= 350
+        ), f"Ensemble mean {ensemble_mean:.1f} outside reasonable range"
 
     def test_ensemble_mean_not_placeholder(self, ensemble_v6_with_mocks, mahomes_2024_week10):
         """Ensemble mean should NOT be placeholder (250 yards)."""
@@ -694,7 +684,9 @@ class TestEnsembleE2EPrediction:
 class TestComponentDiversityExtracted:
     """Test component diversity and aggregation (extracted from v7)."""
 
-    def test_component_diversity_threshold_5_yards(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+    def test_component_diversity_threshold_5_yards(
+        self, ensemble_v6_with_mocks, mahomes_2024_week10
+    ):
         """Components should have ≥5 yards standard deviation."""
         # Get component predictions
         predictions = [
@@ -726,8 +718,9 @@ class TestComponentDiversityExtracted:
         actual_mean = result["ensemble_mean"]
 
         # Allow small difference due to floating point
-        assert abs(actual_mean - expected_mean) < 1.0, \
-            f"Weighted average {actual_mean:.2f} ≠ expected {expected_mean:.2f}"
+        assert (
+            abs(actual_mean - expected_mean) < 1.0
+        ), f"Weighted average {actual_mean:.2f} ≠ expected {expected_mean:.2f}"
 
     def test_uncertainty_pooling(self, ensemble_v6_with_mocks, mahomes_2024_week10):
         """Ensemble should pool uncertainty correctly."""
@@ -746,10 +739,14 @@ class TestTemperatureScalingExtracted:
     def test_temperature_scaling_applied(self, ensemble_v6_with_mocks):
         """Temperature scaling should be applied to predictions."""
         # Check that temperature parameter exists
-        assert hasattr(ensemble_v6_with_mocks, 'temperature') or \
-               ensemble_v6_with_mocks.temperature_path is not None
+        assert (
+            hasattr(ensemble_v6_with_mocks, "temperature")
+            or ensemble_v6_with_mocks.temperature_path is not None
+        )
 
-    def test_prediction_intervals_use_calibrated_std(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+    def test_prediction_intervals_use_calibrated_std(
+        self, ensemble_v6_with_mocks, mahomes_2024_week10
+    ):
         """Prediction intervals should use calibrated uncertainty."""
         result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
 
@@ -768,7 +765,9 @@ class TestTemperatureScalingExtracted:
 class TestComponentFailureHandlingExtracted:
     """Test graceful degradation with component failures (extracted from v7)."""
 
-    def test_ensemble_handles_one_component_failure(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+    def test_ensemble_handles_one_component_failure(
+        self, ensemble_v6_with_mocks, mahomes_2024_week10
+    ):
         """Ensemble should work with 4/5 components."""
         # Simulate one component failure
         ensemble_v6_with_mocks._predict_hybrid = Mock(return_value=(None, None))
@@ -779,7 +778,9 @@ class TestComponentFailureHandlingExtracted:
         assert result is not None
         assert "ensemble_mean" in result
 
-    def test_ensemble_handles_two_component_failures(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+    def test_ensemble_handles_two_component_failures(
+        self, ensemble_v6_with_mocks, mahomes_2024_week10
+    ):
         """Ensemble should work with 3/5 components (minimum)."""
         # Simulate two component failures
         ensemble_v6_with_mocks._predict_hybrid = Mock(return_value=(None, None))
@@ -791,7 +792,9 @@ class TestComponentFailureHandlingExtracted:
         assert result is not None
         assert "ensemble_mean" in result
 
-    def test_ensemble_fails_with_three_component_failures(self, ensemble_v6_with_mocks, mahomes_2024_week10):
+    def test_ensemble_fails_with_three_component_failures(
+        self, ensemble_v6_with_mocks, mahomes_2024_week10
+    ):
         """Ensemble should fail gracefully with <3 components."""
         # Simulate three component failures
         ensemble_v6_with_mocks._predict_hybrid = Mock(return_value=(None, None))
@@ -823,8 +826,7 @@ class TestPredictionOutputStructureExtracted:
         for key in ["ensemble_mean", "ensemble_std"]:
             if key in result:
                 value = result[key]
-                assert isinstance(value, (int, float)), \
-                    f"{key} is not numeric: {type(value)}"
+                assert isinstance(value, (int, float)), f"{key} is not numeric: {type(value)}"
                 assert not np.isnan(value), f"{key} is NaN"
 
     def test_weights_sum_to_one(self, ensemble_v6_with_mocks):
@@ -832,13 +834,12 @@ class TestPredictionOutputStructureExtracted:
         weights = ensemble_v6_with_mocks.weights
         weight_sum = sum(weights.values())
 
-        assert abs(weight_sum - 1.0) < 1e-6, \
-            f"Weights sum to {weight_sum:.6f}, expected 1.0"
+        assert abs(weight_sum - 1.0) < 1e-6, f"Weights sum to {weight_sum:.6f}, expected 1.0"
 
     def test_prediction_time_is_reasonable(self, ensemble_v6_with_mocks, mahomes_2024_week10):
         """Prediction should complete in reasonable time (<5s)."""
         start = time.time()
-        result = ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
+        ensemble_v6_with_mocks.predict(**mahomes_2024_week10)
         elapsed = time.time() - start
 
         assert elapsed < 5.0, f"Prediction took {elapsed:.2f}s (max 5.0s)"

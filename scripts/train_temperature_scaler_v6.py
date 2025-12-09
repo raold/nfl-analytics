@@ -27,41 +27,39 @@ Version: 1.0
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import os
-import logging
-import pickle
 import json
+import logging
+import os
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import pandas as pd
-from scipy import stats
-from sklearn.isotonic import IsotonicRegression
 from dotenv import load_dotenv
+from scipy import stats
 
 # Load environment variables
 load_dotenv()
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 # Optional matplotlib import (for plotting)
 try:
     import matplotlib.pyplot as plt
+
     MATPLOTLIB_AVAILABLE = True
 except ImportError:
     MATPLOTLIB_AVAILABLE = False
     logger.warning("matplotlib not available - calibration plots will be skipped")
 
 # Import ensemble and temperature scaling
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 from py.calibration.temperature_scaling import TemperatureScaler
+from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 
 class TemperatureScalerTrainerV6:
@@ -72,7 +70,7 @@ class TemperatureScalerTrainerV6:
         start_season: int = 2022,
         end_season: int = 2024,
         output_dir: str = "models/calibration",
-        results_dir: str = "analysis/results"
+        results_dir: str = "analysis/results",
     ):
         """
         Initialize temperature scaler trainer.
@@ -117,7 +115,9 @@ class TemperatureScalerTrainerV6:
         logger.info("=" * 80)
 
         # Check if predictions already exist
-        cache_path = self.results_dir / f"ensemble_v6_predictions_{self.start_season}_{self.end_season}.csv"
+        cache_path = (
+            self.results_dir / f"ensemble_v6_predictions_{self.start_season}_{self.end_season}.csv"
+        )
         if cache_path.exists():
             logger.info(f"Loading cached predictions from {cache_path}")
             df = pd.read_csv(cache_path)
@@ -132,11 +132,7 @@ class TemperatureScalerTrainerV6:
             raise ValueError("DB_PASSWORD environment variable not set")
 
         conn = psycopg2.connect(
-            host="localhost",
-            port=5544,
-            database="devdb01",
-            user="dro",
-            password=db_password
+            host="localhost", port=5544, database="devdb01", user="dro", password=db_password
         )
 
         query = """
@@ -164,12 +160,7 @@ class TemperatureScalerTrainerV6:
         """
 
         df = pd.read_sql_query(
-            query,
-            conn,
-            params={
-                'start_season': self.start_season,
-                'end_season': self.end_season
-            }
+            query, conn, params={"start_season": self.start_season, "end_season": self.end_season}
         )
         conn.close()
 
@@ -189,28 +180,30 @@ class TemperatureScalerTrainerV6:
             try:
                 # Generate ensemble prediction
                 pred = self.ensemble.predict(
-                    player_id=row['player_id'],
-                    season=row['season'],
-                    week=row['week'],
+                    player_id=row["player_id"],
+                    season=row["season"],
+                    week=row["week"],
                     return_components=False,
-                    return_uncertainty=True
+                    return_uncertainty=True,
                 )
 
-                predictions.append({
-                    'game_id': row['game_id'],
-                    'season': row['season'],
-                    'week': row['week'],
-                    'player_id': row['player_id'],
-                    'player_name': row['player_name'],
-                    'team': row['team'],
-                    'actual_yards': row['actual_yards'],
-                    'pass_attempts': row['pass_attempts'],
-                    'pred_mean': pred['ensemble_mean'],
-                    'pred_std': pred['ensemble_std'],  # UNCALIBRATED
-                    'lower_90': pred['lower_90'],
-                    'upper_90': pred['upper_90'],
-                    'inference_time_ms': pred['prediction_time_ms']
-                })
+                predictions.append(
+                    {
+                        "game_id": row["game_id"],
+                        "season": row["season"],
+                        "week": row["week"],
+                        "player_id": row["player_id"],
+                        "player_name": row["player_name"],
+                        "team": row["team"],
+                        "actual_yards": row["actual_yards"],
+                        "pass_attempts": row["pass_attempts"],
+                        "pred_mean": pred["ensemble_mean"],
+                        "pred_std": pred["ensemble_std"],  # UNCALIBRATED
+                        "lower_90": pred["lower_90"],
+                        "upper_90": pred["upper_90"],
+                        "inference_time_ms": pred["prediction_time_ms"],
+                    }
+                )
 
                 # Log progress every 100 games
                 if (idx + 1) % 100 == 0:
@@ -220,13 +213,15 @@ class TemperatureScalerTrainerV6:
                     )
 
             except Exception as e:
-                logger.warning(f"Failed to predict {row['player_name']} {row['season']} W{row['week']}: {e}")
+                logger.warning(
+                    f"Failed to predict {row['player_name']} {row['season']} W{row['week']}: {e}"
+                )
                 failed_count += 1
 
         # Convert to DataFrame
         predictions_df = pd.DataFrame(predictions)
 
-        logger.info(f"\n✅ Predictions complete!")
+        logger.info("\n✅ Predictions complete!")
         logger.info(f"  Valid predictions: {len(predictions_df)}")
         logger.info(f"  Failed predictions: {failed_count}")
 
@@ -236,7 +231,9 @@ class TemperatureScalerTrainerV6:
 
         return predictions_df
 
-    def train_temperature_scaler(self, predictions_df: pd.DataFrame) -> Tuple[TemperatureScaler, Dict]:
+    def train_temperature_scaler(
+        self, predictions_df: pd.DataFrame
+    ) -> tuple[TemperatureScaler, dict]:
         """
         Train isotonic regression temperature scaler.
 
@@ -252,13 +249,13 @@ class TemperatureScalerTrainerV6:
 
         # Prepare data for TemperatureScaler
         # Rename columns to match TemperatureScaler expectations
-        calib_df = predictions_df.rename(columns={'actual_yards': 'actual'}).copy()
+        calib_df = predictions_df.rename(columns={"actual_yards": "actual"}).copy()
 
         # Initialize temperature scaler
-        scaler = TemperatureScaler(target_coverage=0.90, method='brentq')
+        scaler = TemperatureScaler(target_coverage=0.90, method="brentq")
 
         # Fit temperature scaler
-        optimal_T = scaler.fit(calib_df)
+        scaler.fit(calib_df)
 
         # Get calibration report
         report = scaler.get_calibration_report()
@@ -268,17 +265,17 @@ class TemperatureScalerTrainerV6:
         logger.info("=" * 80)
         logger.info(f"Optimal Temperature: T = {report['temperature']:.4f}")
         logger.info(f"Target Coverage: {report['target_coverage']:.1%}")
-        logger.info(f"\nBefore Temperature Scaling:")
+        logger.info("\nBefore Temperature Scaling:")
         logger.info(f"  Coverage: {report['coverage_before']:.1%}")
         logger.info(f"  Mean Interval Width: {report['width_before']:.1f} yards")
-        logger.info(f"\nAfter Temperature Scaling:")
+        logger.info("\nAfter Temperature Scaling:")
         logger.info(f"  Coverage: {report['coverage_after']:.1%}")
         logger.info(f"  Mean Interval Width: {report['width_after']:.1f} yards")
         logger.info(f"\nMAE: {report['mae']:.2f} yards (unchanged by scaling)")
         logger.info(f"Samples: {report['n_samples']}")
 
         # Validate calibration achieved target
-        coverage_error = abs(report['coverage_after'] - report['target_coverage'])
+        coverage_error = abs(report["coverage_after"] - report["target_coverage"])
         if coverage_error > 0.02:  # 2% tolerance
             logger.warning(f"⚠️  Large coverage error: {coverage_error:.1%}")
             logger.warning("Temperature scaling may not have fully converged")
@@ -288,10 +285,7 @@ class TemperatureScalerTrainerV6:
         return scaler, report
 
     def generate_calibration_plot(
-        self,
-        predictions_df: pd.DataFrame,
-        scaler: TemperatureScaler,
-        report: Dict
+        self, predictions_df: pd.DataFrame, scaler: TemperatureScaler, report: dict
     ):
         """
         Generate calibration plot (reliability diagram).
@@ -310,14 +304,14 @@ class TemperatureScalerTrainerV6:
         fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
         # Left plot: Coverage before/after temperature scaling
-        calib_df = predictions_df.rename(columns={'actual_yards': 'actual'}).copy()
+        calib_df = predictions_df.rename(columns={"actual_yards": "actual"}).copy()
 
         # Calculate z-scores before temperature scaling
-        z_raw = (calib_df['actual'] - calib_df['pred_mean']) / calib_df['pred_std']
+        z_raw = (calib_df["actual"] - calib_df["pred_mean"]) / calib_df["pred_std"]
 
         # Calculate z-scores after temperature scaling
-        std_calibrated = calib_df['pred_std'] * np.sqrt(scaler.temperature)
-        z_calibrated = (calib_df['actual'] - calib_df['pred_mean']) / std_calibrated
+        std_calibrated = calib_df["pred_std"] * np.sqrt(scaler.temperature)
+        z_calibrated = (calib_df["actual"] - calib_df["pred_mean"]) / std_calibrated
 
         # Plot empirical CDF vs theoretical normal CDF
         quantiles = np.linspace(0, 1, 100)
@@ -326,12 +320,16 @@ class TemperatureScalerTrainerV6:
         empirical_raw = np.quantile(z_raw, quantiles)
         empirical_calibrated = np.quantile(z_calibrated, quantiles)
 
-        axes[0].plot(theoretical_quantiles, empirical_raw, 'o-', label='Before Scaling', alpha=0.7)
-        axes[0].plot(theoretical_quantiles, empirical_calibrated, 's-', label='After Scaling', alpha=0.7)
-        axes[0].plot(theoretical_quantiles, theoretical_quantiles, 'k--', label='Perfect Calibration')
-        axes[0].set_xlabel('Theoretical Quantiles (Normal)')
-        axes[0].set_ylabel('Empirical Quantiles')
-        axes[0].set_title('Q-Q Plot: Calibration Assessment')
+        axes[0].plot(theoretical_quantiles, empirical_raw, "o-", label="Before Scaling", alpha=0.7)
+        axes[0].plot(
+            theoretical_quantiles, empirical_calibrated, "s-", label="After Scaling", alpha=0.7
+        )
+        axes[0].plot(
+            theoretical_quantiles, theoretical_quantiles, "k--", label="Perfect Calibration"
+        )
+        axes[0].set_xlabel("Theoretical Quantiles (Normal)")
+        axes[0].set_ylabel("Empirical Quantiles")
+        axes[0].set_title("Q-Q Plot: Calibration Assessment")
         axes[0].legend()
         axes[0].grid(True, alpha=0.3)
 
@@ -352,25 +350,28 @@ class TemperatureScalerTrainerV6:
             within_cal = (np.abs(z_calibrated) <= z_crit).mean()
             coverage_calibrated.append(within_cal)
 
-        axes[1].plot(confidence_levels, coverage_raw, 'o-', label='Before Scaling', alpha=0.7)
-        axes[1].plot(confidence_levels, coverage_calibrated, 's-', label='After Scaling', alpha=0.7)
-        axes[1].plot(confidence_levels, confidence_levels, 'k--', label='Perfect Calibration')
-        axes[1].set_xlabel('Nominal Confidence Level')
-        axes[1].set_ylabel('Empirical Coverage')
-        axes[1].set_title('Coverage by Confidence Level')
+        axes[1].plot(confidence_levels, coverage_raw, "o-", label="Before Scaling", alpha=0.7)
+        axes[1].plot(confidence_levels, coverage_calibrated, "s-", label="After Scaling", alpha=0.7)
+        axes[1].plot(confidence_levels, confidence_levels, "k--", label="Perfect Calibration")
+        axes[1].set_xlabel("Nominal Confidence Level")
+        axes[1].set_ylabel("Empirical Coverage")
+        axes[1].set_title("Coverage by Confidence Level")
         axes[1].legend()
         axes[1].grid(True, alpha=0.3)
 
         plt.tight_layout()
 
         # Save plot
-        plot_path = self.results_dir / f"temperature_scaler_v6_calibration_{self.start_season}_{self.end_season}.png"
-        plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+        plot_path = (
+            self.results_dir
+            / f"temperature_scaler_v6_calibration_{self.start_season}_{self.end_season}.png"
+        )
+        plt.savefig(plot_path, dpi=300, bbox_inches="tight")
         logger.info(f"✅ Calibration plot saved to {plot_path}")
 
         plt.close()
 
-    def save_temperature_scaler(self, scaler: TemperatureScaler, report: Dict):
+    def save_temperature_scaler(self, scaler: TemperatureScaler, report: dict):
         """
         Save temperature scaler and metadata.
 
@@ -390,21 +391,21 @@ class TemperatureScalerTrainerV6:
 
         # Save metadata (JSON format)
         metadata = {
-            'version': 'v6.0_production',
-            'training_date': datetime.now().isoformat(),
-            'training_seasons': f"{self.start_season}-{self.end_season}",
-            'ensemble_version': 'v6.0',
-            'ensemble_weights': self.ensemble.weights,
-            'temperature': report['temperature'],
-            'target_coverage': report['target_coverage'],
-            'coverage_before': report['coverage_before'],
-            'coverage_after': report['coverage_after'],
-            'width_before': report['width_before'],
-            'width_after': report['width_after'],
-            'mae': report['mae'],
-            'n_samples': report['n_samples'],
-            'improvement_pct': (report['coverage_after'] - report['coverage_before']) * 100,
-            'width_reduction_pct': (1 - report['width_after'] / report['width_before']) * 100
+            "version": "v6.0_production",
+            "training_date": datetime.now().isoformat(),
+            "training_seasons": f"{self.start_season}-{self.end_season}",
+            "ensemble_version": "v6.0",
+            "ensemble_weights": self.ensemble.weights,
+            "temperature": report["temperature"],
+            "target_coverage": report["target_coverage"],
+            "coverage_before": report["coverage_before"],
+            "coverage_after": report["coverage_after"],
+            "width_before": report["width_before"],
+            "width_after": report["width_after"],
+            "mae": report["mae"],
+            "n_samples": report["n_samples"],
+            "improvement_pct": (report["coverage_after"] - report["coverage_before"]) * 100,
+            "width_reduction_pct": (1 - report["width_after"] / report["width_before"]) * 100,
         }
 
         # Convert numpy types to native Python types
@@ -414,7 +415,7 @@ class TemperatureScalerTrainerV6:
         }
 
         metadata_path = self.output_dir / "temperature_scaler_v6_metadata.json"
-        with open(metadata_path, 'w') as f:
+        with open(metadata_path, "w") as f:
             json.dump(metadata_native, f, indent=2)
 
         logger.info(f"✅ Metadata saved to {metadata_path}")
@@ -424,10 +425,14 @@ class TemperatureScalerTrainerV6:
         logger.info("TEMPERATURE SCALER v6.0 TRAINING COMPLETE")
         logger.info("=" * 80)
         logger.info(f"Optimal Temperature: T = {metadata['temperature']:.4f}")
-        logger.info(f"Coverage Improvement: {metadata['coverage_before']:.1%} → {metadata['coverage_after']:.1%}")
+        logger.info(
+            f"Coverage Improvement: {metadata['coverage_before']:.1%} → {metadata['coverage_after']:.1%}"
+        )
         logger.info(f"Interval Width Reduction: {metadata['width_reduction_pct']:.1f}%")
         logger.info(f"Target Coverage: {metadata['target_coverage']:.1%}")
-        logger.info(f"Calibration Status: {'✅ PASS' if 0.88 <= metadata['coverage_after'] <= 0.92 else '❌ FAIL'}")
+        logger.info(
+            f"Calibration Status: {'✅ PASS' if 0.88 <= metadata['coverage_after'] <= 0.92 else '❌ FAIL'}"
+        )
 
     def run(self):
         """Run full temperature scaler training pipeline."""
@@ -457,7 +462,7 @@ def main():
         start_season=2022,
         end_season=2024,
         output_dir="models/calibration",
-        results_dir="analysis/results"
+        results_dir="analysis/results",
     )
 
     trainer.run()

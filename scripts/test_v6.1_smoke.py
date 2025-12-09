@@ -4,23 +4,26 @@ Quick smoke test for Ensemble v6.1 with PostgreSQL R lookup
 """
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 import time
 
+from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+
+
 def main():
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("ENSEMBLE v6.1 SMOKE TEST - PostgreSQL R Lookup")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     print("Initializing ensemble v6.1...")
     ensemble = EnhancedEnsemble5Way(
-        db_host='localhost',
+        db_host="localhost",
         db_port=5544,
-        db_name='devdb01',
-        db_user='dro',
-        db_password='sicillionbillions'
+        db_name="devdb01",
+        db_user="dro",
+        db_password="sicillionbillions",
     )
     print("✅ Ensemble initialized\n")
 
@@ -29,7 +32,7 @@ def main():
     season = 2024
     week = 9
 
-    print(f"Test prediction for:")
+    print("Test prediction for:")
     print(f"  Player: {player_id}")
     print(f"  Season: {season}")
     print(f"  Week: {week}\n")
@@ -48,11 +51,12 @@ def main():
     print(f"\n  Inference time: {elapsed:.1f}ms")
     print(f"  Component time: {result['prediction_time_ms']:.1f}ms")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("✅ SMOKE TEST PASSED - v6.1 is operational")
-    print("="*80 + "\n")
+    print("=" * 80 + "\n")
 
     return 0
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     sys.exit(main())

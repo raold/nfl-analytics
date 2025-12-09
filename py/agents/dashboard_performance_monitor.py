@@ -50,64 +50,67 @@ Phase: 6 (Frontend Agents)
 import functools
 import logging
 import time
-import traceback
 import tracemalloc
 from collections import defaultdict
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
-from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
 # Optional imports
 try:
-    import pandas as pd
     import numpy as np
+    import pandas as pd
+
     PANDAS_AVAILABLE = True
 except ImportError:
     PANDAS_AVAILABLE = False
 
 try:
     import streamlit as st
+
     STREAMLIT_AVAILABLE = True
 except ImportError:
     STREAMLIT_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
 
 class PerformanceSeverity(Enum):
     """Performance issue severity levels."""
+
     CRITICAL = "CRITICAL"  # >10s page load (5x target)
-    HIGH = "HIGH"          # >4s page load (2x target)
-    MEDIUM = "MEDIUM"      # >2s page load (1x target)
-    LOW = "LOW"            # >1s but <2s
-    INFO = "INFO"          # <1s (optimal)
+    HIGH = "HIGH"  # >4s page load (2x target)
+    MEDIUM = "MEDIUM"  # >2s page load (1x target)
+    LOW = "LOW"  # >1s but <2s
+    INFO = "INFO"  # <1s (optimal)
 
 
 class BottleneckType(Enum):
     """Types of dashboard performance bottlenecks."""
-    SLOW_QUERY = "slow_query"                  # Database query >500ms
+
+    SLOW_QUERY = "slow_query"  # Database query >500ms
     N_PLUS_ONE_QUERIES = "n_plus_one_queries"  # Sequential queries in loop
-    LARGE_DATAFRAME = "large_dataframe"        # DataFrame >100MB in memory
-    INEFFICIENT_LOOP = "inefficient_loop"      # Python loop >1s
-    MISSING_CACHE = "missing_cache"            # Repeated computation without cache
+    LARGE_DATAFRAME = "large_dataframe"  # DataFrame >100MB in memory
+    INEFFICIENT_LOOP = "inefficient_loop"  # Python loop >1s
+    MISSING_CACHE = "missing_cache"  # Repeated computation without cache
     EXCESSIVE_CONNECTIONS = "excessive_connections"  # >10 DB connections
-    MEMORY_ACCUMULATION = "memory_accumulation"      # Memory not released
-    SLOW_RENDERING = "slow_rendering"                # Streamlit rendering >500ms
+    MEMORY_ACCUMULATION = "memory_accumulation"  # Memory not released
+    SLOW_RENDERING = "slow_rendering"  # Streamlit rendering >500ms
 
 
 @dataclass
 class PerformanceIssue:
     """Represents a dashboard performance issue."""
+
     severity: PerformanceSeverity
     bottleneck_type: BottleneckType
     title: str
@@ -116,9 +119,9 @@ class PerformanceIssue:
     duration_ms: float
     impact: str
     detected_at: str = field(default_factory=lambda: datetime.now().isoformat())
-    details: Dict[str, Any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
             "severity": self.severity.value,
@@ -129,21 +132,22 @@ class PerformanceIssue:
             "duration_ms": self.duration_ms,
             "impact": self.impact,
             "detected_at": self.detected_at,
-            "details": self.details
+            "details": self.details,
         }
 
 
 @dataclass
 class OptimizationRecommendation:
     """Performance optimization recommendation."""
+
     issue: PerformanceIssue
     priority: int  # 1-5 (1=highest)
     recommendation: str
     expected_improvement: str
     implementation_difficulty: str  # Easy, Medium, Hard
-    code_example: Optional[str] = None
+    code_example: str | None = None
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
             "issue": self.issue.to_dict(),
@@ -151,23 +155,24 @@ class OptimizationRecommendation:
             "recommendation": self.recommendation,
             "expected_improvement": self.expected_improvement,
             "implementation_difficulty": self.implementation_difficulty,
-            "code_example": self.code_example
+            "code_example": self.code_example,
         }
 
 
 @dataclass
 class CachePerformanceReport:
     """Cache performance analysis report."""
+
     total_cache_calls: int
     cache_hits: int
     cache_misses: int
     hit_rate: float
     avg_cache_lookup_ms: float
     functions_using_cache: int
-    functions_missing_cache: List[str]
-    recommendations: List[OptimizationRecommendation]
+    functions_missing_cache: list[str]
+    recommendations: list[OptimizationRecommendation]
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
         return {
             "total_cache_calls": self.total_cache_calls,
@@ -177,7 +182,7 @@ class CachePerformanceReport:
             "avg_cache_lookup_ms": self.avg_cache_lookup_ms,
             "functions_using_cache": self.functions_using_cache,
             "functions_missing_cache": self.functions_missing_cache,
-            "recommendations": [r.to_dict() for r in self.recommendations]
+            "recommendations": [r.to_dict() for r in self.recommendations],
         }
 
 
@@ -193,8 +198,8 @@ class DashboardPerformanceMonitor:
         self,
         page_load_threshold_ms: float = 2000,
         slow_query_threshold_ms: float = 500,
-        db_config: Optional[Dict[str, str]] = None,
-        prometheus_export: bool = True
+        db_config: dict[str, str] | None = None,
+        prometheus_export: bool = True,
     ):
         """
         Initialize Dashboard Performance Monitor.
@@ -210,10 +215,10 @@ class DashboardPerformanceMonitor:
         self.prometheus_export = prometheus_export
 
         # Performance tracking
-        self.page_loads: List[Dict[str, Any]] = []
-        self.query_executions: List[Dict[str, Any]] = []
-        self.cache_stats: Dict[str, Any] = defaultdict(lambda: {"hits": 0, "misses": 0})
-        self.memory_snapshots: List[Tuple[float, int]] = []  # (timestamp, memory_mb)
+        self.page_loads: list[dict[str, Any]] = []
+        self.query_executions: list[dict[str, Any]] = []
+        self.cache_stats: dict[str, Any] = defaultdict(lambda: {"hits": 0, "misses": 0})
+        self.memory_snapshots: list[tuple[float, int]] = []  # (timestamp, memory_mb)
 
         # Database connection
         self.db_config = db_config or {
@@ -221,21 +226,18 @@ class DashboardPerformanceMonitor:
             "port": 5544,
             "database": "devdb01",
             "user": "dro",
-            "password": "sicillionbillions"
+            "password": "sicillionbillions",
         }
 
         # Prometheus metrics (if enabled)
-        self.prometheus_metrics: Dict[str, float] = {}
+        self.prometheus_metrics: dict[str, float] = {}
 
         logger.info(
             f"DashboardPerformanceMonitor initialized (threshold={page_load_threshold_ms}ms)"
         )
 
     def monitor_performance(
-        self,
-        threshold_ms: Optional[float] = None,
-        alert: bool = True,
-        alert_destination: str = "log"
+        self, threshold_ms: float | None = None, alert: bool = True, alert_destination: str = "log"
     ) -> Callable:
         """
         Decorator to monitor function performance.
@@ -276,14 +278,16 @@ class DashboardPerformanceMonitor:
                     memory_delta_mb = end_memory - start_memory
 
                     # Record page load
-                    self.page_loads.append({
-                        "function": func.__name__,
-                        "duration_ms": duration_ms,
-                        "memory_delta_mb": memory_delta_mb,
-                        "success": success,
-                        "error": error,
-                        "timestamp": datetime.now().isoformat()
-                    })
+                    self.page_loads.append(
+                        {
+                            "function": func.__name__,
+                            "duration_ms": duration_ms,
+                            "memory_delta_mb": memory_delta_mb,
+                            "success": success,
+                            "error": error,
+                            "timestamp": datetime.now().isoformat(),
+                        }
+                    )
 
                     # Check threshold and alert
                     if duration_ms > threshold and alert:
@@ -296,19 +300,20 @@ class DashboardPerformanceMonitor:
                             location=f"{func.__module__}.{func.__name__}",
                             duration_ms=duration_ms,
                             impact=f"{(duration_ms / threshold - 1) * 100:.0f}% slower than target",
-                            details={
-                                "memory_delta_mb": memory_delta_mb,
-                                "threshold_ms": threshold
-                            }
+                            details={"memory_delta_mb": memory_delta_mb, "threshold_ms": threshold},
                         )
                         self._send_alert(issue, alert_destination)
 
                     # Export Prometheus metrics
                     if self.prometheus_export:
-                        self.prometheus_metrics[f"dashboard_page_load_{func.__name__}_ms"] = duration_ms
+                        self.prometheus_metrics[f"dashboard_page_load_{func.__name__}_ms"] = (
+                            duration_ms
+                        )
 
                 return result
+
             return wrapper
+
         return decorator
 
     def profile_section(self, section_name: str):
@@ -322,6 +327,7 @@ class DashboardPerformanceMonitor:
             with monitor.profile_section("Load Predictions"):
                 predictions = load_predictions()
         """
+
         class SectionProfiler:
             def __init__(self, monitor, name):
                 self.monitor = monitor
@@ -339,26 +345,24 @@ class DashboardPerformanceMonitor:
                 memory_delta = self.monitor._get_current_memory_mb() - self.start_memory
 
                 logger.info(
-                    f"Section '{self.name}': {duration_ms:.0f}ms, "
-                    f"Memory: {memory_delta:+.1f}MB"
+                    f"Section '{self.name}': {duration_ms:.0f}ms, " f"Memory: {memory_delta:+.1f}MB"
                 )
 
                 # Record for analysis
-                self.monitor.page_loads.append({
-                    "function": f"section_{self.name}",
-                    "duration_ms": duration_ms,
-                    "memory_delta_mb": memory_delta,
-                    "success": exc_type is None,
-                    "error": str(exc_val) if exc_val else None,
-                    "timestamp": datetime.now().isoformat()
-                })
+                self.monitor.page_loads.append(
+                    {
+                        "function": f"section_{self.name}",
+                        "duration_ms": duration_ms,
+                        "memory_delta_mb": memory_delta,
+                        "success": exc_type is None,
+                        "error": str(exc_val) if exc_val else None,
+                        "timestamp": datetime.now().isoformat(),
+                    }
+                )
 
         return SectionProfiler(self, section_name)
 
-    def detect_n_plus_one_queries(
-        self,
-        time_window_seconds: int = 60
-    ) -> List[PerformanceIssue]:
+    def detect_n_plus_one_queries(self, time_window_seconds: int = 60) -> list[PerformanceIssue]:
         """
         Detect N+1 query patterns in dashboard code.
 
@@ -376,7 +380,8 @@ class DashboardPerformanceMonitor:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
 
             # Query pg_stat_statements for repeated queries
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     query,
                     calls,
@@ -388,26 +393,27 @@ class DashboardPerformanceMonitor:
                 AND mean_exec_time > 100  -- Slow queries
                 ORDER BY calls DESC
                 LIMIT 20
-            """)
+            """
+            )
 
             repeated_queries = cursor.fetchall()
 
             for query in repeated_queries:
                 # Heuristic: If called >20 times with same pattern, likely N+1
-                if query['calls'] > 20:
+                if query["calls"] > 20:
                     issue = PerformanceIssue(
                         severity=PerformanceSeverity.HIGH,
                         bottleneck_type=BottleneckType.N_PLUS_ONE_QUERIES,
                         title="Potential N+1 query pattern",
                         description=f"Query executed {query['calls']} times ({query['total_time_ms']:.0f}ms total)",
                         location="Database queries",
-                        duration_ms=query['total_time_ms'],
+                        duration_ms=query["total_time_ms"],
                         impact=f"{query['calls']} sequential queries instead of 1 batch query",
                         details={
-                            "query": query['query'][:200],  # Truncate for readability
-                            "calls": query['calls'],
-                            "avg_time_ms": query['avg_time_ms']
-                        }
+                            "query": query["query"][:200],  # Truncate for readability
+                            "calls": query["calls"],
+                            "avg_time_ms": query["avg_time_ms"],
+                        },
                     )
                     issues.append(issue)
 
@@ -441,22 +447,24 @@ class DashboardPerformanceMonitor:
         recommendations = []
 
         if hit_rate < 0.5:  # <50% hit rate
-            recommendations.append(OptimizationRecommendation(
-                issue=PerformanceIssue(
-                    severity=PerformanceSeverity.HIGH,
-                    bottleneck_type=BottleneckType.MISSING_CACHE,
-                    title="Low cache hit rate",
-                    description=f"Only {hit_rate*100:.0f}% cache hits (target: >80%)",
-                    location="Dashboard caching",
-                    duration_ms=0,
-                    impact=f"Repeated computations wasting {total_misses * 100:.0f}ms"
-                ),
-                priority=1,
-                recommendation="Add @st.cache_data decorators to expensive functions",
-                expected_improvement="50-200x speedup on repeated calls",
-                implementation_difficulty="Easy",
-                code_example="@st.cache_data(ttl=3600)\ndef expensive_query():\n    return query_database()"
-            ))
+            recommendations.append(
+                OptimizationRecommendation(
+                    issue=PerformanceIssue(
+                        severity=PerformanceSeverity.HIGH,
+                        bottleneck_type=BottleneckType.MISSING_CACHE,
+                        title="Low cache hit rate",
+                        description=f"Only {hit_rate*100:.0f}% cache hits (target: >80%)",
+                        location="Dashboard caching",
+                        duration_ms=0,
+                        impact=f"Repeated computations wasting {total_misses * 100:.0f}ms",
+                    ),
+                    priority=1,
+                    recommendation="Add @st.cache_data decorators to expensive functions",
+                    expected_improvement="50-200x speedup on repeated calls",
+                    implementation_difficulty="Easy",
+                    code_example="@st.cache_data(ttl=3600)\ndef expensive_query():\n    return query_database()",
+                )
+            )
 
         return CachePerformanceReport(
             total_cache_calls=total_calls,
@@ -466,10 +474,10 @@ class DashboardPerformanceMonitor:
             avg_cache_lookup_ms=1.0,  # TODO: Track actual cache lookup time
             functions_using_cache=len([s for s in self.cache_stats.values() if s["hits"] > 0]),
             functions_missing_cache=functions_missing_cache,
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
-    def generate_recommendations(self) -> List[OptimizationRecommendation]:
+    def generate_recommendations(self) -> list[OptimizationRecommendation]:
         """
         Generate actionable optimization recommendations based on detected issues.
 
@@ -484,21 +492,23 @@ class DashboardPerformanceMonitor:
             avg_duration = sum(p["duration_ms"] for p in recent_loads) / len(recent_loads)
 
             if avg_duration > self.page_load_threshold_ms:
-                recommendations.append(OptimizationRecommendation(
-                    issue=PerformanceIssue(
-                        severity=PerformanceSeverity.HIGH,
-                        bottleneck_type=BottleneckType.SLOW_RENDERING,
-                        title="Slow average page load",
-                        description=f"Average page load: {avg_duration:.0f}ms (target: {self.page_load_threshold_ms}ms)",
-                        location="Dashboard pages",
-                        duration_ms=avg_duration,
-                        impact=f"{(avg_duration / self.page_load_threshold_ms - 1) * 100:.0f}% slower than target"
-                    ),
-                    priority=1,
-                    recommendation="Profile page load and optimize slow sections",
-                    expected_improvement=f"{avg_duration:.0f}ms → {self.page_load_threshold_ms}ms ({(avg_duration / self.page_load_threshold_ms):.1f}x faster)",
-                    implementation_difficulty="Medium"
-                ))
+                recommendations.append(
+                    OptimizationRecommendation(
+                        issue=PerformanceIssue(
+                            severity=PerformanceSeverity.HIGH,
+                            bottleneck_type=BottleneckType.SLOW_RENDERING,
+                            title="Slow average page load",
+                            description=f"Average page load: {avg_duration:.0f}ms (target: {self.page_load_threshold_ms}ms)",
+                            location="Dashboard pages",
+                            duration_ms=avg_duration,
+                            impact=f"{(avg_duration / self.page_load_threshold_ms - 1) * 100:.0f}% slower than target",
+                        ),
+                        priority=1,
+                        recommendation="Profile page load and optimize slow sections",
+                        expected_improvement=f"{avg_duration:.0f}ms → {self.page_load_threshold_ms}ms ({(avg_duration / self.page_load_threshold_ms):.1f}x faster)",
+                        implementation_difficulty="Medium",
+                    )
+                )
 
         # Add cache recommendations
         cache_report = self.analyze_cache_performance()
@@ -507,14 +517,16 @@ class DashboardPerformanceMonitor:
         # Add N+1 query recommendations
         n_plus_one_issues = self.detect_n_plus_one_queries()
         for issue in n_plus_one_issues:
-            recommendations.append(OptimizationRecommendation(
-                issue=issue,
-                priority=2,
-                recommendation="Batch queries using JOIN or IN clause",
-                expected_improvement=f"{issue.details['calls']}x reduction in queries",
-                implementation_difficulty="Medium",
-                code_example="# Instead of:\nfor player_id in player_ids:\n    query_player(player_id)\n\n# Use:\nquery_players(player_ids)  # Single batch query"
-            ))
+            recommendations.append(
+                OptimizationRecommendation(
+                    issue=issue,
+                    priority=2,
+                    recommendation="Batch queries using JOIN or IN clause",
+                    expected_improvement=f"{issue.details['calls']}x reduction in queries",
+                    implementation_difficulty="Medium",
+                    code_example="# Instead of:\nfor player_id in player_ids:\n    query_player(player_id)\n\n# Use:\nquery_players(player_ids)  # Single batch query",
+                )
+            )
 
         # Sort by priority
         recommendations.sort(key=lambda r: r.priority)
@@ -542,9 +554,9 @@ class DashboardPerformanceMonitor:
 
                 # Cache metrics
                 cache_report = self.analyze_cache_performance()
-                f.write(f'dashboard_cache_hit_rate {cache_report.hit_rate}\n')
-                f.write(f'dashboard_cache_hits_total {cache_report.cache_hits}\n')
-                f.write(f'dashboard_cache_misses_total {cache_report.cache_misses}\n')
+                f.write(f"dashboard_cache_hit_rate {cache_report.hit_rate}\n")
+                f.write(f"dashboard_cache_hits_total {cache_report.cache_hits}\n")
+                f.write(f"dashboard_cache_misses_total {cache_report.cache_misses}\n")
 
             logger.info(f"Exported Prometheus metrics to {output_path}")
 
@@ -558,14 +570,10 @@ class DashboardPerformanceMonitor:
             current, peak = tracemalloc.get_traced_memory()
             tracemalloc.stop()
             return current / (1024 * 1024)  # Convert bytes to MB
-        except:
+        except Exception:
             return 0.0
 
-    def _classify_performance(
-        self,
-        duration_ms: float,
-        threshold_ms: float
-    ) -> PerformanceSeverity:
+    def _classify_performance(self, duration_ms: float, threshold_ms: float) -> PerformanceSeverity:
         """Classify performance issue severity."""
         ratio = duration_ms / threshold_ms
 
@@ -580,11 +588,7 @@ class DashboardPerformanceMonitor:
         else:
             return PerformanceSeverity.INFO
 
-    def _send_alert(
-        self,
-        issue: PerformanceIssue,
-        destination: str = "log"
-    ):
+    def _send_alert(self, issue: PerformanceIssue, destination: str = "log"):
         """Send performance alert to configured destination."""
         message = f"[{issue.severity.value}] {issue.title}: {issue.description}"
 
@@ -594,7 +598,7 @@ class DashboardPerformanceMonitor:
             self.prometheus_metrics[f"dashboard_alert_{issue.bottleneck_type.value}"] = 1
         # TODO: Add Grafana webhook integration
 
-    def get_summary(self) -> Dict[str, Any]:
+    def get_summary(self) -> dict[str, Any]:
         """Get performance monitoring summary."""
         if not self.page_loads:
             return {"status": "No data collected yet"}
@@ -610,15 +614,12 @@ class DashboardPerformanceMonitor:
             "threshold_ms": self.page_load_threshold_ms,
             "performance_status": "GOOD" if avg_duration < self.page_load_threshold_ms else "SLOW",
             "cache_hit_rate": cache_report.hit_rate,
-            "recommendations_count": len(self.generate_recommendations())
+            "recommendations_count": len(self.generate_recommendations()),
         }
 
 
 # Convenience function for quick monitoring
-def monitor_dashboard_performance(
-    threshold_ms: float = 2000,
-    alert: bool = True
-) -> Callable:
+def monitor_dashboard_performance(threshold_ms: float = 2000, alert: bool = True) -> Callable:
     """
     Convenience decorator for quick performance monitoring.
 
@@ -650,7 +651,7 @@ if __name__ == "__main__":
 
     # Get performance summary
     summary = monitor.get_summary()
-    print(f"\nPerformance Summary:")
+    print("\nPerformance Summary:")
     print(f"  Page loads tracked: {summary['page_loads_tracked']}")
     print(f"  Avg page load: {summary['avg_page_load_ms']:.0f}ms")
     print(f"  Status: {summary['performance_status']}")
@@ -658,6 +659,6 @@ if __name__ == "__main__":
     # Get recommendations
     recommendations = monitor.generate_recommendations()
     if recommendations:
-        print(f"\nTop Recommendation:")
+        print("\nTop Recommendation:")
         print(f"  {recommendations[0].recommendation}")
         print(f"  Expected improvement: {recommendations[0].expected_improvement}")

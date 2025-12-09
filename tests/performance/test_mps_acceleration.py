@@ -12,31 +12,32 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 15, 2025
 """
 
-import pytest
-import torch
-import numpy as np
-import xgboost as xgb
-from sklearn.datasets import make_regression
-
 # Import utilities
 import sys
 from pathlib import Path
+
+import numpy as np
+import pytest
+import torch
+import xgboost as xgb
+from sklearn.datasets import make_regression
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from py.utils.device_utils import (
     get_best_device,
-    validate_device_support,
     get_device_info,
+    validate_device_support,
 )
 from py.utils.xgboost_device import (
     get_xgboost_params,
     validate_xgboost_gpu_support,
 )
 
-
 # ============================================================================
 # Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def sample_data():
@@ -48,6 +49,7 @@ def sample_data():
 @pytest.fixture
 def simple_model():
     """Create simple PyTorch model for testing"""
+
     class SimpleModel(torch.nn.Module):
         def __init__(self, input_dim=10, hidden_dim=32, output_dim=1):
             super().__init__()
@@ -65,36 +67,37 @@ def simple_model():
 # Device Detection Tests
 # ============================================================================
 
+
 def test_get_best_device():
     """Test that best device detection works"""
     device = get_best_device()
     assert isinstance(device, torch.device)
-    assert device.type in ['cuda', 'mps', 'cpu']
+    assert device.type in ["cuda", "mps", "cpu"]
 
 
 def test_get_best_device_force_cpu():
     """Test forcing CPU device"""
-    device = get_best_device('cpu')
-    assert device.type == 'cpu'
+    device = get_best_device("cpu")
+    assert device.type == "cpu"
 
 
 @pytest.mark.skipif(not torch.backends.mps.is_available(), reason="MPS not available")
 def test_get_best_device_force_mps():
     """Test forcing MPS device"""
-    device = get_best_device('mps')
-    assert device.type == 'mps'
+    device = get_best_device("mps")
+    assert device.type == "mps"
 
 
 def test_validate_device_support_cpu():
     """Test CPU device validation"""
-    device = torch.device('cpu')
+    device = torch.device("cpu")
     assert validate_device_support(device) is True
 
 
 @pytest.mark.skipif(not torch.backends.mps.is_available(), reason="MPS not available")
 def test_validate_device_support_mps():
     """Test MPS device validation"""
-    device = torch.device('mps')
+    device = torch.device("mps")
     assert validate_device_support(device) is True
 
 
@@ -102,17 +105,18 @@ def test_get_device_info():
     """Test device info retrieval"""
     info = get_device_info()
 
-    assert 'device' in info
-    assert 'device_type' in info
-    assert 'has_cuda' in info
-    assert 'has_mps' in info
-    assert 'cpu_count' in info
-    assert 'pytorch_version' in info
+    assert "device" in info
+    assert "device_type" in info
+    assert "has_cuda" in info
+    assert "has_mps" in info
+    assert "cpu_count" in info
+    assert "pytorch_version" in info
 
 
 # ============================================================================
 # PyTorch MPS Training Tests
 # ============================================================================
+
 
 @pytest.mark.skipif(not torch.backends.mps.is_available(), reason="MPS not available")
 def test_simple_model_mps_training(simple_model, sample_data):
@@ -122,7 +126,7 @@ def test_simple_model_mps_training(simple_model, sample_data):
     y_tensor = torch.FloatTensor(y).unsqueeze(1)
 
     # Move to MPS
-    device = torch.device('mps')
+    device = torch.device("mps")
     model = simple_model.to(device)
     X_mps = X_tensor.to(device)
     y_mps = y_tensor.to(device)
@@ -159,7 +163,7 @@ def test_mps_predictions_match_cpu(simple_model, sample_data):
     X_tensor = torch.FloatTensor(X[:100])  # Use smaller subset for speed
 
     # Train on CPU
-    model_cpu = simple_model.to('cpu')
+    model_cpu = simple_model.to("cpu")
     optimizer = torch.optim.Adam(model_cpu.parameters(), lr=0.01)
     criterion = torch.nn.MSELoss()
 
@@ -177,12 +181,12 @@ def test_mps_predictions_match_cpu(simple_model, sample_data):
         pred_cpu = model_cpu(X_tensor).numpy()
 
     # Move to MPS and get predictions
-    model_mps = model_cpu.to('mps')
-    X_mps = X_tensor.to('mps')
+    model_mps = model_cpu.to("mps")
+    X_mps = X_tensor.to("mps")
 
     model_mps.eval()
     with torch.no_grad():
-        pred_mps = model_mps(X_mps).to('cpu').numpy()
+        pred_mps = model_mps(X_mps).to("cpu").numpy()
 
     # Validate predictions match
     mae_diff = np.abs(pred_cpu - pred_mps).mean()
@@ -204,7 +208,7 @@ def test_mps_faster_than_cpu(simple_model, sample_data):
     y_tensor = torch.FloatTensor(y).unsqueeze(1)
 
     # Benchmark CPU
-    model_cpu = simple_model.to('cpu')
+    model_cpu = simple_model.to("cpu")
     optimizer_cpu = torch.optim.Adam(model_cpu.parameters(), lr=0.01)
     criterion = torch.nn.MSELoss()
 
@@ -218,9 +222,9 @@ def test_mps_faster_than_cpu(simple_model, sample_data):
     cpu_time = time.time() - start_cpu
 
     # Benchmark MPS
-    model_mps = simple_model.to('mps')
-    X_mps = X_tensor.to('mps')
-    y_mps = y_tensor.to('mps')
+    model_mps = simple_model.to("mps")
+    X_mps = X_tensor.to("mps")
+    y_mps = y_tensor.to("mps")
     optimizer_mps = torch.optim.Adam(model_mps.parameters(), lr=0.01)
 
     start_mps = time.time()
@@ -248,62 +252,58 @@ def test_mps_faster_than_cpu(simple_model, sample_data):
 # XGBoost GPU Tests
 # ============================================================================
 
+
 def test_get_xgboost_params_cpu():
     """Test XGBoost CPU parameter configuration"""
-    base_params = {'n_estimators': 100, 'max_depth': 6}
+    base_params = {"n_estimators": 100, "max_depth": 6}
     params = get_xgboost_params(base_params, prefer_gpu=False, verbose=False)
 
-    assert params['tree_method'] == 'hist'
-    assert params['n_jobs'] == -1
-    assert 'device' not in params or params['device'] != 'cuda'
+    assert params["tree_method"] == "hist"
+    assert params["n_jobs"] == -1
+    assert "device" not in params or params["device"] != "cuda"
 
 
 @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
 def test_get_xgboost_params_cuda():
     """Test XGBoost CUDA parameter configuration"""
-    base_params = {'n_estimators': 100, 'max_depth': 6}
+    base_params = {"n_estimators": 100, "max_depth": 6}
     params = get_xgboost_params(base_params, prefer_gpu=True, verbose=False)
 
-    assert params['tree_method'] == 'gpu_hist'
-    assert params['device'] == 'cuda'
-    assert params['predictor'] == 'gpu_predictor'
+    assert params["tree_method"] == "gpu_hist"
+    assert params["device"] == "cuda"
+    assert params["predictor"] == "gpu_predictor"
 
 
 @pytest.mark.skipif(not torch.backends.mps.is_available(), reason="MPS not available")
 def test_get_xgboost_params_mps():
     """Test XGBoost MPS parameter configuration (experimental)"""
-    base_params = {'n_estimators': 100, 'max_depth': 6}
-    params = get_xgboost_params(
-        base_params,
-        prefer_gpu=True,
-        experimental_mps=True,
-        verbose=False
-    )
+    base_params = {"n_estimators": 100, "max_depth": 6}
+    params = get_xgboost_params(base_params, prefer_gpu=True, experimental_mps=True, verbose=False)
 
-    assert params['tree_method'] == 'gpu_hist'
-    assert params['device'] == 'mps'
-    assert params['predictor'] == 'gpu_predictor'
+    assert params["tree_method"] == "gpu_hist"
+    assert params["device"] == "mps"
+    assert params["predictor"] == "gpu_predictor"
 
 
 def test_validate_xgboost_gpu_support():
     """Test XGBoost GPU support validation"""
     validation = validate_xgboost_gpu_support()
 
-    assert 'has_cuda' in validation
-    assert 'has_mps' in validation
-    assert 'xgboost_version' in validation
-    assert 'recommended_device' in validation
-    assert 'warnings' in validation
+    assert "has_cuda" in validation
+    assert "has_mps" in validation
+    assert "xgboost_version" in validation
+    assert "recommended_device" in validation
+    assert "warnings" in validation
 
     # Verify version format
-    assert len(validation['xgboost_version'].split('.')) >= 2
+    assert len(validation["xgboost_version"].split(".")) >= 2
 
 
 def test_xgboost_cpu_training(sample_data):
     """Test XGBoost trains on CPU"""
     X, y = sample_data
 
-    base_params = {'n_estimators': 50, 'max_depth': 4}
+    base_params = {"n_estimators": 50, "max_depth": 4}
     params = get_xgboost_params(base_params, prefer_gpu=False, verbose=False)
 
     model = xgb.XGBRegressor(**params)
@@ -321,6 +321,7 @@ def test_xgboost_cpu_training(sample_data):
 # ============================================================================
 # Integration Tests
 # ============================================================================
+
 
 @pytest.mark.skipif(not torch.backends.mps.is_available(), reason="MPS not available")
 @pytest.mark.slow
@@ -347,7 +348,7 @@ def test_full_pipeline_mps(sample_data):
             return self.fc3(x)
 
     # Train on MPS
-    device = torch.device('mps')
+    device = torch.device("mps")
     model = RegressionNet().to(device)
 
     X_train_t = torch.FloatTensor(X_train).to(device)
@@ -382,6 +383,7 @@ def test_full_pipeline_mps(sample_data):
 # Performance Benchmarks
 # ============================================================================
 
+
 @pytest.mark.benchmark
 @pytest.mark.skipif(not torch.backends.mps.is_available(), reason="MPS not available")
 def test_benchmark_device_comparison(sample_data):
@@ -407,7 +409,7 @@ def test_benchmark_device_comparison(sample_data):
     results = {}
 
     # Benchmark CPU
-    model_cpu = BenchmarkModel().to('cpu')
+    model_cpu = BenchmarkModel().to("cpu")
     optimizer = torch.optim.Adam(model_cpu.parameters(), lr=0.01)
     criterion = torch.nn.MSELoss()
 
@@ -420,12 +422,12 @@ def test_benchmark_device_comparison(sample_data):
         optimizer.step()
     cpu_time = time.time() - start
 
-    results['cpu_time'] = cpu_time
+    results["cpu_time"] = cpu_time
 
     # Benchmark MPS
-    model_mps = BenchmarkModel().to('mps')
-    X_mps = X_tensor.to('mps')
-    y_mps = y_tensor.to('mps')
+    model_mps = BenchmarkModel().to("mps")
+    X_mps = X_tensor.to("mps")
+    y_mps = y_tensor.to("mps")
     optimizer = torch.optim.Adam(model_mps.parameters(), lr=0.01)
 
     start = time.time()
@@ -437,8 +439,8 @@ def test_benchmark_device_comparison(sample_data):
         optimizer.step()
     mps_time = time.time() - start
 
-    results['mps_time'] = mps_time
-    results['speedup'] = cpu_time / mps_time
+    results["mps_time"] = mps_time
+    results["speedup"] = cpu_time / mps_time
 
     # Print results
     print(f"\n{'='*60}")
@@ -450,7 +452,7 @@ def test_benchmark_device_comparison(sample_data):
     print(f"{'='*60}")
 
     # Assert MPS is faster
-    assert results['speedup'] >= 1.5
+    assert results["speedup"] >= 1.5
 
 
 # ============================================================================

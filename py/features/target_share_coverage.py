@@ -11,11 +11,11 @@ Author: NFL Analytics Pipeline
 Created: 2025-10-30
 """
 
-import pandas as pd
-import numpy as np
 import logging
 import sys
-from typing import Optional
+
+import numpy as np
+import pandas as pd
 from sqlalchemy import create_engine
 
 # Configure logging
@@ -38,18 +38,11 @@ class TargetShareCoverageEngine:
     - Concentration vs distribution of targets by coverage type
     """
 
-    def __init__(
-        self,
-        db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-    ):
+    def __init__(self, db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"):
         self.engine = create_engine(db_url)
         logger.info(f"Connected to database: {db_url}")
 
-    def load_passing_plays(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
-    ) -> pd.DataFrame:
+    def load_passing_plays(self, start_season: int = 2024, end_season: int = 2025) -> pd.DataFrame:
         """
         Load passing plays with target/reception data.
 
@@ -100,9 +93,7 @@ class TargetShareCoverageEngine:
         """
 
         df = pd.read_sql(query, self.engine)
-        logger.info(
-            f"Loaded {len(df):,} passing plays from {start_season}-{end_season}"
-        )
+        logger.info(f"Loaded {len(df):,} passing plays from {start_season}-{end_season}")
         return df
 
     def infer_coverage_from_context(self, plays: pd.DataFrame) -> pd.DataFrame:
@@ -125,16 +116,15 @@ class TargetShareCoverageEngine:
 
         # Zone coverage indicators
         zone_mask = (
-            (plays["defenders_in_box"] <= 6) |
-            ((plays["down"] == 3) & (plays["ydstogo"] >= 10)) |
-            ((plays["down"] == 4) & (plays["ydstogo"] >= 10))
+            (plays["defenders_in_box"] <= 6)
+            | ((plays["down"] == 3) & (plays["ydstogo"] >= 10))
+            | ((plays["down"] == 4) & (plays["ydstogo"] >= 10))
         )
         plays.loc[zone_mask, "inferred_coverage"] = "zone"
 
         # Man coverage indicators
-        man_mask = (
-            (plays["defenders_in_box"] >= 7) |
-            ((plays["down"].isin([3, 4])) & (plays["ydstogo"] <= 2))
+        man_mask = (plays["defenders_in_box"] >= 7) | (
+            (plays["down"].isin([3, 4])) & (plays["ydstogo"] <= 2)
         )
         plays.loc[man_mask & ~zone_mask, "inferred_coverage"] = "man"
 
@@ -147,10 +137,7 @@ class TargetShareCoverageEngine:
 
         return plays
 
-    def calculate_target_shares_by_coverage(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_target_shares_by_coverage(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate receiver target shares by coverage type.
 
@@ -165,23 +152,44 @@ class TargetShareCoverageEngine:
         targets = plays[plays["receiver_player_id"].notna()].copy()
 
         # Overall target stats by game
-        overall = targets.groupby([
-            "game_id", "season", "week", "offense_team",
-            "receiver_player_id", "receiver_player_name"
-        ]).agg({
-            "pass_attempt": "sum",
-            "complete_pass": "sum",
-            "yards_gained": "sum",
-            "air_yards": "sum",
-            "touchdown": "sum",
-            "epa": ["sum", "mean"]
-        }).reset_index()
+        overall = (
+            targets.groupby(
+                [
+                    "game_id",
+                    "season",
+                    "week",
+                    "offense_team",
+                    "receiver_player_id",
+                    "receiver_player_name",
+                ]
+            )
+            .agg(
+                {
+                    "pass_attempt": "sum",
+                    "complete_pass": "sum",
+                    "yards_gained": "sum",
+                    "air_yards": "sum",
+                    "touchdown": "sum",
+                    "epa": ["sum", "mean"],
+                }
+            )
+            .reset_index()
+        )
 
         overall.columns = [
-            "game_id", "season", "week", "team",
-            "receiver_id", "receiver_name",
-            "targets_overall", "receptions_overall", "yards_overall",
-            "air_yards_overall", "tds_overall", "epa_overall", "epa_per_target_overall"
+            "game_id",
+            "season",
+            "week",
+            "team",
+            "receiver_id",
+            "receiver_name",
+            "targets_overall",
+            "receptions_overall",
+            "yards_overall",
+            "air_yards_overall",
+            "tds_overall",
+            "epa_overall",
+            "epa_per_target_overall",
         ]
 
         # Target stats by coverage type
@@ -192,22 +200,32 @@ class TargetShareCoverageEngine:
             if len(cov_plays) == 0:
                 continue
 
-            cov_agg = cov_plays.groupby([
-                "game_id", "receiver_player_id", "receiver_player_name"
-            ]).agg({
-                "pass_attempt": "sum",
-                "complete_pass": "sum",
-                "yards_gained": "sum",
-                "air_yards": "sum",
-                "touchdown": "sum",
-                "epa": ["sum", "mean"]
-            }).reset_index()
+            cov_agg = (
+                cov_plays.groupby(["game_id", "receiver_player_id", "receiver_player_name"])
+                .agg(
+                    {
+                        "pass_attempt": "sum",
+                        "complete_pass": "sum",
+                        "yards_gained": "sum",
+                        "air_yards": "sum",
+                        "touchdown": "sum",
+                        "epa": ["sum", "mean"],
+                    }
+                )
+                .reset_index()
+            )
 
             cov_agg.columns = [
-                "game_id", "receiver_id", "receiver_name",
-                f"targets_{coverage}", f"receptions_{coverage}",
-                f"yards_{coverage}", f"air_yards_{coverage}",
-                f"tds_{coverage}", f"epa_{coverage}", f"epa_per_target_{coverage}"
+                "game_id",
+                "receiver_id",
+                "receiver_name",
+                f"targets_{coverage}",
+                f"receptions_{coverage}",
+                f"yards_{coverage}",
+                f"air_yards_{coverage}",
+                f"tds_{coverage}",
+                f"epa_{coverage}",
+                f"epa_per_target_{coverage}",
             ]
 
             coverage_stats.append(cov_agg)
@@ -216,17 +234,18 @@ class TargetShareCoverageEngine:
         result = overall.copy()
         for cov_df in coverage_stats:
             result = result.merge(
-                cov_df,
-                on=["game_id", "receiver_id", "receiver_name"],
-                how="left"
+                cov_df, on=["game_id", "receiver_id", "receiver_name"], how="left"
             )
 
         # Fill NaN values (games where receiver wasn't targeted vs that coverage)
         for coverage in ["zone", "man"]:
             for col in [
-                f"targets_{coverage}", f"receptions_{coverage}",
-                f"yards_{coverage}", f"air_yards_{coverage}",
-                f"tds_{coverage}", f"epa_{coverage}"
+                f"targets_{coverage}",
+                f"receptions_{coverage}",
+                f"yards_{coverage}",
+                f"air_yards_{coverage}",
+                f"tds_{coverage}",
+                f"epa_{coverage}",
             ]:
                 if col in result.columns:
                     result[col] = result[col].fillna(0)
@@ -234,9 +253,7 @@ class TargetShareCoverageEngine:
         return result
 
     def calculate_team_target_distribution(
-        self,
-        plays: pd.DataFrame,
-        receiver_stats: pd.DataFrame
+        self, plays: pd.DataFrame, receiver_stats: pd.DataFrame
     ) -> pd.DataFrame:
         """
         Calculate team-level target distribution metrics.
@@ -248,21 +265,22 @@ class TargetShareCoverageEngine:
         - How distribution changes vs zone/man
         """
         # Get team-level target totals by game and coverage
-        team_coverage_totals = plays[plays["receiver_player_id"].notna()].groupby([
-            "game_id", "season", "week", "offense_team", "inferred_coverage"
-        ]).agg({
-            "pass_attempt": "sum"
-        }).reset_index()
+        team_coverage_totals = (
+            plays[plays["receiver_player_id"].notna()]
+            .groupby(["game_id", "season", "week", "offense_team", "inferred_coverage"])
+            .agg({"pass_attempt": "sum"})
+            .reset_index()
+        )
 
-        team_coverage_totals = team_coverage_totals.rename(columns={
-            "pass_attempt": "team_targets"
-        })
+        team_coverage_totals = team_coverage_totals.rename(columns={"pass_attempt": "team_targets"})
 
         # Calculate target shares
         receiver_coverage = receiver_stats.copy()
 
         # Overall target share
-        team_overall = receiver_stats.groupby(["game_id", "team"])["targets_overall"].sum().reset_index()
+        team_overall = (
+            receiver_stats.groupby(["game_id", "team"])["targets_overall"].sum().reset_index()
+        )
         team_overall = team_overall.rename(columns={"targets_overall": "team_targets_overall"})
 
         receiver_coverage = receiver_coverage.merge(
@@ -281,17 +299,18 @@ class TargetShareCoverageEngine:
                 continue
 
             # Get team totals for this coverage
-            team_cov = plays[
-                (plays["receiver_player_id"].notna()) &
-                (plays["inferred_coverage"] == coverage)
-            ].groupby(["game_id", "offense_team"]).agg({
-                "pass_attempt": "sum"
-            }).reset_index()
+            team_cov = (
+                plays[
+                    (plays["receiver_player_id"].notna()) & (plays["inferred_coverage"] == coverage)
+                ]
+                .groupby(["game_id", "offense_team"])
+                .agg({"pass_attempt": "sum"})
+                .reset_index()
+            )
 
-            team_cov = team_cov.rename(columns={
-                "offense_team": "team",
-                "pass_attempt": f"team_targets_{coverage}"
-            })
+            team_cov = team_cov.rename(
+                columns={"offense_team": "team", "pass_attempt": f"team_targets_{coverage}"}
+            )
 
             receiver_coverage = receiver_coverage.merge(
                 team_cov, on=["game_id", "team"], how="left"
@@ -303,16 +322,13 @@ class TargetShareCoverageEngine:
             ) * 100
 
             # Fill NaN (no targets vs that coverage)
-            receiver_coverage[f"target_share_{coverage}"] = (
-                receiver_coverage[f"target_share_{coverage}"].fillna(0)
-            )
+            receiver_coverage[f"target_share_{coverage}"] = receiver_coverage[
+                f"target_share_{coverage}"
+            ].fillna(0)
 
         return receiver_coverage
 
-    def calculate_target_concentration(
-        self,
-        receiver_stats: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_target_concentration(self, receiver_stats: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate target concentration metrics at team-game level.
 
@@ -332,7 +348,7 @@ class TargetShareCoverageEngine:
                 "game_id": game_id,
                 "team": team,
                 "season": game_data["season"],
-                "week": game_data["week"]
+                "week": game_data["week"],
             }
 
             # Overall concentration
@@ -343,11 +359,15 @@ class TargetShareCoverageEngine:
                 n = len(shares)
                 shares_sorted = np.sort(shares)
                 index = np.arange(1, n + 1)
-                gini = (2 * np.sum(index * shares_sorted)) / (n * np.sum(shares_sorted)) - (n + 1) / n
+                gini = (2 * np.sum(index * shares_sorted)) / (n * np.sum(shares_sorted)) - (
+                    n + 1
+                ) / n
 
                 metrics["target_concentration_gini"] = gini
                 metrics["top_target_share"] = shares[0] if len(shares) > 0 else 0
-                metrics["top3_target_share"] = shares[:3].sum() if len(shares) >= 3 else shares.sum()
+                metrics["top3_target_share"] = (
+                    shares[:3].sum() if len(shares) >= 3 else shares.sum()
+                )
                 metrics["num_receivers_targeted"] = len(shares)
             else:
                 metrics["target_concentration_gini"] = 0
@@ -364,7 +384,9 @@ class TargetShareCoverageEngine:
                     n_zone = len(zone_shares)
                     zone_sorted = np.sort(zone_shares)
                     index_zone = np.arange(1, n_zone + 1)
-                    gini_zone = (2 * np.sum(index_zone * zone_sorted)) / (n_zone * np.sum(zone_sorted)) - (n_zone + 1) / n_zone
+                    gini_zone = (2 * np.sum(index_zone * zone_sorted)) / (
+                        n_zone * np.sum(zone_sorted)
+                    ) - (n_zone + 1) / n_zone
 
                     metrics["target_concentration_gini_zone"] = gini_zone
                     metrics["top_target_share_zone"] = zone_shares[0]
@@ -383,7 +405,9 @@ class TargetShareCoverageEngine:
                     n_man = len(man_shares)
                     man_sorted = np.sort(man_shares)
                     index_man = np.arange(1, n_man + 1)
-                    gini_man = (2 * np.sum(index_man * man_sorted)) / (n_man * np.sum(man_sorted)) - (n_man + 1) / n_man
+                    gini_man = (2 * np.sum(index_man * man_sorted)) / (
+                        n_man * np.sum(man_sorted)
+                    ) - (n_man + 1) / n_man
 
                     metrics["target_concentration_gini_man"] = gini_man
                     metrics["top_target_share_man"] = man_shares[0]
@@ -397,10 +421,7 @@ class TargetShareCoverageEngine:
 
         return pd.DataFrame(team_concentration)
 
-    def add_receiver_role_indicators(
-        self,
-        receiver_stats: pd.DataFrame
-    ) -> pd.DataFrame:
+    def add_receiver_role_indicators(self, receiver_stats: pd.DataFrame) -> pd.DataFrame:
         """
         Add indicators for receiver role within offense.
 
@@ -449,10 +470,7 @@ class TargetShareCoverageEngine:
 
         return result
 
-    def add_efficiency_vs_coverage(
-        self,
-        receiver_stats: pd.DataFrame
-    ) -> pd.DataFrame:
+    def add_efficiency_vs_coverage(self, receiver_stats: pd.DataFrame) -> pd.DataFrame:
         """
         Add efficiency metrics comparing performance vs zone/man.
 
@@ -484,9 +502,7 @@ class TargetShareCoverageEngine:
 
         # Man coverage efficiency
         if "targets_man" in result.columns:
-            result["yards_per_target_man"] = (
-                result["yards_man"] / result["targets_man"]
-            ).fillna(0)
+            result["yards_per_target_man"] = (result["yards_man"] / result["targets_man"]).fillna(0)
 
             result["catch_rate_man"] = (
                 result["receptions_man"] / result["targets_man"] * 100
@@ -508,20 +524,18 @@ class TargetShareCoverageEngine:
                 result["epa_per_target_zone"] - result["epa_per_target_man"]
             )
 
-            result["better_vs_zone"] = (
-                result["epa_per_target_diff_zone_vs_man"] > 0.05
-            ).astype(int)
+            result["better_vs_zone"] = (result["epa_per_target_diff_zone_vs_man"] > 0.05).astype(
+                int
+            )
 
-            result["better_vs_man"] = (
-                result["epa_per_target_diff_zone_vs_man"] < -0.05
-            ).astype(int)
+            result["better_vs_man"] = (result["epa_per_target_diff_zone_vs_man"] < -0.05).astype(
+                int
+            )
 
         return result
 
     def generate_all_features(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
+        self, start_season: int = 2024, end_season: int = 2025
     ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Generate all target share vs coverage features.
@@ -529,9 +543,7 @@ class TargetShareCoverageEngine:
         Returns:
             Tuple of (receiver_features, team_concentration_features)
         """
-        logger.info(
-            f"Generating target share vs coverage features for {start_season}-{end_season}"
-        )
+        logger.info(f"Generating target share vs coverage features for {start_season}-{end_season}")
 
         # Load passing plays
         plays = self.load_passing_plays(start_season, end_season)
@@ -573,8 +585,7 @@ def main():
 
     # Generate features for 2024-2025
     receiver_features, team_features = engine.generate_all_features(
-        start_season=2024,
-        end_season=2025
+        start_season=2024, end_season=2025
     )
 
     print("\n" + "=" * 70)
@@ -588,11 +599,17 @@ def main():
     # Show sample
     print("Sample receiver features:")
     sample_cols = [
-        "receiver_name", "team", "week",
-        "targets_overall", "target_share_overall",
-        "targets_zone", "target_share_zone",
-        "targets_man", "target_share_man",
-        "is_primary_target", "yards_per_target_overall"
+        "receiver_name",
+        "team",
+        "week",
+        "targets_overall",
+        "target_share_overall",
+        "targets_zone",
+        "target_share_zone",
+        "targets_man",
+        "target_share_man",
+        "is_primary_target",
+        "yards_per_target_overall",
     ]
     print(receiver_features[sample_cols].head(10).to_string())
     print()
@@ -623,7 +640,7 @@ def main():
         print(f"  Avg catch rate: {man_targeted['catch_rate_man'].mean():.2f}%")
 
     # Role distribution
-    print(f"\nReceiver roles:")
+    print("\nReceiver roles:")
     print(f"  Primary targets: {receiver_features['is_primary_target'].sum():,} receiver-games")
     print(f"  Secondary targets: {receiver_features['is_secondary_target'].sum():,} receiver-games")
     print(f"  Tertiary targets: {receiver_features['is_tertiary_target'].sum():,} receiver-games")
@@ -637,8 +654,12 @@ def main():
 
     print("Sample team concentration metrics:")
     conc_cols = [
-        "team", "week", "target_concentration_gini",
-        "top_target_share", "top3_target_share", "num_receivers_targeted"
+        "team",
+        "week",
+        "target_concentration_gini",
+        "top_target_share",
+        "top3_target_share",
+        "num_receivers_targeted",
     ]
     print(team_features[conc_cols].head(10).to_string())
     print()
@@ -651,11 +672,15 @@ def main():
 
     if "target_concentration_gini_zone" in team_features.columns:
         zone_games = team_features[team_features["target_concentration_gini_zone"] > 0]
-        print(f"\n  Zone coverage concentration: {zone_games['target_concentration_gini_zone'].mean():.3f}")
+        print(
+            f"\n  Zone coverage concentration: {zone_games['target_concentration_gini_zone'].mean():.3f}"
+        )
 
     if "target_concentration_gini_man" in team_features.columns:
         man_games = team_features[team_features["target_concentration_gini_man"] > 0]
-        print(f"  Man coverage concentration: {man_games['target_concentration_gini_man'].mean():.3f}")
+        print(
+            f"  Man coverage concentration: {man_games['target_concentration_gini_man'].mean():.3f}"
+        )
 
     print("\n" + "=" * 70)
     print("✓ Target share vs coverage feature generation complete")

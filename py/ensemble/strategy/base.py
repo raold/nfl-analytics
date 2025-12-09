@@ -10,10 +10,10 @@ Date: November 9, 2025
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Any
 from enum import Enum
-import numpy as np
+from typing import Any
 
+import numpy as np
 
 # ============================================================================
 # Canonical Ensemble Weight Presets
@@ -28,6 +28,19 @@ DEFAULT_WEIGHTS_V6 = {
     "xgboost_v4_ridge": 0.23,
     "informative_priors_v2": 0.13,
     "hybrid_static_incremental": 0.10,
+}
+
+# v6.1 Weights - 6-way ensemble with GNN (INITIAL CONSERVATIVE ALLOCATION)
+# GNN added with 10% weight (AUC 0.61, Accuracy 55.9%)
+# Other weights scaled down proportionally to maintain total = 1.0
+# NOTE: These are INITIAL weights - will be optimized after validation
+DEFAULT_WEIGHTS_V6_1_GNN = {
+    "state_space_v2": 0.24,
+    "hierarchical_v2": 0.24,
+    "xgboost_v4_ridge": 0.20,
+    "informative_priors_v2": 0.12,
+    "hybrid_static_incremental": 0.10,
+    "gnn_hierarchical_v1": 0.10,
 }
 
 # v8.0 Dirichlet Weights - Optimized for player-level predictions (props: yards, TDs)
@@ -45,6 +58,7 @@ DIRICHLET_WEIGHTS_V8 = {
 
 class ModelType(Enum):
     """Supported model types."""
+
     STATE_SPACE = "state_space"
     HIERARCHICAL = "hierarchical"
     INFORMATIVE_PRIORS = "informative_priors"
@@ -66,12 +80,13 @@ class ModelPrediction:
         confidence: Model confidence score (0-1)
         metadata: Additional model-specific metadata
     """
+
     model_name: str
     model_type: ModelType
     prediction_mean: float
     prediction_std: float
     confidence: float = 1.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
         """Validate prediction values."""
@@ -95,13 +110,14 @@ class EnsemblePrediction:
         confidence: Overall confidence score
         metadata: Additional ensemble metadata
     """
+
     prediction_mean: float
     prediction_std: float
-    model_predictions: List[ModelPrediction]
-    weights: Dict[str, float]
+    model_predictions: list[ModelPrediction]
+    weights: dict[str, float]
     strategy_name: str
     confidence: float = 1.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def num_models(self) -> int:
@@ -136,13 +152,14 @@ class EnsembleConfig:
         cache_predictions: Whether to cache model predictions
         db_config: Database configuration dict
     """
+
     strategy_name: str = "weighted_average"
-    model_paths: Dict[str, str] = field(default_factory=dict)
-    weights: Dict[str, float] = field(default_factory=dict)
+    model_paths: dict[str, str] = field(default_factory=dict)
+    weights: dict[str, float] = field(default_factory=dict)
     confidence_threshold: float = 0.5
     require_minimum_models: int = 2
     cache_predictions: bool = True
-    db_config: Dict[str, Any] = field(default_factory=dict)
+    db_config: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
         """
@@ -153,6 +170,7 @@ class EnsembleConfig:
         """
         if not self.db_config:
             import os
+
             self.db_config = {
                 "host": os.getenv("DB_HOST", "localhost"),
                 "port": int(os.getenv("DB_PORT", "5544")),
@@ -203,11 +221,7 @@ class EnsembleStrategy(ABC):
         pass
 
     @abstractmethod
-    def combine(
-        self,
-        predictions: List[ModelPrediction],
-        **kwargs
-    ) -> EnsemblePrediction:
+    def combine(self, predictions: list[ModelPrediction], **kwargs) -> EnsemblePrediction:
         """
         Combine individual model predictions into ensemble prediction.
 
@@ -223,7 +237,7 @@ class EnsembleStrategy(ABC):
         """
         pass
 
-    def validate_predictions(self, predictions: List[ModelPrediction]) -> None:
+    def validate_predictions(self, predictions: list[ModelPrediction]) -> None:
         """
         Validate predictions before combining.
 
@@ -239,20 +253,16 @@ class EnsembleStrategy(ABC):
         for pred in predictions:
             if np.isnan(pred.prediction_mean) or np.isinf(pred.prediction_mean):
                 raise ValueError(
-                    f"Invalid prediction from {pred.model_name}: "
-                    f"mean={pred.prediction_mean}"
+                    f"Invalid prediction from {pred.model_name}: " f"mean={pred.prediction_mean}"
                 )
             if np.isnan(pred.prediction_std) or pred.prediction_std < 0:
                 raise ValueError(
-                    f"Invalid prediction std from {pred.model_name}: "
-                    f"std={pred.prediction_std}"
+                    f"Invalid prediction std from {pred.model_name}: " f"std={pred.prediction_std}"
                 )
 
     def filter_predictions(
-        self,
-        predictions: List[ModelPrediction],
-        confidence_threshold: float = 0.5
-    ) -> List[ModelPrediction]:
+        self, predictions: list[ModelPrediction], confidence_threshold: float = 0.5
+    ) -> list[ModelPrediction]:
         """
         Filter predictions by confidence threshold.
 
@@ -263,10 +273,7 @@ class EnsembleStrategy(ABC):
         Returns:
             Filtered list of predictions
         """
-        return [
-            p for p in predictions
-            if p.confidence >= confidence_threshold
-        ]
+        return [p for p in predictions if p.confidence >= confidence_threshold]
 
 
 if __name__ == "__main__":
@@ -283,7 +290,7 @@ if __name__ == "__main__":
         prediction_mean=250.5,
         prediction_std=25.0,
         confidence=0.85,
-        metadata={"training_samples": 1000}
+        metadata={"training_samples": 1000},
     )
     logger.info(f"✓ ModelPrediction created: {pred.model_name}")
 
@@ -293,7 +300,7 @@ if __name__ == "__main__":
         prediction_std=20.0,
         model_predictions=[pred],
         weights={"test_model": 1.0},
-        strategy_name="test_strategy"
+        strategy_name="test_strategy",
     )
     logger.info(f"✓ EnsemblePrediction created: {ensemble.num_models} models")
 
@@ -301,10 +308,7 @@ if __name__ == "__main__":
     logger.info(f"✓ 95% Prediction interval: [{lower:.1f}, {upper:.1f}]")
 
     # Test EnsembleConfig
-    config = EnsembleConfig(
-        strategy_name="weighted",
-        weights={"model1": 0.6, "model2": 0.4}
-    )
+    config = EnsembleConfig(strategy_name="weighted", weights={"model1": 0.6, "model2": 0.4})
     logger.info(f"✓ EnsembleConfig created: strategy={config.strategy_name}")
 
     logger.info("\n✅ All data structure tests passed!")

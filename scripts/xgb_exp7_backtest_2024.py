@@ -43,35 +43,33 @@ Version: 7.0-backtest-2024
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-import logging
-import warnings
-import pickle
 import json
+import logging
+import os
+import pickle
+import warnings
 from datetime import datetime
-from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
-from sklearn.linear_model import RidgeCV
-from sklearn.preprocessing import StandardScaler
 import xgboost as xgb
-from sklearn.metrics import mean_absolute_error, mean_squared_error
 from dotenv import load_dotenv
-import os
+from sklearn.linear_model import RidgeCV
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+from sklearn.preprocessing import StandardScaler
 
 # Load environment variables
 load_dotenv()
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class RidgeResidualsBacktest2024:
@@ -82,16 +80,11 @@ class RidgeResidualsBacktest2024:
         db_password = os.getenv("DB_PASSWORD")
         if not db_password:
             raise ValueError(
-                "DB_PASSWORD environment variable not set. "
-                "Set DB_PASSWORD in .env file."
+                "DB_PASSWORD environment variable not set. " "Set DB_PASSWORD in .env file."
             )
 
         self.conn = psycopg2.connect(
-            host="localhost",
-            port=5544,
-            database="devdb01",
-            user="dro",
-            password=db_password
+            host="localhost", port=5544, database="devdb01", user="dro", password=db_password
         )
 
         # Models and scalers
@@ -204,10 +197,7 @@ class RidgeResidualsBacktest2024:
 
         return df
 
-    def prepare_features(
-        self,
-        df: pd.DataFrame
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    def prepare_features(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Prepare feature sets for Ridge and XGBoost.
 
@@ -219,11 +209,17 @@ class RidgeResidualsBacktest2024:
         logger.info("Preparing features (train: 2018-2023, test: 2024)...")
 
         # Add rolling averages for each player
-        df = df.sort_values(['player_id', 'season', 'week']).copy()
-        df['pass_yards_l3'] = df.groupby('player_id')['passing_yards'].shift(1).rolling(3, min_periods=1).mean()
-        df['pass_attempts_l3'] = df.groupby('player_id')['pass_attempts'].shift(1).rolling(3, min_periods=1).mean()
-        df['completions_l3'] = df.groupby('player_id')['completions'].shift(1).rolling(3, min_periods=1).mean()
-        df['completions_pct_l3'] = (df['completions_l3'] / df['pass_attempts_l3']).fillna(0.5)
+        df = df.sort_values(["player_id", "season", "week"]).copy()
+        df["pass_yards_l3"] = (
+            df.groupby("player_id")["passing_yards"].shift(1).rolling(3, min_periods=1).mean()
+        )
+        df["pass_attempts_l3"] = (
+            df.groupby("player_id")["pass_attempts"].shift(1).rolling(3, min_periods=1).mean()
+        )
+        df["completions_l3"] = (
+            df.groupby("player_id")["completions"].shift(1).rolling(3, min_periods=1).mean()
+        )
+        df["completions_pct_l3"] = (df["completions_l3"] / df["pass_attempts_l3"]).fillna(0.5)
 
         # Split data: 2018-2023 train, 2024 test
         train_df = df[df.season < 2024].copy()
@@ -233,44 +229,42 @@ class RidgeResidualsBacktest2024:
 
         # Define feature sets
         # RIDGE FEATURES: Opponent features ONLY
-        self.ridge_features = [
-            'opp_def_epa_exp',
-            'opp_points_allowed_avg',
-            'matchup_difficulty'
-        ]
+        self.ridge_features = ["opp_def_epa_exp", "opp_points_allowed_avg", "matchup_difficulty"]
 
         # BASELINE FEATURES: Player + game context (NO opponent features)
         self.baseline_features = [
-            'pass_yards_l3',           # Player 3-game average (most predictive)
-            'pass_attempts_l3',
-            'completions_l3',
-            'completions_pct_l3',
-            'home_away_encoded'        # Will be created below
+            "pass_yards_l3",  # Player 3-game average (most predictive)
+            "pass_attempts_l3",
+            "completions_l3",
+            "completions_pct_l3",
+            "home_away_encoded",  # Will be created below
         ]
 
         # Encode home/away
-        train_df['home_away_encoded'] = (train_df['home_away'] == 'home').astype(int)
-        test_df['home_away_encoded'] = (test_df['home_away'] == 'home').astype(int)
+        train_df["home_away_encoded"] = (train_df["home_away"] == "home").astype(int)
+        test_df["home_away_encoded"] = (test_df["home_away"] == "home").astype(int)
 
         # Handle missing values
-        for col in ['pass_yards_l3', 'pass_attempts_l3', 'completions_l3', 'completions_pct_l3']:
+        for col in ["pass_yards_l3", "pass_attempts_l3", "completions_l3", "completions_pct_l3"]:
             train_df[col] = train_df[col].fillna(train_df[col].mean())
             test_df[col] = test_df[col].fillna(test_df[col].mean())
 
         # Ensure opponent features exist and are valid
-        for col in ['opp_def_epa_exp', 'opp_points_allowed_avg', 'matchup_difficulty']:
+        for col in ["opp_def_epa_exp", "opp_points_allowed_avg", "matchup_difficulty"]:
             train_df[col] = train_df[col].fillna(0.0)
             test_df[col] = test_df[col].fillna(0.0)
 
         # Target variable
-        train_df['target'] = train_df['passing_yards']
-        test_df['target'] = test_df['passing_yards']
+        train_df["target"] = train_df["passing_yards"]
+        test_df["target"] = test_df["passing_yards"]
 
         return train_df, test_df
 
     def train_ridge_model(self, X_train: pd.DataFrame, y_train: pd.Series):
         """Train RidgeCV on opponent features ONLY."""
-        logger.info(f"Training Ridge on opponent features only ({len(self.ridge_features)} features)...")
+        logger.info(
+            f"Training Ridge on opponent features only ({len(self.ridge_features)} features)..."
+        )
 
         X_ridge = X_train[self.ridge_features].copy()
 
@@ -290,10 +284,7 @@ class RidgeResidualsBacktest2024:
         logger.info(f"Ridge R²: {self.ridge.score(X_ridge_scaled, y_train):.4f}")
 
         # Log coefficients
-        coef_dict = {
-            feat: coef
-            for feat, coef in zip(self.ridge_features, self.ridge.coef_)
-        }
+        coef_dict = {feat: coef for feat, coef in zip(self.ridge_features, self.ridge.coef_)}
         logger.info(f"Ridge coefficients: {json.dumps(coef_dict, indent=2)}")
 
         return X_ridge_scaled
@@ -304,8 +295,8 @@ class RidgeResidualsBacktest2024:
         X_test: pd.DataFrame,
         y_train: pd.Series,
         y_test: pd.Series,
-        X_ridge_train_scaled: np.ndarray
-    ) -> Tuple[np.ndarray, np.ndarray, pd.DataFrame, pd.DataFrame]:
+        X_ridge_train_scaled: np.ndarray,
+    ) -> tuple[np.ndarray, np.ndarray, pd.DataFrame, pd.DataFrame]:
         """
         Calculate residuals: yards_beyond_opponent = actual - ridge.predict(opp_features).
 
@@ -327,26 +318,26 @@ class RidgeResidualsBacktest2024:
         residuals_test = y_test.values - ridge_pred_test
 
         # Log residual statistics
-        logger.info(f"Train residuals: mean={residuals_train.mean():.2f}, std={residuals_train.std():.2f}")
-        logger.info(f"Test residuals: mean={residuals_test.mean():.2f}, std={residuals_test.std():.2f}")
+        logger.info(
+            f"Train residuals: mean={residuals_train.mean():.2f}, std={residuals_train.std():.2f}"
+        )
+        logger.info(
+            f"Test residuals: mean={residuals_test.mean():.2f}, std={residuals_test.std():.2f}"
+        )
         logger.info(f"Ridge train MAE: {mean_absolute_error(y_train, ridge_pred_train):.2f}")
         logger.info(f"Ridge test MAE: {mean_absolute_error(y_test, ridge_pred_test):.2f}")
 
         # Add residuals to training data
         X_train_with_residuals = X_train[self.baseline_features].copy()
-        X_train_with_residuals['residual_feature'] = residuals_train
+        X_train_with_residuals["residual_feature"] = residuals_train
 
         X_test_with_residuals = X_test[self.baseline_features].copy()
-        X_test_with_residuals['residual_feature'] = residuals_test
+        X_test_with_residuals["residual_feature"] = residuals_test
 
         return residuals_train, residuals_test, X_train_with_residuals, X_test_with_residuals
 
     def train_xgboost_model(
-        self,
-        X_train: pd.DataFrame,
-        y_train: pd.Series,
-        X_test: pd.DataFrame,
-        y_test: pd.Series
+        self, X_train: pd.DataFrame, y_train: pd.Series, X_test: pd.DataFrame, y_test: pd.Series
     ):
         """Train XGBoost on baseline features + residual feature."""
         logger.info(f"Training XGBoost on {len(X_train.columns)} features...")
@@ -366,13 +357,11 @@ class RidgeResidualsBacktest2024:
             subsample=0.8,
             colsample_bytree=0.8,
             random_state=42,
-            verbosity=0
+            verbosity=0,
         )
 
         self.xgb_model.fit(
-            X_train_scaled, y_train,
-            eval_set=[(X_test_scaled, y_test)],
-            verbose=False
+            X_train_scaled, y_train, eval_set=[(X_test_scaled, y_test)], verbose=False
         )
 
         # Evaluate
@@ -388,19 +377,18 @@ class RidgeResidualsBacktest2024:
         logger.info(f"XGBoost Test MAE (2024): {test_mae:.2f}, RMSE: {test_rmse:.2f}")
 
         # Feature importance
-        importance_df = pd.DataFrame({
-            'feature': features,
-            'importance': self.xgb_model.feature_importances_
-        }).sort_values('importance', ascending=False)
+        importance_df = pd.DataFrame(
+            {"feature": features, "importance": self.xgb_model.feature_importances_}
+        ).sort_values("importance", ascending=False)
 
         logger.info("\nXGBoost Feature Importance (Top 10):")
         logger.info(importance_df.head(10).to_string(index=False))
 
-        self.results['train_mae'] = train_mae
-        self.results['test_mae_2024'] = test_mae
-        self.results['train_rmse'] = train_rmse
-        self.results['test_rmse_2024'] = test_rmse
-        self.results['feature_importance'] = importance_df.to_dict('records')
+        self.results["train_mae"] = train_mae
+        self.results["test_mae_2024"] = test_mae
+        self.results["train_rmse"] = train_rmse
+        self.results["test_rmse_2024"] = test_rmse
+        self.results["feature_importance"] = importance_df.to_dict("records")
 
         return test_preds
 
@@ -413,24 +401,24 @@ class RidgeResidualsBacktest2024:
         2. Improvement vs baseline > 30 yards (87% claim)
         3. RMSE reasonable (<15 yards)
         """
-        logger.info("\n" + "="*60)
+        logger.info("\n" + "=" * 60)
         logger.info("PRODUCTION READINESS VALIDATION (2024 BACKTEST)")
-        logger.info("="*60)
+        logger.info("=" * 60)
 
         baseline_mae = 40.20
-        test_mae_2024 = self.results['test_mae_2024']
+        test_mae_2024 = self.results["test_mae_2024"]
         test_mae_2025 = 5.10  # From original Exp 7
 
         improvement_2024 = baseline_mae - test_mae_2024
         improvement_pct_2024 = (improvement_2024 / baseline_mae) * 100
 
-        logger.info(f"\n2024 Backtest Results:")
+        logger.info("\n2024 Backtest Results:")
         logger.info(f"  Test MAE (2024): {test_mae_2024:.2f} yards")
         logger.info(f"  Test RMSE (2024): {self.results['test_rmse_2024']:.2f} yards")
         logger.info(f"  Baseline MAE: {baseline_mae:.2f} yards")
         logger.info(f"  Improvement: {improvement_2024:+.2f} yards ({improvement_pct_2024:+.2f}%)")
 
-        logger.info(f"\nComparison to 2025 Test:")
+        logger.info("\nComparison to 2025 Test:")
         logger.info(f"  2025 Test MAE: {test_mae_2025:.2f} yards")
         logger.info(f"  2024 Test MAE: {test_mae_2024:.2f} yards")
         logger.info(f"  Difference: {abs(test_mae_2024 - test_mae_2025):.2f} yards")
@@ -438,29 +426,37 @@ class RidgeResidualsBacktest2024:
         # Production gates
         gate1_pass = test_mae_2024 < 8.0
         gate2_pass = improvement_2024 > 30.0
-        gate3_pass = self.results['test_rmse_2024'] < 15.0
+        gate3_pass = self.results["test_rmse_2024"] < 15.0
 
-        logger.info(f"\nProduction Gates:")
-        logger.info(f"  Gate 1 (MAE < 8 yards): {'✅ PASS' if gate1_pass else '❌ FAIL'} ({test_mae_2024:.2f})")
-        logger.info(f"  Gate 2 (Improvement > 30 yards): {'✅ PASS' if gate2_pass else '❌ FAIL'} ({improvement_2024:.2f})")
-        logger.info(f"  Gate 3 (RMSE < 15 yards): {'✅ PASS' if gate3_pass else '❌ FAIL'} ({self.results['test_rmse_2024']:.2f})")
+        logger.info("\nProduction Gates:")
+        logger.info(
+            f"  Gate 1 (MAE < 8 yards): {'✅ PASS' if gate1_pass else '❌ FAIL'} ({test_mae_2024:.2f})"
+        )
+        logger.info(
+            f"  Gate 2 (Improvement > 30 yards): {'✅ PASS' if gate2_pass else '❌ FAIL'} ({improvement_2024:.2f})"
+        )
+        logger.info(
+            f"  Gate 3 (RMSE < 15 yards): {'✅ PASS' if gate3_pass else '❌ FAIL'} ({self.results['test_rmse_2024']:.2f})"
+        )
 
         production_ready = gate1_pass and gate2_pass and gate3_pass
 
         if production_ready:
-            logger.info(f"\n✅ PRODUCTION READY: All gates passed")
-            logger.info(f"   Recommendation: Integrate into ensemble v6 (20% weight)")
+            logger.info("\n✅ PRODUCTION READY: All gates passed")
+            logger.info("   Recommendation: Integrate into ensemble v6 (20% weight)")
         else:
-            logger.info(f"\n❌ NOT PRODUCTION READY: {sum([gate1_pass, gate2_pass, gate3_pass])}/3 gates passed")
-            logger.info(f"   Recommendation: Further investigation required")
+            logger.info(
+                f"\n❌ NOT PRODUCTION READY: {sum([gate1_pass, gate2_pass, gate3_pass])}/3 gates passed"
+            )
+            logger.info("   Recommendation: Further investigation required")
 
-        self.results['baseline_mae'] = baseline_mae
-        self.results['improvement_mae_2024'] = improvement_2024
-        self.results['improvement_pct_2024'] = improvement_pct_2024
-        self.results['production_ready'] = bool(production_ready)
-        self.results['gate1_mae'] = bool(gate1_pass)
-        self.results['gate2_improvement'] = bool(gate2_pass)
-        self.results['gate3_rmse'] = bool(gate3_pass)
+        self.results["baseline_mae"] = baseline_mae
+        self.results["improvement_mae_2024"] = improvement_2024
+        self.results["improvement_pct_2024"] = improvement_pct_2024
+        self.results["production_ready"] = bool(production_ready)
+        self.results["gate1_mae"] = bool(gate1_pass)
+        self.results["gate2_improvement"] = bool(gate2_pass)
+        self.results["gate3_rmse"] = bool(gate3_pass)
 
     def save_artifacts(self):
         """Save models and metadata."""
@@ -469,37 +465,41 @@ class RidgeResidualsBacktest2024:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
         # Save Ridge model
-        with open(f"models/ridge_residuals_v7_backtest2024_{timestamp}.pkl", 'wb') as f:
-            pickle.dump({
-                'ridge': self.ridge,
-                'scaler': self.ridge_scaler,
-                'features': self.ridge_features
-            }, f)
-        logger.info(f"Saved Ridge model")
+        with open(f"models/ridge_residuals_v7_backtest2024_{timestamp}.pkl", "wb") as f:
+            pickle.dump(
+                {"ridge": self.ridge, "scaler": self.ridge_scaler, "features": self.ridge_features},
+                f,
+            )
+        logger.info("Saved Ridge model")
 
         # Save XGBoost model
         self.xgb_model.save_model(f"models/xgb_ridge_residuals_v7_backtest2024_{timestamp}.json")
-        logger.info(f"Saved XGBoost model")
+        logger.info("Saved XGBoost model")
 
         # Save results
-        with open(f"results/xgb_exp7_backtest2024_results_{timestamp}.json", 'w') as f:
+        with open(f"results/xgb_exp7_backtest2024_results_{timestamp}.json", "w") as f:
             json.dump(self.results, f, indent=2)
-        logger.info(f"Saved results")
+        logger.info("Saved results")
 
         # Log summary
-        logger.info(f"\nResults Summary:")
-        logger.info(json.dumps({
-            'test_mae_2024': self.results['test_mae_2024'],
-            'improvement_vs_baseline': self.results['improvement_mae_2024'],
-            'improvement_pct': f"{self.results['improvement_pct_2024']:.2f}%",
-            'production_ready': self.results['production_ready']
-        }, indent=2))
+        logger.info("\nResults Summary:")
+        logger.info(
+            json.dumps(
+                {
+                    "test_mae_2024": self.results["test_mae_2024"],
+                    "improvement_vs_baseline": self.results["improvement_mae_2024"],
+                    "improvement_pct": f"{self.results['improvement_pct_2024']:.2f}%",
+                    "production_ready": self.results["production_ready"],
+                },
+                indent=2,
+            )
+        )
 
     def run(self):
         """Execute full backtest pipeline."""
-        logger.info("="*60)
+        logger.info("=" * 60)
         logger.info("Ridge Residuals - 2024 BACKTEST (Production Validation)")
-        logger.info("="*60)
+        logger.info("=" * 60)
 
         try:
             # 1. Load data
@@ -509,30 +509,20 @@ class RidgeResidualsBacktest2024:
             train_df, test_df = self.prepare_features(df)
 
             # 3. Train Ridge on opponent features
-            X_ridge_train_scaled = self.train_ridge_model(
-                train_df,
-                train_df['target']
-            )
+            X_ridge_train_scaled = self.train_ridge_model(train_df, train_df["target"])
 
             # 4. Calculate residuals
             _, _, X_train_with_residuals, X_test_with_residuals = self.calculate_residuals(
-                train_df,
-                test_df,
-                train_df['target'],
-                test_df['target'],
-                X_ridge_train_scaled
+                train_df, test_df, train_df["target"], test_df["target"], X_ridge_train_scaled
             )
 
             # 5. Train XGBoost on baseline + residuals
             test_preds = self.train_xgboost_model(
-                X_train_with_residuals,
-                train_df['target'],
-                X_test_with_residuals,
-                test_df['target']
+                X_train_with_residuals, train_df["target"], X_test_with_residuals, test_df["target"]
             )
 
             # 6. Validate production readiness
-            self.validate_production_readiness(test_preds, test_df['target'])
+            self.validate_production_readiness(test_preds, test_df["target"])
 
             # 7. Save artifacts
             self.save_artifacts()

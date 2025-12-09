@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""
+r"""
 Weekly Ensemble Weight Re-Optimization Pipeline
 
 Automated pipeline for adaptive ensemble weight learning:
@@ -34,15 +34,13 @@ Author: Claude Code (Sonnet 4.5)
 """
 
 import argparse
-import sys
-from pathlib import Path
 import json
 import logging
-from datetime import datetime
-from typing import List, Dict, Tuple, Optional
+import sys
+from pathlib import Path
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 import psycopg
 
 # Add project root to path
@@ -53,8 +51,7 @@ from py.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStacking
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -64,44 +61,41 @@ DB_CONFIG = {
     "port": 5544,
     "dbname": "devdb01",
     "user": "dro",
-    "password": "sicillionbillions"
+    "password": "sicillionbillions",
 }
 
 # Model names in ensemble v6.0
 ENSEMBLE_V6_MODELS = [
-    'state_space_v2',
-    'hierarchical_v2',
-    'xgboost_v4_ridge',
-    'informative_priors_v2',
-    'hybrid_static_incremental'
+    "state_space_v2",
+    "hierarchical_v2",
+    "xgboost_v4_ridge",
+    "informative_priors_v2",
+    "hybrid_static_incremental",
 ]
 
 # Default v6.0 static weights (for game predictions)
 DEFAULT_WEIGHTS_V6 = {
-    'state_space_v2': 0.27,
-    'hierarchical_v2': 0.27,
-    'xgboost_v4_ridge': 0.23,
-    'informative_priors_v2': 0.13,
-    'hybrid_static_incremental': 0.10
+    "state_space_v2": 0.27,
+    "hierarchical_v2": 0.27,
+    "xgboost_v4_ridge": 0.23,
+    "informative_priors_v2": 0.13,
+    "hybrid_static_incremental": 0.10,
 }
 
 # Dirichlet-learned v8.0 weights (optimal for player props, Nov 26, 2025 grid search)
 # Grid search: 108 configs, prior_strength=1.0, likelihood_scale=20.0, scoring=squared
 # Result: 31.5% MAE improvement (89.42 -> 61.26 yards)
 DIRICHLET_WEIGHTS_V8 = {
-    'state_space_v2': 0.082,
-    'hierarchical_v2': 0.396,
-    'xgboost_v4_ridge': 0.026,
-    'informative_priors_v2': 0.395,
-    'hybrid_static_incremental': 0.101
+    "state_space_v2": 0.082,
+    "hierarchical_v2": 0.396,
+    "xgboost_v4_ridge": 0.026,
+    "informative_priors_v2": 0.395,
+    "hybrid_static_incremental": 0.101,
 }
 
 
 def fetch_predictions_with_actuals(
-    season: int,
-    week_start: int,
-    week_end: int,
-    model_names: List[str] = ENSEMBLE_V6_MODELS
+    season: int, week_start: int, week_end: int, model_names: list[str] = ENSEMBLE_V6_MODELS
 ) -> pd.DataFrame:
     """
     Fetch component predictions + actual outcomes from database.
@@ -168,10 +162,10 @@ def fetch_predictions_with_actuals(
 
 def optimize_ensemble_weights(
     df_predictions: pd.DataFrame,
-    model_names: List[str],
-    halflife_candidates: List[float] = [2, 3, 4, 5, 6, 8],
-    train_split: float = 0.8
-) -> Tuple[Dict[str, float], float, Dict]:
+    model_names: list[str],
+    halflife_candidates: list[float] = [2, 3, 4, 5, 6, 8],
+    train_split: float = 0.8,
+) -> tuple[dict[str, float], float, dict]:
     """
     Run WLS optimization with grid search over halflife candidates.
 
@@ -190,7 +184,7 @@ def optimize_ensemble_weights(
     wls = AdaptiveWLSWeightsV2(
         predictions_df=df_predictions,
         model_names=model_names,
-        halflife_candidates=halflife_candidates
+        halflife_candidates=halflife_candidates,
     )
 
     # Run grid search
@@ -206,18 +200,18 @@ def optimize_ensemble_weights(
     val_calibration = None  # TODO: Implement calibration check
 
     metrics = {
-        'validation_mae': val_mae,
-        'validation_rmse': val_rmse,
-        'validation_calibration': val_calibration,
-        'validation_games': len(df_predictions),
-        'optimal_halflife': optimal_halflife
+        "validation_mae": val_mae,
+        "validation_rmse": val_rmse,
+        "validation_calibration": val_calibration,
+        "validation_games": len(df_predictions),
+        "optimal_halflife": optimal_halflife,
     }
 
-    logger.info(f"✅ Optimization complete:")
+    logger.info("✅ Optimization complete:")
     logger.info(f"   Optimal halflife: {optimal_halflife} weeks")
     logger.info(f"   Validation MAE: {val_mae:.4f}")
     logger.info(f"   Validation RMSE: {val_rmse:.4f}")
-    logger.info(f"   Optimal weights:")
+    logger.info("   Optimal weights:")
     for model, weight in optimal_weights.items():
         logger.info(f"     {model}: {weight:.4f}")
 
@@ -226,11 +220,11 @@ def optimize_ensemble_weights(
 
 def optimize_ensemble_weights_dirichlet(
     df_predictions: pd.DataFrame,
-    model_names: List[str],
+    model_names: list[str],
     prior_strength: float = 1.0,
     likelihood_scale: float = 20.0,
-    use_v8_priors: bool = True
-) -> Tuple[Dict[str, float], float, Dict]:
+    use_v8_priors: bool = True,
+) -> tuple[dict[str, float], float, dict]:
     """
     Run Dirichlet Bayesian stacking for weight optimization.
 
@@ -247,8 +241,10 @@ def optimize_ensemble_weights_dirichlet(
     Returns:
         (optimal_weights, prior_strength, metrics)
     """
-    logger.info(f"Running Dirichlet optimization (prior_strength={prior_strength}, "
-                f"likelihood_scale={likelihood_scale})")
+    logger.info(
+        f"Running Dirichlet optimization (prior_strength={prior_strength}, "
+        f"likelihood_scale={likelihood_scale})"
+    )
 
     # Choose prior weights
     prior_weights = DIRICHLET_WEIGHTS_V8 if use_v8_priors else DEFAULT_WEIGHTS_V6
@@ -259,11 +255,11 @@ def optimize_ensemble_weights_dirichlet(
         component_names=model_names,
         prior_weights=prior_weights,
         prior_strength=prior_strength,
-        likelihood_scale=likelihood_scale
+        likelihood_scale=likelihood_scale,
     )
 
     # Process predictions in chronological order
-    df_sorted = df_predictions.sort_values(['season', 'week', 'player_id'])
+    df_sorted = df_predictions.sort_values(["season", "week", "player_id"])
 
     errors = []
     for idx, row in df_sorted.iterrows():
@@ -277,7 +273,7 @@ def optimize_ensemble_weights_dirichlet(
         if len(component_preds) < 2:
             continue  # Skip if insufficient components
 
-        actual = row['actual_value']
+        actual = row["actual_value"]
         if pd.isna(actual):
             continue  # Skip if no actual outcome
 
@@ -300,20 +296,20 @@ def optimize_ensemble_weights_dirichlet(
     val_rmse = np.sqrt(np.mean(np.array(errors) ** 2)) if errors else None
 
     metrics = {
-        'validation_mae': val_mae,
-        'validation_rmse': val_rmse,
-        'validation_calibration': None,  # TODO: Implement calibration check
-        'validation_games': len(errors),
-        'prior_strength': prior_strength,
-        'likelihood_scale': likelihood_scale,
-        'num_updates': stacker.num_updates
+        "validation_mae": val_mae,
+        "validation_rmse": val_rmse,
+        "validation_calibration": None,  # TODO: Implement calibration check
+        "validation_games": len(errors),
+        "prior_strength": prior_strength,
+        "likelihood_scale": likelihood_scale,
+        "num_updates": stacker.num_updates,
     }
 
-    logger.info(f"✅ Dirichlet optimization complete:")
+    logger.info("✅ Dirichlet optimization complete:")
     logger.info(f"   Num updates: {stacker.num_updates}")
     logger.info(f"   Validation MAE: {val_mae:.4f}" if val_mae else "   Validation MAE: N/A")
     logger.info(f"   Validation RMSE: {val_rmse:.4f}" if val_rmse else "   Validation RMSE: N/A")
-    logger.info(f"   Optimal weights:")
+    logger.info("   Optimal weights:")
     for model, weight in optimal_weights.items():
         logger.info(f"     {model}: {weight:.4f}")
 
@@ -321,9 +317,8 @@ def optimize_ensemble_weights_dirichlet(
 
 
 def compute_weight_change(
-    new_weights: Dict[str, float],
-    previous_weights: Optional[Dict[str, float]]
-) -> Tuple[float, float, str]:
+    new_weights: dict[str, float], previous_weights: dict[str, float] | None
+) -> tuple[float, float, str]:
     """
     Compute weight change statistics.
 
@@ -353,9 +348,7 @@ def compute_weight_change(
     return l1_norm, max_change, changed_component
 
 
-def get_previous_weights(
-    ensemble_version: str = 'v6.0'
-) -> Optional[Dict[str, float]]:
+def get_previous_weights(ensemble_version: str = "v6.0") -> dict[str, float] | None:
     """
     Fetch most recent weights from database.
 
@@ -392,11 +385,11 @@ def save_weights_to_database(
     training_start_week: int,
     training_end_week: int,
     training_window_size: int,
-    weights: Dict[str, float],
+    weights: dict[str, float],
     halflife: float,
-    metrics: Dict,
-    optimization_method: str = 'wls_grid_search',
-    deployed_by: str = 'weekly_cron'
+    metrics: dict,
+    optimization_method: str = "wls_grid_search",
+    deployed_by: str = "weekly_cron",
 ) -> int:
     """
     Save optimized weights to ml.ensemble_weight_history table.
@@ -498,31 +491,34 @@ def save_weights_to_database(
             cur.execute(update_query, (ensemble_version,))
 
             # Insert new weights
-            cur.execute(insert_query, (
-                ensemble_version,
-                effective_season,
-                effective_week,
-                training_start_week,
-                training_end_week,
-                training_window_size,
-                weights.get('state_space_v2', 0.0),
-                weights.get('hierarchical_v2', 0.0),
-                weights.get('xgboost_v4_ridge', 0.0),
-                weights.get('informative_priors_v2', 0.0),
-                weights.get('hybrid_static_incremental', 0.0),
-                json.dumps(weights),
-                optimization_method,
-                halflife,
-                metrics.get('validation_mae'),
-                metrics.get('validation_rmse'),
-                metrics.get('validation_calibration'),
-                metrics.get('validation_games'),
-                l1_norm,
-                max_change,
-                changed_component,
-                deployed_by,
-                ensemble_version
-            ))
+            cur.execute(
+                insert_query,
+                (
+                    ensemble_version,
+                    effective_season,
+                    effective_week,
+                    training_start_week,
+                    training_end_week,
+                    training_window_size,
+                    weights.get("state_space_v2", 0.0),
+                    weights.get("hierarchical_v2", 0.0),
+                    weights.get("xgboost_v4_ridge", 0.0),
+                    weights.get("informative_priors_v2", 0.0),
+                    weights.get("hybrid_static_incremental", 0.0),
+                    json.dumps(weights),
+                    optimization_method,
+                    halflife,
+                    metrics.get("validation_mae"),
+                    metrics.get("validation_rmse"),
+                    metrics.get("validation_calibration"),
+                    metrics.get("validation_games"),
+                    l1_norm,
+                    max_change,
+                    changed_component,
+                    deployed_by,
+                    ensemble_version,
+                ),
+            )
 
             history_id = cur.fetchone()[0]
             conn.commit()
@@ -534,56 +530,80 @@ def save_weights_to_database(
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='Weekly ensemble weight re-optimization pipeline'
+    parser = argparse.ArgumentParser(description="Weekly ensemble weight re-optimization pipeline")
+    parser.add_argument("--season", type=int, required=True, help="NFL season (e.g., 2024)")
+    parser.add_argument(
+        "--week",
+        type=int,
+        required=True,
+        help="Current week (weights will be deployed for this week)",
     )
-    parser.add_argument('--season', type=int, required=True,
-                        help='NFL season (e.g., 2024)')
-    parser.add_argument('--week', type=int, required=True,
-                        help='Current week (weights will be deployed for this week)')
-    parser.add_argument('--window', type=int, default=6,
-                        help='Training window size in weeks (default: 6)')
-    parser.add_argument('--method', type=str, default='wls',
-                        choices=['wls', 'dirichlet'],
-                        help='Optimization method: wls (Weighted Least Squares) or dirichlet (Bayesian stacking)')
-    parser.add_argument('--halflife-candidates', type=str, default='2,3,4,5,6,8',
-                        help='[WLS] Comma-separated halflife candidates (default: 2,3,4,5,6,8)')
-    parser.add_argument('--prior-strength', type=float, default=1.0,
-                        help='[Dirichlet] Prior concentration parameter (default: 1.0)')
-    parser.add_argument('--likelihood-scale', type=float, default=20.0,
-                        help='[Dirichlet] Likelihood scale in yards (default: 20.0)')
-    parser.add_argument('--use-v8-priors', action='store_true', default=True,
-                        help='[Dirichlet] Use v8.0 Dirichlet priors instead of v6.0 (default: True)')
-    parser.add_argument('--ensemble-version', type=str, default='v6.0',
-                        help='Ensemble version (default: v6.0)')
-    parser.add_argument('--dry-run', action='store_true',
-                        help='Run optimization but do not save to database')
+    parser.add_argument(
+        "--window", type=int, default=6, help="Training window size in weeks (default: 6)"
+    )
+    parser.add_argument(
+        "--method",
+        type=str,
+        default="wls",
+        choices=["wls", "dirichlet"],
+        help="Optimization method: wls (Weighted Least Squares) or dirichlet (Bayesian stacking)",
+    )
+    parser.add_argument(
+        "--halflife-candidates",
+        type=str,
+        default="2,3,4,5,6,8",
+        help="[WLS] Comma-separated halflife candidates (default: 2,3,4,5,6,8)",
+    )
+    parser.add_argument(
+        "--prior-strength",
+        type=float,
+        default=1.0,
+        help="[Dirichlet] Prior concentration parameter (default: 1.0)",
+    )
+    parser.add_argument(
+        "--likelihood-scale",
+        type=float,
+        default=20.0,
+        help="[Dirichlet] Likelihood scale in yards (default: 20.0)",
+    )
+    parser.add_argument(
+        "--use-v8-priors",
+        action="store_true",
+        default=True,
+        help="[Dirichlet] Use v8.0 Dirichlet priors instead of v6.0 (default: True)",
+    )
+    parser.add_argument(
+        "--ensemble-version", type=str, default="v6.0", help="Ensemble version (default: v6.0)"
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Run optimization but do not save to database"
+    )
 
     args = parser.parse_args()
 
     # Parse halflife candidates
-    halflife_candidates = [float(x) for x in args.halflife_candidates.split(',')]
+    halflife_candidates = [float(x) for x in args.halflife_candidates.split(",")]
 
     # Compute training window
     week_start = max(1, args.week - args.window)
     week_end = args.week - 1  # Don't include current week (no actuals yet)
 
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("WEEKLY ENSEMBLE WEIGHT RE-OPTIMIZATION")
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info(f"Ensemble: {args.ensemble_version}")
     logger.info(f"Season: {args.season}")
     logger.info(f"Effective Week: {args.week}")
     logger.info(f"Training Window: W{week_start}-{week_end} ({args.window} weeks)")
     logger.info(f"Method: {args.method.upper()}")
-    if args.method == 'wls':
+    if args.method == "wls":
         logger.info(f"Halflife Candidates: {halflife_candidates}")
     else:  # dirichlet
         logger.info(f"Prior Strength: {args.prior_strength}")
         logger.info(f"Likelihood Scale: {args.likelihood_scale}")
         logger.info(f"Use v8.0 Priors: {args.use_v8_priors}")
     logger.info(f"Dry Run: {args.dry_run}")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     try:
         # Step 1: Fetch predictions + actuals
@@ -591,7 +611,7 @@ def main():
             season=args.season,
             week_start=week_start,
             week_end=week_end,
-            model_names=ENSEMBLE_V6_MODELS
+            model_names=ENSEMBLE_V6_MODELS,
         )
 
         if len(df_predictions) == 0:
@@ -600,22 +620,22 @@ def main():
             return 1
 
         # Step 2: Optimize weights (based on selected method)
-        if args.method == 'wls':
+        if args.method == "wls":
             optimal_weights, optimal_halflife, metrics = optimize_ensemble_weights(
                 df_predictions=df_predictions,
                 model_names=ENSEMBLE_V6_MODELS,
-                halflife_candidates=halflife_candidates
+                halflife_candidates=halflife_candidates,
             )
-            optimization_method = 'wls_grid_search'
+            optimization_method = "wls_grid_search"
         else:  # dirichlet
             optimal_weights, optimal_halflife, metrics = optimize_ensemble_weights_dirichlet(
                 df_predictions=df_predictions,
                 model_names=ENSEMBLE_V6_MODELS,
                 prior_strength=args.prior_strength,
                 likelihood_scale=args.likelihood_scale,
-                use_v8_priors=args.use_v8_priors
+                use_v8_priors=args.use_v8_priors,
             )
-            optimization_method = 'dirichlet_bayesian_stacking'
+            optimization_method = "dirichlet_bayesian_stacking"
 
         # Step 3: Save to database (unless dry run)
         if args.dry_run:
@@ -633,24 +653,25 @@ def main():
                 halflife=optimal_halflife,
                 metrics=metrics,
                 optimization_method=optimization_method,
-                deployed_by='weekly_cron'
+                deployed_by="weekly_cron",
             )
 
             logger.info(f"✅ DEPLOYMENT SUCCESSFUL (history_id={history_id})")
-            logger.info(f"   Production ensemble will reload weights on next prediction call")
+            logger.info("   Production ensemble will reload weights on next prediction call")
 
-        logger.info("="*80)
+        logger.info("=" * 80)
         logger.info("OPTIMIZATION COMPLETE")
-        logger.info("="*80)
+        logger.info("=" * 80)
 
         return 0
 
     except Exception as e:
         logger.error(f"❌ ERROR: {str(e)}")
         import traceback
+
         logger.error(traceback.format_exc())
         return 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

@@ -14,16 +14,16 @@ Author: Claude Code
 Date: 2025-11-15
 """
 
-import os
-import uuid
 import hashlib
 import logging
+import os
+import uuid
 from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Any
+from typing import Any
 
-from fastapi import Security, HTTPException, status, Request
-from fastapi.security import APIKeyHeader
 import psycopg
+from fastapi import HTTPException, Request, Security, status
+from fastapi.security import APIKeyHeader
 from psycopg.rows import dict_row
 
 logger = logging.getLogger(__name__)
@@ -43,9 +43,9 @@ class APIKey:
         owner_email: str,
         rate_limit_per_hour: int,
         rate_limit_per_day: int,
-        allowed_endpoints: Optional[List[str]] = None,
-        allowed_ip_ranges: Optional[List[str]] = None,
-        expires_at: Optional[datetime] = None,
+        allowed_endpoints: list[str] | None = None,
+        allowed_ip_ranges: list[str] | None = None,
+        expires_at: datetime | None = None,
     ):
         self.key_id = key_id
         self.api_key = api_key
@@ -79,7 +79,7 @@ class APIKey:
 class APIKeyAuthenticator:
     """Handles API key authentication and validation"""
 
-    def __init__(self, db_url: Optional[str] = None):
+    def __init__(self, db_url: str | None = None):
         """
         Initialize authenticator
 
@@ -88,9 +88,9 @@ class APIKeyAuthenticator:
         """
         self.db_url = db_url or os.getenv(
             "DATABASE_URL",
-            "postgresql://dro:sicillionbillions@localhost:5544/devdb01"  # pragma: allowlist secret
+            "postgresql://dro:sicillionbillions@localhost:5544/devdb01",  # pragma: allowlist secret
         )
-        self._conn: Optional[psycopg.Connection] = None
+        self._conn: psycopg.Connection | None = None
 
     def _get_connection(self) -> psycopg.Connection:
         """Get or create database connection"""
@@ -104,10 +104,7 @@ class APIKeyAuthenticator:
             self._conn.close()
 
     async def validate_api_key(
-        self,
-        api_key: str,
-        endpoint: str,
-        request: Optional[Request] = None
+        self, api_key: str, endpoint: str, request: Request | None = None
     ) -> APIKey:
         """
         Validate API key against database
@@ -127,7 +124,7 @@ class APIKeyAuthenticator:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="API key required. Include 'X-API-Key' header in request.",
-                headers={"WWW-Authenticate": "ApiKey"}
+                headers={"WWW-Authenticate": "ApiKey"},
             )
 
         conn = self._get_connection()
@@ -145,7 +142,7 @@ class APIKeyAuthenticator:
                     FROM auth.api_keys
                     WHERE api_key = %s
                     """,
-                    (api_key,)
+                    (api_key,),
                 )
                 row = cur.fetchone()
 
@@ -154,7 +151,7 @@ class APIKeyAuthenticator:
                     raise HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
                         detail="Invalid API key",
-                        headers={"WWW-Authenticate": "ApiKey"}
+                        headers={"WWW-Authenticate": "ApiKey"},
                     )
 
                 # Check if key is active
@@ -165,7 +162,7 @@ class APIKeyAuthenticator:
                     )
                     raise HTTPException(
                         status_code=status.HTTP_403_FORBIDDEN,
-                        detail="API key is inactive or revoked. Contact administrator."
+                        detail="API key is inactive or revoked. Contact administrator.",
                     )
 
                 # Create APIKey object
@@ -178,7 +175,7 @@ class APIKeyAuthenticator:
                     rate_limit_per_day=row["rate_limit_per_day"],
                     allowed_endpoints=row["allowed_endpoints"],
                     allowed_ip_ranges=row["allowed_ip_ranges"],
-                    expires_at=row["expires_at"]
+                    expires_at=row["expires_at"],
                 )
 
                 # Check expiry
@@ -190,18 +187,17 @@ class APIKeyAuthenticator:
                     raise HTTPException(
                         status_code=status.HTTP_403_FORBIDDEN,
                         detail=f"API key expired on {row['expires_at'].strftime('%Y-%m-%d')}. "
-                               f"Please rotate your key."
+                        f"Please rotate your key.",
                     )
 
                 # Check endpoint permissions
                 if not api_key_obj.can_access_endpoint(endpoint):
                     logger.warning(
-                        f"Endpoint permission denied: {row['key_name']} "
-                        f"attempted {endpoint}"
+                        f"Endpoint permission denied: {row['key_name']} " f"attempted {endpoint}"
                     )
                     raise HTTPException(
                         status_code=status.HTTP_403_FORBIDDEN,
-                        detail=f"API key does not have permission for endpoint: {endpoint}"
+                        detail=f"API key does not have permission for endpoint: {endpoint}",
                     )
 
                 # Check rate limits
@@ -220,14 +216,10 @@ class APIKeyAuthenticator:
             logger.error(f"API key validation error: {e}", exc_info=True)
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Authentication service error"
+                detail="Authentication service error",
             )
 
-    async def _check_rate_limit(
-        self,
-        api_key_id: int,
-        conn: psycopg.Connection
-    ):
+    async def _check_rate_limit(self, api_key_id: int, conn: psycopg.Connection):
         """
         Check rate limit for API key
 
@@ -240,10 +232,7 @@ class APIKeyAuthenticator:
         """
         with conn.cursor() as cur:
             # Check hourly limit
-            cur.execute(
-                "SELECT * FROM auth.check_rate_limit(%s, 1)",
-                (api_key_id,)
-            )
+            cur.execute("SELECT * FROM auth.check_rate_limit(%s, 1)", (api_key_id,))
             hourly = cur.fetchone()
 
             if hourly["is_limited"]:
@@ -265,15 +254,12 @@ class APIKeyAuthenticator:
                         "X-RateLimit-Remaining": str(
                             max(0, hourly["limit_per_window"] - hourly["requests_in_window"])
                         ),
-                        "X-RateLimit-Reset": str(int(datetime.utcnow().timestamp()) + retry_after)
-                    }
+                        "X-RateLimit-Reset": str(int(datetime.utcnow().timestamp()) + retry_after),
+                    },
                 )
 
             # Check daily limit
-            cur.execute(
-                "SELECT * FROM auth.check_rate_limit(%s, 24)",
-                (api_key_id,)
-            )
+            cur.execute("SELECT * FROM auth.check_rate_limit(%s, 24)", (api_key_id,))
             daily = cur.fetchone()
 
             if daily["is_limited"]:
@@ -295,8 +281,8 @@ class APIKeyAuthenticator:
                         "X-RateLimit-Remaining": str(
                             max(0, daily["limit_per_window"] - daily["requests_in_window"])
                         ),
-                        "X-RateLimit-Reset": str(int(datetime.utcnow().timestamp()) + retry_after)
-                    }
+                        "X-RateLimit-Reset": str(int(datetime.utcnow().timestamp()) + retry_after),
+                    },
                 )
 
     async def log_usage(
@@ -307,10 +293,10 @@ class APIKeyAuthenticator:
         method: str,
         status_code: int,
         response_time_ms: float,
-        ip_address: Optional[str] = None,
-        user_agent: Optional[str] = None,
-        error_type: Optional[str] = None,
-        error_message: Optional[str] = None
+        ip_address: str | None = None,
+        user_agent: str | None = None,
+        error_type: str | None = None,
+        error_message: str | None = None,
     ):
         """
         Log API key usage
@@ -338,10 +324,17 @@ class APIKeyAuthenticator:
                     )
                     """,
                     (
-                        api_key_id, request_id, endpoint, method, status_code,
-                        response_time_ms, ip_address, user_agent,
-                        error_type, error_message
-                    )
+                        api_key_id,
+                        request_id,
+                        endpoint,
+                        method,
+                        status_code,
+                        response_time_ms,
+                        ip_address,
+                        user_agent,
+                        error_type,
+                        error_message,
+                    ),
                 )
                 conn.commit()
         except Exception as e:
@@ -371,12 +364,12 @@ class APIKeyAuthenticator:
         self,
         key_name: str,
         owner_email: str,
-        owner_name: Optional[str] = None,
+        owner_name: str | None = None,
         rate_limit_per_hour: int = 100,
         rate_limit_per_day: int = 1000,
-        allowed_endpoints: Optional[List[str]] = None,
-        expires_in_days: Optional[int] = None
-    ) -> Dict[str, Any]:
+        allowed_endpoints: list[str] | None = None,
+        expires_in_days: int | None = None,
+    ) -> dict[str, Any]:
         """
         Create a new API key
 
@@ -414,17 +407,22 @@ class APIKeyAuthenticator:
                     RETURNING id, created_at
                     """,
                     (
-                        api_key, key_name, key_prefix, owner_email, owner_name,
-                        rate_limit_per_hour, rate_limit_per_day,
-                        allowed_endpoints, expires_at
-                    )
+                        api_key,
+                        key_name,
+                        key_prefix,
+                        owner_email,
+                        owner_name,
+                        rate_limit_per_hour,
+                        rate_limit_per_day,
+                        allowed_endpoints,
+                        expires_at,
+                    ),
                 )
                 result = cur.fetchone()
                 conn.commit()
 
                 logger.info(
-                    f"Created API key: {key_name} for {owner_email} "
-                    f"(ID: {result['id']})"
+                    f"Created API key: {key_name} for {owner_email} " f"(ID: {result['id']})"
                 )
 
                 return {
@@ -436,7 +434,7 @@ class APIKeyAuthenticator:
                     "rate_limit_per_hour": rate_limit_per_hour,
                     "rate_limit_per_day": rate_limit_per_day,
                     "created_at": result["created_at"],
-                    "expires_at": expires_at
+                    "expires_at": expires_at,
                 }
 
         except Exception as e:
@@ -446,7 +444,7 @@ class APIKeyAuthenticator:
 
 
 # Global authenticator instance
-_authenticator: Optional[APIKeyAuthenticator] = None
+_authenticator: APIKeyAuthenticator | None = None
 
 
 def get_authenticator() -> APIKeyAuthenticator:
@@ -458,8 +456,7 @@ def get_authenticator() -> APIKeyAuthenticator:
 
 
 async def require_api_key(
-    request: Request,
-    api_key: Optional[str] = Security(API_KEY_HEADER)
+    request: Request, api_key: str | None = Security(API_KEY_HEADER)
 ) -> APIKey:
     """
     FastAPI dependency for API key authentication

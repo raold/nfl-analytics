@@ -12,12 +12,11 @@ Author: NFL Analytics Team
 Date: October 2025
 """
 
-import subprocess
 import logging
-from pathlib import Path
-from typing import Dict, List, Optional, Any
+import subprocess
 from datetime import datetime
-import pandas as pd
+from pathlib import Path
+from typing import Any
 
 from etl.extract.base import BaseExtractor, ExtractionResult, SourceType
 
@@ -32,7 +31,7 @@ class NFLVerseExtractor(BaseExtractor):
     with retry logic, error handling, and monitoring.
     """
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         """
         Initialize NFLverse extractor.
 
@@ -44,17 +43,13 @@ class NFLVerseExtractor(BaseExtractor):
         """
         super().__init__(source_type=SourceType.R_PACKAGE, config=config)
 
-        self.r_scripts_path = Path(config.get('r_scripts_path', 'R/ingestion'))
-        self.rscript_bin = config.get('rscript_bin', 'Rscript')
-        self.timeout = config.get('timeout', 600)  # 10 minutes default
+        self.r_scripts_path = Path(config.get("r_scripts_path", "R/ingestion"))
+        self.rscript_bin = config.get("rscript_bin", "Rscript")
+        self.timeout = config.get("timeout", 600)  # 10 minutes default
 
         logger.info(f"NFLVerseExtractor initialized with scripts at {self.r_scripts_path}")
 
-    def extract_schedules(
-        self,
-        seasons: Optional[List[int]] = None,
-        **kwargs
-    ) -> ExtractionResult:
+    def extract_schedules(self, seasons: list[int] | None = None, **kwargs) -> ExtractionResult:
         """
         Extract NFL schedules and betting lines.
 
@@ -76,7 +71,7 @@ class NFLVerseExtractor(BaseExtractor):
                 duration_seconds=0.0,
                 source="nflverse_schedules",
                 endpoint=str(script_path),
-                error=f"R script not found: {script_path}"
+                error=f"R script not found: {script_path}",
             )
 
         logger.info(f"Extracting schedules via {script_path}")
@@ -85,11 +80,11 @@ class NFLVerseExtractor(BaseExtractor):
         try:
             # Run R script
             result = subprocess.run(
-                [self.rscript_bin, '--vanilla', str(script_path)],
+                [self.rscript_bin, "--vanilla", str(script_path)],
                 capture_output=True,
                 text=True,
                 timeout=self.timeout,
-                check=True
+                check=True,
             )
 
             duration = (datetime.now() - start_time).total_seconds()
@@ -111,7 +106,7 @@ class NFLVerseExtractor(BaseExtractor):
                 duration_seconds=duration,
                 source="nflverse_schedules",
                 endpoint=str(script_path),
-                metadata={"seasons": seasons, "stdout": result.stdout}
+                metadata={"seasons": seasons, "stdout": result.stdout},
             )
 
         except subprocess.TimeoutExpired as e:
@@ -125,7 +120,7 @@ class NFLVerseExtractor(BaseExtractor):
                 duration_seconds=duration,
                 source="nflverse_schedules",
                 endpoint=str(script_path),
-                error=f"Timeout after {self.timeout}s"
+                error=f"Timeout after {self.timeout}s",
             )
 
         except subprocess.CalledProcessError as e:
@@ -139,14 +134,10 @@ class NFLVerseExtractor(BaseExtractor):
                 duration_seconds=duration,
                 source="nflverse_schedules",
                 endpoint=str(script_path),
-                error=f"R script error: {e.stderr}"
+                error=f"R script error: {e.stderr}",
             )
 
-    def extract_pbp(
-        self,
-        seasons: Optional[List[int]] = None,
-        **kwargs
-    ) -> ExtractionResult:
+    def extract_pbp(self, seasons: list[int] | None = None, **kwargs) -> ExtractionResult:
         """
         Extract play-by-play data with EPA.
 
@@ -168,7 +159,7 @@ class NFLVerseExtractor(BaseExtractor):
                 duration_seconds=0.0,
                 source="nflverse_pbp",
                 endpoint=str(script_path),
-                error=f"R script not found: {script_path}"
+                error=f"R script not found: {script_path}",
             )
 
         logger.info(f"Extracting PBP data via {script_path} (may take 5+ minutes)")
@@ -176,11 +167,11 @@ class NFLVerseExtractor(BaseExtractor):
 
         try:
             result = subprocess.run(
-                [self.rscript_bin, '--vanilla', str(script_path)],
+                [self.rscript_bin, "--vanilla", str(script_path)],
                 capture_output=True,
                 text=True,
                 timeout=self.timeout,
-                check=True
+                check=True,
             )
 
             duration = (datetime.now() - start_time).total_seconds()
@@ -200,7 +191,7 @@ class NFLVerseExtractor(BaseExtractor):
                 duration_seconds=duration,
                 source="nflverse_pbp",
                 endpoint=str(script_path),
-                metadata={"seasons": seasons, "stdout": result.stdout}
+                metadata={"seasons": seasons, "stdout": result.stdout},
             )
 
         except Exception as e:
@@ -214,14 +205,10 @@ class NFLVerseExtractor(BaseExtractor):
                 duration_seconds=duration,
                 source="nflverse_pbp",
                 endpoint=str(script_path),
-                error=str(e)
+                error=str(e),
             )
 
-    def extract_rosters(
-        self,
-        seasons: Optional[List[int]] = None,
-        **kwargs
-    ) -> ExtractionResult:
+    def extract_rosters(self, seasons: list[int] | None = None, **kwargs) -> ExtractionResult:
         """
         Extract player rosters.
 
@@ -247,7 +234,7 @@ class NFLVerseExtractor(BaseExtractor):
                 duration_seconds=0.0,
                 source="nflverse_rosters",
                 endpoint=str(script_path),
-                error=f"R script not found: {script_path}"
+                error=f"R script not found: {script_path}",
             )
 
         logger.info(f"Extracting rosters via {script_path}")
@@ -255,11 +242,11 @@ class NFLVerseExtractor(BaseExtractor):
 
         try:
             result = subprocess.run(
-                [self.rscript_bin, '--vanilla', str(script_path)],
+                [self.rscript_bin, "--vanilla", str(script_path)],
                 capture_output=True,
                 text=True,
                 timeout=self.timeout,
-                check=True
+                check=True,
             )
 
             duration = (datetime.now() - start_time).total_seconds()
@@ -273,7 +260,7 @@ class NFLVerseExtractor(BaseExtractor):
                 duration_seconds=duration,
                 source="nflverse_rosters",
                 endpoint=str(script_path),
-                metadata={"seasons": seasons, "stdout": result.stdout}
+                metadata={"seasons": seasons, "stdout": result.stdout},
             )
 
         except Exception as e:
@@ -287,7 +274,7 @@ class NFLVerseExtractor(BaseExtractor):
                 duration_seconds=duration,
                 source="nflverse_rosters",
                 endpoint=str(script_path),
-                error=str(e)
+                error=str(e),
             )
 
     def _parse_row_count(self, stdout: str) -> int:
@@ -312,11 +299,11 @@ class NFLVerseExtractor(BaseExtractor):
 
         # Try different patterns
         patterns = [
-            r'(\d+)\s+rows?',
-            r'(\d+)\s+games?',
-            r'Loaded\s+(\d+)',
-            r'Inserted\s+(\d+)',
-            r'\[1\]\s+(\d+)'
+            r"(\d+)\s+rows?",
+            r"(\d+)\s+games?",
+            r"Loaded\s+(\d+)",
+            r"Inserted\s+(\d+)",
+            r"\[1\]\s+(\d+)",
         ]
 
         for pattern in patterns:
@@ -339,10 +326,7 @@ class NFLVerseExtractor(BaseExtractor):
         try:
             # Check Rscript binary
             result = subprocess.run(
-                [self.rscript_bin, '--version'],
-                capture_output=True,
-                text=True,
-                timeout=10
+                [self.rscript_bin, "--version"], capture_output=True, text=True, timeout=10
             )
 
             if result.returncode != 0:
@@ -367,11 +351,7 @@ class NFLVerseExtractor(BaseExtractor):
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    config = {
-        'r_scripts_path': 'R/ingestion',
-        'rscript_bin': 'Rscript',
-        'timeout': 600
-    }
+    config = {"r_scripts_path": "R/ingestion", "rscript_bin": "Rscript", "timeout": 600}
 
     extractor = NFLVerseExtractor(config)
 
@@ -381,6 +361,8 @@ if __name__ == "__main__":
 
         # Extract schedules
         result = extractor.extract_schedules()
-        print(f"Schedules: {result.success}, {result.row_count} rows in {result.duration_seconds:.1f}s")
+        print(
+            f"Schedules: {result.success}, {result.row_count} rows in {result.duration_seconds:.1f}s"
+        )
     else:
         print("❌ NFLverse extractor not available")

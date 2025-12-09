@@ -4,9 +4,9 @@ Structural Causal Models (SCM)
 Define and work with causal DAGs for identification.
 """
 
-import networkx as nx
-from typing import List, Set, Optional, Tuple
 import logging
+
+import networkx as nx
 
 logger = logging.getLogger(__name__)
 
@@ -21,11 +21,7 @@ class CausalDAG:
         """Add causal edge"""
         self.graph.add_edge(cause, effect)
 
-    def find_confounders(
-        self,
-        treatment: str,
-        outcome: str
-    ) -> Set[str]:
+    def find_confounders(self, treatment: str, outcome: str) -> set[str]:
         """
         Find confounders using backdoor criterion.
 
@@ -54,12 +50,7 @@ class CausalDAG:
 
         return confounders
 
-    def check_d_separation(
-        self,
-        x: str,
-        y: str,
-        z: Set[str]
-    ) -> bool:
+    def check_d_separation(self, x: str, y: str, z: set[str]) -> bool:
         """
         Check if X and Y are d-separated given Z.
 
@@ -68,11 +59,7 @@ class CausalDAG:
         """
         return nx.d_separated(self.graph, {x}, {y}, z)
 
-    def find_instrumental_variables(
-        self,
-        treatment: str,
-        outcome: str
-    ) -> List[str]:
+    def find_instrumental_variables(self, treatment: str, outcome: str) -> list[str]:
         """
         Find potential instrumental variables.
 

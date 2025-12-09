@@ -14,9 +14,11 @@ Usage:
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
+
 from py.ensemble.enhanced_ensemble_v5_1 import EnhancedEnsemble4Way
 
 logging.basicConfig(level=logging.INFO)
@@ -42,17 +44,18 @@ def test_single_prediction(ensemble):
     try:
         # Patrick Mahomes (00-0033873) - 2024 Week 1
         result = ensemble.predict(
-            player_id="00-0033873",
-            season=2024,
-            week=1,
-            return_individual=True
+            player_id="00-0033873", season=2024, week=1, return_individual=True
         )
 
         # Check output format
         required_keys = [
-            "ensemble_mean", "ensemble_std",
-            "quantile_10", "quantile_90",
-            "weights", "predictions", "inference_time_ms"
+            "ensemble_mean",
+            "ensemble_std",
+            "quantile_10",
+            "quantile_90",
+            "weights",
+            "predictions",
+            "inference_time_ms",
         ]
         for key in required_keys:
             if key not in result:
@@ -60,17 +63,19 @@ def test_single_prediction(ensemble):
                 return False
 
         # Log results
-        logger.info(f"✅ Prediction: {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards")
+        logger.info(
+            f"✅ Prediction: {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards"
+        )
         logger.info(f"✅ 90% CI: [{result['quantile_10']:.1f}, {result['quantile_90']:.1f}]")
         logger.info(f"✅ Active models: {list(result['predictions'].keys())}")
         logger.info(f"✅ Weights: {result['weights']}")
         logger.info(f"✅ Inference time: {result['inference_time_ms']:.1f}ms")
 
         # Sanity checks
-        if result['ensemble_mean'] is not None:
-            if result['ensemble_mean'] < 0 or result['ensemble_mean'] > 600:
+        if result["ensemble_mean"] is not None:
+            if result["ensemble_mean"] < 0 or result["ensemble_mean"] > 600:
                 logger.warning(f"⚠️  Unusual prediction: {result['ensemble_mean']:.1f} yards")
-            if result['ensemble_std'] < 0:
+            if result["ensemble_std"] < 0:
                 logger.error(f"❌ Invalid std: {result['ensemble_std']:.1f}")
                 return False
 
@@ -79,6 +84,7 @@ def test_single_prediction(ensemble):
     except Exception as e:
         logger.error(f"❌ Prediction failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -141,15 +147,16 @@ def test_model_components(ensemble):
     except Exception as e:
         logger.error(f"❌ Model component check failed: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
 
 def main():
     """Run all tests."""
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("Enhanced Ensemble v5.1 Test Suite")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     # Test 1: Import
     ensemble = test_import()
@@ -175,9 +182,9 @@ def main():
         logger.error("❌ Test suite failed (components)")
         return 1
 
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("✅ ALL TESTS PASSED")
-    logger.info("="*70)
+    logger.info("=" * 70)
     logger.info("\nNext Steps:")
     logger.info("1. Verify hybrid model file exists: models/xgboost/hybrid_static_incremental_v1/")
     logger.info("2. Run full backtest on 2024 holdout set")

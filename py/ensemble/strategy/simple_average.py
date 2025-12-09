@@ -8,10 +8,10 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-import numpy as np
-from typing import List
 
-from .base import EnsembleStrategy, ModelPrediction, EnsemblePrediction
+import numpy as np
+
+from .base import EnsemblePrediction, EnsembleStrategy, ModelPrediction
 
 
 class SimpleAverageStrategy(EnsembleStrategy):
@@ -41,11 +41,7 @@ class SimpleAverageStrategy(EnsembleStrategy):
         """Strategy name."""
         return "simple_average"
 
-    def combine(
-        self,
-        predictions: List[ModelPrediction],
-        **kwargs
-    ) -> EnsemblePrediction:
+    def combine(self, predictions: list[ModelPrediction], **kwargs) -> EnsemblePrediction:
         """
         Combine predictions using simple averaging.
 
@@ -68,10 +64,7 @@ class SimpleAverageStrategy(EnsembleStrategy):
 
         # Combine uncertainties (variance pooling)
         # σ²_ensemble = Σ(w_i² * σ_i²)
-        std = np.sqrt(np.sum([
-            weight**2 * p.prediction_std**2
-            for p in predictions
-        ]))
+        std = np.sqrt(np.sum([weight**2 * p.prediction_std**2 for p in predictions]))
 
         # Average confidence
         confidence = np.mean([p.confidence for p in predictions])
@@ -83,16 +76,14 @@ class SimpleAverageStrategy(EnsembleStrategy):
             weights=weights,
             strategy_name=self.name,
             confidence=float(confidence),
-            metadata={
-                "num_models": len(predictions),
-                "method": "simple_average"
-            }
+            metadata={"num_models": len(predictions), "method": "simple_average"},
         )
 
 
 if __name__ == "__main__":
     """Test simple average strategy."""
     import logging
+
     from .base import ModelType
 
     logging.basicConfig(level=logging.INFO)
@@ -115,7 +106,7 @@ if __name__ == "__main__":
     logger.info(f"Confidence: {result.confidence:.3f}")
 
     # Verify equal weights
-    assert all(abs(w - 1/3) < 0.001 for w in result.weights.values())
+    assert all(abs(w - 1 / 3) < 0.001 for w in result.weights.values())
     logger.info("✓ All weights equal (1/3)")
 
     # Verify mean is average

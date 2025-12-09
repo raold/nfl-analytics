@@ -27,9 +27,7 @@ Date: November 16, 2025
 """
 
 import logging
-from typing import Dict, Optional
 
-import numpy as np
 import pandas as pd
 import psycopg2
 
@@ -48,6 +46,7 @@ CLOSING_WINDOW_HOURS = 2  # Last 2 hours before kickoff
 # MARKET DISPERSION EXTRACTOR
 # ============================================================================
 
+
 class MarketDispersionFeatures:
     """
     Extract betting market dispersion features for a game.
@@ -64,19 +63,19 @@ class MarketDispersionFeatures:
 
     def __init__(
         self,
-        db_host: str = 'localhost',
+        db_host: str = "localhost",
         db_port: int = 5544,
-        db_name: str = 'devdb01',
-        db_user: str = 'dro',
-        db_password: str = 'sicillionbillions',
+        db_name: str = "devdb01",
+        db_user: str = "dro",
+        db_password: str = "sicillionbillions",
     ):
         """Initialize market dispersion feature extractor."""
         self.db_config = {
-            'host': db_host,
-            'port': db_port,
-            'database': db_name,
-            'user': db_user,
-            'password': db_password,
+            "host": db_host,
+            "port": db_port,
+            "database": db_name,
+            "user": db_user,
+            "password": db_password,
         }
 
     def _get_db_connection(self):
@@ -89,7 +88,7 @@ class MarketDispersionFeatures:
         away_team: str,
         season: int,
         week: int,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract market dispersion features for a game.
 
@@ -159,25 +158,21 @@ class MarketDispersionFeatures:
         """
 
         try:
-            df = pd.read_sql_query(
-                query,
-                conn,
-                params=(season, week, home_team, away_team)
-            )
+            df = pd.read_sql_query(query, conn, params=(season, week, home_team, away_team))
             conn.close()
 
-            if len(df) == 0 or pd.isna(df['market_dispersion'].iloc[0]):
+            if len(df) == 0 or pd.isna(df["market_dispersion"].iloc[0]):
                 logger.debug(f"Market dispersion: No odds data for {away_team} @ {home_team}")
                 return self._get_default_features()
 
             # Extract features
-            dispersion = float(df['market_dispersion'].iloc[0])
-            books_count = int(df['books_count'].iloc[0])
+            dispersion = float(df["market_dispersion"].iloc[0])
+            books_count = int(df["books_count"].iloc[0])
 
             features = {
-                'market_dispersion': dispersion,
-                'high_dispersion_flag': 1.0 if dispersion > HIGH_DISPERSION_THRESHOLD else 0.0,
-                'books_count': float(books_count),
+                "market_dispersion": dispersion,
+                "high_dispersion_flag": 1.0 if dispersion > HIGH_DISPERSION_THRESHOLD else 0.0,
+                "books_count": float(books_count),
             }
 
             logger.debug(
@@ -192,16 +187,16 @@ class MarketDispersionFeatures:
             conn.close()
             return self._get_default_features()
 
-    def _get_default_features(self) -> Dict[str, float]:
+    def _get_default_features(self) -> dict[str, float]:
         """
         Return default features when extraction fails.
 
         Assumes moderate market dispersion (0.75 points std dev).
         """
         return {
-            'market_dispersion': 0.75,
-            'high_dispersion_flag': 0.0,
-            'books_count': 10.0,  # Assume ~10 books (typical)
+            "market_dispersion": 0.75,
+            "high_dispersion_flag": 0.0,
+            "books_count": 10.0,  # Assume ~10 books (typical)
         }
 
 
@@ -209,7 +204,8 @@ class MarketDispersionFeatures:
 # MATERIALIZED VIEW CREATION (OPTIONAL OPTIMIZATION)
 # ============================================================================
 
-def create_market_dispersion_view(db_config: Optional[Dict] = None) -> None:
+
+def create_market_dispersion_view(db_config: dict | None = None) -> None:
     """
     Create materialized view for market dispersion (speeds up queries).
 
@@ -221,24 +217,26 @@ def create_market_dispersion_view(db_config: Optional[Dict] = None) -> None:
     """
     if db_config is None:
         db_config = {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions',
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
     conn = psycopg2.connect(**db_config)
     cur = conn.cursor()
 
     # Check if odds_history exists
-    cur.execute("""
+    cur.execute(
+        """
         SELECT EXISTS (
             SELECT FROM information_schema.tables
             WHERE table_schema = 'public'
             AND table_name = 'odds_history'
         );
-    """)
+    """
+    )
     table_exists = cur.fetchone()[0]
 
     if not table_exists:
@@ -298,10 +296,12 @@ def create_market_dispersion_view(db_config: Optional[Dict] = None) -> None:
     conn.commit()
 
     # Create index for fast lookups
-    cur.execute("""
+    cur.execute(
+        """
         CREATE INDEX idx_market_dispersion_lookup
         ON mart.market_dispersion (season, week, home_team, away_team);
-    """)
+    """
+    )
     conn.commit()
 
     logger.info("✅ Created materialized view: mart.market_dispersion")
@@ -314,9 +314,10 @@ def create_market_dispersion_view(db_config: Optional[Dict] = None) -> None:
 # BATCH QUERY (FOR TRAINING DATA)
 # ============================================================================
 
+
 def query_market_dispersion_batch(
     game_ids: pd.DataFrame,
-    db_config: Optional[Dict] = None,
+    db_config: dict | None = None,
 ) -> pd.DataFrame:
     """
     Batch extract market dispersion for multiple games.
@@ -330,24 +331,24 @@ def query_market_dispersion_batch(
     """
     if db_config is None:
         db_config = {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions',
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
     conn = psycopg2.connect(**db_config)
 
     # Create temp table
-    if 'game_id' in game_ids.columns:
+    if "game_id" in game_ids.columns:
         # Use game_id directly
         create_temp = "CREATE TEMP TABLE input_games (game_id INT);"
         cur = conn.cursor()
         cur.execute(create_temp)
 
         for _, row in game_ids.iterrows():
-            cur.execute("INSERT INTO input_games VALUES (%s)", (row['game_id'],))
+            cur.execute("INSERT INTO input_games VALUES (%s)", (row["game_id"],))
 
         conn.commit()
 
@@ -368,14 +369,16 @@ def query_market_dispersion_batch(
         """
     else:
         # Use season/week/teams
-        create_temp = "CREATE TEMP TABLE input_games (season INT, week INT, home_team TEXT, away_team TEXT);"
+        create_temp = (
+            "CREATE TEMP TABLE input_games (season INT, week INT, home_team TEXT, away_team TEXT);"
+        )
         cur = conn.cursor()
         cur.execute(create_temp)
 
         for _, row in game_ids.iterrows():
             cur.execute(
                 "INSERT INTO input_games VALUES (%s, %s, %s, %s)",
-                (row['season'], row['week'], row['home_team'], row['away_team'])
+                (row["season"], row["week"], row["home_team"], row["away_team"]),
             )
 
         conn.commit()

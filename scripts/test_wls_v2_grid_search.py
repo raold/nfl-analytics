@@ -64,23 +64,18 @@ def generate_synthetic_predictions(n_games: int = 50, seed: int = 42) -> pd.Data
 
     # Generate component predictions with different error characteristics
     predictions = {
-        'date': pd.date_range('2024-09-01', periods=n_games, freq='W'),
-        'actual': actual,
-
+        "date": pd.date_range("2024-09-01", periods=n_games, freq="W"),
+        "actual": actual,
         # State-Space v2: Low bias (mean=0), moderate noise (std=30)
-        'state_space_v2': actual + np.random.normal(0, 30, n_games),
-
+        "state_space_v2": actual + np.random.normal(0, 30, n_games),
         # Hierarchical v2: Low bias (mean=0), low noise (std=25) - BEST
-        'hierarchical_v2': actual + np.random.normal(0, 25, n_games),
-
+        "hierarchical_v2": actual + np.random.normal(0, 25, n_games),
         # XGBoost v4: Moderate bias (mean=-5), moderate noise (std=28)
-        'xgboost_v4_ridge': actual + np.random.normal(-5, 28, n_games),
-
+        "xgboost_v4_ridge": actual + np.random.normal(-5, 28, n_games),
         # Informative Priors v2: Moderate bias (mean=3), high noise (std=35)
-        'informative_priors_v2': actual + np.random.normal(3, 35, n_games),
-
+        "informative_priors_v2": actual + np.random.normal(3, 35, n_games),
         # ELO: High bias (mean=10), high noise (std=40) - WORST
-        'elo': actual + np.random.normal(10, 40, n_games),
+        "elo": actual + np.random.normal(10, 40, n_games),
     }
 
     df = pd.DataFrame(predictions)
@@ -106,9 +101,15 @@ def test_grid_search():
 
     # Component MAEs (before optimization)
     print("\n2. Component MAEs (before optimization):")
-    model_names = ['state_space_v2', 'hierarchical_v2', 'xgboost_v4_ridge', 'informative_priors_v2', 'elo']
+    model_names = [
+        "state_space_v2",
+        "hierarchical_v2",
+        "xgboost_v4_ridge",
+        "informative_priors_v2",
+        "elo",
+    ]
     for name in model_names:
-        mae = np.mean(np.abs(df[name] - df['actual']))
+        mae = np.mean(np.abs(df[name] - df["actual"]))
         print(f"   {name:25s}: {mae:.2f} yards")
 
     # Initialize WLS optimizer
@@ -116,20 +117,20 @@ def test_grid_search():
     wls = AdaptiveWLSWeightsV2(
         predictions_df=df,
         model_names=model_names,
-        actual_col='actual',
+        actual_col="actual",
         halflife_candidates=[2.0, 3.0, 4.0, 5.0, 6.0, 8.0],
-        weight_constraints={'elo': (0.05, 0.15)},  # Constrain ELO to 5-15%
+        weight_constraints={"elo": (0.05, 0.15)},  # Constrain ELO to 5-15%
     )
 
     # Run grid search
     optimal_weights, optimal_halflife = wls.optimize_weights_with_grid_search(
         validation_split=0.2,
-        metric='mae',
+        metric="mae",
     )
 
-    print(f"\n4. Grid search results:")
+    print("\n4. Grid search results:")
     print(f"   Optimal halflife: {optimal_halflife} weeks")
-    print(f"   Optimal weights:")
+    print("   Optimal weights:")
     for name in sorted(optimal_weights.keys(), key=lambda x: -optimal_weights[x]):
         print(f"     {name:25s}: {optimal_weights[name]:.4f} ({optimal_weights[name]*100:.1f}%)")
 
@@ -138,7 +139,7 @@ def test_grid_search():
     metrics = compute_ensemble_performance_metrics(
         predictions_df=df,
         weights=optimal_weights,
-        actual_col='actual',
+        actual_col="actual",
     )
 
     print(f"   MAE: {metrics['mae']:.2f} yards")
@@ -149,7 +150,7 @@ def test_grid_search():
 
     # Test save/load
     print("\n6. Testing save/load functionality...")
-    output_path = Path('models/ensemble/test_wls_weights.json')
+    output_path = Path("models/ensemble/test_wls_weights.json")
     wls.save_weights(output_path)
 
     loaded_weights, loaded_metadata = AdaptiveWLSWeightsV2.load_weights(output_path)
@@ -172,7 +173,13 @@ def test_rolling_optimization():
     # Generate larger dataset
     df = generate_synthetic_predictions(n_games=100, seed=123)
 
-    model_names = ['state_space_v2', 'hierarchical_v2', 'xgboost_v4_ridge', 'informative_priors_v2', 'elo']
+    model_names = [
+        "state_space_v2",
+        "hierarchical_v2",
+        "xgboost_v4_ridge",
+        "informative_priors_v2",
+        "elo",
+    ]
 
     wls = AdaptiveWLSWeightsV2(
         predictions_df=df,
@@ -191,13 +198,17 @@ def test_rolling_optimization():
     )
 
     print(f"\n Rolling results ({len(rolling_results)} windows):")
-    print(rolling_results[['window_start_idx', 'window_end_idx', 'state_space_v2', 'hierarchical_v2']].head(10))
+    print(
+        rolling_results[
+            ["window_start_idx", "window_end_idx", "state_space_v2", "hierarchical_v2"]
+        ].head(10)
+    )
 
     print("\n✅ Rolling optimization test passed!")
     print("=" * 80)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Run tests
     test_grid_search()
     test_rolling_optimization()

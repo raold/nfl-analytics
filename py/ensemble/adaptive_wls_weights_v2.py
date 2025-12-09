@@ -15,7 +15,6 @@ Date: November 16, 2025
 import json
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import cvxpy as cp
 import numpy as np
@@ -54,11 +53,11 @@ class AdaptiveWLSWeightsV2:
     def __init__(
         self,
         predictions_df: pd.DataFrame,
-        model_names: List[str],
-        actual_col: str = 'actual',
-        halflife_candidates: Optional[List[float]] = None,
+        model_names: list[str],
+        actual_col: str = "actual",
+        halflife_candidates: list[float] | None = None,
         min_observations: int = 10,
-        weight_constraints: Optional[Dict[str, Tuple[float, float]]] = None,
+        weight_constraints: dict[str, tuple[float, float]] | None = None,
     ):
         """
         Initialize WLS optimizer with tunable halflife.
@@ -100,20 +99,16 @@ class AdaptiveWLSWeightsV2:
         self.halflife_candidates = sorted(halflife_candidates)
 
         # Optimal parameters (set after grid search)
-        self.optimal_halflife: Optional[float] = None
-        self.optimal_weights: Optional[Dict[str, float]] = None
-        self.optimal_metric: Optional[float] = None
+        self.optimal_halflife: float | None = None
+        self.optimal_weights: dict[str, float] | None = None
+        self.optimal_metric: float | None = None
 
-        logger.info(f"Initialized AdaptiveWLSWeightsV2:")
+        logger.info("Initialized AdaptiveWLSWeightsV2:")
         logger.info(f"  Observations: {len(predictions_df):,}")
         logger.info(f"  Models: {len(model_names)}")
         logger.info(f"  Halflife candidates: {halflife_candidates}")
 
-    def _compute_exponential_weights(
-        self,
-        n: int,
-        halflife: float
-    ) -> np.ndarray:
+    def _compute_exponential_weights(self, n: int, halflife: float) -> np.ndarray:
         """
         Compute exponential decay weights for recency.
 
@@ -140,9 +135,7 @@ class AdaptiveWLSWeightsV2:
         return weights
 
     def _compute_ensemble_predictions(
-        self,
-        df: pd.DataFrame,
-        weights: Dict[str, float]
+        self, df: pd.DataFrame, weights: dict[str, float]
     ) -> np.ndarray:
         """
         Compute weighted ensemble predictions.
@@ -164,10 +157,10 @@ class AdaptiveWLSWeightsV2:
     def optimize_weights(
         self,
         halflife: float,
-        predictions_df: Optional[pd.DataFrame] = None,
-        metric: str = 'mae',
-        solver: str = 'ECOS',
-    ) -> Dict[str, float]:
+        predictions_df: pd.DataFrame | None = None,
+        metric: str = "mae",
+        solver: str = "ECOS",
+    ) -> dict[str, float]:
         """
         Optimize ensemble weights using WLS with specified halflife.
 
@@ -207,13 +200,13 @@ class AdaptiveWLSWeightsV2:
         y_pred_weighted = X_weighted @ w
 
         # Define objective based on metric
-        if metric == 'mae':
+        if metric == "mae":
             # Minimize weighted MAE: sum(W * |y - X @ w|)
             objective = cp.Minimize(cp.sum(cp.abs(y_pred_weighted - y_weighted)))
-        elif metric == 'mse':
+        elif metric == "mse":
             # Minimize weighted MSE: sum(W * (y - X @ w)^2)
             objective = cp.Minimize(cp.sum_squares(y_pred_weighted - y_weighted))
-        elif metric == 'huber':
+        elif metric == "huber":
             # Minimize Huber loss (robust to outliers)
             objective = cp.Minimize(cp.sum(cp.huber(y_pred_weighted - y_weighted, M=1.0)))
         else:
@@ -239,25 +232,22 @@ class AdaptiveWLSWeightsV2:
             problem.solve(solver=solver, verbose=False)
         except Exception as e:
             logger.warning(f"Solver {solver} failed: {e}. Trying SCS...")
-            problem.solve(solver='SCS', verbose=False)
+            problem.solve(solver="SCS", verbose=False)
 
-        if problem.status not in ['optimal', 'optimal_inaccurate']:
+        if problem.status not in ["optimal", "optimal_inaccurate"]:
             raise ValueError(f"Optimization failed: {problem.status}")
 
         # Extract optimal weights
-        optimal_weights = {
-            name: float(w.value[i])
-            for i, name in enumerate(self.model_names)
-        }
+        optimal_weights = {name: float(w.value[i]) for i, name in enumerate(self.model_names)}
 
         return optimal_weights
 
     def optimize_weights_with_grid_search(
         self,
         validation_split: float = 0.2,
-        metric: str = 'mae',
-        solver: str = 'ECOS',
-    ) -> Tuple[Dict[str, float], float]:
+        metric: str = "mae",
+        solver: str = "ECOS",
+    ) -> tuple[dict[str, float], float]:
         """
         Grid search over halflife candidates, select best on validation set.
 
@@ -291,13 +281,12 @@ class AdaptiveWLSWeightsV2:
         train_df = self.predictions_df.iloc[:-val_size].copy()
         val_df = self.predictions_df.iloc[-val_size:].copy()
 
-        logger.info(f"Grid search validation split:")
+        logger.info("Grid search validation split:")
         logger.info(f"  Train: {len(train_df):,} observations")
         logger.info(f"  Validation: {len(val_df):,} observations")
 
         # Grid search over halflife candidates
-        best_metric_value = float('inf')
-        best_weights = None
+        best_metric_value = float("inf")
         best_halflife = None
 
         grid_results = []
@@ -320,38 +309,35 @@ class AdaptiveWLSWeightsV2:
             val_actual = val_df[self.actual_col].values
 
             # Compute validation metric
-            if metric == 'mae':
+            if metric == "mae":
                 metric_value = np.mean(np.abs(val_preds - val_actual))
-            elif metric == 'mse':
+            elif metric == "mse":
                 metric_value = np.mean((val_preds - val_actual) ** 2)
-            elif metric == 'huber':
+            elif metric == "huber":
                 residuals = val_preds - val_actual
                 metric_value = np.mean(
-                    np.where(
-                        np.abs(residuals) <= 1.0,
-                        0.5 * residuals ** 2,
-                        np.abs(residuals) - 0.5
-                    )
+                    np.where(np.abs(residuals) <= 1.0, 0.5 * residuals**2, np.abs(residuals) - 0.5)
                 )
 
-            grid_results.append({
-                'halflife': halflife,
-                'metric': metric_value,
-                'weights': weights,
-            })
+            grid_results.append(
+                {
+                    "halflife": halflife,
+                    "metric": metric_value,
+                    "weights": weights,
+                }
+            )
 
             logger.info(f"  Halflife {halflife:>4.1f}: {metric.upper()} = {metric_value:.4f}")
 
             # Track best
             if metric_value < best_metric_value:
                 best_metric_value = metric_value
-                best_weights = weights
                 best_halflife = halflife
 
         if best_halflife is None:
             raise ValueError("Grid search failed: No valid halflife candidates")
 
-        logger.info(f"✅ Grid search complete:")
+        logger.info("✅ Grid search complete:")
         logger.info(f"   Optimal halflife: {best_halflife} weeks")
         logger.info(f"   Validation {metric.upper()}: {best_metric_value:.4f}")
 
@@ -369,7 +355,7 @@ class AdaptiveWLSWeightsV2:
         self.optimal_metric = best_metric_value
 
         # Log final weights
-        logger.info(f"   Final weights (full data):")
+        logger.info("   Final weights (full data):")
         for name, weight in sorted(final_weights.items(), key=lambda x: -x[1]):
             logger.info(f"     {name:25s}: {weight:.4f} ({weight*100:.1f}%)")
 
@@ -379,8 +365,8 @@ class AdaptiveWLSWeightsV2:
         self,
         window_size: int = 6,
         step_size: int = 1,
-        halflife: Optional[float] = None,
-        metric: str = 'mae',
+        halflife: float | None = None,
+        metric: str = "mae",
     ) -> pd.DataFrame:
         """
         Track weight evolution over time using rolling window optimization.
@@ -422,8 +408,8 @@ class AdaptiveWLSWeightsV2:
 
             # Record
             result = {
-                'window_start_idx': start_idx,
-                'window_end_idx': end_idx,
+                "window_start_idx": start_idx,
+                "window_end_idx": end_idx,
                 **weights,
             }
             results.append(result)
@@ -437,7 +423,7 @@ class AdaptiveWLSWeightsV2:
     def save_weights(
         self,
         output_path: str,
-        metadata: Optional[Dict] = None,
+        metadata: dict | None = None,
     ) -> None:
         """
         Save optimal weights and metadata to JSON.
@@ -450,27 +436,27 @@ class AdaptiveWLSWeightsV2:
             raise ValueError("Must run optimization first")
 
         output_data = {
-            'weights': self.optimal_weights,
-            'metadata': {
-                'halflife': self.optimal_halflife,
-                'validation_metric': self.optimal_metric,
-                'n_observations': len(self.predictions_df),
-                'model_names': self.model_names,
-                'halflife_candidates': self.halflife_candidates,
+            "weights": self.optimal_weights,
+            "metadata": {
+                "halflife": self.optimal_halflife,
+                "validation_metric": self.optimal_metric,
+                "n_observations": len(self.predictions_df),
+                "model_names": self.model_names,
+                "halflife_candidates": self.halflife_candidates,
                 **(metadata or {}),
-            }
+            },
         }
 
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(output_data, f, indent=2)
 
         logger.info(f"✅ Saved WLS weights to: {output_path}")
 
     @classmethod
-    def load_weights(cls, weights_path: str) -> Tuple[Dict[str, float], Dict]:
+    def load_weights(cls, weights_path: str) -> tuple[dict[str, float], dict]:
         """
         Load weights and metadata from JSON.
 
@@ -480,11 +466,11 @@ class AdaptiveWLSWeightsV2:
         Returns:
             (weights_dict, metadata_dict)
         """
-        with open(weights_path, 'r') as f:
+        with open(weights_path) as f:
             data = json.load(f)
 
-        weights = data['weights']
-        metadata = data.get('metadata', {})
+        weights = data["weights"]
+        metadata = data.get("metadata", {})
 
         logger.info(f"Loaded WLS weights from: {weights_path}")
         logger.info(f"  Halflife: {metadata.get('halflife', 'unknown')}")
@@ -497,11 +483,12 @@ class AdaptiveWLSWeightsV2:
 # UTILITY FUNCTIONS
 # ============================================================================
 
+
 def compute_ensemble_performance_metrics(
     predictions_df: pd.DataFrame,
-    weights: Dict[str, float],
-    actual_col: str = 'actual',
-) -> Dict[str, float]:
+    weights: dict[str, float],
+    actual_col: str = "actual",
+) -> dict[str, float]:
     """
     Compute comprehensive performance metrics for ensemble.
 
@@ -524,11 +511,11 @@ def compute_ensemble_performance_metrics(
     residuals = ensemble_preds - actual
 
     mae = np.mean(np.abs(residuals))
-    rmse = np.sqrt(np.mean(residuals ** 2))
+    rmse = np.sqrt(np.mean(residuals**2))
     mape = np.mean(np.abs(residuals / (actual + 1e-8))) * 100  # Avoid div by 0
 
     # R^2
-    ss_res = np.sum(residuals ** 2)
+    ss_res = np.sum(residuals**2)
     ss_tot = np.sum((actual - actual.mean()) ** 2)
     r2 = 1 - (ss_res / ss_tot)
 
@@ -539,11 +526,11 @@ def compute_ensemble_performance_metrics(
     percentile_90_ae = np.percentile(np.abs(residuals), 90)
 
     return {
-        'mae': mae,
-        'rmse': rmse,
-        'mape': mape,
-        'r2': r2,
-        'median_ae': median_ae,
-        'percentile_90_ae': percentile_90_ae,
-        'n_observations': len(predictions_df),
+        "mae": mae,
+        "rmse": rmse,
+        "mape": mape,
+        "r2": r2,
+        "median_ae": median_ae,
+        "percentile_90_ae": percentile_90_ae,
+        "n_observations": len(predictions_df),
     }

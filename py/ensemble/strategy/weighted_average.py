@@ -8,11 +8,11 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-import numpy as np
-from typing import List, Dict, Optional
 import logging
 
-from .base import EnsembleStrategy, ModelPrediction, EnsemblePrediction
+import numpy as np
+
+from .base import EnsemblePrediction, EnsembleStrategy, ModelPrediction
 
 logger = logging.getLogger(__name__)
 
@@ -41,8 +41,8 @@ class WeightedAverageStrategy(EnsembleStrategy):
 
     def __init__(
         self,
-        weights: Optional[Dict[str, float]] = None,
-        model_correlations: Optional[Dict[tuple[str, str], float]] = None
+        weights: dict[str, float] | None = None,
+        model_correlations: dict[tuple[str, str], float] | None = None,
     ):
         """
         Initialize weighted average strategy.
@@ -55,23 +55,19 @@ class WeightedAverageStrategy(EnsembleStrategy):
                               Set to {} to assume independence (NOT recommended for betting).
         """
         self.weights = weights or {}
-        self.correlations = model_correlations if model_correlations is not None else self._default_correlations()
+        self.correlations = (
+            model_correlations if model_correlations is not None else self._default_correlations()
+        )
 
         # Validate weights if provided
         if self.weights:
             total_weight = sum(self.weights.values())
             if not np.isclose(total_weight, 1.0):
-                logger.warning(
-                    f"Weights sum to {total_weight:.3f}, not 1.0. "
-                    f"Normalizing..."
-                )
+                logger.warning(f"Weights sum to {total_weight:.3f}, not 1.0. " f"Normalizing...")
                 # Normalize weights
-                self.weights = {
-                    name: w / total_weight
-                    for name, w in self.weights.items()
-                }
+                self.weights = {name: w / total_weight for name, w in self.weights.items()}
 
-    def _default_correlations(self) -> Dict[tuple[str, str], float]:
+    def _default_correlations(self) -> dict[tuple[str, str], float]:
         """
         Default model correlations from empirical backtest (2022-2024 season).
 
@@ -91,12 +87,10 @@ class WeightedAverageStrategy(EnsembleStrategy):
             ("hierarchical_v2", "state_space_v2"): 0.75,
             ("informative_priors_v2", "state_space_v2"): 0.72,
             ("hierarchical_v2", "informative_priors_v2"): 0.73,
-
             # BNN correlations (moderate - same paradigm)
             ("bnn_v1", "state_space_v2"): 0.65,
             ("bnn_v1", "hierarchical_v2"): 0.68,
             ("bnn_v1", "informative_priors_v2"): 0.66,
-
             # XGBoost correlations (lower - different paradigm)
             ("state_space_v2", "xgboost_v1"): 0.45,
             ("hierarchical_v2", "xgboost_v1"): 0.48,
@@ -109,11 +103,7 @@ class WeightedAverageStrategy(EnsembleStrategy):
         """Strategy name."""
         return "weighted_average"
 
-    def combine(
-        self,
-        predictions: List[ModelPrediction],
-        **kwargs
-    ) -> EnsemblePrediction:
+    def combine(self, predictions: list[ModelPrediction], **kwargs) -> EnsemblePrediction:
         """
         Combine predictions using weighted averaging.
 
@@ -128,17 +118,14 @@ class WeightedAverageStrategy(EnsembleStrategy):
         self.validate_predictions(predictions)
 
         # Get weights (prefer kwargs, then instance, then confidence-based)
-        weights = kwargs.get('weights', self.weights)
+        weights = kwargs.get("weights", self.weights)
 
         if not weights:
             # Use confidence-based weighting
             weights = self._confidence_based_weights(predictions)
         else:
             # Use provided weights, default to 0 for missing models
-            weights = {
-                p.model_name: weights.get(p.model_name, 0.0)
-                for p in predictions
-            }
+            weights = {p.model_name: weights.get(p.model_name, 0.0) for p in predictions}
 
             # Normalize weights
             total_weight = sum(weights.values())
@@ -147,22 +134,16 @@ class WeightedAverageStrategy(EnsembleStrategy):
             else:
                 # Fallback to equal weights
                 logger.warning("All weights are 0, using equal weights")
-                weights = {p.model_name: 1.0/len(predictions) for p in predictions}
+                weights = {p.model_name: 1.0 / len(predictions) for p in predictions}
 
         # Weighted average
-        mean = sum(
-            weights[p.model_name] * p.prediction_mean
-            for p in predictions
-        )
+        mean = sum(weights[p.model_name] * p.prediction_mean for p in predictions)
 
         # Weighted uncertainty pooling with correlations
         # σ²_ensemble = Σ(w_i² * σ_i²) + 2 * Σ_i Σ_j(w_i * w_j * ρ_ij * σ_i * σ_j)
 
         # Diagonal terms (independent component)
-        variance = sum(
-            weights[p.model_name]**2 * p.prediction_std**2
-            for p in predictions
-        )
+        variance = sum(weights[p.model_name] ** 2 * p.prediction_std**2 for p in predictions)
 
         # Off-diagonal terms (correlation component)
         for i, p_i in enumerate(predictions):
@@ -183,10 +164,7 @@ class WeightedAverageStrategy(EnsembleStrategy):
         std = np.sqrt(variance)
 
         # Weighted confidence
-        confidence = sum(
-            weights[p.model_name] * p.confidence
-            for p in predictions
-        )
+        confidence = sum(weights[p.model_name] * p.confidence for p in predictions)
 
         return EnsemblePrediction(
             prediction_mean=float(mean),
@@ -198,14 +176,11 @@ class WeightedAverageStrategy(EnsembleStrategy):
             metadata={
                 "num_models": len(predictions),
                 "method": "weighted_average",
-                "weighting_scheme": "fixed" if self.weights else "confidence"
-            }
+                "weighting_scheme": "fixed" if self.weights else "confidence",
+            },
         )
 
-    def _confidence_based_weights(
-        self,
-        predictions: List[ModelPrediction]
-    ) -> Dict[str, float]:
+    def _confidence_based_weights(self, predictions: list[ModelPrediction]) -> dict[str, float]:
         """
         Compute weights based on model confidence scores.
 
@@ -219,17 +194,15 @@ class WeightedAverageStrategy(EnsembleStrategy):
 
         if total_confidence == 0:
             # Equal weights if all confidences are 0
-            return {p.model_name: 1.0/len(predictions) for p in predictions}
+            return {p.model_name: 1.0 / len(predictions) for p in predictions}
 
-        return {
-            p.model_name: p.confidence / total_confidence
-            for p in predictions
-        }
+        return {p.model_name: p.confidence / total_confidence for p in predictions}
 
 
 if __name__ == "__main__":
     """Test weighted average strategy."""
     import logging
+
     from .base import ModelType
 
     logging.basicConfig(level=logging.INFO)
@@ -256,7 +229,7 @@ if __name__ == "__main__":
     logger.info(f"Weights: {result.weights}")
 
     # Verify weighted mean
-    expected_mean = 0.5*250 + 0.3*260 + 0.2*255
+    expected_mean = 0.5 * 250 + 0.3 * 260 + 0.2 * 255
     assert abs(result.prediction_mean - expected_mean) < 0.01
     logger.info(f"✓ Weighted mean correct: {expected_mean:.1f}")
 

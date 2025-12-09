@@ -25,11 +25,9 @@ Author: Enhanced Ensemble v7.0
 Date: November 16, 2025
 """
 
-import json
 import logging
 import pickle
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -40,9 +38,9 @@ logger = logging.getLogger(__name__)
 # Try to import LightGBM, fall back to sklearn if not available
 try:
     import lightgbm as lgb
+
     LIGHTGBM_AVAILABLE = True
 except ImportError:
-    from sklearn.linear_model import Ridge
     LIGHTGBM_AVAILABLE = False
     logger.warning("LightGBM not available, falling back to Ridge regression")
 
@@ -53,40 +51,41 @@ except ImportError:
 
 # Model names (must match ensemble components)
 MODEL_NAMES = [
-    'state_space_v2',
-    'hierarchical_v2',
-    'xgboost_v4_ridge',
-    'informative_priors_v2',
-    'elo',
+    "state_space_v2",
+    "hierarchical_v2",
+    "xgboost_v4_ridge",
+    "informative_priors_v2",
+    "elo",
 ]
 
 # Context feature names (15 features from Phase 2C)
 CONTEXT_FEATURE_NAMES = [
     # QB Experience (5)
-    'qb_exp_rookie',
-    'qb_exp_developing',
-    'qb_exp_veteran',
-    'qb_exp_elite_veteran',
-    'log_games_experience',
+    "qb_exp_rookie",
+    "qb_exp_developing",
+    "qb_exp_veteran",
+    "qb_exp_elite_veteran",
+    "log_games_experience",
     # Roster Stability (1)
-    'roster_stability_l3',
+    "roster_stability_l3",
     # Market Dispersion (2)
-    'market_dispersion',
-    'high_dispersion_flag',
+    "market_dispersion",
+    "high_dispersion_flag",
     # Game Context (7)
-    'is_home',
-    'is_dome_game',
-    'is_division_game',
-    'temp_numeric',
-    'wind_numeric',
-    'is_cold_game',
-    'is_windy_game',
+    "is_home",
+    "is_dome_game",
+    "is_division_game",
+    "temp_numeric",
+    "wind_numeric",
+    "is_cold_game",
+    "is_windy_game",
 ]
 
 
 # ============================================================================
 # META-LEARNING WEIGHT PREDICTOR
 # ============================================================================
+
 
 class MetaLearningWeightPredictor:
     """
@@ -112,7 +111,7 @@ class MetaLearningWeightPredictor:
 
     def __init__(
         self,
-        model_type: str = 'lightgbm',
+        model_type: str = "lightgbm",
         n_estimators: int = 100,
         learning_rate: float = 0.05,
         max_depth: int = 5,
@@ -132,7 +131,7 @@ class MetaLearningWeightPredictor:
         self.random_state = random_state
 
         # Initialize 5 separate regressors (one per weight)
-        if model_type == 'lightgbm' and LIGHTGBM_AVAILABLE:
+        if model_type == "lightgbm" and LIGHTGBM_AVAILABLE:
             self.weight_models = {
                 name: lgb.LGBMRegressor(
                     n_estimators=n_estimators,
@@ -143,11 +142,11 @@ class MetaLearningWeightPredictor:
                 )
                 for name in MODEL_NAMES
             }
-        elif model_type == 'ridge' or not LIGHTGBM_AVAILABLE:
+        elif model_type == "ridge" or not LIGHTGBM_AVAILABLE:
             from sklearn.linear_model import Ridge
+
             self.weight_models = {
-                name: Ridge(alpha=1.0, random_state=random_state)
-                for name in MODEL_NAMES
+                name: Ridge(alpha=1.0, random_state=random_state) for name in MODEL_NAMES
             }
             if not LIGHTGBM_AVAILABLE:
                 logger.warning("Using Ridge regression (LightGBM not installed)")
@@ -163,7 +162,7 @@ class MetaLearningWeightPredictor:
         historical_df: pd.DataFrame,
         grid_resolution: int = 11,
         n_random_samples: int = 500,
-    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    ) -> tuple[pd.DataFrame, pd.DataFrame]:
         """
         Generate (X, y) training data from historical predictions.
 
@@ -213,7 +212,7 @@ class MetaLearningWeightPredictor:
             if predictions is None:
                 continue
 
-            actual = row['actual']
+            actual = row["actual"]
 
             # Compute optimal weights for this game
             optimal_weights = self._compute_optimal_weights_for_game(
@@ -234,10 +233,10 @@ class MetaLearningWeightPredictor:
 
     def _compute_optimal_weights_for_game(
         self,
-        predictions: Dict[str, float],
+        predictions: dict[str, float],
         actual: float,
         n_samples: int = 500,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Find weights that minimize absolute error for a single game.
 
@@ -251,7 +250,7 @@ class MetaLearningWeightPredictor:
         Returns:
             Dictionary of optimal weights (sum to 1.0)
         """
-        best_error = float('inf')
+        best_error = float("inf")
         best_weights = None
 
         n_models = len(self.model_names)
@@ -263,10 +262,7 @@ class MetaLearningWeightPredictor:
             weights = dict(zip(self.model_names, weights_arr))
 
             # Compute ensemble prediction
-            ensemble_pred = sum(
-                weights[name] * predictions[name]
-                for name in self.model_names
-            )
+            ensemble_pred = sum(weights[name] * predictions[name] for name in self.model_names)
 
             # Compute error
             error = abs(ensemble_pred - actual)
@@ -283,7 +279,7 @@ class MetaLearningWeightPredictor:
         cv_splits: int = 5,
         grid_resolution: int = 11,
         n_random_samples: int = 500,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Train meta-model with time-series cross-validation.
 
@@ -354,8 +350,8 @@ class MetaLearningWeightPredictor:
             mean_mae = np.mean(scores)
             std_mae = np.std(scores)
             metrics[name] = {
-                'cv_mean_mae': mean_mae,
-                'cv_std_mae': std_mae,
+                "cv_mean_mae": mean_mae,
+                "cv_std_mae": std_mae,
             }
             logger.info(f"  {name:25s}: MAE = {mean_mae:.4f} ± {std_mae:.4f}")
 
@@ -366,7 +362,7 @@ class MetaLearningWeightPredictor:
     def predict_weights(
         self,
         context_features: pd.DataFrame,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Predict optimal weights for given context.
 
@@ -415,7 +411,7 @@ class MetaLearningWeightPredictor:
         if not self.is_fitted:
             raise ValueError("Meta-model not fitted. Call fit() first.")
 
-        if self.model_type != 'lightgbm' or not LIGHTGBM_AVAILABLE:
+        if self.model_type != "lightgbm" or not LIGHTGBM_AVAILABLE:
             logger.warning("Feature importances only available for LightGBM models")
             return None
 
@@ -443,20 +439,20 @@ class MetaLearningWeightPredictor:
 
         # Save model state
         state = {
-            'model_type': self.model_type,
-            'weight_models': self.weight_models,
-            'feature_names': self.feature_names,
-            'model_names': self.model_names,
-            'random_state': self.random_state,
+            "model_type": self.model_type,
+            "weight_models": self.weight_models,
+            "feature_names": self.feature_names,
+            "model_names": self.model_names,
+            "random_state": self.random_state,
         }
 
-        with open(output_path, 'wb') as f:
+        with open(output_path, "wb") as f:
             pickle.dump(state, f)
 
         logger.info(f"✅ Saved meta-model to: {output_path}")
 
     @classmethod
-    def load(cls, model_path: str) -> 'MetaLearningWeightPredictor':
+    def load(cls, model_path: str) -> "MetaLearningWeightPredictor":
         """
         Load trained meta-model from disk.
 
@@ -466,17 +462,17 @@ class MetaLearningWeightPredictor:
         Returns:
             Loaded MetaLearningWeightPredictor instance
         """
-        with open(model_path, 'rb') as f:
+        with open(model_path, "rb") as f:
             state = pickle.load(f)
 
         # Create instance
-        predictor = cls(model_type=state['model_type'])
+        predictor = cls(model_type=state["model_type"])
 
         # Restore state
-        predictor.weight_models = state['weight_models']
-        predictor.feature_names = state['feature_names']
-        predictor.model_names = state['model_names']
-        predictor.random_state = state['random_state']
+        predictor.weight_models = state["weight_models"]
+        predictor.feature_names = state["feature_names"]
+        predictor.model_names = state["model_names"]
+        predictor.random_state = state["random_state"]
         predictor.is_fitted = True
 
         logger.info(f"✅ Loaded meta-model from: {model_path}")
@@ -487,6 +483,7 @@ class MetaLearningWeightPredictor:
 # ============================================================================
 # UTILITY FUNCTIONS
 # ============================================================================
+
 
 def analyze_weight_predictions(
     predictor: MetaLearningWeightPredictor,
@@ -509,9 +506,9 @@ def analyze_weight_predictions(
 
         try:
             weights = predictor.predict_weights(context)
-            weights['player_id'] = row.get('player_id', None)
-            weights['season'] = row.get('season', None)
-            weights['week'] = row.get('week', None)
+            weights["player_id"] = row.get("player_id", None)
+            weights["season"] = row.get("season", None)
+            weights["week"] = row.get("week", None)
             predictions.append(weights)
         except Exception as e:
             logger.warning(f"Prediction failed for row {idx}: {e}")
@@ -524,7 +521,7 @@ def analyze_weight_predictions(
 
 
 def compare_static_vs_adaptive_weights(
-    static_weights: Dict[str, float],
+    static_weights: dict[str, float],
     adaptive_predictions: pd.DataFrame,
 ) -> None:
     """

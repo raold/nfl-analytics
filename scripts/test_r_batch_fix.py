@@ -28,16 +28,14 @@ Date: November 15, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
-import time
 import os
+import time
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -45,9 +43,9 @@ def test_batched_interface():
     """Test batched R model interface."""
     from py.ensemble.r_model_interface_batched import BatchedRModelInterface
 
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("R MODEL BATCH FIX VALIDATION")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     db_config = {
         "host": "localhost",
@@ -83,7 +81,9 @@ def test_batched_interface():
     results_hier = interface.predict_hierarchical_batch(player_ids, seasons, weeks)
     batch_time = time.time() - start
 
-    logger.info(f"✅ Hierarchical batch prediction: {batch_time:.2f}s ({batch_time/5:.3f}s per game)")
+    logger.info(
+        f"✅ Hierarchical batch prediction: {batch_time:.2f}s ({batch_time/5:.3f}s per game)"
+    )
 
     # Validate results
     valid_count = 0
@@ -98,7 +98,7 @@ def test_batched_interface():
     sequential_estimate = 5 * 5.0  # 5 games * 5s each = 25s
     speedup = sequential_estimate / batch_time if batch_time > 0 else 0
 
-    logger.info(f"\n4. Performance Analysis:")
+    logger.info("\n4. Performance Analysis:")
     logger.info(f"   Batch time: {batch_time:.2f}s")
     logger.info(f"   Sequential estimate: {sequential_estimate:.1f}s")
     logger.info(f"   Speedup: {speedup:.1f}x")
@@ -123,9 +123,9 @@ def test_batched_interface():
             logger.error(f"   Week {weeks[i]}: FAILED ❌")
 
     # Final summary
-    logger.info("\n" + "="*80)
+    logger.info("\n" + "=" * 80)
     logger.info("VALIDATION SUMMARY")
-    logger.info("="*80)
+    logger.info("=" * 80)
 
     total_tests = 5
     hier_pass = valid_count == total_tests
@@ -134,20 +134,24 @@ def test_batched_interface():
     load_pass = load_time < 5.0
 
     logger.info(f"✅ Model Loading: {'PASS' if load_pass else 'FAIL'} ({load_time:.2f}s)")
-    logger.info(f"✅ Hierarchical v2: {'PASS' if hier_pass else 'FAIL'} ({valid_count}/{total_tests} predictions)")
-    logger.info(f"✅ Informative Priors v2: {'PASS' if ip_pass else 'FAIL'} ({valid_count_ip}/{total_tests} predictions)")
+    logger.info(
+        f"✅ Hierarchical v2: {'PASS' if hier_pass else 'FAIL'} ({valid_count}/{total_tests} predictions)"
+    )
+    logger.info(
+        f"✅ Informative Priors v2: {'PASS' if ip_pass else 'FAIL'} ({valid_count_ip}/{total_tests} predictions)"
+    )
     logger.info(f"✅ Performance: {'PASS' if perf_pass else 'FAIL'} ({speedup:.1f}x speedup)")
 
     all_pass = hier_pass and ip_pass and perf_pass and load_pass
 
     if all_pass:
         logger.info("\n🎉 ALL TESTS PASSED - R model integration FIXED")
-        logger.info("="*80)
+        logger.info("=" * 80)
         interface.close()
         return 0
     else:
         logger.error("\n❌ SOME TESTS FAILED - Further debugging required")
-        logger.error("="*80)
+        logger.error("=" * 80)
         interface.close()
         return 1
 
@@ -158,6 +162,7 @@ def main():
     except Exception as e:
         logger.error(f"❌ Test crashed: {e}")
         import traceback
+
         logger.error(traceback.format_exc())
         return 1
 

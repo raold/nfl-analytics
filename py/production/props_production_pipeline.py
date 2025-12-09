@@ -48,8 +48,8 @@ sys.path.append(str(Path(__file__).parent.parent))
 from data.fetch_prop_odds import PropOddsFetcher
 from features.player_features import PlayerFeatureEngineer
 from models.props_predictor import PropsPredictor
-from production.props_ev_selector import PropsEVSelector
 from production.paper_trader import PaperTradingEngine
+from production.props_ev_selector import PropsEVSelector
 
 logging.basicConfig(
     level=logging.INFO,
@@ -132,7 +132,7 @@ class PropsPipeline:
             self.paper_trader = PaperTradingEngine(
                 initial_bankroll=bankroll,
                 session_id=paper_session_id,
-                strategy='props_production_pipeline'
+                strategy="props_production_pipeline",
             )
 
         # Create output directory
@@ -535,20 +535,20 @@ class PropsPipeline:
             try:
                 # Place paper trade
                 paper_trade_id = self.paper_trader.place_paper_bet(
-                    game_id=bet.get('game_id', 'unknown'),
-                    player_id=bet['player_id'],
-                    player_name=bet['player_name'],
-                    prop_type=bet['prop_type'],
-                    line_value=bet['line_value'],
-                    bet_side=bet['bet_side'],
-                    odds=bet['odds'],
-                    bookmaker_key=bet.get('bookmaker', 'unknown'),
-                    bet_amount=bet['bet_amount'],
-                    edge=bet.get('edge'),
-                    model_prediction=bet.get('prediction'),
-                    model_std=bet.get('prediction_std'),
-                    confidence=bet.get('confidence'),
-                    model_version='production_v1'
+                    game_id=bet.get("game_id", "unknown"),
+                    player_id=bet["player_id"],
+                    player_name=bet["player_name"],
+                    prop_type=bet["prop_type"],
+                    line_value=bet["line_value"],
+                    bet_side=bet["bet_side"],
+                    odds=bet["odds"],
+                    bookmaker_key=bet.get("bookmaker", "unknown"),
+                    bet_amount=bet["bet_amount"],
+                    edge=bet.get("edge"),
+                    model_prediction=bet.get("prediction"),
+                    model_std=bet.get("prediction_std"),
+                    confidence=bet.get("confidence"),
+                    model_version="production_v1",
                 )
 
                 trades_placed += 1
@@ -562,18 +562,13 @@ class PropsPipeline:
 
             except Exception as e:
                 trades_failed += 1
-                logger.error(
-                    f"  ✗ Failed to place paper trade for {bet['player_name']}: {e}"
-                )
+                logger.error(f"  ✗ Failed to place paper trade for {bet['player_name']}: {e}")
 
-        logger.info(
-            f"✅ Placed {trades_placed} paper trades "
-            f"({trades_failed} failed)"
-        )
+        logger.info(f"✅ Placed {trades_placed} paper trades " f"({trades_failed} failed)")
 
         # Get current session metrics
         metrics = self.paper_trader.get_performance_metrics()
-        logger.info(f"   Session metrics:")
+        logger.info("   Session metrics:")
         logger.info(f"     Total bets: {metrics['total_bets']}")
         logger.info(f"     Pending: {metrics['pending_bets']}")
         logger.info(f"     Bankroll: ${metrics['current_bankroll']:,.2f}")
@@ -581,7 +576,7 @@ class PropsPipeline:
         return {
             "paper_trades_placed": trades_placed,
             "paper_trades_failed": trades_failed,
-            "session_metrics": metrics
+            "session_metrics": metrics,
         }
 
     def run_full_pipeline(self, skip_fetch: bool = False, max_events: int = None) -> dict:
@@ -673,7 +668,7 @@ class PropsPipeline:
 
         if self.paper_trade and "paper_trades_placed" in self.stats:
             logger.info(f"Paper trades placed: {self.stats['paper_trades_placed']}")
-            logger.info(f"View dashboard: http://localhost:8501 (Paper Trading page)")
+            logger.info("View dashboard: http://localhost:8501 (Paper Trading page)")
 
         logger.info("=" * 80 + "\n")
 
@@ -728,12 +723,12 @@ def main():
     parser.add_argument(
         "--paper-trade",
         action="store_true",
-        help="Paper trading mode (simulate bets without real money)"
+        help="Paper trading mode (simulate bets without real money)",
     )
     parser.add_argument(
         "--paper-session-id",
         type=str,
-        help="Paper trading session ID (auto-generated if not provided)"
+        help="Paper trading session ID (auto-generated if not provided)",
     )
 
     args = parser.parse_args()

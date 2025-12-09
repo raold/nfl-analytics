@@ -30,11 +30,10 @@ Date: November 16, 2025
 """
 
 import sys
-from pathlib import Path
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple
 from datetime import datetime
+from pathlib import Path
+
+import pandas as pd
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -46,20 +45,20 @@ class InternationalFeatureValidator:
 
     # Theoretical bounds for each feature
     FEATURE_BOUNDS = {
-        'jet_lag_penalty': (-108, 0),  # Max 9 hours × -12 per hour
-        'body_clock_hour': (-7, 17),   # UTC hours relative to home timezone
-        'early_morning_penalty': (-32, 0),  # Max penalty for very early games
-        'altitude_shock': (-5150, 5150),  # Denver (5280 ft) is extreme
-        'altitude_penalty': (-10.45, 5.0),  # Scaled altitude shock
-        'total_intl_penalty': (-150, 10),  # Sum of all penalties + bonuses
+        "jet_lag_penalty": (-108, 0),  # Max 9 hours × -12 per hour
+        "body_clock_hour": (-7, 17),  # UTC hours relative to home timezone
+        "early_morning_penalty": (-32, 0),  # Max penalty for very early games
+        "altitude_shock": (-5150, 5150),  # Denver (5280 ft) is extreme
+        "altitude_penalty": (-10.45, 5.0),  # Scaled altitude shock
+        "total_intl_penalty": (-150, 10),  # Sum of all penalties + bonuses
     }
 
     # Expected correlations (sign and rough magnitude)
     EXPECTED_CORRELATIONS = {
-        'total_intl_penalty': ('negative', 'weak'),  # Lower penalty → more yards
-        'jet_lag_penalty': ('negative', 'weak'),
-        'early_morning_penalty': ('negative', 'weak'),
-        'altitude_penalty': ('negative', 'weak'),
+        "total_intl_penalty": ("negative", "weak"),  # Lower penalty → more yards
+        "jet_lag_penalty": ("negative", "weak"),
+        "early_morning_penalty": ("negative", "weak"),
+        "altitude_penalty": ("negative", "weak"),
     }
 
     def __init__(self, data_path: str = "data/international_games_2018_2024.csv"):
@@ -88,20 +87,20 @@ class InternationalFeatureValidator:
         """Check all required columns are present."""
         required_columns = [
             # Performance metric
-            'passing_yards',
+            "passing_yards",
             # Causal features
-            'jet_lag_penalty',
-            'body_clock_hour',
-            'early_morning_penalty',
-            'altitude_shock',
-            'altitude_penalty',
-            'total_intl_penalty',
+            "jet_lag_penalty",
+            "body_clock_hour",
+            "early_morning_penalty",
+            "altitude_shock",
+            "altitude_penalty",
+            "total_intl_penalty",
             # Metadata
-            'neutral_field',
-            'is_international',
-            'player_name',
-            'season',
-            'week',
+            "neutral_field",
+            "is_international",
+            "player_name",
+            "season",
+            "week",
         ]
 
         missing = [col for col in required_columns if col not in self.df.columns]
@@ -113,11 +112,15 @@ class InternationalFeatureValidator:
         print(f"✅ All {len(required_columns)} required columns present")
         return True
 
-    def check_missing_values(self) -> Dict[str, int]:
+    def check_missing_values(self) -> dict[str, int]:
         """Check for missing values in critical columns."""
         feature_cols = [
-            'jet_lag_penalty', 'body_clock_hour', 'early_morning_penalty',
-            'altitude_shock', 'altitude_penalty', 'total_intl_penalty'
+            "jet_lag_penalty",
+            "body_clock_hour",
+            "early_morning_penalty",
+            "altitude_shock",
+            "altitude_penalty",
+            "total_intl_penalty",
         ]
 
         missing_counts = {}
@@ -129,15 +132,17 @@ class InternationalFeatureValidator:
 
             if missing > 0:
                 has_missing = True
-                self.issues.append(f"❌ {col}: {missing} missing values ({missing/len(self.df)*100:.1f}%)")
+                self.issues.append(
+                    f"❌ {col}: {missing} missing values ({missing/len(self.df)*100:.1f}%)"
+                )
 
         if not has_missing:
             print(f"✅ No missing values in {len(feature_cols)} feature columns")
 
-        self.validation_results['missing_values'] = missing_counts
+        self.validation_results["missing_values"] = missing_counts
         return missing_counts
 
-    def validate_feature_ranges(self) -> Dict[str, Dict]:
+    def validate_feature_ranges(self) -> dict[str, dict]:
         """Validate features are within theoretical bounds."""
         range_results = {}
 
@@ -157,17 +162,19 @@ class InternationalFeatureValidator:
             outliers_high = (values > max_bound).sum()
 
             range_results[feature] = {
-                'theoretical_min': min_bound,
-                'theoretical_max': max_bound,
-                'actual_min': actual_min,
-                'actual_max': actual_max,
-                'within_bounds': within_bounds,
-                'outliers_low': outliers_low,
-                'outliers_high': outliers_high,
+                "theoretical_min": min_bound,
+                "theoretical_max": max_bound,
+                "actual_min": actual_min,
+                "actual_max": actual_max,
+                "within_bounds": within_bounds,
+                "outliers_low": outliers_low,
+                "outliers_high": outliers_high,
             }
 
             if within_bounds:
-                print(f"✅ {feature}: [{actual_min:.2f}, {actual_max:.2f}] within [{min_bound}, {max_bound}]")
+                print(
+                    f"✅ {feature}: [{actual_min:.2f}, {actual_max:.2f}] within [{min_bound}, {max_bound}]"
+                )
             else:
                 if outliers_low > 0:
                     self.issues.append(
@@ -178,29 +185,37 @@ class InternationalFeatureValidator:
                         f"❌ {feature}: {outliers_high} values above {max_bound} (max: {actual_max:.2f})"
                     )
 
-        self.validation_results['ranges'] = range_results
+        self.validation_results["ranges"] = range_results
         return range_results
 
     def calculate_summary_statistics(self) -> pd.DataFrame:
         """Calculate descriptive statistics for all features."""
         feature_cols = [
-            'passing_yards', 'jet_lag_penalty', 'body_clock_hour',
-            'early_morning_penalty', 'altitude_shock', 'altitude_penalty',
-            'total_intl_penalty'
+            "passing_yards",
+            "jet_lag_penalty",
+            "body_clock_hour",
+            "early_morning_penalty",
+            "altitude_shock",
+            "altitude_penalty",
+            "total_intl_penalty",
         ]
 
         stats = self.df[feature_cols].describe().T
-        stats['missing'] = self.df[feature_cols].isna().sum()
-        stats['zeros'] = (self.df[feature_cols] == 0).sum()
+        stats["missing"] = self.df[feature_cols].isna().sum()
+        stats["zeros"] = (self.df[feature_cols] == 0).sum()
 
-        self.validation_results['summary_stats'] = stats
+        self.validation_results["summary_stats"] = stats
         return stats
 
     def analyze_correlations(self) -> pd.DataFrame:
         """Analyze correlations between features and passing yards."""
         feature_cols = [
-            'jet_lag_penalty', 'body_clock_hour', 'early_morning_penalty',
-            'altitude_shock', 'altitude_penalty', 'total_intl_penalty'
+            "jet_lag_penalty",
+            "body_clock_hour",
+            "early_morning_penalty",
+            "altitude_shock",
+            "altitude_penalty",
+            "total_intl_penalty",
         ]
 
         correlations = []
@@ -210,44 +225,50 @@ class InternationalFeatureValidator:
                 continue
 
             # Pearson correlation
-            corr = self.df['passing_yards'].corr(self.df[feature])
+            corr = self.df["passing_yards"].corr(self.df[feature])
 
             # Sample size (non-missing pairs)
-            n = self.df[[feature, 'passing_yards']].dropna().shape[0]
+            n = self.df[[feature, "passing_yards"]].dropna().shape[0]
 
             # Simple significance test (r > 0.3 is "moderate")
-            strength = 'strong' if abs(corr) > 0.5 else 'moderate' if abs(corr) > 0.3 else 'weak'
-            direction = 'positive' if corr > 0 else 'negative'
+            strength = "strong" if abs(corr) > 0.5 else "moderate" if abs(corr) > 0.3 else "weak"
+            direction = "positive" if corr > 0 else "negative"
 
-            correlations.append({
-                'feature': feature,
-                'correlation': corr,
-                'direction': direction,
-                'strength': strength,
-                'n': n,
-            })
+            correlations.append(
+                {
+                    "feature": feature,
+                    "correlation": corr,
+                    "direction": direction,
+                    "strength": strength,
+                    "n": n,
+                }
+            )
 
-        corr_df = pd.DataFrame(correlations).sort_values('correlation', key=abs, ascending=False)
+        corr_df = pd.DataFrame(correlations).sort_values("correlation", key=abs, ascending=False)
 
         # Check against expected correlations
         for _, row in corr_df.iterrows():
-            feature = row['feature']
+            feature = row["feature"]
             if feature in self.EXPECTED_CORRELATIONS:
                 expected_dir, expected_str = self.EXPECTED_CORRELATIONS[feature]
-                if row['direction'] != expected_dir:
+                if row["direction"] != expected_dir:
                     self.warnings.append(
                         f"⚠️ {feature}: Expected {expected_dir} correlation, got {row['direction']}"
                     )
 
-        self.validation_results['correlations'] = corr_df
+        self.validation_results["correlations"] = corr_df
         return corr_df
 
-    def detect_statistical_outliers(self) -> Dict[str, List]:
+    def detect_statistical_outliers(self) -> dict[str, list]:
         """Detect outliers using IQR method."""
         feature_cols = [
-            'passing_yards', 'jet_lag_penalty', 'body_clock_hour',
-            'early_morning_penalty', 'altitude_shock', 'altitude_penalty',
-            'total_intl_penalty'
+            "passing_yards",
+            "jet_lag_penalty",
+            "body_clock_hour",
+            "early_morning_penalty",
+            "altitude_shock",
+            "altitude_penalty",
+            "total_intl_penalty",
         ]
 
         outliers = {}
@@ -268,10 +289,10 @@ class InternationalFeatureValidator:
 
             if len(outlier_indices) > 0:
                 outliers[col] = {
-                    'count': len(outlier_indices),
-                    'indices': outlier_indices,
-                    'values': self.df.loc[outlier_indices, col].tolist(),
-                    'bounds': (lower_bound, upper_bound),
+                    "count": len(outlier_indices),
+                    "indices": outlier_indices,
+                    "values": self.df.loc[outlier_indices, col].tolist(),
+                    "bounds": (lower_bound, upper_bound),
                 }
 
                 # Only warn if >20% are outliers
@@ -281,18 +302,18 @@ class InternationalFeatureValidator:
                         f"({len(outlier_indices)/len(self.df)*100:.1f}%)"
                     )
             else:
-                outliers[col] = {'count': 0}
+                outliers[col] = {"count": 0}
 
-        self.validation_results['outliers'] = outliers
+        self.validation_results["outliers"] = outliers
         return outliers
 
     def validate_neutral_field(self) -> bool:
         """Validate all games are marked as neutral field."""
-        if 'neutral_field' not in self.df.columns:
+        if "neutral_field" not in self.df.columns:
             self.issues.append("❌ neutral_field column missing")
             return False
 
-        non_neutral = (self.df['neutral_field'] != 1).sum()
+        non_neutral = (self.df["neutral_field"] != 1).sum()
 
         if non_neutral > 0:
             self.warnings.append(
@@ -305,22 +326,22 @@ class InternationalFeatureValidator:
 
     def validate_international_flag(self) -> bool:
         """Validate all games are marked as international."""
-        if 'is_international' not in self.df.columns:
+        if "is_international" not in self.df.columns:
             self.issues.append("❌ is_international column missing")
             return False
 
-        non_intl = (self.df['is_international'] != 1).sum()
+        non_intl = (self.df["is_international"] != 1).sum()
 
         if non_intl > 0:
-            self.warnings.append(
-                f"⚠️ {non_intl} games not marked as international"
-            )
+            self.warnings.append(f"⚠️ {non_intl} games not marked as international")
         else:
             print(f"✅ All {len(self.df)} games correctly marked as international")
 
         return non_intl == 0
 
-    def generate_report(self, output_path: str = "results/international_features_validation.txt") -> str:
+    def generate_report(
+        self, output_path: str = "results/international_features_validation.txt"
+    ) -> str:
         """Generate comprehensive validation report."""
         report_lines = []
 
@@ -337,16 +358,16 @@ class InternationalFeatureValidator:
         report_lines.append("-" * 80)
         report_lines.append("SUMMARY STATISTICS")
         report_lines.append("-" * 80)
-        if 'summary_stats' in self.validation_results:
-            report_lines.append(str(self.validation_results['summary_stats']))
+        if "summary_stats" in self.validation_results:
+            report_lines.append(str(self.validation_results["summary_stats"]))
         report_lines.append("")
 
         # Correlations
         report_lines.append("-" * 80)
         report_lines.append("CORRELATION ANALYSIS (with passing_yards)")
         report_lines.append("-" * 80)
-        if 'correlations' in self.validation_results:
-            corr_df = self.validation_results['correlations']
+        if "correlations" in self.validation_results:
+            corr_df = self.validation_results["correlations"]
             for _, row in corr_df.iterrows():
                 report_lines.append(
                     f"  {row['feature']:25s}: {row['correlation']:7.3f} "
@@ -358,9 +379,9 @@ class InternationalFeatureValidator:
         report_lines.append("-" * 80)
         report_lines.append("FEATURE RANGE VALIDATION")
         report_lines.append("-" * 80)
-        if 'ranges' in self.validation_results:
-            for feature, bounds in self.validation_results['ranges'].items():
-                status = "✅ PASS" if bounds['within_bounds'] else "❌ FAIL"
+        if "ranges" in self.validation_results:
+            for feature, bounds in self.validation_results["ranges"].items():
+                status = "✅ PASS" if bounds["within_bounds"] else "❌ FAIL"
                 report_lines.append(
                     f"  {feature:25s} {status}\n"
                     f"    Theoretical: [{bounds['theoretical_min']:7.2f}, {bounds['theoretical_max']:7.2f}]\n"
@@ -373,9 +394,9 @@ class InternationalFeatureValidator:
         report_lines.append("-" * 80)
         report_lines.append("STATISTICAL OUTLIERS (IQR method)")
         report_lines.append("-" * 80)
-        if 'outliers' in self.validation_results:
-            for feature, outlier_info in self.validation_results['outliers'].items():
-                if outlier_info['count'] > 0:
+        if "outliers" in self.validation_results:
+            for feature, outlier_info in self.validation_results["outliers"].items():
+                if outlier_info["count"] > 0:
                     report_lines.append(
                         f"  {feature:25s}: {outlier_info['count']} outliers "
                         f"(bounds: [{outlier_info['bounds'][0]:.2f}, {outlier_info['bounds'][1]:.2f}])"

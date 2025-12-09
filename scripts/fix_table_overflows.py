@@ -16,37 +16,38 @@ Date: 2025-11-03
 
 import argparse
 import re
-import sys
 from pathlib import Path
-from typing import List, Tuple
+
 
 def has_adjustbox(content: str, tabular_start: int) -> bool:
     """Check if tabular environment already wrapped in adjustbox"""
     # Look backwards from tabular to find if there's an adjustbox
     before_tabular = content[:tabular_start]
-    lines_before = before_tabular.split('\n')
+    lines_before = before_tabular.split("\n")
 
     # Check last 5 lines before tabular
     for line in lines_before[-5:]:
-        if 'adjustbox' in line or 'resizebox' in line or 'scalebox' in line:
+        if "adjustbox" in line or "resizebox" in line or "scalebox" in line:
             return True
     return False
+
 
 def count_columns(tabular_spec: str) -> int:
     """Count number of columns in tabular specification"""
     # Extract spec from \begin{tabular}{...}
-    match = re.search(r'\\begin{tabular}{([^}]+)}', tabular_spec)
+    match = re.search(r"\\begin{tabular}{([^}]+)}", tabular_spec)
     if not match:
         return 0
 
     spec = match.group(1)
     # Count column specifiers (l, c, r, p, etc.)
-    col_count = len(re.findall(r'[lcrp]', spec))
+    col_count = len(re.findall(r"[lcrp]", spec))
     return col_count
+
 
 def is_wide_table(content: str, tabular_start: int) -> bool:
     """Heuristically determine if table is likely too wide"""
-    tabular_line = content[tabular_start:tabular_start+200]
+    tabular_line = content[tabular_start : tabular_start + 200]
     col_count = count_columns(tabular_line)
 
     # Tables with 7+ columns are often problematic
@@ -55,20 +56,21 @@ def is_wide_table(content: str, tabular_start: int) -> bool:
 
     # Check for long column headers
     # Extract first few lines of table
-    table_start = content[tabular_start:tabular_start+500]
-    if 'textbf{' in table_start:
-        headers = re.findall(r'\\textbf{([^}]+)}', table_start)
+    table_start = content[tabular_start : tabular_start + 500]
+    if "textbf{" in table_start:
+        headers = re.findall(r"\\textbf{([^}]+)}", table_start)
         if any(len(h) > 20 for h in headers):
             return True
 
     return False
 
-def fix_table_in_content(content: str) -> Tuple[str, List[str]]:
+
+def fix_table_in_content(content: str) -> tuple[str, list[str]]:
     """Add adjustbox wrappers to tables that need them"""
     changes = []
 
     # Find all tabular environments
-    pattern = r'(\\begin{tabular}{[^}]+})'
+    pattern = r"(\\begin{tabular}{[^}]+})"
     matches = list(re.finditer(pattern, content))
 
     # Process in reverse to preserve offsets
@@ -84,7 +86,7 @@ def fix_table_in_content(content: str) -> Tuple[str, List[str]]:
             continue
 
         # Find the end of this tabular environment
-        end_pattern = r'\\end{tabular}'
+        end_pattern = r"\\end{tabular}"
         end_match = re.search(end_pattern, content[start_pos:])
         if not end_match:
             continue
@@ -95,25 +97,28 @@ def fix_table_in_content(content: str) -> Tuple[str, List[str]]:
         table_content = content[start_pos:end_pos]
 
         # Wrap with adjustbox
-        wrapped = f"\\begin{{adjustbox}}{{max width=\\textwidth}}\n{table_content}\n\\end{{adjustbox}}"
+        wrapped = (
+            f"\\begin{{adjustbox}}{{max width=\\textwidth}}\n{table_content}\n\\end{{adjustbox}}"
+        )
 
         # Replace in content
         content = content[:start_pos] + wrapped + content[end_pos:]
 
         # Log change
-        line_num = content[:start_pos].count('\n') + 1
+        line_num = content[:start_pos].count("\n") + 1
         changes.append(f"Line {line_num}: Added adjustbox wrapper")
 
     return content, changes
 
-def process_file(file_path: Path, dry_run: bool = True) -> Tuple[bool, List[str]]:
+
+def process_file(file_path: Path, dry_run: bool = True) -> tuple[bool, list[str]]:
     """Process a single LaTeX file"""
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
 
         # Skip if no tables
-        if '\\begin{tabular}' not in content:
+        if "\\begin{tabular}" not in content:
             return False, []
 
         # Fix tables
@@ -124,7 +129,7 @@ def process_file(file_path: Path, dry_run: bool = True) -> Tuple[bool, List[str]
 
         # Write changes if not dry run
         if not dry_run:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.write(new_content)
 
         return True, changes
@@ -132,12 +137,13 @@ def process_file(file_path: Path, dry_run: bool = True) -> Tuple[bool, List[str]
     except Exception as e:
         return False, [f"ERROR: {str(e)}"]
 
+
 def main():
     parser = argparse.ArgumentParser(description="Fix table overflows in dissertation")
-    parser.add_argument('--check', action='store_true', help="Dry run (show changes)")
-    parser.add_argument('--fix', action='store_true', help="Actually apply fixes")
-    parser.add_argument('--file', type=str, help="Fix single file")
-    parser.add_argument('--dir', type=str, default='analysis/dissertation', help="Base directory")
+    parser.add_argument("--check", action="store_true", help="Dry run (show changes)")
+    parser.add_argument("--fix", action="store_true", help="Actually apply fixes")
+    parser.add_argument("--file", type=str, help="Fix single file")
+    parser.add_argument("--dir", type=str, default="analysis/dissertation", help="Base directory")
 
     args = parser.parse_args()
 
@@ -162,7 +168,7 @@ def main():
     else:
         # Scan all .tex files
         base_dir = Path(args.dir)
-        tex_files = list(base_dir.rglob('*.tex'))
+        tex_files = list(base_dir.rglob("*.tex"))
 
         print(f"Scanning {len(tex_files)} LaTeX files...")
 
@@ -174,14 +180,14 @@ def main():
 
         # Summary
         print(f"\n{'=' * 70}")
-        print(f"TABLE OVERFLOW FIX SUMMARY")
+        print("TABLE OVERFLOW FIX SUMMARY")
         print(f"{'=' * 70}")
         print(f"Mode: {'DRY RUN (no changes made)' if dry_run else 'FIXING (changes applied)'}")
         print(f"Files scanned: {len(tex_files)}")
         print(f"Files modified: {len(modified_files)}")
 
         if modified_files:
-            print(f"\nModified files:")
+            print("\nModified files:")
             for file_path, changes in modified_files:
                 rel_path = file_path.relative_to(base_dir)
                 print(f"\n  {rel_path}:")
@@ -189,7 +195,8 @@ def main():
                     print(f"    {change}")
 
         if dry_run and modified_files:
-            print(f"\nRun with --fix to apply changes")
+            print("\nRun with --fix to apply changes")
+
 
 if __name__ == "__main__":
     main()

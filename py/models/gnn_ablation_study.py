@@ -19,9 +19,8 @@ import json
 import logging
 import subprocess
 from pathlib import Path
-from typing import Dict, List
+
 import pandas as pd
-import numpy as np
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -41,7 +40,6 @@ ABLATION_CONFIGS = {
         "use_chemistry": True,
         "batch_size": 128,
     },
-
     # Ablation 1: Remove chemistry edges
     "no_chemistry": {
         "name": "No Chemistry Edges",
@@ -51,7 +49,6 @@ ABLATION_CONFIGS = {
         "use_chemistry": False,
         "batch_size": 128,
     },
-
     # Ablation 2: Embedding dimensions
     "embed_32": {
         "name": "Embedding Dim 32",
@@ -69,7 +66,6 @@ ABLATION_CONFIGS = {
         "use_chemistry": True,
         "batch_size": 128,
     },
-
     # Ablation 3: Message passing rounds
     "msg_1": {
         "name": "1 Message Round",
@@ -95,7 +91,6 @@ ABLATION_CONFIGS = {
         "use_chemistry": True,
         "batch_size": 128,
     },
-
     # Ablation 4: Smaller model (all components reduced)
     "small": {
         "name": "Small Model",
@@ -105,7 +100,6 @@ ABLATION_CONFIGS = {
         "use_chemistry": False,
         "batch_size": 128,
     },
-
     # Ablation 5: Larger model (all components increased)
     "large": {
         "name": "Large Model",
@@ -122,20 +116,21 @@ ABLATION_CONFIGS = {
 # Ablation Study Runner
 # =============================================================================
 
+
 def run_single_ablation(
     config_name: str,
-    config: Dict,
-    seasons: List[int],
+    config: dict,
+    seasons: list[int],
     epochs: int,
     device: str,
     output_dir: Path,
-) -> Dict:
+) -> dict:
     """Run a single ablation experiment."""
 
     logger.info("=" * 80)
     logger.info(f"Running ablation: {config['name']}")
     logger.info("=" * 80)
-    logger.info(f"Configuration:")
+    logger.info("Configuration:")
     for key, value in config.items():
         if key != "name":
             logger.info(f"  {key}: {value}")
@@ -143,15 +138,26 @@ def run_single_ablation(
 
     # Build command
     cmd = [
-        "uv", "run", "python", "py/models/train_hierarchical_gnn.py",
-        "--seasons", *[str(s) for s in seasons],
-        "--embedding-dim", str(config["embedding_dim"]),
-        "--hidden-dim", str(config["hidden_dim"]),
-        "--num-message-rounds", str(config["num_message_rounds"]),
-        "--epochs", str(epochs),
-        "--batch-size", str(config["batch_size"]),
-        "--device", device,
-        "--output-dir", str(output_dir / config_name),
+        "uv",
+        "run",
+        "python",
+        "py/models/train_hierarchical_gnn.py",
+        "--seasons",
+        *[str(s) for s in seasons],
+        "--embedding-dim",
+        str(config["embedding_dim"]),
+        "--hidden-dim",
+        str(config["hidden_dim"]),
+        "--num-message-rounds",
+        str(config["num_message_rounds"]),
+        "--epochs",
+        str(epochs),
+        "--batch-size",
+        str(config["batch_size"]),
+        "--device",
+        device,
+        "--output-dir",
+        str(output_dir / config_name),
     ]
 
     # Add chemistry flag if disabled
@@ -189,7 +195,7 @@ def run_single_ablation(
             "error": "Metadata file not found",
         }
 
-    with open(metadata_path, "r") as f:
+    with open(metadata_path) as f:
         metadata = json.load(f)
 
     results = {
@@ -214,20 +220,18 @@ def run_single_ablation(
 
 
 def run_ablation_study(
-    configs: Dict[str, Dict],
-    seasons: List[int],
+    configs: dict[str, dict],
+    seasons: list[int],
     epochs: int,
     device: str,
     output_dir: Path,
-) -> List[Dict]:
+) -> list[dict]:
     """Run all ablation experiments."""
 
     results = []
 
     for config_name, config in configs.items():
-        result = run_single_ablation(
-            config_name, config, seasons, epochs, device, output_dir
-        )
+        result = run_single_ablation(config_name, config, seasons, epochs, device, output_dir)
         results.append(result)
 
         # Save intermediate results
@@ -238,7 +242,7 @@ def run_ablation_study(
     return results
 
 
-def generate_summary_table(results: List[Dict], output_dir: Path):
+def generate_summary_table(results: list[dict], output_dir: Path):
     """Generate summary table and analysis."""
 
     # Extract successful results
@@ -264,19 +268,21 @@ def generate_summary_table(results: List[Dict], output_dir: Path):
         delta_brier = r["best_val_brier"] - baseline_brier
         delta_pct = 100 * delta_brier / baseline_brier
 
-        summary_data.append({
-            "Configuration": r["name"],
-            "Embed Dim": r["config"]["embedding_dim"],
-            "Hidden Dim": r["config"]["hidden_dim"],
-            "Msg Rounds": r["config"]["num_message_rounds"],
-            "Chemistry": "Yes" if r["config"]["use_chemistry"] else "No",
-            "Val Brier": r["best_val_brier"],
-            "Δ Brier": delta_brier,
-            "Δ %": delta_pct,
-            "Test Brier": r["test_brier"],
-            "Test Acc": r["test_accuracy"],
-            "Test AUC": r["test_auc"],
-        })
+        summary_data.append(
+            {
+                "Configuration": r["name"],
+                "Embed Dim": r["config"]["embedding_dim"],
+                "Hidden Dim": r["config"]["hidden_dim"],
+                "Msg Rounds": r["config"]["num_message_rounds"],
+                "Chemistry": "Yes" if r["config"]["use_chemistry"] else "No",
+                "Val Brier": r["best_val_brier"],
+                "Δ Brier": delta_brier,
+                "Δ %": delta_pct,
+                "Test Brier": r["test_brier"],
+                "Test Acc": r["test_accuracy"],
+                "Test AUC": r["test_auc"],
+            }
+        )
 
     df = pd.DataFrame(summary_data)
     df = df.sort_values("Val Brier")
@@ -320,13 +326,13 @@ def generate_summary_table(results: List[Dict], output_dir: Path):
 
     # Embedding dimension impact
     embed_results = df.groupby("Embed Dim")["Val Brier"].mean().sort_values()
-    logger.info(f"\nEmbedding Dimension (average Brier):")
+    logger.info("\nEmbedding Dimension (average Brier):")
     for dim, brier in embed_results.items():
         logger.info(f"  {dim:3d}: {brier:.4f}")
 
     # Message rounds impact
     msg_results = df.groupby("Msg Rounds")["Val Brier"].mean().sort_values()
-    logger.info(f"\nMessage Passing Rounds (average Brier):")
+    logger.info("\nMessage Passing Rounds (average Brier):")
     for rounds, brier in msg_results.items():
         logger.info(f"  {rounds:1d}: {brier:.4f}")
 
@@ -338,6 +344,7 @@ def generate_summary_table(results: List[Dict], output_dir: Path):
 # =============================================================================
 # Main Entry Point
 # =============================================================================
+
 
 def main():
     parser = argparse.ArgumentParser(description="GNN Ablation Study")
@@ -395,9 +402,7 @@ def main():
     logger.info("")
 
     # Run ablation study
-    results = run_ablation_study(
-        configs, args.seasons, args.epochs, args.device, output_dir
-    )
+    results = run_ablation_study(configs, args.seasons, args.epochs, args.device, output_dir)
 
     # Save final results
     results_path = output_dir / "ablation_results.json"

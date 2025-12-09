@@ -20,10 +20,13 @@ Date: November 15, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
+
 import numpy as np
+
 from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 logging.basicConfig(level=logging.INFO)
@@ -32,13 +35,13 @@ logger = logging.getLogger(__name__)
 
 def test_model_loading():
     """Test that all models load successfully."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 1: Model Loading")
-    print("="*70)
+    print("=" * 70)
 
     try:
         ensemble = EnhancedEnsemble5Way()
-        print(f"✅ Ensemble initialized")
+        print("✅ Ensemble initialized")
         print(f"   Weights: {ensemble.weights}")
         print(f"   Temperature: {ensemble.temperature:.4f}")
         print(f"   Version: {ensemble.ensemble_version}")
@@ -65,9 +68,9 @@ def test_model_loading():
 
 def test_feature_shapes(ensemble):
     """Test that feature arrays have correct shapes."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 2: Feature Shapes")
-    print("="*70)
+    print("=" * 70)
 
     # Sample features (realistic values for Patrick Mahomes)
     features = {
@@ -80,7 +83,7 @@ def test_feature_shapes(ensemble):
         "home_away_encoded": 1,  # home game
     }
 
-    print(f"Sample features (Patrick Mahomes-like):")
+    print("Sample features (Patrick Mahomes-like):")
     for k, v in features.items():
         print(f"   {k}: {v}")
 
@@ -90,13 +93,17 @@ def test_feature_shapes(ensemble):
     print(f"\n✅ Ridge features: shape {ridge_X.shape}")
 
     # Test XGBoost v4 features
-    xgb_X = np.array([[
-        features["pass_yards_l3"],
-        features["pass_attempts_l3"],
-        features["completions_l3"],
-        features["completions_pct_l3"],
-        features["home_away_encoded"],
-    ]])
+    xgb_X = np.array(
+        [
+            [
+                features["pass_yards_l3"],
+                features["pass_attempts_l3"],
+                features["completions_l3"],
+                features["completions_pct_l3"],
+                features["home_away_encoded"],
+            ]
+        ]
+    )
     assert xgb_X.shape == (1, 5), f"XGBoost X shape wrong: {xgb_X.shape}"
     print(f"✅ XGBoost v4 features: shape {xgb_X.shape}")
 
@@ -105,9 +112,9 @@ def test_feature_shapes(ensemble):
 
 def test_individual_predictions(ensemble, features):
     """Test that each model produces reasonable predictions."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 3: Individual Model Predictions")
-    print("="*70)
+    print("=" * 70)
 
     predictions = {}
 
@@ -165,21 +172,22 @@ def test_individual_predictions(ensemble, features):
 
 def test_ensemble_aggregation(ensemble, predictions):
     """Test weighted averaging and uncertainty quantification."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 4: Ensemble Aggregation")
-    print("="*70)
+    print("=" * 70)
 
     # Weighted average
     ensemble_mean = sum(
-        predictions[model][0] * ensemble.weights[model]
-        for model in ensemble.weights.keys()
+        predictions[model][0] * ensemble.weights[model] for model in ensemble.weights.keys()
     )
 
-    print(f"\nWeighted predictions:")
+    print("\nWeighted predictions:")
     for model, (pred, std) in predictions.items():
         weight = ensemble.weights[model]
         contribution = pred * weight
-        print(f"   {model:30s}: {pred:6.1f} ± {std:5.1f} yards × {weight:.2f} = {contribution:6.1f}")
+        print(
+            f"   {model:30s}: {pred:6.1f} ± {std:5.1f} yards × {weight:.2f} = {contribution:6.1f}"
+        )
 
     print(f"\n✅ Ensemble mean: {ensemble_mean:.1f} yards")
 
@@ -221,9 +229,9 @@ def test_ensemble_aggregation(ensemble, predictions):
 
 def test_weights_sum_to_one(ensemble):
     """Test that weights sum to 1.0."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("TEST 5: Weight Validation")
-    print("="*70)
+    print("=" * 70)
 
     weight_sum = sum(ensemble.weights.values())
     print(f"Weight sum: {weight_sum:.6f}")
@@ -234,9 +242,9 @@ def test_weights_sum_to_one(ensemble):
 
 def main():
     """Run all tests."""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print("ENSEMBLE v6.0 PRODUCTION - COMPREHENSIVE TEST SUITE")
-    print("="*70)
+    print("=" * 70)
 
     try:
         # Test 1: Model loading
@@ -255,28 +263,29 @@ def main():
         test_weights_sum_to_one(ensemble)
 
         # Summary
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("SUMMARY")
-        print("="*70)
-        print(f"\n✅ All tests passed!")
-        print(f"\nFinal ensemble prediction:")
+        print("=" * 70)
+        print("\n✅ All tests passed!")
+        print("\nFinal ensemble prediction:")
         print(f"   Mean: {result['ensemble_mean']:.1f} yards")
         print(f"   Std (calibrated): {result['calibrated_std']:.1f} yards")
         print(f"   90% PI: [{result['lower_90']:.1f}, {result['upper_90']:.1f}]")
-        print(f"\nModel weights:")
+        print("\nModel weights:")
         for model, weight in ensemble.weights.items():
             print(f"   {model:30s}: {weight:.2%}")
         print(f"\nTemperature scaling: T = {ensemble.temperature:.4f}")
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
 
         return 0
 
     except Exception as e:
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("❌ TEST SUITE FAILED")
-        print("="*70)
+        print("=" * 70)
         print(f"\nError: {e}")
         import traceback
+
         traceback.print_exc()
         return 1
 

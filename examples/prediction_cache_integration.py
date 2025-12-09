@@ -15,7 +15,6 @@ Created: November 22, 2025
 """
 
 import logging
-from typing import Dict, List, Optional
 
 import numpy as np
 import pandas as pd
@@ -43,9 +42,7 @@ class CachedEnsemble:
         # Initialize R interface (slow)
         # self.r_interface = RModelInterface()
 
-    def predict_passing_yards(
-        self, player_id: str, season: int, week: int
-    ) -> Dict[str, float]:
+    def predict_passing_yards(self, player_id: str, season: int, week: int) -> dict[str, float]:
         """
         Get ensemble prediction with cached R model components.
 
@@ -58,12 +55,8 @@ class CachedEnsemble:
         predictions["xgboost"] = self._predict_xgboost(player_id, season, week)
 
         # R models (cache-first to avoid slow rpy2 calls)
-        predictions["state_space"] = self._predict_state_space_cached(
-            player_id, season, week
-        )
-        predictions["hierarchical"] = self._predict_hierarchical_cached(
-            player_id, season, week
-        )
+        predictions["state_space"] = self._predict_state_space_cached(player_id, season, week)
+        predictions["hierarchical"] = self._predict_hierarchical_cached(player_id, season, week)
         predictions["informative_priors"] = self._predict_informative_priors_cached(
             player_id, season, week
         )
@@ -73,9 +66,7 @@ class CachedEnsemble:
 
         return predictions
 
-    def _predict_state_space_cached(
-        self, player_id: str, season: int, week: int
-    ) -> float:
+    def _predict_state_space_cached(self, player_id: str, season: int, week: int) -> float:
         """Get state-space prediction with cache lookup."""
         # Try cache first (<1ms)
         cached = self.cache.get_cached_prediction(
@@ -96,15 +87,11 @@ class CachedEnsemble:
         prediction = self._compute_state_space_prediction(player_id, season, week)
 
         # Cache for next time
-        self._cache_single_prediction(
-            player_id, season, week, prediction, "state_space_v2"
-        )
+        self._cache_single_prediction(player_id, season, week, prediction, "state_space_v2")
 
         return prediction
 
-    def _predict_hierarchical_cached(
-        self, player_id: str, season: int, week: int
-    ) -> float:
+    def _predict_hierarchical_cached(self, player_id: str, season: int, week: int) -> float:
         """Get hierarchical prediction with cache lookup."""
         cached = self.cache.get_cached_prediction(
             player_id=player_id,
@@ -119,14 +106,10 @@ class CachedEnsemble:
             return cached
 
         prediction = self._compute_hierarchical_prediction(player_id, season, week)
-        self._cache_single_prediction(
-            player_id, season, week, prediction, "hierarchical_v2"
-        )
+        self._cache_single_prediction(player_id, season, week, prediction, "hierarchical_v2")
         return prediction
 
-    def _predict_informative_priors_cached(
-        self, player_id: str, season: int, week: int
-    ) -> float:
+    def _predict_informative_priors_cached(self, player_id: str, season: int, week: int) -> float:
         """Get informative priors prediction with cache lookup."""
         cached = self.cache.get_cached_prediction(
             player_id=player_id,
@@ -140,12 +123,8 @@ class CachedEnsemble:
         if cached is not None:
             return cached
 
-        prediction = self._compute_informative_priors_prediction(
-            player_id, season, week
-        )
-        self._cache_single_prediction(
-            player_id, season, week, prediction, "informative_priors_v2"
-        )
+        prediction = self._compute_informative_priors_prediction(player_id, season, week)
+        self._cache_single_prediction(player_id, season, week, prediction, "informative_priors_v2")
         return prediction
 
     def _cache_single_prediction(
@@ -171,16 +150,12 @@ class CachedEnsemble:
         """Placeholder for XGBoost prediction."""
         return 250.0  # Example
 
-    def _compute_state_space_prediction(
-        self, player_id: str, season: int, week: int
-    ) -> float:
+    def _compute_state_space_prediction(self, player_id: str, season: int, week: int) -> float:
         """Placeholder for rpy2 state-space prediction."""
         # In production: self.r_interface.predict_state_space(...)
         return 245.0  # Example
 
-    def _compute_hierarchical_prediction(
-        self, player_id: str, season: int, week: int
-    ) -> float:
+    def _compute_hierarchical_prediction(self, player_id: str, season: int, week: int) -> float:
         """Placeholder for rpy2 hierarchical prediction."""
         return 248.0  # Example
 
@@ -196,9 +171,7 @@ class CachedEnsemble:
 # =============================================================================
 
 
-def train_and_cache_model(
-    model_name: str, stat_type: str, training_seasons: List[int]
-) -> int:
+def train_and_cache_model(model_name: str, stat_type: str, training_seasons: list[int]) -> int:
     """
     Train model and automatically cache all predictions.
 
@@ -274,7 +247,7 @@ def generate_season_predictions(season: int, stat_type: str) -> pd.DataFrame:
 
 
 def predict_week_batch(
-    season: int, week: int, player_ids: List[str], model_name: str
+    season: int, week: int, player_ids: list[str], model_name: str
 ) -> pd.DataFrame:
     """
     Generate predictions for all players in a week with bulk caching.
@@ -325,14 +298,10 @@ def predict_week_batch(
     # Compute missing predictions in batch
     if missing_player_ids:
         logger.info(f"Computing {len(missing_player_ids)} missing predictions")
-        new_predictions = batch_compute_predictions(
-            missing_player_ids, season, week, model_name
-        )
+        new_predictions = batch_compute_predictions(missing_player_ids, season, week, model_name)
 
         # Bulk cache new predictions
-        cache.cache_predictions(
-            new_predictions, model_name=model_name, stat_type="passing_yards"
-        )
+        cache.cache_predictions(new_predictions, model_name=model_name, stat_type="passing_yards")
 
         # Add to results
         for _, row in new_predictions.iterrows():
@@ -350,7 +319,7 @@ def predict_week_batch(
 
 
 def batch_compute_predictions(
-    player_ids: List[str], season: int, week: int, model_name: str
+    player_ids: list[str], season: int, week: int, model_name: str
 ) -> pd.DataFrame:
     """Placeholder for batch prediction computation."""
     return pd.DataFrame(
@@ -368,7 +337,7 @@ def batch_compute_predictions(
 # =============================================================================
 
 
-def weekly_cache_maintenance() -> Dict[str, any]:
+def weekly_cache_maintenance() -> dict[str, any]:
     """
     Perform weekly cache maintenance and monitoring.
 
@@ -430,12 +399,10 @@ def weekly_cache_maintenance() -> Dict[str, any]:
         alerts.append(f"⚠️ Cache hit rate below target: {stats_after.hit_rate:.1f}%")
 
     if stats_after.avg_lookup_time_ms > 2.0:
-        alerts.append(
-            f"⚠️ Lookup time above target: {stats_after.avg_lookup_time_ms:.2f}ms"
-        )
+        alerts.append(f"⚠️ Lookup time above target: {stats_after.avg_lookup_time_ms:.2f}ms")
 
     if not validation_report.is_valid():
-        alerts.append(f"⚠️ Cache validation failed - manual review required")
+        alerts.append("⚠️ Cache validation failed - manual review required")
 
     results["alerts"] = alerts
 
@@ -471,9 +438,7 @@ def weekly_cache_maintenance() -> Dict[str, any]:
 # =============================================================================
 
 
-def migrate_rpy2_to_postgres(
-    model_name: str, stat_type: str, seasons: List[int]
-) -> Dict[str, int]:
+def migrate_rpy2_to_postgres(model_name: str, stat_type: str, seasons: list[int]) -> dict[str, int]:
     """
     Migrate existing rpy2 model predictions to PostgreSQL cache.
 

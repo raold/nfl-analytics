@@ -4,25 +4,22 @@ Audit bibliography for completeness, duplicates, and missing information.
 """
 
 import re
-from pathlib import Path
 from collections import defaultdict
+from pathlib import Path
+
 
 def parse_bib_file(bib_path):
     """Parse BibTeX file and extract entries."""
 
-    with open(bib_path, 'r', encoding='utf-8') as f:
+    with open(bib_path, encoding="utf-8") as f:
         content = f.read()
 
     # Extract all entries
-    entries = re.findall(r'@(\w+)\{([^,]+),([^}]+)\}', content, re.DOTALL)
+    entries = re.findall(r"@(\w+)\{([^,]+),([^}]+)\}", content, re.DOTALL)
 
     parsed_entries = []
     for entry_type, cite_key, fields in entries:
-        entry = {
-            'type': entry_type,
-            'key': cite_key,
-            'fields': {}
-        }
+        entry = {"type": entry_type, "key": cite_key, "fields": {}}
 
         # Parse fields
         field_pattern = r'(\w+)\s*=\s*\{([^}]+)\}|(\w+)\s*=\s*"([^"]+)"'
@@ -34,11 +31,12 @@ def parse_bib_file(bib_path):
                 field_name = match.group(3)
                 field_value = match.group(4)
 
-            entry['fields'][field_name.lower()] = field_value
+            entry["fields"][field_name.lower()] = field_value
 
         parsed_entries.append(entry)
 
     return parsed_entries
+
 
 def check_citations_used(tex_dir, bib_entries):
     """Check which citations are actually used in the dissertation."""
@@ -49,45 +47,46 @@ def check_citations_used(tex_dir, bib_entries):
 
     for tex_file in tex_files:
         try:
-            with open(tex_file, 'r', encoding='utf-8') as f:
+            with open(tex_file, encoding="utf-8") as f:
                 content = f.read()
 
             # Find all citations
-            citations = re.findall(r'\\cite[pt]?\{([^}]+)\}', content)
+            citations = re.findall(r"\\cite[pt]?\{([^}]+)\}", content)
             for citation_list in citations:
-                for key in citation_list.split(','):
+                for key in citation_list.split(","):
                     cited_keys.add(key.strip())
-        except:
+        except Exception:
             pass
 
-    bib_keys = {entry['key'] for entry in bib_entries}
+    bib_keys = {entry["key"] for entry in bib_entries}
 
     unused = bib_keys - cited_keys
     missing = cited_keys - bib_keys
 
     return cited_keys, unused, missing
 
+
 def check_entry_completeness(entries):
     """Check if entries have all required fields."""
 
     required_fields = {
-        'article': ['author', 'title', 'journal', 'year'],
-        'book': ['author', 'title', 'publisher', 'year'],
-        'inproceedings': ['author', 'title', 'booktitle', 'year'],
-        'incollection': ['author', 'title', 'booktitle', 'publisher', 'year'],
+        "article": ["author", "title", "journal", "year"],
+        "book": ["author", "title", "publisher", "year"],
+        "inproceedings": ["author", "title", "booktitle", "year"],
+        "incollection": ["author", "title", "booktitle", "publisher", "year"],
     }
 
     recommended_fields = {
-        'article': ['volume', 'number', 'pages', 'doi'],
-        'book': ['isbn'],
-        'inproceedings': ['pages', 'doi'],
+        "article": ["volume", "number", "pages", "doi"],
+        "book": ["isbn"],
+        "inproceedings": ["pages", "doi"],
     }
 
     issues = []
 
     for entry in entries:
-        entry_type = entry['type'].lower()
-        fields = entry['fields']
+        entry_type = entry["type"].lower()
+        fields = entry["fields"]
 
         if entry_type in required_fields:
             for req_field in required_fields[entry_type]:
@@ -101,9 +100,12 @@ def check_entry_completeness(entries):
                     missing_rec.append(rec_field)
 
             if missing_rec:
-                issues.append(f"{entry['key']}: Missing recommended fields: {', '.join(missing_rec)}")
+                issues.append(
+                    f"{entry['key']}: Missing recommended fields: {', '.join(missing_rec)}"
+                )
 
     return issues
+
 
 def find_duplicate_entries(entries):
     """Find potential duplicate entries."""
@@ -111,16 +113,17 @@ def find_duplicate_entries(entries):
     title_map = defaultdict(list)
 
     for entry in entries:
-        title = entry['fields'].get('title', '').lower()
+        title = entry["fields"].get("title", "").lower()
         if title:
             # Normalize title
-            title = re.sub(r'[^a-z0-9\s]', '', title)
-            title = ' '.join(title.split())
-            title_map[title].append(entry['key'])
+            title = re.sub(r"[^a-z0-9\s]", "", title)
+            title = " ".join(title.split())
+            title_map[title].append(entry["key"])
 
     duplicates = {title: keys for title, keys in title_map.items() if len(keys) > 1}
 
     return duplicates
+
 
 def main():
     """Run bibliography audit."""
@@ -184,18 +187,18 @@ def main():
 
     entry_types = defaultdict(int)
     for entry in entries:
-        entry_types[entry['type']] += 1
+        entry_types[entry["type"]] += 1
 
     print("\nEntry types:")
     for entry_type, count in sorted(entry_types.items(), key=lambda x: -x[1]):
         print(f"  {entry_type}: {count}")
 
     # Check for DOIs
-    with_doi = sum(1 for e in entries if 'doi' in e['fields'])
+    with_doi = sum(1 for e in entries if "doi" in e["fields"])
     print(f"\nEntries with DOI: {with_doi}/{len(entries)} ({100*with_doi/len(entries):.1f}%)")
 
     # Check for URLs
-    with_url = sum(1 for e in entries if 'url' in e['fields'])
+    with_url = sum(1 for e in entries if "url" in e["fields"])
     print(f"Entries with URL: {with_url}/{len(entries)} ({100*with_url/len(entries):.1f}%)")
 
     print("\n" + "=" * 70)
@@ -207,6 +210,7 @@ def main():
     print("3. Ensure all cited works are in references.bib")
     print("4. Check for duplicate entries with similar titles")
     print("5. Add volume/number/pages for journal articles")
+
 
 if __name__ == "__main__":
     main()

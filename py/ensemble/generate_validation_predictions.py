@@ -25,15 +25,13 @@ Version: 1.0
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import logging
 import argparse
-from typing import List, Dict, Tuple
+import logging
 import time
 
 import numpy as np
@@ -45,8 +43,7 @@ from tqdm import tqdm
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -74,7 +71,7 @@ class ValidationPredictionGenerator:
             db_port=db_port,
             db_name=db_name,
             db_user=db_user,
-            db_password=db_password
+            db_password=db_password,
         )
 
         self.db_config = {
@@ -89,11 +86,7 @@ class ValidationPredictionGenerator:
         """Create database connection."""
         return psycopg2.connect(**self.db_config)
 
-    def fetch_validation_games(
-        self,
-        start_season: int,
-        end_season: int
-    ) -> pd.DataFrame:
+    def fetch_validation_games(self, start_season: int, end_season: int) -> pd.DataFrame:
         """
         Fetch validation games from database.
 
@@ -136,9 +129,7 @@ class ValidationPredictionGenerator:
         return df
 
     def generate_predictions(
-        self,
-        validation_games: pd.DataFrame,
-        batch_size: int = 100
+        self, validation_games: pd.DataFrame, batch_size: int = 100
     ) -> pd.DataFrame:
         """
         Generate predictions from all ensemble models.
@@ -154,16 +145,14 @@ class ValidationPredictionGenerator:
         logger.info("GENERATING VALIDATION PREDICTIONS")
         logger.info(f"{'='*70}")
         logger.info(f"Total games: {len(validation_games):,}")
-        logger.info(f"Models: State-Space v2, Hierarchical v2, Informative Priors v2, XGBoost v2")
+        logger.info("Models: State-Space v2, Hierarchical v2, Informative Priors v2, XGBoost v2")
 
         results = []
         start_time = time.time()
 
         # Use tqdm for progress bar
         for i, row in tqdm(
-            validation_games.iterrows(),
-            total=len(validation_games),
-            desc="Generating predictions"
+            validation_games.iterrows(), total=len(validation_games), desc="Generating predictions"
         ):
             player_id = row["player_id"]
             season = row["season"]
@@ -173,10 +162,7 @@ class ValidationPredictionGenerator:
             # Get ensemble prediction (with individual model predictions)
             try:
                 pred = self.ensemble.predict(
-                    player_id=player_id,
-                    season=season,
-                    week=week,
-                    return_individual=True
+                    player_id=player_id, season=season, week=week, return_individual=True
                 )
 
                 # Extract individual predictions
@@ -190,7 +176,12 @@ class ValidationPredictionGenerator:
                 }
 
                 # Add individual model predictions
-                for model_name in ["state_space_v2", "hierarchical_v2", "informative_priors_v2", "xgboost_v2"]:
+                for model_name in [
+                    "state_space_v2",
+                    "hierarchical_v2",
+                    "informative_priors_v2",
+                    "xgboost_v2",
+                ]:
                     if model_name in pred.get("predictions", {}):
                         mean, std = pred["predictions"][model_name]
                         record[f"{model_name}_pred_mean"] = mean
@@ -213,7 +204,12 @@ class ValidationPredictionGenerator:
         df = pd.DataFrame(results)
 
         # Report missing predictions
-        for model_name in ["state_space_v2", "hierarchical_v2", "informative_priors_v2", "xgboost_v2"]:
+        for model_name in [
+            "state_space_v2",
+            "hierarchical_v2",
+            "informative_priors_v2",
+            "xgboost_v2",
+        ]:
             mean_col = f"{model_name}_pred_mean"
             missing = df[mean_col].isna().sum()
             if missing > 0:
@@ -221,11 +217,7 @@ class ValidationPredictionGenerator:
 
         return df
 
-    def save_predictions(
-        self,
-        predictions: pd.DataFrame,
-        output_path: str
-    ):
+    def save_predictions(self, predictions: pd.DataFrame, output_path: str):
         """
         Save predictions to CSV.
 
@@ -249,33 +241,20 @@ def main():
         description="Generate Validation Predictions for Bayesian Stacking"
     )
     parser.add_argument(
-        "--start-season",
-        type=int,
-        default=2022,
-        help="Start season (default: 2022)"
+        "--start-season", type=int, default=2022, help="Start season (default: 2022)"
     )
-    parser.add_argument(
-        "--end-season",
-        type=int,
-        default=2023,
-        help="End season (default: 2023)"
-    )
+    parser.add_argument("--end-season", type=int, default=2023, help="End season (default: 2023)")
     parser.add_argument(
         "--output",
         type=str,
         default="data/validation_predictions.csv",
-        help="Output CSV path (default: data/validation_predictions.csv)"
+        help="Output CSV path (default: data/validation_predictions.csv)",
     )
     parser.add_argument(
-        "--batch-size",
-        type=int,
-        default=100,
-        help="Batch size for progress updates (default: 100)"
+        "--batch-size", type=int, default=100, help="Batch size for progress updates (default: 100)"
     )
     parser.add_argument(
-        "--dry-run",
-        action="store_true",
-        help="Fetch games but don't generate predictions"
+        "--dry-run", action="store_true", help="Fetch games but don't generate predictions"
     )
 
     args = parser.parse_args()
@@ -285,8 +264,7 @@ def main():
 
     # Fetch validation games
     validation_games = generator.fetch_validation_games(
-        start_season=args.start_season,
-        end_season=args.end_season
+        start_season=args.start_season, end_season=args.end_season
     )
 
     if args.dry_run:
@@ -295,22 +273,19 @@ def main():
         return
 
     # Generate predictions
-    predictions = generator.generate_predictions(
-        validation_games,
-        batch_size=args.batch_size
-    )
+    predictions = generator.generate_predictions(validation_games, batch_size=args.batch_size)
 
     # Save to CSV
     generator.save_predictions(predictions, args.output)
 
     logger.info("\n✅ COMPLETE")
     logger.info(f"   Validation predictions saved: {args.output}")
-    logger.info(f"   Ready for Bayesian stacking optimization")
+    logger.info("   Ready for Bayesian stacking optimization")
     logger.info("\nNext step:")
-    logger.info(f"   python3 py/ensemble/bayesian_stacking.py \\")
-    logger.info(f"     --mode optimize \\")
+    logger.info("   python3 py/ensemble/bayesian_stacking.py \\")
+    logger.info("     --mode optimize \\")
     logger.info(f"     --validation-data {args.output} \\")
-    logger.info(f"     --output models/ensemble/stacking_report.md")
+    logger.info("     --output models/ensemble/stacking_report.md")
 
 
 if __name__ == "__main__":

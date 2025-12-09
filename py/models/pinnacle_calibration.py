@@ -32,7 +32,6 @@ Usage:
 """
 
 import logging
-from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
@@ -56,10 +55,7 @@ class PinnacleCalibrator:
     """
 
     def __init__(
-        self,
-        standard_vig: float = 0.055,
-        pinnacle_vig: float = 0.045,
-        risk_tolerance: float = 1.0
+        self, standard_vig: float = 0.055, pinnacle_vig: float = 0.045, risk_tolerance: float = 1.0
     ):
         """
         Initialize Pinnacle calibrator.
@@ -83,9 +79,7 @@ class PinnacleCalibrator:
         )
 
     def adjust_edge_threshold(
-        self,
-        standard_min_edge: float,
-        safety_margin: float = 0.005
+        self, standard_min_edge: float, safety_margin: float = 0.005
     ) -> float:
         """
         Adjust minimum edge threshold for Pinnacle.
@@ -110,18 +104,11 @@ class PinnacleCalibrator:
         # Floor at 1% edge (never bet <1% edge even at Pinnacle)
         adjusted_edge = max(adjusted_edge, 0.01)
 
-        logger.info(
-            f"Edge threshold adjusted: "
-            f"{standard_min_edge:.1%} → {adjusted_edge:.1%}"
-        )
+        logger.info(f"Edge threshold adjusted: " f"{standard_min_edge:.1%} → {adjusted_edge:.1%}")
 
         return adjusted_edge
 
-    def adjust_kelly_fraction(
-        self,
-        standard_kelly: float,
-        aggression_factor: float = 1.4
-    ) -> float:
+    def adjust_kelly_fraction(self, standard_kelly: float, aggression_factor: float = 1.4) -> float:
         """
         Adjust Kelly fraction for Pinnacle's lower variance environment.
 
@@ -145,18 +132,13 @@ class PinnacleCalibrator:
         # Cap at 50% Kelly (never bet >50% of bankroll on single bet)
         adjusted_kelly = min(adjusted_kelly, 0.50)
 
-        logger.info(
-            f"Kelly fraction adjusted: "
-            f"{standard_kelly:.1%} → {adjusted_kelly:.1%}"
-        )
+        logger.info(f"Kelly fraction adjusted: " f"{standard_kelly:.1%} → {adjusted_kelly:.1%}")
 
         return adjusted_kelly
 
     def estimate_roi_improvement(
-        self,
-        current_roi: float,
-        current_vig: Optional[float] = None
-    ) -> Dict[str, float]:
+        self, current_roi: float, current_vig: float | None = None
+    ) -> dict[str, float]:
         """
         Estimate ROI improvement from switching to Pinnacle.
 
@@ -189,12 +171,12 @@ class PinnacleCalibrator:
         realistic_roi = (conservative_roi + optimistic_roi) / 2
 
         return {
-            'current_roi': current_roi,
-            'conservative_roi': conservative_roi,
-            'realistic_roi': realistic_roi,
-            'optimistic_roi': optimistic_roi,
-            'vig_savings': self.vig_savings,
-            'expected_improvement': realistic_roi - current_roi
+            "current_roi": current_roi,
+            "conservative_roi": conservative_roi,
+            "realistic_roi": realistic_roi,
+            "optimistic_roi": optimistic_roi,
+            "vig_savings": self.vig_savings,
+            "expected_improvement": realistic_roi - current_roi,
         }
 
     def calibrate_bet_opportunities(
@@ -202,7 +184,7 @@ class PinnacleCalibrator:
         predictions_df: pd.DataFrame,
         prop_lines_df: pd.DataFrame,
         standard_min_edge: float = 0.03,
-        standard_kelly: float = 0.25
+        standard_kelly: float = 0.25,
     ) -> pd.DataFrame:
         """
         Identify betting opportunities calibrated for Pinnacle.
@@ -221,9 +203,7 @@ class PinnacleCalibrator:
         pinnacle_kelly = self.adjust_kelly_fraction(standard_kelly)
 
         # Filter to Pinnacle lines only
-        pinnacle_lines = prop_lines_df[
-            prop_lines_df['bookmaker_key'] == 'pinnacle'
-        ].copy()
+        pinnacle_lines = prop_lines_df[prop_lines_df["bookmaker_key"] == "pinnacle"].copy()
 
         if pinnacle_lines.empty:
             logger.warning("No Pinnacle lines found in prop_lines_df")
@@ -231,9 +211,7 @@ class PinnacleCalibrator:
 
         # Merge predictions with lines
         opportunities = pinnacle_lines.merge(
-            predictions_df,
-            on=['player_id', 'prop_type'],
-            how='inner'
+            predictions_df, on=["player_id", "prop_type"], how="inner"
         )
 
         if opportunities.empty:
@@ -241,42 +219,43 @@ class PinnacleCalibrator:
             return pd.DataFrame()
 
         # Calculate edge for OVER bets
-        opportunities['over_implied_prob'] = self._odds_to_prob(opportunities['over_odds'])
-        opportunities['model_prob_over'] = opportunities.apply(
-            lambda row: 1 - self._norm_cdf(row['line_value'], row['prediction'], row['std']),
-            axis=1
+        opportunities["over_implied_prob"] = self._odds_to_prob(opportunities["over_odds"])
+        opportunities["model_prob_over"] = opportunities.apply(
+            lambda row: 1 - self._norm_cdf(row["line_value"], row["prediction"], row["std"]), axis=1
         )
-        opportunities['edge_over'] = opportunities['model_prob_over'] - opportunities['over_implied_prob']
+        opportunities["edge_over"] = (
+            opportunities["model_prob_over"] - opportunities["over_implied_prob"]
+        )
 
         # Calculate edge for UNDER bets
-        opportunities['under_implied_prob'] = self._odds_to_prob(opportunities['under_odds'])
-        opportunities['model_prob_under'] = opportunities.apply(
-            lambda row: self._norm_cdf(row['line_value'], row['prediction'], row['std']),
-            axis=1
+        opportunities["under_implied_prob"] = self._odds_to_prob(opportunities["under_odds"])
+        opportunities["model_prob_under"] = opportunities.apply(
+            lambda row: self._norm_cdf(row["line_value"], row["prediction"], row["std"]), axis=1
         )
-        opportunities['edge_under'] = opportunities['model_prob_under'] - opportunities['under_implied_prob']
+        opportunities["edge_under"] = (
+            opportunities["model_prob_under"] - opportunities["under_implied_prob"]
+        )
 
         # Filter to opportunities exceeding Pinnacle threshold
-        over_bets = opportunities[opportunities['edge_over'] >= pinnacle_min_edge].copy()
-        over_bets['bet_side'] = 'over'
-        over_bets['edge'] = over_bets['edge_over']
-        over_bets['odds'] = over_bets['over_odds']
+        over_bets = opportunities[opportunities["edge_over"] >= pinnacle_min_edge].copy()
+        over_bets["bet_side"] = "over"
+        over_bets["edge"] = over_bets["edge_over"]
+        over_bets["odds"] = over_bets["over_odds"]
 
-        under_bets = opportunities[opportunities['edge_under'] >= pinnacle_min_edge].copy()
-        under_bets['bet_side'] = 'under'
-        under_bets['edge'] = under_bets['edge_under']
-        under_bets['odds'] = under_bets['under_odds']
+        under_bets = opportunities[opportunities["edge_under"] >= pinnacle_min_edge].copy()
+        under_bets["bet_side"] = "under"
+        under_bets["edge"] = under_bets["edge_under"]
+        under_bets["odds"] = under_bets["under_odds"]
 
         # Combine
         all_bets = pd.concat([over_bets, under_bets], ignore_index=True)
 
         # Calculate Kelly bet size
-        all_bets['kelly_fraction'] = pinnacle_kelly
-        all_bets['bet_amount_pct'] = all_bets['edge'] * pinnacle_kelly
+        all_bets["kelly_fraction"] = pinnacle_kelly
+        all_bets["bet_amount_pct"] = all_bets["edge"] * pinnacle_kelly
 
         logger.info(
-            f"Found {len(all_bets)} Pinnacle opportunities "
-            f"(min edge: {pinnacle_min_edge:.1%})"
+            f"Found {len(all_bets)} Pinnacle opportunities " f"(min edge: {pinnacle_min_edge:.1%})"
         )
 
         return all_bets
@@ -284,34 +263,31 @@ class PinnacleCalibrator:
     @staticmethod
     def _odds_to_prob(odds: pd.Series) -> pd.Series:
         """Convert American odds to implied probability."""
-        prob = np.where(
-            odds > 0,
-            100.0 / (odds + 100.0),
-            -odds / (-odds + 100.0)
-        )
+        prob = np.where(odds > 0, 100.0 / (odds + 100.0), -odds / (-odds + 100.0))
         return prob
 
     @staticmethod
     def _norm_cdf(x: float, mean: float, std: float) -> float:
         """Normal CDF (cumulative distribution function)."""
         from scipy.stats import norm
+
         return norm.cdf(x, loc=mean, scale=std)
 
-    def get_calibration_summary(self) -> Dict:
+    def get_calibration_summary(self) -> dict:
         """Get summary of calibration adjustments."""
         return {
-            'standard_vig': self.standard_vig,
-            'pinnacle_vig': self.pinnacle_vig,
-            'vig_savings': self.vig_savings,
-            'risk_tolerance': self.risk_tolerance,
-            'edge_threshold_example': {
-                'standard_3pct': self.adjust_edge_threshold(0.03),
-                'standard_2pct': self.adjust_edge_threshold(0.02)
+            "standard_vig": self.standard_vig,
+            "pinnacle_vig": self.pinnacle_vig,
+            "vig_savings": self.vig_savings,
+            "risk_tolerance": self.risk_tolerance,
+            "edge_threshold_example": {
+                "standard_3pct": self.adjust_edge_threshold(0.03),
+                "standard_2pct": self.adjust_edge_threshold(0.02),
             },
-            'kelly_fraction_example': {
-                'standard_25pct': self.adjust_kelly_fraction(0.25),
-                'standard_15pct': self.adjust_kelly_fraction(0.15)
-            }
+            "kelly_fraction_example": {
+                "standard_25pct": self.adjust_kelly_fraction(0.25),
+                "standard_15pct": self.adjust_kelly_fraction(0.15),
+            },
         }
 
 
@@ -319,53 +295,57 @@ class PinnacleCalibrator:
 # CLI for testing
 # ============================================================================
 
+
 def main():
     """Test the Pinnacle calibrator."""
     import argparse
 
-    parser = argparse.ArgumentParser(description='Pinnacle Calibration Tool')
-    parser.add_argument('--standard-vig', type=float, default=0.055, help='Standard book vig (default: 5.5%)')
-    parser.add_argument('--pinnacle-vig', type=float, default=0.045, help='Pinnacle vig (default: 4.5%)')
-    parser.add_argument('--current-roi', type=float, default=-0.075, help='Current ROI (default: -7.5%)')
+    parser = argparse.ArgumentParser(description="Pinnacle Calibration Tool")
+    parser.add_argument(
+        "--standard-vig", type=float, default=0.055, help="Standard book vig (default: 5.5%)"
+    )
+    parser.add_argument(
+        "--pinnacle-vig", type=float, default=0.045, help="Pinnacle vig (default: 4.5%)"
+    )
+    parser.add_argument(
+        "--current-roi", type=float, default=-0.075, help="Current ROI (default: -7.5%)"
+    )
 
     args = parser.parse_args()
 
     # Initialize calibrator
-    calibrator = PinnacleCalibrator(
-        standard_vig=args.standard_vig,
-        pinnacle_vig=args.pinnacle_vig
-    )
+    calibrator = PinnacleCalibrator(standard_vig=args.standard_vig, pinnacle_vig=args.pinnacle_vig)
 
     # Show calibration summary
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("PINNACLE CALIBRATION SUMMARY")
-    print("="*80)
+    print("=" * 80)
 
     summary = calibrator.get_calibration_summary()
-    print(f"\nVig Comparison:")
+    print("\nVig Comparison:")
     print(f"  Standard books: {summary['standard_vig']:.1%}")
     print(f"  Pinnacle:       {summary['pinnacle_vig']:.1%}")
     print(f"  Savings:        {summary['vig_savings']:.1%}")
 
-    print(f"\nEdge Threshold Adjustments:")
-    for standard, pinnacle in summary['edge_threshold_example'].items():
+    print("\nEdge Threshold Adjustments:")
+    for standard, pinnacle in summary["edge_threshold_example"].items():
         print(f"  {standard}: {pinnacle:.1%}")
 
-    print(f"\nKelly Fraction Adjustments:")
-    for standard, pinnacle in summary['kelly_fraction_example'].items():
+    print("\nKelly Fraction Adjustments:")
+    for standard, pinnacle in summary["kelly_fraction_example"].items():
         print(f"  {standard}: {pinnacle:.1%}")
 
     # Estimate ROI improvement
     roi_est = calibrator.estimate_roi_improvement(args.current_roi)
-    print(f"\nROI Improvement Estimate:")
+    print("\nROI Improvement Estimate:")
     print(f"  Current ROI:      {roi_est['current_roi']:+.1%}")
     print(f"  Conservative:     {roi_est['conservative_roi']:+.1%}")
     print(f"  Realistic:        {roi_est['realistic_roi']:+.1%} ⭐")
     print(f"  Optimistic:       {roi_est['optimistic_roi']:+.1%}")
     print(f"  Expected gain:    {roi_est['expected_improvement']:+.1%}")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

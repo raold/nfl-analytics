@@ -4,14 +4,12 @@ ROI/EV Scoring Framework for Experiment Prioritization
 Ranks 40 experiments by expected impact on betting ROI/EV using composite metric.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Tuple
-from dataclasses import dataclass
-import logging
 import json
+import logging
+from dataclasses import dataclass
 from pathlib import Path
-from scipy import stats
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -19,6 +17,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ROIScore:
     """ROI/EV Score for an experiment"""
+
     experiment_id: str
     composite_score: float  # 0-100 scale
     predictive_lift: float  # Expected improvement in prediction accuracy (%)
@@ -27,7 +26,7 @@ class ROIScore:
     sharpe_potential: float  # Expected Sharpe ratio improvement
     confidence: float  # Score confidence (0-1)
     rank: int  # Overall rank (1-40)
-    components: Dict[str, float]  # Detailed breakdown
+    components: dict[str, float]  # Detailed breakdown
 
 
 class ExperimentROIEvaluator:
@@ -53,17 +52,17 @@ class ExperimentROIEvaluator:
 
     def __init__(self):
         self.weights = {
-            'predictive_lift': 0.35,
-            'market_inefficiency': 0.30,
-            'feasibility': 0.20,
-            'sharpe_potential': 0.15
+            "predictive_lift": 0.35,
+            "market_inefficiency": 0.30,
+            "feasibility": 0.20,
+            "sharpe_potential": 0.15,
         }
 
         # Domain knowledge priors for experiment scoring
         self.cvae_priors = self._initialize_cvae_priors()
         self.causal_priors = self._initialize_causal_priors()
 
-    def _initialize_cvae_priors(self) -> Dict:
+    def _initialize_cvae_priors(self) -> dict:
         """
         Initialize priors for cVAE experiments based on literature and domain knowledge.
 
@@ -74,29 +73,29 @@ class ExperimentROIEvaluator:
         """
 
         return {
-            'CVAE-001': {'lift': 5, 'inefficiency': 0.5, 'feasibility': 0.9, 'sharpe': 0.3},
-            'CVAE-002': {'lift': 15, 'inefficiency': 0.8, 'feasibility': 0.9, 'sharpe': 0.6},
-            'CVAE-003': {'lift': 15, 'inefficiency': 0.8, 'feasibility': 0.9, 'sharpe': 0.6},
-            'CVAE-004': {'lift': 10, 'inefficiency': 0.6, 'feasibility': 0.9, 'sharpe': 0.4},
-            'CVAE-005': {'lift': 5, 'inefficiency': 0.4, 'feasibility': 0.7, 'sharpe': 0.2},
-            'CVAE-006': {'lift': 12, 'inefficiency': 0.7, 'feasibility': 0.8, 'sharpe': 0.5},
-            'CVAE-007': {'lift': 18, 'inefficiency': 0.85, 'feasibility': 0.9, 'sharpe': 0.7},
-            'CVAE-008': {'lift': 20, 'inefficiency': 0.9, 'feasibility': 0.7, 'sharpe': 0.8},
-            'CVAE-009': {'lift': 12, 'inefficiency': 0.85, 'feasibility': 0.9, 'sharpe': 0.5},
-            'CVAE-010': {'lift': 25, 'inefficiency': 0.9, 'feasibility': 0.5, 'sharpe': 0.9},
-            'CVAE-011': {'lift': 8, 'inefficiency': 0.6, 'feasibility': 0.9, 'sharpe': 0.4},
-            'CVAE-012': {'lift': 6, 'inefficiency': 0.5, 'feasibility': 0.9, 'sharpe': 0.3},
-            'CVAE-013': {'lift': 5, 'inefficiency': 0.4, 'feasibility': 0.9, 'sharpe': 0.2},
-            'CVAE-014': {'lift': 22, 'inefficiency': 0.95, 'feasibility': 0.8, 'sharpe': 0.85},
-            'CVAE-015': {'lift': 14, 'inefficiency': 0.75, 'feasibility': 0.7, 'sharpe': 0.6},
-            'CVAE-016': {'lift': 10, 'inefficiency': 0.65, 'feasibility': 0.7, 'sharpe': 0.45},
-            'CVAE-017': {'lift': 16, 'inefficiency': 0.8, 'feasibility': 0.5, 'sharpe': 0.65},
-            'CVAE-018': {'lift': 18, 'inefficiency': 0.85, 'feasibility': 0.7, 'sharpe': 0.75},
-            'CVAE-019': {'lift': 17, 'inefficiency': 0.75, 'feasibility': 0.7, 'sharpe': 0.7},
-            'CVAE-020': {'lift': 19, 'inefficiency': 0.8, 'feasibility': 0.5, 'sharpe': 0.75},
+            "CVAE-001": {"lift": 5, "inefficiency": 0.5, "feasibility": 0.9, "sharpe": 0.3},
+            "CVAE-002": {"lift": 15, "inefficiency": 0.8, "feasibility": 0.9, "sharpe": 0.6},
+            "CVAE-003": {"lift": 15, "inefficiency": 0.8, "feasibility": 0.9, "sharpe": 0.6},
+            "CVAE-004": {"lift": 10, "inefficiency": 0.6, "feasibility": 0.9, "sharpe": 0.4},
+            "CVAE-005": {"lift": 5, "inefficiency": 0.4, "feasibility": 0.7, "sharpe": 0.2},
+            "CVAE-006": {"lift": 12, "inefficiency": 0.7, "feasibility": 0.8, "sharpe": 0.5},
+            "CVAE-007": {"lift": 18, "inefficiency": 0.85, "feasibility": 0.9, "sharpe": 0.7},
+            "CVAE-008": {"lift": 20, "inefficiency": 0.9, "feasibility": 0.7, "sharpe": 0.8},
+            "CVAE-009": {"lift": 12, "inefficiency": 0.85, "feasibility": 0.9, "sharpe": 0.5},
+            "CVAE-010": {"lift": 25, "inefficiency": 0.9, "feasibility": 0.5, "sharpe": 0.9},
+            "CVAE-011": {"lift": 8, "inefficiency": 0.6, "feasibility": 0.9, "sharpe": 0.4},
+            "CVAE-012": {"lift": 6, "inefficiency": 0.5, "feasibility": 0.9, "sharpe": 0.3},
+            "CVAE-013": {"lift": 5, "inefficiency": 0.4, "feasibility": 0.9, "sharpe": 0.2},
+            "CVAE-014": {"lift": 22, "inefficiency": 0.95, "feasibility": 0.8, "sharpe": 0.85},
+            "CVAE-015": {"lift": 14, "inefficiency": 0.75, "feasibility": 0.7, "sharpe": 0.6},
+            "CVAE-016": {"lift": 10, "inefficiency": 0.65, "feasibility": 0.7, "sharpe": 0.45},
+            "CVAE-017": {"lift": 16, "inefficiency": 0.8, "feasibility": 0.5, "sharpe": 0.65},
+            "CVAE-018": {"lift": 18, "inefficiency": 0.85, "feasibility": 0.7, "sharpe": 0.75},
+            "CVAE-019": {"lift": 17, "inefficiency": 0.75, "feasibility": 0.7, "sharpe": 0.7},
+            "CVAE-020": {"lift": 19, "inefficiency": 0.8, "feasibility": 0.5, "sharpe": 0.75},
         }
 
-    def _initialize_causal_priors(self) -> Dict:
+    def _initialize_causal_priors(self) -> dict:
         """
         Initialize priors for causal experiments.
 
@@ -107,26 +106,26 @@ class ExperimentROIEvaluator:
         """
 
         return {
-            'CAUSAL-001': {'lift': 10, 'inefficiency': 0.7, 'feasibility': 0.9, 'sharpe': 0.5},
-            'CAUSAL-002': {'lift': 18, 'inefficiency': 0.85, 'feasibility': 0.7, 'sharpe': 0.7},
-            'CAUSAL-003': {'lift': 8, 'inefficiency': 0.5, 'feasibility': 0.9, 'sharpe': 0.4},
-            'CAUSAL-004': {'lift': 12, 'inefficiency': 0.65, 'feasibility': 0.7, 'sharpe': 0.55},
-            'CAUSAL-005': {'lift': 20, 'inefficiency': 0.9, 'feasibility': 0.7, 'sharpe': 0.8},
-            'CAUSAL-006': {'lift': 7, 'inefficiency': 0.5, 'feasibility': 0.9, 'sharpe': 0.35},
-            'CAUSAL-007': {'lift': 6, 'inefficiency': 0.4, 'feasibility': 0.7, 'sharpe': 0.3},
-            'CAUSAL-008': {'lift': 22, 'inefficiency': 0.9, 'feasibility': 0.7, 'sharpe': 0.85},
-            'CAUSAL-009': {'lift': 24, 'inefficiency': 0.95, 'feasibility': 0.5, 'sharpe': 0.9},
-            'CAUSAL-010': {'lift': 14, 'inefficiency': 0.7, 'feasibility': 0.5, 'sharpe': 0.6},
-            'CAUSAL-011': {'lift': 5, 'inefficiency': 0.5, 'feasibility': 0.9, 'sharpe': 0.25},
-            'CAUSAL-012': {'lift': 11, 'inefficiency': 0.75, 'feasibility': 0.9, 'sharpe': 0.5},
-            'CAUSAL-013': {'lift': 13, 'inefficiency': 0.7, 'feasibility': 0.7, 'sharpe': 0.6},
-            'CAUSAL-014': {'lift': 25, 'inefficiency': 0.95, 'feasibility': 0.5, 'sharpe': 0.95},
-            'CAUSAL-015': {'lift': 12, 'inefficiency': 0.65, 'feasibility': 0.7, 'sharpe': 0.55},
-            'CAUSAL-016': {'lift': 4, 'inefficiency': 0.35, 'feasibility': 0.9, 'sharpe': 0.2},
-            'CAUSAL-017': {'lift': 16, 'inefficiency': 0.75, 'feasibility': 0.5, 'sharpe': 0.7},
-            'CAUSAL-018': {'lift': 15, 'inefficiency': 0.8, 'feasibility': 0.7, 'sharpe': 0.65},
-            'CAUSAL-019': {'lift': 8, 'inefficiency': 0.55, 'feasibility': 0.7, 'sharpe': 0.4},
-            'CAUSAL-020': {'lift': 21, 'inefficiency': 0.9, 'feasibility': 0.7, 'sharpe': 0.8},
+            "CAUSAL-001": {"lift": 10, "inefficiency": 0.7, "feasibility": 0.9, "sharpe": 0.5},
+            "CAUSAL-002": {"lift": 18, "inefficiency": 0.85, "feasibility": 0.7, "sharpe": 0.7},
+            "CAUSAL-003": {"lift": 8, "inefficiency": 0.5, "feasibility": 0.9, "sharpe": 0.4},
+            "CAUSAL-004": {"lift": 12, "inefficiency": 0.65, "feasibility": 0.7, "sharpe": 0.55},
+            "CAUSAL-005": {"lift": 20, "inefficiency": 0.9, "feasibility": 0.7, "sharpe": 0.8},
+            "CAUSAL-006": {"lift": 7, "inefficiency": 0.5, "feasibility": 0.9, "sharpe": 0.35},
+            "CAUSAL-007": {"lift": 6, "inefficiency": 0.4, "feasibility": 0.7, "sharpe": 0.3},
+            "CAUSAL-008": {"lift": 22, "inefficiency": 0.9, "feasibility": 0.7, "sharpe": 0.85},
+            "CAUSAL-009": {"lift": 24, "inefficiency": 0.95, "feasibility": 0.5, "sharpe": 0.9},
+            "CAUSAL-010": {"lift": 14, "inefficiency": 0.7, "feasibility": 0.5, "sharpe": 0.6},
+            "CAUSAL-011": {"lift": 5, "inefficiency": 0.5, "feasibility": 0.9, "sharpe": 0.25},
+            "CAUSAL-012": {"lift": 11, "inefficiency": 0.75, "feasibility": 0.9, "sharpe": 0.5},
+            "CAUSAL-013": {"lift": 13, "inefficiency": 0.7, "feasibility": 0.7, "sharpe": 0.6},
+            "CAUSAL-014": {"lift": 25, "inefficiency": 0.95, "feasibility": 0.5, "sharpe": 0.95},
+            "CAUSAL-015": {"lift": 12, "inefficiency": 0.65, "feasibility": 0.7, "sharpe": 0.55},
+            "CAUSAL-016": {"lift": 4, "inefficiency": 0.35, "feasibility": 0.9, "sharpe": 0.2},
+            "CAUSAL-017": {"lift": 16, "inefficiency": 0.75, "feasibility": 0.5, "sharpe": 0.7},
+            "CAUSAL-018": {"lift": 15, "inefficiency": 0.8, "feasibility": 0.7, "sharpe": 0.65},
+            "CAUSAL-019": {"lift": 8, "inefficiency": 0.55, "feasibility": 0.7, "sharpe": 0.4},
+            "CAUSAL-020": {"lift": 21, "inefficiency": 0.9, "feasibility": 0.7, "sharpe": 0.8},
         }
 
     def score_experiment(self, experiment_id: str) -> ROIScore:
@@ -141,16 +140,16 @@ class ExperimentROIEvaluator:
         """
 
         # Get priors
-        if experiment_id.startswith('CVAE'):
+        if experiment_id.startswith("CVAE"):
             priors = self.cvae_priors[experiment_id]
         else:
             priors = self.causal_priors[experiment_id]
 
         # Extract components
-        predictive_lift = priors['lift']  # 0-30% scale
-        market_inefficiency = priors['inefficiency']  # 0-1 scale
-        feasibility = priors['feasibility']  # 0-1 scale
-        sharpe_potential = priors['sharpe']  # 0-1 scale
+        predictive_lift = priors["lift"]  # 0-30% scale
+        market_inefficiency = priors["inefficiency"]  # 0-1 scale
+        feasibility = priors["feasibility"]  # 0-1 scale
+        sharpe_potential = priors["sharpe"]  # 0-1 scale
 
         # Normalize predictive lift to 0-100 scale
         predictive_lift_normalized = (predictive_lift / 30.0) * 100
@@ -166,24 +165,24 @@ class ExperimentROIEvaluator:
 
         # Composite score (weighted average)
         composite_score = (
-            self.weights['predictive_lift'] * predictive_lift_normalized +
-            self.weights['market_inefficiency'] * market_inefficiency_normalized +
-            self.weights['feasibility'] * feasibility_normalized +
-            self.weights['sharpe_potential'] * sharpe_potential_normalized
+            self.weights["predictive_lift"] * predictive_lift_normalized
+            + self.weights["market_inefficiency"] * market_inefficiency_normalized
+            + self.weights["feasibility"] * feasibility_normalized
+            + self.weights["sharpe_potential"] * sharpe_potential_normalized
         )
 
         # Confidence (based on feasibility and data availability)
         confidence = 0.7 + 0.3 * feasibility  # Higher feasibility → higher confidence
 
         components = {
-            'predictive_lift_raw': predictive_lift,
-            'predictive_lift_norm': predictive_lift_normalized,
-            'market_inefficiency_raw': market_inefficiency,
-            'market_inefficiency_norm': market_inefficiency_normalized,
-            'feasibility_raw': feasibility,
-            'feasibility_norm': feasibility_normalized,
-            'sharpe_potential_raw': sharpe_potential,
-            'sharpe_potential_norm': sharpe_potential_normalized,
+            "predictive_lift_raw": predictive_lift,
+            "predictive_lift_norm": predictive_lift_normalized,
+            "market_inefficiency_raw": market_inefficiency,
+            "market_inefficiency_norm": market_inefficiency_normalized,
+            "feasibility_raw": feasibility,
+            "feasibility_norm": feasibility_normalized,
+            "sharpe_potential_raw": sharpe_potential,
+            "sharpe_potential_norm": sharpe_potential_normalized,
         }
 
         return ROIScore(
@@ -195,10 +194,10 @@ class ExperimentROIEvaluator:
             sharpe_potential=sharpe_potential,
             confidence=confidence,
             rank=-1,  # Will be assigned after ranking
-            components=components
+            components=components,
         )
 
-    def rank_all_experiments(self) -> Tuple[List[ROIScore], List[ROIScore], List[ROIScore]]:
+    def rank_all_experiments(self) -> tuple[list[ROIScore], list[ROIScore], list[ROIScore]]:
         """
         Score and rank all 40 experiments.
 
@@ -221,23 +220,23 @@ class ExperimentROIEvaluator:
             score.rank = i + 1
 
         # Split by category
-        cvae_scores = [s for s in all_scores if s.experiment_id.startswith('CVAE')]
-        causal_scores = [s for s in all_scores if s.experiment_id.startswith('CAUSAL')]
+        cvae_scores = [s for s in all_scores if s.experiment_id.startswith("CVAE")]
+        causal_scores = [s for s in all_scores if s.experiment_id.startswith("CAUSAL")]
 
         # Top 10 from each
         top_10_cvae = cvae_scores[:10]
         top_10_causal = causal_scores[:10]
 
-        logger.info(f"Ranked 40 experiments: Top 10 cVAE + Top 10 Causal selected")
+        logger.info("Ranked 40 experiments: Top 10 cVAE + Top 10 Causal selected")
 
         return all_scores, top_10_cvae, top_10_causal
 
     def export_rankings(
         self,
-        all_scores: List[ROIScore],
-        top_10_cvae: List[ROIScore],
-        top_10_causal: List[ROIScore],
-        output_dir: str = "experiments"
+        all_scores: list[ROIScore],
+        top_10_cvae: list[ROIScore],
+        top_10_causal: list[ROIScore],
+        output_dir: str = "experiments",
     ):
         """Export rankings to JSON and CSV"""
 
@@ -255,77 +254,83 @@ class ExperimentROIEvaluator:
 
         # Export JSON with full details
         export_data = {
-            'metadata': {
-                'total_experiments': len(all_scores),
-                'top_cvae_count': len(top_10_cvae),
-                'top_causal_count': len(top_10_causal),
-                'scoring_weights': self.weights,
-                'created_date': pd.Timestamp.now().isoformat()
+            "metadata": {
+                "total_experiments": len(all_scores),
+                "top_cvae_count": len(top_10_cvae),
+                "top_causal_count": len(top_10_causal),
+                "scoring_weights": self.weights,
+                "created_date": pd.Timestamp.now().isoformat(),
             },
-            'all_experiments': [self._score_to_dict(s) for s in all_scores],
-            'top_10_cvae': [self._score_to_dict(s) for s in top_10_cvae],
-            'top_10_causal': [self._score_to_dict(s) for s in top_10_causal]
+            "all_experiments": [self._score_to_dict(s) for s in all_scores],
+            "top_10_cvae": [self._score_to_dict(s) for s in top_10_cvae],
+            "top_10_causal": [self._score_to_dict(s) for s in top_10_causal],
         }
 
-        with open(f"{output_dir}/experiment_rankings.json", 'w') as f:
+        with open(f"{output_dir}/experiment_rankings.json", "w") as f:
             json.dump(export_data, f, indent=2)
 
         logger.info(f"Exported rankings to {output_dir}/")
 
         return all_df, cvae_df, causal_df
 
-    def _scores_to_dataframe(self, scores: List[ROIScore]) -> pd.DataFrame:
+    def _scores_to_dataframe(self, scores: list[ROIScore]) -> pd.DataFrame:
         """Convert scores to DataFrame"""
 
         data = []
         for s in scores:
-            data.append({
-                'rank': s.rank,
-                'experiment_id': s.experiment_id,
-                'category': 'cVAE' if s.experiment_id.startswith('CVAE') else 'Causal',
-                'composite_score': round(s.composite_score, 2),
-                'predictive_lift_pct': round(s.predictive_lift, 1),
-                'market_inefficiency': round(s.market_inefficiency, 2),
-                'feasibility': round(s.implementation_feasibility, 2),
-                'sharpe_potential': round(s.sharpe_potential, 2),
-                'confidence': round(s.confidence, 2)
-            })
+            data.append(
+                {
+                    "rank": s.rank,
+                    "experiment_id": s.experiment_id,
+                    "category": "cVAE" if s.experiment_id.startswith("CVAE") else "Causal",
+                    "composite_score": round(s.composite_score, 2),
+                    "predictive_lift_pct": round(s.predictive_lift, 1),
+                    "market_inefficiency": round(s.market_inefficiency, 2),
+                    "feasibility": round(s.implementation_feasibility, 2),
+                    "sharpe_potential": round(s.sharpe_potential, 2),
+                    "confidence": round(s.confidence, 2),
+                }
+            )
 
         return pd.DataFrame(data)
 
-    def _score_to_dict(self, score: ROIScore) -> Dict:
+    def _score_to_dict(self, score: ROIScore) -> dict:
         """Convert ROIScore to dict for JSON export"""
 
         return {
-            'experiment_id': score.experiment_id,
-            'rank': score.rank,
-            'composite_score': round(score.composite_score, 2),
-            'predictive_lift': round(score.predictive_lift, 1),
-            'market_inefficiency': round(score.market_inefficiency, 2),
-            'implementation_feasibility': round(score.implementation_feasibility, 2),
-            'sharpe_potential': round(score.sharpe_potential, 2),
-            'confidence': round(score.confidence, 2),
-            'components': {k: round(v, 2) for k, v in score.components.items()}
+            "experiment_id": score.experiment_id,
+            "rank": score.rank,
+            "composite_score": round(score.composite_score, 2),
+            "predictive_lift": round(score.predictive_lift, 1),
+            "market_inefficiency": round(score.market_inefficiency, 2),
+            "implementation_feasibility": round(score.implementation_feasibility, 2),
+            "sharpe_potential": round(score.sharpe_potential, 2),
+            "confidence": round(score.confidence, 2),
+            "components": {k: round(v, 2) for k, v in score.components.items()},
         }
 
-    def print_summary(self, all_scores: List[ROIScore], top_10_cvae: List[ROIScore], top_10_causal: List[ROIScore]):
+    def print_summary(
+        self, all_scores: list[ROIScore], top_10_cvae: list[ROIScore], top_10_causal: list[ROIScore]
+    ):
         """Print summary of rankings"""
 
-        print("\n" + "="*100)
+        print("\n" + "=" * 100)
         print("EXPERIMENT RANKINGS - TOP 10 cVAE + TOP 10 CAUSAL")
-        print("="*100)
+        print("=" * 100)
 
-        print(f"\n📊 Composite Scoring Weights:")
+        print("\n📊 Composite Scoring Weights:")
         for component, weight in self.weights.items():
             print(f"   - {component}: {weight:.0%}")
 
         # Overall top 10
-        print(f"\n🏆 TOP 10 EXPERIMENTS (Overall):")
-        print(f"{'Rank':<6} {'ID':<15} {'Category':<10} {'Score':<8} {'Lift%':<8} {'Ineff':<8} {'Feas':<8} {'Sharpe':<8}")
+        print("\n🏆 TOP 10 EXPERIMENTS (Overall):")
+        print(
+            f"{'Rank':<6} {'ID':<15} {'Category':<10} {'Score':<8} {'Lift%':<8} {'Ineff':<8} {'Feas':<8} {'Sharpe':<8}"
+        )
         print("-" * 100)
 
         for score in all_scores[:10]:
-            category = 'cVAE' if score.experiment_id.startswith('CVAE') else 'Causal'
+            category = "cVAE" if score.experiment_id.startswith("CVAE") else "Causal"
             print(
                 f"{score.rank:<6} {score.experiment_id:<15} {category:<10} "
                 f"{score.composite_score:>6.1f}   {score.predictive_lift:>6.1f}%  "
@@ -334,8 +339,10 @@ class ExperimentROIEvaluator:
             )
 
         # Top 10 cVAE
-        print(f"\n\n🔬 TOP 10 cVAE EXPERIMENTS:")
-        print(f"{'Rank':<6} {'ID':<15} {'Score':<8} {'Lift%':<8} {'Ineff':<8} {'Feas':<8} {'Sharpe':<8}")
+        print("\n\n🔬 TOP 10 cVAE EXPERIMENTS:")
+        print(
+            f"{'Rank':<6} {'ID':<15} {'Score':<8} {'Lift%':<8} {'Ineff':<8} {'Feas':<8} {'Sharpe':<8}"
+        )
         print("-" * 100)
 
         for score in top_10_cvae:
@@ -347,8 +354,10 @@ class ExperimentROIEvaluator:
             )
 
         # Top 10 Causal
-        print(f"\n\n🧪 TOP 10 CAUSAL EXPERIMENTS:")
-        print(f"{'Rank':<6} {'ID':<15} {'Score':<8} {'Lift%':<8} {'Ineff':<8} {'Feas':<8} {'Sharpe':<8}")
+        print("\n\n🧪 TOP 10 CAUSAL EXPERIMENTS:")
+        print(
+            f"{'Rank':<6} {'ID':<15} {'Score':<8} {'Lift%':<8} {'Ineff':<8} {'Feas':<8} {'Sharpe':<8}"
+        )
         print("-" * 100)
 
         for score in top_10_causal:
@@ -362,8 +371,10 @@ class ExperimentROIEvaluator:
         # Statistics
         all_df = self._scores_to_dataframe(all_scores)
 
-        print(f"\n\n📈 SUMMARY STATISTICS:")
-        print(f"   Composite Score Range: {all_df['composite_score'].min():.1f} - {all_df['composite_score'].max():.1f}")
+        print("\n\n📈 SUMMARY STATISTICS:")
+        print(
+            f"   Composite Score Range: {all_df['composite_score'].min():.1f} - {all_df['composite_score'].max():.1f}"
+        )
         print(f"   Mean Score: {all_df['composite_score'].mean():.1f}")
         print(f"   Median Score: {all_df['composite_score'].median():.1f}")
         print(f"   Std Dev: {all_df['composite_score'].std():.1f}")
@@ -374,15 +385,14 @@ class ExperimentROIEvaluator:
         print(f"\n   Top 10 cVAE Mean Score: {cvae_df['composite_score'].mean():.1f}")
         print(f"   Top 10 Causal Mean Score: {causal_df['composite_score'].mean():.1f}")
 
-        print("\n" + "="*100 + "\n")
+        print("\n" + "=" * 100 + "\n")
 
 
 def main():
     """Run experiment ranking"""
 
     logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     )
 
     evaluator = ExperimentROIEvaluator()

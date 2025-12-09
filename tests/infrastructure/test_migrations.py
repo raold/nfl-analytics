@@ -17,7 +17,6 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from typing import List, Tuple
 
 import psycopg
 import pytest
@@ -42,18 +41,20 @@ class TestMigrationDiscovery:
 
         # Exclude special files
         migration_files = [
-            f for f in migration_files
+            f
+            for f in migration_files
             if f.name not in ["verify_schema.sql", "rollback_template.sql"]
         ]
 
         assert len(migration_files) > 0, "No migration files found"
 
         # Check numbering pattern (001_xxx.sql, 002_xxx.sql, etc.)
-        pattern = re.compile(r'^\d{3}_\w+\.sql$')
+        pattern = re.compile(r"^\d{3}_\w+\.sql$")
 
         for migration_file in migration_files:
-            assert pattern.match(migration_file.name), \
-                f"Migration {migration_file.name} doesn't follow naming convention (NNN_name.sql)"
+            assert pattern.match(
+                migration_file.name
+            ), f"Migration {migration_file.name} doesn't follow naming convention (NNN_name.sql)"
 
         print(f"✅ Found {len(migration_files)} properly numbered migrations")
 
@@ -106,7 +107,7 @@ class TestMigrationIdempotency:
             port=int(os.environ.get("POSTGRES_PORT", "5544")),
             dbname=os.environ.get("POSTGRES_TEST_DB", "testdb"),
             user=os.environ.get("POSTGRES_USER", "dro"),
-            password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions")
+            password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions"),
         )
         yield conn
         conn.close()
@@ -116,7 +117,7 @@ class TestMigrationIdempotency:
         """Path to migrations directory."""
         return Path("db/migrations")
 
-    def _run_migration(self, conn: psycopg.Connection, migration_file: Path) -> Tuple[bool, str]:
+    def _run_migration(self, conn: psycopg.Connection, migration_file: Path) -> tuple[bool, str]:
         """
         Run a single migration file.
 
@@ -193,10 +194,7 @@ class TestMigrationIdempotency:
                 failed_migrations.append((migration_file.name, error))
 
         if failed_migrations:
-            error_report = "\n".join([
-                f"  - {name}: {error}"
-                for name, error in failed_migrations
-            ])
+            error_report = "\n".join([f"  - {name}: {error}" for name, error in failed_migrations])
             pytest.fail(f"Migrations failed:\n{error_report}")
 
         print(f"✅ All {len(migration_files)} migrations ran successfully")
@@ -213,7 +211,7 @@ class TestMigrationSchemaValidation:
             port=int(os.environ.get("POSTGRES_PORT", "5544")),
             dbname=os.environ.get("POSTGRES_DB", "devdb01"),
             user=os.environ.get("POSTGRES_USER", "dro"),
-            password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions")
+            password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions"),
         )
         yield conn
         conn.close()
@@ -221,22 +219,24 @@ class TestMigrationSchemaValidation:
     def test_core_tables_exist(self, prod_db_conn):
         """Test that all core tables exist."""
         expected_tables = [
-            'games',
-            'plays',
-            'rosters',
-            'odds_history',
-            'betting_lines',
-            'performance_log',
-            'data_quality_log',
+            "games",
+            "plays",
+            "rosters",
+            "odds_history",
+            "betting_lines",
+            "performance_log",
+            "data_quality_log",
         ]
 
         with prod_db_conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT table_name
                 FROM information_schema.tables
                 WHERE table_schema = 'public'
                 AND table_type = 'BASE TABLE'
-            """)
+            """
+            )
 
             existing_tables = {row[0] for row in cur.fetchall()}
 
@@ -250,28 +250,32 @@ class TestMigrationSchemaValidation:
     def test_timescale_hypertables_configured(self, prod_db_conn):
         """Test that TimescaleDB hypertables are properly configured."""
         expected_hypertables = [
-            'odds_history',
-            'performance_log',
-            'data_quality_log',
+            "odds_history",
+            "performance_log",
+            "data_quality_log",
         ]
 
         with prod_db_conn.cursor() as cur:
             # Check if TimescaleDB extension exists
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT COUNT(*)
                 FROM pg_extension
                 WHERE extname = 'timescaledb'
-            """)
+            """
+            )
 
             if cur.fetchone()[0] == 0:
                 pytest.skip("TimescaleDB extension not installed")
 
             # Get list of hypertables
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT hypertable_name
                 FROM timescaledb_information.hypertables
                 WHERE hypertable_schema = 'public'
-            """)
+            """
+            )
 
             existing_hypertables = {row[0] for row in cur.fetchall()}
 
@@ -285,7 +289,8 @@ class TestMigrationSchemaValidation:
     def test_primary_keys_exist(self, prod_db_conn):
         """Test that all tables have primary keys."""
         with prod_db_conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT t.table_name
                 FROM information_schema.tables t
                 WHERE t.table_schema = 'public'
@@ -297,13 +302,14 @@ class TestMigrationSchemaValidation:
                     AND tc.table_name = t.table_name
                     AND tc.constraint_type = 'PRIMARY KEY'
                 )
-            """)
+            """
+            )
 
             tables_without_pk = [row[0] for row in cur.fetchall()]
 
         # Some tables legitimately don't need PKs (like log tables)
         # Exclude TimescaleDB hypertables (they have composite time-based keys)
-        hypertable_tables = ['odds_history', 'performance_log', 'data_quality_log']
+        hypertable_tables = ["odds_history", "performance_log", "data_quality_log"]
         tables_without_pk = [t for t in tables_without_pk if t not in hypertable_tables]
 
         if tables_without_pk:
@@ -315,13 +321,14 @@ class TestMigrationSchemaValidation:
         """Test that critical foreign keys exist."""
         expected_foreign_keys = [
             # (table, column, referenced_table)
-            ('plays', 'game_id', 'games'),
+            ("plays", "game_id", "games"),
             # Add more as needed
         ]
 
         with prod_db_conn.cursor() as cur:
             for table, column, ref_table in expected_foreign_keys:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT COUNT(*)
                     FROM information_schema.table_constraints tc
                     JOIN information_schema.key_column_usage kcu
@@ -330,12 +337,13 @@ class TestMigrationSchemaValidation:
                     AND tc.table_name = %s
                     AND kcu.column_name = %s
                     AND tc.constraint_type = 'FOREIGN KEY'
-                """, (table, column))
+                """,
+                    (table, column),
+                )
 
                 fk_count = cur.fetchone()[0]
 
-                assert fk_count > 0, \
-                    f"Missing foreign key: {table}.{column} -> {ref_table}"
+                assert fk_count > 0, f"Missing foreign key: {table}.{column} -> {ref_table}"
 
         print(f"✅ All {len(expected_foreign_keys)} critical foreign keys exist")
 
@@ -343,26 +351,29 @@ class TestMigrationSchemaValidation:
         """Test that critical indexes exist."""
         critical_indexes = [
             # Table-specific indexes (inferred from table name)
-            ('games', 'season'),
-            ('games', 'week'),
-            ('games', 'kickoff'),
-            ('plays', 'game_id'),
-            ('plays', 'quarter'),
-            ('odds_history', 'event_id'),
-            ('odds_history', 'snapshot_at'),
+            ("games", "season"),
+            ("games", "week"),
+            ("games", "kickoff"),
+            ("plays", "game_id"),
+            ("plays", "quarter"),
+            ("odds_history", "event_id"),
+            ("odds_history", "snapshot_at"),
         ]
 
         with prod_db_conn.cursor() as cur:
             missing_indexes = []
 
             for table, column in critical_indexes:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT COUNT(*)
                     FROM pg_indexes
                     WHERE schemaname = 'public'
                     AND tablename = %s
                     AND indexdef LIKE %s
-                """, (table, f'%{column}%'))
+                """,
+                    (table, f"%{column}%"),
+                )
 
                 index_count = cur.fetchone()[0]
 
@@ -385,20 +396,27 @@ class TestMigrationSchemaValidation:
         result = subprocess.run(
             [
                 "psql",
-                "-h", os.environ.get("POSTGRES_HOST", "localhost"),
-                "-p", os.environ.get("POSTGRES_PORT", "5544"),
-                "-U", os.environ.get("POSTGRES_USER", "dro"),
-                "-d", os.environ.get("POSTGRES_DB", "devdb01"),
-                "-f", str(schema_file),
+                "-h",
+                os.environ.get("POSTGRES_HOST", "localhost"),
+                "-p",
+                os.environ.get("POSTGRES_PORT", "5544"),
+                "-U",
+                os.environ.get("POSTGRES_USER", "dro"),
+                "-d",
+                os.environ.get("POSTGRES_DB", "devdb01"),
+                "-f",
+                str(schema_file),
             ],
-            env={**os.environ, "PGPASSWORD": os.environ.get("POSTGRES_PASSWORD", "sicillionbillions")},
+            env={
+                **os.environ,
+                "PGPASSWORD": os.environ.get("POSTGRES_PASSWORD", "sicillionbillions"),
+            },
             capture_output=True,
             text=True,
-            timeout=30
+            timeout=30,
         )
 
-        assert result.returncode == 0, \
-            f"verify_schema.sql failed: {result.stderr}"
+        assert result.returncode == 0, f"verify_schema.sql failed: {result.stderr}"
 
         print("✅ verify_schema.sql passed")
 
@@ -414,7 +432,7 @@ class TestMigrationDataPreservation:
             port=int(os.environ.get("POSTGRES_PORT", "5544")),
             dbname=os.environ.get("POSTGRES_DB", "devdb01"),
             user=os.environ.get("POSTGRES_USER", "dro"),
-            password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions")
+            password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions"),
         )
         yield conn
         conn.close()
@@ -448,14 +466,16 @@ class TestMigrationDataPreservation:
         """Test that primary key columns don't have NULLs."""
         with prod_db_conn.cursor() as cur:
             # Get all tables with primary keys
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT kcu.table_name, kcu.column_name
                 FROM information_schema.table_constraints tc
                 JOIN information_schema.key_column_usage kcu
                     ON tc.constraint_name = kcu.constraint_name
                 WHERE tc.table_schema = 'public'
                 AND tc.constraint_type = 'PRIMARY KEY'
-            """)
+            """
+            )
 
             pk_columns = cur.fetchall()
 
@@ -470,7 +490,7 @@ class TestMigrationDataPreservation:
                     null_counts.append(f"{table}.{column}: {null_count} NULLs")
 
         if null_counts:
-            pytest.fail(f"Primary key columns with NULLs:\n" + "\n".join(null_counts))
+            pytest.fail("Primary key columns with NULLs:\n" + "\n".join(null_counts))
 
         print(f"✅ All {len(pk_columns)} primary key columns are non-NULL")
 
@@ -509,7 +529,7 @@ class TestMigrationRollback:
                 missing_rollbacks.append(rollback_name)
 
         if missing_rollbacks:
-            pytest.fail(f"Missing rollback scripts:\n" + "\n".join(missing_rollbacks))
+            pytest.fail("Missing rollback scripts:\n" + "\n".join(missing_rollbacks))
 
         print(f"✅ All {len(migration_files)} migrations have rollback scripts")
 
@@ -525,7 +545,7 @@ def run_all_migrations():
         port=int(os.environ.get("POSTGRES_PORT", "5544")),
         dbname=os.environ.get("POSTGRES_DB", "devdb01"),
         user=os.environ.get("POSTGRES_USER", "dro"),
-        password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions")
+        password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions"),
     )
 
     try:

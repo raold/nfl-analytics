@@ -102,7 +102,7 @@ class DependencyChecker:
                 port=port,
                 username="default" if password else None,
                 password=password,
-                socket_timeout=2
+                socket_timeout=2,
             )
             r.ping()
             return True, f"Redis connected at {host}:{port}"

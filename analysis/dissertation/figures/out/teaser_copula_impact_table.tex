@@ -1,17 +1,19 @@
 \begin{table}[t]
-  \centering
-  \small
-  \caption{Copula pricing impact summary.}
-  \begin{tabular}{lcc}
-    \toprule
- \textbf{Metric} & \textbf{Gaussian} & \textbf{$t$-copula} \\
-    \midrule
-    Mean $\Delta$ EV & -0.0385 & -0.0381 \\
-    Max $|\Delta|$ EV & -0.0613 & -0.0610 \\
-    \midrule
-    \multicolumn{3}{l}{Interpretation: Ignoring dependence} \\
-    \multicolumn{3}{l}{overestimates EV by $\sim$3.8\% on average.} \\
-    \bottomrule
-  \end{tabular}
-  \label{tab:copula_impact_summary}
-\end{table}
+    \centering
+    \caption[Copula vs independence teaser pricing]{Teaser EV difference: Gaussian copula ($\rho=0.020$) vs independence assumption across 1408 games (2020--2024). Negative delta indicates independence overestimates EV.}
+    \label{tab:teaser-copula-impact}
+    \begin{adjustbox}{max width=\textwidth}
+    \begin{tabular}{lccc}
+      \toprule
+      \textbf{Scenario} & \textbf{Independence EV (bps)} & \textbf{Copula EV (bps)} & \textbf{Delta (bps)} \\
+      \midrule
+      Dog +3, U44.5 (6pt) & -7903 & -8308 & -406 \\
+      Dog +3, U44.5 (7pt) & -8015 & -8464 & -450 \\
+      Fav -7, U47 (6pt) & -5026 & -5095 & -68 \\
+      Fav -7, U47 (7pt) & -5153 & -5332 & -179 \\
+      Dog +6.5, O41.5 (6pt) & -8202 & -8814 & -613 \\
+      Dog +6.5, O41.5 (7pt) & -8345 & -8938 & -593 \\
+      \bottomrule
+    \end{tabular}
+    \end{adjustbox}
+  \end{table}

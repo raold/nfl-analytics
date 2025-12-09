@@ -19,6 +19,7 @@ Author: Claude Code
 """
 
 import sys
+
 sys.path.append("/Users/dro/rice/nfl-analytics")
 
 import argparse
@@ -26,7 +27,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -40,6 +41,7 @@ from sklearn.preprocessing import StandardScaler
 try:
     import torch
     import torch.nn as nn
+
     PYTORCH_AVAILABLE = True
 except ImportError:
     PYTORCH_AVAILABLE = False
@@ -48,6 +50,7 @@ except ImportError:
 # Try to import BNN conformal wrapper
 try:
     from py.models.bnn_conformal import BNNConformalPredictor, PyTorchBNNWrapper
+
     BNN_CONFORMAL_AVAILABLE = True
 except ImportError:
     BNN_CONFORMAL_AVAILABLE = False
@@ -56,16 +59,14 @@ except ImportError:
 # Import MAPIE for conformal prediction
 try:
     from mapie.regression import SplitConformalRegressor
+
     MAPIE_AVAILABLE = True
 except ImportError:
     MAPIE_AVAILABLE = False
     SplitConformalRegressor = None  # Type hint placeholder
     logging.error("MAPIE not installed - install with: pip install mapie")
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -74,9 +75,9 @@ class ConformalBNNValidator:
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         alpha: float = 0.10,  # 90% coverage
-        use_rf_fallback: bool = False
+        use_rf_fallback: bool = False,
     ):
         """
         Initialize validator.
@@ -105,7 +106,7 @@ class ConformalBNNValidator:
         self.bnn_model_paths = [
             "models/bayesian/bnn_multioutput_v1_final.pt",
             "models/bayesian/bnn_multioutput_passing_v1_canonical.pt",
-            "models/bayesian/bnn_passing_v1.pkl"
+            "models/bayesian/bnn_passing_v1.pkl",
         ]
 
         # Results directory
@@ -113,17 +114,13 @@ class ConformalBNNValidator:
         self.results_dir.mkdir(exist_ok=True)
         (self.results_dir / "figures").mkdir(exist_ok=True)
 
-        logger.info(f"ConformalBNNValidator initialized:")
+        logger.info("ConformalBNNValidator initialized:")
         logger.info(f"  Target coverage: {1-alpha:.1%}")
         logger.info(f"  PyTorch available: {PYTORCH_AVAILABLE}")
         logger.info(f"  MAPIE available: {MAPIE_AVAILABLE}")
         logger.info(f"  Use RF fallback: {self.use_rf_fallback}")
 
-    def load_data(
-        self,
-        start_season: int = 2018,
-        end_season: int = 2024
-    ) -> pd.DataFrame:
+    def load_data(self, start_season: int = 2018, end_season: int = 2024) -> pd.DataFrame:
         """
         Load rushing yards data with Vegas lines from database.
 
@@ -239,10 +236,7 @@ class ConformalBNNValidator:
                 "Please ensure database is running or provide cached data."
             )
 
-    def split_data(
-        self,
-        df: pd.DataFrame
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    def split_data(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Split data temporally into train/calib/test (60/20/20).
 
@@ -260,13 +254,9 @@ class ConformalBNNValidator:
         logger.info("\nSplitting data temporally...")
 
         # Temporal split (no data leakage)
-        train_mask = df['season'] <= 2021
-        calib_mask = (df['season'] == 2022) | (
-            (df['season'] == 2023) & (df['week'] <= 9)
-        )
-        test_mask = ((df['season'] == 2023) & (df['week'] > 9)) | (
-            df['season'] == 2024
-        )
+        train_mask = df["season"] <= 2021
+        calib_mask = (df["season"] == 2022) | ((df["season"] == 2023) & (df["week"] <= 9))
+        test_mask = ((df["season"] == 2023) & (df["week"] > 9)) | (df["season"] == 2024)
 
         train_df = df[train_mask].copy()
         calib_df = df[calib_mask].copy()
@@ -287,10 +277,7 @@ class ConformalBNNValidator:
 
         return train_df, calib_df, test_df
 
-    def prepare_features(
-        self,
-        df: pd.DataFrame
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    def prepare_features(self, df: pd.DataFrame) -> tuple[np.ndarray, np.ndarray]:
         """
         Prepare feature matrix (same 6 features as baseline).
 
@@ -326,7 +313,7 @@ class ConformalBNNValidator:
 
         return X, y
 
-    def load_bnn_model(self) -> Optional[nn.Module]:
+    def load_bnn_model(self) -> nn.Module | None:
         """
         Try to load existing BNN model from checkpoints.
 
@@ -351,19 +338,19 @@ class ConformalBNNValidator:
 
             try:
                 # Load checkpoint
-                checkpoint = torch.load(path, map_location='cpu')
+                checkpoint = torch.load(path, map_location="cpu")
 
                 # Handle different checkpoint formats
                 if isinstance(checkpoint, dict):
-                    if 'model_state_dict' in checkpoint:
+                    if "model_state_dict" in checkpoint:
                         logger.error(
-                            f"    State dict format requires model architecture. "
-                            f"Please use direct model checkpoint."
+                            "    State dict format requires model architecture. "
+                            "Please use direct model checkpoint."
                         )
                         continue
-                    elif 'model' in checkpoint:
-                        model = checkpoint['model']
-                        logger.info(f"    ✓ Loaded model from 'model' key")
+                    elif "model" in checkpoint:
+                        model = checkpoint["model"]
+                        logger.info("    ✓ Loaded model from 'model' key")
                         return model
                     else:
                         logger.error(f"    Unknown checkpoint format: {checkpoint.keys()}")
@@ -371,7 +358,7 @@ class ConformalBNNValidator:
                 else:
                     # Direct model checkpoint
                     model = checkpoint
-                    logger.info(f"    ✓ Loaded direct model checkpoint")
+                    logger.info("    ✓ Loaded direct model checkpoint")
                     return model
 
             except Exception as e:
@@ -382,10 +369,7 @@ class ConformalBNNValidator:
         return None
 
     def create_conformal_predictor(
-        self,
-        X_train: np.ndarray,
-        y_train: np.ndarray,
-        bnn_model: Optional[nn.Module] = None
+        self, X_train: np.ndarray, y_train: np.ndarray, bnn_model: nn.Module | None = None
     ) -> Any:
         """
         Create conformal predictor with BNN or Random Forest base.
@@ -404,14 +388,9 @@ class ConformalBNNValidator:
             logger.info("  Base model: BNN (pre-trained)")
 
             # Wrap BNN for sklearn compatibility
-            base_estimator = PyTorchBNNWrapper(
-                bnn_model,
-                device='cpu',
-                n_samples=50
-            )
+            base_estimator = PyTorchBNNWrapper(bnn_model, device="cpu", n_samples=50)
 
             # No training needed (pre-fitted)
-            cv_method = "prefit"
 
         else:
             logger.info("  Base model: Random Forest")
@@ -443,20 +422,16 @@ class ConformalBNNValidator:
         conformal_model = SplitConformalRegressor(
             estimator=base_estimator,
             confidence_level=1 - self.alpha,  # 0.90 for 90% coverage
-            conformity_score='absolute',  # Absolute residual score
+            conformity_score="absolute",  # Absolute residual score
             prefit=True,  # Estimator already trained
-            n_jobs=-1
+            n_jobs=-1,
         )
 
         logger.info("  ✓ Conformal predictor created")
         return conformal_model
 
     def calibrate_conformal(
-        self,
-        conformal_model: Any,
-        X_calib: np.ndarray,
-        y_calib: np.ndarray,
-        verbose: bool = True
+        self, conformal_model: Any, X_calib: np.ndarray, y_calib: np.ndarray, verbose: bool = True
     ):
         """
         Calibrate conformal prediction on calibration set.
@@ -470,12 +445,12 @@ class ConformalBNNValidator:
             verbose: Print calibration statistics
         """
         if verbose:
-            logger.info(f"\nCalibrating conformal prediction...")
+            logger.info("\nCalibrating conformal prediction...")
             logger.info(f"  Calibration set: {len(X_calib)} samples")
             logger.info(f"  Target coverage: {1-self.alpha:.1%}")
 
         # Scale features if using RF
-        if hasattr(self, 'scaler'):
+        if hasattr(self, "scaler"):
             X_calib_scaled = self.scaler.transform(X_calib)
         else:
             X_calib_scaled = X_calib
@@ -491,27 +466,23 @@ class ConformalBNNValidator:
             # Check empirical coverage
             # intervals shape: (n_samples, 2, 1) where [:, 0, 0] is lower, [:, 1, 0] is upper
             coverage = np.mean(
-                (y_calib >= y_intervals_calib[:, 0, 0]) &
-                (y_calib <= y_intervals_calib[:, 1, 0])
+                (y_calib >= y_intervals_calib[:, 0, 0]) & (y_calib <= y_intervals_calib[:, 1, 0])
             )
 
             width = np.mean(y_intervals_calib[:, 1, 0] - y_intervals_calib[:, 0, 0])
 
-            logger.info(f"\n  Calibration results:")
+            logger.info("\n  Calibration results:")
             logger.info(f"    Empirical coverage: {coverage:.1%} (target: {1-self.alpha:.1%})")
             logger.info(f"    Average interval width: {width:.1f} yards")
 
             if coverage >= (1 - self.alpha - 0.02):
-                logger.info(f"    ✓ Coverage guarantee achieved!")
+                logger.info("    ✓ Coverage guarantee achieved!")
             else:
-                logger.warning(f"    ⚠ Coverage below target (may need more calibration data)")
+                logger.warning("    ⚠ Coverage below target (may need more calibration data)")
 
     def evaluate_test_set(
-        self,
-        conformal_model: Any,
-        X_test: np.ndarray,
-        y_test: np.ndarray
-    ) -> Dict:
+        self, conformal_model: Any, X_test: np.ndarray, y_test: np.ndarray
+    ) -> dict:
         """
         Evaluate conformal predictor on test set.
 
@@ -528,7 +499,7 @@ class ConformalBNNValidator:
         logger.info("=" * 80)
 
         # Scale features if using RF
-        if hasattr(self, 'scaler'):
+        if hasattr(self, "scaler"):
             X_test_scaled = self.scaler.transform(X_test)
         else:
             X_test_scaled = X_test
@@ -585,32 +556,25 @@ class ConformalBNNValidator:
 
         # Package results
         results = {
-            'point_accuracy': {
-                'mae': float(mae),
-                'rmse': float(rmse),
-                'mape': float(mape)
+            "point_accuracy": {"mae": float(mae), "rmse": float(rmse), "mape": float(mape)},
+            "calibration": {
+                "coverage_90": float(coverage_90),
+                "target_coverage": 0.90,
+                "coverage_gap": float(coverage_90 - 0.90),
+                "within_2pct": bool(abs(coverage_90 - 0.90) <= 0.02),
             },
-            'calibration': {
-                'coverage_90': float(coverage_90),
-                'target_coverage': 0.90,
-                'coverage_gap': float(coverage_90 - 0.90),
-                'within_2pct': bool(abs(coverage_90 - 0.90) <= 0.02)
+            "sharpness": {
+                "avg_width": float(avg_width),
+                "median_width": float(median_width),
+                "width_std": float(width_std),
+                "width_cv": float(width_cv),
             },
-            'sharpness': {
-                'avg_width': float(avg_width),
-                'median_width': float(median_width),
-                'width_std': float(width_std),
-                'width_cv': float(width_cv)
-            },
-            'n_test': len(y_test)
+            "n_test": len(y_test),
         }
 
         return results, (y_pred, y_lower, y_upper)
 
-    def compare_to_temperature_scaling(
-        self,
-        conformal_results: Dict
-    ) -> Dict:
+    def compare_to_temperature_scaling(self, conformal_results: dict) -> dict:
         """
         Compare conformal prediction to temperature scaling baseline.
 
@@ -630,45 +594,42 @@ class ConformalBNNValidator:
 
         # Temperature scaling baseline (BNN v3.1 Rushing)
         baseline = {
-            'method': 'Temperature Scaling',
-            'coverage_90': 0.895,  # 89.5%
-            'temperature': 0.75,
-            'source': 'BNN v3.1 Rushing (Nov 2, 2025)'
+            "method": "Temperature Scaling",
+            "coverage_90": 0.895,  # 89.5%
+            "temperature": 0.75,
+            "source": "BNN v3.1 Rushing (Nov 2, 2025)",
         }
 
         # Extract conformal metrics
-        conformal_coverage = conformal_results['calibration']['coverage_90']
-        conformal_width = conformal_results['sharpness']['avg_width']
+        conformal_coverage = conformal_results["calibration"]["coverage_90"]
+        conformal_width = conformal_results["sharpness"]["avg_width"]
 
         # Comparison
-        coverage_diff = conformal_coverage - baseline['coverage_90']
+        coverage_diff = conformal_coverage - baseline["coverage_90"]
 
-        logger.info(f"\nCoverage Comparison:")
+        logger.info("\nCoverage Comparison:")
         logger.info(f"  Temperature Scaling: {baseline['coverage_90']:.1%}")
         logger.info(f"  Conformal Prediction: {conformal_coverage:.1%}")
         logger.info(f"  Difference: {coverage_diff:+.1%}")
 
         if coverage_diff > 0:
-            logger.info(f"  → Conformal prediction achieves BETTER coverage")
+            logger.info("  → Conformal prediction achieves BETTER coverage")
         elif coverage_diff > -0.02:
-            logger.info(f"  → Similar coverage (within 2%)")
+            logger.info("  → Similar coverage (within 2%)")
         else:
-            logger.warning(f"  → Temperature scaling has better coverage")
+            logger.warning("  → Temperature scaling has better coverage")
 
-        logger.info(f"\nSharpness:")
+        logger.info("\nSharpness:")
         logger.info(f"  Conformal width: {conformal_width:.1f} yards")
-        logger.info(f"  (Temperature scaling width not available)")
+        logger.info("  (Temperature scaling width not available)")
 
         comparison = {
-            'baseline': baseline,
-            'conformal': {
-                'coverage_90': conformal_coverage,
-                'avg_width': conformal_width
+            "baseline": baseline,
+            "conformal": {"coverage_90": conformal_coverage, "avg_width": conformal_width},
+            "comparison": {
+                "coverage_diff": float(coverage_diff),
+                "conformal_better": coverage_diff > 0,
             },
-            'comparison': {
-                'coverage_diff': float(coverage_diff),
-                'conformal_better': coverage_diff > 0
-            }
         }
 
         return comparison
@@ -681,7 +642,7 @@ class ConformalBNNValidator:
         y_upper: np.ndarray,
         conformal_model: Any,
         X_calib: np.ndarray,
-        y_calib: np.ndarray
+        y_calib: np.ndarray,
     ):
         """
         Generate diagnostic plots.
@@ -703,7 +664,7 @@ class ConformalBNNValidator:
         logger.info("\nGenerating diagnostic plots...")
 
         # Scale features if using RF
-        if hasattr(self, 'scaler'):
+        if hasattr(self, "scaler"):
             X_calib_scaled = self.scaler.transform(X_calib)
         else:
             X_calib_scaled = X_calib
@@ -723,34 +684,28 @@ class ConformalBNNValidator:
         for conf_level in confidence_levels:
             # Create new conformal model with this confidence level
             temp_conformal = SplitConformalRegressor(
-                estimator=base_estimator,
-                confidence_level=conf_level,
-                prefit=True,
-                n_jobs=-1
+                estimator=base_estimator, confidence_level=conf_level, prefit=True, n_jobs=-1
             )
             temp_conformal.conformalize(X_calib_scaled, y_calib)
 
             # Compute empirical coverage on calibration set
             _, intervals = temp_conformal.predict_interval(X_calib_scaled)
-            coverage = np.mean(
-                (y_calib >= intervals[:, 0, 0]) &
-                (y_calib <= intervals[:, 1, 0])
-            )
+            coverage = np.mean((y_calib >= intervals[:, 0, 0]) & (y_calib <= intervals[:, 1, 0]))
             empirical_coverages.append(coverage)
 
         target_coverages = confidence_levels
 
-        ax.plot(target_coverages, empirical_coverages, 'o-', label='Conformal')
-        ax.plot([0, 1], [0, 1], 'k--', alpha=0.5, label='Perfect')
-        ax.set_xlabel('Target Coverage', fontsize=12)
-        ax.set_ylabel('Empirical Coverage', fontsize=12)
-        ax.set_title('Conformal Calibration Curve', fontsize=14, fontweight='bold')
+        ax.plot(target_coverages, empirical_coverages, "o-", label="Conformal")
+        ax.plot([0, 1], [0, 1], "k--", alpha=0.5, label="Perfect")
+        ax.set_xlabel("Target Coverage", fontsize=12)
+        ax.set_ylabel("Empirical Coverage", fontsize=12)
+        ax.set_title("Conformal Calibration Curve", fontsize=14, fontweight="bold")
         ax.legend()
         ax.grid(True, alpha=0.3)
 
         plot_path = self.results_dir / "figures/conformal_calibration_curve.png"
         plt.tight_layout()
-        plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+        plt.savefig(plot_path, dpi=300, bbox_inches="tight")
         plt.close()
         logger.info(f"  ✓ Saved: {plot_path}")
 
@@ -765,32 +720,39 @@ class ConformalBNNValidator:
         counts = [np.sum(widths == w) for w in unique_widths]
         if len(unique_widths) == 1:
             # Single value - single bar
-            ax.bar([unique_widths[0]], [counts[0]], width=1.0, alpha=0.7, edgecolor='black')
+            ax.bar([unique_widths[0]], [counts[0]], width=1.0, alpha=0.7, edgecolor="black")
             ax.set_xlim(unique_widths[0] - 2, unique_widths[0] + 2)
         elif len(unique_widths) < 50:
             # Few unique values - use bar chart
-            width = min(0.8 * np.diff(sorted(unique_widths)).min() if len(unique_widths) > 1 else 1.0, 1.0)
-            ax.bar(unique_widths, counts, width=width, alpha=0.7, edgecolor='black')
+            width = min(
+                0.8 * np.diff(sorted(unique_widths)).min() if len(unique_widths) > 1 else 1.0, 1.0
+            )
+            ax.bar(unique_widths, counts, width=width, alpha=0.7, edgecolor="black")
         else:
             # Many unique values - try histogram with fixed number of bins
             try:
-                ax.hist(widths, bins=30, alpha=0.7, edgecolor='black')
+                ax.hist(widths, bins=30, alpha=0.7, edgecolor="black")
             except ValueError:
                 # Fallback to bar chart
-                ax.bar(unique_widths, counts, alpha=0.7, edgecolor='black')
-        ax.axvline(np.mean(widths), color='red', linestyle='--',
-                   label=f'Mean: {np.mean(widths):.1f} yards')
-        ax.axvline(np.median(widths), color='blue', linestyle='--',
-                   label=f'Median: {np.median(widths):.1f} yards')
-        ax.set_xlabel('Interval Width (yards)', fontsize=12)
-        ax.set_ylabel('Frequency', fontsize=12)
-        ax.set_title('Prediction Interval Width Distribution', fontsize=14, fontweight='bold')
+                ax.bar(unique_widths, counts, alpha=0.7, edgecolor="black")
+        ax.axvline(
+            np.mean(widths), color="red", linestyle="--", label=f"Mean: {np.mean(widths):.1f} yards"
+        )
+        ax.axvline(
+            np.median(widths),
+            color="blue",
+            linestyle="--",
+            label=f"Median: {np.median(widths):.1f} yards",
+        )
+        ax.set_xlabel("Interval Width (yards)", fontsize=12)
+        ax.set_ylabel("Frequency", fontsize=12)
+        ax.set_title("Prediction Interval Width Distribution", fontsize=14, fontweight="bold")
         ax.legend()
-        ax.grid(True, alpha=0.3, axis='y')
+        ax.grid(True, alpha=0.3, axis="y")
 
         plot_path = self.results_dir / "figures/conformal_interval_width_distribution.png"
         plt.tight_layout()
-        plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+        plt.savefig(plot_path, dpi=300, bbox_inches="tight")
         plt.close()
         logger.info(f"  ✓ Saved: {plot_path}")
 
@@ -806,11 +768,10 @@ class ConformalBNNValidator:
         counts = []
 
         for i in range(len(bins) - 1):
-            mask = (y_pred >= bins[i]) & (y_pred < bins[i+1])
+            mask = (y_pred >= bins[i]) & (y_pred < bins[i + 1])
             if mask.sum() > 0:
                 coverage = np.mean(
-                    (y_test[mask] >= y_lower[mask]) &
-                    (y_test[mask] <= y_upper[mask])
+                    (y_test[mask] >= y_lower[mask]) & (y_test[mask] <= y_upper[mask])
                 )
                 width = np.mean((y_upper - y_lower)[mask])
             else:
@@ -822,11 +783,11 @@ class ConformalBNNValidator:
             counts.append(mask.sum())
 
         # Plot coverage by bin
-        ax.plot(bin_centers, coverages, 'o-', label='Empirical Coverage', linewidth=2)
-        ax.axhline(0.90, color='red', linestyle='--', label='Target (90%)', linewidth=2)
-        ax.set_xlabel('Predicted Rushing Yards', fontsize=12)
-        ax.set_ylabel('Coverage', fontsize=12)
-        ax.set_title('Coverage by Prediction Value', fontsize=14, fontweight='bold')
+        ax.plot(bin_centers, coverages, "o-", label="Empirical Coverage", linewidth=2)
+        ax.axhline(0.90, color="red", linestyle="--", label="Target (90%)", linewidth=2)
+        ax.set_xlabel("Predicted Rushing Yards", fontsize=12)
+        ax.set_ylabel("Coverage", fontsize=12)
+        ax.set_title("Coverage by Prediction Value", fontsize=14, fontweight="bold")
         ax.set_ylim([0.7, 1.0])
         ax.legend()
         ax.grid(True, alpha=0.3)
@@ -834,21 +795,15 @@ class ConformalBNNValidator:
         # Add sample counts as text
         for i, (x, y, count) in enumerate(zip(bin_centers, coverages, counts)):
             if not np.isnan(y) and count > 0:
-                ax.text(x, y + 0.02, f'n={count}', ha='center', va='bottom',
-                       fontsize=8, alpha=0.7)
+                ax.text(x, y + 0.02, f"n={count}", ha="center", va="bottom", fontsize=8, alpha=0.7)
 
         plot_path = self.results_dir / "figures/conformal_coverage_by_prediction.png"
         plt.tight_layout()
-        plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+        plt.savefig(plot_path, dpi=300, bbox_inches="tight")
         plt.close()
         logger.info(f"  ✓ Saved: {plot_path}")
 
-    def save_results(
-        self,
-        results: Dict,
-        comparison: Dict,
-        use_bnn: bool
-    ):
+    def save_results(self, results: dict, comparison: dict, use_bnn: bool):
         """
         Save results to JSON and Markdown.
 
@@ -861,25 +816,29 @@ class ConformalBNNValidator:
 
         # JSON report
         report = {
-            'experiment': 'BNN Conformal Prediction Validation',
-            'timestamp': datetime.now().isoformat(),
-            'config': {
-                'base_model': 'BNN (pre-trained)' if use_bnn else 'Random Forest',
-                'conformal_method': 'split conformal (Jackknife+)',
-                'target_coverage': 0.90,
-                'alpha': self.alpha,
-                'features': [
-                    'carries', 'avg_rushing_l3', 'season_avg',
-                    'week', 'spread_close', 'total_close'
+            "experiment": "BNN Conformal Prediction Validation",
+            "timestamp": datetime.now().isoformat(),
+            "config": {
+                "base_model": "BNN (pre-trained)" if use_bnn else "Random Forest",
+                "conformal_method": "split conformal (Jackknife+)",
+                "target_coverage": 0.90,
+                "alpha": self.alpha,
+                "features": [
+                    "carries",
+                    "avg_rushing_l3",
+                    "season_avg",
+                    "week",
+                    "spread_close",
+                    "total_close",
                 ],
-                'n_features': 6
+                "n_features": 6,
             },
-            'results': results,
-            'comparison': comparison
+            "results": results,
+            "comparison": comparison,
         }
 
         json_path = self.results_dir / "conformal_bnn_validation.json"
-        with open(json_path, 'w') as f:
+        with open(json_path, "w") as f:
             json.dump(report, f, indent=2)
         logger.info(f"  ✓ JSON report: {json_path}")
 
@@ -888,8 +847,8 @@ class ConformalBNNValidator:
             "# BNN Conformal Prediction Validation Results",
             f"\n**Date:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
             f"**Base Model:** {'BNN (pre-trained)' if use_bnn else 'Random Forest'}",
-            f"**Conformal Method:** Split Conformal (Jackknife+)",
-            f"**Target Coverage:** 90%",
+            "**Conformal Method:** Split Conformal (Jackknife+)",
+            "**Target Coverage:** 90%",
             "",
             "## Test Set Performance",
             "",
@@ -927,16 +886,16 @@ class ConformalBNNValidator:
             "3. **Coverage by Prediction:** `figures/conformal_coverage_by_prediction.png`",
             "",
             "## Conclusion",
-            ""
+            "",
         ]
 
         # Add conclusion based on results
-        if results['calibration']['within_2pct']:
+        if results["calibration"]["within_2pct"]:
             md_lines.append(
                 "✓ **VALIDATED:** Conformal prediction achieves target 90% coverage (±2%) on test set. "
                 "Coverage guarantee is empirically confirmed."
             )
-        elif abs(results['calibration']['coverage_gap']) <= 0.05:
+        elif abs(results["calibration"]["coverage_gap"]) <= 0.05:
             md_lines.append(
                 "↗ **GOOD:** Conformal prediction achieves reasonable coverage (within 5% of target). "
                 "Small deviation may be due to finite sample effects."
@@ -948,8 +907,8 @@ class ConformalBNNValidator:
             )
 
         md_path = self.results_dir / "conformal_vs_temperature.md"
-        with open(md_path, 'w') as f:
-            f.write('\n'.join(md_lines))
+        with open(md_path, "w") as f:
+            f.write("\n".join(md_lines))
         logger.info(f"  ✓ Markdown report: {md_path}")
 
     def run_full_validation(self):
@@ -997,9 +956,7 @@ class ConformalBNNValidator:
             logger.warning("\n⚠ BNN not available - using Random Forest fallback")
 
         # Step 4: Create conformal predictor
-        conformal_model = self.create_conformal_predictor(
-            X_train, y_train, bnn_model
-        )
+        conformal_model = self.create_conformal_predictor(X_train, y_train, bnn_model)
 
         # Step 5: Calibrate
         self.calibrate_conformal(conformal_model, X_calib, y_calib, verbose=True)
@@ -1013,10 +970,7 @@ class ConformalBNNValidator:
         comparison = self.compare_to_temperature_scaling(results)
 
         # Step 8: Generate plots
-        self.generate_plots(
-            y_test, y_pred, y_lower, y_upper,
-            conformal_model, X_calib, y_calib
-        )
+        self.generate_plots(y_test, y_pred, y_lower, y_upper, conformal_model, X_calib, y_calib)
 
         # Step 9: Save results
         self.save_results(results, comparison, use_bnn)
@@ -1032,28 +986,21 @@ class ConformalBNNValidator:
 
 def main():
     """Main entry point with CLI argument parsing"""
-    parser = argparse.ArgumentParser(
-        description="Validate BNN Conformal Prediction wrapper"
+    parser = argparse.ArgumentParser(description="Validate BNN Conformal Prediction wrapper")
+    parser.add_argument(
+        "--use-rf-fallback", action="store_true", help="Force Random Forest instead of BNN"
     )
     parser.add_argument(
-        '--use-rf-fallback',
-        action='store_true',
-        help='Force Random Forest instead of BNN'
-    )
-    parser.add_argument(
-        '--alpha',
+        "--alpha",
         type=float,
         default=0.10,
-        help='Miscoverage level (default: 0.10 for 90%% coverage)'
+        help="Miscoverage level (default: 0.10 for 90%% coverage)",
     )
 
     args = parser.parse_args()
 
     # Create validator
-    validator = ConformalBNNValidator(
-        alpha=args.alpha,
-        use_rf_fallback=args.use_rf_fallback
-    )
+    validator = ConformalBNNValidator(alpha=args.alpha, use_rf_fallback=args.use_rf_fallback)
 
     # Run full validation
     validator.run_full_validation()

@@ -5,18 +5,18 @@ Extracts quarter-by-quarter scores, key events, and momentum indicators
 from the database to create training data for the deep generative model.
 """
 
-import pandas as pd
+import json
+import logging
+import sys
+from dataclasses import asdict
+from pathlib import Path
+
 import numpy as np
 import psycopg2
-from psycopg2.extras import RealDictCursor
 import torch
-from torch.utils.data import Dataset, DataLoader
-from typing import Dict, List, Tuple, Optional
-import logging
-from dataclasses import dataclass, asdict
-import json
-from pathlib import Path
-import sys
+from psycopg2.extras import RealDictCursor
+from torch.utils.data import DataLoader, Dataset
+
 sys.path.append(str(Path(__file__).parent.parent))
 
 from models.game_trajectory_cvae import GameTrajectory
@@ -30,12 +30,7 @@ class GameTrajectoryDataset(Dataset):
     PyTorch dataset for game trajectories and conditions.
     """
 
-    def __init__(
-        self,
-        trajectories: List[GameTrajectory],
-        conditions: np.ndarray,
-        transform=None
-    ):
+    def __init__(self, trajectories: list[GameTrajectory], conditions: np.ndarray, transform=None):
         self.trajectories = trajectories
         self.conditions = torch.FloatTensor(conditions)
         self.transform = transform
@@ -58,7 +53,7 @@ class CVAEDataPipeline:
     Extracts and prepares game trajectory data for cVAE training.
     """
 
-    def __init__(self, db_config: Dict[str, str]):
+    def __init__(self, db_config: dict[str, str]):
         self.db_config = db_config
         self.conn = None
         self.cursor = None
@@ -78,10 +73,8 @@ class CVAEDataPipeline:
         logger.info("Disconnected from database")
 
     def extract_game_trajectories(
-        self,
-        start_season: int = 2020,
-        end_season: int = 2024
-    ) -> Tuple[List[GameTrajectory], np.ndarray]:
+        self, start_season: int = 2020, end_season: int = 2024
+    ) -> tuple[list[GameTrajectory], np.ndarray]:
         """
         Extract game trajectories and pre-game conditions from database.
 
@@ -263,7 +256,7 @@ class CVAEDataPipeline:
         conditions_array = np.array(conditions_list)
         return trajectories, conditions_array
 
-    def _create_trajectory(self, game: Dict) -> GameTrajectory:
+    def _create_trajectory(self, game: dict) -> GameTrajectory:
         """
         Create GameTrajectory from database record.
         """
@@ -271,41 +264,47 @@ class CVAEDataPipeline:
         largest_lead, lead_changes = self._calculate_momentum(game)
 
         return GameTrajectory(
-            home_q1=float(game.get('home_q1', 0)),
-            home_q2=float(game.get('home_q2', 0)),
-            home_q3=float(game.get('home_q3', 0)),
-            home_q4=float(game.get('home_q4', 0)),
-            home_ot=float(game.get('home_ot', 0)),
-            away_q1=float(game.get('away_q1', 0)),
-            away_q2=float(game.get('away_q2', 0)),
-            away_q3=float(game.get('away_q3', 0)),
-            away_q4=float(game.get('away_q4', 0)),
-            away_ot=float(game.get('away_ot', 0)),
-            home_defensive_td=bool(game.get('home_def_td', False)),
-            away_defensive_td=bool(game.get('away_def_td', False)),
-            home_special_teams_td=bool(game.get('home_st_td', False)),
-            away_special_teams_td=bool(game.get('away_st_td', False)),
+            home_q1=float(game.get("home_q1", 0)),
+            home_q2=float(game.get("home_q2", 0)),
+            home_q3=float(game.get("home_q3", 0)),
+            home_q4=float(game.get("home_q4", 0)),
+            home_ot=float(game.get("home_ot", 0)),
+            away_q1=float(game.get("away_q1", 0)),
+            away_q2=float(game.get("away_q2", 0)),
+            away_q3=float(game.get("away_q3", 0)),
+            away_q4=float(game.get("away_q4", 0)),
+            away_ot=float(game.get("away_ot", 0)),
+            home_defensive_td=bool(game.get("home_def_td", False)),
+            away_defensive_td=bool(game.get("away_def_td", False)),
+            home_special_teams_td=bool(game.get("home_st_td", False)),
+            away_special_teams_td=bool(game.get("away_st_td", False)),
             largest_lead=largest_lead,
-            lead_changes=lead_changes
+            lead_changes=lead_changes,
         )
 
-    def _calculate_momentum(self, game: Dict) -> Tuple[float, int]:
+    def _calculate_momentum(self, game: dict) -> tuple[float, int]:
         """
         Calculate momentum indicators from quarter scores.
         """
         # Running scores
         home_scores = [
-            game.get('home_q1', 0),
-            game.get('home_q1', 0) + game.get('home_q2', 0),
-            game.get('home_q1', 0) + game.get('home_q2', 0) + game.get('home_q3', 0),
-            game.get('home_q1', 0) + game.get('home_q2', 0) + game.get('home_q3', 0) + game.get('home_q4', 0)
+            game.get("home_q1", 0),
+            game.get("home_q1", 0) + game.get("home_q2", 0),
+            game.get("home_q1", 0) + game.get("home_q2", 0) + game.get("home_q3", 0),
+            game.get("home_q1", 0)
+            + game.get("home_q2", 0)
+            + game.get("home_q3", 0)
+            + game.get("home_q4", 0),
         ]
 
         away_scores = [
-            game.get('away_q1', 0),
-            game.get('away_q1', 0) + game.get('away_q2', 0),
-            game.get('away_q1', 0) + game.get('away_q2', 0) + game.get('away_q3', 0),
-            game.get('away_q1', 0) + game.get('away_q2', 0) + game.get('away_q3', 0) + game.get('away_q4', 0)
+            game.get("away_q1", 0),
+            game.get("away_q1", 0) + game.get("away_q2", 0),
+            game.get("away_q1", 0) + game.get("away_q2", 0) + game.get("away_q3", 0),
+            game.get("away_q1", 0)
+            + game.get("away_q2", 0)
+            + game.get("away_q3", 0)
+            + game.get("away_q4", 0),
         ]
 
         # Calculate leads at each quarter
@@ -315,12 +314,12 @@ class CVAEDataPipeline:
         # Count lead changes
         lead_changes = 0
         for i in range(1, len(leads)):
-            if leads[i] * leads[i-1] < 0:  # Sign change
+            if leads[i] * leads[i - 1] < 0:  # Sign change
                 lead_changes += 1
 
         return largest_lead, lead_changes
 
-    def _create_condition_vector(self, game: Dict) -> np.ndarray:
+    def _create_condition_vector(self, game: dict) -> np.ndarray:
         """
         Create pre-game condition vector from database record.
 
@@ -335,18 +334,18 @@ class CVAEDataPipeline:
         condition = np.zeros(20)
 
         # Betting lines
-        condition[0] = game.get('spread_line', 0) if game.get('spread_line') else 0
-        condition[1] = game.get('total_line', 45) if game.get('total_line') else 45
-        condition[2] = game.get('home_moneyline', -110) if game.get('home_moneyline') else -110
-        condition[3] = game.get('away_moneyline', -110) if game.get('away_moneyline') else -110
+        condition[0] = game.get("spread_line", 0) if game.get("spread_line") else 0
+        condition[1] = game.get("total_line", 45) if game.get("total_line") else 45
+        condition[2] = game.get("home_moneyline", -110) if game.get("home_moneyline") else -110
+        condition[3] = game.get("away_moneyline", -110) if game.get("away_moneyline") else -110
 
         # Recent performance
-        condition[4] = game.get('home_recent_ppg', 21) if game.get('home_recent_ppg') else 21
-        condition[5] = game.get('home_recent_papg', 21) if game.get('home_recent_papg') else 21
-        condition[6] = game.get('away_recent_ppg', 21) if game.get('away_recent_ppg') else 21
-        condition[7] = game.get('away_recent_papg', 21) if game.get('away_recent_papg') else 21
-        condition[8] = game.get('home_recent_ypg', 350) if game.get('home_recent_ypg') else 350
-        condition[9] = game.get('away_recent_ypg', 350) if game.get('away_recent_ypg') else 350
+        condition[4] = game.get("home_recent_ppg", 21) if game.get("home_recent_ppg") else 21
+        condition[5] = game.get("home_recent_papg", 21) if game.get("home_recent_papg") else 21
+        condition[6] = game.get("away_recent_ppg", 21) if game.get("away_recent_ppg") else 21
+        condition[7] = game.get("away_recent_papg", 21) if game.get("away_recent_papg") else 21
+        condition[8] = game.get("home_recent_ypg", 350) if game.get("home_recent_ypg") else 350
+        condition[9] = game.get("away_recent_ypg", 350) if game.get("away_recent_ypg") else 350
 
         # Rest (simplified - both teams typically have 7 days)
         condition[10] = 7  # Home rest days
@@ -354,13 +353,13 @@ class CVAEDataPipeline:
 
         # Weather (defaults - could be enhanced with weather data)
         condition[12] = 60  # Temperature (F)
-        condition[13] = 5   # Wind speed (mph)
-        condition[14] = 0   # Precipitation (mm)
+        condition[13] = 5  # Wind speed (mph)
+        condition[14] = 0  # Precipitation (mm)
 
         # Game context
         condition[15] = 0  # Division game (would need team division data)
         condition[16] = 0  # Primetime (would need game time data)
-        condition[17] = game.get('week', 9)  # Week of season
+        condition[17] = game.get("week", 9)  # Week of season
 
         # Win percentages (simplified based on spread)
         spread = condition[0]
@@ -371,12 +370,12 @@ class CVAEDataPipeline:
 
     def prepare_datasets(
         self,
-        trajectories: List[GameTrajectory],
+        trajectories: list[GameTrajectory],
         conditions: np.ndarray,
         train_split: float = 0.7,
         val_split: float = 0.15,
-        batch_size: int = 32
-    ) -> Tuple[DataLoader, DataLoader, DataLoader]:
+        batch_size: int = 32,
+    ) -> tuple[DataLoader, DataLoader, DataLoader]:
         """
         Prepare train/val/test data loaders.
         """
@@ -388,11 +387,11 @@ class CVAEDataPipeline:
         train_trajectories = trajectories[:n_train]
         train_conditions = conditions[:n_train]
 
-        val_trajectories = trajectories[n_train:n_train + n_val]
-        val_conditions = conditions[n_train:n_train + n_val]
+        val_trajectories = trajectories[n_train : n_train + n_val]
+        val_conditions = conditions[n_train : n_train + n_val]
 
-        test_trajectories = trajectories[n_train + n_val:]
-        test_conditions = conditions[n_train + n_val:]
+        test_trajectories = trajectories[n_train + n_val :]
+        test_conditions = conditions[n_train + n_val :]
 
         # Create datasets
         train_dataset = GameTrajectoryDataset(train_trajectories, train_conditions)
@@ -400,18 +399,14 @@ class CVAEDataPipeline:
         test_dataset = GameTrajectoryDataset(test_trajectories, test_conditions)
 
         # Create data loaders
-        train_loader = DataLoader(
-            train_dataset, batch_size=batch_size, shuffle=True, num_workers=2
-        )
-        val_loader = DataLoader(
-            val_dataset, batch_size=batch_size, shuffle=False, num_workers=2
-        )
-        test_loader = DataLoader(
-            test_dataset, batch_size=batch_size, shuffle=False, num_workers=2
-        )
+        train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+        val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
+        test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
 
-        logger.info(f"Created data loaders - Train: {len(train_dataset)}, "
-                   f"Val: {len(val_dataset)}, Test: {len(test_dataset)}")
+        logger.info(
+            f"Created data loaders - Train: {len(train_dataset)}, "
+            f"Val: {len(val_dataset)}, Test: {len(test_dataset)}"
+        )
 
         return train_loader, val_loader, test_loader
 
@@ -435,7 +430,7 @@ class CVAEDataPipeline:
         logger.info(f"Saved {len(trajectories)} trajectories to {output_path}")
 
 
-def create_simulated_data(n_samples: int = 1000) -> Tuple[List[GameTrajectory], np.ndarray]:
+def create_simulated_data(n_samples: int = 1000) -> tuple[list[GameTrajectory], np.ndarray]:
     """
     Create simulated data for testing the pipeline.
     """
@@ -463,14 +458,14 @@ def create_simulated_data(n_samples: int = 1000) -> Tuple[List[GameTrajectory], 
             home_special_teams_td=np.random.rand() < 0.05,
             away_special_teams_td=np.random.rand() < 0.05,
             largest_lead=float(np.random.uniform(0, 28)),
-            lead_changes=np.random.poisson(1.5)
+            lead_changes=np.random.poisson(1.5),
         )
         trajectories.append(trajectory)
 
         # Simulate conditions
         condition = np.random.randn(20)
         condition[0] = np.random.uniform(-14, 14)  # Spread
-        condition[1] = np.random.uniform(38, 55)   # Total
+        condition[1] = np.random.uniform(38, 55)  # Total
         conditions.append(condition)
 
     return trajectories, np.array(conditions)
@@ -494,7 +489,7 @@ if __name__ == "__main__":
     # Test data loading
     for batch_idx, (traj_batch, cond_batch) in enumerate(train_loader):
         if batch_idx == 0:
-            print(f"\nFirst batch:")
+            print("\nFirst batch:")
             print(f"  Trajectory shape: {traj_batch.shape}")
             print(f"  Condition shape: {cond_batch.shape}")
             print(f"  Trajectory sample: {traj_batch[0][:5]}...")

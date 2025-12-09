@@ -23,10 +23,9 @@ Date: November 26, 2025
 """
 
 import logging
-from typing import Dict, Optional, Tuple
+from functools import lru_cache
 
 import psycopg2
-from functools import lru_cache
 
 logger = logging.getLogger(__name__)
 
@@ -34,11 +33,7 @@ logger = logging.getLogger(__name__)
 class OCFeatureGenerator:
     """Generate OC-related features for NFL prediction models."""
 
-    def __init__(
-        self,
-        db_config: Optional[Dict] = None,
-        cache_size: int = 1024
-    ):
+    def __init__(self, db_config: dict | None = None, cache_size: int = 1024):
         """
         Initialize OC feature generator.
 
@@ -47,11 +42,11 @@ class OCFeatureGenerator:
             cache_size: LRU cache size for feature lookups.
         """
         self.db_config = db_config or {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions'  # pragma: allowlist secret
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",  # pragma: allowlist secret
         }
         self._cache_size = cache_size
         self._conn = None
@@ -69,7 +64,7 @@ class OCFeatureGenerator:
             self._conn = None
 
     @lru_cache(maxsize=1024)
-    def get_oc_continuity(self, team: str, season: int) -> Tuple[int, str, str]:
+    def get_oc_continuity(self, team: str, season: int) -> tuple[int, str, str]:
         """
         Check if OC is same as previous season.
 
@@ -178,11 +173,7 @@ class OCFeatureGenerator:
         return max(0, min(week - 1, 17))
 
     def get_new_oc_adjustment(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        halflife_weeks: float = 4.0
+        self, team: str, season: int, week: int, halflife_weeks: float = 4.0
     ) -> float:
         """
         Calculate adjustment factor for new OC learning curve.
@@ -218,12 +209,8 @@ class OCFeatureGenerator:
         return adjustment
 
     def get_features(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        include_metadata: bool = False
-    ) -> Dict:
+        self, team: str, season: int, week: int, include_metadata: bool = False
+    ) -> dict:
         """
         Get all OC-related features for a team-game.
 
@@ -250,23 +237,21 @@ class OCFeatureGenerator:
         adjustment = self.get_new_oc_adjustment(team, season, week)
 
         features = {
-            'oc_continuity': continuity,
-            'games_with_oc': games_with_oc,
-            'oc_tenure_seasons': tenure,
-            'new_oc_adjustment': round(adjustment, 4),
+            "oc_continuity": continuity,
+            "games_with_oc": games_with_oc,
+            "oc_tenure_seasons": tenure,
+            "new_oc_adjustment": round(adjustment, 4),
         }
 
         if include_metadata:
-            features['current_oc'] = current_oc
-            features['prior_oc'] = prior_oc
+            features["current_oc"] = current_oc
+            features["prior_oc"] = prior_oc
 
         return features
 
     def get_bulk_features(
-        self,
-        team_season_weeks: list,
-        include_metadata: bool = False
-    ) -> Dict[Tuple[str, int, int], Dict]:
+        self, team_season_weeks: list, include_metadata: bool = False
+    ) -> dict[tuple[str, int, int], dict]:
         """
         Get OC features for multiple team-game combinations efficiently.
 
@@ -290,14 +275,15 @@ class OCFeatureGenerator:
 # Standalone Usage
 # ============================================================================
 
+
 def main():
     """Test OC feature generation."""
     import argparse
 
-    parser = argparse.ArgumentParser(description='Test OC feature generation')
-    parser.add_argument('--team', type=str, default='KC', help='Team abbreviation')
-    parser.add_argument('--season', type=int, default=2024, help='Season year')
-    parser.add_argument('--week', type=int, default=3, help='Week number')
+    parser = argparse.ArgumentParser(description="Test OC feature generation")
+    parser.add_argument("--team", type=str, default="KC", help="Team abbreviation")
+    parser.add_argument("--season", type=int, default=2024, help="Season year")
+    parser.add_argument("--week", type=int, default=3, help="Week number")
     args = parser.parse_args()
 
     # Initialize generator
@@ -306,10 +292,7 @@ def main():
     try:
         # Get features
         features = oc_gen.get_features(
-            team=args.team,
-            season=args.season,
-            week=args.week,
-            include_metadata=True
+            team=args.team, season=args.season, week=args.week, include_metadata=True
         )
 
         print(f"\n=== OC Features for {args.team} {args.season} Week {args.week} ===")
@@ -318,14 +301,14 @@ def main():
 
         # Test bulk features
         test_cases = [
-            ('KC', 2024, 1),
-            ('KC', 2024, 5),
-            ('KC', 2024, 10),
-            ('BUF', 2024, 1),
-            ('BUF', 2024, 5),
+            ("KC", 2024, 1),
+            ("KC", 2024, 5),
+            ("KC", 2024, 10),
+            ("BUF", 2024, 1),
+            ("BUF", 2024, 5),
         ]
 
-        print(f"\n=== Bulk Feature Test ===")
+        print("\n=== Bulk Feature Test ===")
         bulk_features = oc_gen.get_bulk_features(test_cases, include_metadata=True)
 
         for key, feats in bulk_features.items():
@@ -337,5 +320,5 @@ def main():
         oc_gen.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

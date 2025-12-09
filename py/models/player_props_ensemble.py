@@ -49,7 +49,6 @@ import logging
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -87,11 +86,11 @@ class EnsemblePrediction:
     q95: float  # 95th percentile
 
     # Individual model outputs
-    bayesian_mean: Optional[float] = None
-    xgboost_mean: Optional[float] = None
-    bnn_mean: Optional[float] = None
-    bnn_calibrated_mean: Optional[float] = None  # 5th model
-    state_space_mean: Optional[float] = None
+    bayesian_mean: float | None = None
+    xgboost_mean: float | None = None
+    bnn_mean: float | None = None
+    bnn_calibrated_mean: float | None = None  # 5th model
+    state_space_mean: float | None = None
 
     # Betting metrics
     over_prob: float = 0.0
@@ -102,7 +101,7 @@ class EnsemblePrediction:
     recommendation: str = "PASS"  # "OVER", "UNDER", or "PASS"
 
     # Model weights
-    weights: Optional[Dict[str, float]] = None
+    weights: dict[str, float] | None = None
 
 
 class PlayerPropsEnsemble:
@@ -163,8 +162,10 @@ class PlayerPropsEnsemble:
         self._load_models()
 
         logger.info("✓ PlayerPropsEnsemble initialized")
-        logger.info(f"  Bayesian: {use_bayesian}, XGBoost: {use_xgboost}, "
-                   f"BNN: {use_bnn}, State-Space: {use_state_space}")
+        logger.info(
+            f"  Bayesian: {use_bayesian}, XGBoost: {use_xgboost}, "
+            f"BNN: {use_bnn}, State-Space: {use_state_space}"
+        )
 
     def _init_cql_sizer(self):
         """Initialize CQL bet sizer for intelligent position sizing."""
@@ -177,7 +178,7 @@ class PlayerPropsEnsemble:
                 cql_model_path=str(cql_model_path),
                 max_kelly_fraction=0.25,  # Conservative (25% of Kelly)
                 min_edge=self.min_edge,  # Use ensemble's min_edge
-                max_uncertainty_pct=0.30  # Max 30% uncertainty
+                max_uncertainty_pct=0.30,  # Max 30% uncertainty
             )
 
             logger.info("  ✓ CQL bet sizer initialized (+24% expected improvement)")
@@ -254,48 +255,52 @@ class PlayerPropsEnsemble:
         if bnn_path.exists():
             try:
                 # Load PyTorch checkpoint
-                checkpoint = torch.load(bnn_path, map_location='cpu', weights_only=False)
+                checkpoint = torch.load(bnn_path, map_location="cpu", weights_only=False)
 
                 # Check if this is the new passing ensemble model or old multioutput
-                if 'feature_cols' in checkpoint:
+                if "feature_cols" in checkpoint:
                     # New passing ensemble model
                     from scripts.train_bnn_passing_ensemble import PassingYardsBNN
 
-                    args = checkpoint.get('args', {})
-                    hidden_dim = args.get('hidden_dim', 64)
-                    dropout = args.get('dropout', 0.2)
-                    input_dim = len(checkpoint['feature_cols'])
+                    args = checkpoint.get("args", {})
+                    hidden_dim = args.get("hidden_dim", 64)
+                    dropout = args.get("dropout", 0.2)
+                    input_dim = len(checkpoint["feature_cols"])
 
                     self.bnn_model = PassingYardsBNN(
-                        input_dim=input_dim,
-                        hidden_dim=hidden_dim,
-                        dropout_rate=dropout
+                        input_dim=input_dim, hidden_dim=hidden_dim, dropout_rate=dropout
                     )
 
-                    self.bnn_model.load_state_dict(checkpoint['model_state_dict'])
+                    self.bnn_model.load_state_dict(checkpoint["model_state_dict"])
                     self.bnn_model.eval()
 
                     # Store scaler params (support both old and new format)
-                    self.bnn_scaler_X_mean = checkpoint.get('scaler_X_mean', checkpoint.get('scaler_mean'))
-                    self.bnn_scaler_X_scale = checkpoint.get('scaler_X_scale', checkpoint.get('scaler_scale'))
-                    self.bnn_scaler_y_mean = checkpoint.get('scaler_y_mean', 0.0)
-                    self.bnn_scaler_y_scale = checkpoint.get('scaler_y_scale', 1.0)
-                    self.bnn_feature_cols = checkpoint.get('feature_cols')
+                    self.bnn_scaler_X_mean = checkpoint.get(
+                        "scaler_X_mean", checkpoint.get("scaler_mean")
+                    )
+                    self.bnn_scaler_X_scale = checkpoint.get(
+                        "scaler_X_scale", checkpoint.get("scaler_scale")
+                    )
+                    self.bnn_scaler_y_mean = checkpoint.get("scaler_y_mean", 0.0)
+                    self.bnn_scaler_y_scale = checkpoint.get("scaler_y_scale", 1.0)
+                    self.bnn_feature_cols = checkpoint.get("feature_cols")
 
-                    logger.info(f"  ✓ Loaded BNN (passing ensemble): {bnn_path.name} (input_dim={input_dim})")
+                    logger.info(
+                        f"  ✓ Loaded BNN (passing ensemble): {bnn_path.name} (input_dim={input_dim})"
+                    )
 
                 else:
                     # Old multioutput model (fallback)
                     from py.models.bnn_multioutput_pytorch import MultiOutputMoEBNN
 
-                    args = checkpoint.get('args', {})
-                    n_experts = args.get('n_experts', 3)
-                    hidden_dim = args.get('hidden_dim', 32)
-                    dropout = args.get('dropout', 0.2)
+                    args = checkpoint.get("args", {})
+                    n_experts = args.get("n_experts", 3)
+                    hidden_dim = args.get("hidden_dim", 32)
+                    dropout = args.get("dropout", 0.2)
 
-                    first_key = 'experts.0.fc1.weight_mu'
-                    if first_key in checkpoint['model_state_dict']:
-                        input_dim = checkpoint['model_state_dict'][first_key].shape[1]
+                    first_key = "experts.0.fc1.weight_mu"
+                    if first_key in checkpoint["model_state_dict"]:
+                        input_dim = checkpoint["model_state_dict"][first_key].shape[1]
                     else:
                         input_dim = 19
 
@@ -303,20 +308,23 @@ class PlayerPropsEnsemble:
                         input_dim=input_dim,
                         n_experts=n_experts,
                         hidden_dim=hidden_dim,
-                        dropout_rate=dropout
+                        dropout_rate=dropout,
                     )
 
-                    self.bnn_model.load_state_dict(checkpoint['model_state_dict'])
+                    self.bnn_model.load_state_dict(checkpoint["model_state_dict"])
                     self.bnn_model.eval()
 
-                    self.bnn_scaler_mean = checkpoint.get('scaler_mean')
-                    self.bnn_scaler_scale = checkpoint.get('scaler_scale')
+                    self.bnn_scaler_mean = checkpoint.get("scaler_mean")
+                    self.bnn_scaler_scale = checkpoint.get("scaler_scale")
 
-                    logger.info(f"  ✓ Loaded BNN (multioutput): {bnn_path.name} (input_dim={input_dim}, n_experts={n_experts})")
+                    logger.info(
+                        f"  ✓ Loaded BNN (multioutput): {bnn_path.name} (input_dim={input_dim}, n_experts={n_experts})"
+                    )
 
             except Exception as e:
                 logger.warning(f"  ✗ Failed to load BNN: {e}")
                 import traceback
+
                 logger.warning(traceback.format_exc())
                 self.use_bnn = False
         else:
@@ -333,17 +341,19 @@ class PlayerPropsEnsemble:
 
                 # Load pre-trained calibrated model (joblib format)
                 import joblib
+
                 self.bnn_calibrated = joblib.load(calibrated_path)
 
                 logger.info(f"  ✓ Loaded BNN Calibrated (T={self.bnn_calibrated.temperature:.2f})")
             else:
                 logger.info("  ✗ BNN Calibrated not found (requires separate training)")
-                logger.info(f"    To train: python py/models/train_bnn_calibrated.py")
+                logger.info("    To train: python py/models/train_bnn_calibrated.py")
                 self.use_bnn_calibrated = False
 
         except Exception as e:
             logger.warning(f"  ✗ Failed to load BNN Calibrated: {e}")
             import traceback
+
             logger.warning(traceback.format_exc())
             self.use_bnn_calibrated = False
 
@@ -357,6 +367,7 @@ class PlayerPropsEnsemble:
 
                 # Load chemistry effects
                 import pandas as pd
+
                 self.qb_wr_chemistry = pd.read_csv(chemistry_path)
 
                 # Create lookup dict for fast access
@@ -364,8 +375,8 @@ class PlayerPropsEnsemble:
                 for _, row in self.qb_wr_chemistry.iterrows():
                     pair_key = f"{row['qb_id']}_{row['receiver_id']}"
                     self.qb_wr_chemistry_dict[pair_key] = {
-                        'mean': row['chemistry_mean'],
-                        'se': row['chemistry_se']
+                        "mean": row["chemistry_mean"],
+                        "se": row["chemistry_se"],
                     }
 
                 logger.info(f"  ✓ Loaded QB-WR Chemistry: {len(self.qb_wr_chemistry)} pairs")
@@ -376,6 +387,7 @@ class PlayerPropsEnsemble:
         except Exception as e:
             logger.warning(f"  ✗ Failed to load QB-WR Chemistry: {e}")
             import traceback
+
             logger.warning(traceback.format_exc())
             self.use_qb_wr_chemistry = False
 
@@ -395,22 +407,21 @@ class PlayerPropsEnsemble:
         if ss_path_v2.exists():
             df = pd.read_csv(ss_path_v2)
             # CRITICAL: Remove week=0 (season totals) before Kalman filtering
-            self.state_space_data = df[df['week'] > 0].copy()
-            logger.info(f"  ✓ Loaded State-Space v2: {len(self.state_space_data)} trajectories (week>0 filtered)")
+            self.state_space_data = df[df["week"] > 0].copy()
+            logger.info(
+                f"  ✓ Loaded State-Space v2: {len(self.state_space_data)} trajectories (week>0 filtered)"
+            )
         elif ss_path_v1.exists():
             df = pd.read_csv(ss_path_v1)
-            self.state_space_data = df[df['week'] > 0].copy() if 'week' in df.columns else df
+            self.state_space_data = df[df["week"] > 0].copy() if "week" in df.columns else df
             logger.info(f"  ✓ Loaded State-Space v1: {len(self.state_space_data)} trajectories")
         else:
             logger.warning(f"  ✗ State-space data not found: {ss_path_v2}")
             self.use_state_space = False
 
     def _apply_temperature_scaling(
-        self,
-        mean: float,
-        std: float,
-        model_name: str
-    ) -> Tuple[float, float]:
+        self, mean: float, std: float, model_name: str
+    ) -> tuple[float, float]:
         """Apply temperature scaling to widen confidence intervals for better calibration.
 
         Temperature scaling: σ_calibrated = σ_raw / T
@@ -445,11 +456,11 @@ class PlayerPropsEnsemble:
         # Requires ~4-5x wider intervals → much lower T values
         # Lower T (< 1.0) widens intervals by dividing std by T
         temperature_map = {
-            "bayesian": 0.35,      # Was 0.75, now 2.86x widening (std/0.35 = std*2.86)
-            "xgboost": 0.40,       # Was 0.80, now 2.5x widening (std*2.5)
-            "bnn": 0.35,           # Was 0.75, now 2.86x widening (similar to Bayesian)
-            "bnn_calibrated": 0.50, # Was 1.0, now 2x widening (even "calibrated" model needs help)
-            "state_space": 1.0     # Nov 8: Reset to 1.0 (NO scaling) after log→yards fix
+            "bayesian": 0.35,  # Was 0.75, now 2.86x widening (std/0.35 = std*2.86)
+            "xgboost": 0.40,  # Was 0.80, now 2.5x widening (std*2.5)
+            "bnn": 0.35,  # Was 0.75, now 2.86x widening (similar to Bayesian)
+            "bnn_calibrated": 0.50,  # Was 1.0, now 2x widening (even "calibrated" model needs help)
+            "state_space": 1.0,  # Nov 8: Reset to 1.0 (NO scaling) after log→yards fix
         }
 
         temperature = temperature_map.get(model_name, 1.0)
@@ -457,7 +468,7 @@ class PlayerPropsEnsemble:
         if temperature != 1.0:
             calibrated_std = std / temperature  # Divide by T < 1 widens interval
             # FIXED: Safe percentage calculation (std already checked > MIN_STD_THRESHOLD)
-            pct_change = (calibrated_std/std - 1)*100  # Safe because std > MIN_STD_THRESHOLD
+            pct_change = (calibrated_std / std - 1) * 100  # Safe because std > MIN_STD_THRESHOLD
             logger.debug(
                 f"Temperature scaling ({model_name}): T={temperature:.2f}, "
                 f"raw_std={std:.2f} → calibrated_std={calibrated_std:.2f} "
@@ -475,8 +486,8 @@ class PlayerPropsEnsemble:
         prop_type: str,
         season: int = 2025,
         week: int = 10,
-        model_version: str = "hierarchical_v1.0"
-    ) -> Tuple[float, float]:
+        model_version: str = "hierarchical_v1.0",
+    ) -> tuple[float, float]:
         """
         Get Bayesian hierarchical prediction from database.
 
@@ -498,7 +509,7 @@ class PlayerPropsEnsemble:
                 port=5544,
                 dbname="devdb01",
                 user="dro",
-                password="sicillionbillions"
+                password="sicillionbillions",
             )
 
             # Map prop_type to stat_type
@@ -554,8 +565,10 @@ class PlayerPropsEnsemble:
 
                 # Apply temperature scaling for calibration (handles zero std internally)
                 mean, std = self._apply_temperature_scaling(mean, std, "bayesian")
-                logger.debug(f"Bayesian prediction for {player_id}: "
-                           f"{mean:.1f} ± {std:.1f} (model: {row[2]})")
+                logger.debug(
+                    f"Bayesian prediction for {player_id}: "
+                    f"{mean:.1f} ± {std:.1f} (model: {row[2]})"
+                )
                 return mean, std
             else:
                 logger.debug(f"No Bayesian prediction for {player_id} {prop_type} {season}")
@@ -566,11 +579,8 @@ class PlayerPropsEnsemble:
             return None, None
 
     def _get_xgboost_prediction(
-        self,
-        player_id: str,
-        prop_type: str,
-        features: Dict
-    ) -> Tuple[float, float]:
+        self, player_id: str, prop_type: str, features: dict
+    ) -> tuple[float, float]:
         """
         Get XGBoost prediction.
 
@@ -586,14 +596,25 @@ class PlayerPropsEnsemble:
             # Feature ordering expected by XGBoost models (from props_predictor.py)
             FEATURE_SETS = {
                 "passing_yards": [
-                    "passing_yards_last3", "passing_yards_last5", "passing_yards_season",
-                    "pass_attempts_last3", "pass_attempts_last5",
-                    "completions_last3", "completions_last5",
-                    "passing_tds_last3", "interceptions_last3", "sacks_last3",
+                    "passing_yards_last3",
+                    "passing_yards_last5",
+                    "passing_yards_season",
+                    "pass_attempts_last3",
+                    "pass_attempts_last5",
+                    "completions_last3",
+                    "completions_last5",
+                    "passing_tds_last3",
+                    "interceptions_last3",
+                    "sacks_last3",
                     "opponent_passing_yards_allowed_avg",
-                    "implied_team_total", "spread", "is_home",
-                    "weather_wind_mph", "weather_temp", "days_rest",
-                    "is_dome", "is_outdoors"
+                    "implied_team_total",
+                    "spread",
+                    "is_home",
+                    "weather_wind_mph",
+                    "weather_temp",
+                    "days_rest",
+                    "is_dome",
+                    "is_outdoors",
                 ],
                 # Add more prop types as needed
             }
@@ -632,11 +653,8 @@ class PlayerPropsEnsemble:
             return None, None
 
     def _get_bnn_prediction(
-        self,
-        player_id: str,
-        prop_type: str,
-        features: Dict
-    ) -> Tuple[float, float]:
+        self, player_id: str, prop_type: str, features: dict
+    ) -> tuple[float, float]:
         """
         Get BNN prediction (PyTorch multi-output).
 
@@ -650,14 +668,25 @@ class PlayerPropsEnsemble:
             # Use same feature ordering as XGBoost
             FEATURE_SETS = {
                 "passing_yards": [
-                    "passing_yards_last3", "passing_yards_last5", "passing_yards_season",
-                    "pass_attempts_last3", "pass_attempts_last5",
-                    "completions_last3", "completions_last5",
-                    "passing_tds_last3", "interceptions_last3", "sacks_last3",
+                    "passing_yards_last3",
+                    "passing_yards_last5",
+                    "passing_yards_season",
+                    "pass_attempts_last3",
+                    "pass_attempts_last5",
+                    "completions_last3",
+                    "completions_last5",
+                    "passing_tds_last3",
+                    "interceptions_last3",
+                    "sacks_last3",
                     "opponent_passing_yards_allowed_avg",
-                    "implied_team_total", "spread", "is_home",
-                    "weather_wind_mph", "weather_temp", "days_rest",
-                    "is_dome", "is_outdoors"
+                    "implied_team_total",
+                    "spread",
+                    "is_home",
+                    "weather_wind_mph",
+                    "weather_temp",
+                    "days_rest",
+                    "is_dome",
+                    "is_outdoors",
                 ],
                 # Add more prop types as needed
             }
@@ -671,24 +700,28 @@ class PlayerPropsEnsemble:
             feature_array = np.array([[features.get(col, 0.0) for col in feature_cols]])
 
             # Normalize features if scaler params available
-            if hasattr(self, 'bnn_scaler_X_mean') and self.bnn_scaler_X_mean is not None:
+            if hasattr(self, "bnn_scaler_X_mean") and self.bnn_scaler_X_mean is not None:
                 if feature_array.shape[1] == len(self.bnn_scaler_X_mean):
-                    feature_array = (feature_array - self.bnn_scaler_X_mean) / self.bnn_scaler_X_scale
+                    feature_array = (
+                        feature_array - self.bnn_scaler_X_mean
+                    ) / self.bnn_scaler_X_scale
                 else:
-                    logger.warning(f"Feature shape mismatch: {feature_array.shape[1]} vs {len(self.bnn_scaler_X_mean)}")
+                    logger.warning(
+                        f"Feature shape mismatch: {feature_array.shape[1]} vs {len(self.bnn_scaler_X_mean)}"
+                    )
 
             feature_tensor = torch.tensor(feature_array, dtype=torch.float32)
 
             with torch.no_grad():
                 # Check if new passing model or old multioutput
-                if hasattr(self.bnn_model, 'yards_mean'):
+                if hasattr(self.bnn_model, "yards_mean"):
                     # New passing ensemble model
                     mean, log_std = self.bnn_model(feature_tensor, sample=False)
                     mean_normalized = mean[0].item()
                     log_std_val = log_std[0].item()
 
                     # Denormalize predictions (if target scaler available)
-                    if hasattr(self, 'bnn_scaler_y_scale') and self.bnn_scaler_y_scale != 1.0:
+                    if hasattr(self, "bnn_scaler_y_scale") and self.bnn_scaler_y_scale != 1.0:
                         mean = mean_normalized * self.bnn_scaler_y_scale + self.bnn_scaler_y_mean
                         std = np.exp(log_std_val) * self.bnn_scaler_y_scale
                     else:
@@ -711,8 +744,7 @@ class PlayerPropsEnsemble:
 
             if np.isnan(std) or np.isinf(std) or std < 0:
                 logger.warning(
-                    f"BNN invalid std: {player_id} std={std} "
-                    f"(invalid) → skipping BNN model"
+                    f"BNN invalid std: {player_id} std={std} " f"(invalid) → skipping BNN model"
                 )
                 return None, None
 
@@ -725,15 +757,13 @@ class PlayerPropsEnsemble:
         except Exception as e:
             logger.warning(f"BNN prediction failed: {e}")
             import traceback
+
             logger.warning(traceback.format_exc())
             return None, None
 
     def _get_bnn_calibrated_prediction(
-        self,
-        player_id: str,
-        prop_type: str,
-        features: Dict
-    ) -> Tuple[float, float]:
+        self, player_id: str, prop_type: str, features: dict
+    ) -> tuple[float, float]:
         """
         Get BNN Calibrated prediction (temperature-scaled for better calibration).
 
@@ -747,14 +777,25 @@ class PlayerPropsEnsemble:
             # Use same feature ordering as base BNN
             FEATURE_SETS = {
                 "passing_yards": [
-                    "passing_yards_last3", "passing_yards_last5", "passing_yards_season",
-                    "pass_attempts_last3", "pass_attempts_last5",
-                    "completions_last3", "completions_last5",
-                    "passing_tds_last3", "interceptions_last3", "sacks_last3",
+                    "passing_yards_last3",
+                    "passing_yards_last5",
+                    "passing_yards_season",
+                    "pass_attempts_last3",
+                    "pass_attempts_last5",
+                    "completions_last3",
+                    "completions_last5",
+                    "passing_tds_last3",
+                    "interceptions_last3",
+                    "sacks_last3",
                     "opponent_passing_yards_allowed_avg",
-                    "implied_team_total", "spread", "is_home",
-                    "weather_wind_mph", "weather_temp", "days_rest",
-                    "is_dome", "is_outdoors"
+                    "implied_team_total",
+                    "spread",
+                    "is_home",
+                    "weather_wind_mph",
+                    "weather_temp",
+                    "days_rest",
+                    "is_dome",
+                    "is_outdoors",
                 ],
             }
 
@@ -790,6 +831,7 @@ class PlayerPropsEnsemble:
         except Exception as e:
             logger.warning(f"BNN Calibrated prediction failed: {e}")
             import traceback
+
             logger.warning(traceback.format_exc())
             return None, None
 
@@ -798,8 +840,8 @@ class PlayerPropsEnsemble:
         player_id: str,
         prop_type: str,
         season: int,  # No default - must be provided explicitly
-        week: int
-    ) -> Tuple[float, float]:
+        week: int,
+    ) -> tuple[float, float]:
         """
         Get state-space prediction from pre-loaded CSV data.
 
@@ -828,16 +870,16 @@ class PlayerPropsEnsemble:
         try:
             # Query DataFrame for exact match
             mask = (
-                (self.state_space_data['player_id'] == player_id) &
-                (self.state_space_data['season'] == season) &
-                (self.state_space_data['week'] == week)
+                (self.state_space_data["player_id"] == player_id)
+                & (self.state_space_data["season"] == season)
+                & (self.state_space_data["week"] == week)
             )
             result = self.state_space_data[mask]
 
             if len(result) > 0:
                 row = result.iloc[0]
-                log_mean = float(row['dynamic_skill'])
-                log_std = float(row['skill_sd'])
+                log_mean = float(row["dynamic_skill"])
+                log_std = float(row["skill_sd"])
 
                 # BUG FIX (Nov 8, 2025): Correct transformation for log(yards+1) → yards
                 # R script uses: log_yards = log(yards + 1)  (line 98 in state_space_player_skills_v2.R)
@@ -850,10 +892,19 @@ class PlayerPropsEnsemble:
                 mean = np.exp(log_mean) - 1  # Inverse of log(yards + 1)
 
                 # Standard deviation via delta method: d/dx[exp(x)-1] = exp(x)
-                std = np.exp(log_mean) * log_std  # Delta method: std_yards ≈ exp(log_mean) × std_log
+                std = (
+                    np.exp(log_mean) * log_std
+                )  # Delta method: std_yards ≈ exp(log_mean) × std_log
 
                 # DEFENSIVE CHECK: Validate mean and std after transformation
-                if np.isnan(mean) or np.isnan(std) or np.isinf(mean) or np.isinf(std) or std <= 0 or mean < 0:
+                if (
+                    np.isnan(mean)
+                    or np.isnan(std)
+                    or np.isinf(mean)
+                    or np.isinf(std)
+                    or std <= 0
+                    or mean < 0
+                ):
                     logger.warning(
                         f"State-space invalid after transformation: {player_id} S{season}W{week} "
                         f"log_mean={log_mean:.2f} log_std={log_std:.2f} → mean={mean:.1f} std={std:.1f} "
@@ -872,20 +923,27 @@ class PlayerPropsEnsemble:
 
             # Fallback: Try most recent available season for player
             player_data = self.state_space_data[
-                self.state_space_data['player_id'] == player_id
-            ].sort_values(['season', 'week'], ascending=[False, False])
+                self.state_space_data["player_id"] == player_id
+            ].sort_values(["season", "week"], ascending=[False, False])
 
             if len(player_data) > 0:
                 row = player_data.iloc[0]
-                log_mean = float(row['dynamic_skill'])
-                log_std = float(row['skill_sd'])
+                log_mean = float(row["dynamic_skill"])
+                log_std = float(row["skill_sd"])
 
                 # BUG FIX (Nov 8, 2025): Correct transformation for log(yards+1) → yards (fallback)
                 mean = np.exp(log_mean) - 1  # Inverse of log(yards + 1)
                 std = np.exp(log_mean) * log_std  # Delta method
 
                 # DEFENSIVE CHECK: Validate mean and std after transformation
-                if np.isnan(mean) or np.isnan(std) or np.isinf(mean) or np.isinf(std) or std <= 0 or mean < 0:
+                if (
+                    np.isnan(mean)
+                    or np.isnan(std)
+                    or np.isinf(mean)
+                    or np.isinf(std)
+                    or std <= 0
+                    or mean < 0
+                ):
                     logger.warning(
                         f"State-space fallback invalid after transformation: {player_id} S{season}W{week} "
                         f"log_mean={log_mean:.2f} log_std={log_std:.2f} → mean={mean:.1f} std={std:.1f} "
@@ -920,8 +978,8 @@ class PlayerPropsEnsemble:
         is_home: bool = False,
         season: int = 2025,
         week: int = 10,
-        features: Optional[Dict] = None,
-        bankroll: float = 10000.0
+        features: dict | None = None,
+        bankroll: float = 10000.0,
     ) -> EnsemblePrediction:
         """
         Generate ensemble prediction for player prop.
@@ -951,12 +1009,12 @@ class PlayerPropsEnsemble:
                 opponent=opponent,
                 is_home=is_home,
                 season=season,
-                week=week
+                week=week,
             )
             if features:
                 logger.info(f"  ✓ Extracted {len(features)} features")
             else:
-                logger.warning(f"  ✗ Feature extraction failed - XGBoost/BNN will be skipped")
+                logger.warning("  ✗ Feature extraction failed - XGBoost/BNN will be skipped")
 
         # Collect predictions from each model
         predictions = []
@@ -969,7 +1027,7 @@ class PlayerPropsEnsemble:
             mean, std = self._get_bayesian_prediction(player_id, prop_type, season, week)
             if mean is not None:
                 predictions.append(mean)
-                variances.append(std ** 2)
+                variances.append(std**2)
                 model_names.append("bayesian")
                 model_values["bayesian_mean"] = mean
 
@@ -978,7 +1036,7 @@ class PlayerPropsEnsemble:
             mean, std = self._get_xgboost_prediction(player_id, prop_type, features)
             if mean is not None:
                 predictions.append(mean)
-                variances.append(std ** 2)
+                variances.append(std**2)
                 model_names.append("xgboost")
                 model_values["xgboost_mean"] = mean
 
@@ -987,7 +1045,7 @@ class PlayerPropsEnsemble:
             mean, std = self._get_bnn_prediction(player_id, prop_type, features)
             if mean is not None:
                 predictions.append(mean)
-                variances.append(std ** 2)
+                variances.append(std**2)
                 model_names.append("bnn")
                 model_values["bnn_mean"] = mean
 
@@ -996,7 +1054,7 @@ class PlayerPropsEnsemble:
             mean, std = self._get_bnn_calibrated_prediction(player_id, prop_type, features)
             if mean is not None:
                 predictions.append(mean)
-                variances.append(std ** 2)
+                variances.append(std**2)
                 model_names.append("bnn_calibrated")
                 model_values["bnn_calibrated_mean"] = mean
 
@@ -1005,7 +1063,7 @@ class PlayerPropsEnsemble:
             mean, std = self._get_state_space_prediction(player_id, prop_type, season, week)
             if mean is not None:
                 predictions.append(mean)
-                variances.append(std ** 2)
+                variances.append(std**2)
                 model_names.append("state_space")
                 model_values["state_space_mean"] = mean
 
@@ -1022,7 +1080,7 @@ class PlayerPropsEnsemble:
                 q05=line - 80,
                 q50=line,
                 q95=line + 80,
-                recommendation="PASS"
+                recommendation="PASS",
             )
 
         # EQUAL WEIGHTING (Nov 7, 2025 diagnostic fix)
@@ -1102,7 +1160,7 @@ class PlayerPropsEnsemble:
             bet_size=float(bet_size),
             recommendation=recommendation,
             weights=weights_dict,
-            **model_values
+            **model_values,
         )
 
     @staticmethod
@@ -1118,6 +1176,7 @@ class PlayerPropsEnsemble:
 # CLI Interface
 # ============================================================================
 
+
 def main():
     """CLI for testing ensemble predictions."""
     import argparse
@@ -1125,8 +1184,9 @@ def main():
     parser = argparse.ArgumentParser(description="Player Props Ensemble Predictor")
     parser.add_argument("--player-id", required=True, help="Player ID (e.g., 00-0036355)")
     parser.add_argument("--player-name", default="Unknown", help="Player name")
-    parser.add_argument("--prop-type", required=True,
-                       choices=["passing_yards", "rushing_yards", "receiving_yards"])
+    parser.add_argument(
+        "--prop-type", required=True, choices=["passing_yards", "rushing_yards", "receiving_yards"]
+    )
     parser.add_argument("--line", type=float, required=True, help="Betting line")
     parser.add_argument("--opponent", help="Opponent team")
     parser.add_argument("--is-home", action="store_true", help="Home game?")
@@ -1145,7 +1205,7 @@ def main():
         use_bayesian=args.use_bayesian,
         use_xgboost=args.use_xgboost,
         use_bnn=args.use_bnn,
-        use_state_space=args.use_state_space
+        use_state_space=args.use_state_space,
     )
 
     # Generate prediction
@@ -1158,7 +1218,7 @@ def main():
         is_home=args.is_home,
         season=args.season,
         week=args.week,
-        bankroll=args.bankroll
+        bankroll=args.bankroll,
     )
 
     # Display results
@@ -1168,7 +1228,7 @@ def main():
     print(f"Line: {prediction.line}")
     print(f"\nEnsemble Prediction: {prediction.mean:.1f} ± {prediction.std:.1f}")
     print(f"90% CI: [{prediction.q05:.1f}, {prediction.q95:.1f}]")
-    print(f"\nIndividual Models:")
+    print("\nIndividual Models:")
     if prediction.bayesian_mean:
         print(f"  Bayesian: {prediction.bayesian_mean:.1f}")
     if prediction.xgboost_mean:
@@ -1177,10 +1237,10 @@ def main():
         print(f"  BNN:      {prediction.bnn_mean:.1f}")
     if prediction.state_space_mean:
         print(f"  State-Space: {prediction.state_space_mean:.1f}")
-    print(f"\nModel Weights:")
+    print("\nModel Weights:")
     for name, weight in prediction.weights.items():
         print(f"  {name}: {weight:.2%}")
-    print(f"\nBetting Analysis:")
+    print("\nBetting Analysis:")
     print(f"  Over probability:  {prediction.over_prob:.1%}")
     print(f"  Under probability: {prediction.under_prob:.1%}")
     print(f"  Edge: {prediction.edge:+.2%}")

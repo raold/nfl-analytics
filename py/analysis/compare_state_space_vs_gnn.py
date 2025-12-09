@@ -19,7 +19,7 @@ from scipy import stats
 def load_metrics(model_dir: Path, metrics_file: str = "test_metrics.json") -> dict:
     """Load test metrics from model directory."""
     metrics_path = model_dir / metrics_file
-    with open(metrics_path, "r") as f:
+    with open(metrics_path) as f:
         return json.load(f)
 
 
@@ -80,13 +80,13 @@ def main():
 
     # GNN ablation metrics
     gnn_ablation_metadata_path = gnn_ablation_dir / "metadata.json"
-    with open(gnn_ablation_metadata_path, "r") as f:
+    with open(gnn_ablation_metadata_path) as f:
         gnn_ablation_metadata = json.load(f)
     gnn_ablation_metrics = gnn_ablation_metadata["test_metrics"]
 
     # GNN Optuna metrics
     gnn_optuna_metadata_path = gnn_optuna_dir / "metadata.json"
-    with open(gnn_optuna_metadata_path, "r") as f:
+    with open(gnn_optuna_metadata_path) as f:
         gnn_optuna_metadata = json.load(f)
     gnn_optuna_metrics = gnn_optuna_metadata["test_metrics"]
 
@@ -148,27 +148,29 @@ def main():
     print("=" * 80)
     print()
 
-    metrics_comparison = pd.DataFrame({
-        "Metric": ["Brier Score", "Log Loss", "Accuracy", "AUC"],
-        "State-Space": [
-            ss_brier,
-            state_space_metrics.get("logloss_win", float("nan")),
-            state_space_metrics.get("accuracy_win", float("nan")),
-            state_space_metrics.get("auc", float("nan")),
-        ],
-        "GNN Ablation": [
-            gnn_abl_brier,
-            gnn_ablation_metrics.get("log_loss", float("nan")),
-            gnn_ablation_metrics.get("accuracy", float("nan")),
-            gnn_ablation_metrics.get("auc", float("nan")),
-        ],
-        "GNN Optuna": [
-            gnn_opt_brier,
-            gnn_optuna_metrics.get("log_loss", float("nan")),
-            gnn_optuna_metrics.get("accuracy", float("nan")),
-            gnn_optuna_metrics.get("auc", float("nan")),
-        ],
-    })
+    metrics_comparison = pd.DataFrame(
+        {
+            "Metric": ["Brier Score", "Log Loss", "Accuracy", "AUC"],
+            "State-Space": [
+                ss_brier,
+                state_space_metrics.get("logloss_win", float("nan")),
+                state_space_metrics.get("accuracy_win", float("nan")),
+                state_space_metrics.get("auc", float("nan")),
+            ],
+            "GNN Ablation": [
+                gnn_abl_brier,
+                gnn_ablation_metrics.get("log_loss", float("nan")),
+                gnn_ablation_metrics.get("accuracy", float("nan")),
+                gnn_ablation_metrics.get("auc", float("nan")),
+            ],
+            "GNN Optuna": [
+                gnn_opt_brier,
+                gnn_optuna_metrics.get("log_loss", float("nan")),
+                gnn_optuna_metrics.get("accuracy", float("nan")),
+                gnn_optuna_metrics.get("auc", float("nan")),
+            ],
+        }
+    )
 
     print(metrics_comparison.to_string(index=False))
     print()
@@ -203,11 +205,11 @@ def main():
         + hidden_dim  # Final classifier
     )
 
-    print(f"  - Parameters: 6 hyperparams (embed, hidden, rounds, LR, batch, chemistry)")
+    print("  - Parameters: 6 hyperparams (embed, hidden, rounds, LR, batch, chemistry)")
     print(f"  - Trainable params: ~{gnn_params:,}")
-    print(f"  - Training time: ~12-16 hours on CPU (20 epochs)")
-    print(f"  - Inference: O(n_players × n_message_rounds)")
-    print(f"  - Uncertainty: No native uncertainty")
+    print("  - Training time: ~12-16 hours on CPU (20 epochs)")
+    print("  - Inference: O(n_players × n_message_rounds)")
+    print("  - Uncertainty: No native uncertainty")
     print()
 
     # === STRENGTHS & WEAKNESSES ===

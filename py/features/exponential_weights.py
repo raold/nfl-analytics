@@ -45,14 +45,12 @@ Research: Sagarin Methodology Analysis
 """
 
 import logging
-from typing import Optional, Union, List
 
 import numpy as np
 import pandas as pd
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -96,7 +94,7 @@ def exponential_weights(n: int, halflife: float = 4.0, reverse: bool = False) ->
         # Oldest (0) should get highest weight
         decay_factors = time_indices / halflife
 
-    weights = 0.5 ** decay_factors
+    weights = 0.5**decay_factors
 
     # Normalize to sum to 1.0
     return weights / weights.sum()
@@ -106,7 +104,7 @@ def exponential_rolling(
     df: pd.DataFrame,
     column: str,
     halflife: float = 4.0,
-    groupby: Optional[Union[str, List[str]]] = None,
+    groupby: str | list[str] | None = None,
     min_periods: int = 1,
     shift_periods: int = 1,
 ) -> pd.Series:
@@ -161,9 +159,11 @@ def exponential_rolling(
         for i in range(n):
             # Get prior observations (exclude current if shift_periods=1)
             if shift_periods > 0:
-                prior_values = values[max(0, i - 100):i]  # Last 100 observations (or all available)
+                prior_values = values[
+                    max(0, i - 100) : i
+                ]  # Last 100 observations (or all available)
             else:
-                prior_values = values[max(0, i - 100):i+1]  # Include current
+                prior_values = values[max(0, i - 100) : i + 1]  # Include current
 
             if len(prior_values) < min_periods:
                 # Not enough prior data
@@ -191,7 +191,7 @@ def exponential_ewm(
     df: pd.DataFrame,
     column: str,
     halflife: float = 4.0,
-    groupby: Optional[Union[str, List[str]]] = None,
+    groupby: str | list[str] | None = None,
     min_periods: int = 1,
 ) -> pd.Series:
     """
@@ -228,9 +228,8 @@ def exponential_ewm(
             groupby = [groupby]
 
         # Group and apply ewm
-        result = (
-            df.groupby(groupby)[column]
-            .transform(lambda x: x.shift(1).ewm(halflife=halflife, min_periods=min_periods).mean())
+        result = df.groupby(groupby)[column].transform(
+            lambda x: x.shift(1).ewm(halflife=halflife, min_periods=min_periods).mean()
         )
     else:
         # Apply to entire series
@@ -243,8 +242,8 @@ def compare_linear_vs_exponential(
     df: pd.DataFrame,
     column: str,
     window: int = 4,
-    halflife: Optional[float] = None,
-    groupby: Optional[Union[str, List[str]]] = None,
+    halflife: float | None = None,
+    groupby: str | list[str] | None = None,
 ) -> pd.DataFrame:
     """
     Compare linear rolling average vs exponential rolling average.
@@ -275,9 +274,8 @@ def compare_linear_vs_exponential(
     if groupby is not None:
         if isinstance(groupby, str):
             groupby = [groupby]
-        linear = (
-            df.groupby(groupby)[column]
-            .transform(lambda x: x.shift(1).rolling(window, min_periods=1).mean())
+        linear = df.groupby(groupby)[column].transform(
+            lambda x: x.shift(1).rolling(window, min_periods=1).mean()
         )
     else:
         linear = df[column].shift(1).rolling(window, min_periods=1).mean()
@@ -286,14 +284,16 @@ def compare_linear_vs_exponential(
     exponential = exponential_ewm(df, column, halflife=halflife, groupby=groupby)
 
     # Build comparison DataFrame
-    comparison = pd.DataFrame({
-        f'{column}_linear': linear,
-        f'{column}_exp': exponential,
-    })
+    comparison = pd.DataFrame(
+        {
+            f"{column}_linear": linear,
+            f"{column}_exp": exponential,
+        }
+    )
 
-    comparison['difference'] = comparison[f'{column}_exp'] - comparison[f'{column}_linear']
-    comparison['pct_difference'] = (
-        100 * comparison['difference'] / comparison[f'{column}_linear'].abs()
+    comparison["difference"] = comparison[f"{column}_exp"] - comparison[f"{column}_linear"]
+    comparison["pct_difference"] = (
+        100 * comparison["difference"] / comparison[f"{column}_linear"].abs()
     )
 
     return comparison
@@ -303,11 +303,13 @@ def main():
     """Demo exponential weighting vs linear rolling."""
     # Create sample data (team EPA over 10 games)
     np.random.seed(42)
-    df = pd.DataFrame({
-        'team': ['KC'] * 10,
-        'game': range(1, 11),
-        'epa': np.random.randn(10) * 0.1,  # Random EPA values
-    })
+    df = pd.DataFrame(
+        {
+            "team": ["KC"] * 10,
+            "game": range(1, 11),
+            "epa": np.random.randn(10) * 0.1,  # Random EPA values
+        }
+    )
 
     print("=" * 80)
     print("EXPONENTIAL WEIGHTING DEMO")
@@ -326,7 +328,7 @@ def main():
 
     print("\nLinear weights (rolling(4).mean()):")
     print(f"  [oldest → newest]: {weights_linear}")
-    print(f"  All games equally weighted")
+    print("  All games equally weighted")
 
     print("\nExponential weights (halflife=4):")
     print(f"  [oldest → newest]: {weights_exp}")
@@ -337,20 +339,22 @@ def main():
     print("APPLY TO DATAFRAME")
     print("=" * 80)
 
-    df['epa_linear'] = df['epa'].shift(1).rolling(4, min_periods=1).mean()
-    df['epa_exp'] = exponential_ewm(df, 'epa', halflife=4, min_periods=1)
+    df["epa_linear"] = df["epa"].shift(1).rolling(4, min_periods=1).mean()
+    df["epa_exp"] = exponential_ewm(df, "epa", halflife=4, min_periods=1)
 
     print("\nResults:")
-    print(df[['game', 'epa', 'epa_linear', 'epa_exp']])
+    print(df[["game", "epa", "epa_linear", "epa_exp"]])
 
     # Compare
-    comparison = compare_linear_vs_exponential(df, 'epa', window=4)
+    comparison = compare_linear_vs_exponential(df, "epa", window=4)
     print("\n" + "=" * 80)
     print("LINEAR vs EXPONENTIAL COMPARISON")
     print("=" * 80)
     print(f"\nMean difference: {comparison['difference'].mean():.4f}")
     print(f"Max difference: {comparison['difference'].abs().max():.4f}")
-    print(f"\nExponential weighting changes estimates by {comparison['pct_difference'].abs().mean():.1f}% on average")
+    print(
+        f"\nExponential weighting changes estimates by {comparison['pct_difference'].abs().mean():.1f}% on average"
+    )
 
     print("\n" + "=" * 80)
     print("CONCLUSION")

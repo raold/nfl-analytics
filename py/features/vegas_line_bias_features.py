@@ -17,16 +17,14 @@ Date: 2025-10-30
 """
 
 import logging
-import pandas as pd
+
 import numpy as np
-from typing import Optional, Tuple, Dict
+import pandas as pd
 from sqlalchemy import create_engine
-from datetime import datetime
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -47,18 +45,13 @@ class VegasLineBiasEngine:
     # Key numbers in NFL betting (most common margins of victory)
     KEY_NUMBERS = [3, 7, 10, 14]
 
-    def __init__(
-        self,
-        db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-    ):
+    def __init__(self, db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"):
         """Initialize the Vegas line bias engine."""
         self.engine = create_engine(db_url)
         logger.info(f"Connected to database: {db_url}")
 
     def load_games_with_lines(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
+        self, start_season: int = 2024, end_season: int = 2025
     ) -> pd.DataFrame:
         """
         Load games with Vegas betting lines and results.
@@ -143,6 +136,7 @@ class VegasLineBiasEngine:
         - Negative odds (favorites): |odds| / (|odds| + 100)
         - Positive odds (underdogs): 100 / (odds + 100)
         """
+
         def moneyline_to_prob(odds):
             """Convert American moneyline odds to implied probability."""
             if pd.isna(odds):
@@ -172,18 +166,13 @@ class VegasLineBiasEngine:
         )
 
         # Is the spread exactly on a key number?
-        df["on_key_number"] = df["spread_close"].apply(
-            lambda x: abs(x) in self.KEY_NUMBERS
-        )
+        df["on_key_number"] = df["spread_close"].apply(lambda x: abs(x) in self.KEY_NUMBERS)
 
         # Specific key numbers
         for kn in self.KEY_NUMBERS:
-            df[f"on_key_{kn}"] = (df["spread_close"].abs() == kn)
+            df[f"on_key_{kn}"] = df["spread_close"].abs() == kn
 
-    def calculate_team_line_performance(
-        self,
-        games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_team_line_performance(self, games: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate historical line performance for each team.
 
@@ -249,43 +238,40 @@ class VegasLineBiasEngine:
         # This gave models "knowledge" of betting results before prediction
 
         # 4-game rolling ATS record
-        df["ats_pct_last4"] = (
-            df.groupby("team")["covered_spread"]
-            .transform(lambda x: x.shift(1).rolling(4, min_periods=1).mean() * 100)
+        df["ats_pct_last4"] = df.groupby("team")["covered_spread"].transform(
+            lambda x: x.shift(1).rolling(4, min_periods=1).mean() * 100
         )
 
         # 8-game rolling ATS record
-        df["ats_pct_last8"] = (
-            df.groupby("team")["covered_spread"]
-            .transform(lambda x: x.shift(1).rolling(8, min_periods=1).mean() * 100)
+        df["ats_pct_last8"] = df.groupby("team")["covered_spread"].transform(
+            lambda x: x.shift(1).rolling(8, min_periods=1).mean() * 100
         )
 
         # Season-to-date ATS record
-        df["ats_pct_season"] = (
-            df.groupby(["team"])["covered_spread"]
-            .transform(lambda x: x.shift(1).expanding().mean() * 100)
+        df["ats_pct_season"] = df.groupby(["team"])["covered_spread"].transform(
+            lambda x: x.shift(1).expanding().mean() * 100
         )
 
         # Over/under trends
-        df["over_pct_last4"] = (
-            df.groupby("team")["over_hit"]
-            .transform(lambda x: x.shift(1).rolling(4, min_periods=1).mean() * 100)
+        df["over_pct_last4"] = df.groupby("team")["over_hit"].transform(
+            lambda x: x.shift(1).rolling(4, min_periods=1).mean() * 100
         )
 
         # Average margin vs spread (last 4 games)
-        df["avg_margin_vs_spread_last4"] = (
-            df.groupby("team")["margin_vs_spread"]
-            .transform(lambda x: x.shift(1).rolling(4, min_periods=1).mean())
+        df["avg_margin_vs_spread_last4"] = df.groupby("team")["margin_vs_spread"].transform(
+            lambda x: x.shift(1).rolling(4, min_periods=1).mean()
         )
 
         # Favorite/underdog splits
         df["as_favorite_ats_pct"] = (
-            df[df["is_favorite"]].groupby("team")["covered_spread"]
+            df[df["is_favorite"]]
+            .groupby("team")["covered_spread"]
             .transform(lambda x: x.shift(1).expanding().mean() * 100)
         )
 
         df["as_underdog_ats_pct"] = (
-            df[~df["is_favorite"]].groupby("team")["covered_spread"]
+            df[~df["is_favorite"]]
+            .groupby("team")["covered_spread"]
             .transform(lambda x: x.shift(1).expanding().mean() * 100)
         )
 
@@ -293,10 +279,7 @@ class VegasLineBiasEngine:
 
         return df
 
-    def calculate_market_efficiency_indicators(
-        self,
-        games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_market_efficiency_indicators(self, games: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate market efficiency and betting value indicators.
 
@@ -339,10 +322,7 @@ class VegasLineBiasEngine:
 
         return df
 
-    def calculate_key_number_performance(
-        self,
-        games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_key_number_performance(self, games: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate performance when spread is on or near key numbers.
 
@@ -383,10 +363,8 @@ class VegasLineBiasEngine:
         return df
 
     def generate_all_features(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        self, start_season: int = 2024, end_season: int = 2025
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Generate all Vegas line bias features.
 
@@ -412,11 +390,7 @@ class VegasLineBiasEngine:
         logger.info(f"  Key number performance: {len(key_number_performance):,} records")
         logger.info("=" * 70)
 
-        return (
-            team_line_performance,
-            market_efficiency,
-            key_number_performance
-        )
+        return (team_line_performance, market_efficiency, key_number_performance)
 
 
 def main():
@@ -424,13 +398,8 @@ def main():
     engine = VegasLineBiasEngine()
 
     # Generate ALL features for 2020-2025 seasons
-    (
-        team_line_performance,
-        market_efficiency,
-        key_number_performance
-    ) = engine.generate_all_features(
-        start_season=2020,
-        end_season=2025
+    (team_line_performance, market_efficiency, key_number_performance) = (
+        engine.generate_all_features(start_season=2020, end_season=2025)
     )
 
     # Display sample statistics
@@ -440,12 +409,11 @@ def main():
     if len(team_line_performance) > 0:
         print(team_line_performance.head(15).to_string())
         print("\nTEAM ATS PERFORMANCE STATISTICS")
-        print(team_line_performance[[
-            "ats_pct_last4",
-            "ats_pct_last8",
-            "ats_pct_season",
-            "avg_margin_vs_spread_last4"
-        ]].describe())
+        print(
+            team_line_performance[
+                ["ats_pct_last4", "ats_pct_last8", "ats_pct_season", "avg_margin_vs_spread_last4"]
+            ].describe()
+        )
 
     print("\n" + "=" * 70)
     print("MARKET EFFICIENCY SAMPLE")
@@ -453,11 +421,7 @@ def main():
     if len(market_efficiency) > 0:
         print(market_efficiency.head(10).to_string())
         print("\nMARKET EFFICIENCY STATISTICS")
-        print(market_efficiency[[
-            "market_vig",
-            "spread_odds_deviation",
-            "implied_prob"
-        ]].describe())
+        print(market_efficiency[["market_vig", "spread_odds_deviation", "implied_prob"]].describe())
 
     print("\n" + "=" * 70)
     print("KEY NUMBER PERFORMANCE")
@@ -471,17 +435,23 @@ def main():
     if len(team_line_performance) > 0:
         # Get most recent entry for each team
         latest = team_line_performance.sort_values("game_id").groupby("team").tail(1)
-        top_ats = latest.nlargest(10, "ats_pct_last4")[[
-            "team", "ats_pct_last4", "ats_pct_season", "avg_margin_vs_spread_last4"
-        ]]
+        top_ats = latest.nlargest(10, "ats_pct_last4")[
+            ["team", "ats_pct_last4", "ats_pct_season", "avg_margin_vs_spread_last4"]
+        ]
         print(top_ats.to_string(index=False))
 
     print("\n" + "=" * 70)
     print("FAVORITE vs UNDERDOG ATS PERFORMANCE")
     print("=" * 70)
     if len(team_line_performance) > 0:
-        fav_ats = team_line_performance[team_line_performance["is_favorite"]]["covered_spread"].mean() * 100
-        dog_ats = team_line_performance[~team_line_performance["is_favorite"]]["covered_spread"].mean() * 100
+        fav_ats = (
+            team_line_performance[team_line_performance["is_favorite"]]["covered_spread"].mean()
+            * 100
+        )
+        dog_ats = (
+            team_line_performance[~team_line_performance["is_favorite"]]["covered_spread"].mean()
+            * 100
+        )
         print(f"Favorites ATS: {fav_ats:.1f}%")
         print(f"Underdogs ATS: {dog_ats:.1f}%")
 
@@ -490,15 +460,15 @@ def main():
     print("=" * 70)
     if len(team_line_performance) > 0:
         over_pct = team_line_performance["over_hit"].mean() * 100
-        under_pct = team_line_performance["~over_hit"].mean() * 100 if "~over_hit" in team_line_performance.columns else (100 - over_pct)
+        (
+            team_line_performance["~over_hit"].mean() * 100
+            if "~over_hit" in team_line_performance.columns
+            else (100 - over_pct)
+        )
         print(f"Over hit rate: {over_pct:.1f}%")
         print(f"Under hit rate: {100 - over_pct:.1f}%")
 
-    return (
-        team_line_performance,
-        market_efficiency,
-        key_number_performance
-    )
+    return (team_line_performance, market_efficiency, key_number_performance)
 
 
 if __name__ == "__main__":

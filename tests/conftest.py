@@ -18,18 +18,19 @@ sys.path.insert(0, str(project_root))
 
 # Remove pytest's 'py' package from sys.modules to allow our local 'py' package
 # to be imported. Store it temporarily so pytest can still use it if needed.
-_pytest_py = sys.modules.get('py')
+_pytest_py = sys.modules.get("py")
 if _pytest_py is not None:
     # Save pytest's py module under a different name
-    sys.modules['_pytest_py_original'] = _pytest_py
+    sys.modules["_pytest_py_original"] = _pytest_py
     # Remove the 'py' module so our local package takes precedence
-    del sys.modules['py']
+    del sys.modules["py"]
 
-import os
 import datetime as dt
-from typing import Generator
-import pytest
+import os
+from collections.abc import Generator
+
 import psycopg
+import pytest
 
 
 @pytest.fixture(scope="session")
@@ -39,10 +40,7 @@ def test_db_dsn() -> str:
 
     Uses TEST_DATABASE_URL if set, otherwise falls back to a test database.
     """
-    return os.getenv(
-        "TEST_DATABASE_URL",
-        "postgresql://testuser:testpass@localhost:5432/testdb"
-    )
+    return os.getenv("TEST_DATABASE_URL", "postgresql://testuser:testpass@localhost:5432/testdb")
 
 
 @pytest.fixture(scope="function")
@@ -75,7 +73,7 @@ def db_cursor(db_connection: psycopg.Connection) -> Generator[psycopg.Cursor, No
 @pytest.fixture
 def sample_snapshot_time() -> dt.datetime:
     """Return a consistent timestamp for testing."""
-    return dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.timezone.utc)
+    return dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.UTC)
 
 
 @pytest.fixture
@@ -102,49 +100,27 @@ def sample_odds_api_response() -> dict:
                         "key": "spreads",
                         "last_update": "2023-09-01T12:00:00Z",
                         "outcomes": [
-                            {
-                                "name": "Buffalo Bills",
-                                "price": 1.91,
-                                "point": -6.5
-                            },
-                            {
-                                "name": "Arizona Cardinals",
-                                "price": 1.91,
-                                "point": 6.5
-                            }
-                        ]
+                            {"name": "Buffalo Bills", "price": 1.91, "point": -6.5},
+                            {"name": "Arizona Cardinals", "price": 1.91, "point": 6.5},
+                        ],
                     },
                     {
                         "key": "totals",
                         "last_update": "2023-09-01T12:00:00Z",
                         "outcomes": [
-                            {
-                                "name": "Over",
-                                "price": 1.87,
-                                "point": 47.5
-                            },
-                            {
-                                "name": "Under",
-                                "price": 1.95,
-                                "point": 47.5
-                            }
-                        ]
+                            {"name": "Over", "price": 1.87, "point": 47.5},
+                            {"name": "Under", "price": 1.95, "point": 47.5},
+                        ],
                     },
                     {
                         "key": "h2h",
                         "last_update": "2023-09-01T12:00:00Z",
                         "outcomes": [
-                            {
-                                "name": "Buffalo Bills",
-                                "price": 1.25
-                            },
-                            {
-                                "name": "Arizona Cardinals",
-                                "price": 4.20
-                            }
-                        ]
-                    }
-                ]
+                            {"name": "Buffalo Bills", "price": 1.25},
+                            {"name": "Arizona Cardinals", "price": 4.20},
+                        ],
+                    },
+                ],
             },
             {
                 "key": "draftkings",
@@ -155,21 +131,13 @@ def sample_odds_api_response() -> dict:
                         "key": "spreads",
                         "last_update": "2023-09-01T12:05:00Z",
                         "outcomes": [
-                            {
-                                "name": "Buffalo Bills",
-                                "price": 1.87,
-                                "point": -6.0
-                            },
-                            {
-                                "name": "Arizona Cardinals",
-                                "price": 1.95,
-                                "point": 6.0
-                            }
-                        ]
+                            {"name": "Buffalo Bills", "price": 1.87, "point": -6.0},
+                            {"name": "Arizona Cardinals", "price": 1.95, "point": 6.0},
+                        ],
                     }
-                ]
-            }
-        ]
+                ],
+            },
+        ],
     }
 
 
@@ -193,21 +161,24 @@ def mock_env_vars(monkeypatch):
 def pytest_addoption(parser):
     """Add custom command-line options."""
     parser.addoption(
-        "--runslow",
-        action="store_true",
-        default=False,
-        help="Run slow tests (default: skip)"
+        "--runslow", action="store_true", default=False, help="Run slow tests (default: skip)"
     )
 
 
 def pytest_configure(config):
     """Configure pytest with custom markers."""
     # Existing markers
-    config.addinivalue_line("markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')")
+    config.addinivalue_line(
+        "markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')"
+    )
 
     # P0 Test Suite markers (Nov 15, 2025)
-    config.addinivalue_line("markers", "critical: marks tests as critical (P0 priority, prevents expensive failures)")
-    config.addinivalue_line("markers", "integration: marks tests as integration tests (require database)")
+    config.addinivalue_line(
+        "markers", "critical: marks tests as critical (P0 priority, prevents expensive failures)"
+    )
+    config.addinivalue_line(
+        "markers", "integration: marks tests as integration tests (require database)"
+    )
     config.addinivalue_line("markers", "benchmark: marks tests as performance benchmarks")
 
 

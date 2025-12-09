@@ -39,18 +39,15 @@ Date: November 27, 2025
 
 import logging
 import warnings
-from typing import Dict, Optional
 
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class PrimetimeFeaturesEngine:
@@ -92,10 +89,7 @@ class PrimetimeFeaturesEngine:
         """Create database connection."""
         return psycopg2.connect(**self.db_config)
 
-    def compute_primetime_features(
-        self,
-        game_id: str
-    ) -> Dict[str, any]:
+    def compute_primetime_features(self, game_id: str) -> dict[str, any]:
         """
         Compute primetime features for a single game.
 
@@ -130,23 +124,23 @@ class PrimetimeFeaturesEngine:
         row = df.iloc[0]
         return self._compute_features_from_row(row)
 
-    def _compute_features_from_row(self, row: pd.Series) -> Dict[str, any]:
+    def _compute_features_from_row(self, row: pd.Series) -> dict[str, any]:
         """Compute primetime features from a game row."""
-        day_of_week = int(row['day_of_week']) if pd.notna(row['day_of_week']) else -1
-        kickoff_hour = int(row['kickoff_hour']) if pd.notna(row['kickoff_hour']) else -1
+        day_of_week = int(row["day_of_week"]) if pd.notna(row["day_of_week"]) else -1
+        kickoff_hour = int(row["kickoff_hour"]) if pd.notna(row["kickoff_hour"]) else -1
 
         # Database flag (may be inaccurate)
-        db_thursday_flag = bool(row.get('is_thursday_night', False))
+        db_thursday_flag = bool(row.get("is_thursday_night", False))
 
         # TNF: Thursday 8pm ET = Friday ~1am UTC (DOW=5 with early hours)
         # Or use database flag if available
         is_thursday_night = db_thursday_flag or (day_of_week == 5 and kickoff_hour <= 5)
 
         # MNF: Monday 8pm ET = Tuesday ~1am UTC (DOW=2 with early hours)
-        is_monday_night = (day_of_week == 2 and kickoff_hour <= 5)
+        is_monday_night = day_of_week == 2 and kickoff_hour <= 5
 
         # SNF: Sunday 8:15pm ET = Monday ~1am UTC (DOW=1 with early hours)
-        is_sunday_night = (day_of_week == 1 and kickoff_hour <= 5)
+        is_sunday_night = day_of_week == 1 and kickoff_hour <= 5
 
         # Any primetime game
         is_primetime = is_thursday_night or is_monday_night or is_sunday_night
@@ -159,74 +153,65 @@ class PrimetimeFeaturesEngine:
         is_tnf_home_disadvantage = is_thursday_night  # Simplified
 
         # Weekend early game (1pm ET Sunday - often lower attention)
-        is_early_sunday = (
-            (day_of_week == 0 and 15 <= kickoff_hour <= 19)  # Sunday ~1pm ET in UTC
-        )
+        is_early_sunday = day_of_week == 0 and 15 <= kickoff_hour <= 19  # Sunday ~1pm ET in UTC
 
         # Late afternoon game (4pm ET Sunday)
-        is_late_afternoon = (
-            (day_of_week == 0 and 20 <= kickoff_hour <= 23) or
-            (day_of_week == 1 and kickoff_hour == 0)
+        is_late_afternoon = (day_of_week == 0 and 20 <= kickoff_hour <= 23) or (
+            day_of_week == 1 and kickoff_hour == 0
         )
 
         features = {
-            'is_thursday_night': is_thursday_night,
-            'is_sunday_night': is_sunday_night,
-            'is_monday_night': is_monday_night,
-            'is_primetime': is_primetime,
-            'is_national_broadcast': is_national_broadcast,
-            'is_tnf_home_disadvantage': is_tnf_home_disadvantage,
-            'is_early_sunday': is_early_sunday,
-            'is_late_afternoon': is_late_afternoon,
-            'game_slot': self._get_game_slot(
-                is_thursday_night, is_sunday_night, is_monday_night,
-                is_early_sunday, is_late_afternoon
-            )
+            "is_thursday_night": is_thursday_night,
+            "is_sunday_night": is_sunday_night,
+            "is_monday_night": is_monday_night,
+            "is_primetime": is_primetime,
+            "is_national_broadcast": is_national_broadcast,
+            "is_tnf_home_disadvantage": is_tnf_home_disadvantage,
+            "is_early_sunday": is_early_sunday,
+            "is_late_afternoon": is_late_afternoon,
+            "game_slot": self._get_game_slot(
+                is_thursday_night,
+                is_sunday_night,
+                is_monday_night,
+                is_early_sunday,
+                is_late_afternoon,
+            ),
         }
 
         return features
 
     def _get_game_slot(
-        self,
-        is_tnf: bool,
-        is_snf: bool,
-        is_mnf: bool,
-        is_early: bool,
-        is_late_afternoon: bool
+        self, is_tnf: bool, is_snf: bool, is_mnf: bool, is_early: bool, is_late_afternoon: bool
     ) -> str:
         """Categorize game slot for potential feature encoding."""
         if is_tnf:
-            return 'TNF'
+            return "TNF"
         elif is_snf:
-            return 'SNF'
+            return "SNF"
         elif is_mnf:
-            return 'MNF'
+            return "MNF"
         elif is_late_afternoon:
-            return 'LATE_AFTERNOON'
+            return "LATE_AFTERNOON"
         elif is_early:
-            return 'EARLY_SUNDAY'
+            return "EARLY_SUNDAY"
         else:
-            return 'OTHER'
+            return "OTHER"
 
-    def _neutral_features(self) -> Dict[str, any]:
+    def _neutral_features(self) -> dict[str, any]:
         """Return neutral features when data unavailable."""
         return {
-            'is_thursday_night': False,
-            'is_sunday_night': False,
-            'is_monday_night': False,
-            'is_primetime': False,
-            'is_national_broadcast': False,
-            'is_tnf_home_disadvantage': False,
-            'is_early_sunday': False,
-            'is_late_afternoon': False,
-            'game_slot': 'UNKNOWN'
+            "is_thursday_night": False,
+            "is_sunday_night": False,
+            "is_monday_night": False,
+            "is_primetime": False,
+            "is_national_broadcast": False,
+            "is_tnf_home_disadvantage": False,
+            "is_early_sunday": False,
+            "is_late_afternoon": False,
+            "game_slot": "UNKNOWN",
         }
 
-    def compute_batch_features(
-        self,
-        season: int,
-        week: int
-    ) -> pd.DataFrame:
+    def compute_batch_features(self, season: int, week: int) -> pd.DataFrame:
         """
         Compute primetime features for all games in a given week.
 
@@ -253,10 +238,7 @@ class PrimetimeFeaturesEngine:
         """
 
         with self._connect_db() as conn:
-            df = pd.read_sql_query(
-                query, conn,
-                params={"season": season, "week": week}
-            )
+            df = pd.read_sql_query(query, conn, params={"season": season, "week": week})
 
         if len(df) == 0:
             logger.warning(f"No games found for {season} week {week}")
@@ -266,17 +248,15 @@ class PrimetimeFeaturesEngine:
         features_list = []
         for _, row in df.iterrows():
             features = self._compute_features_from_row(row)
-            features['game_id'] = row['game_id']
-            features['home_team'] = row['home_team']
-            features['away_team'] = row['away_team']
+            features["game_id"] = row["game_id"]
+            features["home_team"] = row["home_team"]
+            features["away_team"] = row["away_team"]
             features_list.append(features)
 
         return pd.DataFrame(features_list)
 
     def analyze_primetime_performance(
-        self,
-        start_season: int = 2018,
-        end_season: int = 2024
+        self, start_season: int = 2018, end_season: int = 2024
     ) -> pd.DataFrame:
         """
         Analyze historical ATS performance by game slot.
@@ -304,10 +284,7 @@ class PrimetimeFeaturesEngine:
         """
 
         with self._connect_db() as conn:
-            df = pd.read_sql_query(
-                query, conn,
-                params={"start": start_season, "end": end_season}
-            )
+            df = pd.read_sql_query(query, conn, params={"start": start_season, "end": end_season})
 
         # Compute features and add to df
         for idx, row in df.iterrows():
@@ -316,19 +293,17 @@ class PrimetimeFeaturesEngine:
                 df.loc[idx, k] = v
 
         # Calculate ATS results
-        df['margin'] = df['home_score'] - df['away_score']
-        df['home_covered'] = df['margin'] + df['spread_close'] > 0
+        df["margin"] = df["home_score"] - df["away_score"]
+        df["home_covered"] = df["margin"] + df["spread_close"] > 0
 
         # Group by game slot
-        results = df.groupby('game_slot').agg({
-            'game_id': 'count',
-            'home_covered': 'mean'
-        }).rename(columns={
-            'game_id': 'games',
-            'home_covered': 'home_cover_rate'
-        })
+        results = (
+            df.groupby("game_slot")
+            .agg({"game_id": "count", "home_covered": "mean"})
+            .rename(columns={"game_id": "games", "home_covered": "home_cover_rate"})
+        )
 
-        results['away_cover_rate'] = 1 - results['home_cover_rate']
+        results["away_cover_rate"] = 1 - results["home_cover_rate"]
 
         return results.round(3)
 
@@ -336,15 +311,15 @@ class PrimetimeFeaturesEngine:
 def get_primetime_feature_names() -> list:
     """Return list of all primetime feature names for integration."""
     return [
-        'is_thursday_night',
-        'is_sunday_night',
-        'is_monday_night',
-        'is_primetime',
-        'is_national_broadcast',
-        'is_tnf_home_disadvantage',
-        'is_early_sunday',
-        'is_late_afternoon',
-        'game_slot',  # Categorical
+        "is_thursday_night",
+        "is_sunday_night",
+        "is_monday_night",
+        "is_primetime",
+        "is_national_broadcast",
+        "is_tnf_home_disadvantage",
+        "is_early_sunday",
+        "is_late_afternoon",
+        "game_slot",  # Categorical
     ]
 
 
@@ -356,7 +331,7 @@ if __name__ == "__main__":
     print("\n=== Week 12, 2024 Primetime Analysis ===")
     week_games = engine.compute_batch_features(2024, 12)
     if len(week_games) > 0:
-        primetime = week_games[week_games['is_primetime']]
+        primetime = week_games[week_games["is_primetime"]]
         print(f"Total games: {len(week_games)}")
         print(f"Primetime games: {len(primetime)}")
         if len(primetime) > 0:

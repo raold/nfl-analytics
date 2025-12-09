@@ -19,7 +19,6 @@ import argparse
 import json
 import multiprocessing as mp
 import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 import numpy as np
@@ -38,25 +37,25 @@ def train_baseline_ensemble(train_df, return_dict, proc_id):
 
     # XGBoost params with GPU acceleration
     xgb_params = {
-        'objective': 'binary:logistic',
-        'eval_metric': 'logloss',
-        'tree_method': 'hist',  # Fast histogram method
-        'n_estimators': 100,
-        'max_depth': 6,
-        'learning_rate': 0.1,
-        'subsample': 0.8,
-        'colsample_bytree': 0.8,
-        'n_jobs': -1,  # Use all cores
+        "objective": "binary:logistic",
+        "eval_metric": "logloss",
+        "tree_method": "hist",  # Fast histogram method
+        "n_estimators": 100,
+        "max_depth": 6,
+        "learning_rate": 0.1,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "n_jobs": -1,  # Use all cores
     }
 
     # Neural net params (sklearn MLP with max threads)
     nn_params = {
-        'hidden_layer_sizes': (64, 32),
-        'activation': 'relu',
-        'solver': 'adam',
-        'max_iter': 200,
-        'early_stopping': True,
-        'random_state': 42,
+        "hidden_layer_sizes": (64, 32),
+        "activation": "relu",
+        "solver": "adam",
+        "max_iter": 200,
+        "early_stopping": True,
+        "random_state": 42,
     }
 
     baseline = GameOutcomeEnsemble(xgb_params=xgb_params, nn_params=nn_params)
@@ -74,25 +73,25 @@ def train_enhanced_ensemble(train_df, return_dict, proc_id):
 
     # XGBoost params with GPU acceleration
     xgb_params = {
-        'objective': 'binary:logistic',
-        'eval_metric': 'logloss',
-        'tree_method': 'hist',
-        'n_estimators': 100,
-        'max_depth': 6,
-        'learning_rate': 0.1,
-        'subsample': 0.8,
-        'colsample_bytree': 0.8,
-        'n_jobs': -1,  # Use all cores
+        "objective": "binary:logistic",
+        "eval_metric": "logloss",
+        "tree_method": "hist",
+        "n_estimators": 100,
+        "max_depth": 6,
+        "learning_rate": 0.1,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "n_jobs": -1,  # Use all cores
     }
 
     # Neural net params
     nn_params = {
-        'hidden_layer_sizes': (128, 64, 32),  # Larger network for more features
-        'activation': 'relu',
-        'solver': 'adam',
-        'max_iter': 200,
-        'early_stopping': True,
-        'random_state': 42,
+        "hidden_layer_sizes": (128, 64, 32),  # Larger network for more features
+        "activation": "relu",
+        "solver": "adam",
+        "max_iter": 200,
+        "early_stopping": True,
+        "random_state": 42,
     }
 
     enhanced = EnhancedGameOutcomeEnsemble(xgb_params=xgb_params, nn_params=nn_params)
@@ -127,8 +126,8 @@ def run_comparison_backtest_optimized(
     print(f"Kelly multiplier: {kelly_multiplier}")
     print(f"Edge threshold: {edge_threshold:.1%}")
     print(f"Vig: {vig}")
-    print(f"\n🚀 OPTIMIZATION: Parallel ensemble training enabled")
-    print(f"🚀 OPTIMIZATION: XGBoost multi-threading enabled")
+    print("\n🚀 OPTIMIZATION: Parallel ensemble training enabled")
+    print("🚀 OPTIMIZATION: XGBoost multi-threading enabled")
 
     # Load data
     all_seasons = sorted(set(train_seasons + backtest_seasons))
@@ -215,15 +214,32 @@ def run_comparison_backtest_optimized(
     print("BASELINE VS ENHANCED COMPARISON")
     print(f"{'='*80}\n")
 
-    comparison_df = pd.DataFrame({
-        "Model": ["Baseline (9 feat)", "Enhanced (40+ feat)"],
-        "Total Bets": [baseline_summary["n_trades"], enhanced_summary["n_trades"]],
-        "Win Rate": [f"{baseline_summary['win_rate']:.1%}", f"{enhanced_summary['win_rate']:.1%}"],
-        "Final Bankroll": [f"${baseline_summary['final_bankroll']:,.2f}", f"${enhanced_summary['final_bankroll']:,.2f}"],
-        "Total Return": [f"{baseline_summary['total_return']:+.1%}", f"{enhanced_summary['total_return']:+.1%}"],
-        "Sharpe Ratio": [f"{baseline_summary['sharpe_ratio']:.2f}", f"{enhanced_summary['sharpe_ratio']:.2f}"],
-        "Max Drawdown": [f"{baseline_summary['max_drawdown']:.1%}", f"{enhanced_summary['max_drawdown']:.1%}"],
-    })
+    comparison_df = pd.DataFrame(
+        {
+            "Model": ["Baseline (9 feat)", "Enhanced (40+ feat)"],
+            "Total Bets": [baseline_summary["n_trades"], enhanced_summary["n_trades"]],
+            "Win Rate": [
+                f"{baseline_summary['win_rate']:.1%}",
+                f"{enhanced_summary['win_rate']:.1%}",
+            ],
+            "Final Bankroll": [
+                f"${baseline_summary['final_bankroll']:,.2f}",
+                f"${enhanced_summary['final_bankroll']:,.2f}",
+            ],
+            "Total Return": [
+                f"{baseline_summary['total_return']:+.1%}",
+                f"{enhanced_summary['total_return']:+.1%}",
+            ],
+            "Sharpe Ratio": [
+                f"{baseline_summary['sharpe_ratio']:.2f}",
+                f"{enhanced_summary['sharpe_ratio']:.2f}",
+            ],
+            "Max Drawdown": [
+                f"{baseline_summary['max_drawdown']:.1%}",
+                f"{enhanced_summary['max_drawdown']:.1%}",
+            ],
+        }
+    )
 
     print(comparison_df.to_string(index=False))
 
@@ -235,7 +251,9 @@ def run_comparison_backtest_optimized(
     roi_improvement = enhanced_summary["total_return"] - baseline_summary["total_return"]
     win_rate_improvement = enhanced_summary["win_rate"] - baseline_summary["win_rate"]
     sharpe_improvement = enhanced_summary["sharpe_ratio"] - baseline_summary["sharpe_ratio"]
-    profit_improvement = (enhanced_summary["final_bankroll"] - initial_bankroll) - (baseline_summary["final_bankroll"] - initial_bankroll)
+    profit_improvement = (enhanced_summary["final_bankroll"] - initial_bankroll) - (
+        baseline_summary["final_bankroll"] - initial_bankroll
+    )
 
     print(f"\nROI Improvement: {roi_improvement:+.2%}")
     print(f"Win Rate Improvement: {win_rate_improvement:+.1%}")
@@ -254,12 +272,14 @@ def run_comparison_backtest_optimized(
         p2 = enhanced_summary["win_rate"]
 
         p_pooled = (n1 * p1 + n2 * p2) / (n1 + n2)
-        se = np.sqrt(p_pooled * (1 - p_pooled) * (1/n1 + 1/n2))
+        se = np.sqrt(p_pooled * (1 - p_pooled) * (1 / n1 + 1 / n2))
         z_score = (p2 - p1) / se if se > 0 else 0
 
-        print(f"\nStatistical Significance:")
+        print("\nStatistical Significance:")
         print(f"  Z-score: {z_score:.2f}")
-        print(f"  {'Significant at p<0.05' if abs(z_score) > 1.96 else 'Not significant at p<0.05'}")
+        print(
+            f"  {'Significant at p<0.05' if abs(z_score) > 1.96 else 'Not significant at p<0.05'}"
+        )
 
     # Summary verdict
     print(f"\n{'='*80}")
@@ -268,13 +288,17 @@ def run_comparison_backtest_optimized(
 
     if roi_improvement > 0:
         print(f"\n✓ Phase 5 features IMPROVED ROI by {roi_improvement:.2%}")
-        print(f"✓ Enhanced model profit: ${enhanced_summary['final_bankroll'] - initial_bankroll:+,.2f}")
-        print(f"✓ Baseline model profit: ${baseline_summary['final_bankroll'] - initial_bankroll:+,.2f}")
+        print(
+            f"✓ Enhanced model profit: ${enhanced_summary['final_bankroll'] - initial_bankroll:+,.2f}"
+        )
+        print(
+            f"✓ Baseline model profit: ${baseline_summary['final_bankroll'] - initial_bankroll:+,.2f}"
+        )
         print(f"✓ Additional profit from Phase 5: ${profit_improvement:+,.2f}")
     else:
-        print(f"\n✗ Phase 5 features did NOT improve ROI")
+        print("\n✗ Phase 5 features did NOT improve ROI")
         print(f"  ROI change: {roi_improvement:.2%}")
-        print(f"  Possible reasons: overfitting, insufficient data, or features not capturing edge")
+        print("  Possible reasons: overfitting, insufficient data, or features not capturing edge")
 
     # Package results
     results = {
@@ -292,7 +316,9 @@ def run_comparison_backtest_optimized(
 
 
 def parse_args():
-    ap = argparse.ArgumentParser(description="Optimized Phase 5 Feature Enhancement Comparison Backtest")
+    ap = argparse.ArgumentParser(
+        description="Optimized Phase 5 Feature Enhancement Comparison Backtest"
+    )
     ap.add_argument(
         "--train-seasons",
         default="2020,2021,2022",
@@ -331,7 +357,7 @@ def parse_args():
 
 def main():
     # Set multiprocessing start method
-    mp.set_start_method('spawn', force=True)
+    mp.set_start_method("spawn", force=True)
 
     args = parse_args()
 
@@ -357,12 +383,10 @@ def main():
         # Filter out non-serializable objects
         json_results = {
             "baseline": {
-                k: v for k, v in results["baseline"].items()
-                if k not in ["trades_by_season"]
+                k: v for k, v in results["baseline"].items() if k not in ["trades_by_season"]
             },
             "enhanced": {
-                k: v for k, v in results["enhanced"].items()
-                if k not in ["trades_by_season"]
+                k: v for k, v in results["enhanced"].items() if k not in ["trades_by_season"]
             },
             "improvement": results["improvement"],
         }

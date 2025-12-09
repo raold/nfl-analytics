@@ -31,12 +31,11 @@ Usage:
     )
 """
 
-import json
 import logging
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import Any, Dict, List, Optional, Set
 from datetime import datetime
+from enum import Enum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -61,12 +60,12 @@ class AgentCapability:
     agent_type: AgentType
     name: str
     description: str
-    responsibilities: List[str]
-    file_patterns: List[str] = field(default_factory=list)
-    keywords: Set[str] = field(default_factory=set)
-    dependencies: List[AgentType] = field(default_factory=list)
+    responsibilities: list[str]
+    file_patterns: list[str] = field(default_factory=list)
+    keywords: set[str] = field(default_factory=set)
+    dependencies: list[AgentType] = field(default_factory=list)
 
-    def matches(self, task: str, files: Optional[List[str]] = None) -> float:
+    def matches(self, task: str, files: list[str] | None = None) -> float:
         """
         Calculate match score for this agent given a task description.
 
@@ -87,16 +86,13 @@ class AgentCapability:
 
         # File pattern matching (30% weight)
         if files and self.file_patterns:
-            file_matches = sum(
-                1 for f in files
-                for pattern in self.file_patterns
-                if pattern in f
-            )
+            file_matches = sum(1 for f in files for pattern in self.file_patterns if pattern in f)
             score += min(file_matches / len(files), 1.0) * 0.3
 
         # Responsibility matching (20% weight)
         resp_matches = sum(
-            1 for resp in self.responsibilities
+            1
+            for resp in self.responsibilities
             if any(word in task_lower for word in resp.lower().split())
         )
         if self.responsibilities:
@@ -111,9 +107,9 @@ class TaskRouting:
 
     task: str
     primary_agent: AgentType
-    supporting_agents: List[AgentType] = field(default_factory=list)
+    supporting_agents: list[AgentType] = field(default_factory=list)
     confidence: float = 0.0
-    context: Dict[str, Any] = field(default_factory=dict)
+    context: dict[str, Any] = field(default_factory=dict)
     created_at: str = field(default_factory=lambda: datetime.now().isoformat())
 
 
@@ -128,13 +124,11 @@ class AgentCoordinator:
     def __init__(self):
         """Initialize coordinator with agent registry."""
         self.agents = self._initialize_agents()
-        self.routing_history: List[TaskRouting] = []
+        self.routing_history: list[TaskRouting] = []
 
-        logger.info(
-            f"AgentCoordinator initialized with {len(self.agents)} specialized agents"
-        )
+        logger.info(f"AgentCoordinator initialized with {len(self.agents)} specialized agents")
 
-    def _initialize_agents(self) -> Dict[AgentType, AgentCapability]:
+    def _initialize_agents(self) -> dict[AgentType, AgentCapability]:
         """
         Initialize registry of specialized agents with capabilities.
 
@@ -162,13 +156,23 @@ class AgentCoordinator:
                     "figures/",
                 ],
                 keywords={
-                    "dissertation", "latex", "tikz", "compile", "chapter",
-                    "figure", "table", "bibliography", "citation", "reference",
-                    "writeup", "thesis", "subsection", "section",
+                    "dissertation",
+                    "latex",
+                    "tikz",
+                    "compile",
+                    "chapter",
+                    "figure",
+                    "table",
+                    "bibliography",
+                    "citation",
+                    "reference",
+                    "writeup",
+                    "thesis",
+                    "subsection",
+                    "section",
                 },
                 dependencies=[],
             ),
-
             AgentType.MODEL_MANAGEMENT: AgentCapability(
                 agent_type=AgentType.MODEL_MANAGEMENT,
                 name="Model Management Agent",
@@ -212,28 +216,68 @@ class AgentCoordinator:
                     "tests/",
                 ],
                 keywords={
-                    "train", "model", "bayesian", "xgboost", "bnn", "neural network",
-                    "hierarchical", "state-space", "ensemble", "prediction",
-                    "hyperparameter", "optimization", "calibration", "evaluation",
-                    "brms", "stan", "pymc", "cmdstanr", "pytorch",
+                    "train",
+                    "model",
+                    "bayesian",
+                    "xgboost",
+                    "bnn",
+                    "neural network",
+                    "hierarchical",
+                    "state-space",
+                    "ensemble",
+                    "prediction",
+                    "hyperparameter",
+                    "optimization",
+                    "calibration",
+                    "evaluation",
+                    "brms",
+                    "stan",
+                    "pymc",
+                    "cmdstanr",
+                    "pytorch",
                     # Phase 2: Performance
-                    "performance", "profiling", "speed", "bottleneck", "mcmc efficiency",
-                    "backtest time", "training time", "optimize mcmc",
+                    "performance",
+                    "profiling",
+                    "speed",
+                    "bottleneck",
+                    "mcmc efficiency",
+                    "backtest time",
+                    "training time",
+                    "optimize mcmc",
                     # Phase 2: Testing
-                    "test", "testing", "coverage", "unit test", "integration test",
-                    "property test", "hypothesis", "pytest", "temporal validation",
+                    "test",
+                    "testing",
+                    "coverage",
+                    "unit test",
+                    "integration test",
+                    "property test",
+                    "hypothesis",
+                    "pytest",
+                    "temporal validation",
                     # Phase 2: Validation (stronger keywords)
-                    "validate model", "model validation", "mcmc diagnostics",
-                    "validate mcmc", "check diagnostics", "r-hat", "rhat", "ess",
-                    "ess values", "validate r-hat", "validate ess",
-                    "divergence", "calibration", "validate calibration",
-                    "prior posterior", "cross validation",
-                    "statistical validation", "convergence", "check convergence",
+                    "validate model",
+                    "model validation",
+                    "mcmc diagnostics",
+                    "validate mcmc",
+                    "check diagnostics",
+                    "r-hat",
+                    "rhat",
+                    "ess",
+                    "ess values",
+                    "validate r-hat",
+                    "validate ess",
+                    "divergence",
+                    "calibration",
+                    "validate calibration",
+                    "prior posterior",
+                    "cross validation",
+                    "statistical validation",
+                    "convergence",
+                    "check convergence",
                     "model diagnostics",
                 },
                 dependencies=[AgentType.DATA_LAYER],
             ),
-
             AgentType.FRONTEND: AgentCapability(
                 agent_type=AgentType.FRONTEND,
                 name="Frontend Agent",
@@ -255,13 +299,23 @@ class AgentCoordinator:
                     ".json",
                 ],
                 keywords={
-                    "dashboard", "streamlit", "grafana", "visualization", "plot",
-                    "chart", "panel", "monitoring", "metrics", "ui", "interface",
-                    "display", "frontend", "web",
+                    "dashboard",
+                    "streamlit",
+                    "grafana",
+                    "visualization",
+                    "plot",
+                    "chart",
+                    "panel",
+                    "monitoring",
+                    "metrics",
+                    "ui",
+                    "interface",
+                    "display",
+                    "frontend",
+                    "web",
                 },
                 dependencies=[AgentType.DATA_LAYER, AgentType.MODEL_MANAGEMENT],
             ),
-
             AgentType.DATA_LAYER: AgentCapability(
                 agent_type=AgentType.DATA_LAYER,
                 name="Data Layer Agent",
@@ -307,24 +361,59 @@ class AgentCoordinator:
                     "scripts/analyze_data_layer.sh",
                 ],
                 keywords={
-                    "database", "schema", "migration", "query", "sql", "postgres",
-                    "ingest", "data", "etl", "transform", "clean", "feature",
-                    "materialized view", "table", "column", "index",
-                    "leakage", "temporal", "asof", "split", "contamination",
-                    "train test", "validation", "integrity",
+                    "database",
+                    "schema",
+                    "migration",
+                    "query",
+                    "sql",
+                    "postgres",
+                    "ingest",
+                    "data",
+                    "etl",
+                    "transform",
+                    "clean",
+                    "feature",
+                    "materialized view",
+                    "table",
+                    "column",
+                    "index",
+                    "leakage",
+                    "temporal",
+                    "asof",
+                    "split",
+                    "contamination",
+                    "train test",
+                    "validation",
+                    "integrity",
                     # Phase 2: Performance
-                    "query performance", "slow query", "database optimization",
-                    "sql optimization", "index recommendation", "explain analyze",
+                    "query performance",
+                    "slow query",
+                    "database optimization",
+                    "sql optimization",
+                    "index recommendation",
+                    "explain analyze",
                     # Phase 4: Column Lineage & Impact Analysis
-                    "column lineage", "impact analysis", "schema change", "breaking changes",
-                    "unused columns", "dead columns", "column usage", "column tracking",
-                    "dependency graph", "column dependencies", "feature opportunities",
-                    "add column", "remove column", "drop column", "alter column",
-                    "migration validation", "trace column", "column consumers",
+                    "column lineage",
+                    "impact analysis",
+                    "schema change",
+                    "breaking changes",
+                    "unused columns",
+                    "dead columns",
+                    "column usage",
+                    "column tracking",
+                    "dependency graph",
+                    "column dependencies",
+                    "feature opportunities",
+                    "add column",
+                    "remove column",
+                    "drop column",
+                    "alter column",
+                    "migration validation",
+                    "trace column",
+                    "column consumers",
                 },
                 dependencies=[],
             ),
-
             AgentType.PREDICTION_ENGINE: AgentCapability(
                 agent_type=AgentType.PREDICTION_ENGINE,
                 name="Prediction Engine Agent",
@@ -368,28 +457,60 @@ class AgentCoordinator:
                     "py/rl/",
                 ],
                 keywords={
-                    "ensemble", "backtest", "prediction", "production", "deploy",
-                    "roi", "risk", "bet", "betting", "odds", "props",
-                    "weight", "optimization", "integration", "api",
+                    "ensemble",
+                    "backtest",
+                    "prediction",
+                    "production",
+                    "deploy",
+                    "roi",
+                    "risk",
+                    "bet",
+                    "betting",
+                    "odds",
+                    "props",
+                    "weight",
+                    "optimization",
+                    "integration",
+                    "api",
                     # Phase 3: Orchestration (stronger keywords)
-                    "orchestration", "orchestrate ensemble", "ensemble coordination",
-                    "coordinate training", "multi-language training",
-                    "r python coordination", "retrain all models", "retrain ensemble",
-                    "model registry", "cvx", "cvxpy", "weight optimization",
-                    "5-way ensemble", "ensemble models",
+                    "orchestration",
+                    "orchestrate ensemble",
+                    "ensemble coordination",
+                    "coordinate training",
+                    "multi-language training",
+                    "r python coordination",
+                    "retrain all models",
+                    "retrain ensemble",
+                    "model registry",
+                    "cvx",
+                    "cvxpy",
+                    "weight optimization",
+                    "5-way ensemble",
+                    "ensemble models",
                     # Phase 3: Betting Validation
-                    "betting validation", "validate betting", "validate strategy",
-                    "risk gates", "kelly criterion", "roi validation",
-                    "sharpe ratio", "drawdown", "stress test",
-                    "edge validation", "confidence threshold", "bankroll management",
-                    "before deployment", "approve strategy",
+                    "betting validation",
+                    "validate betting",
+                    "validate strategy",
+                    "risk gates",
+                    "kelly criterion",
+                    "roi validation",
+                    "sharpe ratio",
+                    "drawdown",
+                    "stress test",
+                    "edge validation",
+                    "confidence threshold",
+                    "bankroll management",
+                    "before deployment",
+                    "approve strategy",
                     # Phase 2: Performance
-                    "prediction latency", "backtest runtime", "reduce backtest",
-                    "caching", "pipeline optimization",
+                    "prediction latency",
+                    "backtest runtime",
+                    "reduce backtest",
+                    "caching",
+                    "pipeline optimization",
                 },
                 dependencies=[AgentType.MODEL_MANAGEMENT, AgentType.DATA_LAYER],
             ),
-
             AgentType.DOCUMENTATION: AgentCapability(
                 agent_type=AgentType.DOCUMENTATION,
                 name="Documentation Agent",
@@ -418,18 +539,39 @@ class AgentCoordinator:
                     "py/utils/security_auditor.py",
                 ],
                 keywords={
-                    "documentation", "docs", "readme", "guide", "github",
-                    "status", "milestone", "tracking", "update", "maintain",
-                    "index", "catalog", "changelog",
+                    "documentation",
+                    "docs",
+                    "readme",
+                    "guide",
+                    "github",
+                    "status",
+                    "milestone",
+                    "tracking",
+                    "update",
+                    "maintain",
+                    "index",
+                    "catalog",
+                    "changelog",
                     # Code review and security (stronger)
-                    "code review", "review code", "run code review",
-                    "security", "audit", "security audit", "credentials", "secrets",
-                    "vulnerability", "quality", "lint", "review pr", "pr review",
-                    "review betting", "review validator", "review implementation",
+                    "code review",
+                    "review code",
+                    "run code review",
+                    "security",
+                    "audit",
+                    "security audit",
+                    "credentials",
+                    "secrets",
+                    "vulnerability",
+                    "quality",
+                    "lint",
+                    "review pr",
+                    "pr review",
+                    "review betting",
+                    "review validator",
+                    "review implementation",
                 },
                 dependencies=[],
             ),
-
             AgentType.RESEARCH_COORDINATOR: AgentCapability(
                 agent_type=AgentType.RESEARCH_COORDINATOR,
                 name="Research Coordinator",
@@ -484,25 +626,53 @@ class AgentCoordinator:
                 ],
                 keywords={
                     # Experiment tracking (unique to Research Coordinator)
-                    "experiment journey", "research log", "development story",
-                    "what worked", "lessons learned", "document experiment",
-                    "track experiments", "research narrative", "experiment tracking",
+                    "experiment journey",
+                    "research log",
+                    "development story",
+                    "what worked",
+                    "lessons learned",
+                    "document experiment",
+                    "track experiments",
+                    "research narrative",
+                    "experiment tracking",
                     # Dissertation content updates (different from compilation)
-                    "update dissertation chapter", "dissertation findings",
-                    "connect to dissertation", "latex table from results",
-                    "generate latex table", "results to latex",
+                    "update dissertation chapter",
+                    "dissertation findings",
+                    "connect to dissertation",
+                    "latex table from results",
+                    "generate latex table",
+                    "results to latex",
                     # R Statistics guidance (interpretation, not training)
-                    "interpret brms", "interpret mcmc", "help me interpret",
-                    "understand diagnostics", "explain r output", "brms guidance",
-                    "r statistics help", "hierarchical bayesian guidance",
+                    "interpret brms",
+                    "interpret mcmc",
+                    "help me interpret",
+                    "understand diagnostics",
+                    "explain r output",
+                    "brms guidance",
+                    "r statistics help",
+                    "hierarchical bayesian guidance",
                     # Typography & aesthetics (unique focus)
-                    "typography", "aesthetics", "figure style", "tikz style",
-                    "visual consistency", "publication quality", "consistent styling",
-                    "figure aesthetics", "color scheme", "tufte", "design",
+                    "typography",
+                    "aesthetics",
+                    "figure style",
+                    "tikz style",
+                    "visual consistency",
+                    "publication quality",
+                    "consistent styling",
+                    "figure aesthetics",
+                    "color scheme",
+                    "tufte",
+                    "design",
                     # Story synthesis (unique)
-                    "tell the story", "research story", "narrative gaps",
-                    "synthesis", "cross-cutting findings", "holistic view",
-                    "research arc", "connect findings", "synthesize results",
+                    "tell the story",
+                    "research story",
+                    "narrative gaps",
+                    "synthesis",
+                    "cross-cutting findings",
+                    "holistic view",
+                    "research arc",
+                    "connect findings",
+                    "synthesize results",
                 },
                 dependencies=[],  # Reads all agents but depends on none
             ),
@@ -511,10 +681,7 @@ class AgentCoordinator:
         return agents
 
     def analyze_task(
-        self,
-        task: str,
-        files: Optional[List[str]] = None,
-        min_confidence: float = 0.3
+        self, task: str, files: list[str] | None = None, min_confidence: float = 0.3
     ) -> TaskRouting:
         """
         Analyze a task and determine which agents should handle it.
@@ -559,8 +726,11 @@ class AgentCoordinator:
 
         logger.info(
             f"Task routed to {primary_type.value} (confidence: {primary_score:.2f})"
-            + (f" with support from {[a.value for a in supporting_agents]}"
-               if supporting_agents else "")
+            + (
+                f" with support from {[a.value for a in supporting_agents]}"
+                if supporting_agents
+                else ""
+            )
         )
 
         return routing
@@ -577,7 +747,7 @@ class AgentCoordinator:
         """
         return self.agents[agent_type]
 
-    def list_agents(self) -> Dict[str, Dict[str, Any]]:
+    def list_agents(self) -> dict[str, dict[str, Any]]:
         """
         List all available agents with their capabilities.
 
@@ -595,7 +765,7 @@ class AgentCoordinator:
             for agent_type, capability in self.agents.items()
         }
 
-    def get_routing_history(self, limit: int = 10) -> List[Dict[str, Any]]:
+    def get_routing_history(self, limit: int = 10) -> list[dict[str, Any]]:
         """
         Get recent task routing history.
 
@@ -616,7 +786,7 @@ class AgentCoordinator:
             for routing in self.routing_history[-limit:]
         ]
 
-    def get_dependencies(self, agent_type: AgentType) -> List[AgentType]:
+    def get_dependencies(self, agent_type: AgentType) -> list[AgentType]:
         """
         Get dependencies for a specific agent type.
 
@@ -628,7 +798,7 @@ class AgentCoordinator:
         """
         return self.agents[agent_type].dependencies
 
-    def suggest_workflow(self, agent_type: AgentType) -> List[AgentType]:
+    def suggest_workflow(self, agent_type: AgentType) -> list[AgentType]:
         """
         Suggest workflow order when executing tasks for an agent.
 
@@ -656,14 +826,16 @@ class AgentCoordinator:
         add_dependencies(agent_type)
         return workflow
 
-    def execute_workflow(self, workflow_name: str, context: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def execute_workflow(
+        self, workflow_name: str, context: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """
         Execute a predefined workflow (dissertation → models → dashboard).
-        
+
         Args:
             workflow_name: Name of workflow to execute
             context: Optional context data
-            
+
         Returns:
             Dictionary with execution results
         """
@@ -691,53 +863,55 @@ class AgentCoordinator:
                 ("data_leakage", "Temporal safety check"),
             ],
         }
-        
+
         if workflow_name not in workflows:
-            raise ValueError(f"Unknown workflow: {workflow_name}. Available: {list(workflows.keys())}")
-        
+            raise ValueError(
+                f"Unknown workflow: {workflow_name}. Available: {list(workflows.keys())}"
+            )
+
         results = {
             "workflow": workflow_name,
             "started_at": datetime.now().isoformat(),
             "steps": [],
             "success": True,
         }
-        
+
         logger.info(f"Executing workflow: {workflow_name}")
-        
+
         for step_name, step_description in workflows[workflow_name]:
             logger.info(f"  Step: {step_description}")
-            
+
             step_result = {
                 "name": step_name,
                 "description": step_description,
                 "success": True,
                 "message": f"{step_description} completed",
             }
-            
+
             # In a full implementation, this would call actual validators
             # For now, it's a framework for execution
-            
+
             results["steps"].append(step_result)
-        
+
         results["completed_at"] = datetime.now().isoformat()
         logger.info(f"Workflow {workflow_name} completed successfully")
-        
+
         return results
 
     def execute_task(
         self,
         task: str,
-        files: Optional[List[str]] = None,
-        agents: Optional[List[AgentType]] = None,
-    ) -> Dict[str, Any]:
+        files: list[str] | None = None,
+        agents: list[AgentType] | None = None,
+    ) -> dict[str, Any]:
         """
         Execute a task by routing to appropriate agents and running them.
-        
+
         Args:
             task: Task description
             files: Optional list of files involved
             agents: Optional list of specific agents to use (overrides routing)
-            
+
         Returns:
             Dictionary with execution results
         """
@@ -747,7 +921,7 @@ class AgentCoordinator:
             agents_to_run = [routing.primary_agent] + routing.supporting_agents
         else:
             agents_to_run = agents
-        
+
         results = {
             "task": task,
             "agents": [a.value for a in agents_to_run],
@@ -755,29 +929,29 @@ class AgentCoordinator:
             "success": True,
             "outputs": [],
         }
-        
+
         logger.info(f"Executing task: {task}")
         logger.info(f"Using agents: {[a.value for a in agents_to_run]}")
-        
+
         # Execute each agent
         for agent_type in agents_to_run:
             agent_info = self.agents[agent_type]
-            
+
             output = {
                 "agent": agent_type.value,
                 "agent_name": agent_info.name,
                 "success": True,
                 "message": f"Agent {agent_info.name} executed successfully",
             }
-            
+
             # In a full implementation, this would call actual agent executors
             # For now, it's a framework for execution
-            
+
             results["outputs"].append(output)
-        
+
         results["completed_at"] = datetime.now().isoformat()
-        logger.info(f"Task execution completed")
-        
+        logger.info("Task execution completed")
+
         return results
 
     def print_summary(self):
@@ -788,7 +962,11 @@ class AgentCoordinator:
 
         print("Available Agents:")
         for agent_type, capability in self.agents.items():
-            deps = f" (depends on: {[d.value for d in capability.dependencies]})" if capability.dependencies else ""
+            deps = (
+                f" (depends on: {[d.value for d in capability.dependencies]})"
+                if capability.dependencies
+                else ""
+            )
             print(f"\n  {capability.name}{deps}")
             print(f"    - {capability.description}")
             print(f"    - Responsibilities: {len(capability.responsibilities)}")

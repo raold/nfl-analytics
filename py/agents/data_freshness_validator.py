@@ -38,14 +38,12 @@ Phase: 6 (Frontend Agents - Week 4)
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
-import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,10 +52,10 @@ logger = logging.getLogger(__name__)
 class FreshnessStatus(Enum):
     """Data freshness status levels."""
 
-    FRESH = "fresh"           # Updated within threshold
-    STALE = "stale"           # Older than ideal but usable
-    OUTDATED = "outdated"     # Too old, needs refresh
-    MISSING = "missing"       # No data available
+    FRESH = "fresh"  # Updated within threshold
+    STALE = "stale"  # Older than ideal but usable
+    OUTDATED = "outdated"  # Too old, needs refresh
+    MISSING = "missing"  # No data available
 
 
 class DataSource(Enum):
@@ -87,8 +85,8 @@ class DataFreshnessStatus:
     """Status of a specific data source."""
 
     source: DataSource
-    last_updated: Optional[datetime]
-    age_hours: Optional[float]
+    last_updated: datetime | None
+    age_hours: float | None
     status: FreshnessStatus
     is_fresh: bool
     indicator: str  # Emoji indicator
@@ -100,10 +98,10 @@ class EnsembleComponentStatus:
     """Status of an ensemble component."""
 
     component_name: str
-    model_path: Optional[Path]
+    model_path: Path | None
     exists: bool
-    last_modified: Optional[datetime]
-    age_hours: Optional[float]
+    last_modified: datetime | None
+    age_hours: float | None
     is_available: bool
     message: str
 
@@ -114,12 +112,12 @@ class EnsembleHealth:
 
     total_components: int
     available_components: int
-    missing_components: List[str]
-    outdated_components: List[str]
+    missing_components: list[str]
+    outdated_components: list[str]
     is_healthy: bool
     can_generate_predictions: bool
     health_score: float  # 0.0-1.0
-    components: List[EnsembleComponentStatus]
+    components: list[EnsembleComponentStatus]
     checked_at: datetime = field(default_factory=datetime.now)
 
 
@@ -133,7 +131,7 @@ class RefreshReport:
     duration_seconds: float
     records_updated: int
     success: bool
-    error: Optional[str]
+    error: str | None
 
 
 class DataFreshnessValidator:
@@ -150,50 +148,46 @@ class DataFreshnessValidator:
         db_name: str = "devdb01",
         db_user: str = "dro",
         db_password: str = "sicillionbillions",  # pragma: allowlist secret
-        models_path: str = "models/"
+        models_path: str = "models/",
     ):
         self.db_config = {
             "host": db_host,
             "port": db_port,
             "database": db_name,
             "user": db_user,
-            "password": db_password
+            "password": db_password,
         }
         self.models_path = Path(models_path)
 
         # Define freshness thresholds by data source
         self.thresholds = {
             DataSource.PREDICTIONS: FreshnessThreshold(
-                fresh_threshold_hours=24,   # Predictions should be daily
-                stale_threshold_hours=72    # Warning after 3 days
+                fresh_threshold_hours=24,  # Predictions should be daily
+                stale_threshold_hours=72,  # Warning after 3 days
             ),
             DataSource.ODDS: FreshnessThreshold(
-                fresh_threshold_hours=1,    # Odds change hourly
-                stale_threshold_hours=6
+                fresh_threshold_hours=1, stale_threshold_hours=6  # Odds change hourly
             ),
             DataSource.INJURY_REPORTS: FreshnessThreshold(
-                fresh_threshold_hours=12,   # Injury reports update 2x daily
-                stale_threshold_hours=48
+                fresh_threshold_hours=12, stale_threshold_hours=48  # Injury reports update 2x daily
             ),
             DataSource.WEATHER: FreshnessThreshold(
-                fresh_threshold_hours=6,    # Weather updates every 6 hours
-                stale_threshold_hours=24
+                fresh_threshold_hours=6, stale_threshold_hours=24  # Weather updates every 6 hours
             ),
             DataSource.PLAYER_STATS: FreshnessThreshold(
                 fresh_threshold_hours=168,  # Stats update weekly (after games)
-                stale_threshold_hours=336   # Warning after 2 weeks
+                stale_threshold_hours=336,  # Warning after 2 weeks
             ),
             DataSource.TEAM_STATS: FreshnessThreshold(
-                fresh_threshold_hours=168,
-                stale_threshold_hours=336
+                fresh_threshold_hours=168, stale_threshold_hours=336
             ),
             DataSource.ENSEMBLE_WEIGHTS: FreshnessThreshold(
                 fresh_threshold_hours=168,  # Weights reoptimized weekly
-                stale_threshold_hours=720   # Warning after 30 days
+                stale_threshold_hours=720,  # Warning after 30 days
             ),
             DataSource.MODEL_ARTIFACTS: FreshnessThreshold(
                 fresh_threshold_hours=720,  # Models retrained monthly
-                stale_threshold_hours=2160  # Warning after 90 days
+                stale_threshold_hours=2160,  # Warning after 90 days
             ),
         }
 
@@ -202,14 +196,10 @@ class DataFreshnessValidator:
             FreshnessStatus.FRESH: "🟢",
             FreshnessStatus.STALE: "🟡",
             FreshnessStatus.OUTDATED: "🔴",
-            FreshnessStatus.MISSING: "⚫"
+            FreshnessStatus.MISSING: "⚫",
         }
 
-    def check_data_freshness(
-        self,
-        source: str,
-        **filters
-    ) -> DataFreshnessStatus:
+    def check_data_freshness(self, source: str, **filters) -> DataFreshnessStatus:
         """
         Check freshness of a data source.
 
@@ -234,7 +224,7 @@ class DataFreshnessValidator:
                 status=FreshnessStatus.MISSING,
                 is_fresh=False,
                 indicator=self.indicators[FreshnessStatus.MISSING],
-                message=f"No data found for {source}"
+                message=f"No data found for {source}",
             )
 
         # Calculate age
@@ -262,7 +252,7 @@ class DataFreshnessValidator:
             status=status,
             is_fresh=is_fresh,
             indicator=self.indicators[status],
-            message=message
+            message=message,
         )
 
     def validate_ensemble_availability(self) -> EnsembleHealth:
@@ -284,7 +274,7 @@ class DataFreshnessValidator:
             "hierarchical_v2": "bayesian/hierarchical_v2.rds",
             "xgboost_v4_ridge": "xgboost/passing_xgboost_v4_ridge.pkl",
             "informative_priors_v2": "bayesian/informative_priors_v2.rds",
-            "hybrid_static_incremental": "hybrid/static_incremental_v1.pkl"
+            "hybrid_static_incremental": "hybrid/static_incremental_v1.pkl",
         }
 
         component_statuses = []
@@ -296,15 +286,17 @@ class DataFreshnessValidator:
             model_path = self.models_path / relative_path
 
             if not model_path.exists():
-                component_statuses.append(EnsembleComponentStatus(
-                    component_name=component_name,
-                    model_path=model_path,
-                    exists=False,
-                    last_modified=None,
-                    age_hours=None,
-                    is_available=False,
-                    message=f"Model file missing: {model_path}"
-                ))
+                component_statuses.append(
+                    EnsembleComponentStatus(
+                        component_name=component_name,
+                        model_path=model_path,
+                        exists=False,
+                        last_modified=None,
+                        age_hours=None,
+                        is_available=False,
+                        message=f"Model file missing: {model_path}",
+                    )
+                )
                 missing_components.append(component_name)
                 continue
 
@@ -324,15 +316,17 @@ class DataFreshnessValidator:
                 message = f"Model available (last modified {age_hours:.0f}h ago)"
                 available_count += 1
 
-            component_statuses.append(EnsembleComponentStatus(
-                component_name=component_name,
-                model_path=model_path,
-                exists=True,
-                last_modified=last_modified,
-                age_hours=age_hours,
-                is_available=is_available and not is_outdated,
-                message=message
-            ))
+            component_statuses.append(
+                EnsembleComponentStatus(
+                    component_name=component_name,
+                    model_path=model_path,
+                    exists=True,
+                    last_modified=last_modified,
+                    age_hours=age_hours,
+                    is_available=is_available and not is_outdated,
+                    message=message,
+                )
+            )
 
         # Additional check: R model predictions in database
         r_predictions_status = self._check_r_predictions_cached()
@@ -353,14 +347,10 @@ class DataFreshnessValidator:
             is_healthy=is_healthy,
             can_generate_predictions=can_generate_predictions,
             health_score=health_score,
-            components=component_statuses
+            components=component_statuses,
         )
 
-    def refresh_data(
-        self,
-        source: str,
-        **filters
-    ) -> RefreshReport:
+    def refresh_data(self, source: str, **filters) -> RefreshReport:
         """
         Refresh stale data by triggering appropriate update script.
 
@@ -396,7 +386,7 @@ class DataFreshnessValidator:
                 duration_seconds=duration,
                 records_updated=records,
                 success=True,
-                error=None
+                error=None,
             )
 
         except Exception as e:
@@ -411,7 +401,7 @@ class DataFreshnessValidator:
                 duration_seconds=duration,
                 records_updated=0,
                 success=False,
-                error=str(e)
+                error=str(e),
             )
 
     def get_freshness_indicator(self, source: str, **filters) -> str:
@@ -428,7 +418,7 @@ class DataFreshnessValidator:
         status = self.check_data_freshness(source, **filters)
         return status.indicator
 
-    def get_all_freshness_statuses(self) -> Dict[str, DataFreshnessStatus]:
+    def get_all_freshness_statuses(self) -> dict[str, DataFreshnessStatus]:
         """
         Check freshness of all monitored data sources.
 
@@ -447,11 +437,7 @@ class DataFreshnessValidator:
 
     # Private helper methods
 
-    def _get_last_updated(
-        self,
-        source: DataSource,
-        filters: Dict[str, Any]
-    ) -> Optional[datetime]:
+    def _get_last_updated(self, source: DataSource, filters: dict[str, Any]) -> datetime | None:
         """Query database for last_updated timestamp."""
 
         table_mapping = {
@@ -472,9 +458,7 @@ class DataFreshnessValidator:
             with psycopg2.connect(**self.db_config) as conn:
                 with conn.cursor() as cur:
                     # Build WHERE clause from filters
-                    where_clause = " AND ".join(
-                        f"{k} = %s" for k in filters.keys()
-                    )
+                    where_clause = " AND ".join(f"{k} = %s" for k in filters.keys())
                     where_clause = f"WHERE {where_clause}" if where_clause else ""
 
                     query = f"""
@@ -497,11 +481,13 @@ class DataFreshnessValidator:
         try:
             with psycopg2.connect(**self.db_config) as conn:
                 with conn.cursor() as cur:
-                    cur.execute("""
+                    cur.execute(
+                        """
                     SELECT COUNT(*)
                     FROM ml.r_model_predictions
                     WHERE created_at > NOW() - INTERVAL '7 days'
-                    """)
+                    """
+                    )
                     count = cur.fetchone()[0]
                     return count > 0
         except Exception as e:
@@ -540,7 +526,7 @@ if __name__ == "__main__":
 
     # Validate ensemble
     health = validator.validate_ensemble_availability()
-    print(f"\n=== Ensemble Health ===")
+    print("\n=== Ensemble Health ===")
     print(f"Available: {health.available_components}/{health.total_components}")
     print(f"Health score: {health.health_score:.0%}")
     print(f"Can generate predictions: {health.can_generate_predictions}")
@@ -551,7 +537,7 @@ if __name__ == "__main__":
         print(f"Outdated: {', '.join(health.outdated_components)}")
 
     # Check all sources
-    print(f"\n=== All Data Sources ===")
+    print("\n=== All Data Sources ===")
     statuses = validator.get_all_freshness_statuses()
     for source, status in statuses.items():
         print(f"{status.indicator} {source}: {status.message}")

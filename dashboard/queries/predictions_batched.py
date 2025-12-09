@@ -9,16 +9,21 @@ Author: Claude Code
 Date: November 22, 2025
 """
 
-from typing import List, Dict, Optional
-import pandas as pd
 import logging
+
+import pandas as pd
 import psycopg
 
 logger = logging.getLogger(__name__)
 
 # Import schema validation
 try:
-    from dashboard.utils.schema_validator import validate_schema, get_common_schemas, ValidationError
+    from dashboard.utils.schema_validator import (
+        ValidationError,
+        get_common_schemas,
+        validate_schema,
+    )
+
     SCHEMA_VALIDATION_AVAILABLE = True
 except ImportError:
     SCHEMA_VALIDATION_AVAILABLE = False
@@ -30,9 +35,7 @@ class BatchedPredictionQueries:
 
     @staticmethod
     def predictions_batch(
-        conn,
-        game_ids: List[str],
-        stat_type: str = 'passing_yards'
+        conn, game_ids: list[str], stat_type: str = "passing_yards"
     ) -> pd.DataFrame:
         """
         Fetch predictions for multiple games in a single query.
@@ -57,7 +60,7 @@ class BatchedPredictionQueries:
             return pd.DataFrame()
 
         # Generate parameterized placeholders for WHERE IN clause
-        placeholders = ','.join(['%s'] * len(game_ids))
+        placeholders = ",".join(["%s"] * len(game_ids))
 
         query = f"""
         SELECT
@@ -87,7 +90,7 @@ class BatchedPredictionQueries:
             # Schema validation
             if SCHEMA_VALIDATION_AVAILABLE and not df.empty:
                 schemas = get_common_schemas()
-                df = validate_schema(df, schemas.get('predictions', {}), strict=False)
+                df = validate_schema(df, schemas.get("predictions", {}), strict=False)
 
             logger.info(f"Batched fetch: {len(df)} predictions for {len(game_ids)} games")
             return df
@@ -102,10 +105,7 @@ class BatchedPredictionQueries:
 
     @staticmethod
     def line_movement_batch(
-        conn,
-        player_names: List[str],
-        days_back: int = 7,
-        prop_type: str = 'passing_yards'
+        conn, player_names: list[str], days_back: int = 7, prop_type: str = "passing_yards"
     ) -> pd.DataFrame:
         """
         Fetch line movement history for multiple players in a single query.
@@ -130,7 +130,7 @@ class BatchedPredictionQueries:
             return pd.DataFrame()
 
         # Generate parameterized placeholders for WHERE IN clause
-        placeholders = ','.join(['%s'] * len(player_names))
+        placeholders = ",".join(["%s"] * len(player_names))
 
         query = f"""
         SELECT
@@ -154,9 +154,11 @@ class BatchedPredictionQueries:
             # Schema validation
             if SCHEMA_VALIDATION_AVAILABLE and not df.empty:
                 schemas = get_common_schemas()
-                df = validate_schema(df, schemas.get('line_movement', {}), strict=False)
+                df = validate_schema(df, schemas.get("line_movement", {}), strict=False)
 
-            logger.info(f"Batched fetch: {len(df)} line movement records for {len(player_names)} players")
+            logger.info(
+                f"Batched fetch: {len(df)} line movement records for {len(player_names)} players"
+            )
             return df
 
         except psycopg.Error as e:
@@ -168,10 +170,7 @@ class BatchedPredictionQueries:
             return pd.DataFrame()
 
     @staticmethod
-    def game_predictions_batch(
-        conn,
-        game_ids: List[str]
-    ) -> pd.DataFrame:
+    def game_predictions_batch(conn, game_ids: list[str]) -> pd.DataFrame:
         """
         Fetch game-level predictions for multiple games in a single query.
 
@@ -194,7 +193,7 @@ class BatchedPredictionQueries:
             return pd.DataFrame()
 
         # Generate parameterized placeholders for WHERE IN clause
-        placeholders = ','.join(['%s'] * len(game_ids))
+        placeholders = ",".join(["%s"] * len(game_ids))
 
         query = f"""
         SELECT DISTINCT ON (game_id)
@@ -218,14 +217,16 @@ class BatchedPredictionQueries:
             # Schema validation
             if SCHEMA_VALIDATION_AVAILABLE and not df.empty:
                 schemas = get_common_schemas()
-                df = validate_schema(df, schemas.get('game_predictions', {}), strict=False)
+                df = validate_schema(df, schemas.get("game_predictions", {}), strict=False)
 
             logger.info(f"Batched fetch: {len(df)} game predictions for {len(game_ids)} games")
             return df
 
         except psycopg.Error as e:
             # Table might not exist yet - return empty DataFrame
-            logger.debug(f"Game predictions table query failed (expected if table doesn't exist): {e}")
+            logger.debug(
+                f"Game predictions table query failed (expected if table doesn't exist): {e}"
+            )
             return pd.DataFrame()
 
         except Exception as e:
@@ -234,9 +235,7 @@ class BatchedPredictionQueries:
 
     @staticmethod
     def predictions_with_odds_batch(
-        conn,
-        game_ids: List[str],
-        stat_type: str = 'passing_yards'
+        conn, game_ids: list[str], stat_type: str = "passing_yards"
     ) -> pd.DataFrame:
         """
         Fetch predictions with sportsbook odds for multiple games in a single query.
@@ -258,7 +257,7 @@ class BatchedPredictionQueries:
             return pd.DataFrame()
 
         # Generate parameterized placeholders for WHERE IN clause
-        placeholders = ','.join(['%s'] * len(game_ids))
+        placeholders = ",".join(["%s"] * len(game_ids))
 
         query = f"""
         WITH latest_odds AS (
@@ -331,7 +330,7 @@ class BatchedPredictionQueries:
             return pd.DataFrame()
 
 
-def create_lookup_dict(df: pd.DataFrame, key_column: str) -> Dict:
+def create_lookup_dict(df: pd.DataFrame, key_column: str) -> dict:
     """
     Convert DataFrame to dictionary for O(1) lookups.
 

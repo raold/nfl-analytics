@@ -36,8 +36,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)'''
 
-    new = '''# NOTE: Custom CSS removed in favor of Streamlit native components
-# See dashboard/components/cards.py for reusable component library'''
+    new = """# NOTE: Custom CSS removed in favor of Streamlit native components
+# See dashboard/components/cards.py for reusable component library"""
 
     return content.replace(old, new)
 
@@ -47,7 +47,10 @@ def add_components_import(content: str) -> str:
     # Find the line after imports (after "logging.basicConfig")
     import_section = "logging.basicConfig(level=logging.INFO)\nlogger = logging.getLogger(__name__)"
 
-    new_import = import_section + "\n\n# Import dashboard components\nfrom dashboard.components import (\n    service_health_card,\n    game_prediction_card,\n    section_banner,\n    live_games_banner,\n    international_games_banner,\n    scheduled_games_banner,\n    edge_summary_stats,\n    database_stats_row,\n)"
+    new_import = (
+        import_section
+        + "\n\n# Import dashboard components\nfrom dashboard.components import (\n    service_health_card,\n    game_prediction_card,\n    section_banner,\n    live_games_banner,\n    international_games_banner,\n    scheduled_games_banner,\n    edge_summary_stats,\n    database_stats_row,\n)"
+    )
 
     return content.replace(import_section, new_import)
 
@@ -57,7 +60,7 @@ def replace_service_health_cards(content: str) -> str:
     # Pattern matches the HTML service health card block
     pattern = r'st\.markdown\(f"""[\s\S]*?<div style="text-align: center; padding: 15px; background-color:.*?\{status_icon\}</div>[\s\S]*?</div>[\s\S]*?""", unsafe_allow_html=True\)'
 
-    replacement = '''service_health_card(name, port, is_healthy)'''
+    replacement = """service_health_card(name, port, is_healthy)"""
 
     return re.sub(pattern, replacement, content)
 
@@ -77,7 +80,7 @@ def replace_live_games_banner(content: str) -> str:
             </div>
             """, unsafe_allow_html=True)'''
 
-    new = '''live_games_banner()'''
+    new = """live_games_banner()"""
 
     return content.replace(old, new)
 
@@ -86,7 +89,7 @@ def replace_international_banner(content: str) -> str:
     """Replace INTERNATIONAL GAMES banner (line ~1979)."""
     old_pattern = r'st\.markdown\(f"""[\s\S]*?🌍 INTERNATIONAL GAMES - LIVE NOW \(\{len\(in_progress_intl_games\)\}.*?\)[\s\S]*?""", unsafe_allow_html=True\)'
 
-    new = 'international_games_banner(len(in_progress_intl_games))'
+    new = "international_games_banner(len(in_progress_intl_games))"
 
     return re.sub(old_pattern, new, content)
 
@@ -94,7 +97,6 @@ def replace_international_banner(content: str) -> str:
 def replace_scheduled_games_banner(content: str) -> str:
     """Replace scheduled games banners."""
     # Multiple patterns for different day labels
-    pattern = r'st\.markdown\(f"""[\s\S]*?<h3 style="color: white;.*?>[\s\S]*?🔴 LIVE NOW.*?</h3>[\s\S]*?""", unsafe_allow_html=True\)'
 
     # This is more complex - need to handle multiple cases
     # For now, return content unchanged (manual fix required)
@@ -116,10 +118,10 @@ def process_app_py(file_path: Path) -> tuple[str, int]:
     Returns:
         (modified_content, replacement_count)
     """
-    with open(file_path, 'r') as f:
+    with open(file_path) as f:
         content = f.read()
 
-    original_count = content.count('unsafe_allow_html=True')
+    original_count = content.count("unsafe_allow_html=True")
 
     # Apply replacements in order
     content = add_components_import(content)
@@ -129,7 +131,7 @@ def process_app_py(file_path: Path) -> tuple[str, int]:
     content = replace_live_games_banner(content)
     content = replace_international_banner(content)
 
-    final_count = content.count('unsafe_allow_html=True')
+    final_count = content.count("unsafe_allow_html=True")
     replacements_made = original_count - final_count
 
     return content, replacements_made
@@ -144,23 +146,25 @@ def process_game_predictions_patch(file_path: Path) -> tuple[str, int]:
     Returns:
         (modified_content, replacement_count)
     """
-    with open(file_path, 'r') as f:
+    with open(file_path) as f:
         content = f.read()
 
-    original_count = content.count('unsafe_allow_html=True')
+    original_count = content.count("unsafe_allow_html=True")
 
     # Replace the large game card HTML block with native component
     # Find the st.markdown block starting with "with st.container():"
-    old_pattern = r'with st\.container\(\):\s+st\.markdown\(f"""[\s\S]*?""", unsafe_allow_html=True\)'
+    old_pattern = (
+        r'with st\.container\(\):\s+st\.markdown\(f"""[\s\S]*?""", unsafe_allow_html=True\)'
+    )
 
-    new = '''with st.container():
+    new = """with st.container():
                 game_prediction_card(
                     game=game,
                     prediction=pred,
                     spread_edge=spread_edge,
                     total_edge=total_edge,
                     card_type="scheduled"
-                )'''
+                )"""
 
     content = re.sub(old_pattern, new, content)
 
@@ -169,7 +173,7 @@ def process_game_predictions_patch(file_path: Path) -> tuple[str, int]:
     new_import = import_section + "\nfrom dashboard.components import game_prediction_card"
     content = content.replace(import_section, new_import)
 
-    final_count = content.count('unsafe_allow_html=True')
+    final_count = content.count("unsafe_allow_html=True")
     replacements_made = original_count - final_count
 
     return content, replacements_made
@@ -188,13 +192,13 @@ def main():
         print(f"  - Found and replaced {count} HTML blocks")
 
         # Write backup
-        backup_path = app_py.with_suffix('.py.backup')
-        with open(backup_path, 'w') as f:
+        backup_path = app_py.with_suffix(".py.backup")
+        with open(backup_path, "w") as f:
             f.write(open(app_py).read())
         print(f"  - Created backup: {backup_path}")
 
         # Write modified content
-        with open(app_py, 'w') as f:
+        with open(app_py, "w") as f:
             f.write(modified_content)
         print(f"  - ✅ Updated {app_py}")
 
@@ -211,13 +215,13 @@ def main():
         print(f"  - Found and replaced {count} HTML blocks")
 
         # Write backup
-        backup_path = patch_py.with_suffix('.py.backup')
-        with open(backup_path, 'w') as f:
+        backup_path = patch_py.with_suffix(".py.backup")
+        with open(backup_path, "w") as f:
             f.write(open(patch_py).read())
         print(f"  - Created backup: {backup_path}")
 
         # Write modified content
-        with open(patch_py, 'w') as f:
+        with open(patch_py, "w") as f:
             f.write(modified_content)
         print(f"  - ✅ Updated {patch_py}")
 
@@ -225,7 +229,7 @@ def main():
         print(f"  - ❌ Error processing game_predictions_patch.py: {e}")
         return 1
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("Summary:")
     print("  - Created dashboard/components/cards.py (reusable component library)")
     print("  - Replaced HTML blocks with Streamlit native components")
@@ -234,7 +238,7 @@ def main():
     print("  1. Review changes: diff dashboard/app.py{,.backup}")
     print("  2. Test dashboard: streamlit run dashboard/app.py")
     print("  3. If issues found, restore: cp dashboard/app.py.backup dashboard/app.py")
-    print("="*80)
+    print("=" * 80)
 
     return 0
 

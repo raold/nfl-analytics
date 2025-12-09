@@ -48,8 +48,7 @@ Usage:
 
 import os
 import uuid
-from datetime import datetime, timezone
-from typing import Dict, List, Optional, Tuple
+from datetime import UTC, datetime
 
 import numpy as np
 import psycopg2
@@ -72,8 +71,8 @@ class PaperTradingEngine:
     def __init__(
         self,
         initial_bankroll: float = 10000.0,
-        session_id: Optional[str] = None,
-        strategy: str = 'paper_trading'
+        session_id: str | None = None,
+        strategy: str = "paper_trading",
     ):
         """
         Initialize paper trading engine.
@@ -98,7 +97,7 @@ class PaperTradingEngine:
 
     def _generate_session_id(self) -> str:
         """Generate unique session ID."""
-        timestamp = datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')
+        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         random_suffix = uuid.uuid4().hex[:8]
         return f"paper_{timestamp}_{random_suffix}"
 
@@ -110,29 +109,27 @@ class PaperTradingEngine:
             Database connection
         """
         conn = psycopg2.connect(
-            host=os.getenv('DB_HOST', 'localhost'),
-            port=int(os.getenv('DB_PORT', 5544)),
-            database=os.getenv('DB_NAME', 'devdb01'),
-            user=os.getenv('DB_USER', 'dro'),
-            password=os.getenv('DB_PASSWORD', 'sicillionbillions')
+            host=os.getenv("DB_HOST", "localhost"),
+            port=int(os.getenv("DB_PORT", 5544)),
+            database=os.getenv("DB_NAME", "devdb01"),
+            user=os.getenv("DB_USER", "dro"),
+            password=os.getenv("DB_PASSWORD", "sicillionbillions"),
         )
         return conn
 
     def _create_session(self):
         """Create paper trading session record in database."""
         with self.db_conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO paper_trading_sessions (
                     session_id, started_at, initial_bankroll, strategy
                 )
                 VALUES (%s, %s, %s, %s)
                 ON CONFLICT (session_id) DO NOTHING
-            """, (
-                self.session_id,
-                datetime.now(timezone.utc),
-                self.initial_bankroll,
-                self.strategy
-            ))
+            """,
+                (self.session_id, datetime.now(UTC), self.initial_bankroll, self.strategy),
+            )
             self.db_conn.commit()
 
     def place_paper_bet(
@@ -146,11 +143,11 @@ class PaperTradingEngine:
         odds: float,
         bookmaker_key: str,
         bet_amount: float,
-        edge: Optional[float] = None,
-        model_prediction: Optional[float] = None,
-        model_std: Optional[float] = None,
-        confidence: Optional[float] = None,
-        model_version: Optional[str] = None
+        edge: float | None = None,
+        model_prediction: float | None = None,
+        model_std: float | None = None,
+        confidence: float | None = None,
+        model_version: str | None = None,
     ) -> int:
         """
         Place a paper bet (hypothetical, no real money).
@@ -178,20 +175,19 @@ class PaperTradingEngine:
             ValueError: If bet parameters are invalid
         """
         # Validate inputs
-        if bet_side not in ['over', 'under']:
+        if bet_side not in ["over", "under"]:
             raise ValueError(f"bet_side must be 'over' or 'under', got {bet_side}")
 
         if bet_amount <= 0:
             raise ValueError(f"bet_amount must be positive, got {bet_amount}")
 
         if bet_amount > self.bankroll:
-            raise ValueError(
-                f"bet_amount ({bet_amount}) exceeds bankroll ({self.bankroll})"
-            )
+            raise ValueError(f"bet_amount ({bet_amount}) exceeds bankroll ({self.bankroll})")
 
         # Insert into database
         with self.db_conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 INSERT INTO paper_trades (
                     trade_timestamp, game_id, player_id, player_name,
                     prop_type, line_value, bet_side, odds, bookmaker_key,
@@ -202,46 +198,46 @@ class PaperTradingEngine:
                     %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
                 )
                 RETURNING paper_trade_id
-            """, (
-                datetime.now(timezone.utc),
-                game_id,
-                player_id,
-                player_name,
-                prop_type,
-                line_value,
-                bet_side,
-                odds,
-                bookmaker_key,
-                bet_amount,
-                edge,
-                model_prediction,
-                model_std,
-                confidence,
-                'pending',  # outcome
-                model_version,
-                self.strategy,
-                self.session_id
-            ))
+            """,
+                (
+                    datetime.now(UTC),
+                    game_id,
+                    player_id,
+                    player_name,
+                    prop_type,
+                    line_value,
+                    bet_side,
+                    odds,
+                    bookmaker_key,
+                    bet_amount,
+                    edge,
+                    model_prediction,
+                    model_std,
+                    confidence,
+                    "pending",  # outcome
+                    model_version,
+                    self.strategy,
+                    self.session_id,
+                ),
+            )
 
             paper_trade_id = cur.fetchone()[0]
             self.db_conn.commit()
 
         # Add to positions list
-        self.positions.append({
-            'paper_trade_id': paper_trade_id,
-            'bet_amount': bet_amount,
-            'odds': odds,
-            'line_value': line_value,
-            'bet_side': bet_side
-        })
+        self.positions.append(
+            {
+                "paper_trade_id": paper_trade_id,
+                "bet_amount": bet_amount,
+                "odds": odds,
+                "line_value": line_value,
+                "bet_side": bet_side,
+            }
+        )
 
         return paper_trade_id
 
-    def settle_bet(
-        self,
-        paper_trade_id: int,
-        actual_result: float
-    ) -> Tuple[str, float]:
+    def settle_bet(self, paper_trade_id: int, actual_result: float) -> tuple[str, float]:
         """
         Settle a paper bet with actual game result.
 
@@ -255,73 +251,66 @@ class PaperTradingEngine:
         """
         # Get bet details from database
         with self.db_conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT * FROM paper_trades
                 WHERE paper_trade_id = %s AND outcome = 'pending'
-            """, (paper_trade_id,))
+            """,
+                (paper_trade_id,),
+            )
 
             bet = cur.fetchone()
 
             if bet is None:
-                raise ValueError(
-                    f"No pending paper trade found with ID {paper_trade_id}"
-                )
+                raise ValueError(f"No pending paper trade found with ID {paper_trade_id}")
 
         # Determine outcome
-        line_value = bet['line_value']
-        bet_side = bet['bet_side']
-        bet_amount = bet['bet_amount']
-        odds = bet['odds']
+        line_value = bet["line_value"]
+        bet_side = bet["bet_side"]
+        bet_amount = bet["bet_amount"]
+        odds = bet["odds"]
 
         if actual_result > line_value:
             # Over hit
-            outcome = 'win' if bet_side == 'over' else 'loss'
+            outcome = "win" if bet_side == "over" else "loss"
         elif actual_result < line_value:
             # Under hit
-            outcome = 'win' if bet_side == 'under' else 'loss'
+            outcome = "win" if bet_side == "under" else "loss"
         else:
             # Push (exact line value)
-            outcome = 'push'
+            outcome = "push"
 
         # Calculate profit/loss
-        if outcome == 'win':
+        if outcome == "win":
             profit_loss = self._calculate_payout(bet_amount, odds) - bet_amount
-        elif outcome == 'loss':
+        elif outcome == "loss":
             profit_loss = -bet_amount
         else:  # push
             profit_loss = 0.0
 
         # Update database
         with self.db_conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 UPDATE paper_trades
                 SET actual_result = %s,
                     outcome = %s,
                     settled_at = %s,
                     profit_loss = %s
                 WHERE paper_trade_id = %s
-            """, (
-                actual_result,
-                outcome,
-                datetime.now(timezone.utc),
-                profit_loss,
-                paper_trade_id
-            ))
+            """,
+                (actual_result, outcome, datetime.now(UTC), profit_loss, paper_trade_id),
+            )
             self.db_conn.commit()
 
         # Update bankroll
         self.bankroll += profit_loss
 
         # Move from positions to closed_trades
-        self.positions = [
-            p for p in self.positions
-            if p['paper_trade_id'] != paper_trade_id
-        ]
-        self.closed_trades.append({
-            'paper_trade_id': paper_trade_id,
-            'outcome': outcome,
-            'profit_loss': profit_loss
-        })
+        self.positions = [p for p in self.positions if p["paper_trade_id"] != paper_trade_id]
+        self.closed_trades.append(
+            {"paper_trade_id": paper_trade_id, "outcome": outcome, "profit_loss": profit_loss}
+        )
 
         return outcome, profit_loss
 
@@ -345,7 +334,7 @@ class PaperTradingEngine:
 
         return bet_amount + winnings
 
-    def get_performance_metrics(self) -> Dict:
+    def get_performance_metrics(self) -> dict:
         """
         Calculate performance metrics for paper trading session.
 
@@ -364,7 +353,8 @@ class PaperTradingEngine:
         """
         with self.db_conn.cursor(cursor_factory=RealDictCursor) as cur:
             # Get settled bets
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT
                     outcome,
                     bet_amount,
@@ -374,48 +364,53 @@ class PaperTradingEngine:
                 WHERE session_id = %s
                   AND outcome IN ('win', 'loss', 'push')
                 ORDER BY settled_at ASC
-            """, (self.session_id,))
+            """,
+                (self.session_id,),
+            )
 
             settled_bets = cur.fetchall()
 
             # Get total and pending counts
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT
                     COUNT(*) as total_bets,
                     SUM(CASE WHEN outcome = 'pending' THEN 1 ELSE 0 END) as pending_bets
                 FROM paper_trades
                 WHERE session_id = %s
-            """, (self.session_id,))
+            """,
+                (self.session_id,),
+            )
 
             counts = cur.fetchone()
 
         if not settled_bets:
             return {
-                'total_bets': counts['total_bets'] or 0,
-                'settled_bets': 0,
-                'pending_bets': counts['pending_bets'] or 0,
-                'win_rate': 0.0,
-                'roi': 0.0,
-                'total_profit_loss': 0.0,
-                'sharpe_ratio': 0.0,
-                'max_drawdown': 0.0,
-                'current_bankroll': self.bankroll,
-                'bankroll_change': 0.0
+                "total_bets": counts["total_bets"] or 0,
+                "settled_bets": 0,
+                "pending_bets": counts["pending_bets"] or 0,
+                "win_rate": 0.0,
+                "roi": 0.0,
+                "total_profit_loss": 0.0,
+                "sharpe_ratio": 0.0,
+                "max_drawdown": 0.0,
+                "current_bankroll": self.bankroll,
+                "bankroll_change": 0.0,
             }
 
         # Calculate metrics
         num_settled = len(settled_bets)
-        num_wins = sum(1 for bet in settled_bets if bet['outcome'] == 'win')
+        num_wins = sum(1 for bet in settled_bets if bet["outcome"] == "win")
         win_rate = num_wins / num_settled if num_settled > 0 else 0.0
 
-        total_wagered = sum(bet['bet_amount'] for bet in settled_bets)
-        total_profit_loss = sum(bet['profit_loss'] for bet in settled_bets)
+        total_wagered = sum(bet["bet_amount"] for bet in settled_bets)
+        total_profit_loss = sum(bet["profit_loss"] for bet in settled_bets)
         roi = total_profit_loss / total_wagered if total_wagered > 0 else 0.0
 
         # Sharpe ratio (daily returns)
         daily_returns = []
         for bet in settled_bets:
-            daily_return = bet['profit_loss'] / bet['bet_amount']
+            daily_return = bet["profit_loss"] / bet["bet_amount"]
             daily_returns.append(daily_return)
 
         if len(daily_returns) > 1:
@@ -429,7 +424,7 @@ class PaperTradingEngine:
         cumulative_returns = []
         cumulative = 0.0
         for bet in settled_bets:
-            cumulative += bet['profit_loss']
+            cumulative += bet["profit_loss"]
             cumulative_returns.append(cumulative)
 
         if cumulative_returns:
@@ -445,16 +440,16 @@ class PaperTradingEngine:
             max_drawdown = 0.0
 
         return {
-            'total_bets': counts['total_bets'] or 0,
-            'settled_bets': num_settled,
-            'pending_bets': counts['pending_bets'] or 0,
-            'win_rate': win_rate,
-            'roi': roi,
-            'total_profit_loss': total_profit_loss,
-            'sharpe_ratio': sharpe_ratio,
-            'max_drawdown': max_drawdown,
-            'current_bankroll': self.bankroll,
-            'bankroll_change': self.bankroll - self.initial_bankroll
+            "total_bets": counts["total_bets"] or 0,
+            "settled_bets": num_settled,
+            "pending_bets": counts["pending_bets"] or 0,
+            "win_rate": win_rate,
+            "roi": roi,
+            "total_profit_loss": total_profit_loss,
+            "sharpe_ratio": sharpe_ratio,
+            "max_drawdown": max_drawdown,
+            "current_bankroll": self.bankroll,
+            "bankroll_change": self.bankroll - self.initial_bankroll,
         }
 
     def close_session(self):
@@ -462,7 +457,8 @@ class PaperTradingEngine:
         metrics = self.get_performance_metrics()
 
         with self.db_conn.cursor() as cur:
-            cur.execute("""
+            cur.execute(
+                """
                 UPDATE paper_trading_sessions
                 SET ended_at = %s,
                     final_bankroll = %s,
@@ -472,16 +468,18 @@ class PaperTradingEngine:
                     sharpe_ratio = %s,
                     max_drawdown = %s
                 WHERE session_id = %s
-            """, (
-                datetime.now(timezone.utc),
-                self.bankroll,
-                metrics['total_bets'],
-                metrics['win_rate'],
-                metrics['roi'],
-                metrics['sharpe_ratio'],
-                metrics['max_drawdown'],
-                self.session_id
-            ))
+            """,
+                (
+                    datetime.now(UTC),
+                    self.bankroll,
+                    metrics["total_bets"],
+                    metrics["win_rate"],
+                    metrics["roi"],
+                    metrics["sharpe_ratio"],
+                    metrics["max_drawdown"],
+                    self.session_id,
+                ),
+            )
             self.db_conn.commit()
 
         self.db_conn.close()

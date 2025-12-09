@@ -18,10 +18,7 @@ Created: November 22, 2025
 
 import logging
 import subprocess
-import sys
 import time
-from pathlib import Path
-from typing import Dict, List, Optional
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -31,6 +28,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # Example 1: Pre-commit Validation Workflow
 # ============================================================================
+
 
 def example_precommit_validation():
     """
@@ -61,6 +59,7 @@ def example_precommit_validation():
 # ============================================================================
 # Example 2: Dashboard Startup Validation
 # ============================================================================
+
 
 def example_dashboard_startup_validation():
     """
@@ -121,6 +120,7 @@ def example_dashboard_startup_validation():
 # Example 3: CI/CD Integration
 # ============================================================================
 
+
 def example_cicd_integration():
     """
     Example: Run validation in CI/CD pipeline.
@@ -144,9 +144,7 @@ def example_cicd_integration():
         print(f"\nRunning: {description}")
 
         result = subprocess.run(
-            ["./scripts/sync_frontend.sh", command],
-            capture_output=True,
-            text=True
+            ["./scripts/sync_frontend.sh", command], capture_output=True, text=True
         )
 
         if result.returncode != 0:
@@ -168,6 +166,7 @@ def example_cicd_integration():
 # Example 4: Prometheus Monitoring Integration
 # ============================================================================
 
+
 def example_prometheus_monitoring():
     """
     Example: Track schema health with Prometheus metrics.
@@ -185,24 +184,21 @@ def example_prometheus_monitoring():
         print("Install: pip install prometheus-client")
         return
 
-    from py.utils.frontend_engineering_agent import FrontendEngineeringAgent, Severity
+    from py.utils.frontend_engineering_agent import FrontendEngineeringAgent
 
     # Define metrics
     schema_errors = Counter(
-        'dashboard_schema_errors_total',
-        'Total schema validation errors',
-        ['error_type', 'severity']
+        "dashboard_schema_errors_total",
+        "Total schema validation errors",
+        ["error_type", "severity"],
     )
 
     schema_drift_detected = Gauge(
-        'dashboard_schema_drift_detected',
-        'Whether schema drift has been detected (0=no, 1=yes)'
+        "dashboard_schema_drift_detected", "Whether schema drift has been detected (0=no, 1=yes)"
     )
 
     api_contract_violations = Counter(
-        'dashboard_api_contract_violations_total',
-        'Total API contract violations',
-        ['endpoint']
+        "dashboard_api_contract_violations_total", "Total API contract violations", ["endpoint"]
     )
 
     # Run validation and track metrics
@@ -213,10 +209,7 @@ def example_prometheus_monitoring():
     report = agent.validate_dashboard_schema()
 
     for issue in report.issues:
-        schema_errors.labels(
-            error_type=issue.category,
-            severity=issue.severity.value
-        ).inc()
+        schema_errors.labels(error_type=issue.category, severity=issue.severity.value).inc()
 
     print(f"  Tracked {len(report.issues)} issues in metrics")
 
@@ -250,6 +243,7 @@ def example_prometheus_monitoring():
 # Example 5: Custom Validation Rules
 # ============================================================================
 
+
 def example_custom_validation_rules():
     """
     Example: Extend agent with custom validation rules.
@@ -262,8 +256,8 @@ def example_custom_validation_rules():
 
     from py.utils.frontend_engineering_agent import (
         FrontendEngineeringAgent,
+        Severity,
         ValidationIssue,
-        Severity
     )
 
     class CustomFrontendAgent(FrontendEngineeringAgent):
@@ -276,37 +270,46 @@ def example_custom_validation_rules():
             # Custom rule 1: Detect hardcoded seasons
             current_year = 2024  # Example year
             prev_year = 2023  # Example year
-            season_check = f"season = {current_year}" in query.lower() or f"season = {prev_year}" in query.lower()
+            season_check = (
+                f"season = {current_year}" in query.lower()
+                or f"season = {prev_year}" in query.lower()
+            )
             if season_check:
-                issues.append(ValidationIssue(
-                    severity=Severity.WARNING,
-                    category="hardcoded_value",
-                    message="Hardcoded season value detected",
-                    query=query,
-                    suggestion="Use parameter: WHERE season = %(season)s"
-                ))
+                issues.append(
+                    ValidationIssue(
+                        severity=Severity.WARNING,
+                        category="hardcoded_value",
+                        message="Hardcoded season value detected",
+                        query=query,
+                        suggestion="Use parameter: WHERE season = %(season)s",
+                    )
+                )
 
             # Custom rule 2: Require LIMIT on large tables
-            large_tables = ['plays', 'odds_history', 'injuries']
+            large_tables = ["plays", "odds_history", "injuries"]
             for table in large_tables:
-                if table in query.lower() and 'LIMIT' not in query.upper():
-                    issues.append(ValidationIssue(
-                        severity=Severity.WARNING,
-                        category="performance",
-                        message=f"Query on large table '{table}' without LIMIT",
-                        query=query,
-                        suggestion="Add LIMIT clause to prevent full table scan"
-                    ))
+                if table in query.lower() and "LIMIT" not in query.upper():
+                    issues.append(
+                        ValidationIssue(
+                            severity=Severity.WARNING,
+                            category="performance",
+                            message=f"Query on large table '{table}' without LIMIT",
+                            query=query,
+                            suggestion="Add LIMIT clause to prevent full table scan",
+                        )
+                    )
 
             # Custom rule 3: Enforce team abbreviation patterns
             if "WHERE team = 'LA'" in query or "home_team = 'LA'" in query:
-                issues.append(ValidationIssue(
-                    severity=Severity.ERROR,
-                    category="nfl_domain",
-                    message="Ambiguous team abbreviation 'LA'",
-                    query=query,
-                    suggestion="Use 'LAR' (Rams) or 'LAC' (Chargers)"
-                ))
+                issues.append(
+                    ValidationIssue(
+                        severity=Severity.ERROR,
+                        category="nfl_domain",
+                        message="Ambiguous team abbreviation 'LA'",
+                        query=query,
+                        suggestion="Use 'LAR' (Rams) or 'LAC' (Chargers)",
+                    )
+                )
 
             return issues
 
@@ -336,6 +339,7 @@ def example_custom_validation_rules():
 # Example 6: Integration with Sports Analytics Validator
 # ============================================================================
 
+
 def example_sports_analytics_integration():
     """
     Example: Combine frontend validation with NFL domain validation.
@@ -348,8 +352,8 @@ def example_sports_analytics_integration():
 
     from py.utils.frontend_engineering_agent import (
         FrontendEngineeringAgent,
+        Severity,
         ValidationIssue,
-        Severity
     )
 
     try:
@@ -374,13 +378,19 @@ def example_sports_analytics_integration():
 
             # Convert to ValidationIssue format
             for nfl_issue in nfl_issues:
-                issues.append(ValidationIssue(
-                    severity=Severity.ERROR if nfl_issue.severity.value == "ERROR" else Severity.WARNING,
-                    category="nfl_domain",
-                    message=nfl_issue.message,
-                    query=query,
-                    suggestion=getattr(nfl_issue, 'suggestion', None)
-                ))
+                issues.append(
+                    ValidationIssue(
+                        severity=(
+                            Severity.ERROR
+                            if nfl_issue.severity.value == "ERROR"
+                            else Severity.WARNING
+                        ),
+                        category="nfl_domain",
+                        message=nfl_issue.message,
+                        query=query,
+                        suggestion=getattr(nfl_issue, "suggestion", None),
+                    )
+                )
 
             return issues
 
@@ -410,6 +420,7 @@ def example_sports_analytics_integration():
 # Example 7: Automated Migration Application
 # ============================================================================
 
+
 def example_automated_migration():
     """
     Example: Apply automated migration updates.
@@ -423,7 +434,6 @@ def example_automated_migration():
     from py.utils.frontend_engineering_agent import (
         FrontendEngineeringAgent,
         MigrationUpdate,
-        Severity
     )
 
     def apply_migration_update(update: MigrationUpdate, dry_run: bool = True) -> bool:
@@ -433,7 +443,7 @@ def example_automated_migration():
             return False
 
         if dry_run:
-            print(f"\n[DRY RUN] Would apply update:")
+            print("\n[DRY RUN] Would apply update:")
             print(f"  File: {update.file_path}")
             if update.line_number:
                 print(f"  Line: {update.line_number}")
@@ -442,7 +452,7 @@ def example_automated_migration():
             return True
 
         # Actual application (not executed in dry run)
-        with open(update.file_path, 'r') as f:
+        with open(update.file_path) as f:
             content = f.read()
 
         # Only apply if old_code is unique
@@ -457,7 +467,7 @@ def example_automated_migration():
             new_content = content + "\n" + update.new_code
 
         # Write back
-        with open(update.file_path, 'w') as f:
+        with open(update.file_path, "w") as f:
             f.write(new_content)
 
         logger.info(f"✅ Applied update to {update.file_path}")
@@ -490,6 +500,7 @@ def example_automated_migration():
 # Main - Run All Examples
 # ============================================================================
 
+
 def main():
     """Run all integration examples"""
     examples = [
@@ -518,6 +529,7 @@ def main():
         except Exception as e:
             print(f"❌ Example failed: {e}")
             import traceback
+
             traceback.print_exc()
 
         print("\n")

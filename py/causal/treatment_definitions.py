@@ -4,12 +4,11 @@ Treatment Definitions for Causal Inference
 Defines treatment events and exposure variables for causal analysis.
 """
 
-import pandas as pd
-import numpy as np
-from typing import List, Optional, Dict, Tuple
-from dataclasses import dataclass
-from datetime import datetime, timedelta
 import logging
+from dataclasses import dataclass
+from datetime import datetime
+
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -17,13 +16,14 @@ logger = logging.getLogger(__name__)
 @dataclass
 class TreatmentEvent:
     """Represents a treatment event"""
+
     player_id: str
     player_name: str
     treatment_type: str
     treatment_date: datetime
     season: int
     week: int
-    metadata: Dict = None
+    metadata: dict = None
 
 
 class TreatmentDefiner:
@@ -33,9 +33,7 @@ class TreatmentDefiner:
         pass
 
     def define_injury_treatment(
-        self,
-        df: pd.DataFrame,
-        injury_threshold_carries: int = 5
+        self, df: pd.DataFrame, injury_threshold_carries: int = 5
     ) -> pd.DataFrame:
         """
         Define injury treatment as sudden drop in carries.
@@ -50,15 +48,15 @@ class TreatmentDefiner:
         Returns:
             DataFrame with 'injury_treatment' column (0/1)
         """
-        df = df.sort_values(['player_id', 'game_date'])
+        df = df.sort_values(["player_id", "game_date"])
 
         # Lag carries by 1 game
-        df['carries_lag1'] = df.groupby('player_id')['rushing_attempts'].shift(1)
+        df["carries_lag1"] = df.groupby("player_id")["rushing_attempts"].shift(1)
 
         # Treatment = drop from >= threshold to < threshold
-        df['injury_treatment'] = (
-            (df['carries_lag1'] >= injury_threshold_carries) &
-            (df['rushing_attempts'] < injury_threshold_carries)
+        df["injury_treatment"] = (
+            (df["carries_lag1"] >= injury_threshold_carries)
+            & (df["rushing_attempts"] < injury_threshold_carries)
         ).astype(int)
 
         logger.info(f"Defined injury treatment: {df['injury_treatment'].sum()} events")
@@ -66,9 +64,7 @@ class TreatmentDefiner:
         return df
 
     def define_coaching_change_treatment(
-        self,
-        df: pd.DataFrame,
-        coach_changes: List[Tuple[str, int, int]]
+        self, df: pd.DataFrame, coach_changes: list[tuple[str, int, int]]
     ) -> pd.DataFrame:
         """
         Define coaching change treatment.
@@ -80,20 +76,18 @@ class TreatmentDefiner:
         Returns:
             DataFrame with 'coaching_change' column (0/1)
         """
-        df['coaching_change'] = 0
+        df["coaching_change"] = 0
 
         for team, season, week in coach_changes:
-            mask = (df['team'] == team) & (df['season'] == season) & (df['week'] >= week)
-            df.loc[mask, 'coaching_change'] = 1
+            mask = (df["team"] == team) & (df["season"] == season) & (df["week"] >= week)
+            df.loc[mask, "coaching_change"] = 1
 
         logger.info(f"Defined coaching changes: {len(coach_changes)} events")
 
         return df
 
     def define_usage_increase_treatment(
-        self,
-        df: pd.DataFrame,
-        usage_threshold: float = 1.5
+        self, df: pd.DataFrame, usage_threshold: float = 1.5
     ) -> pd.DataFrame:
         """
         Define usage increase treatment (e.g., 50% increase in carries).
@@ -105,17 +99,16 @@ class TreatmentDefiner:
         Returns:
             DataFrame with 'usage_increase' column (0/1)
         """
-        df = df.sort_values(['player_id', 'game_date'])
+        df = df.sort_values(["player_id", "game_date"])
 
         # Calculate 4-game rolling average of carries
-        df['carries_l4'] = (
-            df.groupby('player_id')['rushing_attempts']
-            .transform(lambda x: x.shift(1).rolling(4, min_periods=2).mean())
+        df["carries_l4"] = df.groupby("player_id")["rushing_attempts"].transform(
+            lambda x: x.shift(1).rolling(4, min_periods=2).mean()
         )
 
         # Treatment = current carries > threshold * historical average
-        df['usage_increase'] = (
-            df['rushing_attempts'] > (usage_threshold * df['carries_l4'])
+        df["usage_increase"] = (
+            df["rushing_attempts"] > (usage_threshold * df["carries_l4"])
         ).astype(int)
 
         logger.info(f"Defined usage increases: {df['usage_increase'].sum()} events")
@@ -123,10 +116,8 @@ class TreatmentDefiner:
         return df
 
     def extract_treatment_events(
-        self,
-        df: pd.DataFrame,
-        treatment_col: str
-    ) -> List[TreatmentEvent]:
+        self, df: pd.DataFrame, treatment_col: str
+    ) -> list[TreatmentEvent]:
         """
         Extract list of treatment events from panel.
 
@@ -143,16 +134,16 @@ class TreatmentDefiner:
 
         for _, row in treated.iterrows():
             event = TreatmentEvent(
-                player_id=row.get('player_id', row.get('team')),
-                player_name=row.get('player_name', row.get('team')),
+                player_id=row.get("player_id", row.get("team")),
+                player_name=row.get("player_name", row.get("team")),
                 treatment_type=treatment_col,
-                treatment_date=row['game_date'],
-                season=row['season'],
-                week=row['week'],
+                treatment_date=row["game_date"],
+                season=row["season"],
+                week=row["week"],
                 metadata={
-                    'rushing_attempts': row.get('rushing_attempts'),
-                    'rushing_yards': row.get('rushing_yards')
-                }
+                    "rushing_attempts": row.get("rushing_attempts"),
+                    "rushing_yards": row.get("rushing_yards"),
+                },
             )
             events.append(event)
 
@@ -161,11 +152,7 @@ class TreatmentDefiner:
         return events
 
     def create_treatment_periods(
-        self,
-        df: pd.DataFrame,
-        treatment_col: str,
-        pre_period: int = 4,
-        post_period: int = 4
+        self, df: pd.DataFrame, treatment_col: str, pre_period: int = 4, post_period: int = 4
     ) -> pd.DataFrame:
         """
         Create pre/post treatment period indicators.
@@ -182,18 +169,19 @@ class TreatmentDefiner:
             - 0 = treatment game
             - Positive values = post-treatment
         """
-        df = df.sort_values(['player_id', 'game_date'])
+        df = df.sort_values(["player_id", "game_date"])
 
         # Find first treatment game for each player
-        treatment_games = df[df[treatment_col] == 1].groupby('player_id')['player_game_number'].min()
+        treatment_games = (
+            df[df[treatment_col] == 1].groupby("player_id")["player_game_number"].min()
+        )
 
-        df['treatment_game'] = df['player_id'].map(treatment_games)
-        df['treatment_period'] = df['player_game_number'] - df['treatment_game']
+        df["treatment_game"] = df["player_id"].map(treatment_games)
+        df["treatment_period"] = df["player_game_number"] - df["treatment_game"]
 
         # Keep only pre/post window
-        df['in_treatment_window'] = (
-            (df['treatment_period'] >= -pre_period) &
-            (df['treatment_period'] <= post_period)
+        df["in_treatment_window"] = (df["treatment_period"] >= -pre_period) & (
+            df["treatment_period"] <= post_period
         )
 
         return df

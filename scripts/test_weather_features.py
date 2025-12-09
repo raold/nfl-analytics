@@ -29,6 +29,7 @@ db_config = {
     "password": "sicillionbillions",
 }
 
+
 def test_weather_features():
     """Test weather feature extraction on known games."""
 
@@ -65,6 +66,7 @@ def test_weather_features():
     print("TEST COMPLETE")
     print("=" * 80)
     print()
+
 
 if __name__ == "__main__":
     test_weather_features()

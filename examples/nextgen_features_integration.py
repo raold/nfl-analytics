@@ -25,7 +25,6 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -90,7 +89,7 @@ def example_batch_extraction():
         results[team] = engine.get_team_ngs_features(team, season, week)
     elapsed = time.time() - start
 
-    print(f"\nBatch Extraction Complete:")
+    print("\nBatch Extraction Complete:")
     print(f"  Total Time: {elapsed:.2f}s")
     print(f"  Avg per Team: {elapsed/len(teams)*1000:.1f}ms")
     print(f"  Teams Processed: {len(results)}")
@@ -98,9 +97,9 @@ def example_batch_extraction():
     # Show top CPOE teams
     print("\nTop CPOE Teams (QB Accuracy):")
     cpoe_rankings = sorted(
-        [(team, features['ngs_cpoe']) for team, features in results.items()],
+        [(team, features["ngs_cpoe"]) for team, features in results.items()],
         key=lambda x: x[1],
-        reverse=True
+        reverse=True,
     )
     for rank, (team, cpoe) in enumerate(cpoe_rankings, 1):
         print(f"  {rank}. {team}: {cpoe:+.2f} pp")
@@ -113,8 +112,8 @@ def example_feature_integration():
     print("=" * 80)
 
     # Simulate integration with existing offensive/defensive features
-    from py.features.team_offensive_features import TeamOffensiveFeatures
     from py.features.nextgen_features import NextGenStatsFeatures
+    from py.features.team_offensive_features import TeamOffensiveFeatures
 
     team = "BUF"
     season = datetime.now().year if datetime.now().month >= 9 else datetime.now().year - 1
@@ -133,22 +132,22 @@ def example_feature_integration():
     # Merge features
     all_features = {**off_features, **ngs_features}
 
-    print(f"\nFeature Count:")
+    print("\nFeature Count:")
     print(f"  Traditional Offensive: {len(off_features)}")
     print(f"  Next Gen Stats: {len(ngs_features)}")
     print(f"  Total Combined: {len(all_features)}")
 
     # Compare EPA vs CPOE (different signal)
-    print(f"\nEPA vs CPOE Comparison:")
+    print("\nEPA vs CPOE Comparison:")
     print(f"  EPA per Play: {off_features['off_epa_per_play']:.4f}")
     print(f"  CPOE: {ngs_features['ngs_cpoe']:+.2f} pp")
-    print(f"  (CPOE captures QB accuracy beyond EPA)")
+    print("  (CPOE captures QB accuracy beyond EPA)")
 
     # Compare YPC vs RYOE
-    print(f"\nYPC vs RYOE Comparison:")
+    print("\nYPC vs RYOE Comparison:")
     print(f"  Yards per Carry: {off_features['off_avg_yds_per_rush']:.2f}")
     print(f"  Rush Yards Over Expected: {ngs_features['ngs_ryoe']:+.2f} yds/att")
-    print(f"  (RYOE accounts for blocking quality)")
+    print("  (RYOE accounts for blocking quality)")
 
 
 def example_feature_importance():

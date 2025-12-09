@@ -23,7 +23,6 @@ import os
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import psycopg2
 from psycopg2.extras import DictCursor
@@ -69,12 +68,12 @@ def extract_version(filename: str) -> str:
     if "_v" in filename:
         try:
             return "v" + filename.split("_v")[1].split("_")[0].split(".")[0]
-        except:
+        except Exception:
             pass
     return "v1.0"
 
 
-def get_db_metrics(model_name: str, conn) -> Optional[Dict]:
+def get_db_metrics(model_name: str, conn) -> dict | None:
     """Get performance metrics from database"""
     with conn.cursor() as cur:
         cur.execute(
@@ -108,7 +107,7 @@ def get_db_metrics(model_name: str, conn) -> Optional[Dict]:
     return None
 
 
-def generate_metadata(file_path: Path, conn=None) -> Dict:
+def generate_metadata(file_path: Path, conn=None) -> dict:
     """Generate comprehensive metadata for a model file"""
 
     # Basic file info
@@ -168,7 +167,7 @@ def generate_metadata(file_path: Path, conn=None) -> Dict:
     return metadata
 
 
-def scan_models_directory(base_path: Path = Path("models")) -> List[Path]:
+def scan_models_directory(base_path: Path = Path("models")) -> list[Path]:
     """Scan for model files"""
     extensions = {".pkl", ".pt", ".pth", ".rds", ".json"}
     exclude_dirs = {"__pycache__", ".git", "logs", "checkpoints"}
@@ -190,12 +189,14 @@ def scan_models_directory(base_path: Path = Path("models")) -> List[Path]:
     return model_files
 
 
-def generate_all_metadata(output_dir: Path = Path("models/metadata"), production_only: bool = False):
+def generate_all_metadata(
+    output_dir: Path = Path("models/metadata"), production_only: bool = False
+):
     """Generate metadata for all models"""
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Scanning models directory...")
+    print("Scanning models directory...")
     model_files = scan_models_directory()
     print(f"Found {len(model_files)} model files")
 

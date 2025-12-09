@@ -31,11 +31,10 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
+import json
 import logging
 import os
 from datetime import datetime, timedelta
-
-import json
 
 import numpy as np
 import pandas as pd
@@ -486,6 +485,7 @@ class EnhancedBayesianOnlineUpdater:
         # Initialize Dirichlet stacker for ensemble weights
         try:
             from py.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStackingByStatType
+
             self.dirichlet_stacker = DirichletBayesianStackingByStatType(
                 db_config=self.db_config,
                 use_db=True,
@@ -571,8 +571,8 @@ class EnhancedBayesianOnlineUpdater:
             logger.info(f"Found {len(game_predictions_df)} game predictions")
 
             # Update Dirichlet weights for game outcomes (spread, total, win_prob)
-            for stat_type in ['spread', 'total', 'win_prob']:
-                stat_df = game_predictions_df[game_predictions_df['stat_type'] == stat_type]
+            for stat_type in ["spread", "total", "win_prob"]:
+                stat_df = game_predictions_df[game_predictions_df["stat_type"] == stat_type]
                 if not stat_df.empty:
                     self._update_dirichlet_weights(stat_df, f"{season}_W{week}")
 
@@ -631,12 +631,12 @@ class EnhancedBayesianOnlineUpdater:
         if self.dirichlet_stacker is None:
             return
 
-        for stat_type in predictions_df['stat_type'].unique():
-            stat_df = predictions_df[predictions_df['stat_type'] == stat_type]
+        for stat_type in predictions_df["stat_type"].unique():
+            stat_df = predictions_df[predictions_df["stat_type"] == stat_type]
 
             for _, row in stat_df.iterrows():
                 # Parse component predictions if stored as JSON
-                component_preds = row.get('component_predictions')
+                component_preds = row.get("component_predictions")
                 if isinstance(component_preds, str):
                     try:
                         component_preds = json.loads(component_preds)
@@ -652,11 +652,11 @@ class EnhancedBayesianOnlineUpdater:
                     self.dirichlet_stacker.update(
                         stat_type=stat_type,
                         component_predictions=component_preds,
-                        actual=row['actual_value'],
-                        game_id=row.get('game_id'),
-                        player_id=row.get('player_id'),
-                        season=row.get('season'),
-                        week=row.get('week'),
+                        actual=row["actual_value"],
+                        game_id=row.get("game_id"),
+                        player_id=row.get("player_id"),
+                        season=row.get("season"),
+                        week=row.get("week"),
                     )
                 except Exception as e:
                     logger.debug(f"Could not update Dirichlet for {stat_type}: {e}")
@@ -668,11 +668,11 @@ class EnhancedBayesianOnlineUpdater:
         player_updates = {}
 
         for _, row in predictions_df.iterrows():
-            if row['player_id'] and row['actual_value']:
+            if row["player_id"] and row["actual_value"]:
                 updated = self.player_updater.update_posterior(
-                    player_id=row['player_id'],
-                    prop_type=row['stat_type'],
-                    observation=row['actual_value'],
+                    player_id=row["player_id"],
+                    prop_type=row["stat_type"],
+                    observation=row["actual_value"],
                 )
                 player_updates[f"{row['player_id']}_{row['stat_type']}"] = updated
 
@@ -684,26 +684,27 @@ class EnhancedBayesianOnlineUpdater:
         """Record model performance by stat type."""
         cur = conn.cursor()
 
-        for stat_type in predictions_df['stat_type'].unique():
-            stat_df = predictions_df[predictions_df['stat_type'] == stat_type]
+        for stat_type in predictions_df["stat_type"].unique():
+            stat_df = predictions_df[predictions_df["stat_type"] == stat_type]
             if stat_df.empty:
                 continue
 
             # Compute metrics
-            errors = stat_df['prediction_error'].dropna()
+            errors = stat_df["prediction_error"].dropna()
             if len(errors) == 0:
                 continue
 
             mae = float(errors.abs().mean())
-            rmse = float(np.sqrt((errors ** 2).mean()))
+            rmse = float(np.sqrt((errors**2).mean()))
 
             # Get season/week from game_id
-            parts = game_id.split('_')
+            parts = game_id.split("_")
             season = int(parts[0]) if len(parts) > 0 else 2024
             week = int(parts[1]) if len(parts) > 1 else 1
 
             try:
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT INTO ml.stat_type_performance (
                         model_id, model_name, stat_type, stat_category,
                         season, week_start, week_end,
@@ -717,17 +718,23 @@ class EnhancedBayesianOnlineUpdater:
                         rmse = EXCLUDED.rmse,
                         n_predictions = EXCLUDED.n_predictions,
                         computed_at = EXCLUDED.computed_at
-                """, (
-                    self.model_version,
-                    stat_type,
-                    'player_prop' if stat_type not in ['spread', 'total', 'win_prob'] else 'game_outcome',
-                    season,
-                    week,
-                    week,
-                    mae,
-                    rmse,
-                    len(stat_df),
-                ))
+                """,
+                    (
+                        self.model_version,
+                        stat_type,
+                        (
+                            "player_prop"
+                            if stat_type not in ["spread", "total", "win_prob"]
+                            else "game_outcome"
+                        ),
+                        season,
+                        week,
+                        week,
+                        mae,
+                        rmse,
+                        len(stat_df),
+                    ),
+                )
             except Exception as e:
                 logger.debug(f"Could not record performance: {e}")
 
@@ -758,7 +765,7 @@ def run_online_updates():
         port=int(os.getenv("DB_PORT", "5544")),
         database=os.getenv("DB_NAME", "devdb01"),
         user=os.getenv("DB_USER", "dro"),
-        password=db_password
+        password=db_password,
     )
 
     query = """

@@ -29,29 +29,33 @@ class SystemQueries:
 
         # Total games
         result = conn.execute("SELECT COUNT(*) FROM games").fetchone()
-        stats['total_games'] = result[0] if result else 0
+        stats["total_games"] = result[0] if result else 0
 
         # Total plays
         result = conn.execute("SELECT COUNT(*) FROM plays").fetchone()
-        stats['total_plays'] = result[0] if result else 0
+        stats["total_plays"] = result[0] if result else 0
 
         # Season coverage
         result = conn.execute("SELECT MIN(season), MAX(season) FROM games").fetchone()
-        stats['season_min'] = result[0] if result and result[0] else 0
-        stats['season_max'] = result[1] if result and result[1] else 0
+        stats["season_min"] = result[0] if result and result[0] else 0
+        stats["season_max"] = result[1] if result and result[1] else 0
 
         # Database size
-        result = conn.execute("""
+        result = conn.execute(
+            """
             SELECT pg_size_pretty(pg_database_size('devdb01'))
-        """).fetchone()
-        stats['db_size'] = result[0] if result else 'N/A'
+        """
+        ).fetchone()
+        stats["db_size"] = result[0] if result else "N/A"
 
         # Latest completed game
-        result = conn.execute("""
+        result = conn.execute(
+            """
             SELECT MAX(kickoff) FROM games
             WHERE kickoff IS NOT NULL AND kickoff < NOW()
-        """).fetchone()
-        stats['latest_game'] = result[0] if result and result[0] else None
+        """
+        ).fetchone()
+        stats["latest_game"] = result[0] if result and result[0] else None
 
         return stats
 
@@ -77,10 +81,7 @@ class SystemQueries:
         return pd.read_sql_query(query, conn)
 
     @staticmethod
-    def recent_data_ingestion(
-        conn,
-        min_season: int = 2024
-    ) -> pd.DataFrame:
+    def recent_data_ingestion(conn, min_season: int = 2024) -> pd.DataFrame:
         """
         Get recent data ingestion history by season and week.
 
@@ -131,10 +132,7 @@ class SystemQueries:
         return pd.read_sql_query(query, conn)
 
     @staticmethod
-    def column_statistics(
-        conn,
-        schema: str = 'public'
-    ) -> pd.DataFrame:
+    def column_statistics(conn, schema: str = "public") -> pd.DataFrame:
         """
         Get column metadata for all tables in a schema.
 
@@ -184,10 +182,10 @@ class SystemQueries:
         if not result.empty:
             row = result.iloc[0]
             return {
-                'total_predictions': int(row['total_predictions']),
-                'predictions_with_actuals': int(row['predictions_with_actuals']),
-                'coverage_pct': float(row['coverage_pct']),
-                'avg_calibration': float(row['avg_calibration']),
+                "total_predictions": int(row["total_predictions"]),
+                "predictions_with_actuals": int(row["predictions_with_actuals"]),
+                "coverage_pct": float(row["coverage_pct"]),
+                "avg_calibration": float(row["avg_calibration"]),
             }
 
         return {}
@@ -214,10 +212,7 @@ class SystemQueries:
         return pd.read_sql_query(query, conn)
 
     @staticmethod
-    def slow_queries_log(
-        conn,
-        min_duration_ms: int = 1000
-    ) -> pd.DataFrame:
+    def slow_queries_log(conn, min_duration_ms: int = 1000) -> pd.DataFrame:
         """
         Get slow queries from pg_stat_statements (requires extension enabled).
 
@@ -319,10 +314,10 @@ class SystemQueries:
         if not result.empty:
             row = result.iloc[0]
             return {
-                'active_connections': int(row['active_connections']),
-                'idle_connections': int(row['idle_connections']),
-                'total_connections': int(row['total_connections']),
-                'max_connections': int(row['max_connections']),
+                "active_connections": int(row["active_connections"]),
+                "idle_connections": int(row["idle_connections"]),
+                "total_connections": int(row["total_connections"]),
+                "max_connections": int(row["max_connections"]),
             }
 
         return {}

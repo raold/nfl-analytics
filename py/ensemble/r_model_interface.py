@@ -31,7 +31,6 @@ Version: 1.0
 import logging
 import warnings
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -62,7 +61,7 @@ class RModelInterface:
         rpy2_initialized (bool): Whether rpy2 has been initialized
     """
 
-    def __init__(self, db_config: Dict, db_pool=None):
+    def __init__(self, db_config: dict, db_pool=None):
         """
         Initialize R model interface.
 
@@ -86,8 +85,8 @@ class RModelInterface:
             from rpy2.robjects.conversion import localconverter
 
             # Suppress R package loading messages
-            ro.r('suppressPackageStartupMessages(library(brms))')
-            ro.r('suppressPackageStartupMessages(library(cmdstanr))')
+            ro.r("suppressPackageStartupMessages(library(brms))")
+            ro.r("suppressPackageStartupMessages(library(cmdstanr))")
 
             self._r_session = ro
             self._pandas2ri = pandas2ri
@@ -116,6 +115,7 @@ class RModelInterface:
         else:
             # Fallback: Create new connection (legacy behavior)
             import contextlib
+
             @contextlib.contextmanager
             def _connection():
                 conn = psycopg2.connect(**self.db_config)
@@ -123,11 +123,10 @@ class RModelInterface:
                     yield conn
                 finally:
                     conn.close()
+
             return _connection()
 
-    def _fetch_player_features(
-        self, player_id: str, season: int, week: int
-    ) -> Optional[pd.DataFrame]:
+    def _fetch_player_features(self, player_id: str, season: int, week: int) -> pd.DataFrame | None:
         """
         Fetch player-game features from database.
 
@@ -205,7 +204,7 @@ class RModelInterface:
         model_path: Path,
         model_name: str,
         ndraws: int = 500,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Generate predictions from a brms model.
 
@@ -239,9 +238,7 @@ class RModelInterface:
                 return None
 
             # Convert to R dataframe
-            with self._localconverter(
-                ro.default_converter + self._pandas2ri.converter
-            ):
+            with self._localconverter(ro.default_converter + self._pandas2ri.converter):
                 r_df = ro.conversion.py2rpy(df)
 
             # Assign to R environment
@@ -254,7 +251,7 @@ class RModelInterface:
             # CRITICAL: allow_new_levels=TRUE for 2025 holdout (new player_season levels)
             # CRITICAL: sample_new_levels="uncertainty" to sample from random effects distribution
             ro.r(
-                f"posterior_preds <- posterior_predict(model, newdata = new_data, ndraws = {ndraws}, allow_new_levels = TRUE, sample_new_levels = \"uncertainty\")"
+                f'posterior_preds <- posterior_predict(model, newdata = new_data, ndraws = {ndraws}, allow_new_levels = TRUE, sample_new_levels = "uncertainty")'
             )
 
             # CRITICAL: R models predict log_yards, must exponentiate
@@ -283,7 +280,7 @@ class RModelInterface:
         week: int,
         model_path: Path,
         ndraws: int = 500,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Predict using Hierarchical Bayesian v2 model.
 
@@ -308,7 +305,7 @@ class RModelInterface:
         week: int,
         model_path: Path,
         ndraws: int = 500,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Predict using Informative Priors v2 model.
 
@@ -332,7 +329,7 @@ class RModelInterface:
         season: int,
         week: int,
         skills_df: pd.DataFrame,
-    ) -> Optional[Tuple[float, float]]:
+    ) -> tuple[float, float] | None:
         """
         Predict using State-Space Random Walk v2 (vectorized skills method).
 
@@ -380,9 +377,7 @@ class RModelInterface:
                 cursor.close()
 
             if not row:
-                logger.warning(
-                    f"State-space: No data for {player_id} W{week} {season}"
-                )
+                logger.warning(f"State-space: No data for {player_id} W{week} {season}")
                 return None
 
             attempts, is_home = row
@@ -411,10 +406,7 @@ class RModelInterface:
             R = 0.214  # Measurement noise SD
 
             # Model prediction: log(yards + 1) ~ N(theta + beta_attempts * log(attempts) + beta_home * is_home, R)
-            log_yards_plus_1_mean = (
-                theta + beta_attempts * np.log(attempts) + beta_home * is_home
-            )
-            log_yards_plus_1_std = R
+            log_yards_plus_1_mean = theta + beta_attempts * np.log(attempts) + beta_home * is_home
 
             # Transform to yards scale: yards = exp(log(yards + 1)) - 1
             # For lognormal: if X ~ N(μ, σ²), then exp(X) has mean exp(μ + σ²/2)
@@ -456,9 +448,7 @@ if __name__ == "__main__":
 
     # Test feature fetching
     print("\n1. Testing feature fetching...")
-    features = interface._fetch_player_features(
-        player_id="00-0019596", season=2024, week=9
-    )
+    features = interface._fetch_player_features(player_id="00-0019596", season=2024, week=9)
     if features is not None:
         print(f"✅ Fetched {len(features)} rows with {len(features.columns)} columns")
         print(f"   Columns: {list(features.columns)}")

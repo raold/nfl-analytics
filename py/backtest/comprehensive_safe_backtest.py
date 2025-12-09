@@ -19,25 +19,26 @@ Author: Claude Code
 Date: 2025-11-03
 """
 
-import psycopg
+import json
+from datetime import datetime
+from pathlib import Path
+
 import pandas as pd
-import numpy as np
+import psycopg
+import xgboost as xgb
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-import xgboost as xgb
-from sklearn.metrics import accuracy_score, roc_auc_score, log_loss, classification_report
+from sklearn.metrics import accuracy_score, log_loss, roc_auc_score
 from sklearn.model_selection import cross_val_score
-import json
-from pathlib import Path
-from datetime import datetime
 
 DB_CONFIG = {
     "host": "localhost",
     "port": 5544,
     "dbname": "devdb01",
     "user": "dro",
-    "password": "sicillionbillions"
+    "password": "sicillionbillions",
 }
+
 
 class ComprehensiveSafeBacktest:
     """
@@ -128,44 +129,32 @@ class ComprehensiveSafeBacktest:
         Add rolling statistics (SAFE - all use .shift(1)).
         """
         print("Computing rolling features...")
-        df = df.sort_values(['team', 'kickoff']).copy()
+        df = df.sort_values(["team", "kickoff"]).copy()
 
         # Rolling windows
         windows = [3, 5]
 
         for window in windows:
             # Points scored (previous games only)
-            df[f'avg_points_L{window}'] = (
-                df.groupby('team')['points_for']
-                .shift(1)
-                .rolling(window, min_periods=1)
-                .mean()
+            df[f"avg_points_L{window}"] = (
+                df.groupby("team")["points_for"].shift(1).rolling(window, min_periods=1).mean()
             )
 
             # Points allowed
-            df[f'avg_points_against_L{window}'] = (
-                df.groupby('team')['points_against']
-                .shift(1)
-                .rolling(window, min_periods=1)
-                .mean()
+            df[f"avg_points_against_L{window}"] = (
+                df.groupby("team")["points_against"].shift(1).rolling(window, min_periods=1).mean()
             )
 
             # Margin
-            df[f'avg_margin_L{window}'] = (
-                df.groupby('team')['margin']
-                .shift(1)
-                .rolling(window, min_periods=1)
-                .mean()
+            df[f"avg_margin_L{window}"] = (
+                df.groupby("team")["margin"].shift(1).rolling(window, min_periods=1).mean()
             )
 
         # Win percentage (previous games only)
-        df['won_game'] = (df['margin'] > 0).astype(int)
-        df['prev_wins'] = df.groupby('team')['won_game'].shift(1)
-        df['win_pct'] = (
-            df.groupby('team')['prev_wins']
-            .expanding()
-            .mean()
-            .reset_index(level=0, drop=True)
+        df["won_game"] = (df["margin"] > 0).astype(int)
+        df["prev_wins"] = df.groupby("team")["won_game"].shift(1)
+        df["win_pct"] = (
+            df.groupby("team")["prev_wins"].expanding().mean().reset_index(level=0, drop=True)
         )
 
         print(f"Added rolling features for windows: {windows}")
@@ -180,30 +169,29 @@ class ComprehensiveSafeBacktest:
         print("Preparing matchup features...")
 
         # Get home and away records
-        home_df = df[df['is_home'] == True].copy()
-        away_df = df[df['is_home'] == False].copy()
+        home_df = df[df["is_home"]].copy()
+        away_df = df[not df["is_home"]].copy()
 
         # Merge on game_id
-        matchups = home_df.merge(
-            away_df,
-            on='game_id',
-            suffixes=('_home', '_away')
-        )
+        matchups = home_df.merge(away_df, on="game_id", suffixes=("_home", "_away"))
 
         # Feature differentials (home - away)
         feature_cols = [
-            'avg_points_L3', 'avg_points_L5',
-            'avg_points_against_L3', 'avg_points_against_L5',
-            'avg_margin_L3', 'avg_margin_L5',
-            'win_pct'
+            "avg_points_L3",
+            "avg_points_L5",
+            "avg_points_against_L3",
+            "avg_points_against_L5",
+            "avg_margin_L3",
+            "avg_margin_L5",
+            "win_pct",
         ]
 
         for col in feature_cols:
-            if f'{col}_home' in matchups.columns and f'{col}_away' in matchups.columns:
-                matchups[f'{col}_diff'] = matchups[f'{col}_home'] - matchups[f'{col}_away']
+            if f"{col}_home" in matchups.columns and f"{col}_away" in matchups.columns:
+                matchups[f"{col}_diff"] = matchups[f"{col}_home"] - matchups[f"{col}_away"]
 
         # Target: home team covers spread
-        matchups['home_covers'] = matchups['margin_home'] > matchups['spread_close_home']
+        matchups["home_covers"] = matchups["margin_home"] > matchups["spread_close_home"]
 
         print(f"Created {len(matchups)} matchup records")
         return matchups
@@ -212,24 +200,24 @@ class ComprehensiveSafeBacktest:
         """
         Run comprehensive backtest with multiple models.
         """
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print("COMPREHENSIVE SAFE BACKTEST")
-        print("="*70)
+        print("=" * 70)
 
         # Feature set (SAFE only)
         safe_features = [
-            'spread_close_home',
-            'total_close_home',
-            'is_key_number_home',
-            'favorite_magnitude_home',
-            'is_favored_home',
-            'avg_points_L3_diff',
-            'avg_points_L5_diff',
-            'avg_points_against_L3_diff',
-            'avg_points_against_L5_diff',
-            'avg_margin_L3_diff',
-            'avg_margin_L5_diff',
-            'win_pct_diff'
+            "spread_close_home",
+            "total_close_home",
+            "is_key_number_home",
+            "favorite_magnitude_home",
+            "is_favored_home",
+            "avg_points_L3_diff",
+            "avg_points_L5_diff",
+            "avg_points_against_L3_diff",
+            "avg_points_against_L5_diff",
+            "avg_margin_L3_diff",
+            "avg_margin_L5_diff",
+            "win_pct_diff",
         ]
 
         # Filter to available features
@@ -240,11 +228,11 @@ class ComprehensiveSafeBacktest:
 
         # Prepare data
         X = matchups[available_features].fillna(0).values
-        y = matchups['home_covers'].astype(int).values
+        y = matchups["home_covers"].astype(int).values
 
         # Train/test split (2020-2023 train, 2024 test)
-        train_mask = matchups['season_home'] <= 2023
-        test_mask = matchups['season_home'] == 2024
+        train_mask = matchups["season_home"] <= 2023
+        test_mask = matchups["season_home"] == 2024
 
         X_train, y_train = X[train_mask], y[train_mask]
         X_test, y_test = X[test_mask], y[test_mask]
@@ -255,39 +243,48 @@ class ComprehensiveSafeBacktest:
         results = {}
 
         # Model 1: Logistic Regression (baseline)
-        print("\n" + "-"*70)
+        print("\n" + "-" * 70)
         print("MODEL 1: Logistic Regression (Baseline)")
-        print("-"*70)
-        results['logistic'] = self._test_model(
+        print("-" * 70)
+        results["logistic"] = self._test_model(
             LogisticRegression(random_state=42, max_iter=1000),
-            X_train, y_train, X_test, y_test,
-            "Logistic Regression"
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            "Logistic Regression",
         )
 
         # Model 2: Random Forest
-        print("\n" + "-"*70)
+        print("\n" + "-" * 70)
         print("MODEL 2: Random Forest")
-        print("-"*70)
-        results['random_forest'] = self._test_model(
+        print("-" * 70)
+        results["random_forest"] = self._test_model(
             RandomForestClassifier(n_estimators=100, random_state=42, max_depth=5),
-            X_train, y_train, X_test, y_test,
-            "Random Forest"
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            "Random Forest",
         )
 
         # Model 3: XGBoost
-        print("\n" + "-"*70)
+        print("\n" + "-" * 70)
         print("MODEL 3: XGBoost")
-        print("-"*70)
-        results['xgboost'] = self._test_model(
+        print("-" * 70)
+        results["xgboost"] = self._test_model(
             xgb.XGBClassifier(
                 n_estimators=100,
                 max_depth=3,
                 learning_rate=0.1,
                 random_state=42,
-                eval_metric='logloss'
+                eval_metric="logloss",
             ),
-            X_train, y_train, X_test, y_test,
-            "XGBoost"
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            "XGBoost",
         )
 
         return results
@@ -307,9 +304,9 @@ class ComprehensiveSafeBacktest:
         logloss = log_loss(y_test, y_pred_proba)
 
         # Cross-validation on training set
-        cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring='accuracy')
+        cv_scores = cross_val_score(model, X_train, y_train, cv=5, scoring="accuracy")
 
-        print(f"\nResults:")
+        print("\nResults:")
         print(f"  Test Accuracy: {acc:.3f} ({acc*100:.1f}%)")
         print(f"  Test AUC: {auc:.3f}")
         print(f"  Test Log Loss: {logloss:.3f}")
@@ -332,15 +329,15 @@ class ComprehensiveSafeBacktest:
             "test_log_loss": float(logloss),
             "cv_mean": float(cv_scores.mean()),
             "cv_std": float(cv_scores.std()),
-            "status": status
+            "status": status,
         }
 
     def save_results(self, results):
         """Save backtest results to JSON."""
-        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         output_file = self.output_dir / f"comprehensive_safe_backtest_{timestamp}.json"
 
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(results, f, indent=2)
 
         print(f"\n{'='*70}")
@@ -351,17 +348,17 @@ class ComprehensiveSafeBacktest:
         """Print summary of all models."""
         print(f"\n{'='*70}")
         print("SUMMARY - ALL MODELS")
-        print("="*70)
+        print("=" * 70)
 
         for model_name, result in results.items():
-            acc = result['test_accuracy']
+            acc = result["test_accuracy"]
             print(f"\n{result['model']}:")
             print(f"  Accuracy: {acc:.1%}")
             print(f"  AUC: {result['test_auc']:.3f}")
             print(f"  CV: {result['cv_mean']:.3f} ± {result['cv_std']:.3f}")
 
         # Overall assessment
-        all_realistic = all(0.52 <= r['test_accuracy'] <= 0.55 for r in results.values())
+        all_realistic = all(0.52 <= r["test_accuracy"] <= 0.55 for r in results.values())
 
         print(f"\n{'='*70}")
         if all_realistic:
@@ -370,7 +367,7 @@ class ComprehensiveSafeBacktest:
         else:
             print("⚠️  SOME MODELS OUTSIDE EXPECTED RANGE")
             print("  Review for possible remaining leakage or data quality issues")
-        print("="*70)
+        print("=" * 70)
 
 
 def main():

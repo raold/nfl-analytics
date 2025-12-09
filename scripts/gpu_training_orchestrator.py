@@ -11,16 +11,14 @@ Usage:
     python scripts/gpu_training_orchestrator.py --all      # Run everything
 """
 
-import subprocess
-import time
+import argparse
 import json
 import logging
-import argparse
-from pathlib import Path
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+import subprocess
 import sys
-import os
+import time
+from datetime import datetime, timedelta
+from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -28,18 +26,15 @@ sys.path.insert(0, str(project_root))
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('logs/gpu_orchestrator.log'),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("logs/gpu_orchestrator.log"), logging.StreamHandler()],
 )
 logger = logging.getLogger(__name__)
 
 
 class GPUTrainingJob:
     """Represents a single training job."""
-    
+
     def __init__(
         self,
         name: str,
@@ -48,7 +43,7 @@ class GPUTrainingJob:
         priority: int,
         estimated_hours: float,
         output_dir: str,
-        checkpoint_dir: Optional[str] = None
+        checkpoint_dir: str | None = None,
     ):
         self.name = name
         self.command = command
@@ -65,14 +60,14 @@ class GPUTrainingJob:
 
 class GPUTrainingOrchestrator:
     """Orchestrates GPU training jobs on RTX 4090."""
-    
+
     def __init__(self):
         self.jobs = self._define_training_jobs()
         self.completed_jobs = []
         self.failed_jobs = []
         self.current_job = None
-        
-    def _define_training_jobs(self) -> List[GPUTrainingJob]:
+
+    def _define_training_jobs(self) -> list[GPUTrainingJob]:
         """Define all training jobs with priorities."""
         jobs = [
             # Phase 1: Critical Models (5-7 hours)
@@ -89,7 +84,7 @@ class GPUTrainingOrchestrator:
                 priority=1,
                 estimated_hours=2.5,
                 output_dir="models/bayesian",
-                checkpoint_dir="models/bayesian/bnn_multioutput_checkpoints"
+                checkpoint_dir="models/bayesian/bnn_multioutput_checkpoints",
             ),
             GPUTrainingJob(
                 name="GNN Ablation Study",
@@ -103,9 +98,8 @@ class GPUTrainingOrchestrator:
                 priority=2,
                 estimated_hours=3.5,
                 output_dir="models/gnn/ablation",
-                checkpoint_dir="models/gnn/ablation"
+                checkpoint_dir="models/gnn/ablation",
             ),
-            
             # Phase 2: Experiment-RL Integration (9-14 hours)
             GPUTrainingJob(
                 name="cVAE Training",
@@ -121,7 +115,7 @@ class GPUTrainingOrchestrator:
                 priority=3,
                 estimated_hours=1.5,
                 output_dir="models/cvae",
-                checkpoint_dir="models/cvae/checkpoints"
+                checkpoint_dir="models/cvae/checkpoints",
             ),
             GPUTrainingJob(
                 name="DQN RL Agent",
@@ -136,7 +130,7 @@ class GPUTrainingOrchestrator:
                 priority=4,
                 estimated_hours=5.0,
                 output_dir="models/rl",
-                checkpoint_dir="models/rl/dqn_checkpoints"
+                checkpoint_dir="models/rl/dqn_checkpoints",
             ),
             GPUTrainingJob(
                 name="PPO RL Agent",
@@ -151,9 +145,8 @@ class GPUTrainingOrchestrator:
                 priority=5,
                 estimated_hours=5.0,
                 output_dir="models/rl",
-                checkpoint_dir="models/rl/ppo_checkpoints"
+                checkpoint_dir="models/rl/ppo_checkpoints",
             ),
-            
             # Phase 3: Hyperparameter Optimization (8-10 hours)
             GPUTrainingJob(
                 name="BNN Hyperparameter Search",
@@ -166,9 +159,8 @@ class GPUTrainingOrchestrator:
                 priority=6,
                 estimated_hours=9.0,
                 output_dir="experiments/optimization",
-                checkpoint_dir=None
+                checkpoint_dir=None,
             ),
-            
             # Phase 4: Evaluation & Backtesting (1-1.5 hours)
             GPUTrainingJob(
                 name="BNN Variant Evaluation",
@@ -181,7 +173,7 @@ class GPUTrainingOrchestrator:
                 priority=7,
                 estimated_hours=0.75,
                 output_dir="experiments/evaluation",
-                checkpoint_dir=None
+                checkpoint_dir=None,
             ),
             GPUTrainingJob(
                 name="Ensemble Backtest",
@@ -195,38 +187,38 @@ class GPUTrainingOrchestrator:
                 priority=8,
                 estimated_hours=0.5,
                 output_dir="reports/backtest",
-                checkpoint_dir=None
+                checkpoint_dir=None,
             ),
         ]
-        
+
         return sorted(jobs, key=lambda x: x.priority)
-    
-    def get_gpu_stats(self) -> Dict[str, float]:
+
+    def get_gpu_stats(self) -> dict[str, float]:
         """Get current GPU utilization stats."""
         try:
             result = subprocess.run(
                 [
-                    'nvidia-smi',
-                    '--query-gpu=utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw',
-                    '--format=csv,noheader,nounits'
+                    "nvidia-smi",
+                    "--query-gpu=utilization.gpu,memory.used,memory.total,temperature.gpu,power.draw",
+                    "--format=csv,noheader,nounits",
                 ],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
             )
-            
-            stats = result.stdout.strip().split(', ')
+
+            stats = result.stdout.strip().split(", ")
             return {
-                'gpu_utilization': float(stats[0]),
-                'memory_used_gb': float(stats[1]) / 1024,
-                'memory_total_gb': float(stats[2]) / 1024,
-                'temperature_c': float(stats[3]),
-                'power_w': float(stats[4])
+                "gpu_utilization": float(stats[0]),
+                "memory_used_gb": float(stats[1]) / 1024,
+                "memory_total_gb": float(stats[2]) / 1024,
+                "temperature_c": float(stats[3]),
+                "power_w": float(stats[4]),
             }
         except Exception as e:
             logger.warning(f"Failed to get GPU stats: {e}")
             return {}
-    
+
     def run_job(self, job: GPUTrainingJob) -> bool:
         """Run a single training job."""
         logger.info("=" * 80)
@@ -235,24 +227,26 @@ class GPUTrainingOrchestrator:
         logger.info(f"Estimated time: {job.estimated_hours:.1f} hours")
         logger.info(f"Command: {job.command}")
         logger.info("=" * 80)
-        
+
         job.start_time = datetime.now()
         job.status = "running"
         self.current_job = job
-        
+
         # Create output directories
         Path(job.output_dir).mkdir(parents=True, exist_ok=True)
         if job.checkpoint_dir:
             Path(job.checkpoint_dir).mkdir(parents=True, exist_ok=True)
-        
+
         # Log GPU stats before starting
         gpu_stats = self.get_gpu_stats()
         if gpu_stats:
-            logger.info(f"GPU Stats - Util: {gpu_stats['gpu_utilization']:.1f}%, "
-                       f"Memory: {gpu_stats['memory_used_gb']:.1f}/{gpu_stats['memory_total_gb']:.1f}GB, "
-                       f"Temp: {gpu_stats['temperature_c']:.0f}°C, "
-                       f"Power: {gpu_stats['power_w']:.1f}W")
-        
+            logger.info(
+                f"GPU Stats - Util: {gpu_stats['gpu_utilization']:.1f}%, "
+                f"Memory: {gpu_stats['memory_used_gb']:.1f}/{gpu_stats['memory_total_gb']:.1f}GB, "
+                f"Temp: {gpu_stats['temperature_c']:.0f}°C, "
+                f"Power: {gpu_stats['power_w']:.1f}W"
+            )
+
         try:
             # Run the training command
             process = subprocess.Popen(
@@ -261,26 +255,28 @@ class GPUTrainingOrchestrator:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
                 universal_newlines=True,
-                bufsize=1
+                bufsize=1,
             )
-            
+
             # Monitor output and GPU stats
             last_gpu_check = time.time()
-            for line in iter(process.stdout.readline, ''):
-                print(line, end='')  # Echo to console
-                
+            for line in iter(process.stdout.readline, ""):
+                print(line, end="")  # Echo to console
+
                 # Check GPU stats every 60 seconds
                 if time.time() - last_gpu_check > 60:
                     gpu_stats = self.get_gpu_stats()
                     if gpu_stats:
-                        logger.info(f"[GPU Monitor] Util: {gpu_stats['gpu_utilization']:.1f}%, "
-                                   f"Mem: {gpu_stats['memory_used_gb']:.1f}GB, "
-                                   f"Temp: {gpu_stats['temperature_c']:.0f}°C")
+                        logger.info(
+                            f"[GPU Monitor] Util: {gpu_stats['gpu_utilization']:.1f}%, "
+                            f"Mem: {gpu_stats['memory_used_gb']:.1f}GB, "
+                            f"Temp: {gpu_stats['temperature_c']:.0f}°C"
+                        )
                     last_gpu_check = time.time()
-            
+
             process.wait()
             job.exit_code = process.returncode
-            
+
             if process.returncode == 0:
                 job.status = "completed"
                 self.completed_jobs.append(job)
@@ -291,7 +287,7 @@ class GPUTrainingOrchestrator:
                 self.failed_jobs.append(job)
                 logger.error(f"❌ Job failed with exit code {process.returncode}: {job.name}")
                 return False
-                
+
         except KeyboardInterrupt:
             logger.warning(f"Job interrupted by user: {job.name}")
             process.terminate()
@@ -305,131 +301,140 @@ class GPUTrainingOrchestrator:
         finally:
             job.end_time = datetime.now()
             self.current_job = None
-            
+
             # Git commit results
             self._git_sync(job)
-    
+
     def _git_sync(self, job: GPUTrainingJob):
         """Commit and push results to Git."""
         try:
             logger.info("Syncing results to Git...")
-            
+
             # Stage relevant files
             subprocess.run(["git", "add", job.output_dir], check=True)
             if job.checkpoint_dir:
                 subprocess.run(["git", "add", job.checkpoint_dir], check=True)
             subprocess.run(["git", "add", "logs/"], check=True)
-            
+
             # Create commit message
-            duration = job.end_time - job.start_time if job.end_time and job.start_time else timedelta(0)
+            duration = (
+                job.end_time - job.start_time if job.end_time and job.start_time else timedelta(0)
+            )
             hours = duration.total_seconds() / 3600
             commit_msg = f"feat: complete {job.name} training on RTX 4090 - {hours:.1f}h - status: {job.status}"
-            
+
             # Commit and push
             subprocess.run(["git", "commit", "-m", commit_msg], check=False)
             subprocess.run(["git", "push", "origin", "main"], check=False)
-            
+
             logger.info("✅ Git sync completed")
         except Exception as e:
             logger.warning(f"Git sync failed: {e}")
-    
+
     def run_phase(self, phase: int):
         """Run all jobs in a specific phase."""
         phase_jobs = [job for job in self.jobs if job.phase == phase]
-        
+
         if not phase_jobs:
             logger.warning(f"No jobs found for phase {phase}")
             return
-        
+
         total_hours = sum(job.estimated_hours for job in phase_jobs)
         logger.info(f"\n🚀 Starting Phase {phase}")
         logger.info(f"Jobs to run: {len(phase_jobs)}")
         logger.info(f"Estimated total time: {total_hours:.1f} hours")
-        
+
         for job in phase_jobs:
             try:
                 self.run_job(job)
-                
+
                 # Short break between jobs to let GPU cool down
                 if job != phase_jobs[-1]:  # Not the last job
                     logger.info("Cooling down GPU for 30 seconds...")
                     time.sleep(30)
-                    
+
             except KeyboardInterrupt:
                 logger.warning("Phase interrupted by user")
                 break
-        
+
         self._print_summary()
-    
+
     def run_all(self):
         """Run all phases sequentially."""
         for phase in [1, 2, 3, 4]:
             self.run_phase(phase)
-    
+
     def _print_summary(self):
         """Print summary of completed and failed jobs."""
         logger.info("\n" + "=" * 80)
         logger.info("TRAINING SUMMARY")
         logger.info("=" * 80)
-        
+
         if self.completed_jobs:
             logger.info(f"\n✅ Completed ({len(self.completed_jobs)} jobs):")
             for job in self.completed_jobs:
-                duration = job.end_time - job.start_time if job.end_time and job.start_time else timedelta(0)
+                duration = (
+                    job.end_time - job.start_time
+                    if job.end_time and job.start_time
+                    else timedelta(0)
+                )
                 hours = duration.total_seconds() / 3600
                 logger.info(f"  - {job.name}: {hours:.1f}h")
-        
+
         if self.failed_jobs:
             logger.info(f"\n❌ Failed ({len(self.failed_jobs)} jobs):")
             for job in self.failed_jobs:
                 logger.info(f"  - {job.name}: exit_code={job.exit_code}")
-        
+
         pending_jobs = [job for job in self.jobs if job.status == "pending"]
         if pending_jobs:
             total_remaining = sum(job.estimated_hours for job in pending_jobs)
-            logger.info(f"\n⏳ Pending ({len(pending_jobs)} jobs, ~{total_remaining:.1f}h remaining)")
-    
+            logger.info(
+                f"\n⏳ Pending ({len(pending_jobs)} jobs, ~{total_remaining:.1f}h remaining)"
+            )
+
     def save_state(self, filepath: str = "gpu_orchestrator_state.json"):
         """Save orchestrator state for recovery."""
-        state = {
-            'timestamp': datetime.now().isoformat(),
-            'jobs': []
-        }
-        
+        state = {"timestamp": datetime.now().isoformat(), "jobs": []}
+
         for job in self.jobs:
-            state['jobs'].append({
-                'name': job.name,
-                'phase': job.phase,
-                'priority': job.priority,
-                'status': job.status,
-                'start_time': job.start_time.isoformat() if job.start_time else None,
-                'end_time': job.end_time.isoformat() if job.end_time else None,
-                'exit_code': job.exit_code
-            })
-        
-        with open(filepath, 'w') as f:
+            state["jobs"].append(
+                {
+                    "name": job.name,
+                    "phase": job.phase,
+                    "priority": job.priority,
+                    "status": job.status,
+                    "start_time": job.start_time.isoformat() if job.start_time else None,
+                    "end_time": job.end_time.isoformat() if job.end_time else None,
+                    "exit_code": job.exit_code,
+                }
+            )
+
+        with open(filepath, "w") as f:
             json.dump(state, f, indent=2)
-        
+
         logger.info(f"State saved to {filepath}")
 
 
 def main():
-    parser = argparse.ArgumentParser(description='GPU Training Orchestrator for RTX 4090')
-    parser.add_argument('--phase', type=int, choices=[1, 2, 3, 4],
-                      help='Run specific phase (1=critical, 2=overnight, 3=hyperparam, 4=evaluation)')
-    parser.add_argument('--all', action='store_true',
-                      help='Run all phases sequentially')
-    parser.add_argument('--job', type=str,
-                      help='Run specific job by name')
-    
+    parser = argparse.ArgumentParser(description="GPU Training Orchestrator for RTX 4090")
+    parser.add_argument(
+        "--phase",
+        type=int,
+        choices=[1, 2, 3, 4],
+        help="Run specific phase (1=critical, 2=overnight, 3=hyperparam, 4=evaluation)",
+    )
+    parser.add_argument("--all", action="store_true", help="Run all phases sequentially")
+    parser.add_argument("--job", type=str, help="Run specific job by name")
+
     args = parser.parse_args()
-    
+
     # Create logs directory
-    Path('logs').mkdir(exist_ok=True)
-    Path('logs/training').mkdir(exist_ok=True)
-    
+    Path("logs").mkdir(exist_ok=True)
+    Path("logs/training").mkdir(exist_ok=True)
+
     orchestrator = GPUTrainingOrchestrator()
-    
+
     try:
         if args.all:
             orchestrator.run_all()
@@ -456,5 +461,5 @@ def main():
         orchestrator._print_summary()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

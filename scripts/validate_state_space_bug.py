@@ -7,20 +7,22 @@ Confirms that state-space predictions (5-7 range) are dominating ensemble
 due to low variance, causing 191-yard MAE.
 """
 
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 # Load backtest results
-df = pd.read_csv('/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_FIXED_2022_2024.csv')
+df = pd.read_csv(
+    "/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_FIXED_2022_2024.csv"
+)
 
-print("="*80)
+print("=" * 80)
 print("STATE-SPACE BUG VALIDATION")
-print("="*80)
+print("=" * 80)
 print()
 
 # Calculate error
-df['error'] = df['actual_yards'] - df['prediction_mean']
-df['abs_error'] = df['error'].abs()
+df["error"] = df["actual_yards"] - df["prediction_mean"]
+df["abs_error"] = df["error"].abs()
 
 # Summary statistics
 print("1. ENSEMBLE PREDICTIONS (prediction_mean)")
@@ -58,16 +60,16 @@ print()
 print("5. PREDICTION UNCERTAINTY")
 print("-" * 80)
 print(f"   Ensemble std:    {df['prediction_std'].mean():.2f} yards ❌ TINY (unrealistic)")
-print(f"   Expected std:    ~30-50 yards (realistic)")
+print("   Expected std:    ~30-50 yards (realistic)")
 print()
 
 print("6. CORRELATION WITH ACTUAL")
 print("-" * 80)
-corr_ensemble = df['prediction_mean'].corr(df['actual_yards'])
-corr_bayesian = df['bayesian_mean'].corr(df['actual_yards'])
-corr_xgboost = df['xgboost_mean'].corr(df['actual_yards'])
-corr_bnn = df['bnn_mean'].corr(df['actual_yards'])
-corr_state_space = df['state_space_mean'].corr(df['actual_yards'])
+corr_ensemble = df["prediction_mean"].corr(df["actual_yards"])
+corr_bayesian = df["bayesian_mean"].corr(df["actual_yards"])
+corr_xgboost = df["xgboost_mean"].corr(df["actual_yards"])
+corr_bnn = df["bnn_mean"].corr(df["actual_yards"])
+corr_state_space = df["state_space_mean"].corr(df["actual_yards"])
 
 print(f"   Ensemble:        {corr_ensemble:.4f} ❌ NO PREDICTIVE POWER")
 print(f"   Bayesian:        {corr_bayesian:.4f} ✅")
@@ -78,8 +80,8 @@ print()
 
 print("7. SMOKING GUN: ENSEMBLE ≈ STATE-SPACE")
 print("-" * 80)
-corr_ensemble_ss = df['prediction_mean'].corr(df['state_space_mean'])
-mae_diff = (df['prediction_mean'] - df['state_space_mean']).abs().mean()
+corr_ensemble_ss = df["prediction_mean"].corr(df["state_space_mean"])
+mae_diff = (df["prediction_mean"] - df["state_space_mean"]).abs().mean()
 
 print(f"   Correlation:     {corr_ensemble_ss:.4f} (near 1.0 = state-space dominates)")
 print(f"   MAE difference:  {mae_diff:.4f} yards (near 0 = almost identical)")
@@ -93,9 +95,9 @@ else:
     print("   ⚠️ Hypothesis partially supported but needs investigation")
 
 print()
-print("="*80)
+print("=" * 80)
 print("CONCLUSION")
-print("="*80)
+print("=" * 80)
 print()
 print("✅ HYPOTHESIS CONFIRMED:")
 print("   - State-space predictions (5-7) are player ratings, NOT yards")
@@ -106,4 +108,4 @@ print()
 print("🔧 FIX: Disable state-space in backtest")
 print("   → Expected MAE: 50-60 yards (individual models are correct)")
 print()
-print("="*80)
+print("=" * 80)

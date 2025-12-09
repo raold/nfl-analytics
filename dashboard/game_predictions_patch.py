@@ -14,14 +14,13 @@ Author: Claude Code
 Date: 2025-11-21
 """
 
-import streamlit as st
-import pandas as pd
-import psycopg
-from datetime import datetime
-from typing import Optional, Dict, List
 import os
 import sys
 from pathlib import Path
+
+import pandas as pd
+import psycopg
+import streamlit as st
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -30,51 +29,54 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from dashboard.utils.db import get_db_connection
 except ImportError:
+
     def get_db_connection():
         import os
+
         DB_CONFIG = {
             "host": os.getenv("DB_HOST", "localhost"),
             "port": int(os.getenv("DB_PORT", "5544")),
             "dbname": os.getenv("DB_NAME", "devdb01"),
             "user": os.getenv("DB_USER", "dro"),
-            "password": os.getenv("DB_PASSWORD", "sicillionbillions")
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
         }
         return psycopg.connect(**DB_CONFIG)
+
 
 # Import API client
 from utils.api_client import APIClient
 
 # Import schema validation
 try:
-    from dashboard.utils.schema_validator import validate_schema, get_common_schemas, ValidationError
+    from dashboard.utils.schema_validator import (
+        ValidationError,
+        get_common_schemas,
+        validate_schema,
+    )
+
     SCHEMA_VALIDATION_AVAILABLE = True
 except ImportError:
     SCHEMA_VALIDATION_AVAILABLE = False
     import logging
+
     logging.warning("Schema validation not available - operating without validation")
 
 # Import dashboard constants
 from constants import (
-    STRONG_SPREAD_EDGE_THRESHOLD,
-    MODERATE_SPREAD_EDGE_THRESHOLD,
-    STRONG_TOTAL_EDGE_THRESHOLD,
-    MODERATE_TOTAL_EDGE_THRESHOLD,
-    SPREAD_TO_PROB_LOGISTIC_FACTOR,
-    QB_YARDS_TO_SCORE_INTERCEPT,
-    QB_YARDS_TO_SCORE_SLOPE,
     API_TIMEOUT_LONG,
-    COLOR_SUCCESS_BG,
-    COLOR_WARNING_BG,
-    COLOR_NEUTRAL_BG,
+    COLOR_NEUTRAL,
     COLOR_SUCCESS,
     COLOR_WARNING,
-    COLOR_NEUTRAL,
+    MODERATE_SPREAD_EDGE_THRESHOLD,
+    MODERATE_TOTAL_EDGE_THRESHOLD,
+    STRONG_SPREAD_EDGE_THRESHOLD,
+    STRONG_TOTAL_EDGE_THRESHOLD,
 )
-
 
 # ============================================================================
 # Helper Functions
 # ============================================================================
+
 
 def fetch_game_predictions_db(season: int, week: int) -> pd.DataFrame:
     """
@@ -91,16 +93,17 @@ def fetch_game_predictions_db(season: int, week: int) -> pd.DataFrame:
         DataFrame with stored predictions, or empty DataFrame if table doesn't exist
     """
     import logging
+
     logger = logging.getLogger(__name__)
 
     try:
         # Database config from environment
-        DB_CONFIG = {
+        {
             "host": os.getenv("DB_HOST", "localhost"),
             "port": int(os.getenv("DB_PORT", "5544")),
             "dbname": os.getenv("DB_NAME", "devdb01"),
             "user": os.getenv("DB_USER", "dro"),
-            "password": os.getenv("DB_PASSWORD", "sicillionbillions")
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
         }
 
         query = """
@@ -137,7 +140,7 @@ def fetch_game_predictions_db(season: int, week: int) -> pd.DataFrame:
         return pd.DataFrame()
 
 
-def call_game_prediction_api(game_id: str, season: int, week: int) -> Optional[Dict[str, Any]]:
+def call_game_prediction_api(game_id: str, season: int, week: int) -> dict[str, Any] | None:
     """
     Call FastAPI /predict/game endpoint to generate predictions on-the-fly.
 
@@ -178,11 +181,11 @@ def call_game_prediction_api(game_id: str, season: int, week: int) -> Optional[D
             return None
 
         # Extract QB passing yards (validated, no KeyError risk)
-        home_yards = prediction['home_qb_yards']
-        home_std = prediction['home_qb_yards_std']
-        away_yards = prediction['away_qb_yards']
-        away_std = prediction['away_qb_yards_std']
-        total_yards = prediction.get('total_yards', 0.0)
+        home_yards = prediction["home_qb_yards"]
+        home_std = prediction["home_qb_yards_std"]
+        away_yards = prediction["away_qb_yards"]
+        away_std = prediction["away_qb_yards_std"]
+        total_yards = prediction.get("total_yards", 0.0)
 
         # Estimate scores from QB yards (simple heuristic)
         # Historical correlation: team score ≈ 10 + (QB_yards / 20)
@@ -204,20 +207,20 @@ def call_game_prediction_api(game_id: str, season: int, week: int) -> Optional[D
             predicted_home_win_prob = 1 / (1 + math.exp(-predicted_spread / 7))
 
         return {
-            'game_id': prediction['game_id'],
-            'home_team': prediction['home_team'],
-            'away_team': prediction['away_team'],
-            'home_qb_yards': home_yards,
-            'home_qb_yards_std': home_std,
-            'away_qb_yards': away_yards,
-            'away_qb_yards_std': away_std,
-            'total_yards': total_yards,
-            'predicted_home_score': predicted_home_score,
-            'predicted_away_score': predicted_away_score,
-            'predicted_spread': predicted_spread,
-            'predicted_total': predicted_total,
-            'predicted_home_win_prob': predicted_home_win_prob,
-            'inference_time_ms': prediction.get('processing_ms', 0)
+            "game_id": prediction["game_id"],
+            "home_team": prediction["home_team"],
+            "away_team": prediction["away_team"],
+            "home_qb_yards": home_yards,
+            "home_qb_yards_std": home_std,
+            "away_qb_yards": away_yards,
+            "away_qb_yards_std": away_std,
+            "total_yards": total_yards,
+            "predicted_home_score": predicted_home_score,
+            "predicted_away_score": predicted_away_score,
+            "predicted_spread": predicted_spread,
+            "predicted_total": predicted_total,
+            "predicted_home_win_prob": predicted_home_win_prob,
+            "inference_time_ms": prediction.get("processing_ms", 0),
         }
 
     except Exception as e:
@@ -255,7 +258,7 @@ def get_edge_color(edge: float, bet_type: str) -> str:
     abs_edge = abs(edge)
 
     # Thresholds for significance
-    if bet_type == 'spread':
+    if bet_type == "spread":
         strong_threshold = STRONG_SPREAD_EDGE_THRESHOLD
         moderate_threshold = MODERATE_SPREAD_EDGE_THRESHOLD
     else:  # total
@@ -273,14 +276,15 @@ def get_edge_color(edge: float, bet_type: str) -> str:
 def get_team_logo_url(team_abbr: str) -> str:
     """Get team logo URL from ESPN."""
     # Normalize LAR for logo lookup
-    if team_abbr == 'LA':
-        team_abbr = 'LAR'
+    if team_abbr == "LA":
+        team_abbr = "LAR"
     return f"https://a.espncdn.com/i/teamlogos/nfl/500/{team_abbr}.png"
 
 
 # ============================================================================
 # Main Rendering Function
 # ============================================================================
+
 
 def render_game_predictions_comparison() -> None:
     """
@@ -298,8 +302,9 @@ def render_game_predictions_comparison() -> None:
     # Get current NFL week from ESPN API (reuse existing function)
     try:
         from app import get_current_nfl_week
+
         current_season, current_week = get_current_nfl_week()
-    except:
+    except Exception:
         # Fallback if import fails
         current_season = 2025
         current_week = 12
@@ -316,7 +321,7 @@ def render_game_predictions_comparison() -> None:
             max_value=5.0,
             value=0.0,
             step=0.5,
-            help="Only show games with at least this much spread edge"
+            help="Only show games with at least this much spread edge",
         )
 
     with col2:
@@ -326,7 +331,7 @@ def render_game_predictions_comparison() -> None:
             max_value=10.0,
             value=0.0,
             step=1.0,
-            help="Only show games with at least this much total edge"
+            help="Only show games with at least this much total edge",
         )
 
     with col3:
@@ -335,12 +340,12 @@ def render_game_predictions_comparison() -> None:
             st.rerun()
 
     # Fetch games from database
-    DB_CONFIG = {
+    {
         "host": os.getenv("DB_HOST", "localhost"),
         "port": int(os.getenv("DB_PORT", "5544")),
         "dbname": os.getenv("DB_NAME", "devdb01"),
         "user": os.getenv("DB_USER", "dro"),
-        "password": os.getenv("DB_PASSWORD", "sicillionbillions")
+        "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
     }
 
     try:
@@ -374,7 +379,7 @@ def render_game_predictions_comparison() -> None:
         # Schema validation
         if SCHEMA_VALIDATION_AVAILABLE and not df_games.empty:
             schemas = get_common_schemas()
-            df_games = validate_schema(df_games, schemas['games'], strict=False)
+            df_games = validate_schema(df_games, schemas["games"], strict=False)
 
         if df_games.empty:
             st.info(f"No games found for Week {current_week} of {current_season} season.")
@@ -387,11 +392,13 @@ def render_game_predictions_comparison() -> None:
 
         with st.spinner("Generating predictions..."):
             for idx, game in df_games.iterrows():
-                game_id = game['game_id']
+                game_id = game["game_id"]
 
                 # Try to fetch from database first
                 df_pred = fetch_game_predictions_db(current_season, current_week)
-                db_pred = df_pred[df_pred['game_id'] == game_id] if not df_pred.empty else pd.DataFrame()
+                db_pred = (
+                    df_pred[df_pred["game_id"] == game_id] if not df_pred.empty else pd.DataFrame()
+                )
 
                 if not db_pred.empty:
                     # Use stored prediction
@@ -402,35 +409,37 @@ def render_game_predictions_comparison() -> None:
 
                 if pred:
                     # Calculate edges
-                    spread_edge = calculate_edge(pred.get('predicted_spread'), game['spread_close'])
-                    total_edge = calculate_edge(pred.get('predicted_total'), game['total_close'])
+                    spread_edge = calculate_edge(pred.get("predicted_spread"), game["spread_close"])
+                    total_edge = calculate_edge(pred.get("predicted_total"), game["total_close"])
 
                     # Apply filters
                     if abs(spread_edge) >= min_spread_edge or abs(total_edge) >= min_total_edge:
-                        games_with_predictions.append({
-                            'game': game,
-                            'prediction': pred,
-                            'spread_edge': spread_edge,
-                            'total_edge': total_edge
-                        })
+                        games_with_predictions.append(
+                            {
+                                "game": game,
+                                "prediction": pred,
+                                "spread_edge": spread_edge,
+                                "total_edge": total_edge,
+                            }
+                        )
 
         if not games_with_predictions:
             st.warning("No games match the selected edge filters.")
             return
 
         # Sort by total edge magnitude (descending)
-        games_with_predictions.sort(key=lambda x: abs(x['total_edge']), reverse=True)
+        games_with_predictions.sort(key=lambda x: abs(x["total_edge"]), reverse=True)
 
         # Display game cards
         for game_data in games_with_predictions:
-            game = game_data['game']
-            pred = game_data['prediction']
-            spread_edge = game_data['spread_edge']
-            total_edge = game_data['total_edge']
+            game = game_data["game"]
+            pred = game_data["prediction"]
+            spread_edge = game_data["spread_edge"]
+            total_edge = game_data["total_edge"]
 
             # Determine card styling based on edge
-            spread_color = get_edge_color(spread_edge, 'spread')
-            total_color = get_edge_color(total_edge, 'total')
+            spread_color = get_edge_color(spread_edge, "spread")
+            total_color = get_edge_color(total_edge, "total")
 
             # Use strongest edge for overall card styling
             if abs(spread_edge) >= 2.0 or abs(total_edge) >= 3.0:
@@ -441,7 +450,8 @@ def render_game_predictions_comparison() -> None:
                 card_style = "background-color: #ffffff; border-left: 5px solid #dee2e6;"
 
             with st.container():
-                st.markdown(f"""
+                st.markdown(
+                    f"""
                 <div style="{card_style} padding: 20px; border-radius: 10px; margin: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                         <div style="text-align: center; flex: 1;">
@@ -498,7 +508,9 @@ def render_game_predictions_comparison() -> None:
                         </div>
                     </div>
                 </div>
-                """, unsafe_allow_html=True)
+                """,
+                    unsafe_allow_html=True,
+                )
 
         # Summary stats
         st.markdown("---")
@@ -507,20 +519,29 @@ def render_game_predictions_comparison() -> None:
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            avg_spread_edge = sum(abs(g['spread_edge']) for g in games_with_predictions) / len(games_with_predictions)
+            avg_spread_edge = sum(abs(g["spread_edge"]) for g in games_with_predictions) / len(
+                games_with_predictions
+            )
             st.metric("Avg Spread Edge", f"{avg_spread_edge:.2f} pts")
 
         with col2:
-            avg_total_edge = sum(abs(g['total_edge']) for g in games_with_predictions) / len(games_with_predictions)
+            avg_total_edge = sum(abs(g["total_edge"]) for g in games_with_predictions) / len(
+                games_with_predictions
+            )
             st.metric("Avg Total Edge", f"{avg_total_edge:.2f} pts")
 
         with col3:
-            strong_edge_count = sum(1 for g in games_with_predictions if abs(g['spread_edge']) >= 2.0 or abs(g['total_edge']) >= 3.0)
+            strong_edge_count = sum(
+                1
+                for g in games_with_predictions
+                if abs(g["spread_edge"]) >= 2.0 or abs(g["total_edge"]) >= 3.0
+            )
             st.metric("Strong Edge Games", f"{strong_edge_count}")
 
         # Methodology note
         with st.expander("ℹ️ How Predictions Are Generated"):
-            st.markdown("""
+            st.markdown(
+                """
             **Current Method:**
             - Uses QB passing yards predictions from Ensemble v6.1 model
             - Estimates team scores using historical correlation: Score ≈ 10 + (QB_yards / 20)
@@ -540,22 +561,26 @@ def render_game_predictions_comparison() -> None:
             2. Incorporating team defense, injuries, weather, rest days
             3. Tracking historical accuracy and calibration
             4. Implementing proper bankroll management and risk controls
-            """)
+            """
+            )
 
     except psycopg.Error as e:
         st.error(f"Database error loading games: {e}")
         import logging
+
         logging.error(f"Database error in render_game_predictions_comparison: {e}", exc_info=True)
 
     except ValidationError as e:
         st.warning(f"Schema validation failed for games: {e}")
         import logging
+
         logging.warning(f"Schema mismatch in render_game_predictions_comparison: {e}")
 
     except Exception as e:
         st.error(f"Unexpected error loading game predictions: {str(e)}")
-        import traceback
         import logging
+        import traceback
+
         logging.error(f"Unexpected error in render_game_predictions_comparison: {e}", exc_info=True)
         st.code(traceback.format_exc())
 

@@ -13,14 +13,14 @@ import uuid
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pandas as pd
 import psycopg
 
 from etl.extract.base import ExtractionResult
 from etl.load.loaders import DatabaseLoader, LoadResult
-from etl.monitoring.alerts import AlertLevel, AlertManager
+from etl.monitoring.alerts import AlertManager
 from etl.monitoring.logging import get_pipeline_logger, set_correlation_id
 from etl.monitoring.metrics import MetricsCollector, PipelineMetrics
 from etl.transform.cleaners import DataCleaner
@@ -41,8 +41,8 @@ class PipelineResult:
     rows_failed: int
     start_time: datetime
     end_time: datetime
-    error_message: Optional[str] = None
-    metadata: Dict[str, Any] = None
+    error_message: str | None = None
+    metadata: dict[str, Any] = None
 
     @property
     def duration_seconds(self) -> float:
@@ -74,9 +74,9 @@ class BasePipeline(ABC):
         self,
         pipeline_name: str,
         db_conn: psycopg.Connection,
-        collector: Optional[MetricsCollector] = None,
-        alert_manager: Optional[AlertManager] = None,
-        config: Optional[Dict[str, Any]] = None
+        collector: MetricsCollector | None = None,
+        alert_manager: AlertManager | None = None,
+        config: dict[str, Any] | None = None,
     ):
         """
         Initialize pipeline.
@@ -105,15 +105,12 @@ class BasePipeline(ABC):
 
         # Pipeline logger with correlation ID
         self.logger = get_pipeline_logger(
-            f"etl.pipelines.{pipeline_name}",
-            log_level=self.config.get('log_level', 'INFO')
+            f"etl.pipelines.{pipeline_name}", log_level=self.config.get("log_level", "INFO")
         )
 
         # Metrics for this run
         self.metrics = PipelineMetrics(
-            pipeline_name=pipeline_name,
-            run_id=self.run_id,
-            start_time=datetime.now()
+            pipeline_name=pipeline_name, run_id=self.run_id, start_time=datetime.now()
         )
 
     def __enter__(self):
@@ -125,13 +122,10 @@ class BasePipeline(ABC):
         """Context manager exit with cleanup."""
         if exc_type is not None:
             self.logger.error(
-                f"Pipeline {self.pipeline_name} failed with exception: {exc_val}",
-                exc_info=True
+                f"Pipeline {self.pipeline_name} failed with exception: {exc_val}", exc_info=True
             )
             self.alert_manager.pipeline_failed(
-                self.pipeline_name,
-                str(exc_val),
-                context={"run_id": self.run_id}
+                self.pipeline_name, str(exc_val), context={"run_id": self.run_id}
             )
 
         self.logger.info(f"Pipeline {self.pipeline_name} completed (run_id={self.run_id})")
@@ -218,7 +212,7 @@ class BasePipeline(ABC):
                     "validate_duration": self.metrics.validate_duration,
                     "transform_duration": self.metrics.transform_duration,
                     "load_duration": self.metrics.load_duration,
-                }
+                },
             )
 
         except Exception as e:
@@ -228,9 +222,7 @@ class BasePipeline(ABC):
 
             # Send alert
             self.alert_manager.pipeline_failed(
-                self.pipeline_name,
-                str(e),
-                context={"run_id": self.run_id}
+                self.pipeline_name, str(e), context={"run_id": self.run_id}
             )
 
             end_time = datetime.now()
@@ -244,7 +236,7 @@ class BasePipeline(ABC):
                 rows_failed=self.metrics.rows_extracted - self.metrics.rows_loaded,
                 start_time=start_time,
                 end_time=end_time,
-                error_message=str(e)
+                error_message=str(e),
             )
 
     @abstractmethod
@@ -272,7 +264,7 @@ class BasePipeline(ABC):
             ValidationResult
         """
         # Get entity name from config or use pipeline name
-        entity_name = self.config.get('entity_name', 'schedules')
+        entity_name = self.config.get("entity_name", "schedules")
 
         return self.validator.validate(data, entity_name)
 
@@ -316,17 +308,16 @@ if __name__ == "__main__":
 
         def extract(self) -> ExtractionResult:
             """Extract sample data."""
-            df = pd.DataFrame({
-                'game_id': ['2025_01_SF_PIT', '2025_01_BAL_KC'],
-                'season': [2025, 2025],
-                'week': [1, 1],
-                'home_team': ['PIT', 'KC'],
-                'away_team': ['SF', 'BAL'],
-                'kickoff': [
-                    datetime(2025, 9, 5, 20, 0, 0),
-                    datetime(2025, 9, 5, 23, 0, 0)
-                ]
-            })
+            df = pd.DataFrame(
+                {
+                    "game_id": ["2025_01_SF_PIT", "2025_01_BAL_KC"],
+                    "season": [2025, 2025],
+                    "week": [1, 1],
+                    "home_team": ["PIT", "KC"],
+                    "away_team": ["SF", "BAL"],
+                    "kickoff": [datetime(2025, 9, 5, 20, 0, 0), datetime(2025, 9, 5, 23, 0, 0)],
+                }
+            )
 
             return ExtractionResult(
                 success=True,
@@ -335,22 +326,18 @@ if __name__ == "__main__":
                 extraction_time=datetime.now(),
                 duration_seconds=0.1,
                 source="example",
-                endpoint="sample_data"
+                endpoint="sample_data",
             )
 
         def transform(self, data: pd.DataFrame) -> pd.DataFrame:
             """Clean data."""
             # Example: Remove duplicates
-            return self.cleaner.remove_duplicates(data, subset=['game_id'])
+            return self.cleaner.remove_duplicates(data, subset=["game_id"])
 
         def load(self, data: pd.DataFrame) -> LoadResult:
             """Load to database."""
             # Note: This requires 'games' table to exist
-            return self.loader.upsert(
-                data,
-                'games',
-                conflict_columns=['game_id']
-            )
+            return self.loader.upsert(data, "games", conflict_columns=["game_id"])
 
     # Run example
     print("Example Pipeline Execution:")
@@ -362,7 +349,7 @@ if __name__ == "__main__":
         port=os.environ.get("POSTGRES_PORT", "5544"),
         dbname=os.environ.get("POSTGRES_DB", "devdb01"),
         user=os.environ.get("POSTGRES_USER", "dro"),
-        password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions")
+        password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions"),
     )
 
     try:

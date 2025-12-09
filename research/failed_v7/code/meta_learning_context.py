@@ -26,15 +26,14 @@ Date: November 16, 2025
 """
 
 import logging
-from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
 import psycopg2
 
+from py.features.market_dispersion_features import MarketDispersionFeatures
 from py.features.qb_experience_features import QBExperienceFeatures
 from py.features.roster_stability_features import RosterStabilityFeatures
-from py.features.market_dispersion_features import MarketDispersionFeatures
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +41,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # META-LEARNING CONTEXT ENGINE
 # ============================================================================
+
 
 class MetaLearningContextEngine:
     """
@@ -67,33 +67,33 @@ class MetaLearningContextEngine:
 
     # Division rivals (for is_division_game feature)
     DIVISIONS = {
-        'AFC East': ['BUF', 'MIA', 'NE', 'NYJ'],
-        'AFC North': ['BAL', 'CIN', 'CLE', 'PIT'],
-        'AFC South': ['HOU', 'IND', 'JAX', 'TEN'],
-        'AFC West': ['DEN', 'KC', 'LAC', 'LV'],
-        'NFC East': ['DAL', 'NYG', 'PHI', 'WAS'],
-        'NFC North': ['CHI', 'DET', 'GB', 'MIN'],
-        'NFC South': ['ATL', 'CAR', 'NO', 'TB'],
-        'NFC West': ['ARI', 'LAR', 'SEA', 'SF'],
+        "AFC East": ["BUF", "MIA", "NE", "NYJ"],
+        "AFC North": ["BAL", "CIN", "CLE", "PIT"],
+        "AFC South": ["HOU", "IND", "JAX", "TEN"],
+        "AFC West": ["DEN", "KC", "LAC", "LV"],
+        "NFC East": ["DAL", "NYG", "PHI", "WAS"],
+        "NFC North": ["CHI", "DET", "GB", "MIN"],
+        "NFC South": ["ATL", "CAR", "NO", "TB"],
+        "NFC West": ["ARI", "LAR", "SEA", "SF"],
     }
 
     def __init__(
         self,
-        db_host: str = 'localhost',
+        db_host: str = "localhost",
         db_port: int = 5544,
-        db_name: str = 'devdb01',
-        db_user: str = 'dro',
-        db_password: str = 'sicillionbillions',
+        db_name: str = "devdb01",
+        db_user: str = "dro",
+        db_password: str = "sicillionbillions",
     ):
         """
         Initialize context engine with database configuration.
         """
         self.db_config = {
-            'host': db_host,
-            'port': db_port,
-            'database': db_name,
-            'user': db_user,
-            'password': db_password,
+            "host": db_host,
+            "port": db_port,
+            "database": db_name,
+            "user": db_user,
+            "password": db_password,
         }
 
         # Initialize feature extractors
@@ -160,15 +160,15 @@ class MetaLearningContextEngine:
 
         # Step 3: Extract roster stability features
         roster_features = self.roster_stability.extract(
-            team=game_context['team'],
+            team=game_context["team"],
             season=season,
             week=week,
         )
 
         # Step 4: Extract market dispersion features
         market_features = self.market_dispersion.extract(
-            home_team=game_context['home_team'],
-            away_team=game_context['away_team'],
+            home_team=game_context["home_team"],
+            away_team=game_context["away_team"],
             season=season,
             week=week,
         )
@@ -177,23 +177,20 @@ class MetaLearningContextEngine:
         features = {
             # QB Experience (5 features)
             **qb_exp_onehot,  # qb_exp_rookie, qb_exp_developing, qb_exp_veteran, qb_exp_elite_veteran
-            'log_games_experience': qb_exp_raw['log_games_experience'],
-
+            "log_games_experience": qb_exp_raw["log_games_experience"],
             # Roster Stability (1 feature)
-            'roster_stability_l3': roster_features['roster_stability_l3'],
-
+            "roster_stability_l3": roster_features["roster_stability_l3"],
             # Market Dispersion (2 features)
-            'market_dispersion': market_features['market_dispersion'],
-            'high_dispersion_flag': market_features['high_dispersion_flag'],
-
+            "market_dispersion": market_features["market_dispersion"],
+            "high_dispersion_flag": market_features["high_dispersion_flag"],
             # Game Context (7 features)
-            'is_home': game_context['is_home'],
-            'is_dome_game': game_context['is_dome_game'],
-            'is_division_game': game_context['is_division_game'],
-            'temp_numeric': game_context['temp_numeric'],
-            'wind_numeric': game_context['wind_numeric'],
-            'is_cold_game': game_context['is_cold_game'],
-            'is_windy_game': game_context['is_windy_game'],
+            "is_home": game_context["is_home"],
+            "is_dome_game": game_context["is_dome_game"],
+            "is_division_game": game_context["is_division_game"],
+            "temp_numeric": game_context["temp_numeric"],
+            "wind_numeric": game_context["wind_numeric"],
+            "is_cold_game": game_context["is_cold_game"],
+            "is_windy_game": game_context["is_windy_game"],
         }
 
         # Convert to DataFrame (1 row)
@@ -208,7 +205,7 @@ class MetaLearningContextEngine:
         player_id: str,
         season: int,
         week: int,
-    ) -> Optional[Dict]:
+    ) -> dict | None:
         """
         Query database for game context (team, opponent, stadium, weather).
 
@@ -257,24 +254,24 @@ class MetaLearningContextEngine:
             row = df.iloc[0]
 
             # Check if division game
-            is_division = self._is_division_game(row['team'], row['opponent'])
+            is_division = self._is_division_game(row["team"], row["opponent"])
 
             # Derived features
-            is_cold_game = 1.0 if row['temp_numeric'] < 40 else 0.0
-            is_windy_game = 1.0 if row['wind_numeric'] > 15 else 0.0
+            is_cold_game = 1.0 if row["temp_numeric"] < 40 else 0.0
+            is_windy_game = 1.0 if row["wind_numeric"] > 15 else 0.0
 
             context = {
-                'team': str(row['team']),
-                'opponent': str(row['opponent']),
-                'home_team': str(row['home_team']),
-                'away_team': str(row['away_team']),
-                'is_home': float(row['is_home']),
-                'is_dome_game': float(row['is_dome_game']),
-                'is_division_game': 1.0 if is_division else 0.0,
-                'temp_numeric': float(row['temp_numeric']),
-                'wind_numeric': float(row['wind_numeric']),
-                'is_cold_game': is_cold_game,
-                'is_windy_game': is_windy_game,
+                "team": str(row["team"]),
+                "opponent": str(row["opponent"]),
+                "home_team": str(row["home_team"]),
+                "away_team": str(row["away_team"]),
+                "is_home": float(row["is_home"]),
+                "is_dome_game": float(row["is_dome_game"]),
+                "is_division_game": 1.0 if is_division else 0.0,
+                "temp_numeric": float(row["temp_numeric"]),
+                "wind_numeric": float(row["wind_numeric"]),
+                "is_cold_game": is_cold_game,
+                "is_windy_game": is_windy_game,
             }
 
             return context
@@ -292,27 +289,24 @@ class MetaLearningContextEngine:
         """
         default = {
             # QB Experience (assume developing QB)
-            'qb_exp_rookie': 0.0,
-            'qb_exp_developing': 1.0,
-            'qb_exp_veteran': 0.0,
-            'qb_exp_elite_veteran': 0.0,
-            'log_games_experience': np.log(51.0),  # ~50 games
-
+            "qb_exp_rookie": 0.0,
+            "qb_exp_developing": 1.0,
+            "qb_exp_veteran": 0.0,
+            "qb_exp_elite_veteran": 0.0,
+            "log_games_experience": np.log(51.0),  # ~50 games
             # Roster Stability (assume 85% stable)
-            'roster_stability_l3': 0.85,
-
+            "roster_stability_l3": 0.85,
             # Market Dispersion (assume moderate)
-            'market_dispersion': 0.75,
-            'high_dispersion_flag': 0.0,
-
+            "market_dispersion": 0.75,
+            "high_dispersion_flag": 0.0,
             # Game Context (assume neutral home game, dome, 65°F, 5mph wind)
-            'is_home': 0.5,  # Unknown home/away
-            'is_dome_game': 0.5,  # Unknown dome
-            'is_division_game': 0.0,
-            'temp_numeric': 65.0,
-            'wind_numeric': 5.0,
-            'is_cold_game': 0.0,
-            'is_windy_game': 0.0,
+            "is_home": 0.5,  # Unknown home/away
+            "is_dome_game": 0.5,  # Unknown dome
+            "is_division_game": 0.0,
+            "temp_numeric": 65.0,
+            "wind_numeric": 5.0,
+            "is_cold_game": 0.0,
+            "is_windy_game": 0.0,
         }
 
         return pd.DataFrame([default])
@@ -322,9 +316,10 @@ class MetaLearningContextEngine:
 # BATCH EXTRACTION (FOR TRAINING DATA)
 # ============================================================================
 
+
 def extract_context_features_batch(
     player_season_weeks: pd.DataFrame,
-    db_config: Optional[Dict] = None,
+    db_config: dict | None = None,
 ) -> pd.DataFrame:
     """
     Batch extract context features for multiple player-games.
@@ -340,11 +335,11 @@ def extract_context_features_batch(
     """
     if db_config is None:
         db_config = {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions',
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
     # Initialize engine
@@ -355,15 +350,15 @@ def extract_context_features_batch(
 
     for idx, row in player_season_weeks.iterrows():
         features = engine.extract_context_features(
-            player_id=row['player_id'],
-            season=row['season'],
-            week=row['week'],
+            player_id=row["player_id"],
+            season=row["season"],
+            week=row["week"],
         )
 
         # Add identifiers
-        features['player_id'] = row['player_id']
-        features['season'] = row['season']
-        features['week'] = row['week']
+        features["player_id"] = row["player_id"]
+        features["season"] = row["season"]
+        features["week"] = row["week"]
 
         results.append(features)
 

@@ -12,7 +12,7 @@ import logging
 import os
 from collections.abc import Iterable
 from datetime import date, datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import pandas as pd
 import requests
@@ -34,7 +34,7 @@ class OddsAPIExtractor(BaseExtractor):
     - Tracks API quota usage
     """
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         """
         Initialize Odds API extractor.
 
@@ -51,15 +51,15 @@ class OddsAPIExtractor(BaseExtractor):
         # Load environment if .env exists
         load_dotenv()
 
-        self.api_key = config.get('api_key') or os.environ.get('ODDS_API_KEY')
+        self.api_key = config.get("api_key") or os.environ.get("ODDS_API_KEY")
         if not self.api_key:
             raise ValueError("ODDS_API_KEY not found in config or environment")
 
-        self.api_base = config.get('api_base', 'https://api.the-odds-api.com/v4')
-        self.sport_key = config.get('sport_key', 'americanfootball_nfl')
-        self.regions = config.get('regions', 'us')
-        self.markets = config.get('markets', 'h2h,spreads,totals')
-        self.bookmakers = config.get('bookmakers')
+        self.api_base = config.get("api_base", "https://api.the-odds-api.com/v4")
+        self.sport_key = config.get("sport_key", "americanfootball_nfl")
+        self.regions = config.get("regions", "us")
+        self.markets = config.get("markets", "h2h,spreads,totals")
+        self.bookmakers = config.get("bookmakers")
 
         # Track API usage
         self.requests_made = 0
@@ -71,10 +71,7 @@ class OddsAPIExtractor(BaseExtractor):
         )
 
     def extract_historical(
-        self,
-        start_date: date,
-        end_date: Optional[date] = None,
-        **kwargs
+        self, start_date: date, end_date: date | None = None, **kwargs
     ) -> ExtractionResult:
         """
         Extract historical odds for a date range.
@@ -95,14 +92,16 @@ class OddsAPIExtractor(BaseExtractor):
 
         try:
             for snapshot_date in self._daterange(start_date, end_date):
-                snapshot_dt = datetime.combine(snapshot_date, datetime.min.time()).replace(tzinfo=None)
+                snapshot_dt = datetime.combine(snapshot_date, datetime.min.time()).replace(
+                    tzinfo=None
+                )
 
                 # Build request
                 response = self._fetch_snapshot(snapshot_dt)
 
                 # Track API usage
                 self.requests_made += 1
-                self.requests_remaining = response.headers.get('x-requests-remaining')
+                self.requests_remaining = response.headers.get("x-requests-remaining")
 
                 # Parse response
                 json_data = response.json()
@@ -138,8 +137,8 @@ class OddsAPIExtractor(BaseExtractor):
                     "end_date": str(end_date),
                     "requests_made": self.requests_made,
                     "requests_remaining": self.requests_remaining,
-                    "markets": self.markets
-                }
+                    "markets": self.markets,
+                },
             )
 
         except Exception as e:
@@ -154,7 +153,7 @@ class OddsAPIExtractor(BaseExtractor):
                 duration_seconds=duration,
                 source="odds_api",
                 endpoint=f"historical/{self.sport_key}/odds",
-                error=str(e)
+                error=str(e),
             )
 
     def _fetch_snapshot(self, snapshot_at: datetime) -> requests.Response:
@@ -172,7 +171,7 @@ class OddsAPIExtractor(BaseExtractor):
         """
         url = f"{self.api_base}/historical/sports/{self.sport_key}/odds"
 
-        params: Dict[str, Any] = {
+        params: dict[str, Any] = {
             "apiKey": self.api_key,
             "regions": self.regions,
             "markets": self.markets,
@@ -205,7 +204,7 @@ class OddsAPIExtractor(BaseExtractor):
 
         return response
 
-    def _extract_events(self, json_data: Any) -> List[Dict[str, Any]]:
+    def _extract_events(self, json_data: Any) -> list[dict[str, Any]]:
         """
         Extract events from JSON response.
 
@@ -225,10 +224,8 @@ class OddsAPIExtractor(BaseExtractor):
             return []
 
     def _flatten_events(
-        self,
-        events: List[Dict[str, Any]],
-        snapshot_at: datetime
-    ) -> List[Dict[str, Any]]:
+        self, events: list[dict[str, Any]], snapshot_at: datetime
+    ) -> list[dict[str, Any]]:
         """
         Flatten nested event/bookmaker/market/outcome structure.
 
@@ -239,7 +236,7 @@ class OddsAPIExtractor(BaseExtractor):
         Returns:
             List of flattened row dictionaries
         """
-        rows: List[Dict[str, Any]] = []
+        rows: list[dict[str, Any]] = []
 
         for event in events:
             event_id = event.get("id")
@@ -265,26 +262,28 @@ class OddsAPIExtractor(BaseExtractor):
                     market_last_update = self._parse_iso(market_last_update_str)
 
                     for outcome in market.get("outcomes") or []:
-                        rows.append({
-                            "event_id": event_id,
-                            "sport_key": sport_key,
-                            "commence_time": commence_time,
-                            "home_team": home_team,
-                            "away_team": away_team,
-                            "bookmaker_key": bookmaker_key,
-                            "bookmaker_title": bookmaker_title,
-                            "market_key": market_key,
-                            "market_last_update": market_last_update,
-                            "outcome_name": outcome.get("name"),
-                            "outcome_price": outcome.get("price"),
-                            "outcome_point": outcome.get("point"),
-                            "snapshot_at": snapshot_at,
-                            "book_last_update": book_last_update,
-                        })
+                        rows.append(
+                            {
+                                "event_id": event_id,
+                                "sport_key": sport_key,
+                                "commence_time": commence_time,
+                                "home_team": home_team,
+                                "away_team": away_team,
+                                "bookmaker_key": bookmaker_key,
+                                "bookmaker_title": bookmaker_title,
+                                "market_key": market_key,
+                                "market_last_update": market_last_update,
+                                "outcome_name": outcome.get("name"),
+                                "outcome_price": outcome.get("price"),
+                                "outcome_point": outcome.get("point"),
+                                "snapshot_at": snapshot_at,
+                                "book_last_update": book_last_update,
+                            }
+                        )
 
         return rows
 
-    def _parse_iso(self, value: Optional[str]) -> Optional[datetime]:
+    def _parse_iso(self, value: str | None) -> datetime | None:
         """Parse ISO datetime string."""
         if not value:
             return None
@@ -298,7 +297,7 @@ class OddsAPIExtractor(BaseExtractor):
         for offset in range((end - start).days + 1):
             yield start + timedelta(days=offset)
 
-    def extract(self, endpoint: str, params: Dict[str, Any]) -> pd.DataFrame:
+    def extract(self, endpoint: str, params: dict[str, Any]) -> pd.DataFrame:
         """
         Extract data (required by BaseExtractor).
 
@@ -309,8 +308,8 @@ class OddsAPIExtractor(BaseExtractor):
         Returns:
             DataFrame with odds data
         """
-        start_date = params.get('start_date')
-        end_date = params.get('end_date')
+        start_date = params.get("start_date")
+        end_date = params.get("end_date")
 
         if not start_date:
             raise ValueError("start_date required in params")
@@ -337,8 +336,13 @@ class OddsAPIExtractor(BaseExtractor):
             return True  # Empty is valid (might be no games that day)
 
         required_columns = [
-            'event_id', 'sport_key', 'bookmaker_key', 'market_key',
-            'outcome_name', 'outcome_price', 'snapshot_at'
+            "event_id",
+            "sport_key",
+            "bookmaker_key",
+            "market_key",
+            "outcome_name",
+            "outcome_price",
+            "snapshot_at",
         ]
 
         missing = set(required_columns) - set(data.columns)
@@ -356,24 +360,21 @@ if __name__ == "__main__":
 
     # Example: Extract odds for a single day
     config = {
-        'markets': 'h2h,spreads,totals',
-        'regions': 'us',
+        "markets": "h2h,spreads,totals",
+        "regions": "us",
         # api_key loaded from environment
     }
 
     extractor = OddsAPIExtractor(config)
 
     # Fetch Sept 1, 2024
-    result = extractor.extract_historical(
-        start_date=date(2024, 9, 1),
-        end_date=date(2024, 9, 1)
-    )
+    result = extractor.extract_historical(start_date=date(2024, 9, 1), end_date=date(2024, 9, 1))
 
     if result.success:
         print(f"✅ Extracted {result.row_count} rows in {result.duration_seconds:.1f}s")
         print(f"   API requests remaining: {result.metadata.get('requests_remaining')}")
         if result.data is not None and not result.data.empty:
-            print(f"\nSample data:")
+            print("\nSample data:")
             print(result.data.head())
     else:
         print(f"❌ Extraction failed: {result.error}")

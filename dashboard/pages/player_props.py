@@ -5,19 +5,17 @@ Player Props Dashboard
 Shows QB passing yards predictions vs sportsbook lines with edge analysis.
 """
 
-import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
-import plotly.express as px
-from plotly.subplots import make_subplots
-import psycopg
-from datetime import datetime, timedelta
-import numpy as np
-import sys
-import os
 import logging
-from pathlib import Path
+import os
+import sys
 from contextlib import contextmanager
+from pathlib import Path
+
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import psycopg
+import streamlit as st
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 # Import connection pool for psycopg3
 try:
     from py.utils.psycopg_pool import get_connection_pool
+
     POOL_AVAILABLE = True
 except ImportError:
     POOL_AVAILABLE = False
@@ -36,7 +35,12 @@ except ImportError:
 
 # Import schema validation
 try:
-    from dashboard.utils.schema_validator import validate_schema, get_common_schemas, ValidationError
+    from dashboard.utils.schema_validator import (
+        ValidationError,
+        get_common_schemas,
+        validate_schema,
+    )
+
     SCHEMA_VALIDATION_AVAILABLE = True
 except ImportError:
     SCHEMA_VALIDATION_AVAILABLE = False
@@ -48,8 +52,9 @@ DB_CONFIG = {
     "port": int(os.getenv("DB_PORT", "5544")),
     "dbname": os.getenv("DB_NAME", "devdb01"),
     "user": os.getenv("DB_USER", "dro"),
-    "password": os.getenv("DB_PASSWORD")  # Required: Set DB_PASSWORD environment variable
+    "password": os.getenv("DB_PASSWORD"),  # Required: Set DB_PASSWORD environment variable
 }
+
 
 # Initialize database connection pool (singleton)
 @st.cache_resource
@@ -67,11 +72,12 @@ def get_db_pool():
             user=DB_CONFIG["user"],
             password=DB_CONFIG["password"],
             min_size=2,
-            max_size=10
+            max_size=10,
         )
     except Exception as e:
         logger.error(f"Failed to initialize connection pool: {e}")
         return None
+
 
 @contextmanager
 def get_pooled_connection():
@@ -92,12 +98,9 @@ def get_pooled_connection():
         with get_pooled_connection() as conn:
             yield conn
 
+
 # Page configuration
-st.set_page_config(
-    page_title="Player Props - NFL Analytics",
-    page_icon="🏈",
-    layout="wide"
-)
+st.set_page_config(page_title="Player Props - NFL Analytics", page_icon="🏈", layout="wide")
 
 st.title("🏈 Player Props: QB Passing Yards")
 st.markdown("**Real-time sportsbook lines vs model predictions with edge analysis**")
@@ -116,14 +119,14 @@ min_edge = st.sidebar.slider(
     max_value=50.0,
     value=10.0,
     step=5.0,
-    help="Only show props with at least this much edge"
+    help="Only show props with at least this much edge",
 )
 
 # Bookmaker filter
 bookmakers = st.sidebar.multiselect(
     "Bookmakers",
     ["draftkings", "fanduel", "betmgm", "caesars", "pointsbet"],
-    default=["draftkings", "fanduel"]
+    default=["draftkings", "fanduel"],
 )
 
 # Refresh button
@@ -217,7 +220,7 @@ def fetch_predictions_with_odds(season: int, week: int) -> pd.DataFrame:
         # Schema validation
         if SCHEMA_VALIDATION_AVAILABLE and not df.empty:
             schemas = get_common_schemas()
-            df = validate_schema(df, schemas['predictions_with_odds'], strict=False)
+            df = validate_schema(df, schemas["predictions_with_odds"], strict=False)
 
         logger.info(f"Fetched {len(df)} predictions with odds for {season} Week {week}")
         return df
@@ -270,7 +273,7 @@ def fetch_line_movement(player_name: str) -> pd.DataFrame:
         # Schema validation
         if SCHEMA_VALIDATION_AVAILABLE and not df.empty:
             schemas = get_common_schemas()
-            df = validate_schema(df, schemas['line_movement'], strict=False)
+            df = validate_schema(df, schemas["line_movement"], strict=False)
 
         logger.info(f"Fetched {len(df)} line movement records for {player_name}")
         return df
@@ -304,11 +307,11 @@ if df_props.empty:
 
 # Filter by bookmakers
 if bookmakers:
-    df_props = df_props[df_props['bookmaker_key'].isin(bookmakers)]
+    df_props = df_props[df_props["bookmaker_key"].isin(bookmakers)]
 
 # Filter by edge
 if min_edge > 0:
-    df_props = df_props[abs(df_props['edge']) >= min_edge]
+    df_props = df_props[abs(df_props["edge"]) >= min_edge]
 
 if df_props.empty:
     st.warning("No props match the selected filters")
@@ -318,34 +321,26 @@ if df_props.empty:
 col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    st.metric(
-        "Total Props",
-        len(df_props),
-        help="Number of QB passing props with odds available"
-    )
+    st.metric("Total Props", len(df_props), help="Number of QB passing props with odds available")
 
 with col2:
-    avg_edge = df_props['edge'].mean()
+    avg_edge = df_props["edge"].mean()
     st.metric(
         "Avg Edge",
         f"{avg_edge:.1f} yds",
-        help="Average difference between our prediction and sportsbook line"
+        help="Average difference between our prediction and sportsbook line",
     )
 
 with col3:
-    props_with_edge = len(df_props[abs(df_props['edge']) >= 10])
+    props_with_edge = len(df_props[abs(df_props["edge"]) >= 10])
     st.metric(
-        "Props w/ 10+ Edge",
-        props_with_edge,
-        help="Number of props with at least 10 yards edge"
+        "Props w/ 10+ Edge", props_with_edge, help="Number of props with at least 10 yards edge"
     )
 
 with col4:
-    avg_book_hold = df_props['book_hold'].mean() * 100
+    avg_book_hold = df_props["book_hold"].mean() * 100
     st.metric(
-        "Avg Book Hold",
-        f"{avg_book_hold:.1f}%",
-        help="Average bookmaker profit margin (vig)"
+        "Avg Book Hold", f"{avg_book_hold:.1f}%", help="Average bookmaker profit margin (vig)"
     )
 
 st.markdown("---")
@@ -355,11 +350,11 @@ st.subheader("📊 Edge Distribution")
 
 fig_edge = px.histogram(
     df_props,
-    x='edge',
+    x="edge",
     nbins=30,
     title="Distribution of Edge (Prediction - Sportsbook Line)",
-    labels={'edge': 'Edge (yards)', 'count': 'Number of Props'},
-    color_discrete_sequence=['#1f77b4']
+    labels={"edge": "Edge (yards)", "count": "Number of Props"},
+    color_discrete_sequence=["#1f77b4"],
 )
 fig_edge.update_layout(showlegend=False, height=300)
 st.plotly_chart(fig_edge, use_container_width=True)
@@ -370,31 +365,33 @@ st.markdown("---")
 st.subheader("🎯 Player Props with Odds")
 
 # Sort by absolute edge
-df_display = df_props.sort_values('edge', key=abs, ascending=False).copy()
+df_display = df_props.sort_values("edge", key=abs, ascending=False).copy()
 
 # Format for display
-df_display['matchup'] = df_display.apply(
-    lambda x: f"{x['team']} @ {x['opponent']}" if not x['is_home'] else f"{x['opponent']} @ {x['team']}",
-    axis=1
+df_display["matchup"] = df_display.apply(
+    lambda x: (
+        f"{x['team']} @ {x['opponent']}" if not x["is_home"] else f"{x['opponent']} @ {x['team']}"
+    ),
+    axis=1,
 )
-df_display['prediction'] = df_display.apply(
-    lambda x: f"{x['prediction_mean']:.1f} ± {x['prediction_std']:.1f}",
-    axis=1
+df_display["prediction"] = df_display.apply(
+    lambda x: f"{x['prediction_mean']:.1f} ± {x['prediction_std']:.1f}", axis=1
 )
-df_display['80_ci'] = df_display.apply(
-    lambda x: f"[{x['prediction_q10']:.1f}, {x['prediction_q90']:.1f}]",
-    axis=1
+df_display["80_ci"] = df_display.apply(
+    lambda x: f"[{x['prediction_q10']:.1f}, {x['prediction_q90']:.1f}]", axis=1
 )
-df_display['odds_display'] = df_display.apply(
-    lambda x: f"O {x['over_odds']:+d} / U {x['under_odds']:+d}" if pd.notna(x['over_odds']) else "N/A",
-    axis=1
+df_display["odds_display"] = df_display.apply(
+    lambda x: (
+        f"O {x['over_odds']:+d} / U {x['under_odds']:+d}" if pd.notna(x["over_odds"]) else "N/A"
+    ),
+    axis=1,
 )
 
 # Display each prop as expandable card
 for idx, row in df_display.head(20).iterrows():
     with st.expander(
         f"**{row['player_name']}** ({row['team']}) - Edge: {row['edge']:+.1f} yds - {row['bookmaker_title']}",
-        expanded=False
+        expanded=False,
     ):
         col1, col2, col3 = st.columns([2, 2, 1])
 
@@ -402,7 +399,7 @@ for idx, row in df_display.head(20).iterrows():
             st.markdown("**Game Info**")
             st.markdown(f"- Matchup: {row['matchup']}")
             st.markdown(f"- Kickoff: {row['kickoff']}")
-            if pd.notna(row['actual_value']):
+            if pd.notna(row["actual_value"]):
                 st.markdown(f"- **Actual: {row['actual_value']:.1f} yards**")
 
         with col2:
@@ -414,7 +411,7 @@ for idx, row in df_display.head(20).iterrows():
 
         with col3:
             st.markdown("**Sportsbook**")
-            if pd.notna(row['book_line']):
+            if pd.notna(row["book_line"]):
                 st.markdown(f"- Line: **{row['book_line']:.1f} yards**")
                 st.markdown(f"- Odds: {row['odds_display']}")
                 st.markdown(f"- Hold: {row['book_hold']*100:.1f}%")
@@ -423,32 +420,34 @@ for idx, row in df_display.head(20).iterrows():
                 st.markdown("- No odds available")
 
         # Show line movement chart if available
-        if pd.notna(row['player_name']):
-            df_movement = fetch_line_movement(row['player_name'])
+        if pd.notna(row["player_name"]):
+            df_movement = fetch_line_movement(row["player_name"])
 
             if not df_movement.empty and len(df_movement) > 1:
                 st.markdown("**Line Movement (Last 7 Days)**")
 
                 fig_movement = go.Figure()
 
-                for book in df_movement['bookmaker_title'].unique():
-                    book_data = df_movement[df_movement['bookmaker_title'] == book]
-                    fig_movement.add_trace(go.Scatter(
-                        x=book_data['snapshot_at'],
-                        y=book_data['line_value'],
-                        mode='lines+markers',
-                        name=book,
-                        line=dict(width=2),
-                        marker=dict(size=6)
-                    ))
+                for book in df_movement["bookmaker_title"].unique():
+                    book_data = df_movement[df_movement["bookmaker_title"] == book]
+                    fig_movement.add_trace(
+                        go.Scatter(
+                            x=book_data["snapshot_at"],
+                            y=book_data["line_value"],
+                            mode="lines+markers",
+                            name=book,
+                            line=dict(width=2),
+                            marker=dict(size=6),
+                        )
+                    )
 
                 # Add our prediction as horizontal line
                 fig_movement.add_hline(
-                    y=row['prediction_mean'],
+                    y=row["prediction_mean"],
                     line_dash="dash",
                     line_color="green",
                     annotation_text=f"Our Prediction: {row['prediction_mean']:.1f}",
-                    annotation_position="right"
+                    annotation_position="right",
                 )
 
                 fig_movement.update_layout(
@@ -457,7 +456,7 @@ for idx, row in df_display.head(20).iterrows():
                     yaxis_title="Line (yards)",
                     height=300,
                     showlegend=True,
-                    hovermode='x unified'
+                    hovermode="x unified",
                 )
 
                 st.plotly_chart(fig_movement, use_container_width=True)
@@ -471,7 +470,7 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.markdown("**Biggest OVER Edges** (Our prediction >> Sportsbook line)")
-    over_edges = df_display[df_display['edge'] > 0].nlargest(5, 'edge')
+    over_edges = df_display[df_display["edge"] > 0].nlargest(5, "edge")
 
     if not over_edges.empty:
         for idx, row in over_edges.iterrows():
@@ -485,7 +484,7 @@ with col1:
 
 with col2:
     st.markdown("**Biggest UNDER Edges** (Our prediction << Sportsbook line)")
-    under_edges = df_display[df_display['edge'] < 0].nsmallest(5, 'edge')
+    under_edges = df_display[df_display["edge"] < 0].nsmallest(5, "edge")
 
     if not under_edges.empty:
         for idx, row in under_edges.iterrows():

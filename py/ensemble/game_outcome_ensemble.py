@@ -26,9 +26,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import psycopg
 import xgboost as xgb
-from scipy.special import expit
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import brier_score_loss, log_loss
 from sklearn.neural_network import MLPClassifier
@@ -37,7 +35,6 @@ from sklearn.preprocessing import StandardScaler
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from py.models.state_space import StateSpaceRatings, fetch_games, get_connection
-
 
 # ============================================================================
 # Feature Engineering for Game Outcomes
@@ -106,7 +103,9 @@ def get_team_season_stats(season: int) -> pd.DataFrame:
     return df
 
 
-def validate_no_lookahead_bias(team_stats_dict: dict[int, pd.DataFrame], game_seasons: list[int]) -> None:
+def validate_no_lookahead_bias(
+    team_stats_dict: dict[int, pd.DataFrame], game_seasons: list[int]
+) -> None:
     """
     Validate that team stats do not contain look-ahead bias.
 
@@ -124,7 +123,11 @@ def validate_no_lookahead_bias(team_stats_dict: dict[int, pd.DataFrame], game_se
             stats_df = team_stats_dict[game_season]
             if not stats_df.empty:
                 # Check that stats are from previous season
-                stats_seasons = stats_df['season'].unique() if 'season' in stats_df.columns else [game_season - 1]
+                stats_seasons = (
+                    stats_df["season"].unique()
+                    if "season" in stats_df.columns
+                    else [game_season - 1]
+                )
                 for stats_season in stats_seasons:
                     if stats_season >= game_season:
                         raise AssertionError(
@@ -190,20 +193,22 @@ def engineer_game_features(df: pd.DataFrame, team_stats: dict[int, pd.DataFrame]
             away_points_allowed = 21.0
             away_away_win_pct = 0.5
 
-        features_list.append({
-            "game_id": row["game_id"],
-            "home_win_pct": home_win_pct,
-            "away_win_pct": away_win_pct,
-            "home_points_avg": home_points_avg,
-            "away_points_avg": away_points_avg,
-            "home_points_allowed_avg": home_points_allowed,
-            "away_points_allowed_avg": away_points_allowed,
-            "home_home_win_pct": home_home_win_pct,
-            "away_away_win_pct": away_away_win_pct,
-            "week": week,
-            "margin": row.get("margin", 0),
-            "season": row["season"],
-        })
+        features_list.append(
+            {
+                "game_id": row["game_id"],
+                "home_win_pct": home_win_pct,
+                "away_win_pct": away_win_pct,
+                "home_points_avg": home_points_avg,
+                "away_points_avg": away_points_avg,
+                "home_points_allowed_avg": home_points_allowed,
+                "away_points_allowed_avg": away_points_allowed,
+                "home_home_win_pct": home_home_win_pct,
+                "away_away_win_pct": away_away_win_pct,
+                "week": week,
+                "margin": row.get("margin", 0),
+                "season": row["season"],
+            }
+        )
 
     features_df = pd.DataFrame(features_list)
     return features_df
@@ -242,9 +247,7 @@ class GameOutcomeEnsemble:
         self.xgb_model = None
 
         # Component 3: Bayesian Logistic Regression
-        self.bayesian_lr = LogisticRegression(
-            penalty="l2", C=1.0, max_iter=1000, random_state=42
-        )
+        self.bayesian_lr = LogisticRegression(penalty="l2", C=1.0, max_iter=1000, random_state=42)
 
         # Component 4: Neural Network
         nn_default = {
@@ -262,9 +265,7 @@ class GameOutcomeEnsemble:
         self.nn_model = None
 
         # Component 5: Meta-learner (Stacking)
-        self.meta_learner = LogisticRegression(
-            penalty="l2", C=0.5, max_iter=500, random_state=42
-        )
+        self.meta_learner = LogisticRegression(penalty="l2", C=0.5, max_iter=500, random_state=42)
 
         # Feature scaler
         self.scaler = StandardScaler()
@@ -346,10 +347,14 @@ class GameOutcomeEnsemble:
         # Engineer features
         train_features_df = engineer_game_features(train_df, self.team_stats_cache)
         feature_cols = [
-            "home_win_pct", "away_win_pct",
-            "home_points_avg", "away_points_avg",
-            "home_points_allowed_avg", "away_points_allowed_avg",
-            "home_home_win_pct", "away_away_win_pct",
+            "home_win_pct",
+            "away_win_pct",
+            "home_points_avg",
+            "away_points_avg",
+            "home_points_allowed_avg",
+            "away_points_allowed_avg",
+            "home_home_win_pct",
+            "away_away_win_pct",
             "week",
         ]
         X_train = train_features_df[feature_cols].values
@@ -364,7 +369,7 @@ class GameOutcomeEnsemble:
             val_target = (val_df["margin"] > 0).astype(int).values
             val_features_df = engineer_game_features(val_df, self.team_stats_cache)
             X_val = val_features_df[feature_cols].values
-            X_val_scaled = self.scaler.transform(X_val)
+            self.scaler.transform(X_val)
             dval = xgb.DMatrix(X_val, label=val_target)
             evals = [(dtrain, "train"), (dval, "val")]
             self.xgb_model = xgb.train(
@@ -441,12 +446,14 @@ class GameOutcomeEnsemble:
         print(f"{'-'*80}")
 
         # Stack base model predictions as meta-features
-        meta_features_train = np.column_stack([
-            ss_train_preds,
-            xgb_train_preds,
-            lr_train_preds,
-            nn_train_preds,
-        ])
+        meta_features_train = np.column_stack(
+            [
+                ss_train_preds,
+                xgb_train_preds,
+                lr_train_preds,
+                nn_train_preds,
+            ]
+        )
 
         self.meta_learner.fit(meta_features_train, train_target)
         ensemble_train_preds = self.meta_learner.predict_proba(meta_features_train)[:, 1]
@@ -487,18 +494,24 @@ class GameOutcomeEnsemble:
                 self.team_stats_cache[season] = get_team_season_stats(season)
 
         # Component 1: State-Space
-        ss_preds = np.array([
-            self.state_space.predict_prob_home_win(row["home_team"], row["away_team"])
-            for _, row in df.iterrows()
-        ])
+        ss_preds = np.array(
+            [
+                self.state_space.predict_prob_home_win(row["home_team"], row["away_team"])
+                for _, row in df.iterrows()
+            ]
+        )
 
         # Components 2-4: Feature-based models
         features_df = engineer_game_features(df, self.team_stats_cache)
         feature_cols = [
-            "home_win_pct", "away_win_pct",
-            "home_points_avg", "away_points_avg",
-            "home_points_allowed_avg", "away_points_allowed_avg",
-            "home_home_win_pct", "away_away_win_pct",
+            "home_win_pct",
+            "away_win_pct",
+            "home_points_avg",
+            "away_points_avg",
+            "home_points_allowed_avg",
+            "away_points_allowed_avg",
+            "home_home_win_pct",
+            "away_away_win_pct",
             "week",
         ]
         X = features_df[feature_cols].values

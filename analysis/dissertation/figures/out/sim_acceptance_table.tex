@@ -1,21 +1,17 @@
 \begin{table}[t]
-  \centering
-  \small
-  \begin{threeparttable}
-    \caption{Simulator acceptance test results across 10 seasons (2014--2024).}
-    \label{tab:sim-acceptance-results}
-    \begin{tabular}{lcccc}
+    \centering
+    \caption[Simulator acceptance summary]{Simulator acceptance test summary across 41 weekly evaluations (2023--2025). Pass thresholds: EMD $<2.5$, key mass $<0.05$, Kendall $\delta<0.10$.}
+    \label{tab:sim-acceptance}
+    \begin{tabular}{lcc}
       \toprule
-      \textbf{Test Category}  & \textbf{Pass Rate (\%)}  & \textbf{Mean Dev.}  & \textbf{95\% Dev.}  & \textbf{N Tests} \\
+      \textbf{Test Category} & \textbf{Pass Rate} & \textbf{Median Deviation} \\
       \midrule
-      Margin Distribution & 94.2 & 0.023 & 0.048 & 520 \\
-      Key Numbers & 91.3 & 0.018 & 0.035 & 520 \\
-      Dependence Structure & 87.8 & 0.041 & 0.072 & 520 \\
-      Friction Calibration & 89.1 & 0.029 & 0.054 & 520 \\
+      Margin calibration & 0.0\% & 4.068 \\
+      Key mass accuracy & 78.0\% & 0.007 \\
+      Dependence structure & 63.4\% & 0.093 \\
+      Home win rate & 100.0\% & 0.043 \\
+      \midrule
+      Overall gate (all tests) & 0.0\% & --- \\
       \bottomrule
     \end{tabular}
-    \begin{tablenotes}[flushleft]\footnotesize
-      \item Deviations measured as RMSE for continuous metrics, absolute error for discrete masses. Tests run weekly during NFL season.
-    \end{tablenotes}
-  \end{threeparttable}
-\end{table}
+  \end{table}

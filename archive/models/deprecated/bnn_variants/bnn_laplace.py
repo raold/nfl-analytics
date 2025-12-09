@@ -33,10 +33,9 @@ Usage:
     python py/models/bnn_laplace.py
 """
 
-import sys
 import logging
+import sys
 from pathlib import Path
-from typing import Tuple
 
 import joblib
 import numpy as np
@@ -45,7 +44,6 @@ import psycopg2
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 # Add parent directory to path for imports
@@ -69,7 +67,7 @@ class DeterministicNN(nn.Module):
     - No dropout (train to convergence for MAP estimate)
     """
 
-    def __init__(self, input_dim: int, hidden_dims: Tuple[int]):
+    def __init__(self, input_dim: int, hidden_dims: tuple[int]):
         super().__init__()
 
         self.input_dim = input_dim
@@ -91,9 +89,7 @@ class DeterministicNN(nn.Module):
 
         # Heteroscedastic: separate head for log(std)
         self.log_std_head = nn.Sequential(
-            nn.Linear(prev_dim, prev_dim // 2),
-            nn.ReLU(),
-            nn.Linear(prev_dim // 2, 1)
+            nn.Linear(prev_dim, prev_dim // 2), nn.ReLU(), nn.Linear(prev_dim // 2, 1)
         )
 
         logger.info(
@@ -105,7 +101,7 @@ class DeterministicNN(nn.Module):
         """Count trainable parameters"""
         return sum(p.numel() for p in self.parameters() if p.requires_grad)
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, x: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
         """
         Forward pass
 
@@ -190,9 +186,7 @@ def engineer_features(df: pd.DataFrame) -> pd.DataFrame:
     df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
     df["wind"] = pd.to_numeric(df["wind"], errors="coerce")
 
-    df["is_bad_weather"] = (
-        ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
-    )
+    df["is_bad_weather"] = ((df["temp"] < 32) | (df["wind"] > 15)).fillna(False).astype(int)
 
     # Rolling averages (per player)
     df = df.sort_values(["player_id", "season", "week"])
@@ -270,12 +264,12 @@ def train_map_model(
     y_train: np.ndarray,
     X_val: np.ndarray,
     y_val: np.ndarray,
-    hidden_dims: Tuple[int],
+    hidden_dims: tuple[int],
     epochs: int = 150,
     batch_size: int = 64,
     lr: float = 1e-3,
-    device: str = "cpu"
-) -> Tuple[DeterministicNN, StandardScaler, float, float]:
+    device: str = "cpu",
+) -> tuple[DeterministicNN, StandardScaler, float, float]:
     """
     Train deterministic NN to find MAP estimate
 
@@ -303,10 +297,7 @@ def train_map_model(
     y_val_t = torch.FloatTensor(y_val_norm).to(device)
 
     # Initialize model
-    model = DeterministicNN(
-        input_dim=X_train.shape[1],
-        hidden_dims=hidden_dims
-    ).to(device)
+    model = DeterministicNN(input_dim=X_train.shape[1], hidden_dims=hidden_dims).to(device)
 
     # Optimizer with L2 regularization (for MAP estimate)
     optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=1e-4)
@@ -314,7 +305,7 @@ def train_map_model(
     # Training loop
     logger.info(f"Training MAP model (epochs={epochs}, batch_size={batch_size})...")
 
-    best_val_loss = float('inf')
+    best_val_loss = float("inf")
     patience = 30
     patience_counter = 0
 
@@ -326,7 +317,7 @@ def train_map_model(
         train_loss = 0.0
 
         for i in range(0, len(X_train_t), batch_size):
-            batch_idx = indices[i:i+batch_size]
+            batch_idx = indices[i : i + batch_size]
             X_batch = X_train_t[batch_idx]
             y_batch = y_train_t[batch_idx]
 
@@ -337,25 +328,26 @@ def train_map_model(
             std = torch.exp(log_std)
 
             # Negative log-likelihood loss (Gaussian)
-            loss = 0.5 * torch.mean(
-                torch.log(2 * np.pi * std**2) + ((y_batch - mean) / std)**2
-            )
+            loss = 0.5 * torch.mean(torch.log(2 * np.pi * std**2) + ((y_batch - mean) / std) ** 2)
 
             loss.backward()
             optimizer.step()
 
             train_loss += loss.item()
 
-        train_loss /= (len(X_train_t) // batch_size)
+        train_loss /= len(X_train_t) // batch_size
 
         # Validation
         model.eval()
         with torch.no_grad():
             val_mean, val_log_std = model(X_val_t)
             val_std = torch.exp(val_log_std)
-            val_loss = 0.5 * torch.mean(
-                torch.log(2 * np.pi * val_std**2) + ((y_val_t - val_mean) / val_std)**2
-            ).item()
+            val_loss = (
+                0.5
+                * torch.mean(
+                    torch.log(2 * np.pi * val_std**2) + ((y_val_t - val_mean) / val_std) ** 2
+                ).item()
+            )
 
         # Early stopping
         if val_loss < best_val_loss:
@@ -383,7 +375,7 @@ def fit_laplace_approximation(
     X_train_scaled: np.ndarray,
     y_train_norm: np.ndarray,
     hessian_type: str = "diag",
-    device: str = "cpu"
+    device: str = "cpu",
 ):
     """
     Fit Laplace approximation around MAP estimate
@@ -411,7 +403,8 @@ def fit_laplace_approximation(
     y_train_t = torch.FloatTensor(y_train_norm).to(device)
 
     # Create dataset
-    from torch.utils.data import TensorDataset, DataLoader
+    from torch.utils.data import DataLoader, TensorDataset
+
     train_dataset = TensorDataset(X_train_t, y_train_t)
     train_loader = DataLoader(train_dataset, batch_size=64, shuffle=False)
 
@@ -432,12 +425,7 @@ def fit_laplace_approximation(
     mean_model = MeanOnlyWrapper(model)
 
     # Fit Laplace
-    la = Laplace(
-        mean_model,
-        "regression",
-        subset_of_weights="all",
-        hessian_structure=hessian_type
-    )
+    la = Laplace(mean_model, "regression", subset_of_weights="all", hessian_structure=hessian_type)
 
     la.fit(train_loader)
 
@@ -459,8 +447,8 @@ def predict_with_laplace(
     X: np.ndarray,
     y_mean: float,
     y_std: float,
-    device: str = "cpu"
-) -> Tuple[np.ndarray, np.ndarray]:
+    device: str = "cpu",
+) -> tuple[np.ndarray, np.ndarray]:
     """
     Predict with Laplace approximation
 
@@ -507,32 +495,26 @@ def evaluate_model(
     y: np.ndarray,
     y_mean: float,
     y_std: float,
-    device: str = "cpu"
+    device: str = "cpu",
 ) -> dict:
     """Evaluate Laplace BNN"""
     pred_mean, pred_std = predict_with_laplace(
-        laplace_model, base_model, mean_wrapper,
-        scaler, X, y_mean, y_std, device
+        laplace_model, base_model, mean_wrapper, scaler, X, y_mean, y_std, device
     )
 
     # Metrics
     mae = np.mean(np.abs(pred_mean - y))
-    rmse = np.sqrt(np.mean((pred_mean - y)**2))
+    rmse = np.sqrt(np.mean((pred_mean - y) ** 2))
     calibration = compute_calibration(y, pred_mean, pred_std)
 
-    return {
-        "mae": mae,
-        "rmse": rmse,
-        "calibration": calibration,
-        "mean_pred_std": pred_std.mean()
-    }
+    return {"mae": mae, "rmse": rmse, "calibration": calibration, "mean_pred_std": pred_std.mean()}
 
 
 def main():
     """Main Laplace Approximation BNN training pipeline"""
-    logger.info("="*80)
+    logger.info("=" * 80)
     logger.info("LAPLACE APPROXIMATION BNN - Comprehensive Evaluation")
-    logger.info("="*80 + "\n")
+    logger.info("=" * 80 + "\n")
 
     # Check if laplace-torch is installed
     try:
@@ -575,12 +557,15 @@ def main():
 
         # Train MAP model
         map_model, scaler, y_mean, y_std = train_map_model(
-            X_train, y_train, X_val, y_val,
+            X_train,
+            y_train,
+            X_val,
+            y_val,
             hidden_dims=arch_config["hidden_dims"],
             epochs=150,
             batch_size=64,
             lr=1e-3,
-            device=device
+            device=device,
         )
 
         # Normalize for Laplace fitting
@@ -595,16 +580,17 @@ def main():
             try:
                 # Fit Laplace approximation
                 la, mean_wrapper = fit_laplace_approximation(
-                    map_model, X_train_scaled, y_train_norm,
+                    map_model,
+                    X_train_scaled,
+                    y_train_norm,
                     hessian_type=hessian_type,
-                    device=device
+                    device=device,
                 )
 
                 # Evaluate on validation set
                 logger.info("\nValidation Set (2023):")
                 val_metrics = evaluate_model(
-                    la, map_model, mean_wrapper,
-                    scaler, X_val, y_val, y_mean, y_std, device
+                    la, map_model, mean_wrapper, scaler, X_val, y_val, y_mean, y_std, device
                 )
                 logger.info(f"  MAE: {val_metrics['mae']:.2f} yards")
                 logger.info(f"  RMSE: {val_metrics['rmse']:.2f} yards")
@@ -614,8 +600,7 @@ def main():
                 # Evaluate on test set
                 logger.info("\nTest Set (2024):")
                 test_metrics = evaluate_model(
-                    la, map_model, mean_wrapper,
-                    scaler, X_test, y_test, y_mean, y_std, device
+                    la, map_model, mean_wrapper, scaler, X_test, y_test, y_mean, y_std, device
                 )
                 logger.info(f"  MAE: {test_metrics['mae']:.2f} yards")
                 logger.info(f"  RMSE: {test_metrics['rmse']:.2f} yards")
@@ -635,25 +620,27 @@ def main():
                     "y_std": y_std,
                     "hidden_dims": arch_config["hidden_dims"],
                     "hessian_type": hessian_type,
-                    "input_dim": X_train.shape[1]
+                    "input_dim": X_train.shape[1],
                 }
 
                 joblib.dump(save_dict, model_path)
                 logger.info(f"\n✓ Model saved to {model_path}")
 
                 # Store results
-                results.append({
-                    "architecture": arch_config["name"],
-                    "hidden_dims": str(arch_config["hidden_dims"]),
-                    "hessian_type": hessian_type,
-                    "val_mae": val_metrics["mae"],
-                    "val_calibration": val_metrics["calibration"],
-                    "val_uncertainty": val_metrics["mean_pred_std"],
-                    "test_mae": test_metrics["mae"],
-                    "test_calibration": test_metrics["calibration"],
-                    "test_uncertainty": test_metrics["mean_pred_std"],
-                    "timestamp": pd.Timestamp.now().isoformat()
-                })
+                results.append(
+                    {
+                        "architecture": arch_config["name"],
+                        "hidden_dims": str(arch_config["hidden_dims"]),
+                        "hessian_type": hessian_type,
+                        "val_mae": val_metrics["mae"],
+                        "val_calibration": val_metrics["calibration"],
+                        "val_uncertainty": val_metrics["mean_pred_std"],
+                        "test_mae": test_metrics["mae"],
+                        "test_calibration": test_metrics["calibration"],
+                        "test_uncertainty": test_metrics["mean_pred_std"],
+                        "timestamp": pd.Timestamp.now().isoformat(),
+                    }
+                )
 
             except Exception as e:
                 logger.error(f"Failed to fit Laplace with {hessian_type}: {e}")

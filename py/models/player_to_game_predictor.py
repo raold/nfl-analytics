@@ -14,16 +14,17 @@ Date: 2025-10-26
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-import pandas as pd
-import numpy as np
-from sklearn.model_selection import TimeSeriesSplit
-from sklearn.metrics import brier_score_loss, log_loss, accuracy_score
-import xgboost as xgb
-import nfl_data_py as nfl
 import json
 from datetime import datetime
+
+import nfl_data_py as nfl
+import pandas as pd
+import xgboost as xgb
+from sklearn.metrics import accuracy_score, brier_score_loss, log_loss
+
 
 class PlayerToGamePredictor:
     """
@@ -140,80 +141,85 @@ class PlayerToGamePredictor:
 
         # Filter to this team's recent games (rolling window for recency bias)
         recent_games = player_stats[
-            (player_stats['season'] == season) &
-            (player_stats['recent_team'] == team) &
-            (player_stats['week'] < week)
+            (player_stats["season"] == season)
+            & (player_stats["recent_team"] == team)
+            & (player_stats["week"] < week)
         ]
 
         if len(recent_games) == 0:
             # No recent games, use last season
             recent_games = player_stats[
-                (player_stats['season'] == season - 1) &
-                (player_stats['recent_team'] == team)
+                (player_stats["season"] == season - 1) & (player_stats["recent_team"] == team)
             ]
 
         # === OFFENSE FEATURES ===
 
         # QB passing stats
-        qb_stats = recent_games[recent_games['position'] == 'QB']
+        qb_stats = recent_games[recent_games["position"] == "QB"]
         if len(qb_stats) > 0:
-            features['qb_pass_yards_avg'] = qb_stats['passing_yards'].mean()
-            features['qb_pass_yards_std'] = qb_stats['passing_yards'].std()
-            features['qb_pass_tds_avg'] = qb_stats['passing_tds'].mean()
-            features['qb_completion_pct'] = qb_stats['completions'].sum() / max(qb_stats['attempts'].sum(), 1)
+            features["qb_pass_yards_avg"] = qb_stats["passing_yards"].mean()
+            features["qb_pass_yards_std"] = qb_stats["passing_yards"].std()
+            features["qb_pass_tds_avg"] = qb_stats["passing_tds"].mean()
+            features["qb_completion_pct"] = qb_stats["completions"].sum() / max(
+                qb_stats["attempts"].sum(), 1
+            )
         else:
-            features['qb_pass_yards_avg'] = 0
-            features['qb_pass_yards_std'] = 0
-            features['qb_pass_tds_avg'] = 0
-            features['qb_completion_pct'] = 0.6  # league average
+            features["qb_pass_yards_avg"] = 0
+            features["qb_pass_yards_std"] = 0
+            features["qb_pass_tds_avg"] = 0
+            features["qb_completion_pct"] = 0.6  # league average
 
         # RB rushing stats
-        rb_stats = recent_games[recent_games['position'] == 'RB']
+        rb_stats = recent_games[recent_games["position"] == "RB"]
         if len(rb_stats) > 0:
-            features['rb_rush_yards_avg'] = rb_stats['rushing_yards'].mean()
-            features['rb_rush_tds_avg'] = rb_stats['rushing_tds'].mean()
-            features['rb_yards_per_carry'] = rb_stats['rushing_yards'].sum() / max(rb_stats['carries'].sum(), 1)
+            features["rb_rush_yards_avg"] = rb_stats["rushing_yards"].mean()
+            features["rb_rush_tds_avg"] = rb_stats["rushing_tds"].mean()
+            features["rb_yards_per_carry"] = rb_stats["rushing_yards"].sum() / max(
+                rb_stats["carries"].sum(), 1
+            )
         else:
-            features['rb_rush_yards_avg'] = 0
-            features['rb_rush_tds_avg'] = 0
-            features['rb_yards_per_carry'] = 4.0  # league average
+            features["rb_rush_yards_avg"] = 0
+            features["rb_rush_tds_avg"] = 0
+            features["rb_yards_per_carry"] = 4.0  # league average
 
         # WR receiving stats
-        wr_stats = recent_games[recent_games['position'] == 'WR']
+        wr_stats = recent_games[recent_games["position"] == "WR"]
         if len(wr_stats) > 0:
-            features['wr_rec_yards_avg'] = wr_stats['receiving_yards'].mean()
-            features['wr_rec_tds_avg'] = wr_stats['receiving_tds'].mean()
-            features['wr_receptions_avg'] = wr_stats['receptions'].mean()
+            features["wr_rec_yards_avg"] = wr_stats["receiving_yards"].mean()
+            features["wr_rec_tds_avg"] = wr_stats["receiving_tds"].mean()
+            features["wr_receptions_avg"] = wr_stats["receptions"].mean()
         else:
-            features['wr_rec_yards_avg'] = 0
-            features['wr_rec_tds_avg'] = 0
-            features['wr_receptions_avg'] = 0
+            features["wr_rec_yards_avg"] = 0
+            features["wr_rec_tds_avg"] = 0
+            features["wr_receptions_avg"] = 0
 
         # Total offense
-        features['total_offense_yards'] = (
-            features['qb_pass_yards_avg'] +
-            features['rb_rush_yards_avg'] +
-            features['wr_rec_yards_avg']
+        features["total_offense_yards"] = (
+            features["qb_pass_yards_avg"]
+            + features["rb_rush_yards_avg"]
+            + features["wr_rec_yards_avg"]
         )
 
         # Star power (concentration): max player yards / total yards
-        if features['total_offense_yards'] > 0:
-            max_player_yards = max([
-                qb_stats['passing_yards'].max() if len(qb_stats) > 0 else 0,
-                rb_stats['rushing_yards'].max() if len(rb_stats) > 0 else 0,
-                wr_stats['receiving_yards'].max() if len(wr_stats) > 0 else 0,
-            ])
-            features['star_concentration'] = max_player_yards / features['total_offense_yards']
+        if features["total_offense_yards"] > 0:
+            max_player_yards = max(
+                [
+                    qb_stats["passing_yards"].max() if len(qb_stats) > 0 else 0,
+                    rb_stats["rushing_yards"].max() if len(rb_stats) > 0 else 0,
+                    wr_stats["receiving_yards"].max() if len(wr_stats) > 0 else 0,
+                ]
+            )
+            features["star_concentration"] = max_player_yards / features["total_offense_yards"]
         else:
-            features['star_concentration'] = 0.3  # league average
+            features["star_concentration"] = 0.3  # league average
 
         # === DEFENSE FEATURES ===
 
         # Aggregate opponent stats when playing against this team
         # (These would come from opponent player stats, simplified for now)
-        features['def_yards_allowed_avg'] = 350  # placeholder - league average
-        features['def_points_allowed_avg'] = 23  # placeholder - league average
-        features['def_sack_rate'] = 0.06  # placeholder - league average
+        features["def_yards_allowed_avg"] = 350  # placeholder - league average
+        features["def_points_allowed_avg"] = 23  # placeholder - league average
+        features["def_sack_rate"] = 0.06  # placeholder - league average
 
         return features
 
@@ -233,49 +239,42 @@ class PlayerToGamePredictor:
         features_list = []
 
         for idx, game in games_df.iterrows():
-            season = game['season']
-            week = game['week']
-            home_team = game['home_team']
-            away_team = game['away_team']
+            season = game["season"]
+            week = game["week"]
+            home_team = game["home_team"]
+            away_team = game["away_team"]
 
             # Get features for home team
-            home_features = self.engineer_team_features(
-                player_stats, season, week, home_team
-            )
+            home_features = self.engineer_team_features(player_stats, season, week, home_team)
 
             # Get features for away team
-            away_features = self.engineer_team_features(
-                player_stats, season, week, away_team
-            )
+            away_features = self.engineer_team_features(player_stats, season, week, away_team)
 
             # Combine features with home/away prefix
             combined = {
-                'game_id': game['game_id'],
-                'season': season,
-                'week': week,
-                'home_team': home_team,
-                'away_team': away_team,
-                'target': game.get('home_won', None),
+                "game_id": game["game_id"],
+                "season": season,
+                "week": week,
+                "home_team": home_team,
+                "away_team": away_team,
+                "target": game.get("home_won", None),
             }
 
             for key, val in home_features.items():
-                combined[f'home_{key}'] = val
+                combined[f"home_{key}"] = val
 
             for key, val in away_features.items():
-                combined[f'away_{key}'] = val
+                combined[f"away_{key}"] = val
 
             # Add differential features (home - away)
-            combined['diff_total_offense'] = (
-                combined['home_total_offense_yards'] -
-                combined['away_total_offense_yards']
+            combined["diff_total_offense"] = (
+                combined["home_total_offense_yards"] - combined["away_total_offense_yards"]
             )
-            combined['diff_qb_pass_yards'] = (
-                combined['home_qb_pass_yards_avg'] -
-                combined['away_qb_pass_yards_avg']
+            combined["diff_qb_pass_yards"] = (
+                combined["home_qb_pass_yards_avg"] - combined["away_qb_pass_yards_avg"]
             )
-            combined['diff_rb_rush_yards'] = (
-                combined['home_rb_rush_yards_avg'] -
-                combined['away_rb_rush_yards_avg']
+            combined["diff_rb_rush_yards"] = (
+                combined["home_rb_rush_yards_avg"] - combined["away_rb_rush_yards_avg"]
             )
 
             features_list.append(combined)
@@ -283,7 +282,9 @@ class PlayerToGamePredictor:
         features_df = pd.DataFrame(features_list)
 
         print(f"  Created features for {len(features_df)} games")
-        print(f"  Feature columns: {len([c for c in features_df.columns if c not in ['game_id', 'season', 'week', 'home_team', 'away_team', 'target']])}")
+        print(
+            f"  Feature columns: {len([c for c in features_df.columns if c not in ['game_id', 'season', 'week', 'home_team', 'away_team', 'target']])}"
+        )
 
         return features_df
 
@@ -302,25 +303,26 @@ class PlayerToGamePredictor:
 
         # Define feature columns (exclude metadata and target)
         self.feature_cols = [
-            c for c in train_df.columns
-            if c not in ['game_id', 'season', 'week', 'home_team', 'away_team', 'target']
+            c
+            for c in train_df.columns
+            if c not in ["game_id", "season", "week", "home_team", "away_team", "target"]
         ]
 
         X_train = train_df[self.feature_cols].fillna(0)
-        y_train = train_df['target']
+        y_train = train_df["target"]
 
         # XGBoost parameters (conservative to avoid overfitting)
         params = {
-            'objective': 'binary:logistic',
-            'eval_metric': 'logloss',
-            'max_depth': 3,  # Shallow trees
-            'learning_rate': 0.05,
-            'n_estimators': 100,
-            'subsample': 0.8,
-            'colsample_bytree': 0.8,
-            'min_child_weight': 5,  # Regularization
-            'gamma': 1.0,  # Regularization
-            'random_state': 42,
+            "objective": "binary:logistic",
+            "eval_metric": "logloss",
+            "max_depth": 3,  # Shallow trees
+            "learning_rate": 0.05,
+            "n_estimators": 100,
+            "subsample": 0.8,
+            "colsample_bytree": 0.8,
+            "min_child_weight": 5,  # Regularization
+            "gamma": 1.0,  # Regularization
+            "random_state": 42,
         }
 
         print(f"  Training on {len(X_train)} games with {len(self.feature_cols)} features")
@@ -331,10 +333,11 @@ class PlayerToGamePredictor:
 
         if val_df is not None:
             X_val = val_df[self.feature_cols].fillna(0)
-            y_val = val_df['target']
+            y_val = val_df["target"]
 
             self.model.fit(
-                X_train, y_train,
+                X_train,
+                y_train,
                 eval_set=[(X_train, y_train), (X_val, y_val)],
                 verbose=False,
             )
@@ -344,21 +347,20 @@ class PlayerToGamePredictor:
         # Evaluate on training set
         train_pred = self.model.predict_proba(X_train)[:, 1]
         train_metrics = {
-            'brier': brier_score_loss(y_train, train_pred),
-            'logloss': log_loss(y_train, train_pred),
-            'accuracy': accuracy_score(y_train, train_pred > 0.5),
+            "brier": brier_score_loss(y_train, train_pred),
+            "logloss": log_loss(y_train, train_pred),
+            "accuracy": accuracy_score(y_train, train_pred > 0.5),
         }
 
         print(f"  Train Brier: {train_metrics['brier']:.4f}")
         print(f"  Train Accuracy: {train_metrics['accuracy']:.1%}")
 
         # Feature importance
-        importances = pd.DataFrame({
-            'feature': self.feature_cols,
-            'importance': self.model.feature_importances_
-        }).sort_values('importance', ascending=False)
+        importances = pd.DataFrame(
+            {"feature": self.feature_cols, "importance": self.model.feature_importances_}
+        ).sort_values("importance", ascending=False)
 
-        print(f"\n  Top 5 features:")
+        print("\n  Top 5 features:")
         for _, row in importances.head(5).iterrows():
             print(f"    {row['feature']}: {row['importance']:.4f}")
 
@@ -393,13 +395,13 @@ class PlayerToGamePredictor:
         Returns:
             Dictionary of evaluation metrics
         """
-        y_test = test_df['target']
+        y_test = test_df["target"]
 
         metrics = {
-            'brier': brier_score_loss(y_test, predictions),
-            'logloss': log_loss(y_test, predictions),
-            'accuracy': accuracy_score(y_test, predictions > 0.5),
-            'n_games': len(y_test),
+            "brier": brier_score_loss(y_test, predictions),
+            "logloss": log_loss(y_test, predictions),
+            "accuracy": accuracy_score(y_test, predictions > 0.5),
+            "n_games": len(y_test),
         }
 
         return metrics
@@ -417,18 +419,22 @@ def load_game_outcomes(seasons):
     df = pd.concat(schedules, ignore_index=True)
 
     # Keep only completed games
-    df = df[df['game_type'] == 'REG'].copy()  # Regular season only
-    df = df[df['home_score'].notna()].copy()  # Completed games
+    df = df[df["game_type"] == "REG"].copy()  # Regular season only
+    df = df[df["home_score"].notna()].copy()  # Completed games
 
     # Create target variable
-    df['home_won'] = (df['home_score'] > df['away_score']).astype(int)
+    df["home_won"] = (df["home_score"] > df["away_score"]).astype(int)
 
     # Create game_id if not present
-    if 'game_id' not in df.columns:
-        df['game_id'] = (
-            df['season'].astype(str) + '_' +
-            df['week'].astype(str) + '_' +
-            df['away_team'] + '_' + df['home_team']
+    if "game_id" not in df.columns:
+        df["game_id"] = (
+            df["season"].astype(str)
+            + "_"
+            + df["week"].astype(str)
+            + "_"
+            + df["away_team"]
+            + "_"
+            + df["home_team"]
         )
 
     print(f"  Loaded {len(df)} completed regular season games")
@@ -440,9 +446,9 @@ def main():
     """
     Main execution: Train and evaluate player-to-game predictor.
     """
-    print("="*80)
+    print("=" * 80)
     print("PLAYER-TO-GAME PREDICTION MODEL (Option 1: Feature Engineering)")
-    print("="*80)
+    print("=" * 80)
     print()
 
     # Define train/val/test splits (temporal validation)
@@ -470,14 +476,20 @@ def main():
     games = load_game_outcomes(all_seasons)
 
     # Split games
-    train_games = games[games['season'].isin(train_seasons)]
-    val_games = games[games['season'].isin(val_seasons)]
-    test_games = games[games['season'].isin(test_seasons)]
+    train_games = games[games["season"].isin(train_seasons)]
+    val_games = games[games["season"].isin(val_seasons)]
+    test_games = games[games["season"].isin(test_seasons)]
 
-    print(f"\nGame counts:")
-    print(f"  Train: {len(train_games)} games ({min(train_games['season'])}-{max(train_games['season'])})")
-    print(f"  Validation: {len(val_games)} games ({min(val_games['season'])}-{max(val_games['season'])})")
-    print(f"  Test: {len(test_games)} games ({min(test_games['season'])}-{max(test_games['season'])})")
+    print("\nGame counts:")
+    print(
+        f"  Train: {len(train_games)} games ({min(train_games['season'])}-{max(train_games['season'])})"
+    )
+    print(
+        f"  Validation: {len(val_games)} games ({min(val_games['season'])}-{max(val_games['season'])})"
+    )
+    print(
+        f"  Test: {len(test_games)} games ({min(test_games['season'])}-{max(test_games['season'])})"
+    )
     print()
 
     # Engineer features
@@ -486,15 +498,15 @@ def main():
     test_features = predictor.create_game_features(player_stats, test_games)
 
     # Train model
-    print("="*80)
+    print("=" * 80)
     print("TRAINING")
-    print("="*80)
+    print("=" * 80)
     train_metrics = predictor.train(train_features, val_features)
 
     # Evaluate on validation
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("VALIDATION PERFORMANCE")
-    print("="*80)
+    print("=" * 80)
     val_pred = predictor.predict(val_features)
     val_metrics = predictor.evaluate(val_features, val_pred)
 
@@ -504,9 +516,9 @@ def main():
     print(f"Games: {val_metrics['n_games']}")
 
     # Evaluate on test
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("TEST PERFORMANCE")
-    print("="*80)
+    print("=" * 80)
     test_pred = predictor.predict(test_features)
     test_metrics = predictor.evaluate(test_features, test_pred)
 
@@ -516,37 +528,41 @@ def main():
     print(f"Games: {test_metrics['n_games']}")
 
     # Compare to state-space baseline
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("COMPARISON TO STATE-SPACE BASELINE")
-    print("="*80)
+    print("=" * 80)
 
     # Load state-space results from dissertation
     state_space_val_brier = 0.2458
     state_space_test_brier = 0.2615
 
-    print(f"\nBrier Score Comparison:")
-    print(f"  Validation:")
+    print("\nBrier Score Comparison:")
+    print("  Validation:")
     print(f"    State-Space:    {state_space_val_brier:.4f}")
     print(f"    Player-to-Game: {val_metrics['brier']:.4f}")
-    print(f"    Improvement:    {100*(state_space_val_brier - val_metrics['brier'])/state_space_val_brier:+.1f}%")
+    print(
+        f"    Improvement:    {100*(state_space_val_brier - val_metrics['brier'])/state_space_val_brier:+.1f}%"
+    )
 
-    print(f"\n  Test:")
+    print("\n  Test:")
     print(f"    State-Space:    {state_space_test_brier:.4f}")
     print(f"    Player-to-Game: {test_metrics['brier']:.4f}")
-    print(f"    Improvement:    {100*(state_space_test_brier - test_metrics['brier'])/state_space_test_brier:+.1f}%")
+    print(
+        f"    Improvement:    {100*(state_space_test_brier - test_metrics['brier'])/state_space_test_brier:+.1f}%"
+    )
 
     # Save results
     results = {
-        'train': train_metrics,
-        'validation': val_metrics,
-        'test': test_metrics,
-        'comparison': {
-            'state_space_val_brier': state_space_val_brier,
-            'state_space_test_brier': state_space_test_brier,
-            'player_to_game_val_brier': val_metrics['brier'],
-            'player_to_game_test_brier': test_metrics['brier'],
+        "train": train_metrics,
+        "validation": val_metrics,
+        "test": test_metrics,
+        "comparison": {
+            "state_space_val_brier": state_space_val_brier,
+            "state_space_test_brier": state_space_test_brier,
+            "player_to_game_val_brier": val_metrics["brier"],
+            "player_to_game_test_brier": test_metrics["brier"],
         },
-        'timestamp': datetime.now().isoformat(),
+        "timestamp": datetime.now().isoformat(),
     }
 
     output_dir = Path("models/player_to_game")
@@ -557,16 +573,16 @@ def main():
 
     # Save predictions
     test_output = test_features.copy()
-    test_output['prediction'] = test_pred
+    test_output["prediction"] = test_pred
     test_output.to_csv(output_dir / "test_predictions_2025.csv", index=False)
 
     print(f"\n✓ Results saved to {output_dir}")
-    print(f"  - models/player_to_game/results.json")
-    print(f"  - models/player_to_game/test_predictions_2025.csv")
+    print("  - models/player_to_game/results.json")
+    print("  - models/player_to_game/test_predictions_2025.csv")
 
-    print("\n" + "="*80)
+    print("\n" + "=" * 80)
     print("COMPLETE")
-    print("="*80)
+    print("=" * 80)
 
     return results
 

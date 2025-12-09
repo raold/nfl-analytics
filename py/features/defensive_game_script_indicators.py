@@ -19,16 +19,13 @@ Date: 2025-10-30
 """
 
 import logging
+
 import pandas as pd
-import numpy as np
-from typing import Optional, Tuple, Dict
 from sqlalchemy import create_engine
-from datetime import datetime
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -44,19 +41,12 @@ class DefensiveGameScriptEngine:
     - Game script velocity (momentum)
     """
 
-    def __init__(
-        self,
-        db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-    ):
+    def __init__(self, db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"):
         """Initialize the game script engine."""
         self.engine = create_engine(db_url)
         logger.info(f"Connected to database: {db_url}")
 
-    def load_all_plays(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
-    ) -> pd.DataFrame:
+    def load_all_plays(self, start_season: int = 2024, end_season: int = 2025) -> pd.DataFrame:
         """
         Load all offensive plays with game script context.
 
@@ -120,40 +110,38 @@ class DefensiveGameScriptEngine:
         """
         # Basic score categories (from defense perspective)
         # Note: score_differential > 0 means offense is ahead, so defense is trailing
-        df["def_leading_1score"] = (df["score_differential"] <= -1) & (df["score_differential"] >= -7)
-        df["def_leading_2score"] = (df["score_differential"] <= -8) & (df["score_differential"] >= -14)
+        df["def_leading_1score"] = (df["score_differential"] <= -1) & (
+            df["score_differential"] >= -7
+        )
+        df["def_leading_2score"] = (df["score_differential"] <= -8) & (
+            df["score_differential"] >= -14
+        )
         df["def_leading_3plus"] = df["score_differential"] <= -15
-        df["def_trailing_1score"] = (df["score_differential"] >= 1) & (df["score_differential"] <= 7)
-        df["def_trailing_2score"] = (df["score_differential"] >= 8) & (df["score_differential"] <= 14)
+        df["def_trailing_1score"] = (df["score_differential"] >= 1) & (
+            df["score_differential"] <= 7
+        )
+        df["def_trailing_2score"] = (df["score_differential"] >= 8) & (
+            df["score_differential"] <= 14
+        )
         df["def_trailing_3plus"] = df["score_differential"] >= 15
         df["def_tied"] = df["score_differential"] == 0
 
         # Garbage time: Large differential (>21 points) in 4th quarter
-        df["garbage_time"] = (
-            (df["quarter"] == 4) &
-            (df["score_differential"].abs() > 21)
-        )
+        df["garbage_time"] = (df["quarter"] == 4) & (df["score_differential"].abs() > 21)
 
         # Competitive 4th quarter: Within 1 score in 4th quarter
-        df["competitive_4th"] = (
-            (df["quarter"] == 4) &
-            (df["score_differential"].abs() <= 7)
-        )
+        df["competitive_4th"] = (df["quarter"] == 4) & (df["score_differential"].abs() <= 7)
 
         # High leverage: Close game, late in game
-        df["high_leverage"] = (
-            (df["game_seconds_remaining"] <= 600) &  # Last 10 minutes
-            (df["score_differential"].abs() <= 7)     # Within 1 score
-        )
+        df["high_leverage"] = (df["game_seconds_remaining"] <= 600) & (  # Last 10 minutes
+            df["score_differential"].abs() <= 7
+        )  # Within 1 score
 
         # Negative play (defense wins)
         df["negative_play"] = df["yards_gained"] < 0
         df["turnover"] = (df["interception"] == 1) | (df["fumble_lost"] == 1)
 
-    def calculate_score_situation_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_score_situation_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate defensive performance by score situation.
 
@@ -211,10 +199,7 @@ class DefensiveGameScriptEngine:
 
         return df
 
-    def calculate_garbage_time_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_garbage_time_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate defensive performance in garbage time vs competitive situations.
 
@@ -252,10 +237,7 @@ class DefensiveGameScriptEngine:
 
         return df
 
-    def calculate_competitive_fourth_quarter_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_competitive_fourth_quarter_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate defensive performance in competitive 4th quarters.
 
@@ -297,10 +279,7 @@ class DefensiveGameScriptEngine:
 
         return df
 
-    def calculate_high_leverage_defense(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_high_leverage_defense(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate defensive performance in high leverage situations.
 
@@ -341,10 +320,7 @@ class DefensiveGameScriptEngine:
 
         return df
 
-    def calculate_game_script_velocity(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_game_script_velocity(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate how defensive performance changes as game script evolves.
 
@@ -385,7 +361,11 @@ class DefensiveGameScriptEngine:
                 "script_value": "game_trend",
                 "n_plays": len(game_plays),
                 "avg_epa_per_play": game_plays["epa"].mean(),
-                "epa_momentum": game_plays["epa_roll5"].iloc[-1] if len(game_plays) >= window else game_plays["epa"].mean(),
+                "epa_momentum": (
+                    game_plays["epa_roll5"].iloc[-1]
+                    if len(game_plays) >= window
+                    else game_plays["epa"].mean()
+                ),
                 "pct_plays_improving": game_plays["def_improving"].mean() * 100,
                 "avg_score_momentum": game_plays["score_diff_change"].mean(),
                 "pct_favorable_momentum": game_plays["score_momentum_favorable"].mean() * 100,
@@ -398,11 +378,7 @@ class DefensiveGameScriptEngine:
 
         return df
 
-    def add_rolling_averages(
-        self,
-        metrics: pd.DataFrame,
-        window: int = 4
-    ) -> pd.DataFrame:
+    def add_rolling_averages(self, metrics: pd.DataFrame, window: int = 4) -> pd.DataFrame:
         """
         Add rolling averages for trend analysis.
         """
@@ -421,20 +397,17 @@ class DefensiveGameScriptEngine:
 
         for col in rolling_cols:
             if col in metrics.columns:
-                metrics[f"{col}_roll{window}"] = (
-                    metrics.groupby(["defense_team", "script_type", "script_value"])[col]
-                    .transform(lambda x: x.rolling(window, min_periods=1).mean())
-                )
+                metrics[f"{col}_roll{window}"] = metrics.groupby(
+                    ["defense_team", "script_type", "script_value"]
+                )[col].transform(lambda x: x.rolling(window, min_periods=1).mean())
 
-        logger.info(f"Added rolling averages for game script metrics")
+        logger.info("Added rolling averages for game script metrics")
 
         return metrics
 
     def generate_all_features(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        self, start_season: int = 2024, end_season: int = 2025
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Generate all defensive game script features.
 
@@ -480,7 +453,7 @@ class DefensiveGameScriptEngine:
             garbage_time_metrics,
             competitive_4th_metrics,
             high_leverage_metrics,
-            velocity_metrics
+            velocity_metrics,
         )
 
 
@@ -494,11 +467,8 @@ def main():
         garbage_time_metrics,
         competitive_4th_metrics,
         high_leverage_metrics,
-        velocity_metrics
-    ) = engine.generate_all_features(
-        start_season=2020,
-        end_season=2025
-    )
+        velocity_metrics,
+    ) = engine.generate_all_features(start_season=2020, end_season=2025)
 
     # Display sample statistics
     print("\n" + "=" * 70)
@@ -507,12 +477,11 @@ def main():
     if len(score_situation_metrics) > 0:
         print(score_situation_metrics.head(15).to_string())
         print("\nSCORE SITUATION DEFENSE STATISTICS")
-        print(score_situation_metrics[[
-            "epa_per_play_allowed",
-            "success_rate_allowed",
-            "turnover_rate",
-            "sack_rate"
-        ]].describe())
+        print(
+            score_situation_metrics[
+                ["epa_per_play_allowed", "success_rate_allowed", "turnover_rate", "sack_rate"]
+            ].describe()
+        )
 
     print("\n" + "=" * 70)
     print("COMPETITIVE 4TH QUARTER DEFENSE SAMPLE")
@@ -520,11 +489,11 @@ def main():
     if len(competitive_4th_metrics) > 0:
         print(competitive_4th_metrics.head(10).to_string())
         print("\nCOMPETITIVE 4TH QUARTER STATISTICS")
-        print(competitive_4th_metrics[[
-            "epa_per_play_allowed",
-            "success_rate_allowed",
-            "turnover_rate"
-        ]].describe())
+        print(
+            competitive_4th_metrics[
+                ["epa_per_play_allowed", "success_rate_allowed", "turnover_rate"]
+            ].describe()
+        )
 
     print("\n" + "=" * 70)
     print("HIGH LEVERAGE DEFENSE SAMPLE")
@@ -542,22 +511,34 @@ def main():
     print("TOP 10 DEFENSES IN COMPETITIVE 4TH QUARTERS (by EPA)")
     print("=" * 70)
     if len(competitive_4th_metrics) > 0:
-        top_clutch = competitive_4th_metrics.nsmallest(10, "epa_per_play_allowed")[[
-            "defense_team", "game_id", "n_plays", "epa_per_play_allowed",
-            "success_rate_allowed", "turnover_rate"
-        ]]
+        top_clutch = competitive_4th_metrics.nsmallest(10, "epa_per_play_allowed")[
+            [
+                "defense_team",
+                "game_id",
+                "n_plays",
+                "epa_per_play_allowed",
+                "success_rate_allowed",
+                "turnover_rate",
+            ]
+        ]
         print(top_clutch.to_string(index=False))
 
     print("\n" + "=" * 70)
     print("DEFENSE PERFORMANCE BY SCORE SITUATION")
     print("=" * 70)
     if len(score_situation_metrics) > 0:
-        summary = score_situation_metrics.groupby("script_value").agg({
-            "epa_per_play_allowed": "mean",
-            "success_rate_allowed": "mean",
-            "turnover_rate": "mean",
-            "n_plays": "sum"
-        }).round(2)
+        summary = (
+            score_situation_metrics.groupby("script_value")
+            .agg(
+                {
+                    "epa_per_play_allowed": "mean",
+                    "success_rate_allowed": "mean",
+                    "turnover_rate": "mean",
+                    "n_plays": "sum",
+                }
+            )
+            .round(2)
+        )
         print(summary.to_string())
 
     return (
@@ -565,7 +546,7 @@ def main():
         garbage_time_metrics,
         competitive_4th_metrics,
         high_leverage_metrics,
-        velocity_metrics
+        velocity_metrics,
     )
 
 

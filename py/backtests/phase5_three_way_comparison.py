@@ -15,12 +15,9 @@ Date: 2025-10-30
 
 import argparse
 import json
-import multiprocessing as mp
 import sys
-from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
@@ -35,25 +32,27 @@ def train_model(model_cls, train_df, model_name):
     print(f"\n[{model_name}] Starting training...")
 
     xgb_params = {
-        'objective': 'binary:logistic',
-        'eval_metric': 'logloss',
-        'tree_method': 'hist',
-        'n_estimators': 100,
-        'max_depth': 6 if model_name != "OPTIMIZED" else 4,  # Reduced for optimized
-        'learning_rate': 0.1,
-        'subsample': 0.8,
-        'colsample_bytree': 0.8,
-        'n_jobs': -1,
+        "objective": "binary:logistic",
+        "eval_metric": "logloss",
+        "tree_method": "hist",
+        "n_estimators": 100,
+        "max_depth": 6 if model_name != "OPTIMIZED" else 4,  # Reduced for optimized
+        "learning_rate": 0.1,
+        "subsample": 0.8,
+        "colsample_bytree": 0.8,
+        "n_jobs": -1,
     }
 
     # Add regularization for optimized model
     if model_name == "OPTIMIZED":
-        xgb_params.update({
-            'alpha': 2.0,  # L1 regularization
-            'lambda': 2.0,  # L2 regularization
-            'min_child_weight': 5,
-            'gamma': 0.5,
-        })
+        xgb_params.update(
+            {
+                "alpha": 2.0,  # L1 regularization
+                "lambda": 2.0,  # L2 regularization
+                "min_child_weight": 5,
+                "gamma": 0.5,
+            }
+        )
 
     model = model_cls(xgb_params=xgb_params)
     model.fit(train_df)
@@ -158,39 +157,41 @@ def run_three_way_comparison(
     print("THREE-WAY COMPARISON: BASELINE VS ENHANCED VS OPTIMIZED")
     print(f"{'='*80}\n")
 
-    comparison_df = pd.DataFrame({
-        "Model": ["Baseline (9 feat)", "Enhanced (40+ feat)", "Optimized (19 feat)"],
-        "Total Bets": [
-            baseline_summary["n_trades"],
-            enhanced_summary["n_trades"],
-            optimized_summary["n_trades"]
-        ],
-        "Win Rate": [
-            f"{baseline_summary['win_rate']:.1%}",
-            f"{enhanced_summary['win_rate']:.1%}",
-            f"{optimized_summary['win_rate']:.1%}"
-        ],
-        "Final Bankroll": [
-            f"${baseline_summary['final_bankroll']:,.2f}",
-            f"${enhanced_summary['final_bankroll']:,.2f}",
-            f"${optimized_summary['final_bankroll']:,.2f}"
-        ],
-        "Total Return": [
-            f"{baseline_summary['total_return']:+.1%}",
-            f"{enhanced_summary['total_return']:+.1%}",
-            f"{optimized_summary['total_return']:+.1%}"
-        ],
-        "Sharpe Ratio": [
-            f"{baseline_summary['sharpe_ratio']:.2f}",
-            f"{enhanced_summary['sharpe_ratio']:.2f}",
-            f"{optimized_summary['sharpe_ratio']:.2f}"
-        ],
-        "Max Drawdown": [
-            f"{baseline_summary['max_drawdown']:.1%}",
-            f"{enhanced_summary['max_drawdown']:.1%}",
-            f"{optimized_summary['max_drawdown']:.1%}"
-        ],
-    })
+    comparison_df = pd.DataFrame(
+        {
+            "Model": ["Baseline (9 feat)", "Enhanced (40+ feat)", "Optimized (19 feat)"],
+            "Total Bets": [
+                baseline_summary["n_trades"],
+                enhanced_summary["n_trades"],
+                optimized_summary["n_trades"],
+            ],
+            "Win Rate": [
+                f"{baseline_summary['win_rate']:.1%}",
+                f"{enhanced_summary['win_rate']:.1%}",
+                f"{optimized_summary['win_rate']:.1%}",
+            ],
+            "Final Bankroll": [
+                f"${baseline_summary['final_bankroll']:,.2f}",
+                f"${enhanced_summary['final_bankroll']:,.2f}",
+                f"${optimized_summary['final_bankroll']:,.2f}",
+            ],
+            "Total Return": [
+                f"{baseline_summary['total_return']:+.1%}",
+                f"{enhanced_summary['total_return']:+.1%}",
+                f"{optimized_summary['total_return']:+.1%}",
+            ],
+            "Sharpe Ratio": [
+                f"{baseline_summary['sharpe_ratio']:.2f}",
+                f"{enhanced_summary['sharpe_ratio']:.2f}",
+                f"{optimized_summary['sharpe_ratio']:.2f}",
+            ],
+            "Max Drawdown": [
+                f"{baseline_summary['max_drawdown']:.1%}",
+                f"{enhanced_summary['max_drawdown']:.1%}",
+                f"{optimized_summary['max_drawdown']:.1%}",
+            ],
+        }
+    )
 
     print(comparison_df.to_string(index=False))
 
@@ -202,9 +203,11 @@ def run_three_way_comparison(
     opt_vs_baseline_roi = optimized_summary["total_return"] - baseline_summary["total_return"]
     opt_vs_baseline_wr = optimized_summary["win_rate"] - baseline_summary["win_rate"]
     opt_vs_baseline_sharpe = optimized_summary["sharpe_ratio"] - baseline_summary["sharpe_ratio"]
-    opt_vs_baseline_profit = (optimized_summary["final_bankroll"] - initial_bankroll) - (baseline_summary["final_bankroll"] - initial_bankroll)
+    opt_vs_baseline_profit = (optimized_summary["final_bankroll"] - initial_bankroll) - (
+        baseline_summary["final_bankroll"] - initial_bankroll
+    )
 
-    print(f"\nOPTIMIZED vs BASELINE:")
+    print("\nOPTIMIZED vs BASELINE:")
     print(f"  ROI Improvement: {opt_vs_baseline_roi:+.2%}")
     print(f"  Win Rate Improvement: {opt_vs_baseline_wr:+.1%}")
     print(f"  Sharpe Ratio Improvement: {opt_vs_baseline_sharpe:+.2f}")
@@ -213,9 +216,11 @@ def run_three_way_comparison(
     opt_vs_enhanced_roi = optimized_summary["total_return"] - enhanced_summary["total_return"]
     opt_vs_enhanced_wr = optimized_summary["win_rate"] - enhanced_summary["win_rate"]
     opt_vs_enhanced_sharpe = optimized_summary["sharpe_ratio"] - enhanced_summary["sharpe_ratio"]
-    opt_vs_enhanced_profit = (optimized_summary["final_bankroll"] - initial_bankroll) - (enhanced_summary["final_bankroll"] - initial_bankroll)
+    opt_vs_enhanced_profit = (optimized_summary["final_bankroll"] - initial_bankroll) - (
+        enhanced_summary["final_bankroll"] - initial_bankroll
+    )
 
-    print(f"\nOPTIMIZED vs ENHANCED:")
+    print("\nOPTIMIZED vs ENHANCED:")
     print(f"  ROI Improvement: {opt_vs_enhanced_roi:+.2%}")
     print(f"  Win Rate Improvement: {opt_vs_enhanced_wr:+.1%}")
     print(f"  Sharpe Ratio Improvement: {opt_vs_enhanced_sharpe:+.2f}")
@@ -226,29 +231,42 @@ def run_three_way_comparison(
     print("VERDICT")
     print(f"{'='*80}")
 
-    best_roi_model = "BASELINE" if baseline_summary["total_return"] > max(enhanced_summary["total_return"], optimized_summary["total_return"]) else (
-        "ENHANCED" if enhanced_summary["total_return"] > optimized_summary["total_return"] else "OPTIMIZED"
+    best_roi_model = (
+        "BASELINE"
+        if baseline_summary["total_return"]
+        > max(enhanced_summary["total_return"], optimized_summary["total_return"])
+        else (
+            "ENHANCED"
+            if enhanced_summary["total_return"] > optimized_summary["total_return"]
+            else "OPTIMIZED"
+        )
     )
 
     print(f"\nBEST MODEL BY ROI: {best_roi_model}")
-    print(f"  Baseline: {baseline_summary['total_return']:+.1%} ({baseline_summary['n_trades']} trades)")
-    print(f"  Enhanced: {enhanced_summary['total_return']:+.1%} ({enhanced_summary['n_trades']} trades)")
-    print(f"  Optimized: {optimized_summary['total_return']:+.1%} ({optimized_summary['n_trades']} trades)")
+    print(
+        f"  Baseline: {baseline_summary['total_return']:+.1%} ({baseline_summary['n_trades']} trades)"
+    )
+    print(
+        f"  Enhanced: {enhanced_summary['total_return']:+.1%} ({enhanced_summary['n_trades']} trades)"
+    )
+    print(
+        f"  Optimized: {optimized_summary['total_return']:+.1%} ({optimized_summary['n_trades']} trades)"
+    )
 
     if best_roi_model == "OPTIMIZED":
-        print(f"\n✓ SUCCESS! Optimized model beat both baseline and enhanced")
-        print(f"  Feature selection + regularization WORKED")
-        print(f"  Key insight: Less features + strong regularization > more features")
+        print("\n✓ SUCCESS! Optimized model beat both baseline and enhanced")
+        print("  Feature selection + regularization WORKED")
+        print("  Key insight: Less features + strong regularization > more features")
     elif best_roi_model == "BASELINE":
-        print(f"\n⚠  Baseline still best - Phase 5 features didn't help")
-        print(f"  Possible reasons:")
-        print(f"    - Phase 5 features not predictive for this time period")
-        print(f"    - Regularization too strong")
-        print(f"    - Need different feature combinations")
+        print("\n⚠  Baseline still best - Phase 5 features didn't help")
+        print("  Possible reasons:")
+        print("    - Phase 5 features not predictive for this time period")
+        print("    - Regularization too strong")
+        print("    - Need different feature combinations")
     else:
-        print(f"\n⚠  Enhanced model best - but with overfitting risk")
-        print(f"  99% training accuracy suggests memorization")
-        print(f"  Results may not generalize to future periods")
+        print("\n⚠  Enhanced model best - but with overfitting risk")
+        print("  99% training accuracy suggests memorization")
+        print("  Results may not generalize to future periods")
 
     # Package results
     results = {
@@ -334,16 +352,13 @@ def main():
         # Filter out non-serializable objects
         json_results = {
             "baseline": {
-                k: v for k, v in results["baseline"].items()
-                if k not in ["trades_by_season"]
+                k: v for k, v in results["baseline"].items() if k not in ["trades_by_season"]
             },
             "enhanced": {
-                k: v for k, v in results["enhanced"].items()
-                if k not in ["trades_by_season"]
+                k: v for k, v in results["enhanced"].items() if k not in ["trades_by_season"]
             },
             "optimized": {
-                k: v for k, v in results["optimized"].items()
-                if k not in ["trades_by_season"]
+                k: v for k, v in results["optimized"].items() if k not in ["trades_by_season"]
             },
             "comparison": results["comparison"],
         }

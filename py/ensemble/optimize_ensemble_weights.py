@@ -31,17 +31,14 @@ Date: November 9, 2025
 import argparse
 import json
 import logging
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from scipy import stats
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -50,9 +47,11 @@ logger = logging.getLogger(__name__)
 # Data Classes
 # ============================================================================
 
+
 @dataclass
 class ModelPerformance:
     """Performance metrics for a single model."""
+
     name: str
     mae: float
     rmse: float
@@ -66,29 +65,32 @@ class ModelPerformance:
 @dataclass
 class WeightingResult:
     """Results from a weighting method."""
+
     method: str
-    weights: Dict[str, float]
+    weights: dict[str, float]
     ensemble_mae: float
     ensemble_rmse: float
     ensemble_std: float
     calibration_90: float
     improvement_vs_best_single: float
-    sharpe_ratio: Optional[float] = None
+    sharpe_ratio: float | None = None
 
 
 @dataclass
 class OptimizationResult:
     """Final optimization result."""
+
     optimal_method: str
-    optimal_weights: Dict[str, float]
-    all_methods: List[WeightingResult]
+    optimal_weights: dict[str, float]
+    all_methods: list[WeightingResult]
     comparison_table: pd.DataFrame
-    metadata: Dict
+    metadata: dict
 
 
 # ============================================================================
 # Core Functions
 # ============================================================================
+
 
 def load_predictions(predictions_path: Path) -> pd.DataFrame:
     """
@@ -112,11 +114,10 @@ def load_predictions(predictions_path: Path) -> pd.DataFrame:
     df = pd.read_csv(predictions_path)
 
     # Validate required columns
-    required_cols = ['actual_yards']
-    pred_cols = [col for col in df.columns if col.startswith('pred_')]
-    std_cols = [col for col in df.columns if col.startswith('std_')]
+    pred_cols = [col for col in df.columns if col.startswith("pred_")]
+    [col for col in df.columns if col.startswith("std_")]
 
-    if 'actual_yards' not in df.columns:
+    if "actual_yards" not in df.columns:
         logger.error("Missing 'actual_yards' column")
         raise ValueError("Predictions must contain 'actual_yards' column")
 
@@ -132,10 +133,7 @@ def load_predictions(predictions_path: Path) -> pd.DataFrame:
 
 
 def compute_model_performance(
-    df: pd.DataFrame,
-    model_name: str,
-    pred_col: str,
-    std_col: Optional[str] = None
+    df: pd.DataFrame, model_name: str, pred_col: str, std_col: str | None = None
 ) -> ModelPerformance:
     """
     Compute performance metrics for a single model.
@@ -149,12 +147,12 @@ def compute_model_performance(
     Returns:
         ModelPerformance object
     """
-    actual = df['actual_yards'].values
+    actual = df["actual_yards"].values
     pred = df[pred_col].values
 
     errors = pred - actual
     abs_errors = np.abs(errors)
-    squared_errors = errors ** 2
+    squared_errors = errors**2
 
     mae = np.mean(abs_errors)
     rmse = np.sqrt(np.mean(squared_errors))
@@ -184,11 +182,11 @@ def compute_model_performance(
         std=std,
         calibration_90=coverage,
         bias=bias,
-        n_predictions=len(actual)
+        n_predictions=len(actual),
     )
 
 
-def inverse_variance_weighting(performances: List[ModelPerformance]) -> Dict[str, float]:
+def inverse_variance_weighting(performances: list[ModelPerformance]) -> dict[str, float]:
     """
     Compute weights using inverse variance weighting.
 
@@ -211,7 +209,7 @@ def inverse_variance_weighting(performances: List[ModelPerformance]) -> Dict[str
     return {p.name: float(w) for p, w in zip(performances, weights)}
 
 
-def equal_weighting(performances: List[ModelPerformance]) -> Dict[str, float]:
+def equal_weighting(performances: list[ModelPerformance]) -> dict[str, float]:
     """
     Compute equal weights (baseline).
 
@@ -228,7 +226,7 @@ def equal_weighting(performances: List[ModelPerformance]) -> Dict[str, float]:
     return {p.name: weight for p in performances}
 
 
-def performance_based_weighting(performances: List[ModelPerformance]) -> Dict[str, float]:
+def performance_based_weighting(performances: list[ModelPerformance]) -> dict[str, float]:
     """
     Compute weights based on inverse MAE.
 
@@ -252,9 +250,7 @@ def performance_based_weighting(performances: List[ModelPerformance]) -> Dict[st
 
 
 def compute_ensemble_predictions(
-    df: pd.DataFrame,
-    weights: Dict[str, float],
-    model_columns: Dict[str, str]
+    df: pd.DataFrame, weights: dict[str, float], model_columns: dict[str, str]
 ) -> np.ndarray:
     """
     Compute weighted ensemble predictions.
@@ -278,11 +274,11 @@ def compute_ensemble_predictions(
 
 def evaluate_weighting_method(
     df: pd.DataFrame,
-    weights: Dict[str, float],
-    model_columns: Dict[str, str],
-    std_columns: Dict[str, str],
+    weights: dict[str, float],
+    model_columns: dict[str, str],
+    std_columns: dict[str, str],
     method_name: str,
-    best_single_mae: float
+    best_single_mae: float,
 ) -> WeightingResult:
     """
     Evaluate a weighting method on hold-out data.
@@ -300,7 +296,7 @@ def evaluate_weighting_method(
     """
     # Compute ensemble predictions
     ensemble_pred = compute_ensemble_predictions(df, weights, model_columns)
-    actual = df['actual_yards'].values
+    actual = df["actual_yards"].values
 
     # Compute ensemble uncertainty (variance pooling)
     ensemble_var = 0.0
@@ -308,14 +304,14 @@ def evaluate_weighting_method(
         std_col = std_columns.get(model_name)
         if std_col and std_col in df.columns:
             model_var = df[std_col].values ** 2
-            ensemble_var += (weight ** 2) * model_var
+            ensemble_var += (weight**2) * model_var
 
     ensemble_std = np.sqrt(ensemble_var.mean()) if ensemble_var.mean() > 0 else 0.0
 
     # Performance metrics
     errors = ensemble_pred - actual
     mae = np.mean(np.abs(errors))
-    rmse = np.sqrt(np.mean(errors ** 2))
+    rmse = np.sqrt(np.mean(errors**2))
 
     # Calibration
     if ensemble_std > 0:
@@ -342,11 +338,11 @@ def evaluate_weighting_method(
         ensemble_std=ensemble_std,
         calibration_90=calibration,
         improvement_vs_best_single=improvement,
-        sharpe_ratio=sharpe
+        sharpe_ratio=sharpe,
     )
 
 
-def select_optimal_method(results: List[WeightingResult]) -> WeightingResult:
+def select_optimal_method(results: list[WeightingResult]) -> WeightingResult:
     """
     Select optimal weighting method based on multiple criteria.
 
@@ -371,15 +367,16 @@ def select_optimal_method(results: List[WeightingResult]) -> WeightingResult:
     else:
         # Fallback: select lowest MAE (even if not well-calibrated)
         best = min(results, key=lambda r: r.ensemble_mae)
-        logger.warning(f"⚠ No method meets calibration threshold (89%)")
-        logger.warning(f"  Selected {best.method} (lowest MAE, calibration: {best.calibration_90:.1f}%)")
+        logger.warning("⚠ No method meets calibration threshold (89%)")
+        logger.warning(
+            f"  Selected {best.method} (lowest MAE, calibration: {best.calibration_90:.1f}%)"
+        )
 
     return best
 
 
 def create_comparison_table(
-    performances: List[ModelPerformance],
-    results: List[WeightingResult]
+    performances: list[ModelPerformance], results: list[WeightingResult]
 ) -> pd.DataFrame:
     """
     Create comparison table of all methods.
@@ -394,31 +391,35 @@ def create_comparison_table(
     # Individual models
     individual_rows = []
     for p in performances:
-        individual_rows.append({
-            'model': p.name,
-            'type': 'individual',
-            'mae_yards': p.mae,
-            'rmse_yards': p.rmse,
-            'calibration_90': p.calibration_90,
-            'sharpe_ratio': None,
-            'improvement_vs_best': 0.0
-        })
+        individual_rows.append(
+            {
+                "model": p.name,
+                "type": "individual",
+                "mae_yards": p.mae,
+                "rmse_yards": p.rmse,
+                "calibration_90": p.calibration_90,
+                "sharpe_ratio": None,
+                "improvement_vs_best": 0.0,
+            }
+        )
 
     # Ensemble methods
     ensemble_rows = []
     for r in results:
-        ensemble_rows.append({
-            'model': f"ensemble_{r.method}",
-            'type': 'ensemble',
-            'mae_yards': r.ensemble_mae,
-            'rmse_yards': r.ensemble_rmse,
-            'calibration_90': r.calibration_90,
-            'sharpe_ratio': r.sharpe_ratio,
-            'improvement_vs_best': r.improvement_vs_best_single
-        })
+        ensemble_rows.append(
+            {
+                "model": f"ensemble_{r.method}",
+                "type": "ensemble",
+                "mae_yards": r.ensemble_mae,
+                "rmse_yards": r.ensemble_rmse,
+                "calibration_90": r.calibration_90,
+                "sharpe_ratio": r.sharpe_ratio,
+                "improvement_vs_best": r.improvement_vs_best_single,
+            }
+        )
 
     df = pd.DataFrame(individual_rows + ensemble_rows)
-    df = df.sort_values('mae_yards')
+    df = df.sort_values("mae_yards")
 
     return df
 
@@ -427,11 +428,12 @@ def create_comparison_table(
 # Main Optimization Pipeline
 # ============================================================================
 
+
 def optimize_ensemble_weights(
     predictions_path: Path,
     output_path: Path,
     target_mae: float = 45.2,
-    target_calibration: float = 89.0
+    target_calibration: float = 89.0,
 ) -> OptimizationResult:
     """
     Main optimization pipeline.
@@ -454,14 +456,14 @@ def optimize_ensemble_weights(
     df = load_predictions(predictions_path)
 
     # Identify model columns
-    pred_cols = [col for col in df.columns if col.startswith('pred_')]
-    std_cols = [col for col in df.columns if col.startswith('std_')]
+    pred_cols = [col for col in df.columns if col.startswith("pred_")]
+    std_cols = [col for col in df.columns if col.startswith("std_")]
 
     # Map model names to columns
     model_columns = {}
     std_columns = {}
     for col in pred_cols:
-        model_name = col.replace('pred_', '')
+        model_name = col.replace("pred_", "")
         model_columns[model_name] = col
 
         # Find corresponding std column
@@ -478,7 +480,9 @@ def optimize_ensemble_weights(
         std_col = std_columns.get(model_name)
         perf = compute_model_performance(df, model_name, pred_col, std_col)
         performances.append(perf)
-        logger.info(f"  {model_name:25s} | MAE: {perf.mae:6.2f} | RMSE: {perf.rmse:6.2f} | Cal: {perf.calibration_90:5.1f}%")
+        logger.info(
+            f"  {model_name:25s} | MAE: {perf.mae:6.2f} | RMSE: {perf.rmse:6.2f} | Cal: {perf.calibration_90:5.1f}%"
+        )
 
     best_single_mae = min(p.mae for p in performances)
     logger.info(f"\n  Best single model MAE: {best_single_mae:.2f} yards")
@@ -505,23 +509,27 @@ def optimize_ensemble_weights(
     logger.info("\n[4/5] Evaluating weighting methods...")
     results = [
         evaluate_weighting_method(
-            df, weights_inverse_var, model_columns, std_columns,
-            "inverse_variance", best_single_mae
+            df, weights_inverse_var, model_columns, std_columns, "inverse_variance", best_single_mae
         ),
         evaluate_weighting_method(
-            df, weights_equal, model_columns, std_columns,
-            "equal", best_single_mae
+            df, weights_equal, model_columns, std_columns, "equal", best_single_mae
         ),
         evaluate_weighting_method(
-            df, weights_performance, model_columns, std_columns,
-            "performance_based", best_single_mae
+            df,
+            weights_performance,
+            model_columns,
+            std_columns,
+            "performance_based",
+            best_single_mae,
         ),
     ]
 
     for r in results:
-        logger.info(f"  {r.method:20s} | MAE: {r.ensemble_mae:6.2f} | RMSE: {r.ensemble_rmse:6.2f} | "
-                   f"Cal: {r.calibration_90:5.1f}% | Sharpe: {r.sharpe_ratio:5.2f} | "
-                   f"Δ: {r.improvement_vs_best_single:+6.2f}")
+        logger.info(
+            f"  {r.method:20s} | MAE: {r.ensemble_mae:6.2f} | RMSE: {r.ensemble_rmse:6.2f} | "
+            f"Cal: {r.calibration_90:5.1f}% | Sharpe: {r.sharpe_ratio:5.2f} | "
+            f"Δ: {r.improvement_vs_best_single:+6.2f}"
+        )
 
     # Select optimal method
     logger.info("\n[5/5] Selecting optimal method...")
@@ -560,7 +568,7 @@ def optimize_ensemble_weights(
                 "rmse": float(r.ensemble_rmse),
                 "calibration_90": float(r.calibration_90),
                 "sharpe_ratio": float(r.sharpe_ratio) if r.sharpe_ratio else None,
-                "improvement": float(r.improvement_vs_best_single)
+                "improvement": float(r.improvement_vs_best_single),
             }
             for r in results
         ],
@@ -572,7 +580,7 @@ def optimize_ensemble_weights(
                 "calibration_90": float(p.calibration_90),
                 "variance": float(p.variance),
                 "std": float(p.std),
-                "bias": float(p.bias)
+                "bias": float(p.bias),
             }
             for p in performances
         ],
@@ -582,11 +590,11 @@ def optimize_ensemble_weights(
             "best_single_model": min(performances, key=lambda p: p.mae).name,
             "best_single_mae": float(best_single_mae),
             "optimization_date": "2025-11-09",
-            "canonical_window": "2018-2024 + H=4 decay"
-        }
+            "canonical_window": "2018-2024 + H=4 decay",
+        },
     }
 
-    with open(output_path, 'w') as f:
+    with open(output_path, "w") as f:
         json.dump(result_json, f, indent=2)
 
     logger.info(f"✓ Saved to {output_path}")
@@ -601,13 +609,14 @@ def optimize_ensemble_weights(
         optimal_weights=optimal.weights,
         all_methods=results,
         comparison_table=comparison,
-        metadata=result_json["metadata"]
+        metadata=result_json["metadata"],
     )
 
 
 # ============================================================================
 # CLI
 # ============================================================================
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -626,35 +635,29 @@ Examples:
       --output models/ensemble_weights_2025_optimized.json \\
       --target-mae 45.0 \\
       --target-calibration 90.0
-        """
+        """,
     )
 
     parser.add_argument(
-        '--predictions',
-        type=Path,
-        required=True,
-        help="Path to ensemble predictions CSV"
+        "--predictions", type=Path, required=True, help="Path to ensemble predictions CSV"
     )
 
     parser.add_argument(
-        '--output',
-        type=Path,
-        required=True,
-        help="Path to save optimized weights JSON"
+        "--output", type=Path, required=True, help="Path to save optimized weights JSON"
     )
 
     parser.add_argument(
-        '--target-mae',
+        "--target-mae",
         type=float,
         default=45.2,
-        help="Target ensemble MAE (default: 45.2 from MODEL_REGISTRY.yaml)"
+        help="Target ensemble MAE (default: 45.2 from MODEL_REGISTRY.yaml)",
     )
 
     parser.add_argument(
-        '--target-calibration',
+        "--target-calibration",
         type=float,
         default=89.0,
-        help="Target 90%% calibration coverage (default: 89.0)"
+        help="Target 90%% calibration coverage (default: 89.0)",
     )
 
     args = parser.parse_args()
@@ -664,7 +667,7 @@ Examples:
         predictions_path=args.predictions,
         output_path=args.output,
         target_mae=args.target_mae,
-        target_calibration=args.target_calibration
+        target_calibration=args.target_calibration,
     )
 
     # Print summary

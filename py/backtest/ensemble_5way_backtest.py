@@ -43,20 +43,14 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 import argparse
 import logging
 import time
-from typing import Dict, List, Tuple
-from datetime import datetime
 
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor
 
 from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -77,7 +71,7 @@ class CQLBetSizer:
         max_bet_pct: float = 0.05,
         max_daily_drawdown: float = 0.10,
         max_uncertainty: float = 80.0,
-        kelly_fraction: float = 0.25
+        kelly_fraction: float = 0.25,
     ):
         """
         Initialize CQL bet sizer.
@@ -104,11 +98,7 @@ class CQLBetSizer:
         self.daily_drawdown = 0.0
 
     def calculate_bet_size(
-        self,
-        bankroll: float,
-        pred_mean: float,
-        pred_std: float,
-        vegas_line: float
+        self, bankroll: float, pred_mean: float, pred_std: float, vegas_line: float
     ) -> float:
         """
         Calculate optimal bet size using Kelly Criterion with 4 risk gates.
@@ -130,14 +120,18 @@ class CQLBetSizer:
 
         # Risk Gate 2: Uncertainty Filter
         if pred_std > self.max_uncertainty:
-            logger.debug(f"Gate 2 FAIL: Uncertainty {pred_std:.1f} > {self.max_uncertainty:.1f} yards")
+            logger.debug(
+                f"Gate 2 FAIL: Uncertainty {pred_std:.1f} > {self.max_uncertainty:.1f} yards"
+            )
             return 0.0
 
         # Risk Gate 3: Daily Drawdown Stop-Loss
         if self.daily_start_bankroll is not None:
             current_drawdown = (self.daily_start_bankroll - bankroll) / self.daily_start_bankroll
             if current_drawdown > self.max_daily_drawdown:
-                logger.debug(f"Gate 3 FAIL: Drawdown {current_drawdown:.1%} > {self.max_daily_drawdown:.1%}")
+                logger.debug(
+                    f"Gate 3 FAIL: Drawdown {current_drawdown:.1%} > {self.max_daily_drawdown:.1%}"
+                )
                 return 0.0
 
         # Calculate Kelly fraction
@@ -219,8 +213,8 @@ class EnsembleBacktest:
 
         # Tracking
         self.bankroll = initial_bankroll
-        self.positions: List[Dict] = []
-        self.daily_pnl: List[Dict] = []
+        self.positions: list[dict] = []
+        self.daily_pnl: list[dict] = []
 
     def fetch_historical_games(self) -> pd.DataFrame:
         """
@@ -269,9 +263,7 @@ class EnsembleBacktest:
         return df
 
     def simulate_betting(
-        self,
-        games_df: pd.DataFrame,
-        vegas_line_col: str = "vegas_line"
+        self, games_df: pd.DataFrame, vegas_line_col: str = "vegas_line"
     ) -> pd.DataFrame:
         """
         Simulate betting with ensemble predictions.
@@ -293,35 +285,36 @@ class EnsembleBacktest:
         for i, row in games_df.iterrows():
             # Progress logging
             if (i + 1) % 50 == 0:
-                logger.info(f"Progress: {i+1}/{len(games_df)} games "
-                           f"(Bankroll: ${self.bankroll:,.2f})")
+                logger.info(
+                    f"Progress: {i+1}/{len(games_df)} games " f"(Bankroll: ${self.bankroll:,.2f})"
+                )
 
             # Reset daily tracking on date change
-            if current_date != row['kickoff']:
-                current_date = row['kickoff']
+            if current_date != row["kickoff"]:
+                current_date = row["kickoff"]
                 if self.bet_sizer:
                     self.bet_sizer.reset_daily(self.bankroll)
 
             # Generate ensemble prediction
             try:
                 pred = self.ensemble.predict(
-                    player_id=row['player_id'],
-                    season=row['season'],
-                    week=row['week']
+                    player_id=row["player_id"], season=row["season"], week=row["week"]
                 )
             except Exception as e:
-                logger.warning(f"Prediction failed for {row['player_id']} "
-                              f"W{row['week']} {row['season']}: {e}")
+                logger.warning(
+                    f"Prediction failed for {row['player_id']} "
+                    f"W{row['week']} {row['season']}: {e}"
+                )
                 continue
 
-            if pred['ensemble_mean'] is None:
+            if pred["ensemble_mean"] is None:
                 logger.debug(f"No prediction for {row['player_id']} W{row['week']} {row['season']}")
                 continue
 
             # Use ensemble prediction as proxy for Vegas line if not available
             # (In production, we'd have actual historical props lines)
             if pd.isna(row[vegas_line_col]):
-                vegas_line = pred['ensemble_mean']  # Neutral assumption
+                vegas_line = pred["ensemble_mean"]  # Neutral assumption
             else:
                 vegas_line = row[vegas_line_col]
 
@@ -329,25 +322,25 @@ class EnsembleBacktest:
             if self.use_cql:
                 bet_size = self.bet_sizer.calculate_bet_size(
                     bankroll=self.bankroll,
-                    pred_mean=pred['ensemble_mean'],
-                    pred_std=pred['ensemble_std'],
-                    vegas_line=vegas_line
+                    pred_mean=pred["ensemble_mean"],
+                    pred_std=pred["ensemble_std"],
+                    vegas_line=vegas_line,
                 )
             else:
                 # Fixed $100 bet
-                bet_size = 100.0 if abs(pred['ensemble_mean'] - vegas_line) > 10 else 0.0
+                bet_size = 100.0 if abs(pred["ensemble_mean"] - vegas_line) > 10 else 0.0
 
             # Skip if no bet
             if bet_size == 0.0:
                 continue
 
             # Determine bet direction (over/under)
-            if pred['ensemble_mean'] > vegas_line:
+            if pred["ensemble_mean"] > vegas_line:
                 bet_side = "over"
-                win = row['actual_yards'] > vegas_line
+                win = row["actual_yards"] > vegas_line
             else:
                 bet_side = "under"
-                win = row['actual_yards'] < vegas_line
+                win = row["actual_yards"] < vegas_line
 
             # Calculate P&L (assuming -110 odds)
             if win:
@@ -359,31 +352,33 @@ class EnsembleBacktest:
             self.bankroll += pnl
 
             # Record result
-            results.append({
-                "game_id": row['game_id'],
-                "player_id": row['player_id'],
-                "player_name": row['player_name'],
-                "season": row['season'],
-                "week": row['week'],
-                "actual_yards": row['actual_yards'],
-                "pred_mean": pred['ensemble_mean'],
-                "pred_std": pred['ensemble_std'],
-                "quantile_10": pred['quantile_10'],
-                "quantile_90": pred['quantile_90'],
-                "vegas_line": vegas_line,
-                "bet_side": bet_side,
-                "bet_size": bet_size,
-                "win": win,
-                "pnl": pnl,
-                "bankroll": self.bankroll,
-            })
+            results.append(
+                {
+                    "game_id": row["game_id"],
+                    "player_id": row["player_id"],
+                    "player_name": row["player_name"],
+                    "season": row["season"],
+                    "week": row["week"],
+                    "actual_yards": row["actual_yards"],
+                    "pred_mean": pred["ensemble_mean"],
+                    "pred_std": pred["ensemble_std"],
+                    "quantile_10": pred["quantile_10"],
+                    "quantile_90": pred["quantile_90"],
+                    "vegas_line": vegas_line,
+                    "bet_side": bet_side,
+                    "bet_size": bet_size,
+                    "win": win,
+                    "pnl": pnl,
+                    "bankroll": self.bankroll,
+                }
+            )
 
         results_df = pd.DataFrame(results)
         logger.info(f"\n✅ Backtest complete: {len(results_df):,} bets placed")
 
         return results_df
 
-    def calculate_metrics(self, results_df: pd.DataFrame) -> Dict:
+    def calculate_metrics(self, results_df: pd.DataFrame) -> dict:
         """
         Calculate performance metrics.
 
@@ -396,29 +391,28 @@ class EnsembleBacktest:
             return {}
 
         # Betting metrics
-        total_wagered = results_df['bet_size'].sum()
-        total_pnl = results_df['pnl'].sum()
+        total_wagered = results_df["bet_size"].sum()
+        total_pnl = results_df["pnl"].sum()
         roi = (total_pnl / total_wagered) * 100 if total_wagered > 0 else 0.0
-        win_rate = results_df['win'].mean() * 100
+        win_rate = results_df["win"].mean() * 100
 
         # Sharpe ratio (assume daily returns)
-        returns = results_df['pnl'] / results_df['bet_size']
+        returns = results_df["pnl"] / results_df["bet_size"]
         sharpe = returns.mean() / returns.std() * np.sqrt(252) if returns.std() > 0 else 0.0
 
         # Max drawdown
-        cumulative_pnl = results_df['pnl'].cumsum()
+        cumulative_pnl = results_df["pnl"].cumsum()
         running_max = cumulative_pnl.expanding().max()
         drawdowns = (cumulative_pnl - running_max) / self.initial_bankroll * 100
         max_drawdown = drawdowns.min()
 
         # Prediction accuracy
-        mae = np.abs(results_df['actual_yards'] - results_df['pred_mean']).mean()
-        rmse = np.sqrt(((results_df['actual_yards'] - results_df['pred_mean']) ** 2).mean())
+        mae = np.abs(results_df["actual_yards"] - results_df["pred_mean"]).mean()
+        rmse = np.sqrt(((results_df["actual_yards"] - results_df["pred_mean"]) ** 2).mean())
 
         # Calibration (90% PI coverage)
-        in_interval = (
-            (results_df['actual_yards'] >= results_df['quantile_10']) &
-            (results_df['actual_yards'] <= results_df['quantile_90'])
+        in_interval = (results_df["actual_yards"] >= results_df["quantile_10"]) & (
+            results_df["actual_yards"] <= results_df["quantile_90"]
         )
         calibration_90 = in_interval.mean() * 100
 
@@ -463,18 +457,22 @@ class EnsembleBacktest:
         logger.info(f"Period: {self.start_season}-{self.end_season}")
         logger.info(f"Total Bets: {metrics.get('total_bets', 0):,}")
         logger.info(f"Total Wagered: ${metrics.get('total_wagered', 0):,.2f}")
-        logger.info(f"\nPERFORMANCE METRICS:")
+        logger.info("\nPERFORMANCE METRICS:")
         logger.info(f"  ROI: {metrics.get('roi', 0):.2f}% (Target: +5-7%)")
         logger.info(f"  Win Rate: {metrics.get('win_rate', 0):.1f}% (Target: 59-61%)")
         logger.info(f"  Sharpe Ratio: {metrics.get('sharpe_ratio', 0):.2f} (Target: 2.2-2.6)")
         logger.info(f"  Max Drawdown: {metrics.get('max_drawdown', 0):.1f}% (Target: -8 to -10%)")
-        logger.info(f"\nPREDICTION ACCURACY:")
+        logger.info("\nPREDICTION ACCURACY:")
         logger.info(f"  MAE: {metrics.get('mae', 0):.2f} yards (Target: <45.2)")
         logger.info(f"  RMSE: {metrics.get('rmse', 0):.2f} yards")
-        logger.info(f"  Calibration (90% PI): {metrics.get('calibration_90', 0):.1f}% (Target: ≥89%)")
+        logger.info(
+            f"  Calibration (90% PI): {metrics.get('calibration_90', 0):.1f}% (Target: ≥89%)"
+        )
         logger.info(f"\nFINAL BANKROLL: ${metrics.get('final_bankroll', 0):,.2f}")
         logger.info(f"  P&L: ${metrics.get('total_pnl', 0):,.2f}")
-        logger.info(f"  Return: {(metrics.get('final_bankroll', 0) / self.initial_bankroll - 1) * 100:.2f}%")
+        logger.info(
+            f"  Return: {(metrics.get('final_bankroll', 0) / self.initial_bankroll - 1) * 100:.2f}%"
+        )
         logger.info(f"\nElapsed time: {time.time() - start_time:.1f}s")
         logger.info(f"{'='*70}\n")
 
@@ -483,9 +481,10 @@ class EnsembleBacktest:
         logger.info(f"✅ Results saved to: {output_csv}")
 
         # Save metrics JSON
-        metrics_json = output_csv.replace('.csv', '_metrics.json')
+        metrics_json = output_csv.replace(".csv", "_metrics.json")
         import json
-        with open(metrics_json, 'w') as f:
+
+        with open(metrics_json, "w") as f:
             json.dump(metrics, f, indent=2)
         logger.info(f"✅ Metrics saved to: {metrics_json}")
 
@@ -494,36 +493,24 @@ class EnsembleBacktest:
 
 def main():
     """Command-line interface for backtest."""
-    parser = argparse.ArgumentParser(
-        description="Ensemble 4-Way Backtest (2022-2024)"
-    )
+    parser = argparse.ArgumentParser(description="Ensemble 4-Way Backtest (2022-2024)")
     parser.add_argument(
-        "--start-season",
-        type=int,
-        default=2022,
-        help="Start season (default: 2022)"
+        "--start-season", type=int, default=2022, help="Start season (default: 2022)"
     )
-    parser.add_argument(
-        "--end-season",
-        type=int,
-        default=2024,
-        help="End season (default: 2024)"
-    )
+    parser.add_argument("--end-season", type=int, default=2024, help="End season (default: 2024)")
     parser.add_argument(
         "--initial-bankroll",
         type=float,
         default=10000.0,
-        help="Initial bankroll in dollars (default: 10000)"
+        help="Initial bankroll in dollars (default: 10000)",
     )
     parser.add_argument(
-        "--use-cql",
-        action="store_true",
-        help="Use CQL bet sizer (default: fixed $100 bets)"
+        "--use-cql", action="store_true", help="Use CQL bet sizer (default: fixed $100 bets)"
     )
     parser.add_argument(
         "--output",
         default="analysis/results/ensemble_5way_backtest_2022_2024.csv",
-        help="Output CSV path"
+        help="Output CSV path",
     )
 
     args = parser.parse_args()

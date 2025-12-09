@@ -17,7 +17,6 @@ Author: Claude Code (Sonnet 4.5)
 Date: November 22, 2025
 """
 
-import json
 import tempfile
 from pathlib import Path
 
@@ -39,7 +38,7 @@ class TestInitialization:
             component_names=component_names,
             prior_weights=prior_weights,
             prior_strength=10.0,
-            likelihood_scale=40.0
+            likelihood_scale=40.0,
         )
 
         # Check initialization
@@ -64,10 +63,7 @@ class TestInitialization:
         prior_weights = {"model_a": 0.5, "model_b": 0.4}  # Sum = 0.9
 
         with pytest.raises(ValueError, match="Prior weights must sum to 1.0"):
-            DirichletBayesianStacking(
-                component_names=component_names,
-                prior_weights=prior_weights
-            )
+            DirichletBayesianStacking(component_names=component_names, prior_weights=prior_weights)
 
     def test_initialization_mismatched_components(self):
         """Test initialization fails if prior weights keys don't match components."""
@@ -75,10 +71,7 @@ class TestInitialization:
         prior_weights = {"model_a": 0.5, "model_c": 0.5}  # model_c not in components
 
         with pytest.raises(ValueError, match="don't match component names"):
-            DirichletBayesianStacking(
-                component_names=component_names,
-                prior_weights=prior_weights
-            )
+            DirichletBayesianStacking(component_names=component_names, prior_weights=prior_weights)
 
 
 class TestPrediction:
@@ -90,8 +83,7 @@ class TestPrediction:
         prior_weights = {"model_a": 0.5, "model_b": 0.3, "model_c": 0.2}
 
         stacker = DirichletBayesianStacking(
-            component_names=component_names,
-            prior_weights=prior_weights
+            component_names=component_names, prior_weights=prior_weights
         )
 
         # Predict with known values
@@ -110,8 +102,7 @@ class TestPrediction:
         prior_weights = {"model_a": 0.5, "model_b": 0.5}
 
         stacker = DirichletBayesianStacking(
-            component_names=component_names,
-            prior_weights=prior_weights
+            component_names=component_names, prior_weights=prior_weights
         )
 
         # Wrong component name
@@ -133,7 +124,7 @@ class TestUpdate:
             component_names=component_names,
             prior_weights=prior_weights,
             prior_strength=10.0,
-            likelihood_scale=40.0
+            likelihood_scale=40.0,
         )
 
         # Store initial alpha
@@ -163,7 +154,7 @@ class TestUpdate:
         stacker = DirichletBayesianStacking(
             component_names=component_names,
             prior_weights=prior_weights,
-            prior_strength=5.0  # Weak prior for faster adaptation
+            prior_strength=5.0,  # Weak prior for faster adaptation
         )
 
         # Store initial weights
@@ -187,8 +178,7 @@ class TestUpdate:
         prior_weights = {"model_a": 0.5, "model_b": 0.5}
 
         stacker = DirichletBayesianStacking(
-            component_names=component_names,
-            prior_weights=prior_weights
+            component_names=component_names, prior_weights=prior_weights
         )
 
         # Make 3 updates
@@ -223,7 +213,7 @@ class TestScoringRules:
             prior_weights=prior_weights,
             prior_strength=10.0,
             likelihood_scale=40.0,
-            scoring_rule="exponential"
+            scoring_rule="exponential",
         )
 
         # Perfect prediction → likelihood ≈ 1.0
@@ -244,7 +234,7 @@ class TestScoringRules:
             prior_weights=prior_weights,
             prior_strength=10.0,
             likelihood_scale=40.0,
-            scoring_rule="squared"
+            scoring_rule="squared",
         )
 
         # Perfect prediction → likelihood = 1.0
@@ -265,7 +255,7 @@ class TestScoringRules:
             prior_weights=prior_weights,
             prior_strength=10.0,
             likelihood_scale=40.0,
-            scoring_rule="log"
+            scoring_rule="log",
         )
 
         # Perfect prediction → likelihood = 1.0
@@ -288,7 +278,7 @@ class TestConvergence:
         stacker = DirichletBayesianStacking(
             component_names=component_names,
             prior_weights=prior_weights,
-            prior_strength=5.0  # Weak prior for faster convergence
+            prior_strength=5.0,  # Weak prior for faster convergence
         )
 
         # Simulate 100 predictions where model_good always better
@@ -312,8 +302,7 @@ class TestConvergence:
         prior_weights = {"model_a": 0.5, "model_b": 0.5}
 
         stacker = DirichletBayesianStacking(
-            component_names=component_names,
-            prior_weights=prior_weights
+            component_names=component_names, prior_weights=prior_weights
         )
 
         # Simulate 1000 updates
@@ -345,8 +334,7 @@ class TestDiagnostics:
         prior_weights = {"model_a": 0.5, "model_b": 0.5}
 
         stacker = DirichletBayesianStacking(
-            component_names=component_names,
-            prior_weights=prior_weights
+            component_names=component_names, prior_weights=prior_weights
         )
 
         diagnostics = stacker.get_diagnostics()
@@ -365,8 +353,7 @@ class TestDiagnostics:
         prior_weights = {"model_a": 0.5, "model_b": 0.5}
 
         stacker = DirichletBayesianStacking(
-            component_names=component_names,
-            prior_weights=prior_weights
+            component_names=component_names, prior_weights=prior_weights
         )
 
         # Make 3 updates
@@ -399,7 +386,7 @@ class TestPersistence:
             component_names=component_names,
             prior_weights=prior_weights,
             prior_strength=10.0,
-            likelihood_scale=40.0
+            likelihood_scale=40.0,
         )
 
         # Make some updates
@@ -427,10 +414,7 @@ class TestPersistence:
             original_weights = stacker.get_weights()
             loaded_weights = loaded_stacker.get_weights()
             for name in component_names:
-                assert np.isclose(
-                    original_weights[name],
-                    loaded_weights[name]
-                )
+                assert np.isclose(original_weights[name], loaded_weights[name])
 
     def test_load_nonexistent_file(self):
         """Test load fails gracefully for nonexistent file."""
@@ -447,9 +431,7 @@ class TestReset:
         prior_weights = {"model_a": 0.5, "model_b": 0.5}
 
         stacker = DirichletBayesianStacking(
-            component_names=component_names,
-            prior_weights=prior_weights,
-            prior_strength=10.0
+            component_names=component_names, prior_weights=prior_weights, prior_strength=10.0
         )
 
         # Store initial weights
@@ -470,10 +452,7 @@ class TestReset:
 
         # Weights should match initial
         reset_weights = stacker.get_weights()
-        assert np.allclose(
-            list(initial_weights.values()),
-            list(reset_weights.values())
-        )
+        assert np.allclose(list(initial_weights.values()), list(reset_weights.values()))
         assert stacker.num_updates == 0
 
     def test_reset_with_new_prior(self):
@@ -482,8 +461,7 @@ class TestReset:
         prior_weights = {"model_a": 0.5, "model_b": 0.5}
 
         stacker = DirichletBayesianStacking(
-            component_names=component_names,
-            prior_weights=prior_weights
+            component_names=component_names, prior_weights=prior_weights
         )
 
         # Reset with new prior
@@ -505,8 +483,7 @@ class TestEdgeCases:
         prior_weights = {"model_a": 1.0}
 
         stacker = DirichletBayesianStacking(
-            component_names=component_names,
-            prior_weights=prior_weights
+            component_names=component_names, prior_weights=prior_weights
         )
 
         # Make updates
@@ -527,7 +504,7 @@ class TestEdgeCases:
         stacker = DirichletBayesianStacking(
             component_names=component_names,
             prior_weights=prior_weights,
-            prior_strength=1000.0  # Very strong prior
+            prior_strength=1000.0,  # Very strong prior
         )
 
         # Store initial weights
@@ -549,8 +526,7 @@ class TestEdgeCases:
         prior_weights = {"model_a": 0.5, "model_b": 0.5}
 
         stacker = DirichletBayesianStacking(
-            component_names=component_names,
-            prior_weights=prior_weights
+            component_names=component_names, prior_weights=prior_weights
         )
 
         # All components predict perfectly

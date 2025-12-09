@@ -16,7 +16,6 @@ import argparse
 import json
 import sys
 import time
-from typing import Dict, Any
 
 import requests
 
@@ -134,35 +133,33 @@ class APITester:
         payload = {
             "game_id": "2024_10_KC_LV",
             "player_id": "00-0033873",  # Patrick Mahomes
-            "stat_type": "passing_yards"
+            "stat_type": "passing_yards",
         }
 
         try:
-            print(f"\nRequest Payload:")
+            print("\nRequest Payload:")
             print(json.dumps(payload, indent=2))
 
             start_time = time.time()
-            response = self.session.post(
-                f"{self.base_url}/predict",
-                json=payload,
-                timeout=30
-            )
+            response = self.session.post(f"{self.base_url}/predict", json=payload, timeout=30)
             latency = time.time() - start_time
 
             response.raise_for_status()
 
             data = response.json()
-            print(f"\nResponse:")
+            print("\nResponse:")
             print(f"Prediction: {data['prediction']:.1f}")
             print(f"Confidence: {data['confidence']:.2f}")
             print(f"90% CI: [{data['lower_bound']:.1f}, {data['upper_bound']:.1f}]")
             print(f"Ensemble Method: {data['ensemble_method']}")
             print(f"Latency: {latency:.3f}s")
 
-            print(f"\nModel Contributions:")
+            print("\nModel Contributions:")
             for model in data["models_used"]:
-                print(f"  - {model['model_name']}: {model['prediction']:.1f} "
-                      f"± {model['uncertainty']:.1f} (weight: {model['weight']:.2f})")
+                print(
+                    f"  - {model['model_name']}: {model['prediction']:.1f} "
+                    f"± {model['uncertainty']:.1f} (weight: {model['weight']:.2f})"
+                )
 
             # Validate response
             assert isinstance(data["prediction"], (int, float)), "prediction must be numeric"
@@ -196,7 +193,7 @@ class APITester:
                 "predictions_total",
                 "prediction_latency_seconds",
                 "models_loaded_total",
-                "api_requests_total"
+                "api_requests_total",
             ]
 
             print("\nChecking for required metrics:")
@@ -234,9 +231,7 @@ class APITester:
 
         try:
             response = self.session.post(
-                f"{self.base_url}/predict",
-                json=invalid_payload,
-                timeout=10
+                f"{self.base_url}/predict", json=invalid_payload, timeout=10
             )
 
             print(f"Status Code: {response.status_code}")
@@ -245,7 +240,7 @@ class APITester:
             assert response.status_code == 422, f"Expected 422, got {response.status_code}"
 
             error_data = response.json()
-            print(f"Error Response:")
+            print("Error Response:")
             print(json.dumps(error_data, indent=2))
 
             self.print_success("Error handling working correctly")
@@ -269,7 +264,7 @@ class APITester:
             self.test_models_list,
             self.test_prediction,
             self.test_metrics,
-            self.test_invalid_request
+            self.test_invalid_request,
         ]
 
         for test in tests:
@@ -300,13 +295,11 @@ class APITester:
 
 def main():
     """Main entry point"""
-    parser = argparse.ArgumentParser(
-        description="Test NFL Analytics Prediction API"
-    )
+    parser = argparse.ArgumentParser(description="Test NFL Analytics Prediction API")
     parser.add_argument(
         "--base-url",
         default="http://localhost:8000",
-        help="API base URL (default: http://localhost:8000)"
+        help="API base URL (default: http://localhost:8000)",
     )
 
     args = parser.parse_args()

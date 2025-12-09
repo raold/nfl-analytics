@@ -20,24 +20,22 @@ Author: Claude Code (Anthropic)
 Date: November 13, 2025
 """
 
-import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + '/..'))
+import sys
 
-import time
+sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + "/.."))
+
 import logging
-from pathlib import Path
-from typing import Dict, Optional
+import time
 from dataclasses import dataclass
+from pathlib import Path
 
-import psycopg2
-from psycopg2 import pool
 import numpy as np
 import pandas as pd
+from psycopg2 import pool
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -45,6 +43,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # OPTIMIZATION 1: Connection Pooling
 # ============================================================================
+
 
 class DatabasePoolManager:
     """
@@ -78,7 +77,7 @@ class DatabasePoolManager:
         password: str,
         minconn: int = 2,
         maxconn: int = 8,
-        timeout: float = 2.0
+        timeout: float = 2.0,
     ):
         """Initialize connection pool."""
         self.pool = pool.SimpleConnectionPool(
@@ -89,7 +88,7 @@ class DatabasePoolManager:
             database=database,
             user=user,
             password=password,
-            connect_timeout=timeout
+            connect_timeout=timeout,
         )
         self.minconn = minconn
         self.maxconn = maxconn
@@ -127,6 +126,7 @@ class DatabasePoolManager:
 # OPTIMIZATION 2: R Model Cache
 # ============================================================================
 
+
 class RModelCache:
     """
     Cache R models in memory to avoid reloading from disk.
@@ -160,10 +160,11 @@ class RModelCache:
         if self._r_session is None:
             try:
                 import rpy2.robjects as ro
+
                 self._r_session = ro
                 # Preload required libraries
-                ro.r('library(brms)')
-                ro.r('library(tidyverse)')
+                ro.r("library(brms)")
+                ro.r("library(tidyverse)")
                 logger.info("✓ R session initialized")
             except Exception as e:
                 logger.error(f"Failed to initialize R session: {e}")
@@ -220,18 +221,20 @@ class RModelCache:
                 r_df = ro.conversion.py2rpy(newdata_df)
 
             # Assign to R workspace
-            ro.r.assign('new_data', r_df)
+            ro.r.assign("new_data", r_df)
 
             # Predict (model already loaded in R environment)
-            ro.r(f'''
+            ro.r(
+                f"""
             posterior_preds <- posterior_predict(model_{model_name}, newdata = new_data)
             pred_mean <- mean(posterior_preds)
             pred_std <- sd(posterior_preds)
-            ''')
+            """
+            )
 
             # Extract results
-            pred_mean = float(ro.r('pred_mean')[0])
-            pred_std = float(ro.r('pred_std')[0])
+            pred_mean = float(ro.r("pred_mean")[0])
+            pred_std = float(ro.r("pred_std")[0])
 
             return (pred_mean, pred_std)
 
@@ -243,7 +246,7 @@ class RModelCache:
         """Close R session and free memory."""
         if self._r_session:
             try:
-                self._r_session.r('rm(list=ls())')  # Clear R workspace
+                self._r_session.r("rm(list=ls())")  # Clear R workspace
                 logger.info("✓ R model cache cleaned up")
             except Exception as e:
                 logger.warning(f"Error cleaning up R session: {e}")
@@ -253,9 +256,11 @@ class RModelCache:
 # OPTIMIZATION 3: Feature Cache
 # ============================================================================
 
+
 @dataclass
 class GameFeatures:
     """Cached features for a single player-game."""
+
     player_id: str
     season: int
     week: int
@@ -270,18 +275,18 @@ class GameFeatures:
     wind: float
     # ... add other features as needed
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary for model inference."""
         return {
-            'log_attempts': self.log_attempts,
-            'yards_per_attempt': self.yards_per_attempt,
-            'td_rate': self.td_rate,
-            'is_home': self.is_home,
-            'spread_abs': self.spread_abs,
-            'total_line': self.total_line,
-            'is_bad_weather': self.is_bad_weather,
-            'temp': self.temp,
-            'wind': self.wind,
+            "log_attempts": self.log_attempts,
+            "yards_per_attempt": self.yards_per_attempt,
+            "td_rate": self.td_rate,
+            "is_home": self.is_home,
+            "spread_abs": self.spread_abs,
+            "total_line": self.total_line,
+            "is_bad_weather": self.is_bad_weather,
+            "temp": self.temp,
+            "wind": self.wind,
         }
 
 
@@ -309,11 +314,7 @@ class FeatureCache:
         logger.info("Initialized feature cache")
 
     def get_or_compute(
-        self,
-        player_id: str,
-        season: int,
-        week: int,
-        raw_df: pd.DataFrame
+        self, player_id: str, season: int, week: int, raw_df: pd.DataFrame
     ) -> GameFeatures:
         """
         Get cached features or compute if not cached.
@@ -340,9 +341,9 @@ class FeatureCache:
         try:
             row = raw_df.iloc[0]
 
-            attempts = row['stat_attempts'] or 30
-            yards = row['stat_yards'] or 0
-            touchdowns = row['stat_touchdowns'] or 0
+            attempts = row["stat_attempts"] or 30
+            yards = row["stat_yards"] or 0
+            touchdowns = row["stat_touchdowns"] or 0
 
             features = GameFeatures(
                 player_id=player_id,
@@ -351,12 +352,12 @@ class FeatureCache:
                 log_attempts=np.log1p(attempts),
                 yards_per_attempt=yards / max(attempts, 1),
                 td_rate=touchdowns / max(attempts, 1),
-                is_home=int(row.get('is_home', 0)),
-                spread_abs=abs(row.get('spread_line', 0)),
-                total_line=row.get('total_close', 48.0),
-                is_bad_weather=int(row.get('is_bad_weather', 0)),
-                temp=float(row.get('temp', 70.0)),
-                wind=float(row.get('wind', 5.0)),
+                is_home=int(row.get("is_home", 0)),
+                spread_abs=abs(row.get("spread_line", 0)),
+                total_line=row.get("total_close", 48.0),
+                is_bad_weather=int(row.get("is_bad_weather", 0)),
+                temp=float(row.get("temp", 70.0)),
+                wind=float(row.get("wind", 5.0)),
             )
 
             self._cache[key] = features
@@ -366,22 +367,30 @@ class FeatureCache:
             logger.error(f"Failed to compute features for {key}: {e}")
             # Return safe defaults
             return GameFeatures(
-                player_id=player_id, season=season, week=week,
-                log_attempts=np.log1p(30), yards_per_attempt=2.5,
-                td_rate=0.05, is_home=0, spread_abs=3.0, total_line=48.0,
-                is_bad_weather=0, temp=70.0, wind=5.0
+                player_id=player_id,
+                season=season,
+                week=week,
+                log_attempts=np.log1p(30),
+                yards_per_attempt=2.5,
+                td_rate=0.05,
+                is_home=0,
+                spread_abs=3.0,
+                total_line=48.0,
+                is_bad_weather=0,
+                temp=70.0,
+                wind=5.0,
             )
 
-    def stats(self) -> Dict:
+    def stats(self) -> dict:
         """Get cache statistics."""
         total = self._hits + self._misses
         hit_rate = self._hits / total if total > 0 else 0
         return {
-            'hits': self._hits,
-            'misses': self._misses,
-            'total': total,
-            'hit_rate': hit_rate,
-            'cache_size': len(self._cache),
+            "hits": self._hits,
+            "misses": self._misses,
+            "total": total,
+            "hit_rate": hit_rate,
+            "cache_size": len(self._cache),
         }
 
 
@@ -389,11 +398,12 @@ class FeatureCache:
 # Demonstration
 # ============================================================================
 
+
 def demonstrate_connection_pooling():
     """Demonstrate connection pooling speedup."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("OPTIMIZATION 1: Connection Pooling")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     logger.info("\nWithout pooling (creates new connection per query):")
     logger.info("  - TCP handshake: ~50ms")
@@ -414,9 +424,9 @@ def demonstrate_connection_pooling():
 
 def demonstrate_r_model_cache():
     """Demonstrate R model caching speedup."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("OPTIMIZATION 2: R Model Cache")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     logger.info("\nWithout caching (load model per prediction):")
     logger.info("  - Model 1 (First call):")
@@ -439,9 +449,9 @@ def demonstrate_r_model_cache():
 
 def demonstrate_feature_cache():
     """Demonstrate feature caching speedup."""
-    logger.info("\n" + "="*70)
+    logger.info("\n" + "=" * 70)
     logger.info("OPTIMIZATION 3: Feature Cache")
-    logger.info("="*70)
+    logger.info("=" * 70)
 
     logger.info("\nWithout caching (compute per model):")
     logger.info("  - BNN model: 50ms feature engineering + 50ms inference")
@@ -465,25 +475,25 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Ensemble backtest optimization guide")
-    parser.add_argument('--analyze', action='store_true',
-                        help='Show optimization analysis')
-    parser.add_argument('--test', action='store_true',
-                        help='Run test backtest with optimizations (requires DB)')
+    parser.add_argument("--analyze", action="store_true", help="Show optimization analysis")
+    parser.add_argument(
+        "--test", action="store_true", help="Run test backtest with optimizations (requires DB)"
+    )
     args = parser.parse_args()
 
     if args.analyze or not args.test:
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("4-WAY ENSEMBLE BACKTEST PERFORMANCE OPTIMIZATION")
         logger.info("Expected Runtime Improvement: 45-65 min → 24-44 min (1.5-2.7x)")
-        logger.info("="*70)
+        logger.info("=" * 70)
 
         demonstrate_connection_pooling()
         demonstrate_r_model_cache()
         demonstrate_feature_cache()
 
-        logger.info("\n" + "="*70)
+        logger.info("\n" + "=" * 70)
         logger.info("IMPLEMENTATION SUMMARY")
-        logger.info("="*70)
+        logger.info("=" * 70)
         logger.info("\nPhase 1 (Recommended for this week):")
         logger.info("  1. Add connection pooling to historical_validation_5way.py")
         logger.info("  2. Add R model cache to r_service.py")
@@ -496,7 +506,9 @@ def main():
         logger.info("  7. Implement batch R predictions")
 
         logger.info("\n✓ Complete analysis available in:")
-        logger.info("  /Users/dro/rice/nfl-analytics/docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md")
+        logger.info(
+            "  /Users/dro/rice/nfl-analytics/docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md"
+        )
 
     if args.test:
         logger.info("\nTest mode not yet implemented (requires database connection)")

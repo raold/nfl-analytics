@@ -112,7 +112,9 @@ class BayesianNeuralNetwork:
 
             # Output layer: Hidden2 → Mean (1 output)
             w_out_mu_sd = pm.HalfNormal("w_out_mu_sd", sigma=self.prior_scale)
-            w_out_mu = pm.Normal("w_out_mu", mu=0, sigma=w_out_mu_sd, shape=(self.hidden_dims[1], 1))
+            w_out_mu = pm.Normal(
+                "w_out_mu", mu=0, sigma=w_out_mu_sd, shape=(self.hidden_dims[1], 1)
+            )
             b_out_mu = pm.Normal("b_out_mu", mu=0, sigma=self.prior_scale)
 
             y_pred_mu = pm.Deterministic("y_pred", (h2 @ w_out_mu + b_out_mu).flatten())
@@ -122,8 +124,12 @@ class BayesianNeuralNetwork:
                 # Output layer: Hidden2 → Log-Std
                 # Use SMALLER prior scale for sigma head to prevent explosion
                 w_out_sigma_sd = pm.HalfNormal("w_out_sigma_sd", sigma=self.prior_scale * 0.1)
-                w_out_sigma = pm.Normal("w_out_sigma", mu=0, sigma=w_out_sigma_sd, shape=(self.hidden_dims[1], 1))
-                b_out_sigma = pm.Normal("b_out_sigma", mu=-2.0, sigma=self.prior_scale * 0.5)  # Prior mean at log(0.135)
+                w_out_sigma = pm.Normal(
+                    "w_out_sigma", mu=0, sigma=w_out_sigma_sd, shape=(self.hidden_dims[1], 1)
+                )
+                b_out_sigma = pm.Normal(
+                    "b_out_sigma", mu=-2.0, sigma=self.prior_scale * 0.5
+                )  # Prior mean at log(0.135)
 
                 # Learn log(sigma) to ensure sigma > 0, with clipping to prevent explosion
                 log_sigma_pred = pm.math.clip((h2 @ w_out_sigma + b_out_sigma).flatten(), -5.0, 3.0)
@@ -276,7 +282,7 @@ class BayesianNeuralNetwork:
             hidden_dims=save_dict["hidden_dims"],
             inference_method=save_dict["inference_method"],
             heteroscedastic=heteroscedastic,
-            prior_scale=prior_scale
+            prior_scale=prior_scale,
         )
 
         bnn.trace = save_dict["trace"]
@@ -315,7 +321,9 @@ class BayesianNeuralNetwork:
                 # Heteroscedastic: Input-dependent uncertainty
                 # Output layer: Hidden2 → Log-Std
                 w_out_sigma_sd = pm.HalfNormal("w_out_sigma_sd", sigma=1.0)
-                w_out_sigma = pm.Normal("w_out_sigma", mu=0, sigma=w_out_sigma_sd, shape=(bnn.hidden_dims[1], 1))
+                w_out_sigma = pm.Normal(
+                    "w_out_sigma", mu=0, sigma=w_out_sigma_sd, shape=(bnn.hidden_dims[1], 1)
+                )
                 b_out_sigma = pm.Normal("b_out_sigma", mu=0, sigma=1)
 
                 # Learn log(sigma) to ensure sigma > 0, with floor to prevent collapse
@@ -323,11 +331,11 @@ class BayesianNeuralNetwork:
                 sigma_pred = pm.Deterministic("sigma_pred", pm.math.exp(log_sigma_pred) + 1e-6)
 
                 # Likelihood with input-dependent noise
-                y_obs = pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma_pred, observed=y_data)
+                pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma_pred, observed=y_data)
             else:
                 # Homoscedastic: Single scalar noise parameter
                 sigma = pm.HalfNormal("sigma", sigma=1.0)
-                y_obs = pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma, observed=y_data)
+                pm.Normal("y_obs", mu=y_pred_mu, sigma=sigma, observed=y_data)
 
         bnn.model = model
 

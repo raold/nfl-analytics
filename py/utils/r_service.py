@@ -17,18 +17,17 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
+import json
+import logging
 import subprocess
 import sys
 import time
-import logging
-from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
 from pathlib import Path
-import json
-import tempfile
 
 try:
     from py.utils.claude_cache import get_default_cache
+
     CACHE_AVAILABLE = True
 except ImportError:
     get_default_cache = None
@@ -41,27 +40,33 @@ logger = logging.getLogger(__name__)
 @dataclass
 class RServiceConfig:
     """Configuration for R service."""
+
     rscript_path: str = "Rscript"
     timeout_seconds: int = 300  # 5 minutes default
     max_retries: int = 3
     retry_backoff_seconds: float = 2.0
-    required_packages: List[str] = None
+    required_packages: list[str] = None
 
     def __post_init__(self):
         if self.required_packages is None:
             self.required_packages = [
-                "brms", "tidyverse", "DBI", "RPostgres",
-                "cmdstanr", "posterior"
+                "brms",
+                "tidyverse",
+                "DBI",
+                "RPostgres",
+                "cmdstanr",
+                "posterior",
             ]
 
 
 @dataclass
 class RServiceHealth:
     """R service health status."""
+
     is_healthy: bool
-    r_version: Optional[str] = None
-    missing_packages: List[str] = None
-    error_message: Optional[str] = None
+    r_version: str | None = None
+    missing_packages: list[str] = None
+    error_message: str | None = None
     check_time: float = 0.0
 
     def __post_init__(self):
@@ -71,16 +76,19 @@ class RServiceHealth:
 
 class RServiceError(Exception):
     """Base exception for R service errors."""
+
     pass
 
 
 class RTimeoutError(RServiceError):
     """Raised when R subprocess times out."""
+
     pass
 
 
 class RPackageError(RServiceError):
     """Raised when required R packages are missing."""
+
     pass
 
 
@@ -111,10 +119,10 @@ class RService:
         ```
     """
 
-    def __init__(self, config: Optional[RServiceConfig] = None):
+    def __init__(self, config: RServiceConfig | None = None):
         """Initialize R service with configuration."""
         self.config = config or RServiceConfig()
-        self._last_health_check: Optional[RServiceHealth] = None
+        self._last_health_check: RServiceHealth | None = None
         self._health_check_cache_seconds = 300  # 5 minutes
 
         # Initialize Redis cache for R prediction results
@@ -135,9 +143,13 @@ class RService:
             RServiceHealth object with status and diagnostics
         """
         # Return cached result if fresh
-        if (not force
+        if (
+            not force
             and self._last_health_check
-            and (time.time() - self._last_health_check.check_time < self._health_check_cache_seconds)):
+            and (
+                time.time() - self._last_health_check.check_time < self._health_check_cache_seconds
+            )
+        ):
             logger.debug("Returning cached health check result")
             return self._last_health_check
 
@@ -147,16 +159,13 @@ class RService:
         # Check 1: Verify Rscript is available
         try:
             result = subprocess.run(
-                [self.config.rscript_path, "--version"],
-                capture_output=True,
-                text=True,
-                timeout=5
+                [self.config.rscript_path, "--version"], capture_output=True, text=True, timeout=5
             )
             if result.returncode != 0:
                 health = RServiceHealth(
                     is_healthy=False,
                     error_message=f"Rscript not available: {result.stderr}",
-                    check_time=time.time()
+                    check_time=time.time(),
                 )
                 self._last_health_check = health
                 return health
@@ -168,7 +177,7 @@ class RService:
             health = RServiceHealth(
                 is_healthy=False,
                 error_message=f"Rscript not found at {self.config.rscript_path}",
-                check_time=time.time()
+                check_time=time.time(),
             )
             self._last_health_check = health
             return health
@@ -176,7 +185,7 @@ class RService:
             health = RServiceHealth(
                 is_healthy=False,
                 error_message="Rscript version check timed out",
-                check_time=time.time()
+                check_time=time.time(),
             )
             self._last_health_check = health
             return health
@@ -184,19 +193,19 @@ class RService:
         # Check 2: Verify required packages
         missing_packages = []
         for package in self.config.required_packages:
-            check_script = f'''
+            check_script = f"""
             if (!requireNamespace("{package}", quietly = TRUE)) {{
                 cat("MISSING")
             }} else {{
                 cat("OK")
             }}
-            '''
+            """
             try:
                 result = subprocess.run(
                     [self.config.rscript_path, "-e", check_script],
                     capture_output=True,
                     text=True,
-                    timeout=10
+                    timeout=10,
                 )
                 if "MISSING" in result.stdout:
                     missing_packages.append(package)
@@ -215,12 +224,16 @@ class RService:
             is_healthy=is_healthy,
             r_version=r_version,
             missing_packages=missing_packages,
-            error_message=f"Missing packages: {', '.join(missing_packages)}" if missing_packages else None,
-            check_time=time.time()
+            error_message=(
+                f"Missing packages: {', '.join(missing_packages)}" if missing_packages else None
+            ),
+            check_time=time.time(),
         )
 
         elapsed = time.time() - start_time
-        logger.info(f"Health check completed in {elapsed:.2f}s: {'✓ HEALTHY' if is_healthy else '✗ UNHEALTHY'}")
+        logger.info(
+            f"Health check completed in {elapsed:.2f}s: {'✓ HEALTHY' if is_healthy else '✗ UNHEALTHY'}"
+        )
 
         self._last_health_check = health
         return health
@@ -228,9 +241,9 @@ class RService:
     def execute(
         self,
         r_code: str,
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         retry: bool = True,
-        env: Optional[Dict[str, str]] = None
+        env: dict[str, str] | None = None,
     ) -> subprocess.CompletedProcess:
         """
         Execute R code with retry logic and timeout handling.
@@ -260,7 +273,7 @@ class RService:
                     capture_output=True,
                     text=True,
                     timeout=timeout,
-                    env=env
+                    env=env,
                 )
 
                 if result.returncode == 0:
@@ -292,8 +305,7 @@ class RService:
 
                 if attempt == max_attempts:
                     raise RTimeoutError(
-                        f"R execution timed out after {timeout}s "
-                        f"(tried {max_attempts} times)"
+                        f"R execution timed out after {timeout}s " f"(tried {max_attempts} times)"
                     )
 
                 # Exponential backoff before retry
@@ -307,9 +319,9 @@ class RService:
     def execute_script(
         self,
         script_path: Path,
-        args: Optional[List[str]] = None,
-        timeout: Optional[int] = None,
-        retry: bool = True
+        args: list[str] | None = None,
+        timeout: int | None = None,
+        retry: bool = True,
     ) -> subprocess.CompletedProcess:
         """
         Execute an R script file with retry logic.
@@ -335,14 +347,11 @@ class RService:
 
         for attempt in range(1, max_attempts + 1):
             try:
-                logger.debug(f"Executing R script: {script_path} (attempt {attempt}/{max_attempts})")
-
-                result = subprocess.run(
-                    cmd,
-                    capture_output=True,
-                    text=True,
-                    timeout=timeout
+                logger.debug(
+                    f"Executing R script: {script_path} (attempt {attempt}/{max_attempts})"
                 )
+
+                result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
 
                 if result.returncode == 0:
                     logger.info(f"✓ R script succeeded: {script_path.name}")
@@ -372,11 +381,7 @@ class RService:
         raise RServiceError("Unexpected error in execute_script loop")
 
     def batch_predict(
-        self,
-        model_path: Path,
-        newdata_csv: Path,
-        output_csv: Path,
-        timeout: Optional[int] = None
+        self, model_path: Path, newdata_csv: Path, output_csv: Path, timeout: int | None = None
     ) -> Path:
         """
         High-performance batch prediction using R model.
@@ -395,7 +400,7 @@ class RService:
         """
         timeout = timeout or 600  # 10 minutes for batch processing
 
-        r_code = f'''
+        r_code = f"""
         library(brms)
         library(tidyverse)
 
@@ -419,7 +424,7 @@ class RService:
         cat("Saving predictions to {output_csv}...\\n")
         write_csv(output, "{output_csv}")
         cat("✓ Saved", nrow(output), "predictions\\n")
-        '''
+        """
 
         logger.info(f"Running batch prediction: {newdata_csv} -> {output_csv}")
         result = self.execute(r_code, timeout=timeout)
@@ -436,11 +441,11 @@ class RService:
     def execute_with_cache(
         self,
         r_code: str,
-        cache_key: Optional[str] = None,
+        cache_key: str | None = None,
         cache_ttl: int = 21600,  # 6 hours default
-        timeout: Optional[int] = None,
+        timeout: int | None = None,
         retry: bool = True,
-        env: Optional[Dict[str, str]] = None
+        env: dict[str, str] | None = None,
     ) -> subprocess.CompletedProcess:
         """
         Execute R code with Redis caching support.
@@ -503,7 +508,7 @@ class RService:
                         args=["Rscript", "-e", "(cached)"],
                         returncode=0,
                         stdout=cached["stdout"],
-                        stderr=cached.get("stderr", "")
+                        stderr=cached.get("stderr", ""),
                     )
 
             except Exception as e:
@@ -524,7 +529,7 @@ class RService:
                 cache_data = {
                     "stdout": result.stdout,
                     "stderr": result.stderr,
-                    "returncode": result.returncode
+                    "returncode": result.returncode,
                 }
 
                 cache_full_key = f"r_result:{cache_key}"
@@ -542,7 +547,7 @@ class RService:
 
 
 # Singleton instance for easy access
-_default_service: Optional[RService] = None
+_default_service: RService | None = None
 
 
 def get_r_service() -> RService:
@@ -591,15 +596,20 @@ if __name__ == "__main__":
     health = service.health_check(force=True)
 
     if args.json:
-        print(json.dumps({
-            "is_healthy": health.is_healthy,
-            "r_version": health.r_version,
-            "missing_packages": health.missing_packages,
-            "error_message": health.error_message,
-        }, indent=2))
+        print(
+            json.dumps(
+                {
+                    "is_healthy": health.is_healthy,
+                    "r_version": health.r_version,
+                    "missing_packages": health.missing_packages,
+                    "error_message": health.error_message,
+                },
+                indent=2,
+            )
+        )
     else:
         print(f"\n{'='*60}")
-        print(f"R SERVICE HEALTH CHECK")
+        print("R SERVICE HEALTH CHECK")
         print(f"{'='*60}")
         print(f"Status: {'✓ HEALTHY' if health.is_healthy else '✗ UNHEALTHY'}")
         print(f"R Version: {health.r_version}")
@@ -609,7 +619,7 @@ if __name__ == "__main__":
             for pkg in health.missing_packages:
                 print(f"  - {pkg}")
         else:
-            print(f"\n✓ All required packages available")
+            print("\n✓ All required packages available")
 
         if health.error_message:
             print(f"\nError: {health.error_message}")

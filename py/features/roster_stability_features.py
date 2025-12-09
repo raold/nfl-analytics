@@ -22,9 +22,7 @@ Date: November 16, 2025
 """
 
 import logging
-from typing import Dict, Optional
 
-import numpy as np
 import pandas as pd
 import psycopg2
 
@@ -34,6 +32,7 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # ROSTER STABILITY EXTRACTOR
 # ============================================================================
+
 
 class RosterStabilityFeatures:
     """
@@ -50,19 +49,19 @@ class RosterStabilityFeatures:
 
     def __init__(
         self,
-        db_host: str = 'localhost',
+        db_host: str = "localhost",
         db_port: int = 5544,
-        db_name: str = 'devdb01',
-        db_user: str = 'dro',
-        db_password: str = 'sicillionbillions',
+        db_name: str = "devdb01",
+        db_user: str = "dro",
+        db_password: str = "sicillionbillions",
     ):
         """Initialize roster stability feature extractor."""
         self.db_config = {
-            'host': db_host,
-            'port': db_port,
-            'database': db_name,
-            'user': db_user,
-            'password': db_password,
+            "host": db_host,
+            "port": db_port,
+            "database": db_name,
+            "user": db_user,
+            "password": db_password,
         }
 
     def _get_db_connection(self):
@@ -74,7 +73,7 @@ class RosterStabilityFeatures:
         team: str,
         season: int,
         week: int,
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """
         Extract roster stability features for a team-game.
 
@@ -159,20 +158,20 @@ class RosterStabilityFeatures:
 
         try:
             df = pd.read_sql_query(
-                query,
-                conn,
-                params=(season, team, week, week, season, week, team)
+                query, conn, params=(season, team, week, week, season, week, team)
             )
             conn.close()
 
-            if len(df) == 0 or pd.isna(df['roster_stability_l3'].iloc[0]):
-                logger.debug(f"Roster stability: Team {team} W{week} S{season} - using default (0.85)")
+            if len(df) == 0 or pd.isna(df["roster_stability_l3"].iloc[0]):
+                logger.debug(
+                    f"Roster stability: Team {team} W{week} S{season} - using default (0.85)"
+                )
                 return self._get_default_features()
 
             # Extract features
             features = {
-                'roster_stability_l3': float(df['roster_stability_l3'].iloc[0]),
-                'roster_turnover_l3': float(df['roster_turnover_l3'].iloc[0]),
+                "roster_stability_l3": float(df["roster_stability_l3"].iloc[0]),
+                "roster_turnover_l3": float(df["roster_turnover_l3"].iloc[0]),
             }
 
             logger.debug(
@@ -187,15 +186,15 @@ class RosterStabilityFeatures:
             conn.close()
             return self._get_default_features()
 
-    def _get_default_features(self) -> Dict[str, float]:
+    def _get_default_features(self) -> dict[str, float]:
         """
         Return default features when extraction fails.
 
         Assumes average roster stability (85% retention).
         """
         return {
-            'roster_stability_l3': 0.85,
-            'roster_turnover_l3': 0.15,
+            "roster_stability_l3": 0.85,
+            "roster_turnover_l3": 0.15,
         }
 
 
@@ -203,7 +202,8 @@ class RosterStabilityFeatures:
 # MATERIALIZED VIEW CREATION (OPTIONAL OPTIMIZATION)
 # ============================================================================
 
-def create_roster_stability_view(db_config: Optional[Dict] = None) -> None:
+
+def create_roster_stability_view(db_config: dict | None = None) -> None:
     """
     Create materialized view for roster stability (speeds up queries).
 
@@ -215,11 +215,11 @@ def create_roster_stability_view(db_config: Optional[Dict] = None) -> None:
     """
     if db_config is None:
         db_config = {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions',
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
     conn = psycopg2.connect(**db_config)
@@ -288,10 +288,12 @@ def create_roster_stability_view(db_config: Optional[Dict] = None) -> None:
     conn.commit()
 
     # Create index for fast lookups
-    cur.execute("""
+    cur.execute(
+        """
         CREATE INDEX idx_roster_stability_lookup
         ON mart.roster_stability (team, season, week);
-    """)
+    """
+    )
     conn.commit()
 
     logger.info("✅ Created materialized view: mart.roster_stability")
@@ -304,9 +306,10 @@ def create_roster_stability_view(db_config: Optional[Dict] = None) -> None:
 # BATCH QUERY (FOR TRAINING DATA)
 # ============================================================================
 
+
 def query_roster_stability_batch(
     team_season_weeks: pd.DataFrame,
-    db_config: Optional[Dict] = None,
+    db_config: dict | None = None,
 ) -> pd.DataFrame:
     """
     Batch extract roster stability for multiple team-games.
@@ -320,11 +323,11 @@ def query_roster_stability_batch(
     """
     if db_config is None:
         db_config = {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions',
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
         }
 
     conn = psycopg2.connect(**db_config)
@@ -345,7 +348,7 @@ def query_roster_stability_batch(
     for _, row in team_season_weeks.iterrows():
         cur.execute(
             "INSERT INTO input_team_games VALUES (%s, %s, %s)",
-            (row['team'], row['season'], row['week'])
+            (row["team"], row["season"], row["week"]),
         )
 
     conn.commit()

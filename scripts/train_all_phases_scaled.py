@@ -6,14 +6,12 @@ RTX 4090 is barely being used - let's CRUSH these models with massive scale.
 
 import subprocess
 import time
-import json
-from pathlib import Path
-from datetime import datetime
 
 print("=" * 80)
 print(" SCALED-UP TRAINING PIPELINE - PHASES 2-4 ".center(80))
 print(" RTX 4090 Maximum Performance Mode ".center(80))
 print("=" * 80)
+
 
 def run_and_log(command, log_file, job_name):
     """Run command and log output."""
@@ -23,14 +21,8 @@ def run_and_log(command, log_file, job_name):
 
     start = time.time()
 
-    with open(log_file, 'w') as f:
-        result = subprocess.run(
-            command,
-            shell=True,
-            stdout=f,
-            stderr=subprocess.STDOUT,
-            text=True
-        )
+    with open(log_file, "w") as f:
+        result = subprocess.run(command, shell=True, stdout=f, stderr=subprocess.STDOUT, text=True)
 
     duration = time.time() - start
 
@@ -41,12 +33,14 @@ def run_and_log(command, log_file, job_name):
         print(f"[-] {job_name} failed with exit code {result.returncode}")
         return False
 
+
 def git_checkpoint(message):
     """Create Git checkpoint."""
-    print(f"\n[*] Creating Git checkpoint...")
-    subprocess.run(['git', 'add', 'models/', 'logs/training/'], check=False)
-    subprocess.run(['git', 'commit', '-m', message], check=False)
-    print(f"[+] Checkpoint created")
+    print("\n[*] Creating Git checkpoint...")
+    subprocess.run(["git", "add", "models/", "logs/training/"], check=False)
+    subprocess.run(["git", "commit", "-m", message], check=False)
+    print("[+] Checkpoint created")
+
 
 # ============================================================================
 # PHASE 2: REINFORCEMENT LEARNING (Scaled 3x)
@@ -58,19 +52,19 @@ print("=" * 80)
 
 phase2_jobs = [
     {
-        'name': 'DQN Training (Scaled)',
-        'command': 'python py/rl/train_experiment_rl.py --agent dqn --episodes 5000 --eval-freq 100 --hidden-dim 256 --batch-size 128 --learning-rate 0.0003',
-        'log': 'logs/training/dqn_scaled.log'
+        "name": "DQN Training (Scaled)",
+        "command": "python py/rl/train_experiment_rl.py --agent dqn --episodes 5000 --eval-freq 100 --hidden-dim 256 --batch-size 128 --learning-rate 0.0003",
+        "log": "logs/training/dqn_scaled.log",
     },
     {
-        'name': 'PPO Training (Scaled)',
-        'command': 'python py/rl/train_experiment_rl.py --agent ppo --episodes 3000 --eval-freq 100 --hidden-dim 256 --batch-size 256 --learning-rate 0.0003',
-        'log': 'logs/training/ppo_scaled.log'
-    }
+        "name": "PPO Training (Scaled)",
+        "command": "python py/rl/train_experiment_rl.py --agent ppo --episodes 3000 --eval-freq 100 --hidden-dim 256 --batch-size 256 --learning-rate 0.0003",
+        "log": "logs/training/ppo_scaled.log",
+    },
 ]
 
 for job in phase2_jobs:
-    success = run_and_log(job['command'], job['log'], job['name'])
+    success = run_and_log(job["command"], job["log"], job["name"])
     if success:
         git_checkpoint(f"feat: {job['name']} complete")
     time.sleep(10)  # Brief cooldown
@@ -244,13 +238,13 @@ with open(output_dir / "bnn_optuna_results.json", 'w') as f:
 print(f"[+] Results saved to {output_dir}/bnn_optuna_results.json")
 """
 
-with open('scripts/bnn_optuna_search.py', 'w') as f:
+with open("scripts/bnn_optuna_search.py", "w") as f:
     f.write(optuna_script)
 
 success = run_and_log(
-    'python scripts/bnn_optuna_search.py',
-    'logs/training/bnn_optuna.log',
-    'BNN Optuna Hyperparameter Search (100 trials)'
+    "python scripts/bnn_optuna_search.py",
+    "logs/training/bnn_optuna.log",
+    "BNN Optuna Hyperparameter Search (100 trials)",
 )
 if success:
     git_checkpoint("feat: BNN hyperparameter optimization complete (100 trials)")
@@ -419,13 +413,13 @@ torch.save({
 print("[+] Model saved to models/bayesian/bnn_optimized_final.pt")
 """
 
-with open('scripts/train_best_bnn.py', 'w') as f:
+with open("scripts/train_best_bnn.py", "w") as f:
     f.write(best_bnn_script)
 
 success = run_and_log(
-    'python scripts/train_best_bnn.py',
-    'logs/training/bnn_optimized_final.log',
-    'Final BNN Training (500 epochs, optimized hyperparameters)'
+    "python scripts/train_best_bnn.py",
+    "logs/training/bnn_optimized_final.log",
+    "Final BNN Training (500 epochs, optimized hyperparameters)",
 )
 if success:
     git_checkpoint("feat: Final optimized BNN training complete")

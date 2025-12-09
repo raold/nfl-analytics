@@ -62,7 +62,6 @@ import logging
 import pickle
 import time
 import warnings
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -70,12 +69,13 @@ import psycopg2
 import xgboost as xgb
 from dotenv import load_dotenv
 
-# Import hybrid model
-from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
 from py.ensemble.r_model_interface import RModelInterface
 
 # NEW: Import causal features module
 from py.features.causal_features_v1 import CausalFeaturesV1
+
+# Import hybrid model
+from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
 
 # Load environment variables
 load_dotenv()
@@ -133,13 +133,13 @@ class EnhancedEnsemble5Way:
         ridge_path: str = "models/ridge_residuals_v7_backtest2024_20251114_184552.pkl",
         xgboost_v4_path: str = "models/xgb_ridge_residuals_v7_backtest2024_20251114_184552.json",
         hybrid_base_path: str = "models/xgboost/hybrid_static_incremental_v1",
-        weights: Optional[Dict[str, float]] = None,
-        temperature_scaler_path: Optional[str] = "models/calibration/temperature_scaler_5way.pkl",
+        weights: dict[str, float] | None = None,
+        temperature_scaler_path: str | None = "models/calibration/temperature_scaler_5way.pkl",
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
         db_user: str = "dro",
-        db_password: Optional[str] = None,
+        db_password: str | None = None,
     ):
         """
         Initialize 5-way ensemble predictor with causal features.
@@ -230,7 +230,9 @@ class EnhancedEnsemble5Way:
                         scaler_data = pickle.load(f)
                         self.temperature = scaler_data.get("temperature", 1.0)
                         self.temperature_scaler = scaler_data
-                    logger.info(f"Loaded v4 temperature scaler (fallback): T = {self.temperature:.4f}")
+                    logger.info(
+                        f"Loaded v4 temperature scaler (fallback): T = {self.temperature:.4f}"
+                    )
                 else:
                     logger.warning("Predictions will be UNCALIBRATED (overcalibrated)")
 
@@ -326,7 +328,7 @@ class EnhancedEnsemble5Way:
         # ============================================================
 
         hybrid_static_path = self.hybrid_base_path / "static_model.pkl"
-        hybrid_incremental_path = self.hybrid_base_path / "incremental_model.pkl"
+        self.hybrid_base_path / "incremental_model.pkl"
         hybrid_scaler_path = self.hybrid_base_path / "static_scaler.pkl"
 
         if not hybrid_static_path.exists():
@@ -349,8 +351,10 @@ class EnhancedEnsemble5Way:
 
             self.hybrid_model.static_trained = True
 
-            logger.info(f"✅ Hybrid Static-Incremental XGBoost loaded from {self.hybrid_base_path.name}")
-            logger.info(f"   Static weight: 70%, Incremental weight: 30%")
+            logger.info(
+                f"✅ Hybrid Static-Incremental XGBoost loaded from {self.hybrid_base_path.name}"
+            )
+            logger.info("   Static weight: 70%, Incremental weight: 30%")
         except Exception as e:
             raise Exception(
                 f"CRITICAL: Failed to load Hybrid model from {self.hybrid_base_path}. "
@@ -380,7 +384,7 @@ class EnhancedEnsemble5Way:
 
         try:
             self.r_interface = RModelInterface(db_config=self.db_config)
-            logger.info(f"✅ R model interface initialized")
+            logger.info("✅ R model interface initialized")
         except Exception as e:
             logger.warning(f"⚠️  Failed to initialize R interface: {e}")
             logger.warning("R models (Hierarchical, Informative Priors) will use fallback")
@@ -395,12 +399,12 @@ class EnhancedEnsemble5Way:
         player_id: str,
         season: int,
         week: int,
-        opponent_team: Optional[str] = None,  # NEW: required for causal features
-        player_team: Optional[str] = None,    # NEW: required for causal features
-        game_weather: Optional[Dict] = None,  # OPTIONAL: for future weather features
+        opponent_team: str | None = None,  # NEW: required for causal features
+        player_team: str | None = None,  # NEW: required for causal features
+        game_weather: dict | None = None,  # OPTIONAL: for future weather features
         return_components: bool = False,
         return_uncertainty: bool = True,
-    ) -> Dict:
+    ) -> dict:
         """
         Generate 5-way ensemble prediction with causal adjustments.
 
@@ -453,7 +457,7 @@ class EnhancedEnsemble5Way:
                 components["state_space_v2"] = {"mean": ss_pred, "std": ss_std}
                 valid_predictions.append("state_space_v2")
             else:
-                logger.warning(f"Component state_space_v2 returned None")
+                logger.warning("Component state_space_v2 returned None")
         except Exception as e:
             logger.warning(f"Component state_space_v2 failed: {e}")
 
@@ -464,7 +468,7 @@ class EnhancedEnsemble5Way:
                 components["hierarchical_v2"] = {"mean": hier_pred, "std": hier_std}
                 valid_predictions.append("hierarchical_v2")
             else:
-                logger.warning(f"Component hierarchical_v2 returned None")
+                logger.warning("Component hierarchical_v2 returned None")
         except Exception as e:
             logger.warning(f"Component hierarchical_v2 failed: {e}")
 
@@ -475,7 +479,7 @@ class EnhancedEnsemble5Way:
                 components["xgboost_v4_ridge"] = {"mean": xgb_v4_pred, "std": xgb_v4_std}
                 valid_predictions.append("xgboost_v4_ridge")
             else:
-                logger.warning(f"Component xgboost_v4_ridge returned None")
+                logger.warning("Component xgboost_v4_ridge returned None")
         except Exception as e:
             logger.warning(f"Component xgboost_v4_ridge failed: {e}")
 
@@ -486,7 +490,7 @@ class EnhancedEnsemble5Way:
                 components["informative_priors_v2"] = {"mean": ip_pred, "std": ip_std}
                 valid_predictions.append("informative_priors_v2")
             else:
-                logger.warning(f"Component informative_priors_v2 returned None")
+                logger.warning("Component informative_priors_v2 returned None")
         except Exception as e:
             logger.warning(f"Component informative_priors_v2 failed: {e}")
 
@@ -497,7 +501,7 @@ class EnhancedEnsemble5Way:
                 components["hybrid_static_incremental"] = {"mean": hybrid_pred, "std": hybrid_std}
                 valid_predictions.append("hybrid_static_incremental")
             else:
-                logger.warning(f"Component hybrid_static_incremental returned None")
+                logger.warning("Component hybrid_static_incremental returned None")
         except Exception as e:
             logger.warning(f"Component hybrid_static_incremental failed: {e}")
 
@@ -511,8 +515,7 @@ class EnhancedEnsemble5Way:
 
         # Weighted average (only using valid components)
         base_ensemble_mean = sum(
-            components[model]["mean"] * self.weights[model]
-            for model in valid_predictions
+            components[model]["mean"] * self.weights[model] for model in valid_predictions
         )
 
         # Variance pooling for uncertainty
@@ -600,13 +603,12 @@ class EnhancedEnsemble5Way:
 
         if return_components:
             result["components"] = {
-                k: {"mean": float(v["mean"]), "std": float(v["std"])}
-                for k, v in components.items()
+                k: {"mean": float(v["mean"]), "std": float(v["std"])} for k, v in components.items()
             }
 
         return result
 
-    def _fetch_features(self, player_id: str, season: int, week: int) -> Dict:
+    def _fetch_features(self, player_id: str, season: int, week: int) -> dict:
         """Fetch features from database for prediction."""
         conn = psycopg2.connect(**self.db_config)
         cur = conn.cursor()
@@ -674,8 +676,8 @@ class EnhancedEnsemble5Way:
         }
 
     def _predict_state_space(
-        self, player_id: str, season: int, week: int, features: Dict
-    ) -> Tuple[float, float]:
+        self, player_id: str, season: int, week: int, features: dict
+    ) -> tuple[float, float]:
         """
         Predict using State-Space Random Walk v2.
 
@@ -695,7 +697,7 @@ class EnhancedEnsemble5Way:
                 elif "skill_mean" in player_skill.columns:
                     mean = player_skill["skill_mean"].values[0]
                 else:
-                    logger.warning(f"State-space skills missing 'skill' or 'skill_mean' column")
+                    logger.warning("State-space skills missing 'skill' or 'skill_mean' column")
                     mean = None
 
                 if mean is not None:
@@ -708,9 +710,7 @@ class EnhancedEnsemble5Way:
 
         # Fallback: Use R interface for state-space prediction (SLOW)
         if self.r_interface is not None and self.skills_df is not None:
-            result = self.r_interface.predict_state_space(
-                player_id, season, week, self.skills_df
-            )
+            result = self.r_interface.predict_state_space(player_id, season, week, self.skills_df)
             if result is not None:
                 return result
 
@@ -719,8 +719,8 @@ class EnhancedEnsemble5Way:
         return 220.0, 50.0
 
     def _predict_hierarchical(
-        self, player_id: str, season: int, week: int, features: Dict
-    ) -> Tuple[float, float]:
+        self, player_id: str, season: int, week: int, features: dict
+    ) -> tuple[float, float]:
         """
         Predict using Hierarchical Bayesian v2.
 
@@ -733,8 +733,7 @@ class EnhancedEnsemble5Way:
         # Use R interface for brms prediction
         if self.r_interface is not None and self.hierarchical_path.exists():
             result = self.r_interface.predict_hierarchical(
-                player_id, season, week, self.hierarchical_path,
-                ndraws=1000
+                player_id, season, week, self.hierarchical_path, ndraws=1000
             )
             if result is not None:
                 return result
@@ -743,7 +742,7 @@ class EnhancedEnsemble5Way:
         logger.warning("Hierarchical v2 prediction unavailable, using league average")
         return 225.0, 50.0
 
-    def _predict_xgboost_v4(self, features: Dict) -> Tuple[float, float]:
+    def _predict_xgboost_v4(self, features: dict) -> tuple[float, float]:
         """
         Predict using XGBoost v4 Ridge Residuals.
 
@@ -756,24 +755,24 @@ class EnhancedEnsemble5Way:
         """
         # Stage 1: Ridge opponent baseline
         matchup_difficulty = features["opponent_epa"] * features["opponent_points_allowed"] / 20.0
-        ridge_X = np.array([[
-            features["opponent_epa"],
-            features["opponent_points_allowed"],
-            matchup_difficulty
-        ]])
+        ridge_X = np.array(
+            [[features["opponent_epa"], features["opponent_points_allowed"], matchup_difficulty]]
+        )
         ridge_X_scaled = self.ridge_scaler.transform(ridge_X)
         ridge_pred = self.ridge_model.predict(ridge_X_scaled)[0]
 
         # Stage 2: XGBoost residual
         xgb_X = np.array(
-            [[
-                features["pass_yards_l3"],
-                features["pass_attempts_l3"],
-                features["completions_l3"],
-                features["completions_pct_l3"],
-                features["home_away_encoded"],
-                0.0,  # residual_feature (unknown at prediction time)
-            ]]
+            [
+                [
+                    features["pass_yards_l3"],
+                    features["pass_attempts_l3"],
+                    features["completions_l3"],
+                    features["completions_pct_l3"],
+                    features["home_away_encoded"],
+                    0.0,  # residual_feature (unknown at prediction time)
+                ]
+            ]
         )
         xgb_feature_names = self.xgb_v4_features + ["residual_feature"]
         xgb_dmatrix = xgb.DMatrix(xgb_X, feature_names=xgb_feature_names)
@@ -788,8 +787,8 @@ class EnhancedEnsemble5Way:
         return float(final_pred), float(std)
 
     def _predict_informative_priors(
-        self, player_id: str, season: int, week: int, features: Dict
-    ) -> Tuple[float, float]:
+        self, player_id: str, season: int, week: int, features: dict
+    ) -> tuple[float, float]:
         """
         Predict using Informative Priors v2.
 
@@ -802,8 +801,7 @@ class EnhancedEnsemble5Way:
         # Use R interface for brms prediction
         if self.r_interface is not None and self.informative_path.exists():
             result = self.r_interface.predict_informative_priors(
-                player_id, season, week, self.informative_path,
-                ndraws=1000
+                player_id, season, week, self.informative_path, ndraws=1000
             )
             if result is not None:
                 return result
@@ -812,7 +810,7 @@ class EnhancedEnsemble5Way:
         logger.warning("Informative Priors v2 prediction unavailable, using league average")
         return 215.0, 48.0
 
-    def _predict_hybrid(self, features: Dict) -> Tuple[float, float]:
+    def _predict_hybrid(self, features: dict) -> tuple[float, float]:
         """
         Predict using Hybrid Static-Incremental XGBoost.
 
@@ -821,7 +819,9 @@ class EnhancedEnsemble5Way:
         """
         # Calculate derived features
         log_attempts = np.log1p(features.get("pass_attempts_l3", 30.0))
-        yards_per_attempt = features.get("pass_yards_l3", 200.0) / max(features.get("pass_attempts_l3", 30.0), 1.0)
+        yards_per_attempt = features.get("pass_yards_l3", 200.0) / max(
+            features.get("pass_attempts_l3", 30.0), 1.0
+        )
         td_rate = 0.04  # Default TD rate (~4%)
         is_home = features.get("home_away_encoded", 0)
         spread_abs = 3.0  # Default spread
@@ -835,21 +835,25 @@ class EnhancedEnsemble5Way:
         wind = 5.0  # Default wind
 
         # Prepare features for hybrid model (13 features)
-        X = np.array([[
-            log_attempts,
-            yards_per_attempt,
-            td_rate,
-            is_home,
-            spread_abs,
-            total_line,
-            is_bad_weather,
-            yards_L3,
-            yards_per_attempt_L3,
-            td_rate_L3,
-            week_in_season,
-            temp,
-            wind
-        ]])
+        X = np.array(
+            [
+                [
+                    log_attempts,
+                    yards_per_attempt,
+                    td_rate,
+                    is_home,
+                    spread_abs,
+                    total_line,
+                    is_bad_weather,
+                    yards_L3,
+                    yards_per_attempt_L3,
+                    td_rate_L3,
+                    week_in_season,
+                    temp,
+                    wind,
+                ]
+            ]
+        )
 
         # Get hybrid prediction (static component only for batch inference)
         X_scaled = self.hybrid_model.static_scaler.transform(X)
@@ -869,7 +873,7 @@ if __name__ == "__main__":
         ensemble = EnhancedEnsemble5Way(db_password=os.getenv("DB_PASSWORD"))
         print(f"✅ Ensemble initialized with weights: {ensemble.weights}")
         print(f"   Temperature: {ensemble.temperature:.4f}")
-        print(f"   Version: v7.0 (Causal Features Integration)")
+        print("   Version: v7.0 (Causal Features Integration)")
 
         # Test causal adjustment (Patrick Mahomes vs HOU)
         print("\n📊 Testing causal adjustment:")
@@ -897,4 +901,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
         traceback.print_exc()

@@ -19,9 +19,7 @@ import json
 import logging
 import os
 import sys
-from datetime import timedelta
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -105,7 +103,7 @@ def fetch_international_games(season_start: int = 2018) -> pd.DataFrame:
     return df
 
 
-def fetch_qb_performances(game_ids: List[str]) -> pd.DataFrame:
+def fetch_qb_performances(game_ids: list[str]) -> pd.DataFrame:
     """
     Fetch QB passing performance for specific games.
 
@@ -160,7 +158,7 @@ def fetch_qb_performances(game_ids: List[str]) -> pd.DataFrame:
     return df
 
 
-def fetch_qb_domestic_average(player_ids: List[str], season_start: int = 2018) -> pd.DataFrame:
+def fetch_qb_domestic_average(player_ids: list[str], season_start: int = 2018) -> pd.DataFrame:
     """
     Fetch QB domestic (non-international) average performance.
 
@@ -237,7 +235,7 @@ def fetch_qb_domestic_average(player_ids: List[str], season_start: int = 2018) -
 
 def analyze_edge_a_west_coast_penalty(
     intl_games: pd.DataFrame, qb_perf: pd.DataFrame, domestic_avg: pd.DataFrame
-) -> Dict:
+) -> dict:
     """
     Edge A: Test if West Coast QBs underperform in early London games.
 
@@ -356,14 +354,22 @@ def analyze_edge_a_west_coast_penalty(
             )
         ),
         "qb_details": west_coast_with_baseline[
-            ["player_display_name", "current_team", "season", "week", "stat_yards", "avg_yards", "penalty"]
+            [
+                "player_display_name",
+                "current_team",
+                "season",
+                "week",
+                "stat_yards",
+                "avg_yards",
+                "penalty",
+            ]
         ].to_dict("records"),
     }
 
     return result
 
 
-def analyze_edge_b_totals_under_bias(intl_games: pd.DataFrame) -> Dict:
+def analyze_edge_b_totals_under_bias(intl_games: pd.DataFrame) -> dict:
     """
     Edge B: Test if international game totals have UNDER bias.
 
@@ -466,7 +472,7 @@ def analyze_edge_b_totals_under_bias(intl_games: pd.DataFrame) -> Dict:
     return result
 
 
-def analyze_edge_c_lingering_fatigue(intl_games: pd.DataFrame) -> Dict:
+def analyze_edge_c_lingering_fatigue(intl_games: pd.DataFrame) -> dict:
     """
     Edge C: Test if teams underperform in next game after international travel.
 
@@ -544,17 +550,19 @@ def analyze_edge_c_lingering_fatigue(intl_games: pd.DataFrame) -> Dict:
                 qb_perf = pd.read_sql(qb_query, conn)
 
                 if len(qb_perf) > 0:
-                    fatigue_data.append({
-                        "team": team,
-                        "intl_season": season,
-                        "intl_week": week,
-                        "next_season": next_season,
-                        "next_week": next_week,
-                        "days_since_intl": next_game["days_since_intl"].iloc[0],
-                        "player_id": qb_perf["player_id"].iloc[0],
-                        "player_name": qb_perf["player_display_name"].iloc[0],
-                        "stat_yards": qb_perf["stat_yards"].iloc[0],
-                    })
+                    fatigue_data.append(
+                        {
+                            "team": team,
+                            "intl_season": season,
+                            "intl_week": week,
+                            "next_season": next_season,
+                            "next_week": next_week,
+                            "days_since_intl": next_game["days_since_intl"].iloc[0],
+                            "player_id": qb_perf["player_id"].iloc[0],
+                            "player_name": qb_perf["player_display_name"].iloc[0],
+                            "stat_yards": qb_perf["stat_yards"].iloc[0],
+                        }
+                    )
 
     conn.close()
 
@@ -593,8 +601,8 @@ def analyze_edge_c_lingering_fatigue(intl_games: pd.DataFrame) -> Dict:
     )
 
     # Model: penalty = -10 * exp(-days_since / 7)
-    fatigue_with_baseline["predicted_penalty"] = (
-        -10 * np.exp(-fatigue_with_baseline["days_since_intl"] / 7.0)
+    fatigue_with_baseline["predicted_penalty"] = -10 * np.exp(
+        -fatigue_with_baseline["days_since_intl"] / 7.0
     )
 
     # Statistical test
@@ -654,7 +662,11 @@ def analyze_edge_c_lingering_fatigue(intl_games: pd.DataFrame) -> Dict:
         "interpretation": (
             f"QBs in next game after international travel averaged {avg_penalty:.1f} yards "
             f"vs domestic baseline (p={p_value:.4f}). "
-            + (f"Short rest (<7 days): {short_rest_penalty:.1f} yards penalty. " if short_rest_penalty else "")
+            + (
+                f"Short rest (<7 days): {short_rest_penalty:.1f} yards penalty. "
+                if short_rest_penalty
+                else ""
+            )
             + (
                 f"VIABLE: Edge exists, estimated {roi:.1f}% ROI at -110 odds."
                 if viable
@@ -754,8 +766,10 @@ def main():
     logger.info("SUMMARY")
     logger.info("=" * 80)
     logger.info(f"Viable edges: {results['summary']['viable_edges']}/3")
-    logger.info(f"Best edge: {results['summary']['best_edge'][0]} "
-                f"(ROI: {results['summary']['best_edge'][1]:.2f}%)")
+    logger.info(
+        f"Best edge: {results['summary']['best_edge'][0]} "
+        f"(ROI: {results['summary']['best_edge'][1]:.2f}%)"
+    )
 
     for edge_name, edge_data in results["edges"].items():
         logger.info(f"\n{edge_data['name']}:")
@@ -767,7 +781,9 @@ def main():
 
     # Exit code based on success criteria
     if results["summary"]["viable_edges"] >= 1:
-        logger.info("\n✅ SUCCESS: At least 1 viable betting edge identified with +5% ROI potential")
+        logger.info(
+            "\n✅ SUCCESS: At least 1 viable betting edge identified with +5% ROI potential"
+        )
         sys.exit(0)
     else:
         logger.warning("\n⚠️ WARNING: No viable betting edges found meeting +5% ROI criteria")

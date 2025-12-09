@@ -22,7 +22,6 @@ Date: 2025-10-17
 """
 
 import argparse
-import ast
 import json
 import re
 from pathlib import Path
@@ -73,7 +72,7 @@ class LeakageAuditor:
                 f"Run this script from repository root."
             )
 
-        with open(self.catalog_path, "r") as f:
+        with open(self.catalog_path) as f:
             return yaml.safe_load(f)
 
     def get_safe_features(self) -> set[str]:
@@ -140,7 +139,7 @@ class LeakageAuditor:
                         findings["status"] = "WARN"
 
             # Check for SQL queries without cutoff parameters
-            sql_pattern = r'(SELECT.*?FROM.*?(?:WHERE|;))'
+            sql_pattern = r"(SELECT.*?FROM.*?(?:WHERE|;))"
             sql_queries = re.finditer(sql_pattern, content, re.DOTALL | re.IGNORECASE)
 
             for match in sql_queries:
@@ -148,7 +147,9 @@ class LeakageAuditor:
                 line_num = content[: match.start()].count("\n") + 1
 
                 # Check if query has temporal safety patterns
-                has_cutoff = any(re.search(pat, query, re.IGNORECASE) for pat in self.SAFE_SQL_PATTERNS)
+                has_cutoff = any(
+                    re.search(pat, query, re.IGNORECASE) for pat in self.SAFE_SQL_PATTERNS
+                )
 
                 if has_cutoff:
                     findings["safe_patterns"].append(line_num)
@@ -209,12 +210,8 @@ class LeakageAuditor:
 
         all_findings = feature_findings + model_findings
 
-        total_warnings = sum(
-            1 for f in all_findings if f["status"] == "WARN"
-        )
-        total_passes = sum(
-            1 for f in all_findings if f["status"] == "PASS"
-        )
+        total_warnings = sum(1 for f in all_findings if f["status"] == "WARN")
+        total_passes = sum(1 for f in all_findings if f["status"] == "PASS")
 
         return {
             "catalog": {
@@ -338,9 +335,7 @@ class LeakageAuditor:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Audit codebase for temporal leakage risks"
-    )
+    parser = argparse.ArgumentParser(description="Audit codebase for temporal leakage risks")
     parser.add_argument(
         "--output",
         type=Path,
@@ -387,6 +382,7 @@ def main():
 
     # Exit with non-zero if warnings
     import sys
+
     if summary["audit_results"]["status"] != "PASS":
         sys.exit(1)
 

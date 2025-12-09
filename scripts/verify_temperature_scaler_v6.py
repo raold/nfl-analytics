@@ -14,15 +14,13 @@ Date: November 15, 2025
 
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
 import pickle
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -42,15 +40,15 @@ def verify_temperature_scaler():
 
     # Load scaler
     try:
-        with open(scaler_path, 'rb') as f:
+        with open(scaler_path, "rb") as f:
             scaler_data = pickle.load(f)
 
-        logger.info(f"✅ Temperature scaler loaded successfully")
+        logger.info("✅ Temperature scaler loaded successfully")
         logger.info(f"   Temperature: T = {scaler_data['temperature']:.4f}")
         logger.info(f"   Target coverage: {scaler_data['target_coverage']:.1%}")
 
         # Validate temperature is reasonable
-        T = scaler_data['temperature']
+        T = scaler_data["temperature"]
         if not (0.5 <= T <= 2.0):
             logger.warning(f"⚠️  Temperature {T:.4f} outside typical range [0.5, 2.0]")
             return False
@@ -77,7 +75,7 @@ def verify_ensemble_integration():
             temperature_scaler_path="models/calibration/temperature_scaler_v6.pkl"
         )
 
-        logger.info(f"✅ Ensemble initialized successfully")
+        logger.info("✅ Ensemble initialized successfully")
         logger.info(f"   Version: {ensemble.ensemble_version}")
         logger.info(f"   Weights: {ensemble.weights}")
         logger.info(f"   Temperature: T = {ensemble.temperature:.4f}")
@@ -98,6 +96,7 @@ def verify_ensemble_integration():
     except Exception as e:
         logger.error(f"❌ Failed to initialize ensemble: {e}")
         import traceback
+
         traceback.print_exc()
         return False
 
@@ -109,8 +108,8 @@ def main():
     logger.info("=" * 80 + "\n")
 
     checks = {
-        'Temperature Scaler': verify_temperature_scaler(),
-        'Ensemble Integration': verify_ensemble_integration()
+        "Temperature Scaler": verify_temperature_scaler(),
+        "Ensemble Integration": verify_ensemble_integration(),
     }
 
     # Print summary

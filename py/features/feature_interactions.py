@@ -17,10 +17,10 @@ Date: 2025-10-30
 """
 
 import logging
+
 import numpy as np
 import pandas as pd
 import psycopg
-from typing import Dict, Tuple, Optional
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -29,7 +29,20 @@ logger = logging.getLogger(__name__)
 
 # Team home climate classifications
 WARM_WEATHER_TEAMS = {"MIA", "TB", "JAX", "NO", "ATL", "CAR", "HOU", "DAL", "ARI", "LA", "LV", "SF"}
-COLD_WEATHER_TEAMS = {"BUF", "GB", "CHI", "DET", "MIN", "NE", "NYJ", "NYG", "CLE", "PIT", "BAL", "CIN"}
+COLD_WEATHER_TEAMS = {
+    "BUF",
+    "GB",
+    "CHI",
+    "DET",
+    "MIN",
+    "NE",
+    "NYJ",
+    "NYG",
+    "CLE",
+    "PIT",
+    "BAL",
+    "CIN",
+}
 DOME_TEAMS = {"NO", "ATL", "DET", "MIN", "DAL", "ARI", "LA", "LV"}
 HIGH_ALTITUDE_TEAMS = {"DEN"}
 
@@ -89,8 +102,15 @@ class FeatureInteractionEngine:
             df = pd.read_sql_query(query, conn)
 
         # Derive weekday from day_of_week (0=Sunday, 1=Monday, ..., 6=Saturday)
-        weekday_map = {0: "Sunday", 1: "Monday", 2: "Tuesday", 3: "Wednesday",
-                      4: "Thursday", 5: "Friday", 6: "Saturday"}
+        weekday_map = {
+            0: "Sunday",
+            1: "Monday",
+            2: "Tuesday",
+            3: "Wednesday",
+            4: "Thursday",
+            5: "Friday",
+            6: "Saturday",
+        }
         df["weekday"] = df["day_of_week"].map(weekday_map)
 
         # Create gametime column from hour (for prime time detection)
@@ -98,7 +118,7 @@ class FeatureInteractionEngine:
 
         # Parse temperature and wind (stored as TEXT in database)
         df["temp"] = pd.to_numeric(df["temp"], errors="coerce")
-        df["wind"] = pd.to_numeric(df["wind"].astype(str).str.extract(r'(\d+)')[0], errors="coerce")
+        df["wind"] = pd.to_numeric(df["wind"].astype(str).str.extract(r"(\d+)")[0], errors="coerce")
 
         self.logger.info(f"Loaded {len(df)} games with context")
         return df
@@ -130,33 +150,23 @@ class FeatureInteractionEngine:
 
         # 1. Dome team playing outdoors in extreme weather
         result["dome_team_outdoor_cold"] = (
-            result["away_is_dome_team"] *
-            result["outdoor_game"] *
-            result["extreme_cold"]
+            result["away_is_dome_team"] * result["outdoor_game"] * result["extreme_cold"]
         )
         result["dome_team_outdoor_wind"] = (
-            result["away_is_dome_team"] *
-            result["outdoor_game"] *
-            result["high_wind"]
+            result["away_is_dome_team"] * result["outdoor_game"] * result["high_wind"]
         )
 
         # 2. Warm weather team in extreme cold (e.g., MIA/TB @ BUF/GB)
-        result["warm_team_in_cold"] = (
-            result["away_is_warm_climate"] *
-            result["extreme_cold"]
-        )
+        result["warm_team_in_cold"] = result["away_is_warm_climate"] * result["extreme_cold"]
 
         # 3. Cold weather team in extreme heat (e.g., GB/NE @ MIA/TB)
-        result["cold_team_in_heat"] = (
-            result["away_is_cold_climate"] *
-            result["extreme_heat"]
-        )
+        result["cold_team_in_heat"] = result["away_is_cold_climate"] * result["extreme_heat"]
 
         # 4. Weather intensity score (composite)
         result["weather_severity"] = (
-            result["extreme_cold"].astype(float) +
-            result["extreme_heat"].astype(float) +
-            result["high_wind"].astype(float) * 0.5
+            result["extreme_cold"].astype(float)
+            + result["extreme_heat"].astype(float)
+            + result["high_wind"].astype(float) * 0.5
         )
 
         return result
@@ -181,7 +191,27 @@ class FeatureInteractionEngine:
             **{team: 4 for team in ["SEA", "SF", "LA", "LV"]},
             **{team: 3 for team in ["DEN", "ARI"]},
             **{team: 2 for team in ["KC", "DAL", "HOU", "TEN", "NO", "MIN", "CHI", "GB", "DET"]},
-            **{team: 1 for team in ["BUF", "NE", "NYJ", "NYG", "PHI", "WAS", "BAL", "PIT", "CLE", "CIN", "IND", "JAX", "MIA", "TB", "CAR", "ATL"]},
+            **{
+                team: 1
+                for team in [
+                    "BUF",
+                    "NE",
+                    "NYJ",
+                    "NYG",
+                    "PHI",
+                    "WAS",
+                    "BAL",
+                    "PIT",
+                    "CLE",
+                    "CIN",
+                    "IND",
+                    "JAX",
+                    "MIA",
+                    "TB",
+                    "CAR",
+                    "ATL",
+                ]
+            },
         }
 
         result["home_zone"] = result["home_team"].map(zone_map)
@@ -191,28 +221,20 @@ class FeatureInteractionEngine:
         # === PRIMARY INTERACTIONS ===
 
         # 1. Thursday night + cross-country travel (2+ time zones)
-        result["thursday_long_travel"] = (
-            result["is_thursday_night"] *
-            (result["zone_distance"] >= 2).astype(int)
-        )
+        result["thursday_long_travel"] = result["is_thursday_night"] * (
+            result["zone_distance"] >= 2
+        ).astype(int)
 
         # 2. Short rest + any significant travel
-        result["short_rest_with_travel"] = (
-            result["short_rest"] *
-            result["zone_distance"]
-        )
+        result["short_rest_with_travel"] = result["short_rest"] * result["zone_distance"]
 
         # 3. Very short rest + cross-country
-        result["critical_fatigue"] = (
-            result["very_short_rest"] *
-            (result["zone_distance"] >= 2).astype(int)
-        )
+        result["critical_fatigue"] = result["very_short_rest"] * (
+            result["zone_distance"] >= 2
+        ).astype(int)
 
         # 4. Rest disadvantage (away team worse rest than home)
-        result["rest_disadvantage"] = np.maximum(
-            0,
-            result["home_rest"] - result["away_rest"]
-        )
+        result["rest_disadvantage"] = np.maximum(0, result["home_rest"] - result["away_rest"])
 
         return result
 
@@ -229,8 +251,7 @@ class FeatureInteractionEngine:
 
         # === PRIMARY INTERACTION ===
         result["altitude_with_short_rest"] = (
-            result["playing_at_altitude"] *
-            result["away_short_rest"]
+            result["playing_at_altitude"] * result["away_short_rest"]
         )
 
         return result
@@ -247,10 +268,14 @@ class FeatureInteractionEngine:
         result = df.copy()
 
         # Game context
-        result["is_division_game"] = (
-            result["home_division"] == result["away_division"]
-        ).astype(int)
-        result["is_prime_time"] = result["gametime"].isin(["8:20", "8:15"]).astype(int) if "gametime" in result.columns else 0
+        result["is_division_game"] = (result["home_division"] == result["away_division"]).astype(
+            int
+        )
+        result["is_prime_time"] = (
+            result["gametime"].isin(["8:20", "8:15"]).astype(int)
+            if "gametime" in result.columns
+            else 0
+        )
 
         # Line characteristics
         result["is_favorite"] = (result["spread_close"] < 0).astype(int)
@@ -260,23 +285,14 @@ class FeatureInteractionEngine:
         # === PRIMARY INTERACTIONS ===
 
         # 1. Division game + small spread (high variance)
-        result["division_toss_up"] = (
-            result["is_division_game"] *
-            result["small_spread"]
-        )
+        result["division_toss_up"] = result["is_division_game"] * result["small_spread"]
 
         # 2. Large favorite in bad weather (harder to cover)
         if "weather_severity" in result.columns:
-            result["big_favorite_bad_weather"] = (
-                result["large_spread"] *
-                result["weather_severity"]
-            )
+            result["big_favorite_bad_weather"] = result["large_spread"] * result["weather_severity"]
 
         # 3. Prime time + public favorite (potential trap game)
-        result["prime_time_favorite"] = (
-            result["is_prime_time"] *
-            result["is_favorite"]
-        )
+        result["prime_time_favorite"] = result["is_prime_time"] * result["is_favorite"]
 
         return result
 
@@ -297,7 +313,7 @@ class FeatureInteractionEngine:
         # Note: Would need defensive strength metrics from other modules
         # Placeholder for integration with defensive features
         result["pass_rush_advantage"] = 0  # To be filled from defensive metrics
-        result["run_def_advantage"] = 0     # To be filled from defensive metrics
+        result["run_def_advantage"] = 0  # To be filled from defensive metrics
 
         return result
 
@@ -333,12 +349,12 @@ class FeatureInteractionEngine:
         """
         # Define high-value patterns
         high_value = df[
-            (df["dome_team_outdoor_cold"] == 1) |
-            (df["warm_team_in_cold"] == 1) |
-            (df["thursday_long_travel"] == 1) |
-            (df["altitude_with_short_rest"] == 1) |
-            (df["critical_fatigue"] == 1) |
-            (df.get("big_favorite_bad_weather", 0) >= 1)
+            (df["dome_team_outdoor_cold"] == 1)
+            | (df["warm_team_in_cold"] == 1)
+            | (df["thursday_long_travel"] == 1)
+            | (df["altitude_with_short_rest"] == 1)
+            | (df["critical_fatigue"] == 1)
+            | (df.get("big_favorite_bad_weather", 0) >= 1)
         ].copy()
 
         self.logger.info(f"Identified {len(high_value)} high-value interaction games")
@@ -363,8 +379,12 @@ def main():
 
     # Weather × Travel interactions
     logger.info("\n1. Weather × Travel Interactions:")
-    logger.info(f"   Dome teams playing outdoor cold: {interactions_df['dome_team_outdoor_cold'].sum()}")
-    logger.info(f"   Dome teams playing outdoor wind: {interactions_df['dome_team_outdoor_wind'].sum()}")
+    logger.info(
+        f"   Dome teams playing outdoor cold: {interactions_df['dome_team_outdoor_cold'].sum()}"
+    )
+    logger.info(
+        f"   Dome teams playing outdoor wind: {interactions_df['dome_team_outdoor_wind'].sum()}"
+    )
     logger.info(f"   Warm teams in extreme cold: {interactions_df['warm_team_in_cold'].sum()}")
     logger.info(f"   Cold teams in extreme heat: {interactions_df['cold_team_in_heat'].sum()}")
 
@@ -372,11 +392,15 @@ def main():
     logger.info("\n2. Rest × Travel Interactions:")
     logger.info(f"   Thursday night + long travel: {interactions_df['thursday_long_travel'].sum()}")
     logger.info(f"   Critical fatigue situations: {interactions_df['critical_fatigue'].sum()}")
-    logger.info(f"   Short rest with travel (avg): {interactions_df['short_rest_with_travel'].mean():.2f}")
+    logger.info(
+        f"   Short rest with travel (avg): {interactions_df['short_rest_with_travel'].mean():.2f}"
+    )
 
     # Altitude interactions
     logger.info("\n3. Altitude Interactions:")
-    logger.info(f"   Playing at altitude with short rest: {interactions_df['altitude_with_short_rest'].sum()}")
+    logger.info(
+        f"   Playing at altitude with short rest: {interactions_df['altitude_with_short_rest'].sum()}"
+    )
 
     # Vegas context interactions
     logger.info("\n4. Vegas × Context Interactions:")
@@ -390,8 +414,15 @@ def main():
     if len(high_value_games) > 0:
         logger.info(f"   Total high-value games: {len(high_value_games)}")
         logger.info("\n   Sample high-value games:")
-        display_cols = ["game_id", "away_team", "home_team", "temp", "away_rest",
-                        "dome_team_outdoor_cold", "thursday_long_travel"]
+        display_cols = [
+            "game_id",
+            "away_team",
+            "home_team",
+            "temp",
+            "away_rest",
+            "dome_team_outdoor_cold",
+            "thursday_long_travel",
+        ]
         available_cols = [col for col in display_cols if col in high_value_games.columns]
         logger.info(f"\n{high_value_games[available_cols].head(10).to_string()}")
 

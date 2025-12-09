@@ -4,11 +4,10 @@ Unit tests for py/ingest_odds_history.py
 Tests the core parsing and transformation logic without external dependencies.
 """
 
-import sys
+import datetime as dt
 import importlib.util
 from pathlib import Path
-import datetime as dt
-from typing import Any, Dict, List
+from typing import Any
 
 import pytest
 
@@ -39,14 +38,14 @@ class TestParseIso:
         assert result.hour == 17
         assert result.minute == 0
         assert result.second == 0
-        assert result.tzinfo == dt.timezone.utc
+        assert result.tzinfo == dt.UTC
 
     def test_parse_iso_with_offset(self):
         """Test parsing ISO timestamp with explicit UTC offset."""
         result = parse_iso("2023-09-07T17:00:00+00:00")
         assert result is not None
         assert result.year == 2023
-        assert result.tzinfo == dt.timezone.utc
+        assert result.tzinfo == dt.UTC
 
     def test_parse_iso_none(self):
         """Test parse_iso handles None gracefully."""
@@ -112,52 +111,60 @@ class TestFlattenEvents:
 
     def test_flatten_events_empty_list(self):
         """Test flatten_events with empty event list."""
-        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.timezone.utc)
+        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.UTC)
         result = flatten_events([], snapshot)
         assert result == []
 
     def test_flatten_events_no_bookmakers(self):
         """Test flatten_events with event but no bookmakers."""
-        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.timezone.utc)
-        events: List[Dict[str, Any]] = [{
-            "id": "abc123",
-            "sport_key": "americanfootball_nfl",
-            "commence_time": "2023-09-07T17:00:00Z",
-            "home_team": "Buffalo Bills",
-            "away_team": "Arizona Cardinals",
-            "bookmakers": []
-        }]
+        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.UTC)
+        events: list[dict[str, Any]] = [
+            {
+                "id": "abc123",
+                "sport_key": "americanfootball_nfl",
+                "commence_time": "2023-09-07T17:00:00Z",
+                "home_team": "Buffalo Bills",
+                "away_team": "Arizona Cardinals",
+                "bookmakers": [],
+            }
+        ]
         result = flatten_events(events, snapshot)
         assert result == []
 
     def test_flatten_events_single_market_spread(self):
         """Test flatten_events with single event and spread market."""
-        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.timezone.utc)
-        events: List[Dict[str, Any]] = [{
-            "id": "abc123",
-            "sport_key": "americanfootball_nfl",
-            "commence_time": "2023-09-07T17:00:00Z",
-            "home_team": "Buffalo Bills",
-            "away_team": "Arizona Cardinals",
-            "bookmakers": [{
-                "key": "fanduel",
-                "title": "FanDuel",
-                "last_update": "2023-09-01T12:00:00Z",
-                "markets": [{
-                    "key": "spreads",
-                    "last_update": "2023-09-01T12:00:00Z",
-                    "outcomes": [
-                        {"name": "Buffalo Bills", "price": 1.91, "point": -6.5},
-                        {"name": "Arizona Cardinals", "price": 1.91, "point": 6.5}
-                    ]
-                }]
-            }]
-        }]
-        
+        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.UTC)
+        events: list[dict[str, Any]] = [
+            {
+                "id": "abc123",
+                "sport_key": "americanfootball_nfl",
+                "commence_time": "2023-09-07T17:00:00Z",
+                "home_team": "Buffalo Bills",
+                "away_team": "Arizona Cardinals",
+                "bookmakers": [
+                    {
+                        "key": "fanduel",
+                        "title": "FanDuel",
+                        "last_update": "2023-09-01T12:00:00Z",
+                        "markets": [
+                            {
+                                "key": "spreads",
+                                "last_update": "2023-09-01T12:00:00Z",
+                                "outcomes": [
+                                    {"name": "Buffalo Bills", "price": 1.91, "point": -6.5},
+                                    {"name": "Arizona Cardinals", "price": 1.91, "point": 6.5},
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            }
+        ]
+
         result = flatten_events(events, snapshot)
-        
+
         assert len(result) == 2
-        
+
         # Check first outcome (home favorite)
         assert result[0]["event_id"] == "abc123"
         assert result[0]["sport_key"] == "americanfootball_nfl"
@@ -170,49 +177,53 @@ class TestFlattenEvents:
         assert result[0]["outcome_price"] == 1.91
         assert result[0]["outcome_point"] == -6.5
         assert result[0]["snapshot_at"] == snapshot
-        
+
         # Check second outcome (away underdog)
         assert result[1]["outcome_name"] == "Arizona Cardinals"
         assert result[1]["outcome_point"] == 6.5
 
     def test_flatten_events_multiple_markets(self):
         """Test flatten_events with multiple markets (spreads + totals)."""
-        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.timezone.utc)
-        events: List[Dict[str, Any]] = [{
-            "id": "abc123",
-            "sport_key": "americanfootball_nfl",
-            "commence_time": "2023-09-07T17:00:00Z",
-            "home_team": "Buffalo Bills",
-            "away_team": "Arizona Cardinals",
-            "bookmakers": [{
-                "key": "fanduel",
-                "title": "FanDuel",
-                "last_update": "2023-09-01T12:00:00Z",
-                "markets": [
+        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.UTC)
+        events: list[dict[str, Any]] = [
+            {
+                "id": "abc123",
+                "sport_key": "americanfootball_nfl",
+                "commence_time": "2023-09-07T17:00:00Z",
+                "home_team": "Buffalo Bills",
+                "away_team": "Arizona Cardinals",
+                "bookmakers": [
                     {
-                        "key": "spreads",
+                        "key": "fanduel",
+                        "title": "FanDuel",
                         "last_update": "2023-09-01T12:00:00Z",
-                        "outcomes": [
-                            {"name": "Buffalo Bills", "price": 1.91, "point": -6.5},
-                            {"name": "Arizona Cardinals", "price": 1.91, "point": 6.5}
-                        ]
-                    },
-                    {
-                        "key": "totals",
-                        "last_update": "2023-09-01T12:00:00Z",
-                        "outcomes": [
-                            {"name": "Over", "price": 1.87, "point": 47.5},
-                            {"name": "Under", "price": 1.95, "point": 47.5}
-                        ]
+                        "markets": [
+                            {
+                                "key": "spreads",
+                                "last_update": "2023-09-01T12:00:00Z",
+                                "outcomes": [
+                                    {"name": "Buffalo Bills", "price": 1.91, "point": -6.5},
+                                    {"name": "Arizona Cardinals", "price": 1.91, "point": 6.5},
+                                ],
+                            },
+                            {
+                                "key": "totals",
+                                "last_update": "2023-09-01T12:00:00Z",
+                                "outcomes": [
+                                    {"name": "Over", "price": 1.87, "point": 47.5},
+                                    {"name": "Under", "price": 1.95, "point": 47.5},
+                                ],
+                            },
+                        ],
                     }
-                ]
-            }]
-        }]
-        
+                ],
+            }
+        ]
+
         result = flatten_events(events, snapshot)
-        
+
         assert len(result) == 4  # 2 spreads + 2 totals
-        
+
         # Check market keys
         market_keys = [row["market_key"] for row in result]
         assert market_keys.count("spreads") == 2
@@ -220,73 +231,85 @@ class TestFlattenEvents:
 
     def test_flatten_events_multiple_bookmakers(self):
         """Test flatten_events with multiple bookmakers."""
-        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.timezone.utc)
-        events: List[Dict[str, Any]] = [{
-            "id": "abc123",
-            "sport_key": "americanfootball_nfl",
-            "commence_time": "2023-09-07T17:00:00Z",
-            "home_team": "Buffalo Bills",
-            "away_team": "Arizona Cardinals",
-            "bookmakers": [
-                {
-                    "key": "fanduel",
-                    "title": "FanDuel",
-                    "last_update": "2023-09-01T12:00:00Z",
-                    "markets": [{
-                        "key": "spreads",
+        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.UTC)
+        events: list[dict[str, Any]] = [
+            {
+                "id": "abc123",
+                "sport_key": "americanfootball_nfl",
+                "commence_time": "2023-09-07T17:00:00Z",
+                "home_team": "Buffalo Bills",
+                "away_team": "Arizona Cardinals",
+                "bookmakers": [
+                    {
+                        "key": "fanduel",
+                        "title": "FanDuel",
                         "last_update": "2023-09-01T12:00:00Z",
-                        "outcomes": [
-                            {"name": "Buffalo Bills", "price": 1.91, "point": -6.5}
-                        ]
-                    }]
-                },
-                {
-                    "key": "draftkings",
-                    "title": "DraftKings",
-                    "last_update": "2023-09-01T12:05:00Z",
-                    "markets": [{
-                        "key": "spreads",
+                        "markets": [
+                            {
+                                "key": "spreads",
+                                "last_update": "2023-09-01T12:00:00Z",
+                                "outcomes": [
+                                    {"name": "Buffalo Bills", "price": 1.91, "point": -6.5}
+                                ],
+                            }
+                        ],
+                    },
+                    {
+                        "key": "draftkings",
+                        "title": "DraftKings",
                         "last_update": "2023-09-01T12:05:00Z",
-                        "outcomes": [
-                            {"name": "Buffalo Bills", "price": 1.87, "point": -6.0}
-                        ]
-                    }]
-                }
-            ]
-        }]
-        
+                        "markets": [
+                            {
+                                "key": "spreads",
+                                "last_update": "2023-09-01T12:05:00Z",
+                                "outcomes": [
+                                    {"name": "Buffalo Bills", "price": 1.87, "point": -6.0}
+                                ],
+                            }
+                        ],
+                    },
+                ],
+            }
+        ]
+
         result = flatten_events(events, snapshot)
-        
+
         assert len(result) == 2
         bookmakers = {row["bookmaker_key"] for row in result}
         assert bookmakers == {"fanduel", "draftkings"}
 
     def test_flatten_events_h2h_market_no_points(self):
         """Test flatten_events with h2h (moneyline) market that has no points."""
-        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.timezone.utc)
-        events: List[Dict[str, Any]] = [{
-            "id": "abc123",
-            "sport_key": "americanfootball_nfl",
-            "commence_time": "2023-09-07T17:00:00Z",
-            "home_team": "Buffalo Bills",
-            "away_team": "Arizona Cardinals",
-            "bookmakers": [{
-                "key": "fanduel",
-                "title": "FanDuel",
-                "last_update": "2023-09-01T12:00:00Z",
-                "markets": [{
-                    "key": "h2h",
-                    "last_update": "2023-09-01T12:00:00Z",
-                    "outcomes": [
-                        {"name": "Buffalo Bills", "price": 1.25},
-                        {"name": "Arizona Cardinals", "price": 4.20}
-                    ]
-                }]
-            }]
-        }]
-        
+        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.UTC)
+        events: list[dict[str, Any]] = [
+            {
+                "id": "abc123",
+                "sport_key": "americanfootball_nfl",
+                "commence_time": "2023-09-07T17:00:00Z",
+                "home_team": "Buffalo Bills",
+                "away_team": "Arizona Cardinals",
+                "bookmakers": [
+                    {
+                        "key": "fanduel",
+                        "title": "FanDuel",
+                        "last_update": "2023-09-01T12:00:00Z",
+                        "markets": [
+                            {
+                                "key": "h2h",
+                                "last_update": "2023-09-01T12:00:00Z",
+                                "outcomes": [
+                                    {"name": "Buffalo Bills", "price": 1.25},
+                                    {"name": "Arizona Cardinals", "price": 4.20},
+                                ],
+                            }
+                        ],
+                    }
+                ],
+            }
+        ]
+
         result = flatten_events(events, snapshot)
-        
+
         assert len(result) == 2
         assert result[0]["market_key"] == "h2h"
         assert result[0]["outcome_point"] is None  # No point for moneylines
@@ -295,22 +318,26 @@ class TestFlattenEvents:
 
     def test_flatten_events_missing_fields(self):
         """Test flatten_events handles missing optional fields gracefully."""
-        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.timezone.utc)
-        events: List[Dict[str, Any]] = [{
-            "id": "abc123",
-            "bookmakers": [{
-                "key": "fanduel",
-                "markets": [{
-                    "key": "spreads",
-                    "outcomes": [
-                        {"name": "Team A", "price": 1.91}  # Missing point
-                    ]
-                }]
-            }]
-        }]
-        
+        snapshot = dt.datetime(2023, 9, 1, 12, 0, 0, tzinfo=dt.UTC)
+        events: list[dict[str, Any]] = [
+            {
+                "id": "abc123",
+                "bookmakers": [
+                    {
+                        "key": "fanduel",
+                        "markets": [
+                            {
+                                "key": "spreads",
+                                "outcomes": [{"name": "Team A", "price": 1.91}],  # Missing point
+                            }
+                        ],
+                    }
+                ],
+            }
+        ]
+
         result = flatten_events(events, snapshot)
-        
+
         assert len(result) == 1
         assert result[0]["event_id"] == "abc123"
         assert result[0]["sport_key"] is None

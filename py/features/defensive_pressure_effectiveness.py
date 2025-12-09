@@ -17,16 +17,13 @@ Date: 2025-10-30
 """
 
 import logging
+
 import pandas as pd
-import numpy as np
-from typing import Optional, Tuple
 from sqlalchemy import create_engine
-from datetime import datetime
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -44,19 +41,12 @@ class DefensivePressureEffectivenessEngine:
     - Game script impact on pressure
     """
 
-    def __init__(
-        self,
-        db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-    ):
+    def __init__(self, db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"):
         """Initialize the pressure effectiveness engine."""
         self.engine = create_engine(db_url)
         logger.info(f"Connected to database: {db_url}")
 
-    def load_passing_plays(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
-    ) -> pd.DataFrame:
+    def load_passing_plays(self, start_season: int = 2024, end_season: int = 2025) -> pd.DataFrame:
         """
         Load passing plays from the database.
 
@@ -120,10 +110,7 @@ class DefensivePressureEffectivenessEngine:
 
         return df
 
-    def calculate_team_pressure_metrics(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_team_pressure_metrics(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate team-level pressure effectiveness metrics per game.
 
@@ -159,29 +146,36 @@ class DefensivePressureEffectivenessEngine:
                 "defense_team": defense_team,
                 "n_pass_plays": n_total_pass_plays,
                 "n_dropbacks": n_dropbacks,
-
                 # Primary pressure indicators
                 "sack_rate": group["sack"].mean() * 100,
                 "sacks": group["sack"].sum(),
                 "scramble_rate": group["qb_scramble"].mean() * 100,
                 "scrambles": group["qb_scramble"].sum(),
-
                 # Pressure avoidance indicators
-                "quick_pass_rate_allowed": dropbacks["quick_pass"].mean() * 100 if n_dropbacks > 0 else 0,
-                "deep_pass_rate_allowed": dropbacks["deep_pass"].mean() * 100 if n_dropbacks > 0 else 0,
-
+                "quick_pass_rate_allowed": (
+                    dropbacks["quick_pass"].mean() * 100 if n_dropbacks > 0 else 0
+                ),
+                "deep_pass_rate_allowed": (
+                    dropbacks["deep_pass"].mean() * 100 if n_dropbacks > 0 else 0
+                ),
                 # Performance metrics (on non-sack plays)
-                "completion_pct_allowed": dropbacks["complete_pass"].mean() * 100 if n_dropbacks > 0 else 0,
-                "yards_per_attempt_allowed": dropbacks["yards_gained"].mean() if n_dropbacks > 0 else 0,
+                "completion_pct_allowed": (
+                    dropbacks["complete_pass"].mean() * 100 if n_dropbacks > 0 else 0
+                ),
+                "yards_per_attempt_allowed": (
+                    dropbacks["yards_gained"].mean() if n_dropbacks > 0 else 0
+                ),
                 "air_yards_per_attempt": dropbacks["air_yards"].mean() if n_dropbacks > 0 else 0,
                 "epa_per_dropback_allowed": dropbacks["epa"].mean() if n_dropbacks > 0 else 0,
                 "success_rate_allowed": dropbacks["success"].mean() * 100 if n_dropbacks > 0 else 0,
-
                 # Explosive plays and turnovers
-                "explosive_play_rate_allowed": (dropbacks["yards_gained"] >= 20).mean() * 100 if n_dropbacks > 0 else 0,
-                "touchdown_rate_allowed": dropbacks["touchdown"].mean() * 100 if n_dropbacks > 0 else 0,
+                "explosive_play_rate_allowed": (
+                    (dropbacks["yards_gained"] >= 20).mean() * 100 if n_dropbacks > 0 else 0
+                ),
+                "touchdown_rate_allowed": (
+                    dropbacks["touchdown"].mean() * 100 if n_dropbacks > 0 else 0
+                ),
                 "interception_rate": group["interception"].mean() * 100,
-
                 # Overall impact (including sacks)
                 "epa_per_play_allowed": group["epa"].mean(),
                 "wpa_per_play_allowed": group["wpa"].mean(),
@@ -190,11 +184,11 @@ class DefensivePressureEffectivenessEngine:
             # Pressure effectiveness score (composite metric)
             # Higher is better for defense
             metrics["pressure_effectiveness_score"] = (
-                metrics["sack_rate"] * 2.0 +  # Sacks are very valuable
-                metrics["scramble_rate"] * 1.0 +  # Scrambles are moderately valuable
-                metrics["quick_pass_rate_allowed"] * 0.5 -  # Quick passes avoid pressure
-                metrics["deep_pass_rate_allowed"] * 0.5 +  # Deep passes indicate confidence
-                metrics["interception_rate"] * 3.0  # Turnovers are highly valuable
+                metrics["sack_rate"] * 2.0  # Sacks are very valuable
+                + metrics["scramble_rate"] * 1.0  # Scrambles are moderately valuable
+                + metrics["quick_pass_rate_allowed"] * 0.5  # Quick passes avoid pressure
+                - metrics["deep_pass_rate_allowed"] * 0.5  # Deep passes indicate confidence
+                + metrics["interception_rate"] * 3.0  # Turnovers are highly valuable
             )
 
             results.append(metrics)
@@ -204,10 +198,7 @@ class DefensivePressureEffectivenessEngine:
 
         return df
 
-    def calculate_situational_pressure(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_situational_pressure(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate pressure effectiveness by game situation.
 
@@ -227,13 +218,13 @@ class DefensivePressureEffectivenessEngine:
             plays["ydstogo"],
             bins=[0, 3, 7, 100],
             labels=["short", "medium", "long"],
-            include_lowest=True
+            include_lowest=True,
         )
 
         plays["score_situation"] = pd.cut(
             plays["score_differential"],
             bins=[-100, -7, 7, 100],
-            labels=["losing", "tied", "winning"]
+            labels=["losing", "tied", "winning"],
         )
 
         results = []
@@ -335,10 +326,7 @@ class DefensivePressureEffectivenessEngine:
 
         return df
 
-    def calculate_third_down_pressure(
-        self,
-        plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_third_down_pressure(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate pressure effectiveness specifically on 3rd downs.
 
@@ -360,7 +348,7 @@ class DefensivePressureEffectivenessEngine:
             third_downs["ydstogo"],
             bins=[0, 3, 7, 100],
             labels=["short", "medium", "long"],
-            include_lowest=True
+            include_lowest=True,
         )
 
         # Conversion is success on 3rd down
@@ -387,7 +375,6 @@ class DefensivePressureEffectivenessEngine:
                 "conversion_rate_allowed": group["converted"].mean() * 100,
                 "epa_per_play_allowed": group["epa"].mean(),
                 "quick_pass_rate": dropbacks["quick_pass"].mean() * 100 if n_dropbacks > 0 else 0,
-
                 # Impact metrics: conversion rate on sacks vs non-sacks
                 "sack_stops_conversion": True,  # Sacks almost always prevent conversion
             }
@@ -399,11 +386,7 @@ class DefensivePressureEffectivenessEngine:
 
         return df
 
-    def add_rolling_averages(
-        self,
-        metrics: pd.DataFrame,
-        window: int = 4
-    ) -> pd.DataFrame:
+    def add_rolling_averages(self, metrics: pd.DataFrame, window: int = 4) -> pd.DataFrame:
         """
         Add rolling averages for trend analysis.
 
@@ -419,7 +402,7 @@ class DefensivePressureEffectivenessEngine:
         metrics = metrics.copy()
 
         # Merge game dates for sorting
-        game_dates = metrics[["game_id", "defense_team"]].drop_duplicates()
+        metrics[["game_id", "defense_team"]].drop_duplicates()
 
         # Sort by team and game
         metrics = metrics.sort_values(["defense_team", "game_id"])
@@ -435,19 +418,15 @@ class DefensivePressureEffectivenessEngine:
 
         for col in rolling_cols:
             if col in metrics.columns:
-                metrics[f"{col}_roll{window}"] = (
-                    metrics.groupby("defense_team")[col]
-                    .transform(lambda x: x.rolling(window, min_periods=1).mean())
+                metrics[f"{col}_roll{window}"] = metrics.groupby("defense_team")[col].transform(
+                    lambda x: x.rolling(window, min_periods=1).mean()
                 )
 
         logger.info(f"Added rolling averages for {len(rolling_cols)} metrics")
 
         return metrics
 
-    def add_percentile_ranks(
-        self,
-        metrics: pd.DataFrame
-    ) -> pd.DataFrame:
+    def add_percentile_ranks(self, metrics: pd.DataFrame) -> pd.DataFrame:
         """
         Add percentile ranks within each game week.
 
@@ -471,13 +450,11 @@ class DefensivePressureEffectivenessEngine:
                 # Lower EPA is better for defense, so reverse the rank
                 if "epa" in col.lower() or "allowed" in col.lower():
                     metrics[f"{col}_pctile"] = (
-                        metrics.groupby("game_id")[col]
-                        .rank(pct=True, ascending=True) * 100
+                        metrics.groupby("game_id")[col].rank(pct=True, ascending=True) * 100
                     )
                 else:
                     metrics[f"{col}_pctile"] = (
-                        metrics.groupby("game_id")[col]
-                        .rank(pct=True, ascending=False) * 100
+                        metrics.groupby("game_id")[col].rank(pct=True, ascending=False) * 100
                     )
 
         logger.info(f"Added percentile ranks for {len(rank_cols)} metrics")
@@ -485,10 +462,8 @@ class DefensivePressureEffectivenessEngine:
         return metrics
 
     def generate_all_features(
-        self,
-        start_season: int = 2024,
-        end_season: int = 2025
-    ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        self, start_season: int = 2024, end_season: int = 2025
+    ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
         """
         Generate all pressure effectiveness features.
 
@@ -529,8 +504,7 @@ def main():
 
     # Generate features for 2024-2025 seasons
     team_metrics, situational_metrics, third_down_metrics = engine.generate_all_features(
-        start_season=2024,
-        end_season=2025
+        start_season=2024, end_season=2025
     )
 
     # Display sample statistics
@@ -542,13 +516,17 @@ def main():
     print("\n" + "=" * 70)
     print("TEAM PRESSURE STATISTICS")
     print("=" * 70)
-    print(team_metrics[[
-        "sack_rate",
-        "pressure_effectiveness_score",
-        "quick_pass_rate_allowed",
-        "epa_per_play_allowed",
-        "interception_rate"
-    ]].describe())
+    print(
+        team_metrics[
+            [
+                "sack_rate",
+                "pressure_effectiveness_score",
+                "quick_pass_rate_allowed",
+                "epa_per_play_allowed",
+                "interception_rate",
+            ]
+        ].describe()
+    )
 
     print("\n" + "=" * 70)
     print("SITUATIONAL PRESSURE SAMPLE")
@@ -564,10 +542,16 @@ def main():
     print("\n" + "=" * 70)
     print("TOP 10 PRESSURE DEFENSES (by effectiveness score)")
     print("=" * 70)
-    top_pressure = team_metrics.nlargest(10, "pressure_effectiveness_score")[[
-        "defense_team", "game_id", "sack_rate", "pressure_effectiveness_score",
-        "epa_per_play_allowed", "quick_pass_rate_allowed"
-    ]]
+    top_pressure = team_metrics.nlargest(10, "pressure_effectiveness_score")[
+        [
+            "defense_team",
+            "game_id",
+            "sack_rate",
+            "pressure_effectiveness_score",
+            "epa_per_play_allowed",
+            "quick_pass_rate_allowed",
+        ]
+    ]
     print(top_pressure.to_string(index=False))
 
     return team_metrics, situational_metrics, third_down_metrics

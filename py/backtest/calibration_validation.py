@@ -3,8 +3,8 @@ Simple calibration validation script for 2025 holdout data.
 
 Generates ensemble predictions and calculates 90% PI coverage without requiring prop odds.
 """
+
 import logging
-import os
 import sys
 from pathlib import Path
 
@@ -67,37 +67,43 @@ def fetch_qb_games(conn, start_season: int, end_season: int) -> pd.DataFrame:
 
     df = pd.DataFrame(rows)
     if len(df) > 0:
-        df['game_id'] = df.apply(lambda x: f"{x['season']}_{x['week']}_{x['player_id']}", axis=1)
+        df["game_id"] = df.apply(lambda x: f"{x['season']}_{x['week']}_{x['player_id']}", axis=1)
 
     return df
 
 
 def add_lagged_features(df: pd.DataFrame) -> pd.DataFrame:
     """Add L3 lagged features (last 3 games) for each player."""
-    df = df.sort_values(['player_id', 'season', 'week'])
+    df = df.sort_values(["player_id", "season", "week"])
 
-    for player_id in df['player_id'].unique():
-        mask = df['player_id'] == player_id
+    for player_id in df["player_id"].unique():
+        mask = df["player_id"] == player_id
         player_df = df[mask].copy()
 
         # Calculate rolling averages (last 3 games)
-        player_df['yards_L3'] = player_df['actual_yards'].rolling(3, min_periods=1).mean().shift(1)
-        player_df['yards_per_attempt_L3'] = (
-            player_df['actual_yards'] / player_df['attempts']
-        ).rolling(3, min_periods=1).mean().shift(1)
-        player_df['td_rate_L3'] = (
-            player_df['passing_tds'] / player_df['attempts']
-        ).rolling(3, min_periods=1).mean().shift(1)
+        player_df["yards_L3"] = player_df["actual_yards"].rolling(3, min_periods=1).mean().shift(1)
+        player_df["yards_per_attempt_L3"] = (
+            (player_df["actual_yards"] / player_df["attempts"])
+            .rolling(3, min_periods=1)
+            .mean()
+            .shift(1)
+        )
+        player_df["td_rate_L3"] = (
+            (player_df["passing_tds"] / player_df["attempts"])
+            .rolling(3, min_periods=1)
+            .mean()
+            .shift(1)
+        )
 
         # Update main dataframe
-        df.loc[mask, 'yards_L3'] = player_df['yards_L3'].values
-        df.loc[mask, 'yards_per_attempt_L3'] = player_df['yards_per_attempt_L3'].values
-        df.loc[mask, 'td_rate_L3'] = player_df['td_rate_L3'].values
+        df.loc[mask, "yards_L3"] = player_df["yards_L3"].values
+        df.loc[mask, "yards_per_attempt_L3"] = player_df["yards_per_attempt_L3"].values
+        df.loc[mask, "td_rate_L3"] = player_df["td_rate_L3"].values
 
     # Fill missing lagged features with league averages
-    df['yards_L3'] = df['yards_L3'].fillna(240.0)
-    df['yards_per_attempt_L3'] = df['yards_per_attempt_L3'].fillna(7.0)
-    df['td_rate_L3'] = df['td_rate_L3'].fillna(0.04)
+    df["yards_L3"] = df["yards_L3"].fillna(240.0)
+    df["yards_per_attempt_L3"] = df["yards_per_attempt_L3"].fillna(7.0)
+    df["td_rate_L3"] = df["td_rate_L3"].fillna(0.04)
 
     return df
 
@@ -107,29 +113,30 @@ def calculate_calibration_metrics(df: pd.DataFrame) -> dict:
     n = len(df)
 
     # 90% PI coverage
-    within_90 = ((df['actual_yards'] >= df['lower_90']) &
-                 (df['actual_yards'] <= df['upper_90'])).sum()
+    within_90 = (
+        (df["actual_yards"] >= df["lower_90"]) & (df["actual_yards"] <= df["upper_90"])
+    ).sum()
     coverage_90 = within_90 / n
 
     # Binomial test: H0: coverage = 0.90
-    binom_pvalue = stats.binomtest(within_90, n, 0.90, alternative='two-sided').pvalue
+    binom_pvalue = stats.binomtest(within_90, n, 0.90, alternative="two-sided").pvalue
 
     # Prediction error metrics
-    errors = df['actual_yards'] - df['pred_mean']
+    errors = df["actual_yards"] - df["pred_mean"]
     mae = np.abs(errors).mean()
-    rmse = np.sqrt((errors ** 2).mean())
+    rmse = np.sqrt((errors**2).mean())
 
     # Interval width (sharpness)
-    interval_width = (df['upper_90'] - df['lower_90']).mean()
+    interval_width = (df["upper_90"] - df["lower_90"]).mean()
 
     return {
-        'n_games': n,
-        'coverage_90': coverage_90,
-        'within_90': within_90,
-        'binom_pvalue': binom_pvalue,
-        'mae': mae,
-        'rmse': rmse,
-        'mean_interval_width': interval_width,
+        "n_games": n,
+        "coverage_90": coverage_90,
+        "within_90": within_90,
+        "binom_pvalue": binom_pvalue,
+        "mae": mae,
+        "rmse": rmse,
+        "mean_interval_width": interval_width,
     }
 
 
@@ -146,7 +153,7 @@ def main():
     logger.info("\n📥 Fetching 2025 QB games...")
     df = fetch_qb_games(conn, 2025, 2025)
     logger.info(f"✅ Fetched {len(df):,} QB games")
-    logger.info(f"   Seasons: 2025-2025")
+    logger.info("   Seasons: 2025-2025")
     logger.info(f"   Players: {df['player_id'].nunique()}")
 
     # Add lagged features
@@ -160,40 +167,42 @@ def main():
     for idx, row in df.iterrows():
         try:
             pred = ensemble.predict(
-                player_id=row['player_id'],
-                season=row['season'],
-                week=row['week']
+                player_id=row["player_id"], season=row["season"], week=row["week"]
             )
 
             # Calculate 90% PI (using normal approximation)
-            lower_90 = pred['ensemble_mean'] - 1.645 * pred['ensemble_std']
-            upper_90 = pred['ensemble_mean'] + 1.645 * pred['ensemble_std']
+            lower_90 = pred["ensemble_mean"] - 1.645 * pred["ensemble_std"]
+            upper_90 = pred["ensemble_mean"] + 1.645 * pred["ensemble_std"]
 
-            predictions.append({
-                'pred_mean': pred['ensemble_mean'],
-                'pred_std': pred['ensemble_std'],
-                'lower_90': lower_90,
-                'upper_90': upper_90,
-            })
+            predictions.append(
+                {
+                    "pred_mean": pred["ensemble_mean"],
+                    "pred_std": pred["ensemble_std"],
+                    "lower_90": lower_90,
+                    "upper_90": upper_90,
+                }
+            )
 
             if (idx + 1) % 50 == 0:
                 logger.info(f"   Progress: {idx + 1}/{len(df)} ({(idx+1)/len(df)*100:.0f}%)")
 
         except Exception as e:
             logger.error(f"❌ Prediction failed for game {row['game_id']}: {e}")
-            predictions.append({
-                'pred_mean': np.nan,
-                'pred_std': np.nan,
-                'lower_90': np.nan,
-                'upper_90': np.nan,
-            })
+            predictions.append(
+                {
+                    "pred_mean": np.nan,
+                    "pred_std": np.nan,
+                    "lower_90": np.nan,
+                    "upper_90": np.nan,
+                }
+            )
 
     # Combine predictions with actuals
     pred_df = pd.DataFrame(predictions)
     df = pd.concat([df, pred_df], axis=1)
 
     # Drop failed predictions
-    df = df.dropna(subset=['pred_mean'])
+    df = df.dropna(subset=["pred_mean"])
     logger.info(f"\n✅ Generated {len(df):,} valid predictions")
 
     # Calculate calibration metrics
@@ -205,24 +214,26 @@ def main():
     logger.info("CALIBRATION RESULTS (2025 HOLDOUT)")
     logger.info("=" * 80)
     logger.info(f"Games: {metrics['n_games']}")
-    logger.info(f"\n90% PI Coverage: {metrics['within_90']}/{metrics['n_games']} ({metrics['coverage_90']*100:.1f}%)")
-    logger.info(f"  Target: 85-95% (ideal: 90%)")
+    logger.info(
+        f"\n90% PI Coverage: {metrics['within_90']}/{metrics['n_games']} ({metrics['coverage_90']*100:.1f}%)"
+    )
+    logger.info("  Target: 85-95% (ideal: 90%)")
 
-    if 0.85 <= metrics['coverage_90'] <= 0.95:
-        logger.info(f"  ✅ CALIBRATED (within target range)")
-    elif metrics['coverage_90'] < 0.85:
-        logger.info(f"  ❌ UNDERCALIBRATED (ensemble overconfident)")
+    if 0.85 <= metrics["coverage_90"] <= 0.95:
+        logger.info("  ✅ CALIBRATED (within target range)")
+    elif metrics["coverage_90"] < 0.85:
+        logger.info("  ❌ UNDERCALIBRATED (ensemble overconfident)")
     else:
-        logger.info(f"  ⚠️  OVERCALIBRATED (ensemble underconfident)")
+        logger.info("  ⚠️  OVERCALIBRATED (ensemble underconfident)")
 
     logger.info(f"\nBinomial Test: p = {metrics['binom_pvalue']:.4f}")
-    logger.info(f"  (H0: coverage = 90%, α = 0.05)")
+    logger.info("  (H0: coverage = 90%, α = 0.05)")
 
-    logger.info(f"\nPrediction Error:")
+    logger.info("\nPrediction Error:")
     logger.info(f"  MAE: {metrics['mae']:.2f} yards")
     logger.info(f"  RMSE: {metrics['rmse']:.2f} yards")
 
-    logger.info(f"\nInterval Sharpness:")
+    logger.info("\nInterval Sharpness:")
     logger.info(f"  Mean Width: {metrics['mean_interval_width']:.1f} yards")
     logger.info("=" * 80)
 

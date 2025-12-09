@@ -1,13 +1,14 @@
-# -*- coding: utf-8 -*-
 """
 make_teaser_ev_figs.py — Teaser EV curve + heatmap
 Curve PDF: analysis/dissertation/figures/out/teaser_ev_curve.pdf
 Heatmap PDF: analysis/dissertation/figures/out/teaser_ev_heatmap.pdf
 """
-import os
+
 import argparse
-import numpy as np
+import os
+
 import matplotlib.pyplot as plt
+import numpy as np
 
 CURVE_OUT_DEFAULT = "analysis/dissertation/figures/out/teaser_ev_curve.pdf"
 HEAT_OUT_DEFAULT = "analysis/dissertation/figures/out/teaser_ev_heatmap.pdf"

@@ -15,12 +15,12 @@ Author: NFL Analytics Team
 Date: November 22, 2025
 """
 
+from dataclasses import dataclass
+
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Tuple, Dict, Optional
-import numpy as np
-from dataclasses import dataclass
 
 
 @dataclass
@@ -75,7 +75,7 @@ class DriveLSTM(nn.Module):
             hidden_size=config.hidden_size,
             num_layers=config.num_layers,
             batch_first=True,
-            dropout=config.dropout if config.num_layers > 1 else 0
+            dropout=config.dropout if config.num_layers > 1 else 0,
         )
 
         # Dropout
@@ -86,28 +86,26 @@ class DriveLSTM(nn.Module):
             nn.Linear(config.hidden_size, config.hidden_size // 2),
             nn.ReLU(),
             nn.Dropout(config.dropout),
-            nn.Linear(config.hidden_size // 2, 1)
+            nn.Linear(config.hidden_size // 2, 1),
         )
 
         self.points_head = nn.Sequential(
             nn.Linear(config.hidden_size, config.hidden_size // 2),
             nn.ReLU(),
             nn.Dropout(config.dropout),
-            nn.Linear(config.hidden_size // 2, config.num_points_classes)
+            nn.Linear(config.hidden_size // 2, config.num_points_classes),
         )
 
         self.result_head = nn.Sequential(
             nn.Linear(config.hidden_size, config.hidden_size // 2),
             nn.ReLU(),
             nn.Dropout(config.dropout),
-            nn.Linear(config.hidden_size // 2, config.num_result_classes)
+            nn.Linear(config.hidden_size // 2, config.num_result_classes),
         )
 
     def forward(
-        self,
-        x: torch.Tensor,
-        hidden: Optional[Tuple[torch.Tensor, torch.Tensor]] = None
-    ) -> Dict[str, torch.Tensor]:
+        self, x: torch.Tensor, hidden: tuple[torch.Tensor, torch.Tensor] | None = None
+    ) -> dict[str, torch.Tensor]:
         """
         Forward pass.
 
@@ -138,17 +136,13 @@ class DriveLSTM(nn.Module):
         result_logits = self.result_head(last_output)  # [batch_size, num_result_classes]
 
         return {
-            'yards': yards_pred,
-            'points': points_logits,
-            'result': result_logits,
-            'hidden': hidden
+            "yards": yards_pred,
+            "points": points_logits,
+            "result": result_logits,
+            "hidden": hidden,
         }
 
-    def predict(
-        self,
-        x: torch.Tensor,
-        return_probs: bool = True
-    ) -> Dict[str, torch.Tensor]:
+    def predict(self, x: torch.Tensor, return_probs: bool = True) -> dict[str, torch.Tensor]:
         """
         Make predictions (inference mode).
 
@@ -164,8 +158,8 @@ class DriveLSTM(nn.Module):
             outputs = self.forward(x)
 
             if return_probs:
-                outputs['points_probs'] = F.softmax(outputs['points'], dim=-1)
-                outputs['result_probs'] = F.softmax(outputs['result'], dim=-1)
+                outputs["points_probs"] = F.softmax(outputs["points"], dim=-1)
+                outputs["result_probs"] = F.softmax(outputs["result"], dim=-1)
 
         return outputs
 
@@ -199,10 +193,8 @@ class MultiTaskLoss(nn.Module):
         self.result_loss_fn = nn.CrossEntropyLoss()
 
     def forward(
-        self,
-        predictions: Dict[str, torch.Tensor],
-        targets: Dict[str, torch.Tensor]
-    ) -> Tuple[torch.Tensor, Dict[str, float]]:
+        self, predictions: dict[str, torch.Tensor], targets: dict[str, torch.Tensor]
+    ) -> tuple[torch.Tensor, dict[str, float]]:
         """
         Compute multi-task loss.
 
@@ -214,34 +206,25 @@ class MultiTaskLoss(nn.Module):
             (total_loss, loss_dict) tuple
         """
         # Compute individual losses
-        yards_loss = self.yards_loss_fn(
-            predictions['yards'].squeeze(),
-            targets['yards']
-        )
+        yards_loss = self.yards_loss_fn(predictions["yards"].squeeze(), targets["yards"])
 
-        points_loss = self.points_loss_fn(
-            predictions['points'],
-            targets['points']
-        )
+        points_loss = self.points_loss_fn(predictions["points"], targets["points"])
 
-        result_loss = self.result_loss_fn(
-            predictions['result'],
-            targets['result']
-        )
+        result_loss = self.result_loss_fn(predictions["result"], targets["result"])
 
         # Weighted combination
         total_loss = (
-            self.config.yards_weight * yards_loss +
-            self.config.points_weight * points_loss +
-            self.config.result_weight * result_loss
+            self.config.yards_weight * yards_loss
+            + self.config.points_weight * points_loss
+            + self.config.result_weight * result_loss
         )
 
         # Loss breakdown
         loss_dict = {
-            'total': total_loss.item(),
-            'yards': yards_loss.item(),
-            'points': points_loss.item(),
-            'result': result_loss.item()
+            "total": total_loss.item(),
+            "yards": yards_loss.item(),
+            "points": points_loss.item(),
+            "result": result_loss.item(),
         }
 
         return total_loss, loss_dict
@@ -262,7 +245,7 @@ class DriveSequenceDataset(torch.utils.data.Dataset):
         points: np.ndarray,  # [num_drives]
         results: np.ndarray,  # [num_drives]
         game_ids: np.ndarray,  # [num_drives]
-        sequence_length: int = 10
+        sequence_length: int = 10,
     ):
         """
         Initialize dataset.
@@ -299,7 +282,7 @@ class DriveSequenceDataset(torch.utils.data.Dataset):
 
         for game_id in unique_games:
             # Get drives for this game
-            game_mask = (self.game_ids == game_id)
+            game_mask = self.game_ids == game_id
             game_features = self.features[game_mask]
             game_yards = self.yards[game_mask]
             game_points = self.points[game_mask]
@@ -315,7 +298,9 @@ class DriveSequenceDataset(torch.utils.data.Dataset):
 
                 # Pad if necessary
                 if len(seq_features) < self.sequence_length:
-                    padding = np.zeros((self.sequence_length - len(seq_features), game_features.shape[1]))
+                    padding = np.zeros(
+                        (self.sequence_length - len(seq_features), game_features.shape[1])
+                    )
                     seq_features = np.vstack([padding, seq_features])
 
                 # Target is current drive
@@ -323,12 +308,7 @@ class DriveSequenceDataset(torch.utils.data.Dataset):
                 target_points = game_points[i]
                 target_result = game_results[i]
 
-                sequences.append((
-                    seq_features,
-                    target_yards,
-                    target_points,
-                    target_result
-                ))
+                sequences.append((seq_features, target_yards, target_points, target_result))
 
         return sequences
 
@@ -352,7 +332,7 @@ class DriveSequenceDataset(torch.utils.data.Dataset):
             torch.FloatTensor(seq_features),
             torch.FloatTensor([yards]),
             torch.LongTensor([points]),
-            torch.LongTensor([result])
+            torch.LongTensor([result]),
         )
 
 
@@ -368,8 +348,8 @@ def create_dataloaders(
     val_results: np.ndarray,
     val_game_ids: np.ndarray,
     sequence_length: int = 10,
-    batch_size: int = 64
-) -> Tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
+    batch_size: int = 64,
+) -> tuple[torch.utils.data.DataLoader, torch.utils.data.DataLoader]:
     """
     Create train and validation dataloaders.
 
@@ -383,27 +363,25 @@ def create_dataloaders(
         (train_loader, val_loader) tuple
     """
     train_dataset = DriveSequenceDataset(
-        train_features, train_yards, train_points, train_results,
-        train_game_ids, sequence_length
+        train_features, train_yards, train_points, train_results, train_game_ids, sequence_length
     )
 
     val_dataset = DriveSequenceDataset(
-        val_features, val_yards, val_points, val_results,
-        val_game_ids, sequence_length
+        val_features, val_yards, val_points, val_results, val_game_ids, sequence_length
     )
 
     train_loader = torch.utils.data.DataLoader(
         train_dataset,
         batch_size=batch_size,
         shuffle=True,
-        num_workers=0  # Fix pickling error on macOS
+        num_workers=0,  # Fix pickling error on macOS
     )
 
     val_loader = torch.utils.data.DataLoader(
         val_dataset,
         batch_size=batch_size,
         shuffle=False,
-        num_workers=0  # Fix pickling error on macOS
+        num_workers=0,  # Fix pickling error on macOS
     )
 
     return train_loader, val_loader
@@ -411,12 +389,7 @@ def create_dataloaders(
 
 if __name__ == "__main__":
     # Test model architecture
-    config = LSTMConfig(
-        input_size=20,
-        hidden_size=256,
-        num_layers=2,
-        sequence_length=10
-    )
+    config = LSTMConfig(input_size=20, hidden_size=256, num_layers=2, sequence_length=10)
 
     model = DriveLSTM(config)
 

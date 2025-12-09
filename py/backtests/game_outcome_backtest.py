@@ -22,13 +22,14 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from scipy.stats import norm
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from py.ensemble.game_outcome_ensemble import GameOutcomeEnsemble, fetch_games
 
 
-def kelly_fraction(prob: float, odds: float, kelly_multiplier: float = 0.25, max_bet_frac: float = 0.10) -> float:
+def kelly_fraction(
+    prob: float, odds: float, kelly_multiplier: float = 0.25, max_bet_frac: float = 0.10
+) -> float:
     """
     Calculate Kelly criterion bet size with SAFETY LIMITS.
 
@@ -206,18 +207,18 @@ class GameOutcomeBacktest:
                     # Bet on home team
                     bet_side = "home"
                     bet_prob = prob_home_win
-                    bet_spread = spread  # Home team spread
                     outcome = 1 if (margin + spread) > 0 else 0
                 else:
                     # Bet on away team
                     bet_side = "away"
                     bet_prob = 1 - prob_home_win
-                    bet_spread = -spread  # Away team gets opposite spread
                     outcome = 1 if (-margin + (-spread)) > 0 else 0
 
                 # Calculate Kelly bet size with safety limits
                 decimal_odds = american_to_decimal(self.vig)
-                kelly_frac = kelly_fraction(bet_prob, decimal_odds, self.kelly_multiplier, self.max_bet_frac)
+                kelly_frac = kelly_fraction(
+                    bet_prob, decimal_odds, self.kelly_multiplier, self.max_bet_frac
+                )
 
                 if kelly_frac <= 0:
                     continue  # No bet
@@ -237,26 +238,30 @@ class GameOutcomeBacktest:
                     self.bankroll += profit
 
                 # Record trade
-                self.trades.append({
-                    "game_id": game_id,
-                    "season": season,
-                    "week": week,
-                    "home_team": home_team,
-                    "away_team": away_team,
-                    "bet_side": bet_side,
-                    "bet_prob": bet_prob,
-                    "market_prob": market_prob_home if bet_side == "home" else market_prob_away,
-                    "edge": abs(edge),
-                    "kelly_frac": kelly_frac,
-                    "bet_size": bet_size,
-                    "outcome": outcome,
-                    "profit": profit,
-                    "bankroll": self.bankroll,
-                })
+                self.trades.append(
+                    {
+                        "game_id": game_id,
+                        "season": season,
+                        "week": week,
+                        "home_team": home_team,
+                        "away_team": away_team,
+                        "bet_side": bet_side,
+                        "bet_prob": bet_prob,
+                        "market_prob": market_prob_home if bet_side == "home" else market_prob_away,
+                        "edge": abs(edge),
+                        "kelly_frac": kelly_frac,
+                        "bet_size": bet_size,
+                        "outcome": outcome,
+                        "profit": profit,
+                        "bankroll": self.bankroll,
+                    }
+                )
 
                 self.cumulative_returns.append(self.bankroll / self.initial_bankroll - 1)
 
-            print(f"  Trades this week: {len([t for t in self.trades if t['season'] == season and t['week'] == week])}")
+            print(
+                f"  Trades this week: {len([t for t in self.trades if t['season'] == season and t['week'] == week])}"
+            )
             print(f"  Bankroll: ${self.bankroll:,.2f}")
 
         # Calculate summary metrics
@@ -283,7 +288,11 @@ class GameOutcomeBacktest:
         if len(self.cumulative_returns) > 1:
             returns_series = pd.Series(self.cumulative_returns)
             returns_diff = returns_series.diff().dropna()
-            sharpe_ratio = (returns_diff.mean() / returns_diff.std()) * np.sqrt(16) if returns_diff.std() > 0 else 0.0
+            sharpe_ratio = (
+                (returns_diff.mean() / returns_diff.std()) * np.sqrt(16)
+                if returns_diff.std() > 0
+                else 0.0
+            )
         else:
             sharpe_ratio = 0.0
 
@@ -310,7 +319,9 @@ class GameOutcomeBacktest:
             season_trades = trades_df[trades_df["season"] == season]
             season_profit = season_trades["profit"].sum()
             season_win_rate = season_trades["outcome"].mean()
-            print(f"{season}: {len(season_trades)} trades, Win rate: {season_win_rate:.1%}, P&L: ${season_profit:+,.2f}")
+            print(
+                f"{season}: {len(season_trades)} trades, Win rate: {season_win_rate:.1%}, P&L: ${season_profit:+,.2f}"
+            )
 
         return {
             "n_trades": int(n_trades),
@@ -333,10 +344,12 @@ class GameOutcomeBacktest:
         print(f"\nTrades saved to {trades_file}")
 
         # Save cumulative returns
-        returns_df = pd.DataFrame({
-            "trade_num": range(len(self.cumulative_returns)),
-            "cumulative_return": self.cumulative_returns,
-        })
+        returns_df = pd.DataFrame(
+            {
+                "trade_num": range(len(self.cumulative_returns)),
+                "cumulative_return": self.cumulative_returns,
+            }
+        )
         returns_file = output_dir / "cumulative_returns.csv"
         returns_df.to_csv(returns_file, index=False)
         print(f"Cumulative returns saved to {returns_file}")

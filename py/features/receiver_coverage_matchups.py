@@ -34,7 +34,6 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
 
 import numpy as np
 import pandas as pd
@@ -136,9 +135,7 @@ class ReceiverCoverageMatchupEngine:
 
         return plays
 
-    def calculate_defensive_backfield_rankings(
-        self, plays: pd.DataFrame
-    ) -> pd.DataFrame:
+    def calculate_defensive_backfield_rankings(self, plays: pd.DataFrame) -> pd.DataFrame:
         """
         Calculate defensive backfield quality rankings by team/season/week.
 
@@ -168,11 +165,12 @@ class ReceiverCoverageMatchupEngine:
                 yac_allowed=("yards_after_catch", "sum"),
                 cpoe_allowed=("cpoe", "mean"),
                 epa_allowed=("epa", "mean"),
-                explosive_plays_allowed=(
-                    "yards_gained", lambda x: (x > 20).sum()
-                ),
+                explosive_plays_allowed=("yards_gained", lambda x: (x > 20).sum()),
                 touchdowns_allowed=(
-                    "touchdown", lambda x: ((x == 1) & (plays.loc[x.index, "td_team"] == plays.loc[x.index, "posteam"])).sum()
+                    "touchdown",
+                    lambda x: (
+                        (x == 1) & (plays.loc[x.index, "td_team"] == plays.loc[x.index, "posteam"])
+                    ).sum(),
                 ),
             )
             .reset_index()
@@ -202,18 +200,18 @@ class ReceiverCoverageMatchupEngine:
         ]
 
         for col in rolling_cols:
-            defense_stats[f"{col}_rolling"] = defense_stats.groupby("defteam")[
-                col
-            ].transform(lambda x: x.shift(1).rolling(5, min_periods=1).mean())
+            defense_stats[f"{col}_rolling"] = defense_stats.groupby("defteam")[col].transform(
+                lambda x: x.shift(1).rolling(5, min_periods=1).mean()
+            )
 
         # Calculate percentile ranks within season/week
         # Lower percentile = better defense (less allowed)
         ranking_cols = [f"{col}_rolling" for col in rolling_cols]
 
         for col in ranking_cols:
-            defense_stats[f"{col}_pct"] = defense_stats.groupby(["season", "week"])[
-                col
-            ].rank(pct=True)
+            defense_stats[f"{col}_pct"] = defense_stats.groupby(["season", "week"])[col].rank(
+                pct=True
+            )
 
         # Composite defensive quality score (0-100, higher = worse defense)
         # Weight CPOE and EPA more heavily as they're best proxies
@@ -306,9 +304,7 @@ class ReceiverCoverageMatchupEngine:
             lambda x: "zone" if x > 0.5 else "man"
         )
 
-        logger.info(
-            f"Inferred coverage: {plays['inferred_coverage'].value_counts().to_dict()}"
-        )
+        logger.info(f"Inferred coverage: {plays['inferred_coverage'].value_counts().to_dict()}")
 
         return plays
 
@@ -377,7 +373,12 @@ class ReceiverCoverageMatchupEngine:
                 targets=("receiver_player_id", "count"),
                 receptions=("complete_pass", "sum"),
                 receiving_yards=("yards_gained", "sum"),
-                touchdowns=("touchdown", lambda x: ((x == 1) & (plays.loc[x.index, "td_team"] == plays.loc[x.index, "posteam"])).sum()),
+                touchdowns=(
+                    "touchdown",
+                    lambda x: (
+                        (x == 1) & (plays.loc[x.index, "td_team"] == plays.loc[x.index, "posteam"])
+                    ).sum(),
+                ),
                 air_yards=("air_yards", "sum"),
                 yards_after_catch=("yards_after_catch", "sum"),
                 epa=("epa", "sum"),
@@ -385,58 +386,86 @@ class ReceiverCoverageMatchupEngine:
                 first_downs=("first_down", "sum"),
                 # Situational
                 red_zone_targets=("red_zone", "sum"),
-                red_zone_catches=("complete_pass", lambda x: x[plays.loc[x.index, "red_zone"] == 1].sum()),
+                red_zone_catches=(
+                    "complete_pass",
+                    lambda x: x[plays.loc[x.index, "red_zone"] == 1].sum(),
+                ),
                 # Coverage splits (zone)
-                zone_targets=("zone_prob", lambda x: (plays.loc[x.index, "inferred_coverage"] == "zone").sum()),
-                zone_catches=("complete_pass", lambda x: x[plays.loc[x.index, "inferred_coverage"] == "zone"].sum()),
-                zone_yards=("yards_gained", lambda x: x[plays.loc[x.index, "inferred_coverage"] == "zone"].sum()),
-                zone_yac=("yards_after_catch", lambda x: x[plays.loc[x.index, "inferred_coverage"] == "zone"].sum()),
+                zone_targets=(
+                    "zone_prob",
+                    lambda x: (plays.loc[x.index, "inferred_coverage"] == "zone").sum(),
+                ),
+                zone_catches=(
+                    "complete_pass",
+                    lambda x: x[plays.loc[x.index, "inferred_coverage"] == "zone"].sum(),
+                ),
+                zone_yards=(
+                    "yards_gained",
+                    lambda x: x[plays.loc[x.index, "inferred_coverage"] == "zone"].sum(),
+                ),
+                zone_yac=(
+                    "yards_after_catch",
+                    lambda x: x[plays.loc[x.index, "inferred_coverage"] == "zone"].sum(),
+                ),
                 # Coverage splits (man)
-                man_targets=("man_prob", lambda x: (plays.loc[x.index, "inferred_coverage"] == "man").sum()),
-                man_catches=("complete_pass", lambda x: x[plays.loc[x.index, "inferred_coverage"] == "man"].sum()),
-                man_yards=("yards_gained", lambda x: x[plays.loc[x.index, "inferred_coverage"] == "man"].sum()),
-                man_yac=("yards_after_catch", lambda x: x[plays.loc[x.index, "inferred_coverage"] == "man"].sum()),
+                man_targets=(
+                    "man_prob",
+                    lambda x: (plays.loc[x.index, "inferred_coverage"] == "man").sum(),
+                ),
+                man_catches=(
+                    "complete_pass",
+                    lambda x: x[plays.loc[x.index, "inferred_coverage"] == "man"].sum(),
+                ),
+                man_yards=(
+                    "yards_gained",
+                    lambda x: x[plays.loc[x.index, "inferred_coverage"] == "man"].sum(),
+                ),
+                man_yac=(
+                    "yards_after_catch",
+                    lambda x: x[plays.loc[x.index, "inferred_coverage"] == "man"].sum(),
+                ),
                 # Pressure splits
                 pressure_targets=("qb_hit", lambda x: (x == 1).sum()),
-                pressure_catches=("complete_pass", lambda x: x[plays.loc[x.index, "qb_hit"] == 1].sum()),
+                pressure_catches=(
+                    "complete_pass",
+                    lambda x: x[plays.loc[x.index, "qb_hit"] == 1].sum(),
+                ),
             )
             .reset_index()
         )
 
         # Calculate rate stats
-        receiver_games["catch_rate"] = (
-            receiver_games["receptions"] / receiver_games["targets"]
-        )
+        receiver_games["catch_rate"] = receiver_games["receptions"] / receiver_games["targets"]
         receiver_games["yards_per_target"] = (
             receiver_games["receiving_yards"] / receiver_games["targets"]
         )
-        receiver_games["yac_per_reception"] = (
-            receiver_games["yards_after_catch"] / receiver_games["receptions"].replace(0, np.nan)
-        )
+        receiver_games["yac_per_reception"] = receiver_games["yards_after_catch"] / receiver_games[
+            "receptions"
+        ].replace(0, np.nan)
 
         # Coverage-specific rates
-        receiver_games["zone_catch_rate"] = (
-            receiver_games["zone_catches"] / receiver_games["zone_targets"].replace(0, np.nan)
-        )
-        receiver_games["man_catch_rate"] = (
-            receiver_games["man_catches"] / receiver_games["man_targets"].replace(0, np.nan)
-        )
-        receiver_games["zone_yac_per_catch"] = (
-            receiver_games["zone_yac"] / receiver_games["zone_catches"].replace(0, np.nan)
-        )
-        receiver_games["man_yac_per_catch"] = (
-            receiver_games["man_yac"] / receiver_games["man_catches"].replace(0, np.nan)
-        )
+        receiver_games["zone_catch_rate"] = receiver_games["zone_catches"] / receiver_games[
+            "zone_targets"
+        ].replace(0, np.nan)
+        receiver_games["man_catch_rate"] = receiver_games["man_catches"] / receiver_games[
+            "man_targets"
+        ].replace(0, np.nan)
+        receiver_games["zone_yac_per_catch"] = receiver_games["zone_yac"] / receiver_games[
+            "zone_catches"
+        ].replace(0, np.nan)
+        receiver_games["man_yac_per_catch"] = receiver_games["man_yac"] / receiver_games[
+            "man_catches"
+        ].replace(0, np.nan)
 
         # Red zone efficiency
-        receiver_games["red_zone_catch_rate"] = (
-            receiver_games["red_zone_catches"] / receiver_games["red_zone_targets"].replace(0, np.nan)
-        )
+        receiver_games["red_zone_catch_rate"] = receiver_games["red_zone_catches"] / receiver_games[
+            "red_zone_targets"
+        ].replace(0, np.nan)
 
         # Pressure performance
-        receiver_games["pressure_catch_rate"] = (
-            receiver_games["pressure_catches"] / receiver_games["pressure_targets"].replace(0, np.nan)
-        )
+        receiver_games["pressure_catch_rate"] = receiver_games["pressure_catches"] / receiver_games[
+            "pressure_targets"
+        ].replace(0, np.nan)
 
         # DB quality indicators
         receiver_games["vs_elite_db"] = (receiver_games["db_tier"] == "elite").astype(int)
@@ -446,9 +475,7 @@ class ReceiverCoverageMatchupEngine:
 
         return receiver_games
 
-    def add_rolling_matchup_features(
-        self, receiver_games: pd.DataFrame
-    ) -> pd.DataFrame:
+    def add_rolling_matchup_features(self, receiver_games: pd.DataFrame) -> pd.DataFrame:
         """
         Add rolling averages for matchup-adjusted performance.
 
@@ -461,9 +488,7 @@ class ReceiverCoverageMatchupEngine:
         logger.info("Adding rolling matchup features...")
 
         # Sort by player and date
-        receiver_games = receiver_games.sort_values(
-            ["receiver_player_id", "season", "week"]
-        )
+        receiver_games = receiver_games.sort_values(["receiver_player_id", "season", "week"])
 
         # Rolling windows (3, 5 games)
         windows = [3, 5]
@@ -485,23 +510,20 @@ class ReceiverCoverageMatchupEngine:
 
         for window in windows:
             for col in rolling_cols:
-                receiver_games[f"{col}_L{window}"] = receiver_games.groupby(
-                    "receiver_player_id"
-                )[col].transform(lambda x: x.shift(1).rolling(window, min_periods=1).mean())
+                receiver_games[f"{col}_L{window}"] = receiver_games.groupby("receiver_player_id")[
+                    col
+                ].transform(lambda x: x.shift(1).rolling(window, min_periods=1).mean())
 
         # Matchup-adjusted features (performance vs DB quality)
         # Compare current game DB quality to recent average
-        receiver_games["db_quality_vs_avg"] = (
-            receiver_games["db_quality_score"]
-            - receiver_games.groupby("receiver_player_id")["db_quality_score"].transform(
-                lambda x: x.shift(1).rolling(5, min_periods=1).mean()
-            )
+        receiver_games["db_quality_vs_avg"] = receiver_games[
+            "db_quality_score"
+        ] - receiver_games.groupby("receiver_player_id")["db_quality_score"].transform(
+            lambda x: x.shift(1).rolling(5, min_periods=1).mean()
         )
 
         # Favorable matchup indicator (facing weaker DBs than usual)
-        receiver_games["favorable_matchup"] = (
-            receiver_games["db_quality_vs_avg"] > 10
-        ).astype(int)
+        receiver_games["favorable_matchup"] = (receiver_games["db_quality_vs_avg"] > 10).astype(int)
 
         logger.info("Rolling matchup features added")
 
@@ -556,9 +578,7 @@ class ReceiverCoverageMatchupEngine:
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Generate WR-CB coverage matchup features"
-    )
+    parser = argparse.ArgumentParser(description="Generate WR-CB coverage matchup features")
     parser.add_argument(
         "--season",
         type=int,

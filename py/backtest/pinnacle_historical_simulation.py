@@ -28,8 +28,6 @@ Usage:
 import argparse
 import json
 import logging
-from datetime import datetime
-from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -56,7 +54,7 @@ class PinnacleSimulator:
         pinnacle_min_edge: float = 0.025,  # Pinnacle
         baseline_kelly: float = 0.25,  # Square books
         pinnacle_kelly: float = 0.35,  # Pinnacle
-        db_config: Dict = None
+        db_config: dict = None,
     ):
         """Initialize simulator with vig and strategy parameters."""
 
@@ -73,11 +71,11 @@ class PinnacleSimulator:
         # Database connection
         if db_config is None:
             db_config = {
-                'host': 'localhost',
-                'port': 5544,
-                'database': 'devdb01',
-                'user': 'dro',
-                'password': os.getenv('DB_PASSWORD', 'sicillionbillions')
+                "host": "localhost",
+                "port": 5544,
+                "database": "devdb01",
+                "user": "dro",
+                "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
             }
         self.db_config = db_config
 
@@ -89,9 +87,7 @@ class PinnacleSimulator:
         )
 
     def load_historical_bets(
-        self,
-        start_season: int = 2022,
-        end_season: int = 2024
+        self, start_season: int = 2022, end_season: int = 2024
     ) -> pd.DataFrame:
         """
         Load historical betting results from database.
@@ -140,11 +136,7 @@ class PinnacleSimulator:
         logger.info("No historical data found - creating synthetic baseline")
         return self._create_synthetic_baseline(start_season, end_season)
 
-    def _create_synthetic_baseline(
-        self,
-        start_season: int,
-        end_season: int
-    ) -> pd.DataFrame:
+    def _create_synthetic_baseline(self, start_season: int, end_season: int) -> pd.DataFrame:
         """
         Create synthetic betting history based on dissertation baseline.
 
@@ -197,25 +189,29 @@ class PinnacleSimulator:
             else:
                 profit = -bet_amount
 
-            bets.append({
-                'season': season,
-                'week': week,
-                'player_name': f'Player_{i % 100}',
-                'prop_type': np.random.choice(['player_pass_yds', 'player_rush_yds', 'player_reception_yds']),
-                'line_value': 200.0 + np.random.normal(0, 50),
-                'bet_side': np.random.choice(['over', 'under']),
-                'odds': odds,
-                'bookmaker_key': 'draftkings',  # Baseline: square book
-                'bet_amount': bet_amount,
-                'edge': edge,
-                'confidence': np.random.uniform(0.60, 0.75),
-                'outcome': 'win' if won else 'loss',
-                'profit_loss': profit
-            })
+            bets.append(
+                {
+                    "season": season,
+                    "week": week,
+                    "player_name": f"Player_{i % 100}",
+                    "prop_type": np.random.choice(
+                        ["player_pass_yds", "player_rush_yds", "player_reception_yds"]
+                    ),
+                    "line_value": 200.0 + np.random.normal(0, 50),
+                    "bet_side": np.random.choice(["over", "under"]),
+                    "odds": odds,
+                    "bookmaker_key": "draftkings",  # Baseline: square book
+                    "bet_amount": bet_amount,
+                    "edge": edge,
+                    "confidence": np.random.uniform(0.60, 0.75),
+                    "outcome": "win" if won else "loss",
+                    "profit_loss": profit,
+                }
+            )
 
         df = pd.DataFrame(bets)
 
-        baseline_roi = df['profit_loss'].sum() / df['bet_amount'].sum()
+        baseline_roi = df["profit_loss"].sum() / df["bet_amount"].sum()
         logger.info(
             f"Created {len(df)} synthetic bets: "
             f"ROI={baseline_roi:.1%}, "
@@ -224,10 +220,7 @@ class PinnacleSimulator:
 
         return df
 
-    def simulate_pinnacle_performance(
-        self,
-        historical_bets: pd.DataFrame
-    ) -> Dict:
+    def simulate_pinnacle_performance(self, historical_bets: pd.DataFrame) -> dict:
         """
         Simulate what performance would have been with Pinnacle.
 
@@ -240,11 +233,11 @@ class PinnacleSimulator:
         baseline_bets = historical_bets.copy()
 
         # Calculate baseline performance
-        baseline_total_wagered = baseline_bets['bet_amount'].sum()
-        baseline_total_profit = baseline_bets['profit_loss'].sum()
+        baseline_total_wagered = baseline_bets["bet_amount"].sum()
+        baseline_total_profit = baseline_bets["profit_loss"].sum()
         baseline_roi = baseline_total_profit / baseline_total_wagered
         baseline_n_bets = len(baseline_bets)
-        baseline_win_rate = (baseline_bets['outcome'] == 'win').mean()
+        baseline_win_rate = (baseline_bets["outcome"] == "win").mean()
 
         logger.info(
             f"Baseline: {baseline_n_bets} bets, "
@@ -261,27 +254,29 @@ class PinnacleSimulator:
 
             # Adjust bet size (Pinnacle uses higher Kelly fraction)
             kelly_multiplier = self.pinnacle_kelly / self.baseline_kelly
-            pinnacle_bet_size = bet['bet_amount'] * kelly_multiplier
+            pinnacle_bet_size = bet["bet_amount"] * kelly_multiplier
 
             # Adjust profit/loss for Pinnacle vig
             # Pinnacle: lower vig → better odds → higher profit on wins
             vig_improvement = self.vig_savings
 
-            if bet['outcome'] == 'win':
+            if bet["outcome"] == "win":
                 # Wins are more profitable at Pinnacle
-                baseline_profit_pct = bet['profit_loss'] / bet['bet_amount']
+                baseline_profit_pct = bet["profit_loss"] / bet["bet_amount"]
                 pinnacle_profit_pct = baseline_profit_pct + vig_improvement
                 pinnacle_profit = pinnacle_bet_size * pinnacle_profit_pct
             else:
                 # Losses are same dollar amount (you lose your stake)
                 pinnacle_profit = -pinnacle_bet_size
 
-            pinnacle_bets.append({
-                **bet.to_dict(),
-                'bet_amount': pinnacle_bet_size,
-                'profit_loss': pinnacle_profit,
-                'bookmaker_key': 'pinnacle'
-            })
+            pinnacle_bets.append(
+                {
+                    **bet.to_dict(),
+                    "bet_amount": pinnacle_bet_size,
+                    "profit_loss": pinnacle_profit,
+                    "bookmaker_key": "pinnacle",
+                }
+            )
 
         # Add NEW bets that qualify only at Pinnacle (lower edge threshold)
         # Estimate 30% more opportunities
@@ -305,30 +300,32 @@ class PinnacleSimulator:
             else:
                 profit = -bet_amount
 
-            pinnacle_bets.append({
-                'season': baseline_bets['season'].iloc[i % len(baseline_bets)],
-                'week': baseline_bets['week'].iloc[i % len(baseline_bets)],
-                'player_name': f'Marginal_Player_{i}',
-                'prop_type': np.random.choice(['player_pass_yds', 'player_rush_yds']),
-                'line_value': 200.0,
-                'bet_side': 'over',
-                'odds': -110,
-                'bookmaker_key': 'pinnacle',
-                'bet_amount': bet_amount,
-                'edge': edge,
-                'confidence': 0.55,
-                'outcome': 'win' if won else 'loss',
-                'profit_loss': profit
-            })
+            pinnacle_bets.append(
+                {
+                    "season": baseline_bets["season"].iloc[i % len(baseline_bets)],
+                    "week": baseline_bets["week"].iloc[i % len(baseline_bets)],
+                    "player_name": f"Marginal_Player_{i}",
+                    "prop_type": np.random.choice(["player_pass_yds", "player_rush_yds"]),
+                    "line_value": 200.0,
+                    "bet_side": "over",
+                    "odds": -110,
+                    "bookmaker_key": "pinnacle",
+                    "bet_amount": bet_amount,
+                    "edge": edge,
+                    "confidence": 0.55,
+                    "outcome": "win" if won else "loss",
+                    "profit_loss": profit,
+                }
+            )
 
         pinnacle_df = pd.DataFrame(pinnacle_bets)
 
         # Calculate Pinnacle performance
-        pinnacle_total_wagered = pinnacle_df['bet_amount'].sum()
-        pinnacle_total_profit = pinnacle_df['profit_loss'].sum()
+        pinnacle_total_wagered = pinnacle_df["bet_amount"].sum()
+        pinnacle_total_profit = pinnacle_df["profit_loss"].sum()
         pinnacle_roi = pinnacle_total_profit / pinnacle_total_wagered
         pinnacle_n_bets = len(pinnacle_df)
-        pinnacle_win_rate = (pinnacle_df['outcome'] == 'win').mean()
+        pinnacle_win_rate = (pinnacle_df["outcome"] == "win").mean()
 
         logger.info(
             f"Pinnacle: {pinnacle_n_bets} bets (+{pinnacle_n_bets - baseline_n_bets}), "
@@ -338,50 +335,50 @@ class PinnacleSimulator:
 
         # Statistical significance test
         t_stat, p_value = stats.ttest_ind(
-            pinnacle_df['profit_loss'] / pinnacle_df['bet_amount'],
-            baseline_bets['profit_loss'] / baseline_bets['bet_amount']
+            pinnacle_df["profit_loss"] / pinnacle_df["bet_amount"],
+            baseline_bets["profit_loss"] / baseline_bets["bet_amount"],
         )
 
         return {
-            'baseline': {
-                'n_bets': baseline_n_bets,
-                'total_wagered': baseline_total_wagered,
-                'total_profit': baseline_total_profit,
-                'roi': baseline_roi,
-                'win_rate': baseline_win_rate,
-                'avg_bet_size': baseline_bets['bet_amount'].mean(),
-                'avg_edge': baseline_bets['edge'].mean()
+            "baseline": {
+                "n_bets": baseline_n_bets,
+                "total_wagered": baseline_total_wagered,
+                "total_profit": baseline_total_profit,
+                "roi": baseline_roi,
+                "win_rate": baseline_win_rate,
+                "avg_bet_size": baseline_bets["bet_amount"].mean(),
+                "avg_edge": baseline_bets["edge"].mean(),
             },
-            'pinnacle': {
-                'n_bets': pinnacle_n_bets,
-                'total_wagered': pinnacle_total_wagered,
-                'total_profit': pinnacle_total_profit,
-                'roi': pinnacle_roi,
-                'win_rate': pinnacle_win_rate,
-                'avg_bet_size': pinnacle_df['bet_amount'].mean(),
-                'avg_edge': pinnacle_df['edge'].mean()
+            "pinnacle": {
+                "n_bets": pinnacle_n_bets,
+                "total_wagered": pinnacle_total_wagered,
+                "total_profit": pinnacle_total_profit,
+                "roi": pinnacle_roi,
+                "win_rate": pinnacle_win_rate,
+                "avg_bet_size": pinnacle_df["bet_amount"].mean(),
+                "avg_edge": pinnacle_df["edge"].mean(),
             },
-            'improvement': {
-                'roi_delta': pinnacle_roi - baseline_roi,
-                'roi_delta_pct': (pinnacle_roi - baseline_roi) / abs(baseline_roi),
-                'new_bets': pinnacle_n_bets - baseline_n_bets,
-                'new_bets_pct': (pinnacle_n_bets - baseline_n_bets) / baseline_n_bets,
-                't_statistic': t_stat,
-                'p_value': p_value,
-                'significant': p_value < 0.05
+            "improvement": {
+                "roi_delta": pinnacle_roi - baseline_roi,
+                "roi_delta_pct": (pinnacle_roi - baseline_roi) / abs(baseline_roi),
+                "new_bets": pinnacle_n_bets - baseline_n_bets,
+                "new_bets_pct": (pinnacle_n_bets - baseline_n_bets) / baseline_n_bets,
+                "t_statistic": t_stat,
+                "p_value": p_value,
+                "significant": p_value < 0.05,
             },
-            'parameters': {
-                'baseline_vig': self.baseline_vig,
-                'pinnacle_vig': self.pinnacle_vig,
-                'vig_savings': self.vig_savings,
-                'baseline_min_edge': self.baseline_min_edge,
-                'pinnacle_min_edge': self.pinnacle_min_edge,
-                'baseline_kelly': self.baseline_kelly,
-                'pinnacle_kelly': self.pinnacle_kelly
-            }
+            "parameters": {
+                "baseline_vig": self.baseline_vig,
+                "pinnacle_vig": self.pinnacle_vig,
+                "vig_savings": self.vig_savings,
+                "baseline_min_edge": self.baseline_min_edge,
+                "pinnacle_min_edge": self.pinnacle_min_edge,
+                "baseline_kelly": self.baseline_kelly,
+                "pinnacle_kelly": self.pinnacle_kelly,
+            },
         }
 
-    def generate_report(self, results: Dict, output_path: str = None):
+    def generate_report(self, results: dict, output_path: str = None):
         """Generate human-readable report."""
 
         report = []
@@ -419,10 +416,14 @@ class PinnacleSimulator:
         report.append("-" * 80)
         report.append(f"ROI Improvement:  {results['improvement']['roi_delta']:+.2%}")
         report.append(f"ROI % Change:     {results['improvement']['roi_delta_pct']:+.1%}")
-        report.append(f"New Bets:         +{results['improvement']['new_bets']:,} ({results['improvement']['new_bets_pct']:+.0%})")
+        report.append(
+            f"New Bets:         +{results['improvement']['new_bets']:,} ({results['improvement']['new_bets_pct']:+.0%})"
+        )
         report.append(f"T-statistic:      {results['improvement']['t_statistic']:.2f}")
         report.append(f"P-value:          {results['improvement']['p_value']:.4f}")
-        report.append(f"Significant:      {'✅ YES' if results['improvement']['significant'] else '❌ NO'}")
+        report.append(
+            f"Significant:      {'✅ YES' if results['improvement']['significant'] else '❌ NO'}"
+        )
         report.append("")
 
         # Parameters
@@ -442,7 +443,7 @@ class PinnacleSimulator:
         print(report_text)
 
         if output_path:
-            with open(output_path.replace('.json', '_report.txt'), 'w') as f:
+            with open(output_path.replace(".json", "_report.txt"), "w") as f:
                 f.write(report_text)
             logger.info(f"Report saved to {output_path.replace('.json', '_report.txt')}")
 
@@ -450,11 +451,18 @@ class PinnacleSimulator:
 def main():
     """Run Pinnacle historical simulation."""
 
-    parser = argparse.ArgumentParser(description='Pinnacle Historical Simulation')
-    parser.add_argument('--start-season', type=int, default=2022, help='Start season')
-    parser.add_argument('--end-season', type=int, default=2024, help='End season')
-    parser.add_argument('--baseline-roi', type=float, default=-0.075, help='Baseline ROI (e.g., -0.075 = -7.5%)')
-    parser.add_argument('--output', type=str, default='analysis/results/pinnacle_simulation.json', help='Output path')
+    parser = argparse.ArgumentParser(description="Pinnacle Historical Simulation")
+    parser.add_argument("--start-season", type=int, default=2022, help="Start season")
+    parser.add_argument("--end-season", type=int, default=2024, help="End season")
+    parser.add_argument(
+        "--baseline-roi", type=float, default=-0.075, help="Baseline ROI (e.g., -0.075 = -7.5%)"
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        default="analysis/results/pinnacle_simulation.json",
+        help="Output path",
+    )
 
     args = parser.parse_args()
 
@@ -463,8 +471,7 @@ def main():
 
     # Load historical bets (real or synthetic)
     historical_bets = simulator.load_historical_bets(
-        start_season=args.start_season,
-        end_season=args.end_season
+        start_season=args.start_season, end_season=args.end_season
     )
 
     # Run simulation
@@ -474,7 +481,7 @@ def main():
     simulator.generate_report(results, args.output)
 
     # Save results
-    with open(args.output, 'w') as f:
+    with open(args.output, "w") as f:
         # Convert numpy types to Python types for JSON serialization
         results_serializable = json.loads(
             json.dumps(results, default=lambda x: float(x) if isinstance(x, np.floating) else x)
@@ -484,12 +491,12 @@ def main():
     logger.info(f"Results saved to {args.output}")
 
     # Summary
-    print(f"\n📊 SUMMARY:")
+    print("\n📊 SUMMARY:")
     print(f"   Baseline ROI:  {results['baseline']['roi']:+.2%}")
     print(f"   Pinnacle ROI:  {results['pinnacle']['roi']:+.2%}")
     print(f"   Improvement:   {results['improvement']['roi_delta']:+.2%}")
     print(f"   Significant:   {'✅ YES' if results['improvement']['significant'] else '❌ NO'}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

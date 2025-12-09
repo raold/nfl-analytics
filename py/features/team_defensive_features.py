@@ -82,8 +82,6 @@ Reference: CLAUDE.md § Feature Engineering Patterns
 
 import logging
 import warnings
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -91,11 +89,10 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore")
 
 
 class TeamDefensiveFeatures:
@@ -156,7 +153,7 @@ class TeamDefensiveFeatures:
 
     def __init__(
         self,
-        db_config: Optional[Dict] = None,
+        db_config: dict | None = None,
         db_host: str = "localhost",
         db_port: int = 5544,
         db_name: str = "devdb01",
@@ -221,12 +218,8 @@ class TeamDefensiveFeatures:
         return weights
 
     def _get_recent_games(
-        self,
-        team: str,
-        target_season: int,
-        target_week: int,
-        lookback: int = None
-    ) -> List[Tuple[str, int, int]]:
+        self, team: str, target_season: int, target_week: int, lookback: int = None
+    ) -> list[tuple[str, int, int]]:
         """
         Get last N games before target week (TEMPORAL SAFETY).
 
@@ -263,10 +256,7 @@ class TeamDefensiveFeatures:
         LIMIT %s;
         """
 
-        cursor.execute(
-            query,
-            (team, team, target_season, target_season, target_week, lookback)
-        )
+        cursor.execute(query, (team, team, target_season, target_season, target_week, lookback))
         recent_games = cursor.fetchall()
 
         cursor.close()
@@ -275,11 +265,8 @@ class TeamDefensiveFeatures:
         return recent_games
 
     def _compute_epa_features(
-        self,
-        team: str,
-        games: List[Tuple[str, int, int]],
-        weights: np.ndarray
-    ) -> Dict[str, float]:
+        self, team: str, games: list[tuple[str, int, int]], weights: np.ndarray
+    ) -> dict[str, float]:
         """
         Compute EPA-based defensive features with exponential decay weighting.
 
@@ -300,11 +287,11 @@ class TeamDefensiveFeatures:
         """
         if not games:
             return {
-                'def_epa_allowed_per_play': self.DEFAULT_DEF_EPA,
-                'def_success_rate_allowed': self.DEFAULT_SUCCESS_RATE,
-                'def_pass_epa_allowed_per_play': self.DEFAULT_PASS_EPA,
-                'def_rush_epa_allowed_per_play': self.DEFAULT_RUSH_EPA,
-                'def_turnover_rate': self.DEFAULT_TURNOVER_RATE,
+                "def_epa_allowed_per_play": self.DEFAULT_DEF_EPA,
+                "def_success_rate_allowed": self.DEFAULT_SUCCESS_RATE,
+                "def_pass_epa_allowed_per_play": self.DEFAULT_PASS_EPA,
+                "def_rush_epa_allowed_per_play": self.DEFAULT_RUSH_EPA,
+                "def_turnover_rate": self.DEFAULT_TURNOVER_RATE,
             }
 
         conn = self._connect_db()
@@ -339,44 +326,45 @@ class TeamDefensiveFeatures:
 
         if not results:
             return {
-                'def_epa_allowed_per_play': self.DEFAULT_DEF_EPA,
-                'def_success_rate_allowed': self.DEFAULT_SUCCESS_RATE,
-                'def_pass_epa_allowed_per_play': self.DEFAULT_PASS_EPA,
-                'def_rush_epa_allowed_per_play': self.DEFAULT_RUSH_EPA,
-                'def_turnover_rate': self.DEFAULT_TURNOVER_RATE,
+                "def_epa_allowed_per_play": self.DEFAULT_DEF_EPA,
+                "def_success_rate_allowed": self.DEFAULT_SUCCESS_RATE,
+                "def_pass_epa_allowed_per_play": self.DEFAULT_PASS_EPA,
+                "def_rush_epa_allowed_per_play": self.DEFAULT_RUSH_EPA,
+                "def_turnover_rate": self.DEFAULT_TURNOVER_RATE,
             }
 
         # Create DataFrame ordered by game recency (match weights order)
         df = pd.DataFrame(results)
         game_id_to_idx = {gid: idx for idx, (gid, _, _) in enumerate(games)}
-        df['game_order'] = df['game_id'].map(game_id_to_idx)
-        df = df.sort_values('game_order')
+        df["game_order"] = df["game_id"].map(game_id_to_idx)
+        df = df.sort_values("game_order")
 
         # Apply exponential decay weights (trim weights if fewer results than games)
         n_results = len(df)
         w = weights[:n_results] / weights[:n_results].sum()  # Renormalize
 
         # Weighted averages (convert to float to handle PostgreSQL Decimal types)
-        def_epa = np.average(df['avg_epa'].fillna(self.DEFAULT_DEF_EPA).astype(float), weights=w)
-        success_rate = np.average(df['success_rate'].fillna(self.DEFAULT_SUCCESS_RATE).astype(float), weights=w)
-        pass_epa = np.average(df['pass_epa'].fillna(self.DEFAULT_PASS_EPA).astype(float), weights=w)
-        rush_epa = np.average(df['rush_epa'].fillna(self.DEFAULT_RUSH_EPA).astype(float), weights=w)
-        turnover_rate = np.average(df['turnover_rate'].fillna(self.DEFAULT_TURNOVER_RATE).astype(float), weights=w)
+        def_epa = np.average(df["avg_epa"].fillna(self.DEFAULT_DEF_EPA).astype(float), weights=w)
+        success_rate = np.average(
+            df["success_rate"].fillna(self.DEFAULT_SUCCESS_RATE).astype(float), weights=w
+        )
+        pass_epa = np.average(df["pass_epa"].fillna(self.DEFAULT_PASS_EPA).astype(float), weights=w)
+        rush_epa = np.average(df["rush_epa"].fillna(self.DEFAULT_RUSH_EPA).astype(float), weights=w)
+        turnover_rate = np.average(
+            df["turnover_rate"].fillna(self.DEFAULT_TURNOVER_RATE).astype(float), weights=w
+        )
 
         return {
-            'def_epa_allowed_per_play': float(def_epa),
-            'def_success_rate_allowed': float(success_rate),
-            'def_pass_epa_allowed_per_play': float(pass_epa),
-            'def_rush_epa_allowed_per_play': float(rush_epa),
-            'def_turnover_rate': float(turnover_rate),
+            "def_epa_allowed_per_play": float(def_epa),
+            "def_success_rate_allowed": float(success_rate),
+            "def_pass_epa_allowed_per_play": float(pass_epa),
+            "def_rush_epa_allowed_per_play": float(rush_epa),
+            "def_turnover_rate": float(turnover_rate),
         }
 
     def _compute_explosive_efficiency_features(
-        self,
-        team: str,
-        games: List[Tuple[str, int, int]],
-        weights: np.ndarray
-    ) -> Dict[str, float]:
+        self, team: str, games: list[tuple[str, int, int]], weights: np.ndarray
+    ) -> dict[str, float]:
         """
         Compute explosive play and efficiency features with exponential decay.
 
@@ -397,11 +385,11 @@ class TeamDefensiveFeatures:
         """
         if not games:
             return {
-                'def_explosive_play_rate_allowed': self.DEFAULT_EXPLOSIVE_RATE,
-                'def_stuff_rate': self.DEFAULT_STUFF_RATE,
-                'def_first_down_rate_allowed': self.DEFAULT_FIRST_DOWN_RATE,
-                'def_third_down_conv_rate_allowed': self.DEFAULT_THIRD_DOWN_RATE,
-                'def_red_zone_td_rate_allowed': self.DEFAULT_RED_ZONE_TD_RATE,
+                "def_explosive_play_rate_allowed": self.DEFAULT_EXPLOSIVE_RATE,
+                "def_stuff_rate": self.DEFAULT_STUFF_RATE,
+                "def_first_down_rate_allowed": self.DEFAULT_FIRST_DOWN_RATE,
+                "def_third_down_conv_rate_allowed": self.DEFAULT_THIRD_DOWN_RATE,
+                "def_red_zone_td_rate_allowed": self.DEFAULT_RED_ZONE_TD_RATE,
             }
 
         conn = self._connect_db()
@@ -438,52 +426,49 @@ class TeamDefensiveFeatures:
 
         if not results:
             return {
-                'def_explosive_play_rate_allowed': self.DEFAULT_EXPLOSIVE_RATE,
-                'def_stuff_rate': self.DEFAULT_STUFF_RATE,
-                'def_first_down_rate_allowed': self.DEFAULT_FIRST_DOWN_RATE,
-                'def_third_down_conv_rate_allowed': self.DEFAULT_THIRD_DOWN_RATE,
-                'def_red_zone_td_rate_allowed': self.DEFAULT_RED_ZONE_TD_RATE,
+                "def_explosive_play_rate_allowed": self.DEFAULT_EXPLOSIVE_RATE,
+                "def_stuff_rate": self.DEFAULT_STUFF_RATE,
+                "def_first_down_rate_allowed": self.DEFAULT_FIRST_DOWN_RATE,
+                "def_third_down_conv_rate_allowed": self.DEFAULT_THIRD_DOWN_RATE,
+                "def_red_zone_td_rate_allowed": self.DEFAULT_RED_ZONE_TD_RATE,
             }
 
         # Order by game recency and apply weights
         df = pd.DataFrame(results)
         game_id_to_idx = {gid: idx for idx, (gid, _, _) in enumerate(games)}
-        df['game_order'] = df['game_id'].map(game_id_to_idx)
-        df = df.sort_values('game_order')
+        df["game_order"] = df["game_id"].map(game_id_to_idx)
+        df = df.sort_values("game_order")
 
         n_results = len(df)
         w = weights[:n_results] / weights[:n_results].sum()
 
         explosive_rate = np.average(
-            df['explosive_rate'].fillna(self.DEFAULT_EXPLOSIVE_RATE).astype(float), weights=w
+            df["explosive_rate"].fillna(self.DEFAULT_EXPLOSIVE_RATE).astype(float), weights=w
         )
         stuff_rate = np.average(
-            df['stuff_rate'].fillna(self.DEFAULT_STUFF_RATE).astype(float), weights=w
+            df["stuff_rate"].fillna(self.DEFAULT_STUFF_RATE).astype(float), weights=w
         )
         first_down_rate = np.average(
-            df['first_down_rate'].fillna(self.DEFAULT_FIRST_DOWN_RATE).astype(float), weights=w
+            df["first_down_rate"].fillna(self.DEFAULT_FIRST_DOWN_RATE).astype(float), weights=w
         )
         third_down_rate = np.average(
-            df['third_down_conv_rate'].fillna(self.DEFAULT_THIRD_DOWN_RATE).astype(float), weights=w
+            df["third_down_conv_rate"].fillna(self.DEFAULT_THIRD_DOWN_RATE).astype(float), weights=w
         )
         red_zone_td_rate = np.average(
-            df['red_zone_td_rate'].fillna(self.DEFAULT_RED_ZONE_TD_RATE).astype(float), weights=w
+            df["red_zone_td_rate"].fillna(self.DEFAULT_RED_ZONE_TD_RATE).astype(float), weights=w
         )
 
         return {
-            'def_explosive_play_rate_allowed': float(explosive_rate),
-            'def_stuff_rate': float(stuff_rate),
-            'def_first_down_rate_allowed': float(first_down_rate),
-            'def_third_down_conv_rate_allowed': float(third_down_rate),
-            'def_red_zone_td_rate_allowed': float(red_zone_td_rate),
+            "def_explosive_play_rate_allowed": float(explosive_rate),
+            "def_stuff_rate": float(stuff_rate),
+            "def_first_down_rate_allowed": float(first_down_rate),
+            "def_third_down_conv_rate_allowed": float(third_down_rate),
+            "def_red_zone_td_rate_allowed": float(red_zone_td_rate),
         }
 
     def _compute_passing_defense_features(
-        self,
-        team: str,
-        games: List[Tuple[str, int, int]],
-        weights: np.ndarray
-    ) -> Dict[str, float]:
+        self, team: str, games: list[tuple[str, int, int]], weights: np.ndarray
+    ) -> dict[str, float]:
         """
         Compute passing defense features with exponential decay.
 
@@ -504,11 +489,11 @@ class TeamDefensiveFeatures:
         """
         if not games:
             return {
-                'def_avg_yds_per_pass_allowed': self.DEFAULT_YDS_PER_PASS,
-                'def_completion_pct_allowed': self.DEFAULT_COMPLETION_PCT,
-                'def_pass_success_rate_allowed': self.DEFAULT_PASS_SUCCESS,
-                'def_sack_rate': self.DEFAULT_SACK_RATE,
-                'def_pressure_rate': self.DEFAULT_PRESSURE_RATE,
+                "def_avg_yds_per_pass_allowed": self.DEFAULT_YDS_PER_PASS,
+                "def_completion_pct_allowed": self.DEFAULT_COMPLETION_PCT,
+                "def_pass_success_rate_allowed": self.DEFAULT_PASS_SUCCESS,
+                "def_sack_rate": self.DEFAULT_SACK_RATE,
+                "def_pressure_rate": self.DEFAULT_PRESSURE_RATE,
             }
 
         conn = self._connect_db()
@@ -542,52 +527,49 @@ class TeamDefensiveFeatures:
 
         if not results:
             return {
-                'def_avg_yds_per_pass_allowed': self.DEFAULT_YDS_PER_PASS,
-                'def_completion_pct_allowed': self.DEFAULT_COMPLETION_PCT,
-                'def_pass_success_rate_allowed': self.DEFAULT_PASS_SUCCESS,
-                'def_sack_rate': self.DEFAULT_SACK_RATE,
-                'def_pressure_rate': self.DEFAULT_PRESSURE_RATE,
+                "def_avg_yds_per_pass_allowed": self.DEFAULT_YDS_PER_PASS,
+                "def_completion_pct_allowed": self.DEFAULT_COMPLETION_PCT,
+                "def_pass_success_rate_allowed": self.DEFAULT_PASS_SUCCESS,
+                "def_sack_rate": self.DEFAULT_SACK_RATE,
+                "def_pressure_rate": self.DEFAULT_PRESSURE_RATE,
             }
 
         # Order by game recency and apply weights
         df = pd.DataFrame(results)
         game_id_to_idx = {gid: idx for idx, (gid, _, _) in enumerate(games)}
-        df['game_order'] = df['game_id'].map(game_id_to_idx)
-        df = df.sort_values('game_order')
+        df["game_order"] = df["game_id"].map(game_id_to_idx)
+        df = df.sort_values("game_order")
 
         n_results = len(df)
         w = weights[:n_results] / weights[:n_results].sum()
 
         avg_yds_per_pass = np.average(
-            df['avg_yds_per_pass'].fillna(self.DEFAULT_YDS_PER_PASS).astype(float), weights=w
+            df["avg_yds_per_pass"].fillna(self.DEFAULT_YDS_PER_PASS).astype(float), weights=w
         )
         completion_pct = np.average(
-            df['completion_pct'].fillna(self.DEFAULT_COMPLETION_PCT).astype(float), weights=w
+            df["completion_pct"].fillna(self.DEFAULT_COMPLETION_PCT).astype(float), weights=w
         )
         pass_success_rate = np.average(
-            df['pass_success_rate'].fillna(self.DEFAULT_PASS_SUCCESS).astype(float), weights=w
+            df["pass_success_rate"].fillna(self.DEFAULT_PASS_SUCCESS).astype(float), weights=w
         )
         sack_rate = np.average(
-            df['sack_rate'].fillna(self.DEFAULT_SACK_RATE).astype(float), weights=w
+            df["sack_rate"].fillna(self.DEFAULT_SACK_RATE).astype(float), weights=w
         )
         pressure_rate = np.average(
-            df['pressure_rate'].fillna(self.DEFAULT_PRESSURE_RATE).astype(float), weights=w
+            df["pressure_rate"].fillna(self.DEFAULT_PRESSURE_RATE).astype(float), weights=w
         )
 
         return {
-            'def_avg_yds_per_pass_allowed': float(avg_yds_per_pass),
-            'def_completion_pct_allowed': float(completion_pct),
-            'def_pass_success_rate_allowed': float(pass_success_rate),
-            'def_sack_rate': float(sack_rate),
-            'def_pressure_rate': float(pressure_rate),
+            "def_avg_yds_per_pass_allowed": float(avg_yds_per_pass),
+            "def_completion_pct_allowed": float(completion_pct),
+            "def_pass_success_rate_allowed": float(pass_success_rate),
+            "def_sack_rate": float(sack_rate),
+            "def_pressure_rate": float(pressure_rate),
         }
 
     def _compute_rushing_defense_features(
-        self,
-        team: str,
-        games: List[Tuple[str, int, int]],
-        weights: np.ndarray
-    ) -> Dict[str, float]:
+        self, team: str, games: list[tuple[str, int, int]], weights: np.ndarray
+    ) -> dict[str, float]:
         """
         Compute rushing defense features with exponential decay.
 
@@ -605,8 +587,8 @@ class TeamDefensiveFeatures:
         """
         if not games:
             return {
-                'def_avg_yds_per_rush_allowed': self.DEFAULT_YDS_PER_RUSH,
-                'def_rush_success_rate_allowed': self.DEFAULT_RUSH_SUCCESS,
+                "def_avg_yds_per_rush_allowed": self.DEFAULT_YDS_PER_RUSH,
+                "def_rush_success_rate_allowed": self.DEFAULT_RUSH_SUCCESS,
             }
 
         conn = self._connect_db()
@@ -635,37 +617,34 @@ class TeamDefensiveFeatures:
 
         if not results:
             return {
-                'def_avg_yds_per_rush_allowed': self.DEFAULT_YDS_PER_RUSH,
-                'def_rush_success_rate_allowed': self.DEFAULT_RUSH_SUCCESS,
+                "def_avg_yds_per_rush_allowed": self.DEFAULT_YDS_PER_RUSH,
+                "def_rush_success_rate_allowed": self.DEFAULT_RUSH_SUCCESS,
             }
 
         # Order by game recency and apply weights
         df = pd.DataFrame(results)
         game_id_to_idx = {gid: idx for idx, (gid, _, _) in enumerate(games)}
-        df['game_order'] = df['game_id'].map(game_id_to_idx)
-        df = df.sort_values('game_order')
+        df["game_order"] = df["game_id"].map(game_id_to_idx)
+        df = df.sort_values("game_order")
 
         n_results = len(df)
         w = weights[:n_results] / weights[:n_results].sum()
 
         avg_yds_per_rush = np.average(
-            df['avg_yds_per_rush'].fillna(self.DEFAULT_YDS_PER_RUSH).astype(float), weights=w
+            df["avg_yds_per_rush"].fillna(self.DEFAULT_YDS_PER_RUSH).astype(float), weights=w
         )
         rush_success_rate = np.average(
-            df['rush_success_rate'].fillna(self.DEFAULT_RUSH_SUCCESS).astype(float), weights=w
+            df["rush_success_rate"].fillna(self.DEFAULT_RUSH_SUCCESS).astype(float), weights=w
         )
 
         return {
-            'def_avg_yds_per_rush_allowed': float(avg_yds_per_rush),
-            'def_rush_success_rate_allowed': float(rush_success_rate),
+            "def_avg_yds_per_rush_allowed": float(avg_yds_per_rush),
+            "def_rush_success_rate_allowed": float(rush_success_rate),
         }
 
     def _compute_game_level_features(
-        self,
-        team: str,
-        games: List[Tuple[str, int, int]],
-        weights: np.ndarray
-    ) -> Dict[str, float]:
+        self, team: str, games: list[tuple[str, int, int]], weights: np.ndarray
+    ) -> dict[str, float]:
         """
         Compute game-level defensive features with exponential decay.
 
@@ -688,13 +667,13 @@ class TeamDefensiveFeatures:
         """
         if not games:
             return {
-                'def_points_allowed_per_game': self.DEFAULT_POINTS_ALLOWED,
-                'def_yds_allowed_per_game': self.DEFAULT_YDS_ALLOWED,
-                'def_pass_yds_allowed_per_game': self.DEFAULT_PASS_YDS_ALLOWED,
-                'def_rush_yds_allowed_per_game': self.DEFAULT_RUSH_YDS_ALLOWED,
-                'def_scoring_drives_pct_allowed': self.DEFAULT_SCORING_DRIVES_PCT,
-                'def_penalty_rate': self.DEFAULT_PENALTY_RATE,
-                'def_blitz_rate': self.DEFAULT_BLITZ_RATE,
+                "def_points_allowed_per_game": self.DEFAULT_POINTS_ALLOWED,
+                "def_yds_allowed_per_game": self.DEFAULT_YDS_ALLOWED,
+                "def_pass_yds_allowed_per_game": self.DEFAULT_PASS_YDS_ALLOWED,
+                "def_rush_yds_allowed_per_game": self.DEFAULT_RUSH_YDS_ALLOWED,
+                "def_scoring_drives_pct_allowed": self.DEFAULT_SCORING_DRIVES_PCT,
+                "def_penalty_rate": self.DEFAULT_PENALTY_RATE,
+                "def_blitz_rate": self.DEFAULT_BLITZ_RATE,
             }
 
         conn = self._connect_db()
@@ -747,65 +726,64 @@ class TeamDefensiveFeatures:
 
         if not points_results or not yards_results:
             return {
-                'def_points_allowed_per_game': self.DEFAULT_POINTS_ALLOWED,
-                'def_yds_allowed_per_game': self.DEFAULT_YDS_ALLOWED,
-                'def_pass_yds_allowed_per_game': self.DEFAULT_PASS_YDS_ALLOWED,
-                'def_rush_yds_allowed_per_game': self.DEFAULT_RUSH_YDS_ALLOWED,
-                'def_scoring_drives_pct_allowed': self.DEFAULT_SCORING_DRIVES_PCT,
-                'def_penalty_rate': self.DEFAULT_PENALTY_RATE,
-                'def_blitz_rate': self.DEFAULT_BLITZ_RATE,
+                "def_points_allowed_per_game": self.DEFAULT_POINTS_ALLOWED,
+                "def_yds_allowed_per_game": self.DEFAULT_YDS_ALLOWED,
+                "def_pass_yds_allowed_per_game": self.DEFAULT_PASS_YDS_ALLOWED,
+                "def_rush_yds_allowed_per_game": self.DEFAULT_RUSH_YDS_ALLOWED,
+                "def_scoring_drives_pct_allowed": self.DEFAULT_SCORING_DRIVES_PCT,
+                "def_penalty_rate": self.DEFAULT_PENALTY_RATE,
+                "def_blitz_rate": self.DEFAULT_BLITZ_RATE,
             }
 
         # Merge points and yards data
         df_points = pd.DataFrame(points_results)
         df_yards = pd.DataFrame(yards_results)
-        df = df_points.merge(df_yards, on='game_id', how='outer')
+        df = df_points.merge(df_yards, on="game_id", how="outer")
 
         # Order by game recency and apply weights
         game_id_to_idx = {gid: idx for idx, (gid, _, _) in enumerate(games)}
-        df['game_order'] = df['game_id'].map(game_id_to_idx)
-        df = df.sort_values('game_order')
+        df["game_order"] = df["game_id"].map(game_id_to_idx)
+        df = df.sort_values("game_order")
 
         n_results = len(df)
         w = weights[:n_results] / weights[:n_results].sum()
 
         points_allowed = np.average(
-            df['points_allowed'].fillna(self.DEFAULT_POINTS_ALLOWED).astype(float), weights=w
+            df["points_allowed"].fillna(self.DEFAULT_POINTS_ALLOWED).astype(float), weights=w
         )
         yds_allowed = np.average(
-            df['total_yards'].fillna(self.DEFAULT_YDS_ALLOWED).astype(float), weights=w
+            df["total_yards"].fillna(self.DEFAULT_YDS_ALLOWED).astype(float), weights=w
         )
         pass_yds_allowed = np.average(
-            df['pass_yards'].fillna(self.DEFAULT_PASS_YDS_ALLOWED).astype(float), weights=w
+            df["pass_yards"].fillna(self.DEFAULT_PASS_YDS_ALLOWED).astype(float), weights=w
         )
         rush_yds_allowed = np.average(
-            df['rush_yards'].fillna(self.DEFAULT_RUSH_YDS_ALLOWED).astype(float), weights=w
+            df["rush_yards"].fillna(self.DEFAULT_RUSH_YDS_ALLOWED).astype(float), weights=w
         )
         scoring_drives_pct = np.average(
-            df['scoring_drives_pct'].fillna(self.DEFAULT_SCORING_DRIVES_PCT).astype(float), weights=w
+            df["scoring_drives_pct"].fillna(self.DEFAULT_SCORING_DRIVES_PCT).astype(float),
+            weights=w,
         )
         penalty_rate = np.average(
-            df['penalty_rate'].fillna(self.DEFAULT_PENALTY_RATE).astype(float), weights=w
+            df["penalty_rate"].fillna(self.DEFAULT_PENALTY_RATE).astype(float), weights=w
         )
         blitz_rate = np.average(
-            df['blitz_proxy'].fillna(self.DEFAULT_BLITZ_RATE).astype(float), weights=w
+            df["blitz_proxy"].fillna(self.DEFAULT_BLITZ_RATE).astype(float), weights=w
         )
 
         return {
-            'def_points_allowed_per_game': float(points_allowed),
-            'def_yds_allowed_per_game': float(yds_allowed),
-            'def_pass_yds_allowed_per_game': float(pass_yds_allowed),
-            'def_rush_yds_allowed_per_game': float(rush_yds_allowed),
-            'def_scoring_drives_pct_allowed': float(scoring_drives_pct),
-            'def_penalty_rate': float(penalty_rate),
-            'def_blitz_rate': float(blitz_rate),
+            "def_points_allowed_per_game": float(points_allowed),
+            "def_yds_allowed_per_game": float(yds_allowed),
+            "def_pass_yds_allowed_per_game": float(pass_yds_allowed),
+            "def_rush_yds_allowed_per_game": float(rush_yds_allowed),
+            "def_scoring_drives_pct_allowed": float(scoring_drives_pct),
+            "def_penalty_rate": float(penalty_rate),
+            "def_blitz_rate": float(blitz_rate),
         }
 
     def _compute_variance_features(
-        self,
-        team: str,
-        games: List[Tuple[str, int, int]]
-    ) -> Dict[str, float]:
+        self, team: str, games: list[tuple[str, int, int]]
+    ) -> dict[str, float]:
         """
         Compute defensive performance variance features.
 
@@ -828,9 +806,9 @@ class TeamDefensiveFeatures:
         if not games or len(games) < 2:
             # Need at least 2 games to compute variance
             return {
-                'def_epa_std_4wk': self.DEFAULT_DEF_EPA_STD,
-                'def_points_allowed_std_4wk': self.DEFAULT_DEF_POINTS_STD,
-                'def_epa_consistency_score': self.DEFAULT_DEF_CONSISTENCY_SCORE,
+                "def_epa_std_4wk": self.DEFAULT_DEF_EPA_STD,
+                "def_points_allowed_std_4wk": self.DEFAULT_DEF_POINTS_STD,
+                "def_epa_consistency_score": self.DEFAULT_DEF_CONSISTENCY_SCORE,
             }
 
         conn = self._connect_db()
@@ -865,9 +843,9 @@ class TeamDefensiveFeatures:
 
         if not results or len(results) < 2:
             return {
-                'def_epa_std_4wk': self.DEFAULT_DEF_EPA_STD,
-                'def_points_allowed_std_4wk': self.DEFAULT_DEF_POINTS_STD,
-                'def_epa_consistency_score': self.DEFAULT_DEF_CONSISTENCY_SCORE,
+                "def_epa_std_4wk": self.DEFAULT_DEF_EPA_STD,
+                "def_points_allowed_std_4wk": self.DEFAULT_DEF_POINTS_STD,
+                "def_epa_consistency_score": self.DEFAULT_DEF_CONSISTENCY_SCORE,
             }
 
         # Convert to pandas for rolling std computation
@@ -875,12 +853,12 @@ class TeamDefensiveFeatures:
 
         # Order by game recency (match games order)
         game_id_to_idx = {gid: idx for idx, (gid, _, _) in enumerate(games)}
-        df['game_order'] = df['game_id'].map(game_id_to_idx)
-        df = df.sort_values('game_order')
+        df["game_order"] = df["game_id"].map(game_id_to_idx)
+        df = df.sort_values("game_order")
 
         # Compute standard deviations
-        epa_std = df['game_epa_allowed'].std()
-        points_std = df['points_allowed'].std()
+        epa_std = df["game_epa_allowed"].std()
+        points_std = df["points_allowed"].std()
 
         # Compute consistency score (1 - normalized_std)
         # Normalize EPA std to 0-1 range (assume 0.3 is high variance)
@@ -889,17 +867,14 @@ class TeamDefensiveFeatures:
         consistency_score = 1.0 - normalized_epa_std
 
         return {
-            'def_epa_std_4wk': float(epa_std if not pd.isna(epa_std) else self.DEFAULT_DEF_EPA_STD),
-            'def_points_allowed_std_4wk': float(points_std if not pd.isna(points_std) else self.DEFAULT_DEF_POINTS_STD),
-            'def_epa_consistency_score': float(consistency_score),
+            "def_epa_std_4wk": float(epa_std if not pd.isna(epa_std) else self.DEFAULT_DEF_EPA_STD),
+            "def_points_allowed_std_4wk": float(
+                points_std if not pd.isna(points_std) else self.DEFAULT_DEF_POINTS_STD
+            ),
+            "def_epa_consistency_score": float(consistency_score),
         }
 
-    def extract_features(
-        self,
-        team: str,
-        season: int,
-        week: int
-    ) -> Dict[str, float]:
+    def extract_features(self, team: str, season: int, week: int) -> dict[str, float]:
         """
         Extract all 27 defensive features for a team at a specific game.
 
@@ -970,18 +945,10 @@ class TeamDefensiveFeatures:
         explosive_features = self._compute_explosive_efficiency_features(
             team, recent_games, weights
         )
-        passing_features = self._compute_passing_defense_features(
-            team, recent_games, weights
-        )
-        rushing_features = self._compute_rushing_defense_features(
-            team, recent_games, weights
-        )
-        game_features = self._compute_game_level_features(
-            team, recent_games, weights
-        )
-        variance_features = self._compute_variance_features(
-            team, recent_games
-        )
+        passing_features = self._compute_passing_defense_features(team, recent_games, weights)
+        rushing_features = self._compute_rushing_defense_features(team, recent_games, weights)
+        game_features = self._compute_game_level_features(team, recent_games, weights)
+        variance_features = self._compute_variance_features(team, recent_games)
 
         # Merge all features
         all_features = {
@@ -995,12 +962,7 @@ class TeamDefensiveFeatures:
 
         return all_features
 
-    def validate_no_leakage(
-        self,
-        team: str,
-        season: int,
-        week: int
-    ) -> bool:
+    def validate_no_leakage(self, team: str, season: int, week: int) -> bool:
         """
         Validate temporal safety: ensure all games are BEFORE target week.
 
@@ -1016,10 +978,7 @@ class TeamDefensiveFeatures:
 
         for game_id, game_season, game_week in recent_games:
             # Check: game is BEFORE target
-            is_before = (
-                game_season < season or
-                (game_season == season and game_week < week)
-            )
+            is_before = game_season < season or (game_season == season and game_week < week)
             if not is_before:
                 logger.error(
                     f"TEMPORAL LEAKAGE DETECTED: {team} game {game_id} "
@@ -1049,20 +1008,10 @@ def main():
     parser.add_argument(
         "--test-team",
         default="KC",
-        help="Test team abbreviation (default: KC for Kansas City Chiefs)"
+        help="Test team abbreviation (default: KC for Kansas City Chiefs)",
     )
-    parser.add_argument(
-        "--test-season",
-        type=int,
-        default=2024,
-        help="Test season (default: 2024)"
-    )
-    parser.add_argument(
-        "--test-week",
-        type=int,
-        default=10,
-        help="Test week (default: 10)"
-    )
+    parser.add_argument("--test-season", type=int, default=2024, help="Test season (default: 2024)")
+    parser.add_argument("--test-week", type=int, default=10, help="Test week (default: 10)")
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
 
     args = parser.parse_args()
@@ -1081,9 +1030,7 @@ def main():
 
     # Extract all 27 features
     features = engine.extract_features(
-        team=args.test_team,
-        season=args.test_season,
-        week=args.test_week
+        team=args.test_team, season=args.test_season, week=args.test_week
     )
 
     print("Team Defensive Features (27 total):")
@@ -1134,11 +1081,7 @@ def main():
     print("TEMPORAL SAFETY VALIDATION")
     print("=" * 80)
 
-    is_valid = engine.validate_no_leakage(
-        args.test_team,
-        args.test_season,
-        args.test_week
-    )
+    is_valid = engine.validate_no_leakage(args.test_team, args.test_season, args.test_week)
 
     if is_valid:
         print("✓ PASSED: All games are BEFORE target week (no temporal leakage)")

@@ -55,17 +55,17 @@ Example Violations:
     - home_score + away_score != total_points
 """
 
+import logging
 import re
 import sys
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set, Tuple
-import logging
+from typing import Any
 
 try:
-    import pandas as pd
     import numpy as np
+    import pandas as pd
 
     PANDAS_AVAILABLE = True
 except ImportError:
@@ -193,10 +193,10 @@ class ValidationIssue:
     severity: Severity
     category: str  # e.g., "position_eligibility", "stat_range", "schedule"
     message: str
-    details: Optional[str] = None
-    row_index: Optional[int] = None
-    column: Optional[str] = None
-    value: Optional[Any] = None
+    details: str | None = None
+    row_index: int | None = None
+    column: str | None = None
+    value: Any | None = None
 
     def __str__(self) -> str:
         """Format issue for display"""
@@ -216,9 +216,9 @@ class ValidationIssue:
 class ValidationReport:
     """Aggregated validation report"""
 
-    issues: List[ValidationIssue] = field(default_factory=list)
+    issues: list[ValidationIssue] = field(default_factory=list)
     rows_checked: int = 0
-    dataset_name: Optional[str] = None
+    dataset_name: str | None = None
 
     def add_issue(self, issue: ValidationIssue) -> None:
         """Add issue to report"""
@@ -232,7 +232,7 @@ class ValidationReport:
         """Check if report contains WARNING-level issues"""
         return any(issue.severity == Severity.WARNING for issue in self.issues)
 
-    def get_issues_by_severity(self, severity: Severity) -> List[ValidationIssue]:
+    def get_issues_by_severity(self, severity: Severity) -> list[ValidationIssue]:
         """Filter issues by severity"""
         return [issue for issue in self.issues if issue.severity == severity]
 
@@ -316,7 +316,7 @@ class SportsAnalyticsValidator:
     def validate_dataframe(
         self,
         df: pd.DataFrame,
-        dataset_name: Optional[str] = None,
+        dataset_name: str | None = None,
     ) -> ValidationReport:
         """
         Validate DataFrame against NFL domain rules.
@@ -362,7 +362,9 @@ class SportsAnalyticsValidator:
             eligible_stats = POSITION_STAT_ELIGIBILITY.get(position, set())
 
             # Type narrowing: Convert stat_category to str for comparison
-            stat_category_str = str(stat_category) if not isinstance(stat_category, str) else stat_category
+            stat_category_str = (
+                str(stat_category) if not isinstance(stat_category, str) else stat_category
+            )
 
             # Check if stat category is eligible
             if stat_category_str not in eligible_stats:
@@ -487,7 +489,7 @@ class SportsAnalyticsValidator:
                         severity=Severity.ERROR,
                         category="schedule",
                         message=f"Invalid week number: {row['week']}",
-                        details=f"Regular season: 1-18, Playoffs: 19-22",
+                        details="Regular season: 1-18, Playoffs: 19-22",
                         row_index=int(idx) if isinstance(idx, (int, np.integer)) else None,
                         column="week",
                         value=row["week"],
@@ -546,7 +548,7 @@ class SportsAnalyticsValidator:
                         ValidationIssue(
                             severity=Severity.ERROR,
                             category="team_abbreviation",
-                            message=f"Ambiguous team abbreviation: 'LA'",
+                            message="Ambiguous team abbreviation: 'LA'",
                             details="Use 'LAR' (LA Rams) or 'LAC' (LA Chargers)",
                             row_index=int(idx) if isinstance(idx, (int, np.integer)) else None,
                             column=col,
@@ -568,7 +570,9 @@ class SportsAnalyticsValidator:
                                     category="team_abbreviation",
                                     message=f"Outdated team abbreviation: '{team}' in {season}",
                                     details=f"Team relocated to '{new_abbrev}' in {relocation_year}",
-                                    row_index=int(idx) if isinstance(idx, (int, np.integer)) else None,
+                                    row_index=(
+                                        int(idx) if isinstance(idx, (int, np.integer)) else None
+                                    ),
                                     column=col,
                                     value=team,
                                 )
@@ -631,7 +635,7 @@ class SportsAnalyticsValidator:
                         severity=Severity.WARNING,
                         category="game_results",
                         message=f"Unusually high home score: {home_score}",
-                        details=f"Historical max: 73 points (1940)",
+                        details="Historical max: 73 points (1940)",
                         row_index=int(idx) if isinstance(idx, (int, np.integer)) else None,
                         column="home_score",
                         value=home_score,
@@ -644,7 +648,7 @@ class SportsAnalyticsValidator:
                         severity=Severity.WARNING,
                         category="game_results",
                         message=f"Unusually high away score: {away_score}",
-                        details=f"Historical max: 73 points (1940)",
+                        details="Historical max: 73 points (1940)",
                         row_index=int(idx) if isinstance(idx, (int, np.integer)) else None,
                         column="away_score",
                         value=away_score,
@@ -683,7 +687,7 @@ class SportsAnalyticsValidator:
                             )
                         )
 
-    def check_query_logic(self, query: str) -> List[ValidationIssue]:
+    def check_query_logic(self, query: str) -> list[ValidationIssue]:
         """
         Check SQL query for NFL domain logic violations.
 
@@ -773,7 +777,7 @@ class SportsAnalyticsValidator:
 
         return issues
 
-    def validate_query_file(self, query_path: Path) -> List[ValidationIssue]:
+    def validate_query_file(self, query_path: Path) -> list[ValidationIssue]:
         """
         Validate SQL query from file.
 
@@ -783,7 +787,7 @@ class SportsAnalyticsValidator:
         Returns:
             List of validation issues
         """
-        with open(query_path, "r") as f:
+        with open(query_path) as f:
             query = f.read()
 
         return self.check_query_logic(query)

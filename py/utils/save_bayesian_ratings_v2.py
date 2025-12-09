@@ -15,12 +15,11 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-import sys
 import logging
-from pathlib import Path
+import sys
 
 # Import the robust R service
-from py.utils.r_service import get_r_service, ensure_r_healthy, RServiceError
+from py.utils.r_service import RServiceError, ensure_r_healthy, get_r_service
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -174,9 +173,7 @@ def main():
         logger.info("This may take 2-5 minutes depending on model size...")
 
         result = r_service.execute(
-            r_code=R_SCRIPT,
-            timeout=300,  # 5 minutes max
-            retry=True    # Enable automatic retries
+            r_code=R_SCRIPT, timeout=300, retry=True  # 5 minutes max  # Enable automatic retries
         )
 
         # Print R output

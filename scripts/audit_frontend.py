@@ -24,38 +24,24 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from py.agents.frontend_auditor import FrontendAuditor
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Frontend Audit Agent - Automated UI/UX, data, and accessibility checks'
+        description="Frontend Audit Agent - Automated UI/UX, data, and accessibility checks"
+    )
+    parser.add_argument("--page", help="Audit specific page only")
+    parser.add_argument(
+        "--severity", help="Filter by severity (comma-separated: critical,high,medium,low)"
+    )
+    parser.add_argument("--ci", action="store_true", help="CI/CD mode - machine-readable output")
+    parser.add_argument(
+        "--fail-on", help="Fail if issues of this severity found (critical, high, medium, low)"
     )
     parser.add_argument(
-        '--page',
-        help='Audit specific page only'
-    )
-    parser.add_argument(
-        '--severity',
-        help='Filter by severity (comma-separated: critical,high,medium,low)'
-    )
-    parser.add_argument(
-        '--ci',
-        action='store_true',
-        help='CI/CD mode - machine-readable output'
-    )
-    parser.add_argument(
-        '--fail-on',
-        help='Fail if issues of this severity found (critical, high, medium, low)'
-    )
-    parser.add_argument(
-        '--output-dir',
-        default='docs/audits',
-        help='Output directory for audit reports'
+        "--output-dir", default="docs/audits", help="Output directory for audit reports"
     )
 
     args = parser.parse_args()
@@ -66,7 +52,7 @@ def main():
     # Run audit
     if args.page:
         logger.info(f"Auditing specific page: {args.page}")
-        issues = auditor.audit_page(args.page)
+        auditor.audit_page(args.page)
         report = None  # TODO: Create report from issues
     else:
         logger.info("Running full frontend audit...")
@@ -74,7 +60,7 @@ def main():
 
     # Filter by severity if requested
     if args.severity and report:
-        severities = [s.strip() for s in args.severity.split(',')]
+        severities = [s.strip() for s in args.severity.split(",")]
         filtered_issues = report.filter_by_severity(*severities)
         logger.info(f"Filtered to {len(filtered_issues)} issues with severity: {severities}")
     else:
@@ -88,7 +74,7 @@ def main():
 
     # Check fail condition
     if args.fail_on and report:
-        fail_severities = [s.strip() for s in args.fail_on.split(',')]
+        fail_severities = [s.strip() for s in args.fail_on.split(",")]
         fail_issues = report.filter_by_severity(*fail_severities)
 
         if fail_issues:
@@ -101,5 +87,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

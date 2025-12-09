@@ -16,7 +16,6 @@ import logging
 import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -40,10 +39,10 @@ class CacheStats:
     cache_size_mb: float
     hit_rate: float
     avg_lookup_time_ms: float
-    oldest_prediction: Optional[datetime]
-    newest_prediction: Optional[datetime]
-    predictions_by_model: Dict[str, int]
-    predictions_by_stat_type: Dict[str, int]
+    oldest_prediction: datetime | None
+    newest_prediction: datetime | None
+    predictions_by_model: dict[str, int]
+    predictions_by_stat_type: dict[str, int]
 
 
 @dataclass
@@ -57,7 +56,7 @@ class ValidationReport:
     nan_predictions: int
     out_of_range_predictions: int
     orphaned_predictions: int
-    issues: List[str]
+    issues: list[str]
 
     def is_valid(self) -> bool:
         """Check if cache passed validation."""
@@ -70,7 +69,7 @@ class ValidationReport:
     def summary(self) -> str:
         """Generate human-readable summary."""
         lines = [
-            f"Cache Validation Report",
+            "Cache Validation Report",
             f"  Total Checked: {self.total_checked:,}",
             f"  Valid: {self.valid_predictions:,}",
             f"  Invalid: {self.invalid_predictions:,}",
@@ -80,7 +79,7 @@ class ValidationReport:
             f"  Orphaned: {self.orphaned_predictions:,}",
         ]
         if self.issues:
-            lines.append(f"\nIssues Found:")
+            lines.append("\nIssues Found:")
             for issue in self.issues[:10]:  # Show first 10 issues
                 lines.append(f"  - {issue}")
             if len(self.issues) > 10:
@@ -116,7 +115,7 @@ class PredictionCacheManager:
     BATCH_SIZE = 1000
     BACKFILL_BATCH_SIZE = 5000
 
-    def __init__(self, db_url: Optional[str] = None):
+    def __init__(self, db_url: str | None = None):
         """
         Initialize cache manager.
 
@@ -263,9 +262,9 @@ class PredictionCacheManager:
         stat_type: str,
         season: int,
         week: int,
-        model_name: Optional[str] = None,
-        max_age_hours: Optional[int] = None,
-    ) -> Optional[float]:
+        model_name: str | None = None,
+        max_age_hours: int | None = None,
+    ) -> float | None:
         """
         Fast lookup of cached prediction.
 
@@ -338,10 +337,10 @@ class PredictionCacheManager:
 
     def invalidate_cache(
         self,
-        model_name: Optional[str] = None,
-        stat_type: Optional[str] = None,
-        season: Optional[int] = None,
-        older_than_hours: Optional[int] = None,
+        model_name: str | None = None,
+        stat_type: str | None = None,
+        season: int | None = None,
+        older_than_hours: int | None = None,
     ) -> int:
         """
         Invalidate (delete) cached predictions matching criteria.
@@ -414,15 +413,11 @@ class PredictionCacheManager:
             total_predictions = cursor.fetchone()[0]
 
             # Unique players
-            cursor.execute(
-                "SELECT COUNT(DISTINCT player_id) FROM ml.r_model_predictions"
-            )
+            cursor.execute("SELECT COUNT(DISTINCT player_id) FROM ml.r_model_predictions")
             unique_players = cursor.fetchone()[0]
 
             # Unique models
-            cursor.execute(
-                "SELECT COUNT(DISTINCT model_name) FROM ml.r_model_predictions"
-            )
+            cursor.execute("SELECT COUNT(DISTINCT model_name) FROM ml.r_model_predictions")
             unique_models = cursor.fetchone()[0]
 
             # Cache size
@@ -466,14 +461,10 @@ class PredictionCacheManager:
 
             # Calculate hit rate
             total_lookups = self._hit_count + self._miss_count
-            hit_rate = (
-                (self._hit_count / total_lookups * 100) if total_lookups > 0 else 0.0
-            )
+            hit_rate = (self._hit_count / total_lookups * 100) if total_lookups > 0 else 0.0
 
             # Average lookup time
-            avg_lookup_time = (
-                np.mean(self._lookup_times) if self._lookup_times else 0.0
-            )
+            avg_lookup_time = np.mean(self._lookup_times) if self._lookup_times else 0.0
 
             return CacheStats(
                 total_predictions=total_predictions,
@@ -491,7 +482,7 @@ class PredictionCacheManager:
         finally:
             cursor.close()
 
-    def validate_cache_integrity(self, sample_size: Optional[int] = None) -> ValidationReport:
+    def validate_cache_integrity(self, sample_size: int | None = None) -> ValidationReport:
         """
         Validate cache data integrity.
 
@@ -552,9 +543,7 @@ class PredictionCacheManager:
                 # Check for NaN
                 if prediction is None or np.isnan(prediction):
                     nan_predictions += 1
-                    issues.append(
-                        f"NaN prediction for {player_id}/{stat_type}/{season}/{week}"
-                    )
+                    issues.append(f"NaN prediction for {player_id}/{stat_type}/{season}/{week}")
                     continue
 
                 # Check range
@@ -605,13 +594,9 @@ class PredictionCacheManager:
             )
             orphaned_predictions = cursor.fetchone()[0] or 0
             if orphaned_predictions > 0:
-                issues.append(
-                    f"{orphaned_predictions} predictions for players not in database"
-                )
+                issues.append(f"{orphaned_predictions} predictions for players not in database")
 
-            invalid_predictions = (
-                nan_predictions + out_of_range_predictions + duplicate_predictions
-            )
+            invalid_predictions = nan_predictions + out_of_range_predictions + duplicate_predictions
 
             return ValidationReport(
                 total_checked=total_checked,
@@ -627,7 +612,7 @@ class PredictionCacheManager:
         finally:
             cursor.close()
 
-    def optimize_indexes(self) -> Dict[str, bool]:
+    def optimize_indexes(self) -> dict[str, bool]:
         """
         Optimize cache table indexes for performance.
 
@@ -707,10 +692,10 @@ class PredictionCacheManager:
         self,
         model_name: str,
         stat_type: str,
-        seasons: List[int],
+        seasons: list[int],
         rpy2_prediction_function,
-        player_ids: Optional[List[str]] = None,
-    ) -> Tuple[int, int]:
+        player_ids: list[str] | None = None,
+    ) -> tuple[int, int]:
         """
         Backfill cache from existing rpy2 model predictions.
 
@@ -724,9 +709,7 @@ class PredictionCacheManager:
         Returns:
             Tuple of (total_predictions, cached_predictions)
         """
-        logger.info(
-            f"Starting backfill for {model_name}/{stat_type} across {len(seasons)} seasons"
-        )
+        logger.info(f"Starting backfill for {model_name}/{stat_type} across {len(seasons)} seasons")
 
         total_predictions = 0
         cached_predictions = 0
@@ -749,9 +732,7 @@ class PredictionCacheManager:
                 # Cache in batches
                 for i in range(0, len(predictions_df), self.BACKFILL_BATCH_SIZE):
                     batch = predictions_df.iloc[i : i + self.BACKFILL_BATCH_SIZE]
-                    cached = self.cache_predictions(
-                        batch, model_name, stat_type, validate=True
-                    )
+                    cached = self.cache_predictions(batch, model_name, stat_type, validate=True)
                     cached_predictions += cached
 
                     logger.info(
@@ -770,9 +751,7 @@ class PredictionCacheManager:
 
         return total_predictions, cached_predictions
 
-    def _validate_predictions(
-        self, predictions: pd.DataFrame, stat_type: str
-    ) -> pd.DataFrame:
+    def _validate_predictions(self, predictions: pd.DataFrame, stat_type: str) -> pd.DataFrame:
         """
         Validate predictions before caching.
 
@@ -793,8 +772,7 @@ class PredictionCacheManager:
         if stat_type in self.STAT_RANGES:
             min_val, max_val = self.STAT_RANGES[stat_type]
             predictions = predictions[
-                (predictions["prediction"] >= min_val)
-                & (predictions["prediction"] <= max_val)
+                (predictions["prediction"] >= min_val) & (predictions["prediction"] <= max_val)
             ]
 
         # Remove invalid player IDs
@@ -802,12 +780,8 @@ class PredictionCacheManager:
         predictions = predictions[predictions["player_id"] != ""]
 
         # Remove invalid seasons/weeks
-        predictions = predictions[
-            (predictions["season"] >= 2015) & (predictions["season"] <= 2030)
-        ]
-        predictions = predictions[
-            (predictions["week"] >= 1) & (predictions["week"] <= 22)
-        ]
+        predictions = predictions[(predictions["season"] >= 2015) & (predictions["season"] <= 2030)]
+        predictions = predictions[(predictions["week"] >= 1) & (predictions["week"] <= 22)]
 
         removed = initial_count - len(predictions)
         if removed > 0:
@@ -857,10 +831,10 @@ def main():
         print(f"Avg Lookup Time: {stats.avg_lookup_time_ms:.2f} ms")
         print(f"Oldest Prediction: {stats.oldest_prediction}")
         print(f"Newest Prediction: {stats.newest_prediction}")
-        print(f"\nPredictions by Model:")
+        print("\nPredictions by Model:")
         for model, count in stats.predictions_by_model.items():
             print(f"  {model}: {count:,}")
-        print(f"\nPredictions by Stat Type:")
+        print("\nPredictions by Stat Type:")
         for stat, count in stats.predictions_by_stat_type.items():
             print(f"  {stat}: {count:,}")
         print(f"{'='*60}\n")

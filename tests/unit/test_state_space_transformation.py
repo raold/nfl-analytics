@@ -9,7 +9,6 @@ See: STATE_SPACE_COMPREHENSIVE_DIAGNOSIS.md (Bug A1: Unit Mismatch)
 """
 
 import numpy as np
-import pytest
 
 
 def test_lognormal_transformation_math():
@@ -41,8 +40,8 @@ def test_lognormal_transformation_math():
     # Sanity checks
     assert mean > 100  # Realistic passing yards (not 5-10 which is log-scale)
     assert mean < 500  # Not absurdly high
-    assert std > 10    # Reasonable uncertainty
-    assert std < 200   # Not absurdly wide
+    assert std > 10  # Reasonable uncertainty
+    assert std < 200  # Not absurdly wide
 
     print(f"✓ Transformation Test 1: log_mean={log_mean:.2f}, log_std={log_std:.2f}")
     print(f"  → yards_mean={mean:.1f}, yards_std={std:.1f}")
@@ -57,9 +56,9 @@ def test_lognormal_transformation_realistic_values():
     """
     test_cases = [
         # (log_mean, log_std, expected_mean_range, expected_std_range)
-        (4.5, 0.2, (90, 100), (18, 20)),     # Low-end QB (backup)
-        (5.0, 0.3, (150, 170), (45, 55)),    # Average QB
-        (5.5, 0.35, (240, 270), (85, 95)),   # High-end QB (starter)
+        (4.5, 0.2, (90, 100), (18, 20)),  # Low-end QB (backup)
+        (5.0, 0.3, (150, 170), (45, 55)),  # Average QB
+        (5.5, 0.35, (240, 270), (85, 95)),  # High-end QB (starter)
     ]
 
     for log_mean, log_std, mean_range, std_range in test_cases:
@@ -67,13 +66,17 @@ def test_lognormal_transformation_realistic_values():
         std = mean * log_std
 
         # Check ranges
-        assert mean_range[0] <= mean <= mean_range[1], \
-            f"Mean {mean:.1f} not in expected range {mean_range}"
-        assert std_range[0] <= std <= std_range[1], \
-            f"Std {std:.1f} not in expected range {std_range}"
+        assert (
+            mean_range[0] <= mean <= mean_range[1]
+        ), f"Mean {mean:.1f} not in expected range {mean_range}"
+        assert (
+            std_range[0] <= std <= std_range[1]
+        ), f"Std {std:.1f} not in expected range {std_range}"
 
-        print(f"✓ Realistic Test: log({log_mean:.1f}, {log_std:.2f}) → "
-              f"yards({mean:.1f} ± {std:.1f})")
+        print(
+            f"✓ Realistic Test: log({log_mean:.1f}, {log_std:.2f}) → "
+            f"yards({mean:.1f} ± {std:.1f})"
+        )
 
 
 def test_transformation_vs_no_transformation():
@@ -86,7 +89,7 @@ def test_transformation_vs_no_transformation():
 
     # BUGGY CODE (treats log-scale as yards directly)
     buggy_mean = log_mean  # 5.7 yards - WRONG!
-    buggy_std = log_std    # 0.3 yards - WRONG!
+    buggy_std = log_std  # 0.3 yards - WRONG!
 
     # FIXED CODE (transforms to yards)
     fixed_mean = np.exp(log_mean + 0.5 * log_std**2)
@@ -95,10 +98,12 @@ def test_transformation_vs_no_transformation():
     # Calculate underestimation
     underestimation_factor = fixed_mean / buggy_mean
 
-    print(f"\n✓ Bug Demonstration:")
+    print("\n✓ Bug Demonstration:")
     print(f"  BUGGY:  {buggy_mean:.1f} ± {buggy_std:.1f} yards (treats log-scale as yards)")
     print(f"  FIXED:  {fixed_mean:.1f} ± {fixed_std:.1f} yards (correct transformation)")
-    print(f"  Underestimation: {underestimation_factor:.1f}x  ({fixed_mean/buggy_mean:.1f}× too small!)")
+    print(
+        f"  Underestimation: {underestimation_factor:.1f}x  ({fixed_mean/buggy_mean:.1f}× too small!)"
+    )
 
     # This was the root cause of 191 yard MAE vs 58.7 for other models
     assert underestimation_factor > 50, "Should show massive underestimation"
@@ -118,8 +123,10 @@ def test_edge_cases():
     assert np.isfinite(mean)
     assert np.isfinite(std)
     assert std > 0  # Still positive
-    print(f"✓ Edge Case 1 (low std): log({log_mean:.1f}, {log_std:.2f}) → "
-          f"yards({mean:.1f} ± {std:.1f})")
+    print(
+        f"✓ Edge Case 1 (low std): log({log_mean:.1f}, {log_std:.2f}) → "
+        f"yards({mean:.1f} ± {std:.1f})"
+    )
 
     # Case 2: High uncertainty (log_std = 0.5)
     log_std = 0.5
@@ -129,8 +136,10 @@ def test_edge_cases():
     assert np.isfinite(mean)
     assert np.isfinite(std)
     assert std < mean  # Std shouldn't exceed mean
-    print(f"✓ Edge Case 2 (high std): log({log_mean:.1f}, {log_std:.2f}) → "
-          f"yards({mean:.1f} ± {std:.1f})")
+    print(
+        f"✓ Edge Case 2 (high std): log({log_mean:.1f}, {log_std:.2f}) → "
+        f"yards({mean:.1f} ± {std:.1f})"
+    )
 
     # Case 3: Very low log_mean (backup QB, limited data)
     log_mean = 3.5  # exp(3.5) = 33 yards
@@ -140,8 +149,10 @@ def test_edge_cases():
 
     assert mean > 20  # Should still be reasonable
     assert mean < 100  # But low for a QB
-    print(f"✓ Edge Case 3 (low mean): log({log_mean:.1f}, {log_std:.2f}) → "
-          f"yards({mean:.1f} ± {std:.1f})")
+    print(
+        f"✓ Edge Case 3 (low mean): log({log_mean:.1f}, {log_std:.2f}) → "
+        f"yards({mean:.1f} ± {std:.1f})"
+    )
 
 
 def test_temperature_scaling_unchanged():

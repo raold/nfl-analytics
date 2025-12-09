@@ -14,9 +14,8 @@ import json
 import logging
 import re
 import subprocess
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
+from pathlib import Path
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -25,6 +24,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class DependencyIssue:
     """Dependency sync issue."""
+
     package: str
     expected: str
     actual: str
@@ -35,15 +35,16 @@ class DependencyIssue:
 @dataclass
 class SyncReport:
     """Dependency sync validation report."""
+
     rpy2_compatible: bool
     r_packages_synced: bool
     python_packages_synced: bool
-    issues: List[DependencyIssue]
+    issues: list[DependencyIssue]
 
     @property
     def is_healthy(self) -> bool:
         """Check if environment is healthy."""
-        critical_issues = [i for i in self.issues if i.severity == 'critical']
+        critical_issues = [i for i in self.issues if i.severity == "critical"]
         return len(critical_issues) == 0
 
 
@@ -68,9 +69,9 @@ class DependencySyncValidator:
 
     # rpy2 compatibility matrix
     RPY2_COMPAT = {
-        '4.5': '3.5.16',  # R 4.5.x requires rpy2 >= 3.5.16
-        '4.4': '3.5.15',
-        '4.3': '3.5.12',
+        "4.5": "3.5.16",  # R 4.5.x requires rpy2 >= 3.5.16
+        "4.4": "3.5.15",
+        "4.3": "3.5.12",
     }
 
     def __init__(self):
@@ -100,19 +101,17 @@ class DependencySyncValidator:
             rpy2_compatible=rpy2_ok,
             r_packages_synced=r_ok,
             python_packages_synced=py_ok,
-            issues=issues
+            issues=issues,
         )
 
-    def _check_rpy2_compat(self) -> Tuple[bool, Optional[DependencyIssue]]:
+    def _check_rpy2_compat(self) -> tuple[bool, DependencyIssue | None]:
         """Check rpy2 version compatible with R version."""
         try:
             # Get R version
             r_version = subprocess.check_output(
-                ['R', '--version'],
-                stderr=subprocess.STDOUT,
-                text=True
+                ["R", "--version"], stderr=subprocess.STDOUT, text=True
             )
-            r_ver_match = re.search(r'R version (\d+\.\d+)', r_version)
+            r_ver_match = re.search(r"R version (\d+\.\d+)", r_version)
             if not r_ver_match:
                 return True, None
 
@@ -121,26 +120,27 @@ class DependencySyncValidator:
             # Get rpy2 version
             try:
                 import rpy2
+
                 rpy2_ver = rpy2.__version__
             except ImportError:
                 return False, DependencyIssue(
-                    package='rpy2',
-                    expected='>=3.5.15',
-                    actual='not installed',
-                    severity='critical',
-                    fix_command='pip install rpy2>=3.5.15'
+                    package="rpy2",
+                    expected=">=3.5.15",
+                    actual="not installed",
+                    severity="critical",
+                    fix_command="pip install rpy2>=3.5.15",
                 )
 
             # Check compatibility
-            required_rpy2 = self.RPY2_COMPAT.get(r_ver, '3.5.15')
+            required_rpy2 = self.RPY2_COMPAT.get(r_ver, "3.5.15")
 
             if rpy2_ver < required_rpy2:
                 return False, DependencyIssue(
-                    package='rpy2',
-                    expected=f'>={required_rpy2}',
+                    package="rpy2",
+                    expected=f">={required_rpy2}",
                     actual=rpy2_ver,
-                    severity='critical',
-                    fix_command=f'pip install rpy2>={required_rpy2}'
+                    severity="critical",
+                    fix_command=f"pip install rpy2>={required_rpy2}",
                 )
 
             return True, None
@@ -149,33 +149,33 @@ class DependencySyncValidator:
             logger.warning(f"Could not check rpy2 compatibility: {e}")
             return True, None
 
-    def _check_r_packages(self) -> Tuple[bool, List[DependencyIssue]]:
+    def _check_r_packages(self) -> tuple[bool, list[DependencyIssue]]:
         """Check R packages match renv.lock."""
         if not self.renv_lock.exists():
             return True, []
 
         try:
-            with open(self.renv_lock, 'r') as f:
+            with open(self.renv_lock) as f:
                 lockfile = json.load(f)
 
-            packages_expected = lockfile.get('Packages', {})
+            packages_expected = lockfile.get("Packages", {})
             issues = []
 
             # Check key packages only (brms, cmdstanr, rstanarm)
-            key_packages = ['brms', 'cmdstanr', 'rstanarm']
+            key_packages = ["brms", "cmdstanr", "rstanarm"]
 
             for pkg in key_packages:
                 if pkg not in packages_expected:
                     continue
 
-                expected_ver = packages_expected[pkg]['Version']
+                expected_ver = packages_expected[pkg]["Version"]
 
                 # Get installed version
                 try:
                     result = subprocess.check_output(
-                        ['R', '-q', '-e', f'packageVersion("{pkg}")'],
+                        ["R", "-q", "-e", f'packageVersion("{pkg}")'],
                         stderr=subprocess.STDOUT,
-                        text=True
+                        text=True,
                     )
 
                     ver_match = re.search(r"'(\d+\.\d+\.\d+)'", result)
@@ -183,13 +183,15 @@ class DependencySyncValidator:
                         actual_ver = ver_match.group(1)
 
                         if actual_ver != expected_ver:
-                            issues.append(DependencyIssue(
-                                package=pkg,
-                                expected=expected_ver,
-                                actual=actual_ver,
-                                severity='warning',
-                                fix_command='Rscript -e "renv::restore()"'
-                            ))
+                            issues.append(
+                                DependencyIssue(
+                                    package=pkg,
+                                    expected=expected_ver,
+                                    actual=actual_ver,
+                                    severity="warning",
+                                    fix_command='Rscript -e "renv::restore()"',
+                                )
+                            )
 
                 except Exception:
                     pass
@@ -200,15 +202,15 @@ class DependencySyncValidator:
             logger.warning(f"Could not check R packages: {e}")
             return True, []
 
-    def _check_python_packages(self) -> Tuple[bool, List[DependencyIssue]]:
+    def _check_python_packages(self) -> tuple[bool, list[DependencyIssue]]:
         """Check Python packages match requirements.txt."""
         # Simplified - just check key packages exist
         key_packages = {
-            'pandas': 'pandas',
-            'numpy': 'numpy',
-            'rpy2': 'rpy2',
-            'scikit-learn': 'sklearn',
-            'xgboost': 'xgboost'
+            "pandas": "pandas",
+            "numpy": "numpy",
+            "rpy2": "rpy2",
+            "scikit-learn": "sklearn",
+            "xgboost": "xgboost",
         }
 
         issues = []
@@ -217,18 +219,20 @@ class DependencySyncValidator:
             try:
                 __import__(import_name)
             except ImportError:
-                issues.append(DependencyIssue(
-                    package=pkg_name,
-                    expected='installed',
-                    actual='missing',
-                    severity='critical',
-                    fix_command='pip install -r requirements.txt'
-                ))
+                issues.append(
+                    DependencyIssue(
+                        package=pkg_name,
+                        expected="installed",
+                        actual="missing",
+                        severity="critical",
+                        fix_command="pip install -r requirements.txt",
+                    )
+                )
 
         return len(issues) == 0, issues
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # CLI interface
     validator = DependencySyncValidator()
     report = validator.validate_sync()
@@ -242,7 +246,7 @@ if __name__ == '__main__':
         print("⚠️  Dependency issues detected:\n")
 
         for issue in report.issues:
-            if issue.severity == 'critical':
+            if issue.severity == "critical":
                 print(f"❌ {issue.package}:")
             else:
                 print(f"⚠️  {issue.package}:")

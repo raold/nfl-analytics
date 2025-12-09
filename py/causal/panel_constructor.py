@@ -5,14 +5,12 @@ Builds longitudinal panel datasets from NFL database for causal analysis.
 Supports both player-level and team-level panels with derived features.
 """
 
-import pandas as pd
-import numpy as np
-from typing import Optional, List, Dict, Tuple
-from dataclasses import dataclass
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from pathlib import Path
 import logging
+from dataclasses import dataclass
+
+import numpy as np
+import pandas as pd
+import psycopg2
 
 logger = logging.getLogger(__name__)
 
@@ -20,6 +18,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class PanelConfig:
     """Configuration for panel construction"""
+
     start_season: int = 2020
     end_season: int = 2024
     min_games_per_player: int = 4
@@ -30,7 +29,7 @@ class PanelConfig:
 class PanelConstructor:
     """Constructs panel datasets for causal inference from NFL database"""
 
-    def __init__(self, db_params: Optional[Dict] = None):
+    def __init__(self, db_params: dict | None = None):
         """
         Initialize panel constructor with database connection.
 
@@ -38,11 +37,11 @@ class PanelConstructor:
             db_params: Database connection parameters. If None, uses defaults.
         """
         self.db_params = db_params or {
-            'dbname': 'nfl_data',
-            'user': 'nfl_user',
-            'password': os.getenv('DB_PASSWORD', 'sicillionbillions'),
-            'host': 'localhost',
-            'port': 5544
+            "dbname": "nfl_data",
+            "user": "nfl_user",
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
+            "host": "localhost",
+            "port": 5544,
         }
         self.conn = None
 
@@ -63,10 +62,7 @@ class PanelConstructor:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.close()
 
-    def build_player_game_panel(
-        self,
-        config: Optional[PanelConfig] = None
-    ) -> pd.DataFrame:
+    def build_player_game_panel(self, config: PanelConfig | None = None) -> pd.DataFrame:
         """
         Build player-game level panel dataset.
 
@@ -146,38 +142,41 @@ class PanelConstructor:
         """
 
         params = {
-            'start_season': config.start_season,
-            'end_season': config.end_season,
-            'min_games': config.min_games_per_player,
-            'include_playoffs': config.include_playoffs
+            "start_season": config.start_season,
+            "end_season": config.end_season,
+            "min_games": config.min_games_per_player,
+            "include_playoffs": config.include_playoffs,
         }
 
         df = pd.read_sql_query(query, self.conn, params=params)
 
-        logger.info(f"Built player-game panel: {len(df)} observations, {df['player_id'].nunique()} players")
+        logger.info(
+            f"Built player-game panel: {len(df)} observations, {df['player_id'].nunique()} players"
+        )
 
         return df
 
-    def add_player_ability_features(
-        self,
-        df: pd.DataFrame,
-        window: int = 4
-    ) -> pd.DataFrame:
+    def add_player_ability_features(self, df: pd.DataFrame, window: int = 4) -> pd.DataFrame:
         """
         Add rolling average features for player ability.
         """
-        df = df.sort_values(['player_id', 'game_date'])
+        df = df.sort_values(["player_id", "game_date"])
 
         # Calculate per-game efficiency metrics
-        df['yards_per_carry'] = df['rushing_yards'] / df['rushing_attempts'].replace(0, np.nan)
-        df['yards_per_target'] = df['receiving_yards'] / df['targets'].replace(0, np.nan)
+        df["yards_per_carry"] = df["rushing_yards"] / df["rushing_attempts"].replace(0, np.nan)
+        df["yards_per_target"] = df["receiving_yards"] / df["targets"].replace(0, np.nan)
 
         # Rolling averages (lag to prevent data leakage)
-        for col in ['rushing_yards', 'rushing_attempts', 'yards_per_carry',
-                    'receiving_yards', 'targets', 'yards_per_target']:
-            df[f'{col}_l{window}'] = (
-                df.groupby('player_id')[col]
-                .transform(lambda x: x.shift(1).rolling(window, min_periods=1).mean())
+        for col in [
+            "rushing_yards",
+            "rushing_attempts",
+            "yards_per_carry",
+            "receiving_yards",
+            "targets",
+            "yards_per_target",
+        ]:
+            df[f"{col}_l{window}"] = df.groupby("player_id")[col].transform(
+                lambda x: x.shift(1).rolling(window, min_periods=1).mean()
             )
 
         return df

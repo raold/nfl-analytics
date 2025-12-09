@@ -33,15 +33,12 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import xgboost as xgb
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import brier_score_loss, log_loss
 from sklearn.neural_network import MLPClassifier
-from sklearn.preprocessing import StandardScaler
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from py.ensemble.game_outcome_ensemble import GameOutcomeEnsemble, get_team_season_stats
 from py.features.feature_loader import AdvancedFeatureLoader
-from py.models.state_space import StateSpaceRatings
 
 
 class RealisticGameOutcomeEnsemble(GameOutcomeEnsemble):
@@ -71,20 +68,20 @@ class RealisticGameOutcomeEnsemble(GameOutcomeEnsemble):
 
         # ONLY use non-leaking features
         self.legitimate_phase5_features = [
-            "extreme_cold",              # Weather (external source)
-            "dome_team_outdoor_wind",    # Weather + venue (external)
-            "is_conference_game",        # Schedule (publicly known)
-            "away_short_rest",           # Rest days (publicly known)
-            "high_wind",                 # Weather (external source)
+            "extreme_cold",  # Weather (external source)
+            "dome_team_outdoor_wind",  # Weather + venue (external)
+            "is_conference_game",  # Schedule (publicly known)
+            "away_short_rest",  # Rest days (publicly known)
+            "high_wind",  # Weather (external source)
         ]
 
         # Explicitly document BANNED features (for reference)
         self.banned_features = [
-            "home_implied_prob",   # LEAKAGE: from closing line
-            "away_implied_prob",   # LEAKAGE: from closing line
-            "spread_magnitude",    # LEAKAGE: derived from closing line
-            "is_large_spread",     # LEAKAGE: derived from closing line
-            "home_is_favorite",    # LEAKAGE: derived from closing line
+            "home_implied_prob",  # LEAKAGE: from closing line
+            "away_implied_prob",  # LEAKAGE: from closing line
+            "spread_magnitude",  # LEAKAGE: derived from closing line
+            "is_large_spread",  # LEAKAGE: derived from closing line
+            "home_is_favorite",  # LEAKAGE: derived from closing line
         ]
 
         # Cache for advanced features
@@ -93,20 +90,20 @@ class RealisticGameOutcomeEnsemble(GameOutcomeEnsemble):
         # XGBoost params with STRONG REGULARIZATION
         if xgb_params is None:
             self.xgb_params = {
-                'objective': 'binary:logistic',
-                'eval_metric': 'logloss',
-                'tree_method': 'hist',
-                'n_estimators': 100,
-                'max_depth': 4,  # Reduced to prevent overfitting
-                'learning_rate': 0.1,
-                'subsample': 0.8,
-                'colsample_bytree': 0.8,
+                "objective": "binary:logistic",
+                "eval_metric": "logloss",
+                "tree_method": "hist",
+                "n_estimators": 100,
+                "max_depth": 4,  # Reduced to prevent overfitting
+                "learning_rate": 0.1,
+                "subsample": 0.8,
+                "colsample_bytree": 0.8,
                 # Strong L1/L2 regularization
-                'alpha': 2.0,  # L1 regularization
-                'lambda': 2.0,  # L2 regularization
-                'min_child_weight': 5,
-                'gamma': 0.5,
-                'n_jobs': -1,
+                "alpha": 2.0,  # L1 regularization
+                "lambda": 2.0,  # L2 regularization
+                "min_child_weight": 5,
+                "gamma": 0.5,
+                "n_jobs": -1,
             }
         else:
             self.xgb_params = xgb_params
@@ -118,14 +115,18 @@ class RealisticGameOutcomeEnsemble(GameOutcomeEnsemble):
         if cache_key in self.advanced_features_cache:
             cached_df = self.advanced_features_cache[cache_key]
             # Return only legitimate features
-            available_features = [f for f in self.legitimate_phase5_features if f in cached_df.columns]
+            available_features = [
+                f for f in self.legitimate_phase5_features if f in cached_df.columns
+            ]
             return cached_df[["game_id"] + available_features]
 
         # Load all features
         all_features = self.feature_loader.load_all_features(game_ids)
 
         # Filter to legitimate features ONLY
-        available_features = [f for f in self.legitimate_phase5_features if f in all_features.columns]
+        available_features = [
+            f for f in self.legitimate_phase5_features if f in all_features.columns
+        ]
         legitimate_df = all_features[["game_id"] + available_features]
 
         # Cache for reuse
@@ -187,18 +188,20 @@ class RealisticGameOutcomeEnsemble(GameOutcomeEnsemble):
                 away_points_allowed = 21.0
                 away_away_win_pct = 0.5
 
-            baseline_features.append({
-                "game_id": row["game_id"],
-                "home_win_pct": home_win_pct,
-                "away_win_pct": away_win_pct,
-                "home_points_avg": home_points_avg,
-                "away_points_avg": away_points_avg,
-                "home_points_allowed_avg": home_points_allowed,
-                "away_points_allowed_avg": away_points_allowed,
-                "home_home_win_pct": home_home_win_pct,
-                "away_away_win_pct": away_away_win_pct,
-                "week": week,
-            })
+            baseline_features.append(
+                {
+                    "game_id": row["game_id"],
+                    "home_win_pct": home_win_pct,
+                    "away_win_pct": away_win_pct,
+                    "home_points_avg": home_points_avg,
+                    "away_points_avg": away_points_avg,
+                    "home_points_allowed_avg": home_points_allowed,
+                    "away_points_allowed_avg": away_points_allowed,
+                    "home_home_win_pct": home_home_win_pct,
+                    "away_away_win_pct": away_away_win_pct,
+                    "week": week,
+                }
+            )
 
         baseline_df = pd.DataFrame(baseline_features)
 
@@ -243,7 +246,7 @@ class RealisticGameOutcomeEnsemble(GameOutcomeEnsemble):
         for feat in self.legitimate_phase5_features:
             print(f"  ✓ {feat}")
 
-        print(f"\nExplicitly BANNED features (data leakage):")
+        print("\nExplicitly BANNED features (data leakage):")
         for feat in self.banned_features:
             print(f"  ❌ {feat}")
 
@@ -284,7 +287,9 @@ class RealisticGameOutcomeEnsemble(GameOutcomeEnsemble):
         print(f"\n{'-'*80}")
         print("[2/5] Training XGBoost Model (REALISTIC + REGULARIZED)")
         print(f"{'-'*80}")
-        print(f"  Regularization: alpha={self.xgb_params['alpha']}, lambda={self.xgb_params['lambda']}")
+        print(
+            f"  Regularization: alpha={self.xgb_params['alpha']}, lambda={self.xgb_params['lambda']}"
+        )
         print(f"  Tree depth: max_depth={self.xgb_params['max_depth']}")
 
         # Engineer REALISTIC features (baseline + legitimate Phase 5)
@@ -293,10 +298,14 @@ class RealisticGameOutcomeEnsemble(GameOutcomeEnsemble):
         # Define feature columns
         feature_cols = [
             # Baseline features (9)
-            "home_win_pct", "away_win_pct",
-            "home_points_avg", "away_points_avg",
-            "home_points_allowed_avg", "away_points_allowed_avg",
-            "home_home_win_pct", "away_away_win_pct",
+            "home_win_pct",
+            "away_win_pct",
+            "home_points_avg",
+            "away_points_avg",
+            "home_points_allowed_avg",
+            "away_points_allowed_avg",
+            "home_home_win_pct",
+            "away_away_win_pct",
             "week",
         ]
 
@@ -305,7 +314,9 @@ class RealisticGameOutcomeEnsemble(GameOutcomeEnsemble):
 
         # Filter to columns that exist
         available_cols = [col for col in feature_cols if col in train_features_df.columns]
-        print(f"  Using {len(available_cols)} features (9 baseline + {len(available_cols)-9} legitimate Phase 5)")
+        print(
+            f"  Using {len(available_cols)} features (9 baseline + {len(available_cols)-9} legitimate Phase 5)"
+        )
 
         X_train = train_features_df[available_cols].values
 
@@ -319,7 +330,7 @@ class RealisticGameOutcomeEnsemble(GameOutcomeEnsemble):
             val_target = (val_df["margin"] > 0).astype(int).values
             val_features_df = self._engineer_realistic_features(val_df)
             X_val = val_features_df[available_cols].values
-            X_val_scaled = self.scaler.transform(X_val)
+            self.scaler.transform(X_val)
             dval = xgb.DMatrix(X_val, label=val_target)
             evals = [(dtrain, "train"), (dval, "val")]
             self.xgb_model = xgb.train(
@@ -393,12 +404,14 @@ class RealisticGameOutcomeEnsemble(GameOutcomeEnsemble):
         print("[5/5] Training Meta-Learner (Stacking)")
         print(f"{'-'*80}")
 
-        meta_features_train = np.column_stack([
-            ss_train_preds,
-            xgb_train_preds,
-            lr_train_preds,
-            nn_train_preds,
-        ])
+        meta_features_train = np.column_stack(
+            [
+                ss_train_preds,
+                xgb_train_preds,
+                lr_train_preds,
+                nn_train_preds,
+            ]
+        )
 
         self.meta_learner.fit(meta_features_train, train_target)
         ensemble_train_preds = self.meta_learner.predict_proba(meta_features_train)[:, 1]
@@ -439,10 +452,12 @@ class RealisticGameOutcomeEnsemble(GameOutcomeEnsemble):
                 self.team_stats_cache[season] = get_team_season_stats(season)
 
         # Component 1: State-Space
-        ss_preds = np.array([
-            self.state_space.predict_prob_home_win(row["home_team"], row["away_team"])
-            for _, row in df.iterrows()
-        ])
+        ss_preds = np.array(
+            [
+                self.state_space.predict_prob_home_win(row["home_team"], row["away_team"])
+                for _, row in df.iterrows()
+            ]
+        )
 
         # Components 2-4: Realistic feature-based models
         features_df = self._engineer_realistic_features(df)

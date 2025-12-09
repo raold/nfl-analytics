@@ -23,10 +23,9 @@ Date: November 26, 2025
 
 import logging
 import math
-from typing import Dict, Optional, Tuple
+from functools import lru_cache
 
 import psycopg2
-from functools import lru_cache
 
 logger = logging.getLogger(__name__)
 
@@ -35,10 +34,7 @@ class DCFeatureGenerator:
     """Generate DC-related features for NFL prediction models."""
 
     def __init__(
-        self,
-        db_config: Optional[Dict] = None,
-        cache_size: int = 1024,
-        halflife_weeks: float = 4.0
+        self, db_config: dict | None = None, cache_size: int = 1024, halflife_weeks: float = 4.0
     ):
         """
         Initialize DC feature generator.
@@ -49,11 +45,11 @@ class DCFeatureGenerator:
             halflife_weeks: Half-life for new DC adjustment decay (weeks).
         """
         self.db_config = db_config or {
-            'host': 'localhost',
-            'port': 5544,
-            'database': 'devdb01',
-            'user': 'dro',
-            'password': 'sicillionbillions'  # pragma: allowlist secret
+            "host": "localhost",
+            "port": 5544,
+            "database": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",  # pragma: allowlist secret
         }
         self._cache_size = cache_size
         self._conn = None
@@ -72,7 +68,7 @@ class DCFeatureGenerator:
             self._conn = None
 
     @lru_cache(maxsize=1024)
-    def get_dc_continuity(self, team: str, season: int) -> Tuple[int, str, str]:
+    def get_dc_continuity(self, team: str, season: int) -> tuple[int, str, str]:
         """
         Check if DC is same as previous season.
 
@@ -112,8 +108,8 @@ class DCFeatureGenerator:
         cur.close()
 
         if row:
-            return (row[2], row[0] or 'Unknown', row[1] or 'Unknown')
-        return (0, 'Unknown', 'Unknown')
+            return (row[2], row[0] or "Unknown", row[1] or "Unknown")
+        return (0, "Unknown", "Unknown")
 
     @lru_cache(maxsize=1024)
     def get_dc_tenure(self, team: str, season: int) -> int:
@@ -158,12 +154,8 @@ class DCFeatureGenerator:
         return row[0] if row and row[0] else 1
 
     def get_features(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        opponent: Optional[str] = None
-    ) -> Dict[str, float]:
+        self, team: str, season: int, week: int, opponent: str | None = None
+    ) -> dict[str, float]:
         """
         Get all DC features for a team-season-week.
 
@@ -195,16 +187,16 @@ class DCFeatureGenerator:
             new_dc_adjustment = 0.8 * decay_factor
 
         features = {
-            'dc_continuity': continuity,
-            'games_with_dc': games_with_dc,
-            'dc_tenure_seasons': tenure,
-            'new_dc_adjustment': round(new_dc_adjustment, 4),
+            "dc_continuity": continuity,
+            "games_with_dc": games_with_dc,
+            "dc_tenure_seasons": tenure,
+            "new_dc_adjustment": round(new_dc_adjustment, 4),
         }
 
         # Add opponent DC continuity if opponent provided
         if opponent:
             opp_continuity, _, _ = self.get_dc_continuity(opponent, season)
-            features['opponent_dc_continuity'] = opp_continuity
+            features["opponent_dc_continuity"] = opp_continuity
 
         logger.debug(
             f"DC features for {team} {season} W{week}: "
@@ -215,12 +207,8 @@ class DCFeatureGenerator:
         return features
 
     def get_opponent_adjusted_features(
-        self,
-        team: str,
-        opponent: str,
-        season: int,
-        week: int
-    ) -> Dict[str, float]:
+        self, team: str, opponent: str, season: int, week: int
+    ) -> dict[str, float]:
         """
         Get DC features adjusted for opponent's defensive coordinator situation.
 
@@ -242,16 +230,15 @@ class DCFeatureGenerator:
         opp_features = self.get_features(opponent, season, week)
 
         # Add opponent features with 'opp_' prefix
-        team_features['opp_dc_continuity'] = opp_features['dc_continuity']
-        team_features['opp_dc_tenure_seasons'] = opp_features['dc_tenure_seasons']
-        team_features['opp_new_dc_adjustment'] = opp_features['new_dc_adjustment']
+        team_features["opp_dc_continuity"] = opp_features["dc_continuity"]
+        team_features["opp_dc_tenure_seasons"] = opp_features["dc_tenure_seasons"]
+        team_features["opp_new_dc_adjustment"] = opp_features["new_dc_adjustment"]
 
         return team_features
 
 
 def main():
     """Test DC feature generation."""
-    import sys
 
     logging.basicConfig(level=logging.INFO)
 
@@ -259,12 +246,12 @@ def main():
 
     # Test cases
     test_cases = [
-        ('KC', 2024, 1),
-        ('KC', 2024, 5),
-        ('BUF', 2024, 1),
-        ('BUF', 2024, 5),
-        ('PHI', 2024, 1),
-        ('SF', 2024, 1),
+        ("KC", 2024, 1),
+        ("KC", 2024, 5),
+        ("BUF", 2024, 1),
+        ("BUF", 2024, 5),
+        ("PHI", 2024, 1),
+        ("SF", 2024, 1),
     ]
 
     print("=" * 70)
