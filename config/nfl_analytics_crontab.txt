@@ -39,13 +39,14 @@ NFL_ANALYTICS_DIR=/Users/dro/rice/nfl-analytics
 # Odds Tracking (3x daily)
 # ====================================
 # 10am ET (15:00 UTC) - Morning line
-0 15 * * * cd $NFL_ANALYTICS_DIR && uv run python scripts/fetch_odds.py >> /tmp/odds_fetcher_cron.log 2>&1
+# Using smart odds script with priority-based fetching and quota tracking
+0 15 * * * cd $NFL_ANALYTICS_DIR && uv run python py/ingest_odds_smart.py --priority high --max-calls 10 >> /tmp/odds_fetcher_cron.log 2>&1
 
 # 4pm ET (21:00 UTC) - Afternoon movement
-0 21 * * * cd $NFL_ANALYTICS_DIR && uv run python scripts/fetch_odds.py >> /tmp/odds_fetcher_cron.log 2>&1
+0 21 * * * cd $NFL_ANALYTICS_DIR && uv run python py/ingest_odds_smart.py --priority high --max-calls 10 >> /tmp/odds_fetcher_cron.log 2>&1
 
 # 10pm ET (03:00 UTC next day) - Closing lines
-0 3 * * * cd $NFL_ANALYTICS_DIR && uv run python scripts/fetch_odds.py >> /tmp/odds_fetcher_cron.log 2>&1
+0 3 * * * cd $NFL_ANALYTICS_DIR && uv run python py/ingest_odds_smart.py --priority urgent --max-calls 15 >> /tmp/odds_fetcher_cron.log 2>&1
 
 # ====================================
 # Outcome Backfill
@@ -53,6 +54,20 @@ NFL_ANALYTICS_DIR=/Users/dro/rice/nfl-analytics
 # Wednesday 6am ET (11:00 UTC) - After all games complete (including MNF)
 # Auto-detects all pending predictions
 0 11 * * 3 cd $NFL_ANALYTICS_DIR && uv run python scripts/backfill_outcomes.py >> /tmp/backfill_outcomes_cron.log 2>&1
+
+# ====================================
+# Database Maintenance
+# ====================================
+# Daily 5am ET (10:00 UTC) - Refresh materialized views
+# Runs after any overnight data updates
+0 10 * * * cd $NFL_ANALYTICS_DIR && uv run python scripts/refresh_marts.py --all >> /tmp/refresh_marts_cron.log 2>&1
+
+# ====================================
+# Feature Staleness Monitoring
+# ====================================
+# Daily 6am ET (11:00 UTC) - Check feature freshness
+# Runs after materialized view refresh to validate data currency
+0 11 * * * cd $NFL_ANALYTICS_DIR && uv run python scripts/feature_staleness_monitor.py >> /tmp/feature_staleness_cron.log 2>&1
 
 # ====================================
 # Optional: Weekly Summary Report

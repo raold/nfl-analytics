@@ -243,6 +243,11 @@ class TestCreateLookupDict:
 class TestPerformanceImprovements:
     """Test suite to verify N+1 elimination."""
 
+    @pytest.fixture
+    def sample_game_ids(self):
+        """Sample game IDs for testing."""
+        return ["2024_12_BAL_LAC", "2024_12_KC_LV", "2024_12_BUF_SF"]
+
     @patch("dashboard.queries.predictions_batched.pd.read_sql_query")
     def test_n_plus_1_elimination_proof(self, mock_read_sql, sample_game_ids):
         """Prove that batched query executes only ONCE regardless of game count."""

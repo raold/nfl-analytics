@@ -25,12 +25,14 @@ Usage:
         --prop-type passing_yards \
         --output models/props/passing_yards_model.json
 
-    # Predict single player
+    # Predict single player (loads features from database)
     python py/models/props_predictor.py \
         --model models/props/passing_yards_model.json \
         --predict \
         --player-id "00-0036355" \
         --opponent "KC" \
+        --season 2024 \
+        --week 12 \
         --line 275.5
 
     # Backtest all props
@@ -49,6 +51,8 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import psycopg2
+import psycopg2.extras
 import xgboost as xgb
 from scipy import stats
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -59,6 +63,15 @@ logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
 )
 logger = logging.getLogger(__name__)
+
+# Redis cache for feature loading
+try:
+    from py.utils.claude_cache import get_default_cache
+
+    REDIS_AVAILABLE = True
+except ImportError:
+    logger.warning("Redis cache not available - features will not be cached")
+    REDIS_AVAILABLE = False
 
 
 # ============================================================================
@@ -293,6 +306,416 @@ class PropsPredictor:
         self.feature_cols: list[str] = []
         self.scaler_mean: np.ndarray | None = None
         self.scaler_std: np.ndarray | None = None
+
+        # Database connection parameters
+        self.db_params = {
+            "host": "localhost",
+            "port": 5544,
+            "dbname": "devdb01",
+            "user": "dro",
+            "password": "sicillionbillions",
+        }
+
+        # Feature cache with 1-hour TTL
+        self.feature_cache_ttl = 3600  # 1 hour in seconds
+
+    def _get_cache_key(
+        self, player_id: str, season: int, week: int, opponent: str
+    ) -> str:
+        """Generate cache key for player features."""
+        import hashlib
+
+        key_data = f"props:{player_id}:{season}:{week}:{opponent}:{self.prop_type}"
+        return hashlib.sha256(key_data.encode()).hexdigest()
+
+    def load_player_features_from_db(
+        self,
+        player_id: str,
+        season: int,
+        week: int,
+        opponent: str,
+        use_cache: bool = True,
+    ) -> dict | None:
+        """
+        Load player features from database with Redis caching.
+
+        Queries mart.player_game_stats for recent performance and combines
+        with game context (spread, total, weather) from games table.
+
+        Args:
+            player_id: Player ID (GSIS ID, e.g., "00-0019596")
+            season: NFL season year
+            week: Week number (1-18)
+            opponent: Opponent team abbreviation (e.g., "KC")
+            use_cache: Whether to use Redis cache (default: True)
+
+        Returns:
+            Dictionary of features or None if unavailable
+
+        Example:
+            >>> predictor = PropsPredictor("passing_yards")
+            >>> features = predictor.load_player_features_from_db(
+            ...     player_id="00-0019596",
+            ...     season=2024,
+            ...     week=12,
+            ...     opponent="KC"
+            ... )
+        """
+        # Try cache first
+        if use_cache and REDIS_AVAILABLE:
+            cache = get_default_cache()
+            if cache:
+                cache_key = self._get_cache_key(player_id, season, week, opponent)
+                try:
+                    cached = cache.get(cache_key)
+                    if cached:
+                        logger.info(
+                            f"✅ Cache HIT: {player_id} features (week {week})"
+                        )
+                        return cached
+                except Exception as e:
+                    logger.warning(f"Cache read failed: {e}")
+
+        # Cache miss - query database
+        logger.info(f"❌ Cache MISS: Loading {player_id} features from database")
+
+        try:
+            conn = psycopg2.connect(**self.db_params)
+            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+            # Query for player features with recent games
+            # Pattern follows SQL_PATTERNS.md canonical join via (season, week)
+            query = """
+                WITH player_team AS (
+                    -- Get player's current team
+                    SELECT player_id, current_team, position_group
+                    FROM mart.player_hierarchy
+                    WHERE player_id = %s
+                ),
+                recent_games AS (
+                    -- Get player's last 8 games for rolling features
+                    SELECT
+                        pgs.season,
+                        pgs.week,
+                        pgs.stat_category,
+                        pgs.stat_yards,
+                        pgs.stat_attempts,
+                        pgs.stat_touchdowns,
+                        pgs.stat_receptions,
+                        pgs.stat_targets,
+                        g.kickoff,
+                        g.game_id,
+                        g.spread_close,
+                        g.total_close,
+                        g.roof,
+                        g.temp,
+                        g.wind
+                    FROM mart.player_game_stats pgs
+                    JOIN player_team pt ON pgs.player_id = pt.player_id
+                    LEFT JOIN games g ON
+                        g.season = pgs.season
+                        AND g.week = pgs.week
+                        AND (g.home_team = pt.current_team OR g.away_team = pt.current_team)
+                    WHERE pgs.player_id = %s
+                        AND pgs.season >= %s - 1  -- Last 2 seasons
+                        AND (
+                            (pgs.season < %s) OR
+                            (pgs.season = %s AND pgs.week < %s)
+                        )  -- Only games before target week
+                    ORDER BY g.kickoff DESC NULLS LAST
+                    LIMIT 8
+                ),
+                opponent_defense AS (
+                    -- Get opponent defensive stats
+                    SELECT
+                        AVG(CASE WHEN pgs.stat_category = 'passing' THEN pgs.stat_yards END) as pass_yards_allowed_avg,
+                        AVG(CASE WHEN pgs.stat_category = 'rushing' THEN pgs.stat_yards END) as rush_yards_allowed_avg,
+                        AVG(CASE WHEN pgs.stat_category = 'receiving' THEN pgs.stat_yards END) as rec_yards_allowed_avg
+                    FROM mart.player_game_stats pgs
+                    JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
+                    LEFT JOIN games g ON
+                        g.season = pgs.season
+                        AND g.week = pgs.week
+                        AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
+                    WHERE (g.home_team = %s OR g.away_team = %s)  -- Opponent
+                        AND pgs.season = %s
+                        AND pgs.week < %s  -- Only games before target week
+                ),
+                upcoming_game AS (
+                    -- Get game context for prediction
+                    SELECT
+                        g.spread_close,
+                        g.total_close,
+                        g.roof,
+                        g.temp,
+                        g.wind,
+                        pt.current_team,
+                        CASE WHEN g.home_team = pt.current_team THEN 1 ELSE 0 END as is_home,
+                        CASE WHEN g.roof = 'dome' THEN 1 ELSE 0 END as is_dome,
+                        CASE WHEN g.roof IN ('outdoors', 'open') THEN 1 ELSE 0 END as is_outdoors
+                    FROM games g
+                    CROSS JOIN player_team pt
+                    WHERE g.season = %s
+                        AND g.week = %s
+                        AND (g.home_team = pt.current_team OR g.away_team = pt.current_team)
+                    LIMIT 1
+                )
+                SELECT
+                    -- Player info
+                    pt.player_id,
+                    pt.current_team,
+                    pt.position_group,
+
+                    -- Rolling stats (last 3 games)
+                    AVG(CASE WHEN rg.stat_category = 'passing' AND row_num <= 3 THEN rg.stat_yards END) as passing_yards_last3,
+                    AVG(CASE WHEN rg.stat_category = 'passing' AND row_num <= 3 THEN rg.stat_attempts END) as pass_attempts_last3,
+                    AVG(CASE WHEN rg.stat_category = 'passing' AND row_num <= 3 THEN rg.stat_touchdowns END) as passing_tds_last3,
+                    SUM(CASE WHEN rg.stat_category = 'passing' AND row_num <= 3 THEN rg.stat_attempts END) as completions_last3,
+
+                    -- Rolling stats (last 5 games)
+                    AVG(CASE WHEN rg.stat_category = 'passing' AND row_num <= 5 THEN rg.stat_yards END) as passing_yards_last5,
+                    AVG(CASE WHEN rg.stat_category = 'passing' AND row_num <= 5 THEN rg.stat_attempts END) as pass_attempts_last5,
+                    SUM(CASE WHEN rg.stat_category = 'passing' AND row_num <= 5 THEN rg.stat_attempts END) as completions_last5,
+
+                    -- Season stats
+                    AVG(CASE WHEN rg.stat_category = 'passing' THEN rg.stat_yards END) as passing_yards_season,
+                    AVG(CASE WHEN rg.stat_category = 'passing' THEN rg.stat_touchdowns END) as passing_tds_season,
+
+                    -- Rushing stats
+                    AVG(CASE WHEN rg.stat_category = 'rushing' AND row_num <= 3 THEN rg.stat_yards END) as rushing_yards_last3,
+                    AVG(CASE WHEN rg.stat_category = 'rushing' AND row_num <= 3 THEN rg.stat_attempts END) as rush_attempts_last3,
+                    AVG(CASE WHEN rg.stat_category = 'rushing' AND row_num <= 3 THEN rg.stat_touchdowns END) as rushing_tds_last3,
+                    AVG(CASE WHEN rg.stat_category = 'rushing' AND row_num <= 5 THEN rg.stat_yards END) as rushing_yards_last5,
+                    AVG(CASE WHEN rg.stat_category = 'rushing' AND row_num <= 5 THEN rg.stat_attempts END) as rush_attempts_last5,
+                    AVG(CASE WHEN rg.stat_category = 'rushing' THEN rg.stat_yards END) as rushing_yards_season,
+
+                    -- Receiving stats
+                    AVG(CASE WHEN rg.stat_category = 'receiving' AND row_num <= 3 THEN rg.stat_yards END) as receiving_yards_last3,
+                    AVG(CASE WHEN rg.stat_category = 'receiving' AND row_num <= 3 THEN rg.stat_receptions END) as receptions_last3,
+                    AVG(CASE WHEN rg.stat_category = 'receiving' AND row_num <= 3 THEN rg.stat_targets END) as targets_last3,
+                    AVG(CASE WHEN rg.stat_category = 'receiving' AND row_num <= 3 THEN rg.stat_touchdowns END) as receiving_tds_last3,
+                    AVG(CASE WHEN rg.stat_category = 'receiving' AND row_num <= 5 THEN rg.stat_yards END) as receiving_yards_last5,
+                    AVG(CASE WHEN rg.stat_category = 'receiving' AND row_num <= 5 THEN rg.stat_receptions END) as receptions_last5,
+                    AVG(CASE WHEN rg.stat_category = 'receiving' AND row_num <= 5 THEN rg.stat_targets END) as targets_last5,
+                    AVG(CASE WHEN rg.stat_category = 'receiving' THEN rg.stat_yards END) as receiving_yards_season,
+                    AVG(CASE WHEN rg.stat_category = 'receiving' THEN rg.stat_receptions END) as receptions_season,
+
+                    -- Opponent defense
+                    od.pass_yards_allowed_avg as opponent_pass_yards_allowed_avg,
+                    COALESCE(od.rush_yards_allowed_avg, 100.0) as opponent_rush_yards_allowed_avg,
+                    COALESCE(od.rec_yards_allowed_avg, 50.0) as opponent_rec_yards_allowed_avg,
+
+                    -- Game context
+                    ug.spread_close as spread,
+                    ug.total_close as implied_team_total,
+                    ug.is_home,
+                    ug.is_dome,
+                    ug.is_outdoors,
+                    COALESCE(ug.temp, 72.0) as weather_temp,
+                    COALESCE(ug.wind, 0.0) as weather_wind_mph,
+
+                    -- Additional context
+                    0 as days_rest,  -- TODO: Calculate from game schedule
+                    0 as red_zone_attempts_last3,  -- TODO: Add red zone stats
+                    0 as red_zone_carries_last3,
+                    0 as red_zone_targets_last3,
+                    0 as is_turf,  -- TODO: Add surface type
+                    0 as sacks_last3,  -- TODO: Add sack data
+                    0 as interceptions_last3,
+                    0 as interceptions_last5,
+                    0 as interceptions_season
+
+                FROM player_team pt
+                CROSS JOIN (
+                    SELECT *, ROW_NUMBER() OVER (ORDER BY kickoff DESC) as row_num
+                    FROM recent_games
+                ) rg
+                LEFT JOIN opponent_defense od ON 1=1
+                LEFT JOIN upcoming_game ug ON 1=1
+                GROUP BY
+                    pt.player_id,
+                    pt.current_team,
+                    pt.position_group,
+                    od.pass_yards_allowed_avg,
+                    od.rush_yards_allowed_avg,
+                    od.rec_yards_allowed_avg,
+                    ug.spread_close,
+                    ug.total_close,
+                    ug.is_home,
+                    ug.is_dome,
+                    ug.is_outdoors,
+                    ug.temp,
+                    ug.wind;
+            """
+
+            cursor.execute(
+                query,
+                (
+                    player_id,  # player_team CTE
+                    player_id,  # recent_games CTE
+                    season,  # recent_games season filter
+                    season,  # recent_games season filter
+                    season,  # recent_games season filter
+                    week,  # recent_games week filter
+                    opponent,  # opponent_defense
+                    opponent,  # opponent_defense
+                    season,  # opponent_defense season
+                    week,  # opponent_defense week
+                    season,  # upcoming_game season
+                    week,  # upcoming_game week
+                ),
+            )
+
+            result = cursor.fetchone()
+            cursor.close()
+            conn.close()
+
+            if result is None:
+                logger.warning(
+                    f"No features found for {player_id} (season={season}, week={week})"
+                )
+                # Try fallback to historical average
+                return self._get_historical_average_features(
+                    player_id, season, week
+                )
+
+            # Convert to dict and fill NaN with 0
+            features = dict(result)
+            features = {k: (v if v is not None else 0.0) for k, v in features.items()}
+
+            # Cache features
+            if use_cache and REDIS_AVAILABLE:
+                cache = get_default_cache()
+                if cache:
+                    cache_key = self._get_cache_key(player_id, season, week, opponent)
+                    try:
+                        cache.set(cache_key, features, ttl=self.feature_cache_ttl)
+                        logger.info(
+                            f"💾 Cached features for {player_id} (TTL={self.feature_cache_ttl}s)"
+                        )
+                    except Exception as e:
+                        logger.warning(f"Cache write failed: {e}")
+
+            return features
+
+        except psycopg2.Error as e:
+            logger.error(f"Database error loading features for {player_id}: {e}")
+            # Fallback to historical average
+            return self._get_historical_average_features(player_id, season, week)
+
+        except Exception as e:
+            logger.error(f"Unexpected error loading features for {player_id}: {e}")
+            return None
+
+    def _get_historical_average_features(
+        self, player_id: str, season: int, week: int
+    ) -> dict | None:
+        """
+        Fallback to historical average features if database query fails.
+
+        Queries player's career averages as fallback when recent game data
+        is unavailable.
+
+        Args:
+            player_id: Player ID
+            season: Season year
+            week: Week number
+
+        Returns:
+            Dictionary of historical average features or None if unavailable
+        """
+        logger.warning(
+            f"Falling back to historical averages for {player_id} (season={season}, week={week})"
+        )
+
+        try:
+            conn = psycopg2.connect(**self.db_params)
+            cursor = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+            # Get career averages for this player
+            query = """
+                SELECT
+                    player_id,
+                    AVG(CASE WHEN stat_category = 'passing' THEN stat_yards END) as passing_yards_season,
+                    AVG(CASE WHEN stat_category = 'passing' THEN stat_attempts END) as pass_attempts_last3,
+                    AVG(CASE WHEN stat_category = 'rushing' THEN stat_yards END) as rushing_yards_season,
+                    AVG(CASE WHEN stat_category = 'rushing' THEN stat_attempts END) as rush_attempts_last3,
+                    AVG(CASE WHEN stat_category = 'receiving' THEN stat_yards END) as receiving_yards_season,
+                    AVG(CASE WHEN stat_category = 'receiving' THEN stat_receptions END) as receptions_last3,
+                    AVG(CASE WHEN stat_category = 'receiving' THEN stat_targets END) as targets_last3
+                FROM mart.player_game_stats
+                WHERE player_id = %s
+                    AND season >= %s - 2  -- Last 3 seasons
+                GROUP BY player_id;
+            """
+
+            cursor.execute(query, (player_id, season))
+            result = cursor.fetchone()
+            cursor.close()
+            conn.close()
+
+            if result is None:
+                logger.error(
+                    f"No historical data found for {player_id} - cannot generate features"
+                )
+                return None
+
+            # Create feature dict with defaults for missing values
+            features = dict(result)
+
+            # Fill in missing features with league averages
+            default_features = {
+                "passing_yards_last3": features.get("passing_yards_season", 0),
+                "passing_yards_last5": features.get("passing_yards_season", 0),
+                "pass_attempts_last5": features.get("pass_attempts_last3", 0),
+                "completions_last3": features.get("pass_attempts_last3", 0) * 0.65,
+                "completions_last5": features.get("pass_attempts_last3", 0) * 0.65,
+                "passing_tds_last3": 1.5,
+                "passing_tds_season": 1.5,
+                "rushing_yards_last3": features.get("rushing_yards_season", 0),
+                "rushing_yards_last5": features.get("rushing_yards_season", 0),
+                "rush_attempts_last5": features.get("rush_attempts_last3", 0),
+                "rushing_tds_last3": 0.3,
+                "rushing_tds_season": 0.3,
+                "receiving_yards_last3": features.get("receiving_yards_season", 0),
+                "receiving_yards_last5": features.get("receiving_yards_season", 0),
+                "receptions_last5": features.get("receptions_last3", 0),
+                "targets_last5": features.get("targets_last3", 0),
+                "receiving_tds_last3": 0.3,
+                "receiving_tds_season": 0.3,
+                "opponent_pass_yards_allowed_avg": 240.0,
+                "opponent_rush_yards_allowed_avg": 100.0,
+                "opponent_rec_yards_allowed_avg": 50.0,
+                "spread": 0.0,
+                "implied_team_total": 21.0,
+                "is_home": 0,
+                "is_dome": 0,
+                "is_outdoors": 1,
+                "weather_temp": 72.0,
+                "weather_wind_mph": 5.0,
+                "days_rest": 7,
+                "red_zone_attempts_last3": 0,
+                "red_zone_carries_last3": 0,
+                "red_zone_targets_last3": 0,
+                "is_turf": 0,
+                "sacks_last3": 0,
+                "interceptions_last3": 0,
+                "interceptions_last5": 0,
+                "interceptions_season": 0,
+            }
+
+            # Merge with defaults
+            features.update(default_features)
+            features = {k: (v if v is not None else 0.0) for k, v in features.items()}
+
+            logger.info(
+                f"✅ Historical averages loaded for {player_id} (career stats)"
+            )
+            return features
+
+        except Exception as e:
+            logger.error(f"Failed to load historical averages for {player_id}: {e}")
+            return None
 
     def prepare_features(self, df: pd.DataFrame, target_col: str) -> tuple[pd.DataFrame, pd.Series]:
         """
@@ -785,6 +1208,21 @@ def main():
         help="Player ID for prediction",
     )
     parser.add_argument(
+        "--opponent",
+        type=str,
+        help="Opponent team abbreviation (e.g., 'KC', 'SF')",
+    )
+    parser.add_argument(
+        "--season",
+        type=int,
+        help="Season year for prediction",
+    )
+    parser.add_argument(
+        "--week",
+        type=int,
+        help="Week number for prediction",
+    )
+    parser.add_argument(
         "--line",
         type=float,
         help="Prop line for prediction",
@@ -805,15 +1243,31 @@ def main():
         if not args.model or not args.player_id or args.line is None:
             parser.error("--predict requires --model, --player-id, --line")
 
+        # Additional required args for database lookup
+        if not args.opponent or not args.season or not args.week:
+            parser.error(
+                "--predict also requires --opponent, --season, --week for database feature lookup"
+            )
+
         predictor = PropsPredictor.load_model(args.model)
 
-        # TODO: Load player features from database
-        # For now, use dummy features
-        features = {col: 0.0 for col in predictor.feature_cols}
+        # Load player features from database
+        features = predictor.load_player_features_from_db(
+            player_id=args.player_id,
+            season=args.season,
+            week=args.week,
+            opponent=args.opponent,
+        )
+
+        if features is None:
+            logger.error(
+                f"Failed to load features for {args.player_id} - cannot make prediction"
+            )
+            return
 
         result = predictor.predict_single(
             player_id=args.player_id,
-            player_name="Player Name",
+            player_name=features.get("player_name", "Player Name"),
             features=features,
             line=args.line,
         )

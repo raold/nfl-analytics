@@ -46,7 +46,8 @@ class TestExponentialDecayAdjustment(unittest.TestCase):
         with patch.object(
             self.generator, "get_dc_continuity", return_value=(0, "New DC", "Old DC")
         ):
-            features = self.generator.get_features("BUF", 2024, 1)
+            with patch.object(self.generator, "get_dc_tenure", return_value=1):
+                features = self.generator.get_features("BUF", 2024, 1)
 
         self.assertAlmostEqual(
             features["new_dc_adjustment"],

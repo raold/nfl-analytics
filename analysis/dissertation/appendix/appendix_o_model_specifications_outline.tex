@@ -1021,22 +1021,11 @@ Figure~\ref{fig:calibration-curves} presents calibration curves for all three Ba
 
 \begin{figure}[htbp]
 \centering
-% PLACEHOLDER: Include actual TikZ/pgfplots calibration curves here
-% Example structure:
-% \begin{tikzpicture}
-% \begin{axis}[...]
-% \addplot[...] coordinates {(0.1, 0.095) (0.2, 0.189) ... (0.9, 0.885)};
-% \end{axis}
-% \end{tikzpicture}
-\fbox{\parbox{0.9\linewidth}{\centering
-\textbf{[PLACEHOLDER: Calibration Curves]}\\[0.5em]
-3 panels (State-Space v2, Hierarchical v2, Informative Priors v2)\\
-X-axis: Predicted quantile (0.1--0.9)\\
-Y-axis: Empirical coverage\\
-Diagonal line = perfect calibration\\
-Points = observed coverage at each quantile\\
-Shaded region = 95\% confidence band
-}}
+\IfFileExists{../figures/out/bayesian_calibration_curves.png}{%
+  \includegraphics[width=0.9\linewidth]{../figures/out/bayesian_calibration_curves.png}%
+}{%
+  \fbox{\scriptsize Calibration curves pending}%
+}
 \caption{Calibration Curves for Bayesian Models}
 \label{fig:calibration-curves}
 \end{figure}
@@ -1055,16 +1044,11 @@ Figure~\ref{fig:convergence-traces} shows $\hat{R}$ evolution over MCMC iteratio
 
 \begin{figure}[htbp]
 \centering
-% PLACEHOLDER: Include convergence trace plots
-\fbox{\parbox{0.9\linewidth}{\centering
-\textbf{[PLACEHOLDER: Convergence Traces]}\\[0.5em]
-2 panels (Hierarchical v2, Informative Priors v2)\\
-X-axis: MCMC iteration (0--6000)\\
-Y-axis: $\hat{R}$ statistic\\
-Horizontal line at $\hat{R}$ = 1.02 (threshold)\\
-Three traces: 2000 iter, 4000 iter, 6000 iter\\
-Demonstrates improvement: 1.03 → 1.01 → 1.009
-}}
+\IfFileExists{../figures/out/mcmc_convergence_traces.png}{%
+  \includegraphics[width=0.9\linewidth]{../figures/out/mcmc_convergence_traces.png}%
+}{%
+  \fbox{\scriptsize Convergence traces pending}%
+}
 \caption{Convergence Improvement with Increased MCMC Iterations}
 \label{fig:convergence-traces}
 \end{figure}
@@ -1075,17 +1059,12 @@ Figure~\ref{fig:feature-importance} displays gain-based feature importance for X
 
 \begin{figure}[htbp]
 \centering
-% PLACEHOLDER: Feature importance bar chart
-\fbox{\parbox{0.9\linewidth}{\centering
-\textbf{[PLACEHOLDER: Feature Importance]}\\[0.5em]
-Horizontal bar chart\\
-X-axis: Feature gain (0--1.0)\\
-Y-axis: Feature names (6 features)\\
-Dominant bar: residual\_feature (0.914)\\
-Color: accent blue gradient\\
-Validates orthogonalization strategy
-}}
-\caption{XGBoost v4 Feature Importance (Gain Metric)}
+\IfFileExists{../figures/out/xgboost_feature_importance.png}{%
+  \includegraphics[width=0.9\linewidth]{../figures/out/xgboost_feature_importance.png}%
+}{%
+  \fbox{\scriptsize Feature importance figure pending}%
+}
+\caption{XGBoost v5.1 Feature Importance (Gain Metric, Top 20)}
 \label{fig:feature-importance}
 \end{figure}
 

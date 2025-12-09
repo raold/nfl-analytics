@@ -224,7 +224,7 @@ def fetch_odds_for_date(
     regions: str = DEFAULT_REGIONS,
     markets: str = DEFAULT_MARKETS,
 ) -> list[dict[str, Any]]:
-    """Fetch odds for a specific date."""
+    """Fetch historical odds for a specific date (requires paid plan)."""
     url = f"{API_BASE}/historical/sports/{sport_key}/odds"
     snapshot_at = dt.datetime.combine(date, dt.time(0, 0, tzinfo=dt.UTC))
 

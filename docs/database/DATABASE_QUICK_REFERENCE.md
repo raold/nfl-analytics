@@ -89,12 +89,13 @@ postgresql://dro:sicillionbillions@localhost:5544/devdb01
 
 ## Schema Overview
 
-**56 tables across 5 schemas:**
-- `public` - Raw data (games, plays, weather, injuries, odds_history)
-- `mart` - Derived tables and materialized views
-- `nfl` - (if exists) Additional NFL data
-- `ml` - (Nov 2, 2025) Model registry and training metadata
-- `admin` - System tables
+**56 tables across 4 user schemas** (+ TimescaleDB internal schemas):
+- `public` - Raw data (games, plays, weather, injuries, odds_history, nextgen_*, players, rosters_weekly)
+- `mart` - Derived tables and materialized views (player_hierarchy, player_game_stats, team_epa, team_injury_load)
+- `ml` - Model registry and training metadata (model_registry, predictions, ensemble_versions)
+- `metadata` - Column lineage tracking
+
+**Note:** TimescaleDB adds 8 internal schemas (_timescaledb_*) for hypertable management.
 
 ---
 

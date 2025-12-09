@@ -666,76 +666,85 @@ safe_db_operation(
     }
 
     # ============================================================
-    # 3. ROSTERS (ROSTERS TABLE) - DISABLED FOR PHASE 1
+    # 3. ROSTERS (using rosters_weekly table)
     # ============================================================
+    # Re-enabled: FK constraint dropped, using rosters_weekly instead of rosters
 
-    # DISABLED: Rosters cause transaction rollback due to FK constraint with players table
-    # Players table must be populated FIRST before rosters can be inserted
-    # This is not critical for Phase 1 (play-by-play data is what matters for props predictions)
-    # TODO Phase 2: Fix rosters_player_id_fkey constraint or populate players table first
-    log_message("Skipping rosters ingestion for Phase 1 (not critical - plays data imported successfully)", level = "INFO")
+    roster_result <- tryCatch(
+      {
+        run_pipeline_step(
+          step_name = sprintf("Load %d Rosters", CURRENT_SEASON),
+          expr = {
+            # Load rosters with retry
+            rosters <- retry_operation(
+              expr = load_rosters(CURRENT_SEASON),
+              max_attempts = 3,
+              delay = 5,
+              error_message = sprintf("Failed to load %d rosters from nflverse", CURRENT_SEASON)
+            )
 
-    # Rosters ingestion disabled - uncommit below when players table is populated
-    # roster_result <- tryCatch({
-    #   run_pipeline_step(
-    #     step_name = sprintf("Load %d Rosters", CURRENT_SEASON),
-    #     expr = {
-    #     # Load rosters with retry
-    #     rosters <- retry_operation(
-    #       expr = load_rosters(CURRENT_SEASON),
-    #       max_attempts = 3,
-    #       delay = 5,
-    #       error_message = sprintf("Failed to load %d rosters from nflverse", CURRENT_SEASON)
-    #     )
-    #
-    #     log_message(sprintf("Found %d roster entries", nrow(rosters)), level = "INFO")
-    #
-    #     # Select only columns that exist in our database schema
-    #     # Database has: season, week, team, player_id, position, depth_chart_position,
-    #     #               jersey_number, status, full_name, football_name
-    #     rosters <- rosters %>%
-    #       select(any_of(c(
-    #         "season", "week", "team",
-    #         "gsis_id",  # Will rename to player_id
-    #         "position", "depth_chart_position", "jersey_number",
-    #         "status", "full_name", "football_name"
-    #       ))) %>%
-    #       rename(player_id = gsis_id)  # Database uses player_id not gsis_id
-    #
-    #     # Filter out NULL or empty player_id entries (primary key constraint)
-    #     null_count <- sum(is.na(rosters$player_id) | rosters$player_id == "")
-    #     if (null_count > 0) {
-    #       log_message(sprintf("Filtering %d roster entries with NULL/empty player_id", null_count), level = "WARNING")
-    #       rosters <- rosters[!is.na(rosters$player_id) & rosters$player_id != "", ]
-    #     }
-    #
-    #     # Validate rosters
-    #     validate_data(
-    #       data = rosters,
-    #       expected_cols = c("season", "week", "team", "player_id"),
-    #       min_rows = 100  # Should have many roster entries
-    #     )
-    #
-    #     # Delete existing rosters for this season
-    #     deleted_count <- dbExecute(conn,
-    #       sprintf("DELETE FROM rosters WHERE season = %d", CURRENT_SEASON))
-    #     log_message(sprintf("Deleted %d existing roster entries for season %d",
-    #                        deleted_count, CURRENT_SEASON),
-    #                level = "INFO")
-    #
-    #     # Insert new rosters
-    #     dbWriteTable(conn, "rosters", rosters, append = TRUE, row.names = FALSE)
-    #     log_message(sprintf("Inserted %d roster entries", nrow(rosters)), level = "INFO")
-    #
-    #     TRUE
-    #     },
-    #     conn = conn
-    #   )
-    # }, error = function(e) {
-    #   log_message(sprintf("Rosters ingestion skipped due to error: %s", e$message), level = "WARNING")
-    #   log_message("This is OK - rosters are not critical for Phase 1 (plays data is what matters)", level = "INFO")
-    #   NULL
-    # })
+            log_message(sprintf("Found %d roster entries", nrow(rosters)), level = "INFO")
+
+            # Select columns that exist in rosters_weekly table
+            # rosters_weekly uses gsis_id (not player_id)
+            available_cols <- c(
+              "season", "week", "game_type", "team", "gsis_id",
+              "position", "depth_chart_position", "jersey_number",
+              "status", "full_name", "first_name", "last_name",
+              "birth_date", "height", "weight", "college",
+              "espn_id", "sportradar_id", "yahoo_id", "rotowire_id",
+              "pff_id", "pfr_id", "fantasy_data_id", "sleeper_id",
+              "years_exp", "headshot_url", "ngs_position",
+              "status_description_abbr", "football_name",
+              "esb_id", "gsis_it_id", "smart_id",
+              "entry_year", "rookie_year", "draft_club", "draft_number"
+            )
+
+            rosters <- rosters %>%
+              select(any_of(available_cols))
+
+            # Filter out NULL or empty gsis_id entries (primary key component)
+            null_count <- sum(is.na(rosters$gsis_id) | rosters$gsis_id == "")
+            if (null_count > 0) {
+              log_message(sprintf("Filtering %d roster entries with NULL/empty gsis_id", null_count), level = "WARNING")
+              rosters <- rosters[!is.na(rosters$gsis_id) & rosters$gsis_id != "", ]
+            }
+
+            # Validate rosters
+            validate_data(
+              data = rosters,
+              expected_cols = c("season", "week", "team", "gsis_id"),
+              min_rows = 100
+            )
+
+            # Delete existing rosters for this season from rosters_weekly
+            deleted_count <- dbExecute(
+              conn,
+              sprintf("DELETE FROM rosters_weekly WHERE season = %d", CURRENT_SEASON)
+            )
+            log_message(
+              sprintf(
+                "Deleted %d existing roster entries for season %d",
+                deleted_count, CURRENT_SEASON
+              ),
+              level = "INFO"
+            )
+
+            # Insert new rosters into rosters_weekly
+            dbWriteTable(conn, "rosters_weekly", rosters, append = TRUE, row.names = FALSE)
+            log_message(sprintf("Inserted %d roster entries into rosters_weekly", nrow(rosters)), level = "INFO")
+
+            TRUE
+          },
+          conn = conn
+        )
+      },
+      error = function(e) {
+        log_message(sprintf("Rosters ingestion failed: %s", e$message), level = "WARNING")
+        log_message("Continuing without roster update (existing data preserved)", level = "INFO")
+        NULL
+      }
+    )
 
     # ============================================================
     # 4. CALCULATE TURNOVERS AND PENALTIES (if plays exist)
@@ -813,7 +822,7 @@ safe_db_operation(
       SELECT
         (SELECT COUNT(*) FROM games WHERE season = %d) as games_count,
         (SELECT COUNT(*) FROM plays WHERE game_id LIKE '%d_%%') as plays_count,
-        (SELECT COUNT(*) FROM rosters WHERE season = %d) as roster_count,
+        (SELECT COUNT(*) FROM rosters_weekly WHERE season = %d) as roster_count,
         (SELECT COUNT(*) FROM games WHERE season = %d AND home_score IS NOT NULL) as completed_games
     ", CURRENT_SEASON, CURRENT_SEASON, CURRENT_SEASON, CURRENT_SEASON))
 
