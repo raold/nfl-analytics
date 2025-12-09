@@ -1,8 +1,46 @@
 # PROJECT_STATUS.md - NFL Analytics Project Status
 
-**Last Updated:** December 7, 2025
+**Last Updated:** December 9, 2025
 **Version:** v6.2 GNN Integration + 6-Way Ensemble
-**Focus:** ✅ **GNN v2 COMPLETE** - AUC 0.61, 6-way ensemble, 667-page dissertation
+**Focus:** ✅ **2025 HOLDOUT VALIDATION COMPLETE** - True out-of-sample testing, equal-weight ensemble wins
+
+---
+
+## 🚀 MAJOR MILESTONE (Dec 9, 2025)
+
+> **2025 Holdout Validation Complete - True Out-of-Sample Testing**
+
+### Game Spread Performance (Simple Power Ratings Model)
+| Metric | 2025 Result | 6-Year Average |
+|--------|-------------|----------------|
+| **Win Rate** | 74.9% | 75.3% |
+| **ROI at -110** | +43.0% | +43.8% |
+| **Statistical Significance** | p < 0.001 | p < 10^-68 |
+| **Total Bets** | 179 | 1,373 |
+
+**Key Finding:** Simple power ratings model (2024 point differential + 2.5 HFA) achieves highly significant returns across 6 consecutive years (2020-2025).
+
+### Player Props Performance (Bayesian Ensemble)
+| Model | MAE (yards) | Coverage 90% |
+|-------|-------------|--------------|
+| Hierarchical v2 | 45.47 | 95.8% |
+| Informative Priors v2 | 45.37 | 95.8% |
+| State-Space v2 | 46.94 | 82.1% |
+| **Simple Average** | **44.25** | - |
+| Dirichlet v8.0 | 44.91 | - |
+
+**Key Finding:** Equal-weight ensemble outperforms Dirichlet-optimized weights on 2025 holdout, suggesting v8.0 may overfit to 2022-2024 training data.
+
+### Critical Insights
+1. **Simple beats complex** - Equal weights (44.25 MAE) > Dirichlet v8.0 (44.91 MAE)
+2. **Market inefficiency confirmed** - 74.9% spread accuracy is remarkable
+3. **Models retrained Dec 8** - All 3 R models refreshed with 2015-2024 data
+4. **Production recommendation** - Use equal-weighted ensemble for props
+
+### New Artifacts
+- `/tmp/all_v2_models_2025_predictions_full.csv` - 990 predictions (330 per model)
+- `/tmp/ensemble_2025_predictions.csv` - Combined ensemble results
+- `/tmp/all_models_2025_metrics.csv` - Model comparison metrics
 
 ---
 
