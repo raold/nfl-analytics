@@ -188,6 +188,96 @@ class NFLDatabase:
         logger.info(f"Loaded {len(df)} games for season {season}")
         return df
 
+    def load_nextgen_passing(self, season: int) -> pd.DataFrame:
+        """Load NextGen passing stats for a season."""
+        query = f"""
+        SELECT
+            player_id, season, week,
+            attempts, pass_yards, pass_touchdowns, interceptions,
+            passer_rating, completions, completion_percentage,
+            avg_time_to_throw, avg_completed_air_yards, avg_intended_air_yards,
+            avg_air_yards_differential, aggressiveness, max_completed_air_distance,
+            avg_air_yards_to_sticks, completion_percentage_above_expectation,
+            expected_completion_percentage
+        FROM nextgen_passing
+        WHERE season = {season}
+        """
+        with psycopg.connect(self.db_url) as conn:
+            df = pd.read_sql(query, conn)
+        logger.info(f"Loaded {len(df)} NextGen passing records for {season}")
+        return df
+
+    def load_nextgen_rushing(self, season: int) -> pd.DataFrame:
+        """Load NextGen rushing stats for a season."""
+        query = f"""
+        SELECT
+            player_id, season, week,
+            carries, rush_yards, rush_touchdowns, rush_first_downs, rush_fumbles,
+            efficiency, percent_attempts_gte_eight_defenders, avg_time_to_los,
+            rush_yards_over_expected, avg_rush_yards,
+            rush_yards_over_expected_per_att, rush_pct_over_expected
+        FROM nextgen_rushing
+        WHERE season = {season}
+        """
+        with psycopg.connect(self.db_url) as conn:
+            df = pd.read_sql(query, conn)
+        logger.info(f"Loaded {len(df)} NextGen rushing records for {season}")
+        return df
+
+    def load_nextgen_receiving(self, season: int) -> pd.DataFrame:
+        """Load NextGen receiving stats for a season."""
+        query = f"""
+        SELECT
+            player_id, season, week,
+            targets, receptions, receiving_yards, receiving_touchdowns, receiving_fumbles,
+            receiving_air_yards, receiving_yards_after_catch, receiving_first_downs,
+            avg_cushion, avg_separation, avg_intended_air_yards,
+            percent_share_of_intended_air_yards, catch_percentage,
+            avg_yac, avg_expected_yac, avg_yac_above_expectation
+        FROM nextgen_receiving
+        WHERE season = {season}
+        """
+        with psycopg.connect(self.db_url) as conn:
+            df = pd.read_sql(query, conn)
+        logger.info(f"Loaded {len(df)} NextGen receiving records for {season}")
+        return df
+
+    def load_player_info(self) -> pd.DataFrame:
+        """Load player biographical info (weight, experience, draft position)."""
+        query = """
+        SELECT
+            player_id,
+            weight,
+            years_exp,
+            draft_number,
+            EXTRACT(YEAR FROM AGE(CURRENT_DATE, birth_date)) as age
+        FROM players
+        WHERE player_id IS NOT NULL
+        """
+        with psycopg.connect(self.db_url) as conn:
+            df = pd.read_sql(query, conn)
+        logger.info(f"Loaded {len(df)} player info records")
+        return df
+
+    def load_bayesian_ratings(self, season: int) -> pd.DataFrame:
+        """Load Bayesian player ratings for a season."""
+        query = f"""
+        SELECT
+            player_id,
+            stat_type,
+            rating_mean,
+            rating_sd,
+            position_group_mean,
+            team_effect,
+            n_games_observed
+        FROM mart.bayesian_player_ratings
+        WHERE season = {season}
+        """
+        with psycopg.connect(self.db_url) as conn:
+            df = pd.read_sql(query, conn)
+        logger.info(f"Loaded {len(df)} Bayesian rating records for {season}")
+        return df
+
 
 # =============================================================================
 # Graph Builder
@@ -280,23 +370,64 @@ class NFLGraphBuilder:
 
         # Load player stats from ALL seasons
         all_stats = []
+        all_passing = []
+        all_rushing = []
+        all_receiving = []
+        all_ratings = []
+
         for season in seasons:
             season_stats = self.db.load_player_game_stats(season=season)
             all_stats.append(season_stats)
 
+            # Load enhanced features for each season
+            try:
+                all_passing.append(self.db.load_nextgen_passing(season=season))
+            except Exception:
+                pass
+            try:
+                all_rushing.append(self.db.load_nextgen_rushing(season=season))
+            except Exception:
+                pass
+            try:
+                all_receiving.append(self.db.load_nextgen_receiving(season=season))
+            except Exception:
+                pass
+            try:
+                all_ratings.append(self.db.load_bayesian_ratings(season=season))
+            except Exception:
+                pass
+
         player_stats = pd.concat(all_stats, ignore_index=True)
         logger.info(f"  Unified player stats: {len(player_stats)} player-game records")
 
+        # Concatenate enhanced features
+        nextgen_passing = pd.concat(all_passing, ignore_index=True) if all_passing else None
+        nextgen_rushing = pd.concat(all_rushing, ignore_index=True) if all_rushing else None
+        nextgen_receiving = pd.concat(all_receiving, ignore_index=True) if all_receiving else None
+        bayesian_ratings = pd.concat(all_ratings, ignore_index=True) if all_ratings else None
+
+        try:
+            player_info = self.db.load_player_info()
+        except Exception:
+            player_info = None
+
         # 1. Add player nodes (use hierarchy as source of truth for player list)
-        logger.info("Adding player nodes...")
-        player_features = self._create_player_features(player_stats)
+        logger.info("Adding player nodes with 51-dim features...")
+        player_features = self._create_player_features(
+            player_stats,
+            nextgen_passing=nextgen_passing,
+            nextgen_rushing=nextgen_rushing,
+            nextgen_receiving=nextgen_receiving,
+            player_info=player_info,
+            bayesian_ratings=bayesian_ratings,
+        )
 
         # Add nodes for ALL players in hierarchy (with or without stats)
         for _, player in player_hierarchy.iterrows():
             player_id = player["player_id"]
             features = player_features.get(
                 player_id,
-                torch.zeros(9, dtype=torch.float32)  # Zero features if no stats
+                torch.zeros(self.PLAYER_FEATURE_DIM, dtype=torch.float32)  # Zero features if no stats
             )
             graph.add_node("player", features=features, external_id=player_id)
 
@@ -370,6 +501,9 @@ class NFLGraphBuilder:
 
         return graph
 
+    # Number of player features (must match _create_player_features output)
+    PLAYER_FEATURE_DIM = 51
+
     def build_season_graph(
         self,
         season: int,
@@ -377,7 +511,7 @@ class NFLGraphBuilder:
         include_matchups: bool = False
     ) -> NFLGraph:
         """
-        Build graph for an entire season.
+        Build graph for an entire season with comprehensive player features.
 
         Args:
             season: NFL season (e.g., 2024)
@@ -391,20 +525,59 @@ class NFLGraphBuilder:
 
         graph = NFLGraph()
 
-        # Load data
+        # Load all data sources
+        logger.info("Loading data...")
         player_hierarchy = self.db.load_player_hierarchy(season=season)
         player_stats = self.db.load_player_game_stats(season=season)
 
+        # Load enhanced features
+        try:
+            nextgen_passing = self.db.load_nextgen_passing(season=season)
+        except Exception as e:
+            logger.warning(f"Could not load NextGen passing: {e}")
+            nextgen_passing = None
+
+        try:
+            nextgen_rushing = self.db.load_nextgen_rushing(season=season)
+        except Exception as e:
+            logger.warning(f"Could not load NextGen rushing: {e}")
+            nextgen_rushing = None
+
+        try:
+            nextgen_receiving = self.db.load_nextgen_receiving(season=season)
+        except Exception as e:
+            logger.warning(f"Could not load NextGen receiving: {e}")
+            nextgen_receiving = None
+
+        try:
+            player_info = self.db.load_player_info()
+        except Exception as e:
+            logger.warning(f"Could not load player info: {e}")
+            player_info = None
+
+        try:
+            bayesian_ratings = self.db.load_bayesian_ratings(season=season)
+        except Exception as e:
+            logger.warning(f"Could not load Bayesian ratings: {e}")
+            bayesian_ratings = None
+
         # 1. Add player nodes (use hierarchy as source of truth for player list)
-        logger.info("Adding player nodes...")
-        player_features = self._create_player_features(player_stats)
+        logger.info("Adding player nodes with 51-dim features...")
+        player_features = self._create_player_features(
+            player_stats,
+            nextgen_passing=nextgen_passing,
+            nextgen_rushing=nextgen_rushing,
+            nextgen_receiving=nextgen_receiving,
+            player_info=player_info,
+            bayesian_ratings=bayesian_ratings,
+        )
 
         # Add nodes for ALL players in hierarchy (with or without stats)
         for _, player in player_hierarchy.iterrows():
             player_id = player["player_id"]
             features = player_features.get(
                 player_id,
-                torch.zeros(9, dtype=torch.float32)  # Zero features if no stats
+                torch.zeros(self.PLAYER_FEATURE_DIM, dtype=torch.float32)  # Zero features if no stats
             )
             graph.add_node("player", features=features, external_id=player_id)
 
@@ -478,57 +651,163 @@ class NFLGraphBuilder:
 
         return graph
 
-    def _create_player_features(self, player_stats: pd.DataFrame) -> Dict[str, torch.Tensor]:
+    def _create_player_features(
+        self,
+        player_stats: pd.DataFrame,
+        nextgen_passing: Optional[pd.DataFrame] = None,
+        nextgen_rushing: Optional[pd.DataFrame] = None,
+        nextgen_receiving: Optional[pd.DataFrame] = None,
+        player_info: Optional[pd.DataFrame] = None,
+        bayesian_ratings: Optional[pd.DataFrame] = None,
+    ) -> Dict[str, torch.Tensor]:
         """
-        Create player feature tensors from stats.
+        Create comprehensive player feature tensors from all available data sources.
 
-        Aggregates season-level stats for each player.
-
-        Features (10-dim):
-        - Average attempts, yards, TDs
-        - Completion percentage (for QBs)
-        - Efficiency metrics (avg_time_to_throw, cpoe, etc.)
+        Features (51 dimensions total):
+        - Basic stats (9): attempts, yards, TDs, completion%, time_to_throw, air_yards_diff, cpoe, negatives, games
+        - NextGen Passing (14): passer_rating, completed_air_yards, intended_air_yards, aggressiveness,
+                               max_completed_air_distance, air_yards_to_sticks, expected_comp%, interceptions, etc.
+        - NextGen Rushing (10): efficiency, time_to_los, ryoe, ryoe_per_att, rush_pct_over_expected,
+                               first_downs, fumbles, carries, yards, TDs
+        - NextGen Receiving (13): separation, cushion, yac, expected_yac, yac_above_exp, catch_pct,
+                                 air_yards_share, targets, receptions, yards, TDs, first_downs, fumbles
+        - Player Info (4): weight, experience, draft_pick, age
+        - Bayesian Ratings (1): rating_mean (averaged across stat types)
 
         Returns:
             Dict[player_id → feature_tensor]
         """
         player_features = {}
 
+        # Index auxiliary data by player_id for fast lookup
+        passing_by_player = {}
+        if nextgen_passing is not None and len(nextgen_passing) > 0:
+            for pid, grp in nextgen_passing.groupby("player_id"):
+                passing_by_player[pid] = grp.mean(numeric_only=True)
+
+        rushing_by_player = {}
+        if nextgen_rushing is not None and len(nextgen_rushing) > 0:
+            for pid, grp in nextgen_rushing.groupby("player_id"):
+                rushing_by_player[pid] = grp.mean(numeric_only=True)
+
+        receiving_by_player = {}
+        if nextgen_receiving is not None and len(nextgen_receiving) > 0:
+            for pid, grp in nextgen_receiving.groupby("player_id"):
+                receiving_by_player[pid] = grp.mean(numeric_only=True)
+
+        info_by_player = {}
+        if player_info is not None and len(player_info) > 0:
+            info_by_player = player_info.set_index("player_id").to_dict("index")
+
+        ratings_by_player = {}
+        if bayesian_ratings is not None and len(bayesian_ratings) > 0:
+            for pid, grp in bayesian_ratings.groupby("player_id"):
+                ratings_by_player[pid] = grp["rating_mean"].mean()
+
+        def safe_get(data, key, default=0.0):
+            """Safely get a value, handling NaN."""
+            if data is None:
+                return default
+            val = data.get(key, default) if isinstance(data, dict) else data[key] if key in data.index else default
+            return float(val) if not pd.isna(val) else default
+
         # Group by player and aggregate
         for player_id, group in player_stats.groupby("player_id"):
-            # Aggregate stats across all games
             features = []
 
-            # Basic stats
+            # === Basic stats (9 features) ===
             features.append(group["stat_attempts"].mean() if "stat_attempts" in group else 0.0)
             features.append(group["stat_yards"].mean() if "stat_yards" in group else 0.0)
             features.append(group["stat_touchdowns"].mean() if "stat_touchdowns" in group else 0.0)
-
-            # Completion percentage (for QBs/WRs)
             completions = group["stat_completions"].sum() if "stat_completions" in group else 0
             attempts = group["stat_attempts"].sum() if "stat_attempts" in group else 1
             features.append(completions / max(attempts, 1))
-
-            # Efficiency metrics (handle NaNs)
             features.append(group["avg_time_to_throw"].mean() if "avg_time_to_throw" in group else 0.0)
             features.append(group["avg_air_yards_differential"].mean() if "avg_air_yards_differential" in group else 0.0)
             features.append(group["cpoe"].mean() if "cpoe" in group else 0.0)
-
-            # Negative events (INTs, fumbles)
             features.append(group["stat_negative"].mean() if "stat_negative" in group else 0.0)
+            features.append(len(group))  # games played
 
-            # Games played
-            features.append(len(group))
+            # === NextGen Passing (14 features) ===
+            passing = passing_by_player.get(player_id)
+            features.append(safe_get(passing, "passer_rating"))
+            features.append(safe_get(passing, "avg_completed_air_yards"))
+            features.append(safe_get(passing, "avg_intended_air_yards"))
+            features.append(safe_get(passing, "aggressiveness"))
+            features.append(safe_get(passing, "max_completed_air_distance"))
+            features.append(safe_get(passing, "avg_air_yards_to_sticks"))
+            features.append(safe_get(passing, "expected_completion_percentage"))
+            features.append(safe_get(passing, "completion_percentage_above_expectation"))
+            features.append(safe_get(passing, "interceptions"))
+            features.append(safe_get(passing, "pass_yards"))
+            features.append(safe_get(passing, "pass_touchdowns"))
+            features.append(safe_get(passing, "attempts"))
+            features.append(safe_get(passing, "completions"))
+            features.append(safe_get(passing, "completion_percentage"))
 
-            # Position encoding (one-hot)
-            # TODO: Add position one-hot encoding if needed
+            # === NextGen Rushing (10 features) ===
+            rushing = rushing_by_player.get(player_id)
+            features.append(safe_get(rushing, "efficiency"))
+            features.append(safe_get(rushing, "avg_time_to_los"))
+            features.append(safe_get(rushing, "rush_yards_over_expected"))
+            features.append(safe_get(rushing, "rush_yards_over_expected_per_att"))
+            features.append(safe_get(rushing, "rush_pct_over_expected"))
+            features.append(safe_get(rushing, "rush_first_downs"))
+            features.append(safe_get(rushing, "rush_fumbles"))
+            features.append(safe_get(rushing, "carries"))
+            features.append(safe_get(rushing, "rush_yards"))
+            features.append(safe_get(rushing, "rush_touchdowns"))
+
+            # === NextGen Receiving (13 features) ===
+            receiving = receiving_by_player.get(player_id)
+            features.append(safe_get(receiving, "avg_separation"))
+            features.append(safe_get(receiving, "avg_cushion"))
+            features.append(safe_get(receiving, "avg_yac"))
+            features.append(safe_get(receiving, "avg_expected_yac"))
+            features.append(safe_get(receiving, "avg_yac_above_expectation"))
+            features.append(safe_get(receiving, "catch_percentage"))
+            features.append(safe_get(receiving, "percent_share_of_intended_air_yards"))
+            features.append(safe_get(receiving, "targets"))
+            features.append(safe_get(receiving, "receptions"))
+            features.append(safe_get(receiving, "receiving_yards"))
+            features.append(safe_get(receiving, "receiving_touchdowns"))
+            features.append(safe_get(receiving, "receiving_first_downs"))
+            features.append(safe_get(receiving, "receiving_fumbles"))
+
+            # === Player Info (4 features) ===
+            info = info_by_player.get(player_id, {})
+            features.append(safe_get(info, "weight", 220.0))  # default weight
+            features.append(safe_get(info, "years_exp", 3.0))  # default experience
+            features.append(safe_get(info, "draft_number", 128.0))  # default mid-round pick
+            features.append(safe_get(info, "age", 26.0))  # default age
+
+            # === Bayesian Rating (1 feature) ===
+            features.append(ratings_by_player.get(player_id, 0.0))
 
             # Convert to tensor and handle NaNs
-            feature_tensor = torch.tensor([float(f) if not pd.isna(f) else 0.0 for f in features], dtype=torch.float32)
+            feature_tensor = torch.tensor(
+                [float(f) if not pd.isna(f) else 0.0 for f in features],
+                dtype=torch.float32
+            )
 
             player_features[player_id] = feature_tensor
 
-        logger.info(f"Created features for {len(player_features)} players")
+        logger.info(f"Created {len(features)}-dim features for {len(player_features)} players")
+
+        # Normalize features (z-score normalization) to improve gradient stability
+        if player_features:
+            all_features = torch.stack(list(player_features.values()))
+            mean = all_features.mean(dim=0)
+            std = all_features.std(dim=0)
+            # Avoid division by zero for constant features
+            std = torch.where(std < 1e-6, torch.ones_like(std), std)
+
+            # Apply normalization to each player's features
+            for player_id in player_features:
+                player_features[player_id] = (player_features[player_id] - mean) / std
+
+            logger.info(f"  Features normalized (z-score), dim={len(mean)}")
+
         return player_features
 
     def _find_chemistry_edges(self, player_hierarchy: pd.DataFrame) -> List[Tuple[str, str]]:

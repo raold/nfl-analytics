@@ -1,8 +1,32 @@
-# Agent Handbook
+# Agent Handbook - Single-User Edition
 
-## 🎯 Overview
+**Last Updated:** December 2025  
+**Context:** Single-user, local laptop development (no cloud, no security concerns)
 
-This NFL analytics platform uses a **three-agent coordination model** for efficient development and operations:
+> ⚠️ **IMPORTANT**: This system has been refactored for single-user use.  
+> 📚 **See:** `docs/AGENTS_SINGLE_USER.md` for the complete single-user guide.
+
+## 🚀 Quick Start (Single-User)
+
+```bash
+# Quick validation (2 checks)
+python scripts/quick_validate.py --quick
+
+# Before backtest (5 checks)
+python scripts/quick_validate.py --before-backtest
+
+# Before training (4 checks)
+python scripts/quick_validate.py --before-training
+```
+
+**Essential Agents (7):** NFL Domain, Data Leakage, SQL Schema, Statistical, Betting, Ensemble Health, Model Registry  
+**Removed Agents (3):** Security Auditor, A/B Test Monitor, Cache Invalidator (archived to `archive/agents/enterprise/`)
+
+---
+
+## 🎯 Original Three-Agent Model
+
+This NFL analytics platform originally used a **three-agent coordination model**:
 
 1. **DevOps Agent** - Infrastructure, database, deployment, monitoring
 2. **ETL Agent** - Data ingestion, pipelines, validation, quality
