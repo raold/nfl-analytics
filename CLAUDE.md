@@ -120,8 +120,12 @@
 | `defteam` | `opponent` | Defensive team |
 
 ### Team Abbreviations
-- Los Angeles teams: `LAR` (Rams), `LAC` (Chargers) - NOT `LA`
-- Washington: `WAS` (current), check season for historical
+**IMPORTANT:** Database uses nflverse format, models accept both:
+- Rams: Database uses `LA`, canonical is `LAR` - **BOTH are valid**
+- Chargers: `LAC` in both
+- Raiders: Database uses `LV` (current), `OAK` (historical)
+- Washington: `WAS` (current)
+- Use `py.utils.team_mapping.normalize_team()` for conversions
 
 ### SCHEMA-FIRST DISCIPLINE
 - `mart.player_game_stats` has NO `game_id` column - use `(season, week, team)` composite key

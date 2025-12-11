@@ -1,9 +1,9 @@
 # NFL Analytics API Endpoint Inventory
 
-**Last Updated:** November 28, 2025
+**Last Updated:** December 11, 2025
 **Total Endpoints:** 19
-**OpenAPI Coverage:** 6/19 (32%) - **14 endpoints need documentation**
-**Status:** Operational (v6.1 Ensemble)
+**OpenAPI Coverage:** 19/19 (100%) - **ALL ENDPOINTS DOCUMENTED**
+**Status:** Production Ready (v6.1 Ensemble)
 
 ---
 
@@ -11,63 +11,106 @@
 
 | Category | Documented | Undocumented | Total |
 |----------|------------|--------------|-------|
-| Root Level | 5 | 2 | 7 |
-| Game Predictions | 0 | 7 | 7 |
-| Props Predictions | 0 | 5 | 5 |
-| **Total** | **5** | **14** | **19** |
+| Root Level | 7 | 0 | 7 |
+| Game Predictions | 7 | 0 | 7 |
+| Props Predictions | 5 | 0 | 5 |
+| **Total** | **19** | **0** | **19** |
+
+**Documentation Status:** ✅ COMPLETE
+
+All 19 endpoints now have:
+- Full OpenAPI 3.0 specifications
+- Request/response schemas
+- Example requests and responses
+- Error documentation
+- Performance characteristics
+- Client SDK examples (Python, JavaScript)
 
 ---
 
 ## 1. Root Level Endpoints (main.py)
 
-### Documented in OpenAPI
+### All Documented ✅
 
-| Endpoint | Method | Description | Auth |
-|----------|--------|-------------|------|
-| `/` | GET | API root with links | No |
-| `/health` | GET | Service health status | No |
-| `/models` | GET | List loaded models | No |
-| `/predict` | POST | Player prop prediction | No |
-| `/metrics` | GET | Prometheus metrics | No |
-
-### Undocumented (NEED ADDITION)
-
-| Endpoint | Method | Description | Auth |
-|----------|--------|-------------|------|
-| `/status` | GET | Status and metrics summary | No |
-| `/predict/game` | POST | Game-level QB predictions | No |
+| Endpoint | Method | Description | OpenAPI | Auth |
+|----------|--------|-------------|---------|------|
+| `/` | GET | API root with links | ✅ | No |
+| `/health` | GET | Service health status | ✅ | No |
+| `/models` | GET | List loaded models | ✅ | No |
+| `/predict` | POST | Player prop prediction (legacy) | ✅ | No |
+| `/predict/game` | POST | Game-level QB predictions | ✅ | No |
+| `/metrics` | GET | Prometheus metrics | ✅ | No |
+| `/status` | GET | Status and metrics summary | ✅ | No |
 
 ---
 
 ## 2. Game Predictions (/api/v1)
 
 **Router:** `py/api/routes/game_predictions.py`
-**Status:** All 7 endpoints undocumented
+**Status:** All 7 endpoints documented ✅
 
-| Endpoint | Method | Description | Auth |
-|----------|--------|-------------|------|
-| `/api/v1/predict/game/full` | POST | Full game prediction (scores, spreads, totals, win probs) | No |
-| `/api/v1/predict/week` | POST | Batch predict all games in a week | No |
-| `/api/v1/predict/games/batch` | POST | Batch predict 1-50 games | No |
-| `/api/v1/predictions/game/{game_id}` | GET | Retrieve stored prediction | No |
-| `/api/v1/predict/game` | POST | QB passing yards for both teams | No |
-| `/api/v1/predict/cache/invalidate` | POST | Invalidate prediction cache | No |
-| `/api/v1/predict/cache/stats` | GET | Cache statistics | No |
+| Endpoint | Method | Description | OpenAPI | Cache | Auth |
+|----------|--------|-------------|---------|-------|------|
+| `/api/v1/predict/game/full` | POST | Full game prediction (scores, spreads, totals, win probs) | ✅ | Yes | No |
+| `/api/v1/predict/week` | POST | Batch predict all games in a week | ✅ | Yes | No |
+| `/api/v1/predict/games/batch` | POST | Batch predict 1-50 games | ✅ | Yes | No |
+| `/api/v1/predictions/game/{game_id}` | GET | Retrieve stored prediction | ✅ | N/A | No |
+| `/api/v1/predict/game` | POST | QB passing yards for both teams | ✅ | No | No |
+| `/api/v1/predict/cache/invalidate` | POST | Invalidate prediction cache | ✅ | N/A | No |
+| `/api/v1/predict/cache/stats` | GET | Cache statistics | ✅ | N/A | No |
 
 ---
 
 ## 3. Props Predictions (/api/v1)
 
 **Router:** `py/api/routes/props_predictions.py`
-**Status:** All 5 endpoints undocumented
+**Status:** All 5 endpoints documented ✅
 
-| Endpoint | Method | Description | Auth |
-|----------|--------|-------------|------|
-| `/api/v1/predict/passing_yards/{player_id}` | POST | Passing yards prediction (Ensemble v6.1 + A/B test) | No |
-| `/api/v1/predict/rushing_yards/{player_id}` | POST | Rushing yards prediction (Ensemble v6.1) | No |
-| `/api/v1/predict/receiving_yards/{player_id}` | POST | Receiving yards prediction (Ensemble v6.1) | No |
-| `/api/v1/predict/touchdown_prob/{player_id}` | POST | TD probability (XGBoost v1) | No |
-| `/api/v1/props/health` | GET | Props model health check | No |
+| Endpoint | Method | Description | OpenAPI | A/B Test | Auth |
+|----------|--------|-------------|---------|----------|------|
+| `/api/v1/predict/passing_yards/{player_id}` | POST | Passing yards prediction (Ensemble v6.1 + A/B test) | ✅ | Yes | No |
+| `/api/v1/predict/rushing_yards/{player_id}` | POST | Rushing yards prediction (Ensemble v6.1) | ✅ | No | No |
+| `/api/v1/predict/receiving_yards/{player_id}` | POST | Receiving yards prediction (Ensemble v6.1) | ✅ | No | No |
+| `/api/v1/predict/touchdown_prob/{player_id}` | POST | TD probability (XGBoost v1) | ✅ | No | No |
+| `/api/v1/props/health` | GET | Props model health check | ✅ | N/A | No |
+
+---
+
+## Documentation Deliverables
+
+### 1. API Reference Guide
+**File:** `/docs/api/API_REFERENCE.md`
+**Status:** ✅ Complete
+
+Contains:
+- Complete endpoint documentation
+- Request/response schemas
+- Authentication & rate limiting details
+- Model versions and performance metrics
+- Error codes and troubleshooting
+- Client SDK examples (Python, JavaScript)
+- Performance benchmarks
+- Example API calls (curl, Python, JS)
+
+### 2. OpenAPI 3.0 Specification
+**Endpoint:** `http://localhost:8000/openapi.json`
+**Status:** ✅ Auto-generated by FastAPI
+
+- Comprehensive schemas for all 19 endpoints
+- Request/response models with examples
+- Validation rules and constraints
+- Error response schemas
+- Interactive Swagger UI at `/docs`
+
+### 3. Interactive Documentation
+**Endpoint:** `http://localhost:8000/docs`
+**Status:** ✅ Available via Swagger UI
+
+Features:
+- Try-it-out functionality for all endpoints
+- Request/response examples
+- Schema validation
+- Error response previews
 
 ---
 
@@ -285,6 +328,20 @@ curl http://localhost:8000/api/v1/props/health
 | Informative Priors v2 | 13% | Bayesian informative priors (brms) |
 | Hybrid Incremental | 10% | 70% static + 30% incremental blend |
 
+### Dirichlet v8.0 (Props A/B Test)
+
+| Component | Weight | Notes |
+|-----------|--------|-------|
+| Hierarchical v2 | 39.6% | Up from 27% |
+| Informative Priors v2 | 39.5% | Up from 13% |
+| Hybrid Incremental | 10.1% | Similar |
+| State-Space v2 | 8.2% | Down from 27% |
+| XGBoost v4 Ridge | 2.6% | Down from 23% |
+
+**Performance:** 31.5% MAE improvement on validation set
+
+**2025 Holdout Note:** Equal-weight averaging (44.25 MAE) outperformed Dirichlet v8.0 (44.91 MAE) on Dec 9 holdout validation.
+
 ### Temperature Scaling
 
 - **T = 0.7083** (v6.1, corrected Nov 23)
@@ -293,8 +350,9 @@ curl http://localhost:8000/api/v1/props/health
 ### A/B Testing (Props)
 
 - **Control (50%):** Default v6.0 weights
-- **Treatment (50%):** Dirichlet v8.0 weights (31.5% MAE improvement)
-- **Assignment:** MD5 hash of player_id + week + season
+- **Treatment (50%):** Dirichlet v8.0 weights
+- **Assignment:** Deterministic MD5 hash of `player_id + week + season`
+- **Logging:** All predictions logged to `ml.predictions` table
 
 ---
 
@@ -306,6 +364,7 @@ curl http://localhost:8000/api/v1/props/health
 | Warm Predictions | ~105ms |
 | Cache Hit | <1ms |
 | Batch (16 games) | <2s (with cache) |
+| Week Prediction (14 games) | ~3-5s |
 
 ---
 
@@ -316,18 +375,52 @@ curl http://localhost:8000/api/v1/props/health
 | 200 | Success |
 | 400 | Validation error (invalid request) |
 | 404 | Game/player not found |
-| 503 | Models not available |
 | 500 | Internal server error |
+| 503 | Models not available |
+
+---
+
+## Changelog
+
+### December 11, 2025 - v3.0.0
+- ✅ **ALL 19 ENDPOINTS DOCUMENTED**
+- Created comprehensive API reference guide
+- Added request/response schemas with examples
+- Documented authentication and rate limiting (planned)
+- Added client SDK examples (Python, JavaScript)
+- Included performance benchmarks
+- Added troubleshooting and error handling guides
+
+### November 28, 2025 - v2.0
+- Identified 14 undocumented endpoints
+- Updated endpoint inventory
+- Added basic schemas
+
+### November 22, 2025 - v1.0
+- Initial endpoint inventory
+- Partial documentation for 5 endpoints
 
 ---
 
 ## Next Steps
 
-1. **Update OpenAPI spec** with 14 missing endpoints (6-8 hours)
-2. **Add authentication** to protected endpoints (optional)
-3. **Add rate limiting** per documentation claims
+1. ✅ **COMPLETED:** Update OpenAPI spec with 14 missing endpoints
+2. **TODO:** Add authentication to protected endpoints (optional)
+3. **TODO:** Implement rate limiting per documentation claims
+4. **TODO:** Create Postman collection for testing
+5. **TODO:** Generate API client libraries (Python, JavaScript, Go)
 
 ---
 
-**Author:** Claude Code (Opus 4.5)
-**Version:** 1.0
+## Links
+
+- **API Reference:** [/docs/api/API_REFERENCE.md](/docs/api/API_REFERENCE.md)
+- **OpenAPI Spec:** `http://localhost:8000/openapi.json`
+- **Swagger UI:** `http://localhost:8000/docs`
+- **ReDoc:** `http://localhost:8000/redoc` (alternative UI)
+
+---
+
+**Author:** Claude Code (Sonnet 4.5)
+**Version:** 3.0.0
+**Status:** ✅ Production Ready

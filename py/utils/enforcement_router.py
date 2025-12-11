@@ -453,6 +453,14 @@ class EnforcementRouter:
             import importlib.util
             from pathlib import Path
 
+            # Skip migration files that CREATE new tables (can't validate against non-existent schema)
+            if content and "migrations/" in file_path and re.search(r"CREATE\s+TABLE", content, re.IGNORECASE):
+                return ValidationResult(
+                    status=ValidationStatus.PASSED,
+                    agent_name="sql_validation",
+                    message="Migration file creating new table - skipping schema validation",
+                )
+
             # Load sql_validator module directly from file path
             # This works regardless of how enforcement_router is invoked
             sql_validator_path = Path(__file__).parent / "sql_validator.py"

@@ -310,15 +310,23 @@ A complete end-to-end sports betting system integrating: (1)~automated data pipe
 \paragraph{Final Performance Metrics (v6.0).}
 \begin{center}
 \small
-\begin{tabular}{p{3.2cm}p{1.8cm}p{5.8cm}}
+\begin{tabular}{p{3.8cm}p{2.0cm}p{5.0cm}}
 \toprule
-\textbf{Metric} & \textbf{Result} & \textbf{Interpretation} \\
+\textbf{Domain / Metric} & \textbf{Result} & \textbf{Interpretation} \\
 \midrule
-MAE Improvement & -33.4\% & Significant increase in prediction accuracy \\
-Closing Line Value & +28.5 bps & Beat market consensus by 0.285\% \\
-Win Rate & 60.8\% & Consistently winning bets \\
-\textbf{ROI} & \textbf{+6.45\%} & \textbf{Consistent profit after transaction costs} \\
-Sharpe Ratio & +2.51 & Strong risk-adjusted returns \\
+\multicolumn{3}{l}{\textit{Game Spread Predictions (2022--2025)}} \\
+\quad Cover Rate & 60.2\% & Exceeds 52.4\% breakeven threshold \\
+\quad 2025 Holdout Accuracy & 74.9\% & Validated on unseen season (p < 0.001) \\
+\quad Spread MAE & 10.25 pts & Near target (<10 pts) \\
+\midrule
+\multicolumn{3}{l}{\textit{Player Props Ensemble (2025 Holdout)}} \\
+\quad Passing Yards MAE & 44.25 yds & Equal-weight ensemble (best) \\
+\quad Calibration (90\% CI) & 95.8\% & Well-calibrated uncertainty \\
+\midrule
+\multicolumn{3}{l}{\textit{Betting Simulation (2022--2024)}} \\
+\quad \textbf{ROI} & \textbf{+2.96\%} & \textbf{Profitable after transaction costs} \\
+\quad Win Rate & 53.89\% & Above 52.4\% breakeven \\
+\quad Sharpe Ratio & 0.48 & Positive risk-adjusted returns \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -341,7 +349,7 @@ This dissertation presents a system-of-systems for prediction and decision-makin
 
 The final, profitable system is built on three core principles discovered through rigorous experimentation. First, a \textbf{feature orthogonalization methodology} ("Ridge Residuals") based on Gram-Schmidt decomposition is introduced to remove confounding between player skill and opponent strength, yielding an 88\% improvement in component accuracy. Second, a \textbf{diversified ensemble architecture} is employed, combining Bayesian (State-Space, Hierarchical), frequentist (ELO), and machine learning (XGBoost) models. We show that ensemble variance reduction is driven more by minimizing inter-model correlation ($\bar{\rho}=0.32$) than by maximizing individual model accuracy. Third, a \textbf{hybrid static-incremental structure} (70\% static, 30\% incremental) is developed to resolve the stability-adaptation trade-off, achieving a 4.2\% performance gain over pure static or incremental approaches.
 
-These modeling principles are integrated into a full-stack system featuring: idempotent data pipelines on TimescaleDB; dependence-aware pricing models (Skellam, copulas); and a risk-management layer using offline reinforcement learning (CQL) for bet sizing, governed by off-policy evaluation gates and portfolio-level CVaR constraints. Multi-season backtesting (2022-2024) of the final v6.0 system validates a +6.45\% ROI with a Sharpe Ratio of +2.51.
+These modeling principles are integrated into a full-stack system featuring: idempotent data pipelines on TimescaleDB; dependence-aware pricing models (Skellam, copulas); and a risk-management layer using offline reinforcement learning (CQL) for bet sizing, governed by off-policy evaluation gates and portfolio-level CVaR constraints. Multi-season backtesting (2022--2024) of the final v6.0 system validates a +2.96\% ROI with 53.89\% win rate, while true out-of-sample testing on 2025 data demonstrates 74.9\% spread prediction accuracy.
 
 The contributions are twofold: (1) a complete, reproducible, and profitable NFL betting system, and (2) a set of generalizable principles for applied machine learning in efficient markets, supported by a transparent accounting of both successful and failed research paths (e.g., an 84-hour, 0\%-return investigation into Bayesian Neural Networks). This work provides a playbook for moving beyond simple prediction to building robust, profitable, and deployable decision-making systems.
 \addcontentsline{toc}{chapter}{Abstract}

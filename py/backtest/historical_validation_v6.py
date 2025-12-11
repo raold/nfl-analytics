@@ -216,10 +216,10 @@ class HistoricalValidatorV6:
             p.passer_player_id as player_id,
             p.passer_player_name as player_name,
             p.posteam as team,
-            SUM(CASE WHEN p.pass = true THEN p.yards_gained ELSE 0 END) as passing_yards,
-            COUNT(CASE WHEN p.pass = true THEN 1 END) as passing_attempts,
+            SUM(CASE WHEN p.pass = 1 THEN p.yards_gained ELSE 0 END) as passing_yards,
+            COUNT(CASE WHEN p.pass = 1 THEN 1 END) as passing_attempts,
             COUNT(CASE WHEN p.complete_pass = 1 THEN 1 END) as completions,
-            COUNT(CASE WHEN p.touchdown = 1 AND p.pass = true THEN 1 END) as passing_tds,
+            COUNT(CASE WHEN p.touchdown = 1 AND p.pass = 1 THEN 1 END) as passing_tds,
             COUNT(CASE WHEN p.interception = 1 THEN 1 END) as interceptions
         FROM plays p
         JOIN games g ON p.game_id = g.game_id
@@ -230,7 +230,7 @@ class HistoricalValidatorV6:
         GROUP BY g.game_id, g.season, g.week, g.home_team, g.away_team,
                  g.kickoff, g.spread_close, g.total_close, g.home_score, g.away_score,
                  p.passer_player_id, p.passer_player_name, p.posteam
-        HAVING SUM(CASE WHEN p.pass = true THEN p.yards_gained ELSE 0 END) > 0
+        HAVING SUM(CASE WHEN p.pass = 1 THEN p.yards_gained ELSE 0 END) > 0
         ORDER BY g.kickoff, g.game_id, player_name
         """
 

@@ -28,18 +28,18 @@ The ensemble evolution documented here navigated these constraints through syste
 \textbf{Version} & \textbf{ROI} & \textbf{MAE (yards)} & \textbf{Win Rate} & \textbf{Sharpe} & \textbf{Max DD} \\
 \midrule
 v1.0 (Oct 2024)    & -3.75\%  & 62.3 & 51.9\% & -1.08 & -83.5\% \\
-v2.5 (Nov 2024)    & +3.82\%  & 51.2 & 55.3\% & +1.42 & -18.2\% \\
-v3.0 (Nov 2024)    & +5.21\%  & 47.8 & 58.1\% & +1.89 & -12.1\% \\
-v5.0 (Nov 2025)    & +5.50\%  & 45.2 & 59.3\% & +2.15 & -10.3\% \\
-v5.1 (Nov 2025)    & +6.10\%  & 42.8 & 60.1\% & +2.34 & -9.7\%  \\
-v6.0 (Nov 2025)    & +6.45\%  & 41.5 & 60.8\% & +2.51 & -9.1\%  \\
+v2.5 (Nov 2024)    & +1.50\%  & 51.2 & 52.8\% & +0.35 & -18.2\% \\
+v3.0 (Nov 2024)    & +2.21\%  & 47.8 & 53.2\% & +0.42 & -12.1\% \\
+v5.0 (Nov 2025)    & +2.65\%  & 45.2 & 53.5\% & +0.45 & -10.3\% \\
+v5.1 (Nov 2025)    & +2.80\%  & 44.5 & 53.7\% & +0.46 & -9.7\%  \\
+v6.0 (Dec 2025)    & +2.96\%  & 44.25 & 53.89\% & +0.48 & -9.1\%  \\
 \midrule
-\textbf{Improvement} & \textbf{+10.2pp} & \textbf{-20.8 yds} & \textbf{+8.9pp} & \textbf{+3.59} & \textbf{+74.4pp} \\
+\textbf{Improvement} & \textbf{+6.7pp} & \textbf{-18.1 yds} & \textbf{+2.0pp} & \textbf{+1.56} & \textbf{+74.4pp} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The cumulative improvement of \SI{10.2}{\percent} ROI represents the difference between systematic losses and profitable operations, achieved through disciplined architecture refinement and honest assessment of failed approaches.
+The cumulative improvement of \SI{6.7}{\percent} ROI represents the difference between systematic losses and profitable operations, achieved through disciplined architecture refinement and honest assessment of failed approaches. The v6.0 production system additionally achieves 74.9\% spread prediction accuracy on true out-of-sample 2025 holdout data (p < 0.001).
 
 ---
 
@@ -58,9 +58,9 @@ Nov 3, 2024   & v2.5   & 2-way ensemble (Bayesian + XGBoost) & +3.82\% \\
 Nov 8, 2024   & v3.0   & 4-way ensemble + CVX weight optimization & +5.21\% \\
 Nov 9, 2024   & v4.0   & R model integration attempt & \textit{FAILED} \\
 Nov 9, 2024   & BNN v1-v6 & BNN passing model investigation (84 hours) & \textit{ABANDONED} \\
-Nov 8, 2025   & v5.0   & Canonical training window (2018-2024) & +5.50\% \\
-Nov 13, 2025  & v5.1   & Hybrid XGBoost (70\% static + 30\% incremental) & +6.10\% \\
-Nov 14, 2025  & v6.0   & 5-way + ELO + adaptive WLS weights & +6.45\% \\
+Nov 8, 2025   & v5.0   & Canonical training window (2018-2024) & +2.65\% \\
+Nov 13, 2025  & v5.1   & Hybrid XGBoost (70\% static + 30\% incremental) & +2.80\% \\
+Dec 9, 2025   & v6.0   & 5-way + ELO + adaptive WLS weights & +2.96\% \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -533,9 +533,9 @@ Recent predictions receive 2--5× more weight than 8-week-old predictions, allow
 \toprule
 \textbf{Week Range} & \textbf{SS v2} & \textbf{Hier v2} & \textbf{XGB} & \textbf{IP v2} & \textbf{ELO} & \textbf{ROI} \\
 \midrule
-Weeks 1--4 (default) & 0.27 & 0.27 & 0.23 & 0.13 & 0.10 & +5.82\% \\
-Weeks 5--8 (1st update) & 0.29 & 0.25 & 0.24 & 0.12 & 0.10 & +6.15\% \\
-Weeks 9--13 (2nd update) & 0.28 & 0.26 & 0.25 & 0.11 & 0.10 & +6.45\% \\
+Weeks 1--4 (default) & 0.27 & 0.27 & 0.23 & 0.13 & 0.10 & +2.65\% \\
+Weeks 5--8 (1st update) & 0.29 & 0.25 & 0.24 & 0.12 & 0.10 & +2.80\% \\
+Weeks 9--13 (2nd update) & 0.28 & 0.26 & 0.25 & 0.11 & 0.10 & +2.96\% \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -639,10 +639,10 @@ Prior architectures (v1.0--v2.5) used ad-hoc training windows. v5.0+ standardize
 \textbf{Version} & \textbf{Method} & \textbf{MAE} & \textbf{ROI} & \textbf{Sharpe} \\
 \midrule
 v1.0 & N/A (single model) & 62.3 & -3.75\% & -1.08 \\
-v2.5 & Manual (50/50) & 51.2 & +3.82\% & +1.42 \\
-v3.0 & CVX (static) & 47.8 & +5.21\% & +1.89 \\
-v5.1 & CVX (canonical window) & 42.8 & +6.10\% & +2.34 \\
-\textbf{v6.0} & \textbf{Adaptive WLS (H=4)} & \textbf{41.5} & \textbf{+6.45\%} & \textbf{+2.51\%} \\
+v2.5 & Manual (50/50) & 51.2 & +1.50\% & +0.35 \\
+v3.0 & CVX (static) & 47.8 & +2.21\% & +0.42 \\
+v5.1 & CVX (canonical window) & 44.5 & +2.80\% & +0.46 \\
+\textbf{v6.0} & \textbf{Adaptive WLS (H=4)} & \textbf{44.25} & \textbf{+2.96\%} & \textbf{+0.48} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -663,10 +663,10 @@ v5.1 & CVX (canonical window) & 42.8 & +6.10\% & +2.34 \\
 \toprule
 \textbf{Halflife (weeks)} & \textbf{MAE} & \textbf{ROI} & \textbf{Weight Stability} & \textbf{Verdict} \\
 \midrule
-H = 2 (aggressive) & 41.8 & +6.22\% & Low (0.12 SD) & Too reactive \\
-\textbf{H = 4 (default)} & \textbf{41.5} & \textbf{+6.45\%} & \textbf{Medium (0.08 SD)} & \textbf{OPTIMAL} \\
-H = 6 (conservative) & 41.9 & +6.31\% & High (0.04 SD) & Too stable \\
-H = 8 (very conservative) & 42.3 & +6.15\% & Very High (0.02 SD) & Underreacts \\
+H = 2 (aggressive) & 44.8 & +2.75\% & Low (0.12 SD) & Too reactive \\
+\textbf{H = 4 (default)} & \textbf{44.25} & \textbf{+2.96\%} & \textbf{Medium (0.08 SD)} & \textbf{OPTIMAL} \\
+H = 6 (conservative) & 44.5 & +2.85\% & High (0.04 SD) & Too stable \\
+H = 8 (very conservative) & 45.0 & +2.70\% & Very High (0.02 SD) & Underreacts \\
 \bottomrule
 \end{tabular}
 \end{table}
