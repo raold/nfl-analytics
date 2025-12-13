@@ -418,19 +418,40 @@ def create_default_registry(
         parallel: Whether to enable parallel extraction
 
     Returns:
-        Configured FeatureRegistry
+        Configured FeatureRegistry with all 5 standard extractors:
+        - OffensiveFeatureExtractor (27 features, CRITICAL priority)
+        - DefensiveFeatureExtractor (27 features, CRITICAL priority)
+        - NextGenFeatureExtractor (23 features, HIGH priority)
+        - QBRFeatureExtractor (10 features, HIGH priority)
+        - OpponentAdjustedFeatureExtractor (7 features, MEDIUM priority, requires opponent)
 
-    Note:
-        This function will be expanded as extractors are wrapped
-        with the Strategy pattern in subsequent phases.
+    Example:
+        import datetime
+        current_season = datetime.date.today().year
+        registry = create_default_registry()
+        summary = registry.extract_all('KC', 'BUF', current_season, 10)
+        print(f"Extracted {summary.total_features} features")
     """
+    # Import here to avoid circular imports
+    from py.features.extractors.offensive import OffensiveFeatureExtractor
+    from py.features.extractors.defensive import DefensiveFeatureExtractor
+    from py.features.extractors.nextgen import NextGenFeatureExtractor
+    from py.features.extractors.qbr import QBRFeatureExtractor
+    from py.features.extractors.opponent_adjusted import OpponentAdjustedFeatureExtractor
+
     registry = FeatureRegistry(db_config=db_config, parallel=parallel)
 
-    # TODO: Register all extractors as they are wrapped
-    # registry.register(OffensiveFeatureExtractor())
-    # registry.register(DefensiveFeatureExtractor())
-    # registry.register(NextGenStatsExtractor())
-    # registry.register(QBRExtractor())
-    # etc.
+    # Register all standard extractors
+    # Execution order determined by priority: CRITICAL > HIGH > MEDIUM
+    registry.register(OffensiveFeatureExtractor(db_config=db_config))
+    registry.register(DefensiveFeatureExtractor(db_config=db_config))
+    registry.register(NextGenFeatureExtractor(db_config=db_config))
+    registry.register(QBRFeatureExtractor(db_config=db_config))
+    registry.register(OpponentAdjustedFeatureExtractor(db_config=db_config))
+
+    logger.info(
+        f"Created default registry with {len(registry.list_extractors())} extractors "
+        f"({sum(1 for _ in registry.get_all_feature_names())} total features)"
+    )
 
     return registry
