@@ -1,5 +1,11 @@
 """Enhanced as-of team/game features incorporating new backfilled columns.
 
+.. deprecated::
+    This module is deprecated. Use `py.features.asof_features_unified` instead:
+
+        from py.features.asof_features_unified import get_asof_features
+        df = get_asof_features(feature_level='enhanced')
+
 This extends asof_features.py to include:
 - Advanced play-level metrics: success rate, air yards, completion %, win probability
 - Turnover and penalty differentials from games table
@@ -9,8 +15,17 @@ Example:
   python py/features/asof_features_enhanced.py --output analysis/features/asof_team_features_enhanced.csv \
       --season-start 2003 --validate
 """
-
 from __future__ import annotations
+
+import warnings
+
+warnings.warn(
+    "asof_features_enhanced is deprecated. Use asof_features_unified instead: "
+    "from py.features.asof_features_unified import get_asof_features; "
+    "df = get_asof_features(feature_level='enhanced')",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 import argparse
 import os
@@ -100,10 +115,10 @@ team_stats AS (
            COALESCE(AVG(CASE WHEN success = 1.0 THEN 1.0 ELSE 0.0 END), 0) AS success_rate,
 
            -- Passing efficiency (pass and rush are BOOLEAN)
-           COALESCE(AVG(CASE WHEN pass = TRUE THEN air_yards END), 0) AS air_yards_mean,
-           COALESCE(AVG(CASE WHEN pass = TRUE THEN yards_after_catch END), 0) AS yac_mean,
-           COALESCE(AVG(CASE WHEN pass = TRUE THEN cpoe END), 0) AS cpoe_mean,
-           COALESCE(AVG(CASE WHEN pass = TRUE AND complete_pass = 1 THEN 1.0 ELSE 0.0 END), 0) AS completion_pct,
+           COALESCE(AVG(CASE WHEN pass = 1 THEN air_yards END), 0) AS air_yards_mean,
+           COALESCE(AVG(CASE WHEN pass = 1 THEN yards_after_catch END), 0) AS yac_mean,
+           COALESCE(AVG(CASE WHEN pass = 1 THEN cpoe END), 0) AS cpoe_mean,
+           COALESCE(AVG(CASE WHEN pass = 1 AND complete_pass = 1 THEN 1.0 ELSE 0.0 END), 0) AS completion_pct,
 
            -- Win probability
            COALESCE(MAX(wp), 0.5) AS wp_max,
@@ -115,8 +130,8 @@ team_stats AS (
            COALESCE(AVG(CASE WHEN no_huddle = 1.0 THEN 1.0 ELSE 0.0 END), 0) AS no_huddle_rate,
 
            -- Explosive plays (pass and rush are BOOLEAN)
-           COUNT(CASE WHEN pass = TRUE AND yards_gained >= 20 THEN 1 END) AS explosive_pass,
-           COUNT(CASE WHEN rush = TRUE AND yards_gained >= 10 THEN 1 END) AS explosive_rush
+           COUNT(CASE WHEN pass = 1 AND yards_gained >= 20 THEN 1 END) AS explosive_pass,
+           COUNT(CASE WHEN rush = 1 AND yards_gained >= 10 THEN 1 END) AS explosive_rush
 
     FROM plays
     WHERE posteam IS NOT NULL
