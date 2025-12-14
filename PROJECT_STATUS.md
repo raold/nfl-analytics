@@ -1,8 +1,73 @@
 # PROJECT_STATUS.md - NFL Analytics Project Status
 
-**Last Updated:** December 9, 2025
-**Version:** v6.2 GNN Integration + 6-Way Ensemble
-**Focus:** ✅ **2025 HOLDOUT VALIDATION COMPLETE** - True out-of-sample testing, equal-weight ensemble wins
+**Last Updated:** December 13, 2025
+**Version:** v6.2 GNN Integration + 6-Way Ensemble + Code Quality Remediation
+**Focus:** ✅ **CODE QUALITY REMEDIATION COMPLETE** - 6-phase systematic fix of 90+ issues
+
+---
+
+## 🚀 MAJOR MILESTONE (Dec 13, 2025)
+
+> **Code Quality Remediation Complete - 6-Phase Systematic Fix**
+
+### Remediation Summary
+
+Following a comprehensive 6-agent code review that identified 90+ issues, a systematic remediation was executed:
+
+| Phase | Description | Key Deliverables |
+|-------|-------------|------------------|
+| **Phase 1** | Foundation Tests | 85 unit tests for temporal safety, validation |
+| **Phase 2** | Strategy Pattern | `FeatureExtractorStrategy`, `ValidatorRegistry` |
+| **Phase 3** | Asof Consolidation | `asof_features_unified.py` (3→1 module) |
+| **Phase 4** | Connection Pool | Verified existing infrastructure (`psycopg_pool.py`) |
+| **Phase 5** | Critical Bug Fixes | Temporal split, uncertainty, connection leak |
+| **Phase 6** | Documentation | XGBoost params config, team_mapping, CLAUDE.md |
+
+### Critical Bug Fixes (Phase 5)
+
+| Bug | Before | After | Impact |
+|-----|--------|-------|--------|
+| **Temporal Split** | Percentage-based | Season-based | Prevents data leakage |
+| **Uncertainty** | `MAE * 0.5` (arbitrary) | `RMSE` (statistical) | Correct confidence intervals |
+| **Connection Leak** | Manual try/finally | Context manager | Prevents resource exhaustion |
+
+### New Architecture Components
+
+- **ValidatorRegistry** (`py/validation/validators/registry.py`): Strategy pattern for extensible validation
+- **FeatureExtractorStrategy** (`py/features/extractors/base.py`): Interface for feature extraction plugins
+- **XGBoost Config** (`py/models/config/xgboost_params.py`): Documented hyperparameters with explanations
+
+### Key Files Added/Modified
+
+```
+New Files:
+├── py/validation/validators/    # Validation framework
+│   ├── base.py                  # Strategy interface
+│   ├── registry.py              # ValidatorRegistry
+│   ├── temporal.py              # TemporalSafetyValidator
+│   ├── schema.py                # SchemaValidator
+│   └── feature_range.py         # FeatureRangeValidator
+├── py/features/
+│   ├── asof_features_unified.py # Consolidated asof (1000 lines)
+│   └── extractors/base.py       # FeatureExtractorStrategy
+├── py/models/config/
+│   └── xgboost_params.py        # Documented hyperparameters
+├── py/utils/team_mapping.py     # Team abbreviation utility
+└── tests/unit/validation/       # 20 validation tests
+
+Modified Files:
+├── py/models/game_outcome_model_fixed.py  # Season-based split, RMSE uncertainty
+├── py/services/game_outcome_runs.py       # Context manager for connections
+├── py/features/asof_features_enhanced.py  # Deprecation warning
+└── py/features/asof_features_v2.py        # Deprecation warning
+```
+
+### Lessons Learned (Added to CLAUDE.md)
+
+7. Season-based temporal splits prevent data leakage
+8. RMSE is correct uncertainty estimate (not MAE * arbitrary factor)
+9. Context managers for DB prevent resource leaks
+10. Strategy pattern enables plugin validators
 
 ---
 
