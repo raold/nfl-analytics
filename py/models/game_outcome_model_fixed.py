@@ -33,6 +33,7 @@ import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, roc_auc_score
 
 from py.features.game_feature_extractor import GameFeatureExtractor
+from py.models.config.xgboost_params import DEFAULT_XGB_PARAMS, CLASSIFIER_XGB_PARAMS
 from py.utils.team_mapping import VALID_TEAMS, normalize_team
 
 # Setup logging
@@ -121,23 +122,11 @@ class GameOutcomeModel:
         logger.info(f"Training on seasons: {seasons}")
         start = time.time()
 
-        # Default XGBoost parameters (optimized for NFL data)
+        # Use centralized hyperparameters from config module
+        # See py/models/config/xgboost_params.py for parameter documentation
         if xgb_params is None:
-            xgb_params = {
-                "n_estimators": 500,
-                "max_depth": 8,
-                "learning_rate": 0.03,
-                "subsample": 0.8,
-                "colsample_bytree": 0.8,
-                "gamma": 1,
-                "reg_alpha": 0.1,
-                "reg_lambda": 1,
-                "min_child_weight": 5,
-                "random_state": 42,
-                "n_jobs": n_jobs,
-                "early_stopping_rounds": 50,
-                "eval_metric": "mae",
-            }
+            xgb_params = DEFAULT_XGB_PARAMS.copy()
+            xgb_params["n_jobs"] = n_jobs
 
         # 1. Load training data with batch extraction
         logger.info("Loading training data with batch feature extraction...")
