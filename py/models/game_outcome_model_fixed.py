@@ -33,46 +33,14 @@ import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, roc_auc_score
 
 from py.features.game_feature_extractor import GameFeatureExtractor
+from py.utils.team_mapping import VALID_TEAMS, normalize_team
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-# Constants
-VALID_TEAMS = {
-    "ARI",
-    "ATL",
-    "BAL",
-    "BUF",
-    "CAR",
-    "CHI",
-    "CIN",
-    "CLE",
-    "DAL",
-    "DEN",
-    "DET",
-    "GB",
-    "HOU",
-    "IND",
-    "JAX",
-    "KC",
-    "LAC",
-    "LAR",
-    "LV",
-    "MIA",
-    "MIN",
-    "NE",
-    "NO",
-    "NYG",
-    "NYJ",
-    "PHI",
-    "PIT",
-    "SF",
-    "SEA",
-    "TB",
-    "TEN",
-    "WAS",
-}
+# Note: VALID_TEAMS imported from py.utils.team_mapping
+# Includes both canonical (LAR, LAC, LV) and database (LA, SD, OAK) abbreviations
 
 
 class GameOutcomeModel:
@@ -195,24 +163,28 @@ class GameOutcomeModel:
 
         logger.info(f"Feature matrix: {X.shape[0]} samples × {X.shape[1]} features")
 
-        # 3. FIXED: Proper temporal train-validation split
-        split_idx = int(len(df_sorted) * (1 - validation_split))
+        # 3. FIXED: Season-based temporal split to prevent data leakage
+        # Training on seasons < max_season, validating on max_season
+        max_season = df_sorted["season"].max()
+        train_mask = df_sorted["season"] < max_season
+        val_mask = df_sorted["season"] == max_season
 
-        X_train = X[:split_idx]
-        X_val = X[split_idx:]
-        y_spread_train = y_spread[:split_idx]
-        y_spread_val = y_spread[split_idx:]
-        y_total_train = y_total[:split_idx]
-        y_total_val = y_total[split_idx:]
-        y_win_train = y_win_prob[:split_idx]
-        y_win_val = y_win_prob[split_idx:]
+        X_train = X[train_mask]
+        X_val = X[val_mask]
+        y_spread_train = y_spread[train_mask]
+        y_spread_val = y_spread[val_mask]
+        y_total_train = y_total[train_mask]
+        y_total_val = y_total[val_mask]
+        y_win_train = y_win_prob[train_mask]
+        y_win_val = y_win_prob[val_mask]
 
-        logger.info(f"Training: {len(X_train)} samples")
-        logger.info(f"Validation: {len(X_val)} samples")
+        train_seasons = df_sorted[train_mask]["season"].unique()
+        logger.info(f"Training: {len(X_train)} samples from seasons {sorted(train_seasons)}")
+        logger.info(f"Validation: {len(X_val)} samples from season {max_season}")
 
         # Store validation data info for uncertainty estimation
-        val_info = df_sorted.iloc[split_idx:][["season", "week"]].describe()
-        logger.info(f"Validation set: {val_info}")
+        val_info = df_sorted[val_mask][["season", "week"]].describe()
+        logger.info(f"Validation set summary:\n{val_info}")
 
         # 4. Train models in parallel on M4 Mac
         logger.info("Training 3 XGBoost models in parallel...")
@@ -272,9 +244,10 @@ class GameOutcomeModel:
         # 5. Evaluate on validation set
         metrics = self._evaluate_models(X_val, y_spread_val, y_total_val, y_win_val)
 
-        # FIXED: Store validation MAE as uncertainty estimates
-        self.spread_std = metrics["spread_mae"] * 0.5  # Conservative uncertainty
-        self.total_std = metrics["total_mae"] * 0.5
+        # FIXED: Use RMSE as proper uncertainty estimate (residual standard deviation)
+        # RMSE is the correct measure for prediction intervals (unlike MAE * arbitrary factor)
+        self.spread_std = metrics["spread_rmse"]
+        self.total_std = metrics["total_rmse"]
 
         # 6. Compute SHAP values (FIXED: proper storage)
         self._compute_shap_values(X_val)
@@ -409,27 +382,33 @@ class GameOutcomeModel:
         if not self.models_trained:
             raise RuntimeError("Models not trained. Call train() or load_models() first.")
 
-        # Validate teams
+        # Validate teams - accept both canonical (LAR) and database (LA) formats
+        # VALID_TEAMS includes both formats from py.utils.team_mapping
         if home_team not in VALID_TEAMS:
             raise ValueError(f"Invalid home_team: {home_team}. Must be one of {VALID_TEAMS}")
         if away_team not in VALID_TEAMS:
             raise ValueError(f"Invalid away_team: {away_team}. Must be one of {VALID_TEAMS}")
 
+        # Normalize to database format for feature extraction (LA not LAR)
+        # The feature extractor queries the database which uses nflverse format
+        home_team_db = normalize_team(home_team, to_canonical=False)  # LAR -> LA
+        away_team_db = normalize_team(away_team, to_canonical=False)
+
         # Validate season and week
         if not (2000 <= season <= 2030):
             raise ValueError(f"Invalid season: {season}. Must be between 2000-2030")
-        if not (1 <= week <= 18):
-            raise ValueError(f"Invalid week: {week}. Must be between 1-18")
+        if not (1 <= week <= 22):  # Extended to 22 for playoffs
+            raise ValueError(f"Invalid week: {week}. Must be between 1-22")
 
         if home_team == away_team:
             raise ValueError(f"home_team and away_team cannot be the same: {home_team}")
 
         start = time.time()
 
-        # 1. Extract features
+        # 1. Extract features (use database format team names)
         try:
             features = self.feature_extractor.extract_game_features(
-                home_team, away_team, season, week
+                home_team_db, away_team_db, season, week
             )
         except Exception as e:
             logger.error(f"Feature extraction failed: {e}")
@@ -465,6 +444,49 @@ class GameOutcomeModel:
         }
 
         return result
+
+    def predict_games(self, games: list[dict]) -> list[dict]:
+        """
+        Predict outcomes for multiple games (batch prediction).
+
+        This is a convenience wrapper around predict() for batch operations.
+
+        Args:
+            games: List of game dictionaries, each containing:
+                - game_id: Unique game identifier
+                - home_team: Home team abbreviation
+                - away_team: Away team abbreviation
+                - season: Season year
+                - week: Week number
+
+        Returns:
+            List of prediction dictionaries, each containing:
+                - game_id: From input
+                - home_spread, total_points, home_win_probability
+                - spread_std, total_std
+                - inference_time_ms
+        """
+        predictions = []
+        for game in games:
+            try:
+                pred = self.predict(
+                    home_team=game['home_team'],
+                    away_team=game['away_team'],
+                    season=game['season'],
+                    week=game['week'],
+                )
+                pred['game_id'] = game.get('game_id')
+                predictions.append(pred)
+            except Exception as e:
+                logger.warning(
+                    f"Failed to predict {game.get('away_team')}@{game.get('home_team')}: {e}"
+                )
+                # Return partial result with error
+                predictions.append({
+                    'game_id': game.get('game_id'),
+                    'error': str(e),
+                })
+        return predictions
 
     def _evaluate_models(
         self,
@@ -614,10 +636,20 @@ class GameOutcomeModel:
 
 def main():
     """Example usage and testing."""
+    from datetime import datetime
+
+    # Dynamic season calculation (NFL season runs Sept-Feb)
+    current_year = datetime.now().year
+    current_month = datetime.now().month
+    # If Jan-Aug, NFL season is previous year; if Sept-Dec, it's current year
+    current_season = current_year if current_month >= 9 else current_year - 1
+    training_seasons = list(range(current_season - 2, current_season + 1))
+
     model = GameOutcomeModel()
 
-    # Train on recent seasons
-    metrics = model.train(seasons=[2022, 2023, 2024], validation_split=0.2)
+    # Train on recent seasons (dynamically computed)
+    print(f"Training on seasons: {training_seasons}")
+    metrics = model.train(seasons=training_seasons, validation_split=0.2)
 
     print("Validation Metrics:")
     print(f"  Spread MAE: {metrics['spread_mae']:.2f}")
@@ -627,9 +659,9 @@ def main():
     # Save models
     model.save_models()
 
-    # Test prediction
+    # Test prediction (use current season)
     try:
-        prediction = model.predict(home_team="KC", away_team="BUF", season=2024, week=11)
+        prediction = model.predict(home_team="KC", away_team="BUF", season=current_season, week=11)
         print("\nSample Prediction:")
         print(json.dumps(prediction, indent=2))
     except Exception as e:

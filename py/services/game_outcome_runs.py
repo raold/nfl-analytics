@@ -70,66 +70,65 @@ def _fetch_games(target_season: int) -> pd.DataFrame:
 
 
 def _store_predictions(predictions_df: pd.DataFrame, prediction_run_id: uuid4) -> int:
-    conn = psycopg2.connect(**DB_CONFIG)
-    cur = conn.cursor()
-    try:
-        records = []
-        for _, row in predictions_df.iterrows():
-            records.append({
-                'prediction_run_id': str(prediction_run_id),
-                'game_id': str(row['game_id']),
-                'season': _safe_int(row['season']),
-                'week': _safe_int(row['week']),
-                'home_team': row['home_team'],
-                'away_team': row['away_team'],
-                'kickoff': row['kickoff'],
-                'pred_home_spread': _safe_float(row['pred_home_spread']),
-                'pred_total': _safe_float(row['pred_total']),
-                'pred_home_win_prob': _safe_float(row['pred_home_win_prob']),
-                'spread_std': _safe_float(row['spread_std']),
-                'total_std': _safe_float(row['total_std']),
-                'vegas_spread': _safe_float(row['vegas_spread']),
-                'vegas_total': _safe_float(row['vegas_total']),
-                'actual_home_score': _safe_int(row.get('actual_home_score')),
-                'actual_away_score': _safe_int(row.get('actual_away_score')),
-                'actual_spread': _safe_float(row.get('actual_spread')),
-                'actual_total': _safe_float(row.get('actual_total')),
-                'model_version': row.get('model_version'),
-                'inference_time_ms': _safe_float(row.get('inference_time_ms')),
-            })
+    """Store predictions to database with proper connection management."""
+    records = []
+    for _, row in predictions_df.iterrows():
+        records.append({
+            'prediction_run_id': str(prediction_run_id),
+            'game_id': str(row['game_id']),
+            'season': _safe_int(row['season']),
+            'week': _safe_int(row['week']),
+            'home_team': row['home_team'],
+            'away_team': row['away_team'],
+            'kickoff': row['kickoff'],
+            'pred_home_spread': _safe_float(row['pred_home_spread']),
+            'pred_total': _safe_float(row['pred_total']),
+            'pred_home_win_prob': _safe_float(row['pred_home_win_prob']),
+            'spread_std': _safe_float(row['spread_std']),
+            'total_std': _safe_float(row['total_std']),
+            'vegas_spread': _safe_float(row['vegas_spread']),
+            'vegas_total': _safe_float(row['vegas_total']),
+            'actual_home_score': _safe_int(row.get('actual_home_score')),
+            'actual_away_score': _safe_int(row.get('actual_away_score')),
+            'actual_spread': _safe_float(row.get('actual_spread')),
+            'actual_total': _safe_float(row.get('actual_total')),
+            'model_version': row.get('model_version'),
+            'inference_time_ms': _safe_float(row.get('inference_time_ms')),
+        })
 
-        if not records:
-            return 0
+    if not records:
+        return 0
 
-        insert_query = f"""
-        INSERT INTO {TABLE_NAME} (
-            prediction_run_id,
-            game_id, season, week, home_team, away_team, kickoff,
-            pred_home_spread, pred_total, pred_home_win_prob,
-            spread_std, total_std,
-            vegas_spread, vegas_total,
-            actual_home_score, actual_away_score, actual_spread, actual_total,
-            model_version, inference_time_ms
-        ) VALUES (
-            %(prediction_run_id)s, %(game_id)s, %(season)s, %(week)s, %(home_team)s, %(away_team)s, %(kickoff)s,
-            %(pred_home_spread)s, %(pred_total)s, %(pred_home_win_prob)s,
-            %(spread_std)s, %(total_std)s,
-            %(vegas_spread)s, %(vegas_total)s,
-            %(actual_home_score)s, %(actual_away_score)s, %(actual_spread)s, %(actual_total)s,
-            %(model_version)s, %(inference_time_ms)s
-        )
-        """
+    insert_query = f"""
+    INSERT INTO {TABLE_NAME} (
+        prediction_run_id,
+        game_id, season, week, home_team, away_team, kickoff,
+        pred_home_spread, pred_total, pred_home_win_prob,
+        spread_std, total_std,
+        vegas_spread, vegas_total,
+        actual_home_score, actual_away_score, actual_spread, actual_total,
+        model_version, inference_time_ms
+    ) VALUES (
+        %(prediction_run_id)s, %(game_id)s, %(season)s, %(week)s, %(home_team)s, %(away_team)s, %(kickoff)s,
+        %(pred_home_spread)s, %(pred_total)s, %(pred_home_win_prob)s,
+        %(spread_std)s, %(total_std)s,
+        %(vegas_spread)s, %(vegas_total)s,
+        %(actual_home_score)s, %(actual_away_score)s, %(actual_spread)s, %(actual_total)s,
+        %(model_version)s, %(inference_time_ms)s
+    )
+    """
 
-        execute_batch(cur, insert_query, records, page_size=100)
-        conn.commit()
-        return len(records)
-    except Exception:
-        conn.rollback()
-        logger.exception("Failed to store predictions")
-        raise
-    finally:
-        cur.close()
-        conn.close()
+    # FIXED: Use context manager to prevent connection leaks
+    with psycopg2.connect(**DB_CONFIG) as conn:
+        with conn.cursor() as cur:
+            try:
+                execute_batch(cur, insert_query, records, page_size=100)
+                conn.commit()
+                return len(records)
+            except Exception:
+                conn.rollback()
+                logger.exception("Failed to store predictions")
+                raise
 
 
 def run_game_outcome_predictions(
@@ -182,6 +181,11 @@ def run_game_outcome_predictions(
             pred = predictions_by_id.get(game['game_id'])
             if not pred:
                 logger.warning("Missing prediction for %s", game['game_id'])
+                continue
+
+            # Skip predictions that failed (have error key instead of results)
+            if 'error' in pred:
+                logger.warning("Prediction failed for %s: %s", game['game_id'], pred['error'])
                 continue
 
             all_predictions.append({
