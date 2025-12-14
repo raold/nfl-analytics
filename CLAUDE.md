@@ -1,6 +1,6 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** December 9, 2025 | **Version:** 5.9 | **Status:** Production Ready (Grade A+)
+**Last Updated:** December 13, 2025 | **Version:** 6.0 | **Status:** Production Ready (Grade A+)
 
 ## Quick Status
 
@@ -223,31 +223,36 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ---
 
-## Current Status (Dec 9, 2025)
+## Current Status (Dec 13, 2025)
 
 **Completed:**
 - 2025 Holdout Validation: 74.9% spread accuracy, 44.25 MAE props (Dec 9)
 - Phase 2 Advanced Stats: 120 new features
 - Dirichlet Optimization: Equal weights outperform v8.0 on holdout
 - **Synthetic Features (Dec 9):** 37 new features across 3 modules
-  - Interaction features: QB-OL synergy, defensive balance, explosive mismatch
-  - Momentum features: Form intensity, pressure consistency, RZ efficiency
-  - Research-driven: nfelo EPA weighting (1.6:1.0), coaching rationality
 - **Props Stability Weighting (Dec 9):** SumerSports YoY correlation research integrated
+- **Code Quality Remediation (Dec 13):** 6-phase systematic fix (90+ issues)
+  - Phase 1: Foundation tests (85 unit tests added)
+  - Phase 2: Strategy pattern for feature extractors (FeatureExtractorStrategy interface)
+  - Phase 3: Unified asof features (consolidated 3 modules into `asof_features_unified.py`)
+  - Phase 4: Connection pool verification (infrastructure already existed)
+  - Phase 5: Critical bug fixes (temporal split, connection leak, uncertainty estimation)
+  - Phase 6: Documentation (XGBoost hyperparams, team_mapping, CLAUDE.md)
 
-**Key Findings (Dec 9):**
-- Equal-weight ensemble beats Dirichlet v8.0 on 2025 holdout (44.25 vs 44.91 MAE)
-- Offensive EPA is 60% more predictive than defensive EPA (nfelo research)
-- RB stats have ~0 YoY correlation (downweight in props models)
+**Key Findings (Dec 13):**
+- Season-based temporal split prevents data leakage (train on seasons < max, validate on max)
+- RMSE is correct uncertainty estimate (not MAE * 0.5)
+- Context managers prevent connection leaks in high-load scenarios
 
 **In Progress:**
-- XGBoost v5 retraining with 342-feature set
+- XGBoost v5 retraining with 342-feature set (awaiting remediation completion)
 - Ensemble v6.2 integration with synthetic features
 
 **Strategic Decisions:**
 - BNN research abandoned (Nov 9) - 84 hours, 6 approaches, only BNN v3.1 Rushing remains
 - Dynamic meta-learning rejected (Nov 18) - static weights outperform, see ADR-009
 - Dual-weight strategy adopted (Nov 27) - different domains need different weights
+- ValidatorRegistry pattern adopted (Dec 13) - Strategy pattern for validation
 
 **Recent Work:** [docs/milestones/RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY.md)
 
@@ -294,10 +299,14 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 4. Know when to abandon research lines (BNN: 84 hours, 6 approaches)
 5. Always validate baselines independently
 6. **Schema-first discipline** - `mart.player_game_stats.game_id` error occurred DOZENS of times
+7. **Season-based temporal splits** - percentage splits can leak data across train/val
+8. **RMSE for uncertainty** - MAE * arbitrary factor has no statistical basis
+9. **Context managers for DB** - always use `with conn:` to prevent resource leaks
+10. **Strategy pattern for extensibility** - ValidatorRegistry enables plugin validators
 
 ---
 
-**Version:** 5.9 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
+**Version:** 6.0 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
 
 **Project Rules:**
 - Never take shortcuts, never use synthetic data
