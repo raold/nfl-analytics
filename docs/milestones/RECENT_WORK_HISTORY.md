@@ -2,8 +2,54 @@
 
 **Purpose**: Comprehensive chronological record of all recent project work, decisions, and achievements for project continuity and context.
 
-**Last Updated**: December 9, 2025
+**Last Updated**: December 14, 2025
 **Format**: Reverse chronological (newest first)
+
+---
+
+## December 14, 2025: XGBoost Feature Optimization Experiments
+
+**Context**: Investigated whether feature engineering optimizations could improve XGBoost prediction accuracy.
+
+**Work Performed**:
+
+1. **Feature Weighting Experiment (Rejected)**
+   - Tested Bayesian/Dirichlet weighting of features by SHAP importance
+   - **Finding**: NO EFFECT - XGBoost is scale-invariant (tree splits don't care about magnitude)
+   - All 5 weighting schemes produced identical MAE (10.31)
+
+2. **Feature Pruning Experiment (Trade-off Found)**
+   - Tested 25%, 50%, 75%, 100% feature retention based on SHAP importance
+   - **Finding**: Trade-off discovered - fewer features improves win AUC but hurts spread MAE
+
+   | Retention | Features | Spread MAE | Win AUC |
+   |-----------|----------|------------|---------|
+   | 100% | 344 | 10.31 | 0.649 |
+   | 50% | 172 | 10.48 | 0.663 |
+   | 25% | 86 | 10.39 | 0.690 |
+
+3. **Regularization Tuning (Marginal Improvement)**
+   - Tested reg_alpha (0.5, 1.0, 2.0) and reg_lambda (1.0, 2.0, 5.0)
+   - **Best config**: reg_alpha=1.0, reg_lambda=2.0
+   - Improvement: -0.09% spread MAE (10.31 → 10.30), +4.5% win AUC (0.649 → 0.678)
+   - **Decision**: Marginal improvement doesn't justify complexity
+
+4. **Column Sampling (No Improvement)**
+   - Tested colsample_bytree (0.4, 0.5, 0.6, 0.8) and colsample_bylevel (0.6, 0.8)
+   - **Finding**: No consistent improvement, increased variance
+
+**Key Learnings**:
+- Feature weighting is fundamentally incompatible with tree-based models
+- Baseline XGBoost configuration is already near-optimal
+- Different optimal feature sets exist for classification vs regression tasks
+
+**Decision**: Retain baseline configuration (ADR-011)
+
+**Files Created**:
+- `py/models/feature_optimization_experiment.py` - Experiment runner
+- `data/feature_optimization_results.csv` - All experiment results
+- `data/best_xgb_config.json` - Best configuration (for reference)
+- `docs/adr/011-xgboost-feature-optimization.md` - Decision record
 
 ---
 

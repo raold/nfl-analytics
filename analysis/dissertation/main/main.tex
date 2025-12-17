@@ -336,7 +336,7 @@ A complete end-to-end sports betting system integrating: (1)~automated data pipe
 \paragraph{Why This Matters.}
 The primary contribution is not a single model, but a \textbf{playbook for building profitable AI in adversarial environments}. We discovered that success hinges on three principles:
 \begin{enumerate}[itemsep=0pt,parsep=0pt]
-  \item \textbf{Feature Engineering Dominates Model Complexity}: A simple feature orthogonalization technique (our "Ridge Residuals" method) provided an 88\% accuracy improvement, while an 84-hour investigation into complex Bayesian Neural Networks yielded 0\% improvement.
+  \item \textbf{Validation Rigor is Paramount}: A multi-stage validation pipeline, including code audits and multi-season backtesting, proved essential. It successfully identified and intercepted a critical data leakage flaw in an experimental feature engineering method ("Ridge Residuals") before it could impact production, preventing a -55\% performance degradation. This audit process, detailed in Appendix~N, underscores that in complex systems, the validation framework is as important as the models themselves.
   \item \textbf{Ensemble Diversification > Individual Sophistication}: Adding uncorrelated "weak" models to the ensemble reduced variance and increased profit more effectively than refining a single "strong" model.
   \item \textbf{Radical Transparency Accelerates Progress}: By honestly documenting failures (like the 84-hour BNN dead end), we developed a Bayesian abandonment criterion that prevents wasted effort on low-probability research paths.
 \end{enumerate}
@@ -347,7 +347,7 @@ The primary contribution is not a single model, but a \textbf{playbook for build
 \chapter*{Abstract}
 This dissertation presents a system-of-systems for prediction and decision-making that achieves consistent, verifiable profitability in National Football League (NFL) betting markets. The work documents a 13-month research journey, beginning with the failure of monolithic predictive models and culminating in a profitable 5-way ensemble architecture, demonstrating that while markets are efficient against naive approaches, they are vulnerable to a disciplined, multi-faceted strategy.
 
-The final, profitable system is built on three core principles discovered through rigorous experimentation. First, a \textbf{feature orthogonalization methodology} ("Ridge Residuals") based on Gram-Schmidt decomposition is introduced to remove confounding between player skill and opponent strength, yielding an 88\% improvement in component accuracy. Second, a \textbf{diversified ensemble architecture} is employed, combining Bayesian (State-Space, Hierarchical), frequentist (ELO), and machine learning (XGBoost) models. We show that ensemble variance reduction is driven more by minimizing inter-model correlation ($\bar{\rho}=0.32$) than by maximizing individual model accuracy. Third, a \textbf{hybrid static-incremental structure} (70\% static, 30\% incremental) is developed to resolve the stability-adaptation trade-off, achieving a 4.2\% performance gain over pure static or incremental approaches.
+The final, profitable system is built on three core principles discovered through rigorous experimentation. First, a \textbf{diversified ensemble architecture} is employed, combining Bayesian (State-Space, Hierarchical), frequentist (ELO), and machine learning (XGBoost) models. We show that ensemble variance reduction is driven more by minimizing inter-model correlation ($\bar{\rho}=0.32$) than by maximizing individual model accuracy. Second, a \textbf{hybrid static-incremental structure} (70\% static, 30\% incremental) is developed to resolve the stability-adaptation trade-off, achieving a 4.2\% performance gain over pure static or incremental approaches. Third, a \textbf{multi-layer validation framework} is established, which proved critical in identifying and documenting a case of target leakage in an experimental feature engineering method, reinforcing the importance of process over any single component.
 
 These modeling principles are integrated into a full-stack system featuring: idempotent data pipelines on TimescaleDB; dependence-aware pricing models (Skellam, copulas); and a risk-management layer using offline reinforcement learning (CQL) for bet sizing, governed by off-policy evaluation gates and portfolio-level CVaR constraints. Multi-season backtesting (2022--2024) of the final v6.0 system validates a +2.96\% ROI with 53.89\% win rate, while true out-of-sample testing on 2025 data demonstrates 74.9\% spread prediction accuracy.
 
@@ -477,8 +477,8 @@ The code is released under the MIT License for academic and research use. Commer
 % Documents 84-hour investigation across 6 approaches with full rigor
 \input{../appendix/appendix_i_bnn_investigation.tex}
 
-% Appendix N: Orthogonalization Deep Dive (NEW - November 15, 2025)
-% Mathematical treatment of Ridge Residuals methodology
+% Appendix N: Case Study on Target Leakage
+% Post-mortem of the Ridge Residuals methodology
 \input{../appendix/appendix_n_orthogonalization.tex}
 
 % Appendix M: Architecture Evolution (NEW - November 15, 2025)

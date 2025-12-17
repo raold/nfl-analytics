@@ -15,58 +15,17 @@
 %   - Section~\ref{sec:ensemble-evolution} (ensemble integration)
 % ============================================================================
 
-\chapter{Orthogonalization Deep Dive: Ridge Residuals Methodology}
-\label{app:orthogonalization}
+\chapter{Case Study: Target Leakage in Two-Stage Models}
+\label{app:leakage-case-study}
 
-\section{Introduction: The Orthogonalization Problem in Sports Analytics}
+\section{Introduction: A Case Study on the Perils of Target Leakage}
 
-While XGBoost v2 achieved reasonable baseline performance (40.20 MAE on 2023 test data), careful analysis revealed a fundamental statistical challenge: \textbf{opponent defensive strength confounds quarterback skill signals}. Consider Patrick Mahomes facing Arizona's 31st-ranked defense (2023): his 360 passing yards could reflect elite skill, favorable matchup, or both. Naive regression conflates these sources, attributing all 360 yards to Mahomes' ability---overestimating future performance against stronger opponents.
+In the course of this research, a novel feature engineering method, dubbed "Ridge Residuals," was developed to solve the problem of opponent-player confounding. Initial results were staggering, suggesting an 88\% improvement in model accuracy and representing what appeared to be a significant breakthrough. However, a rigorous final audit conducted before production deployment revealed these results to be entirely spurious, the product of a subtle but critical target leakage flaw in the validation pipeline.
 
-This appendix provides rigorous mathematical treatment of \textbf{feature orthogonalization} as a solution to confound removal, documenting the XGBoost v4 Ridge Residuals methodology that achieved 88.31\% MAE improvement (4.70 $\pm$ 0.40 MAE across 2022--2024) through systematic decorrelation of opponent and player features.
-
-\paragraph{The Central Challenge.}
-Formally, observed passing yards decompose as:
-
-\begin{equation}
-Y_{\text{observed}} = \underbrace{\mu_{\text{player}}(X_{\text{QB}})}_{\text{skill signal}} + \underbrace{\mu_{\text{opp}}(X_{\text{defense}})}_{\text{matchup confound}} + \varepsilon
-\label{eq:confound-decomposition}
-\end{equation}
-
-where $X_{\text{QB}}$ represents quarterback-specific features (recent averages, completion percentage) and $X_{\text{defense}}$ represents opponent defensive metrics (EPA allowed, points surrendered). Standard XGBoost learns:
-
-\begin{equation}
-\hat{Y} = f(X_{\text{QB}}, X_{\text{defense}}) = \text{XGBoost}(X_{\text{QB}}, X_{\text{defense}})
-\end{equation}
-
-but fails to disentangle $\mu_{\text{player}}$ from $\mu_{\text{opp}}$ when $\text{Cov}(X_{\text{QB}}, X_{\text{defense}}) \neq 0$. Elite quarterbacks systematically face stronger defenses (playoff teams, division rivals), inducing correlation $\rho \approx 0.42$ (Table~\ref{tab:feature-correlations}). Gradient boosting trees greedily split on highest-variance features---opponent strength (68\% feature importance in XGBoost v2)---relegating player skill to deeper, data-sparse tree levels.
-
-\paragraph{Solution: Ridge Residuals Orthogonalization.}
-The Ridge Residuals methodology explicitly decorrelates opponent and player features through three stages:
-
-\begin{enumerate}[itemsep=2pt,parsep=0pt]
-    \item \textbf{Stage 1 (Ridge Opponent Baseline):} Train regularized linear model on \emph{opponent features only}:
-    \begin{equation}
-        \hat{\boldsymbol{\beta}}_{\text{Ridge}} = \arg\min_{\boldsymbol{\beta}} \left\{ \sum_{i=1}^{n} (y_i - \mathbf{x}_{\text{opp}, i}^T \boldsymbol{\beta})^2 + \alpha \|\boldsymbol{\beta}\|_2^2 \right\}
-    \end{equation}
-    with $\alpha = 100$ (strong regularization, cross-validated).
-
-    \item \textbf{Stage 2 (Residual Extraction):} Compute QB-specific residuals orthogonal to opponent strength:
-    \begin{equation}
-        r_q = \mathbb{E}[Y_q] - \hat{y}_{\text{Ridge}}(X_{\text{defense}, q})
-        \label{eq:residual-extraction}
-    \end{equation}
-    where $\mathbb{E}[Y_q]$ is quarterback $q$'s recent average (L3 games), representing typical performance.
-
-    \item \textbf{Stage 3 (XGBoost with Uncorrelated Features):} Train gradient boosting on baseline features plus orthogonalized residual:
-    \begin{equation}
-        \hat{Y} = \text{XGBoost}(X_{\text{QB}}, X_{\text{context}}, r_q) + \hat{y}_{\text{Ridge}}(X_{\text{defense}})
-    \end{equation}
-\end{enumerate}
-
-By construction, $\text{Cov}(r_q, X_{\text{defense}}) \approx 0$ (proven in Section~\ref{sec:statistical-theory}), eliminating the correlation that plagued XGBoost v2 while preserving player-specific skill signal.
+This appendix presents a post-mortem of that experiment. It is a cautionary tale that details the theoretical motivation for the method, the flawed implementation, the misleading results it generated, the process of its discovery, and the lessons learned. While the experiment failed to produce a viable model, its failure provided one of the most valuable insights of this dissertation: \textbf{in a complex machine learning system, the validation process is more critical than any single model}. This case study underscores the paramount importance of defense-in-depth validation and the insidious nature of target leakage.
 
 \paragraph{Roadmap.}
-This appendix proceeds as follows: Section~\ref{sec:math-foundations} establishes mathematical foundations of orthogonalization from first principles (Gram-Schmidt, variance decomposition). Section~\ref{sec:multicollinearity} formalizes the multicollinearity problem specific to NFL prediction. Section~\ref{sec:ridge-methodology} details the three-stage Ridge Residuals architecture with implementation specifics. Section~\ref{sec:statistical-theory} provides rigorous theoretical justification (orthogonal decomposition theorem, bias-variance tradeoff). Section~\ref{sec:implementation} documents production implementation nuances (QB-specific centering, fail-fast validation, outlier clipping). Section~\ref{sec:ablation} quantifies each component's contribution through systematic ablation studies. Section~\ref{sec:alternatives} compares to alternative approaches (pure XGBoost, incremental learning, ELO+WLS, deep learning). Section~\ref{sec:multiseas-validation} validates robustness across 2022--2024 seasons. Section~\ref{sec:production-lessons} distills practical lessons for practitioners. Section~\ref{sec:limitations} acknowledges limitations and future research directions.
+This case study proceeds as follows: Section~\ref{sec:appendix_n_problem} outlines the statistical problem the experiment sought to solve. Section~\ref{sec:appendix_n_flawed_methodology} details the initial, flawed two-stage methodology. Section~\ref{sec:appendix_n_erroneous_results} presents the misleadingly optimistic results generated by the leaking pipeline. Section~\ref{sec:appendix_n_leakage_discovery} explains the mechanism of the target leak and how it was discovered. Section~\ref{sec:appendix_n_corrected_results} shows the true, poor performance of the model after the leak was fixed. Finally, Section~\ref{sec:appendix_n_lessons} concludes with the key takeaways for practitioners.
 
 ---
 
@@ -880,7 +839,7 @@ Consider deep learning when dataset exceeds 50,000 QB-games (requires 25--50 sea
 
 ---
 
-\section{Multi-Season Validation and Robustness}
+\section{Erroneous Multi-Season Validation Results}
 \label{sec:multiseas-validation}
 
 Single-season validation can mislead: 2023 quirks (rule changes, roster turnover, COVID-era data) may not generalize to 2024. Require consistent performance across 3+ seasons before production deployment.
@@ -888,7 +847,7 @@ Single-season validation can mislead: 2023 quirks (rule changes, roster turnover
 \begin{table}[htbp]
 \centering
 \small
-\caption{Multi-Season Validation Results (2022--2024, Rolling Origin Cross-Validation)}
+\caption{\textbf{(Erroneous)} Multi-Season Results from Flawed Model}
 \label{tab:multiseas-validation}
 \begin{tabular}{@{}lS[table-format=3.0]S[table-format=1.2]S[table-format=2.2]S[table-format=3.1]S[table-format=1.6]S[table-format=1.2]@{}}
 \toprule
@@ -903,6 +862,7 @@ Single-season validation can mislead: 2023 quirks (rule changes, roster turnover
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
+\item \textbf{Warning:} The results in this table are invalid due to the target leakage discussed in Section~\ref{sec:appendix_n_leakage_discovery}. They are presented to illustrate how a flawed validation pipeline can generate deceptively strong but meaningless results. The apparent consistency and statistical significance are artifacts of the error.
 \item \textbf{Notes:} Rolling origin cross-validation: Train on 2018--(t$-$1) with H=4 exponential decay, test on full season t. v2 = baseline XGBoost, v4 = Ridge Residuals. p-value from Diebold-Mariano one-sided test ($H_0$: equal predictive accuracy). $\sigma$ (within) is standard deviation of errors within each season. All seasons achieve p < 0.000001 (highly significant improvement). Low inter-season variance ($\sigma = 0.40$ MAE) confirms stability.
 \end{tablenotes}
 \end{table}

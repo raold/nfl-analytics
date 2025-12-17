@@ -265,13 +265,15 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
   - Phase 6: Documentation (XGBoost hyperparams, team_mapping, CLAUDE.md)
 - **Git Worktrees (Dec 20):** 4 parallel development worktrees (experiments, dissertation, hotfix, backtest)
 
-**Key Findings (Dec 13):**
+**Key Findings (Dec 13-14):**
 - Season-based temporal split prevents data leakage (train on seasons < max, validate on max)
 - RMSE is correct uncertainty estimate (not MAE * 0.5)
 - Context managers prevent connection leaks in high-load scenarios
+- **Feature weighting has NO effect on XGBoost** - tree models are scale-invariant (Dec 14)
+- **Feature pruning trade-off discovered** (Dec 14): More features = better spread MAE, fewer = better win AUC
+- **Best XGBoost config**: reg_alpha=1.0, reg_lambda=2.0 (only 0.09% improvement over baseline)
 
 **In Progress:**
-- XGBoost v5 retraining with 342-feature set (awaiting remediation completion)
 - Ensemble v6.2 integration with synthetic features
 
 **Strategic Decisions:**
@@ -279,6 +281,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 - Dynamic meta-learning rejected (Nov 18) - static weights outperform, see ADR-009
 - Dual-weight strategy adopted (Nov 27) - different domains need different weights
 - ValidatorRegistry pattern adopted (Dec 13) - Strategy pattern for validation
+- **Feature optimization tested, baseline retained (Dec 14)** - see ADR-011
 
 **Recent Work:** [docs/milestones/RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY.md)
 
@@ -293,7 +296,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 | Architecture | [ARCHITECTURE_REFERENCE](docs/ARCHITECTURE_REFERENCE.md), [COMPONENT_DEEP_DIVES](docs/COMPONENT_DEEP_DIVES.md) |
 | Milestones | [RECENT_WORK_HISTORY](docs/milestones/RECENT_WORK_HISTORY.md), [docs/milestones/](docs/milestones/) |
 | Synthesis | [DIRICHLET_OPTIMIZATION](docs/synthesis/DIRICHLET_WEIGHT_OPTIMIZATION_SYNTHESIS_NOV27.md) |
-| ADRs | [docs/adr/](docs/adr/) (009: Dynamic weights rejection) |
+| ADRs | [docs/adr/](docs/adr/) (009: Dynamic weights, 011: Feature optimization) |
 
 ---
 
@@ -329,10 +332,13 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 8. **RMSE for uncertainty** - MAE * arbitrary factor has no statistical basis
 9. **Context managers for DB** - always use `with conn:` to prevent resource leaks
 10. **Strategy pattern for extensibility** - ValidatorRegistry enables plugin validators
+11. **Feature weighting doesn't help tree models** - XGBoost splits on values, not magnitudes (scale-invariant)
+12. **Pruning creates trade-offs** - fewer features improves classification but hurts regression accuracy
+13. **Test hypotheses empirically** - Bayesian/Dirichlet weighting sounded promising but had zero effect
 
 ---
 
-**Version:** 6.0 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
+**Version:** 6.1 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
 
 **Project Rules:**
 - Never take shortcuts, never use synthetic data

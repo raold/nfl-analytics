@@ -185,11 +185,11 @@ class EnhancedEnsemble5Way:
 
     # Canonical v6.0 weights (optimized for game predictions)
     DEFAULT_WEIGHTS = {
-        "state_space_v2": 0.27,
-        "hierarchical_v2": 0.27,
-        "xgboost_v4_ridge": 0.23,
-        "informative_priors_v2": 0.13,
-        "hybrid_static_incremental": 0.10,
+        "state_space_v2": 0.35,
+        "hierarchical_v2": 0.35,
+        "xgboost_v4_ridge": 0.00,  # DISABLED: Target leakage identified (Dec 17, 2025)
+        "informative_priors_v2": 0.15,
+        "hybrid_static_incremental": 0.15,
     }
 
     # Dirichlet-learned v8.0 weights (optimized for player props)
@@ -580,16 +580,17 @@ class EnhancedEnsemble5Way:
         except Exception as e:
             logger.warning(f"Component hierarchical_v2 failed: {e}")
 
-        # 3. XGBoost v4 Ridge Residuals (23%)
-        try:
-            xgb_v4_pred, xgb_v4_std = self._predict_xgboost_v4(features)
-            if xgb_v4_pred is not None:
-                components["xgboost_v4_ridge"] = {"mean": xgb_v4_pred, "std": xgb_v4_std}
-                valid_predictions.append("xgboost_v4_ridge")
-            else:
-                logger.warning("Component xgboost_v4_ridge returned None")
-        except Exception as e:
-            logger.warning(f"Component xgboost_v4_ridge failed: {e}")
+        # 3. XGBoost v4 Ridge Residuals (0%) - DISABLED due to leakage
+        if self.weights.get("xgboost_v4_ridge", 0) > 0:
+            try:
+                xgb_v4_pred, xgb_v4_std = self._predict_xgboost_v4(features)
+                if xgb_v4_pred is not None:
+                    components["xgboost_v4_ridge"] = {"mean": xgb_v4_pred, "std": xgb_v4_std}
+                    valid_predictions.append("xgboost_v4_ridge")
+                else:
+                    logger.warning("Component xgboost_v4_ridge returned None")
+            except Exception as e:
+                logger.warning(f"Component xgboost_v4_ridge failed: {e}")
 
         # 4. Informative Priors v2 (13%)
         try:

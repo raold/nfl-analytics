@@ -80,7 +80,7 @@ This dissertation began with a fundamental question: can machine learning extrac
 
 However, that failure was not the conclusion, but the beginning of a 13-month research journey. The central finding of this dissertation is therefore not that markets are efficient, but that \textbf{profitability is achievable through a disciplined process of discovery}. By systematically identifying the failure modes of early models and developing specific architectural principles to overcome them, we constructed the v6.0 system—a profitable, robust, and reproducible decision engine.
 
-The dramatic improvement in model accuracy and profitability can be substantially attributed to the feature orthogonalization process described in Chapter 4. The "Ridge Residuals" method provided an 88\% improvement in component accuracy by giving the ensemble models a less noisy, more robust signal of intrinsic team and player strength. This confirms our core hypothesis: in efficient markets, superior feature engineering is a more potent source of alpha than marginal improvements in model architecture.
+The dramatic improvement in model accuracy and profitability can be substantially attributed to the principles of ensemble diversification and the robustness of the individual Bayesian and state-space models. By combining multiple, weakly correlated models, the ensemble was able to produce a more stable and accurate consensus prediction than any single component could alone. This confirms our core hypothesis: in efficient markets, system-level architecture and diversification are more potent sources of alpha than the pursuit of a single, perfect model.
 
 The final v6.0 system, a 5-way ensemble built on the principles of feature orthogonalization, diversification, and hybrid modeling, was subjected to the same rigorous, multi-season validation that caused earlier models to fail. It succeeded.
 
@@ -415,6 +415,9 @@ We report out-of-sample performance by season. Stability across 2015--2024 demon
 
 % Include Causal Inference Framework section
 \input{../chapter_09_results_discussion/section_causal_inference.tex}
+
+% Include Feature Optimization Experiments section
+\input{../chapter_09_results_discussion/section_feature_optimization_experiments.tex}
 
 \section{Economic Value and Risk}
 We summarize results with both statistical and economic metrics: CLV distribution, realized edge relative to closing, bankroll growth, MAR ratio, and maximum drawdown. We report per-season performance to highlight regime variability.

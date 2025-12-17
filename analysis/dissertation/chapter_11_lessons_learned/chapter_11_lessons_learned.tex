@@ -16,7 +16,7 @@ This concluding chapter synthesizes the highest-level lessons from that journey.
 The successful v6.0 ensemble was built upon three core technical principles that were discovered through rigorous experimentation. The detailed evolution and validation of these methods are now presented in their respective chapters, but are summarized here.
 
 \begin{enumerate}
-    \item \textbf{Feature Engineering Dominates Model Complexity.} The single most impactful discovery was the "Ridge Residuals" orthogonalization method, which isolates a pure QB skill signal from confounding opponent effects. This simple feature engineering technique improved a key model component's accuracy by 88\% and proved far more valuable than an 84-hour investigation into complex Bayesian Neural Networks. The full methodology is now detailed in \Cref{sec:ridge-residuals}.
+    \item \textbf{Validation Rigor and the Perils of Target Leakage.} The most important lesson of this research was not a specific modeling technique, but the process of discovering a critical flaw in one. An experimental two-stage model for feature orthogonalization (the "Ridge Residuals" method) initially appeared to be a breakthrough, promising an 88\% reduction in error. However, a final pre-deployment audit revealed this to be the result of a subtle but catastrophic target leakage flaw in the validation pipeline. When corrected, the method actually performed 55\% \textit{worse} than the baseline. This experience, detailed in the case study in Appendix~N, proved that a robust, multi-layered validation process is the most critical component of the system, as it is the only defense against chasing phantom improvements and deploying invalid models.
 
     \item \textbf{Ensemble Diversification > Individual Sophistication.} The v1.0 system failed because it relied on a single model. The profitable v6.0 system succeeded by combining five weakly correlated models. As shown by the variance decomposition analysis in \Cref{sec:unified-baseline-comparison}, adding a simple, uncorrelated model (like ELO) was more effective at reducing overall error than further refining a single, sophisticated one.
 
@@ -42,6 +42,21 @@ Our post-mortem analysis showed that with a prior belief of 50\% ($P_0=0.5$) and
 \subsection{Empiricism Over Theory}
 The initial v1.0 hierarchical model was theoretically sound and would likely pass academic peer review. Empirically, it failed with an -83.5\% drawdown. The market provides unforgiving, real-money feedback that accelerates learning. This dissertation embraces the principle that theory is the hypothesis, but out-of-sample data is the verdict.
 
+\subsection{Algorithm Properties Trump Intuition: The Feature Weighting Failure}
+
+A compelling hypothesis emerged from SHAP analysis: 39\% of features (135 of 344) showed near-zero importance. The intuition seemed sound---weighting these features down should reduce noise and improve generalization. Five different weighting schemes were tested (raw SHAP, square-root, log, binary, Dirichlet-smoothed), and \textbf{all produced identical results to baseline}.
+
+The explanation is fundamental: \textbf{tree-based models are scale-invariant}. XGBoost splits on comparisons ($x_j < t$), not magnitudes. Multiplying any feature by a constant only shifts the split threshold---it cannot change what the model learns. This is mathematically inert:
+\begin{equation}
+    \text{split}(X_j < t) \equiv \text{split}(c \cdot X_j < c \cdot t) \quad \forall c > 0
+\end{equation}
+
+This contrasts sharply with linear models and neural networks, where feature scaling directly affects coefficients and gradient flow. The lesson: \textbf{know your algorithm's mathematical properties before designing interventions}. An approach that works brilliantly for one model class may be provably ineffective for another.
+
+Follow-up experiments revealed a nuanced finding: hard feature pruning \textit{does} affect XGBoost, but creates a trade-off. Removing features improved classification (win AUC: +6.3\%) but hurt regression (spread MAE: +1.7\%). The "noisy" features contribute marginally to regression tasks. This led to a key decision: retain all features for spread prediction, but consider pruning for classification-only applications.
+
+Full experimental details are provided in \Cref{sec:feature-optimization}.
+
 \subsection{Honest Failure Accounting Builds Credibility}
 This dissertation transparently documents its most significant failures. This is not self-flagellation; it is a core tenet of the scientific method. By detailing what didn't work and why, we (1) prevent future researchers from repeating the same mistakes, (2) provide a more credible foundation for our successful results, and (3) map the true boundaries of what is feasible in this problem domain.
 
@@ -51,7 +66,7 @@ This dissertation transparently documents its most significant failures. This is
 The principles discovered in this work are not limited to sports. They are generalizable to any domain involving prediction and decision-making under uncertainty.
 
 \begin{itemize}
-    \item \textbf{Finance:} The "Ridge Residuals" method is a form of market-neutral alpha signal generation. The ensemble diversification principle is the foundation of modern portfolio theory. The hybrid static-adaptive architecture is directly applicable to balancing long-term strategic asset allocation with short-term tactical adjustments.
+    \item \textbf{Finance:} The principle of feature orthogonalization is directly analogous to the search for market-neutral alpha signals. The ensemble diversification principle is the foundation of modern portfolio theory, and the hybrid static-adaptive architecture is directly applicable to balancing long-term strategic asset allocation with short-term tactical adjustments.
 
     \item \textbf{Healthcare:} The orthogonalization technique is a direct analogue to methods in causal inference used to estimate the true treatment effect of a drug by controlling for patient confounders.
 
