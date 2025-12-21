@@ -1,13 +1,14 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** December 20, 2025 | **Version:** 6.1 | **Status:** Production Ready (Grade A+)
+**Last Updated:** December 21, 2025 | **Version:** 6.3 | **Status:** Production Ready (Grade A+)
 
 ## Quick Status
 
 | Component | State | Key Metric |
 |-----------|-------|------------|
 | Ensemble | v6.2 + equal-weight props | 54.5% spread (games), 44.25 MAE (props) |
-| Features | 342 total (Phase 2 + Synthetic) | Base 305 + 37 synthetic/research |
+| Features | 368 total (Phase 2 + Synthetic + Semantic) | Base 305 + 37 synthetic + 26 semantic |
+| Semantic Stack | NEW (Dec 21) | Ollama/MLX inference, 26 LLM features |
 | Database | 56 tables, 1.25M plays | PostgreSQL + Redis |
 | Dissertation | 693 pages | Compiles cleanly |
 | Infrastructure | 8/9 Docker services | ~105ms inference |
@@ -59,7 +60,7 @@
 - `models/` - Trained artifacts (~60 files)
 - `docs/` - 400+ documentation files
 
-**Features (342 total):**
+**Features (368 total):**
 
 | Category | Count | Module |
 |----------|-------|--------|
@@ -73,16 +74,18 @@
 | Strength of Victory | 24 | `strength_of_victory_features.py` |
 | PossessionValue | 16 | `possession_value_features.py` |
 | Playcalling | 22 | `playcalling_features.py` |
-| **Synthetic Interaction** | 11 | `synthetic_interaction_features.py` (NEW) |
-| **Synthetic Momentum** | 11 | `synthetic_momentum_features.py` (NEW) |
-| **Research-Driven** | 15 | `research_driven_features.py` (NEW) |
-| Props Stability | N/A | `py/ensemble/props_stability_weights.py` (NEW) |
+| **Synthetic Interaction** | 11 | `synthetic_interaction_features.py` |
+| **Synthetic Momentum** | 11 | `synthetic_momentum_features.py` |
+| **Research-Driven** | 15 | `research_driven_features.py` |
+| **Semantic (LLM)** | 26 | `py/semantic/features/semantic_features.py` (NEW) |
+| Props Stability | N/A | `py/ensemble/props_stability_weights.py` |
 
 **Entry Points:**
-- `GameFeatureExtractor` - Base 305 features (unified API, <500ms)
+- `GameFeatureExtractor` - Base 305 + 26 semantic features (unified API, <500ms)
 - `SyntheticInteractionEngine` - QB-OL synergy, defensive balance, explosive mismatch
 - `SyntheticMomentumEngine` - Form intensity, pressure consistency, RZ efficiency
 - `ResearchDrivenEngine` - nfelo EPA weighting (1.6:1.0), coaching rationality
+- `SemanticFeatureExtractor` - LLM-derived sentiment, injury severity, media signals (NEW)
 
 ---
 
@@ -215,6 +218,87 @@ git worktree prune
 
 ---
 
+## Semantic Stack (LLM Integration)
+
+**Status:** Phase 1 Complete (Dec 21, 2025)
+**Goal:** Add AI/LLM capabilities to push win rate past 52.4% breakeven toward 56-57%
+
+### Architecture
+
+```
+py/semantic/
+├── models/           # LLM inference clients
+│   ├── ollama_client.py   # qwen3:8b (chat endpoint, 240s timeout)
+│   ├── mlx_client.py      # Apple Silicon (Qwen2.5-7B-Instruct-4bit)
+│   └── inference.py       # Unified client with fallback chain
+├── ingestion/        # Data pipelines
+│   ├── news_ingester.py   # ESPN news classification
+│   └── social_ingester.py # Twitter/X verified accounts
+├── features/         # Feature engineering
+│   └── semantic_features.py  # 26 LLM-derived features
+└── training/         # Model fine-tuning
+    ├── annotation_pipeline.py  # DB → training data
+    └── fine_tune.py           # Ollama/MLX fine-tuning
+```
+
+### Semantic Features (26 total, prefix: `sem_`)
+
+**Per-Team (11 each):**
+| Feature | Type | Description |
+|---------|------|-------------|
+| `sentiment_24h` | float | News/social sentiment (-1 to 1) |
+| `sentiment_7d_trend` | float | Week-over-week sentiment change |
+| `injury_severity_llm` | int | LLM-assessed injury impact (1-5) |
+| `key_player_risk` | float | Star player injury probability |
+| `media_buzz_volume` | float | Media attention (0-1 normalized) |
+| `coaching_change` | bool | Recent coaching staff changes |
+| `roster_churn` | float | Player turnover indicator |
+| `public_overreaction` | float | Market sentiment extremity |
+| `contrarian_signal` | float | Inverse public sentiment |
+
+**Matchup (4):**
+| Feature | Description |
+|---------|-------------|
+| `sentiment_differential` | Home - away sentiment gap |
+| `injury_advantage` | Relative injury situation |
+| `media_attention_ratio` | Coverage imbalance |
+| `combined_semantic_edge` | Composite semantic signal |
+
+### Inference Configuration
+
+| Setting | Value | Notes |
+|---------|-------|-------|
+| Primary Model | qwen3:8b (Ollama) | Chat endpoint, not generate |
+| Fallback | MLX → Gemini → Claude | Automatic failover |
+| Timeout | 240 seconds | 4 min for complex queries |
+| Caching | Content-hash based | Redis integration |
+
+### Training Data (Dec 21, 2025)
+
+| Dataset | Samples | Source |
+|---------|---------|--------|
+| NER (entities) | 5,000 | 84K+ injury records (2009-2025) |
+| Sentiment | 2,000 | Game outcomes (2022-2025) |
+
+**Files:** `data/semantic_training/` (train.jsonl, Modelfile, ner/sentiment splits)
+
+### Usage
+
+```python
+# Semantic features auto-integrated into GameFeatureExtractor
+from py.features.game_feature_extractor import GameFeatureExtractor
+extractor = GameFeatureExtractor()
+features = extractor.extract_game_features(game_id)
+# Access: features['sem_home_sentiment_24h'], features['sem_injury_advantage'], etc.
+
+# Value bet detection with LLM explanations
+from py.production.value_bet_detector import ValueBetDetector
+detector = ValueBetDetector(min_edge=0.03, use_llm_explanations=True)
+bets = detector.detect_value_bets(predictions)
+```
+
+---
+
 ## Enforcement Framework
 
 **Purpose:** Catch errors at commit time through automated validation routing.
@@ -248,7 +332,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ---
 
-## Current Status (Dec 13, 2025)
+## Current Status (Dec 21, 2025)
 
 **Completed:**
 - 2025 Holdout Validation: 74.9% spread accuracy, 44.25 MAE props (Dec 9)
@@ -264,17 +348,25 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
   - Phase 5: Critical bug fixes (temporal split, connection leak, uncertainty estimation)
   - Phase 6: Documentation (XGBoost hyperparams, team_mapping, CLAUDE.md)
 - **Git Worktrees (Dec 20):** 4 parallel development worktrees (experiments, dissertation, hotfix, backtest)
+- **Semantic Stack Phase 1 (Dec 21):** LLM-powered feature engineering
+  - 26 semantic features integrated into GameFeatureExtractor (prefix: `sem_`)
+  - Ollama (qwen3:8b) + MLX + Gemini/Claude fallback chain
+  - News/social ingestion, NER/sentiment training data (5K + 2K samples)
+  - ValueBetDetector with LLM-generated explanations
+  - Fine-tuning utilities for Ollama Modelfile and MLX LoRA
 
-**Key Findings (Dec 13-14):**
+**Key Findings (Dec 13-21):**
 - Season-based temporal split prevents data leakage (train on seasons < max, validate on max)
 - RMSE is correct uncertainty estimate (not MAE * 0.5)
 - Context managers prevent connection leaks in high-load scenarios
 - **Feature weighting has NO effect on XGBoost** - tree models are scale-invariant (Dec 14)
 - **Feature pruning trade-off discovered** (Dec 14): More features = better spread MAE, fewer = better win AUC
 - **Best XGBoost config**: reg_alpha=1.0, reg_lambda=2.0 (only 0.09% improvement over baseline)
+- **qwen3:8b requires chat endpoint** (Dec 21): generate endpoint returns empty, use chat with 240s timeout
 
 **In Progress:**
-- Ensemble v6.2 integration with synthetic features
+- Test fine-tuned NER model on holdout data
+- Compare MLX vs Ollama inference performance (latency/accuracy benchmarks)
 
 **Strategic Decisions:**
 - BNN research abandoned (Nov 9) - 84 hours, 6 approaches, only BNN v3.1 Rushing remains

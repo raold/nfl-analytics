@@ -6,14 +6,15 @@
 
 Production-grade NFL analytics platform featuring a 5-way Bayesian ensemble, 342 engineered features, and R + Python pipelines backed by TimescaleDB. Includes **formal statistical testing frameworks**, **distributed compute**, and comprehensive **dissertation documentation**.
 
-## 🚀 Latest Results (Dec 9, 2025)
+## 🚀 Latest Results (Dec 21, 2025)
 
 | Metric | Performance | Notes |
 |--------|-------------|-------|
 | **Spread Accuracy** | 74.9% | 2025 holdout (179 bets) |
 | **Props MAE** | 44.25 yards | Equal-weight ensemble |
-| **Features** | 342 total | 305 base + 37 synthetic |
+| **Features** | 368 total | 305 base + 37 synthetic + 26 semantic |
 | **Dissertation** | 693 pages | 12 chapters + appendices |
+| **Semantic Stack** | NEW | LLM-powered NER, sentiment, explanations |
 
 ## 📚 Documentation
 
@@ -299,13 +300,81 @@ uv run python py/models/train_xgboost_canonical.py
 uv run python py/ensemble/enhanced_ensemble_v6_production.py
 ```
 
-**Key Features (342 total)**:
+**Key Features (368 total)**:
 - **Base features** (305): TeamOffensive, TeamDefensive, NextGen, QBR, OpponentAdjusted
 - **Synthetic interaction** (11): QB-OL synergy, defensive balance, explosive mismatch
 - **Synthetic momentum** (11): Form intensity, pressure consistency, RZ efficiency
 - **Research-driven** (15): nfelo EPA weighting (1.6:1.0), coaching rationality
+- **Semantic features** (26): LLM-derived from news/social media (NEW)
 
 See **CLAUDE.md** for complete feature documentation.
+
+### 12. Semantic Stack (LLM Integration)
+
+**Status: NEW (Dec 21, 2025)** - LLM-powered semantic analysis for NFL betting
+
+The Semantic Stack adds AI/LLM capabilities to enhance win rate through semantic understanding of news, injuries, and market signals.
+
+**Architecture:**
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Layer 4: Decision Support                                  │
+│  - ValueBetDetector with LLM-generated explanations        │
+│  - Human-in-the-loop validation                            │
+└─────────────────────────────────────────────────────────────┘
+                              ↑
+┌─────────────────────────────────────────────────────────────┐
+│  Layer 3: Semantic Feature Engineering (26 features)        │
+│  - Sentiment (24h, 7d trend, differential)                 │
+│  - Injury severity (LLM-assessed)                          │
+│  - Media buzz, coaching changes                            │
+└─────────────────────────────────────────────────────────────┘
+                              ↑
+┌─────────────────────────────────────────────────────────────┐
+│  Layer 2: LLM Inference                                     │
+│  - Local: Ollama (qwen3:8b) + MLX (Apple Silicon)          │
+│  - Fallback: Gemini Flash → Claude API                     │
+│  - 4-minute timeout, content caching                       │
+└─────────────────────────────────────────────────────────────┘
+                              ↑
+┌─────────────────────────────────────────────────────────────┐
+│  Layer 1: Data Ingestion                                    │
+│  - ESPN news (existing)                                    │
+│  - Social media (Twitter/X verified accounts)              │
+│  - Historical injury records (84K+ samples)                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Key Components:**
+- `py/semantic/models/` - Ollama/MLX/API inference clients
+- `py/semantic/features/` - SemanticFeatureExtractor (26 features)
+- `py/semantic/ingestion/` - News and social media ingesters
+- `py/semantic/training/` - NER/sentiment annotation and fine-tuning
+- `py/production/value_bet_detector.py` - LLM-explained value bets
+
+**Usage:**
+```python
+# Semantic features integrated into GameFeatureExtractor
+from py.features.game_feature_extractor import GameFeatureExtractor
+extractor = GameFeatureExtractor()
+features = extractor.extract_game_features(game_id)
+# Semantic features prefixed with 'sem_': sem_home_sentiment_24h, etc.
+
+# Value bet detection with explanations
+from py.production.value_bet_detector import ValueBetDetector
+detector = ValueBetDetector(min_edge=0.03)
+bets = detector.detect_value_bets(predictions)
+for bet in bets:
+    print(f"{bet.bet_side}: {bet.edge_pct} edge")
+    print(f"  {bet.explanation}")
+```
+
+**Training Data (Dec 21, 2025):**
+- NER training: 5,000 samples (4,500 train / 500 val) from 84K injury records
+- Sentiment training: 2,000 samples from game outcomes
+- Fine-tuning: Ollama Modelfile + MLX LoRA configs
+
+See **[Semantic Stack Plan](.claude/plans/stateful-waddling-narwhal.md)** for full implementation roadmap.
 
 ### 10. Conservative Q-Learning (CQL) Training
 

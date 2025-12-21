@@ -1,8 +1,122 @@
 # PROJECT_STATUS.md - NFL Analytics Project Status
 
-**Last Updated:** December 13, 2025
-**Version:** v6.2 GNN Integration + 6-Way Ensemble + Code Quality Remediation
-**Focus:** ✅ **CODE QUALITY REMEDIATION COMPLETE** - 6-phase systematic fix of 90+ issues
+**Last Updated:** December 21, 2025
+**Version:** v6.3 Semantic Stack + GNN Integration + 6-Way Ensemble
+**Focus:** ✅ **SEMANTIC STACK PHASE 1 COMPLETE** - LLM-powered NER, sentiment, value bet explanations
+
+---
+
+## 🚀 MAJOR MILESTONE (Dec 21, 2025)
+
+> **Semantic Stack Phase 1 Complete - LLM-Powered Feature Engineering**
+
+### Semantic Stack Overview
+
+Added AI/LLM capabilities to enhance win rate through semantic understanding of news, injuries, and market signals. Self-hosted local inference with API fallback.
+
+| Component | Status | Files | Description |
+|-----------|--------|-------|-------------|
+| **Inference Layer** | ✅ Complete | `py/semantic/models/` | Ollama (qwen3:8b) + MLX + Gemini fallback |
+| **News Ingestion** | ✅ Complete | `py/semantic/ingestion/` | ESPN + social media (Twitter/X) |
+| **Semantic Features** | ✅ Complete | `py/semantic/features/` | 26 features integrated into GameFeatureExtractor |
+| **Value Bet Detector** | ✅ Complete | `py/production/value_bet_detector.py` | LLM-generated explanations |
+| **Training Pipeline** | ✅ Complete | `py/semantic/training/` | 5,000 NER + 2,000 sentiment samples |
+| **Fine-tuning Utils** | ✅ Complete | `py/semantic/training/fine_tune.py` | Ollama Modelfile + MLX LoRA |
+
+### Semantic Features (26 total)
+
+**Per-Team Features (11 each):**
+- `sentiment_24h`, `sentiment_7d_trend` - News/social sentiment
+- `injury_severity_llm` - LLM-assessed injury impact (1-5 scale)
+- `key_player_risk` - Star player injury probability
+- `media_buzz_volume` - Media attention (0-1 normalized)
+- `coaching_change`, `roster_churn` - Team stability indicators
+- `public_overreaction`, `contrarian_signal` - Market sentiment
+
+**Matchup Features (4):**
+- `sentiment_differential` - Home vs away sentiment gap
+- `injury_advantage` - Relative injury situation
+- `media_attention_ratio` - Relative coverage
+- `combined_semantic_edge` - Composite semantic signal
+
+### LLM Inference Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  SemanticInferenceClient (py/semantic/models/inference.py)  │
+├─────────────────────────────────────────────────────────┤
+│  Fallback Chain (prefer_local=True):                    │
+│  1. MLX (Apple Silicon) - mlx-community/Qwen2.5-7B     │
+│  2. Ollama (qwen3:8b) - 240s timeout, chat endpoint    │
+│  3. Gemini Flash API - rate limited                    │
+│  4. Claude API - final fallback                        │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Training Data Generated
+
+| Dataset | Train | Val | Source |
+|---------|-------|-----|--------|
+| NER (entities) | 4,500 | 500 | 84K+ injury records (2009-2025) |
+| Sentiment | 1,537 | 463 | Game outcomes (2022-2025) |
+
+**Output Files:**
+- `data/semantic_training/train.jsonl` (2.6 MB)
+- `data/semantic_training/ner_training_train.jsonl`
+- `data/semantic_training/sentiment_training_train.jsonl`
+- `data/semantic_training/Modelfile` (Ollama custom model)
+
+### Key Files Added
+
+```
+New Files (Dec 21, 2025):
+├── py/semantic/
+│   ├── __init__.py
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── ollama_client.py      # qwen3:8b via chat endpoint
+│   │   ├── mlx_client.py         # Apple Silicon inference
+│   │   ├── inference.py          # Unified client with fallback
+│   │   ├── config.py             # Model configurations
+│   │   └── loader.py             # Model loading utilities
+│   ├── ingestion/
+│   │   ├── __init__.py
+│   │   ├── news_ingester.py      # ESPN news classification
+│   │   └── social_ingester.py    # Twitter/X verified accounts
+│   ├── features/
+│   │   ├── __init__.py
+│   │   └── semantic_features.py  # 26 semantic features
+│   └── training/
+│       ├── __init__.py
+│       ├── annotation_pipeline.py # DB → training data
+│       └── fine_tune.py           # Ollama/MLX fine-tuning
+├── py/production/
+│   └── value_bet_detector.py     # LLM-explained value bets
+└── data/semantic_training/
+    ├── train.jsonl
+    ├── Modelfile
+    ├── ner_training_*.jsonl
+    └── sentiment_training_*.jsonl
+
+Modified Files:
+├── py/features/game_feature_extractor.py  # Semantic feature integration
+└── py/semantic/models/inference.py         # 240s timeout (from 120s)
+```
+
+### Git Commits (Dec 21, 2025)
+
+- `b57ffe4` - feat(semantic): add semantic stack for LLM-powered feature extraction
+- `4be8dc2` - feat(features): integrate semantic features into GameFeatureExtractor
+- `2192b3f` - feat(production): add value bet detector with LLM explanations
+- `2fa4d6c` - feat(semantic): add annotation pipeline for NER/sentiment training
+- `4db4c06` - feat(semantic): add fine-tuning utilities for NER/sentiment models
+
+### Next Steps (Phase 2)
+
+1. **Test fine-tuned NER model** - Validate on holdout data
+2. **Compare MLX vs Ollama performance** - Latency/accuracy benchmarks
+3. **A/B test semantic features** - Validate lift on 2025 holdout
+4. **RAG integration** - Historical game context retrieval
 
 ---
 
