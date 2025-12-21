@@ -1,6 +1,6 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** December 13, 2025 | **Version:** 6.0 | **Status:** Production Ready (Grade A+)
+**Last Updated:** December 20, 2025 | **Version:** 6.1 | **Status:** Production Ready (Grade A+)
 
 ## Quick Status
 
@@ -172,6 +172,31 @@ pre-commit install
 
 **Conventions:** Never commit secrets, test before commit, follow conventional commits, main branch: `main`
 
+### Git Worktrees
+
+The project uses git worktrees for parallel development workflows:
+
+| Worktree | Directory | Branch | Purpose |
+|----------|-----------|--------|---------|
+| Main | `nfl-analytics/` | `main` | Primary development |
+| Experiments | `../nfl-experiments/` | `experiments` | Model experiments, XGBoost tuning |
+| Dissertation | `../nfl-dissertation/` | `dissertation` | Isolated LaTeX compilation |
+| Hotfix | `../nfl-hotfix/` | `hotfix` | Quick production fixes |
+| Backtest | `../nfl-backtest/` | `backtest` | Long-running backtests |
+
+```bash
+# List all worktrees
+git worktree list
+
+# Remove a worktree when done
+git worktree remove ../nfl-hotfix
+
+# Prune stale references
+git worktree prune
+```
+
+**Note:** Each worktree needs its own `.venv` for Python dependencies.
+
 ---
 
 ## Agent Infrastructure
@@ -238,6 +263,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
   - Phase 4: Connection pool verification (infrastructure already existed)
   - Phase 5: Critical bug fixes (temporal split, connection leak, uncertainty estimation)
   - Phase 6: Documentation (XGBoost hyperparams, team_mapping, CLAUDE.md)
+- **Git Worktrees (Dec 20):** 4 parallel development worktrees (experiments, dissertation, hotfix, backtest)
 
 **Key Findings (Dec 13):**
 - Season-based temporal split prevents data leakage (train on seasons < max, validate on max)
