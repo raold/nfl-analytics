@@ -1,0 +1,28 @@
+{
+  "baseline": {
+    "name": "Baseline (No Semantic)",
+    "total_games": 195,
+    "correct": "147",
+    "accuracy": 0.7538461538461538,
+    "roi_per_bet": 0.43909230769230767,
+    "total_roi_pct": 43.90923076923077,
+    "p_value": 3.44764793879918e-11,
+    "significant": "True"
+  },
+  "semantic": {
+    "name": "With Semantic Features",
+    "total_games": 195,
+    "correct": "148",
+    "accuracy": 0.7589743589743589,
+    "roi_per_bet": 0.44888205128205133,
+    "total_roi_pct": 44.888205128205136,
+    "p_value": 1.2131084125007785e-11,
+    "significant": "True"
+  },
+  "lift": {
+    "accuracy": 0.00512820512820511,
+    "roi": 0.9789743589743694,
+    "mcnemar_p": 1.0
+  },
+  "games": 195
+}
