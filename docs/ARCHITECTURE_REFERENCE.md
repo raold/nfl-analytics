@@ -1,7 +1,7 @@
 # Architecture Reference
 
-**Last Updated:** November 8, 2025
-**Version:** 4.4
+**Last Updated:** December 20, 2025
+**Version:** 4.5
 **Purpose:** Complete directory structure reference for NFL Analytics project
 
 ---
@@ -22,14 +22,13 @@ nfl-analytics/
 │   │   └── validation.py                 # Validation/backtesting
 │   ├── compute/                          # Distributed compute system
 │   │   ├── statistics/                   # Statistical testing
-│   │   ├── sync/                         # Google Drive sync
 │   │   ├── hardware/                     # M4 vs 4090 routing
 │   │   ├── task_queue.py                 # Task management (WAL mode)
 │   │   ├── adaptive_scheduler.py         # Multi-armed bandit
-│   │   └── compute_worker.py             # Worker processes
+│   │   └── worker.py                     # Worker processes
 │   ├── features/                         # Feature engineering
 │   │   ├── asof_features.py              # Leakage-safe as-of features
-│   │   ├── asof_features_enhanced.py     # 157-feature enhanced set
+│   │   ├── asof_features_unified.py      # 342-feature unified set
 │   │   ├── bayesian_player_features.py   # Extract from posteriors
 │   │   ├── defensive_situational_strength.py        # Phase 2.4
 │   │   ├── defensive_game_script_indicators.py      # Phase 2.5
@@ -91,7 +90,7 @@ nfl-analytics/
 ├── analysis/                             # Analysis outputs
 │   ├── dissertation/                     # Dissertation (LaTeX)
 │   │   ├── main/                         # Main dissertation
-│   │   │   ├── main.tex                  # 324-page dissertation
+│   │   │   ├── main.tex                  # 693-page dissertation
 │   │   │   └── main.pdf                  # Compiled PDF
 │   │   ├── chapter_1_introduction/       # Chapter 1
 │   │   ├── chapter_2_literature_review/  # Chapter 2
@@ -243,7 +242,7 @@ nfl-analytics/
 - Canonical training window tracking
 
 ### `/analysis` - Research Outputs
-- **dissertation/**: 324-page LaTeX dissertation
+- **dissertation/**: 693-page LaTeX dissertation
 - **features/**: Feature engineering outputs
 - **results/**: Experiment results (ablation, backtest, calibration)
 - **reports/**: Analysis reports
@@ -313,6 +312,6 @@ tree -L 4 --dirsfirst -I 'pgdata|__pycache__|*.pyc|.git|node_modules|renv|*.log|
 
 ---
 
-**Last Updated:** November 8, 2025
-**Maintainer:** Claude Code (Sonnet 4.5)
+**Last Updated:** December 20, 2025
+**Maintainer:** Claude Code
 **Purpose:** Complete directory reference for AI assistants and developers

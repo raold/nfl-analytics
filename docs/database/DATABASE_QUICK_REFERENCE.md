@@ -1,6 +1,6 @@
 # Database Quick Reference
 
-**Last Updated:** December 7, 2025
+**Last Updated:** December 20, 2025
 **Purpose:** Quick lookup reference for database schema, connections, and critical conventions
 **Full Documentation:** See [DATABASE_SCHEMA_AUDIT.md](DATABASE_SCHEMA_AUDIT.md)
 **Health Check:** `python scripts/db_health_check.py`
@@ -56,7 +56,7 @@ errors = validate_query("SELECT pgs.game_id FROM mart.player_game_stats pgs")
 
 ## Connection Information
 
-**PostgreSQL 14+ with TimescaleDB Extension**
+**PostgreSQL 17 with TimescaleDB Extension**
 
 ```
 Host:     localhost:5544
@@ -81,7 +81,7 @@ postgresql://dro:sicillionbillions@localhost:5544/devdb01
 | `g.kickoff` | `g.game_date`, `g.gameday` | Game timestamp (stored as DATE) |
 | `g.spread_close` | `g.spread_line` | Closing betting spread |
 | `g.total_close` | `g.total_line` | Closing over/under total |
-| `LAR` / `LAC` | `LA` | LA Rams (LAR) vs LA Chargers (LAC) |
+| `LAR` or `LA` | - | Rams: DB uses `LA`, canonical `LAR` - both valid |
 
 **Why?** These are the actual column names in `public.games`. Using wrong names will cause JOIN failures and silent NULL values.
 
@@ -105,7 +105,7 @@ postgresql://dro:sicillionbillions@localhost:5544/devdb01
 
 | Table | Rows | Period | Purpose |
 |-------|------|--------|---------|
-| `games` | 6,991 | 1999-2024 | Game metadata, betting lines, outcomes |
+| `games` | 7,263 | 1999-2025 | Game metadata, betting lines, outcomes |
 | `plays` | 1.2M | 1999-2024 | Play-by-play data with EPA values |
 | `weather` | ~7K | Varies | Weather conditions (game_id PK) |
 | `injuries` | ~50K | Varies | Injury status records |

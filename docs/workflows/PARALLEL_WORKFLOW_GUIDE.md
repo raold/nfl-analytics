@@ -177,7 +177,7 @@ Total: ~2-3 minutes (vs ~8-10 minutes full build)
            ▼
      ┌────────────────────────────┐
      │ LEVEL 3: Feature Generation│  (Sequential - depends on all)
-     │ asof_features_enhanced.py  │
+     │ asof_features_unified.py  │
      └──────────┬─────────────────┘
                 │
                 ▼
@@ -431,7 +431,7 @@ PHASE 1: DATA REFRESH (ETL - 15 min)
 ├─ Level 0: nflverse_schedules, players (parallel)
 ├─ Level 1: nflverse_pbp, odds, weather (parallel)
 ├─ Level 2: EPA aggregation (parallel)
-└─ Level 3: asof_features_enhanced.py
+└─ Level 3: asof_features_unified.py
 
 PHASE 2: MODEL UPDATES (Training - 3 hours, parallel with Phase 3)
 ├─ M4: GLM retrain with Week 10 data
@@ -498,7 +498,7 @@ Rscript R/ingestion/ingest_pbp.R                     # 15 min
 python py/ingest_odds_history.py ...                 # 20 min
 python py/weather_meteostat.py ...                   # 10 min
 Rscript R/features/features_epa.R                    # 5 min
-python py/features/asof_features_enhanced.py ...     # 8 min
+python py/features/asof_features_unified.py ...     # 8 min
 # Total: ~60 minutes
 
 # Parallel way: ~18 minutes

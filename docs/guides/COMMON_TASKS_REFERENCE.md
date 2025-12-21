@@ -40,8 +40,8 @@ psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \
 This should return a positive count. If the table is empty, run data ingestion scripts first:
 
 ```bash
-Rscript --vanilla data/ingest_schedules.R
-Rscript --vanilla data/ingest_pbp.R
+Rscript --vanilla R/ingestion/ingest_schedules.R
+Rscript --vanilla R/ingestion/ingest_pbp.R
 ```
 
 **2. Train the model**

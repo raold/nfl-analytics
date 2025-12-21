@@ -4,7 +4,7 @@
 
 <h1 align="center">NFL Analytics</h1>
 
-Production-grade NFL analytics platform featuring a 6-way Bayesian ensemble, 342 engineered features, and R + Python pipelines backed by TimescaleDB. Includes **formal statistical testing frameworks**, **distributed compute**, and comprehensive **dissertation documentation**.
+Production-grade NFL analytics platform featuring a 5-way Bayesian ensemble, 342 engineered features, and R + Python pipelines backed by TimescaleDB. Includes **formal statistical testing frameworks**, **distributed compute**, and comprehensive **dissertation documentation**.
 
 ## 🚀 Latest Results (Dec 9, 2025)
 
@@ -13,12 +13,12 @@ Production-grade NFL analytics platform featuring a 6-way Bayesian ensemble, 342
 | **Spread Accuracy** | 74.9% | 2025 holdout (179 bets) |
 | **Props MAE** | 44.25 yards | Equal-weight ensemble |
 | **Features** | 342 total | 305 base + 37 synthetic |
-| **Dissertation** | 664 pages | 12 chapters + appendices |
+| **Dissertation** | 693 pages | 12 chapters + appendices |
 
 ## 📚 Documentation
 
 **Quick Links:**
-- **[CLAUDE.md](CLAUDE.md)** - Comprehensive project documentation (v5.9)
+- **[CLAUDE.md](CLAUDE.md)** - Comprehensive project documentation (v6.1)
 - **[PROJECT_STATUS.md](PROJECT_STATUS.md)** - Current project status (updated Dec 9, 2025)
 - **[SETUP.md](SETUP.md)** - Environment setup instructions
 
@@ -29,7 +29,7 @@ Production-grade NFL analytics platform featuring a 6-way Bayesian ensemble, 342
   - [2025 Holdout Validation](PROJECT_STATUS.md) (Dec 9, 2025)
   - [GNN v2 Integration](docs/milestones/GNN_V2_INTEGRATION_DEC7.md) (Dec 7, 2025)
   - [Dirichlet Optimization](docs/synthesis/DIRICHLET_WEIGHT_OPTIMIZATION_SYNTHESIS_NOV27.md) (Nov 27, 2025)
-- **[Dissertation](analysis/dissertation/main/main.pdf)**: 664-page dissertation
+- **[Dissertation](analysis/dissertation/main/main.pdf)**: 693-page dissertation
   - 12 chapters: Data foundation through production deployment
   - Causal inference, Bayesian hierarchical models, Reinforcement Learning
   - Comprehensive appendices (BNN investigation, architecture evolution)
@@ -45,6 +45,20 @@ Below is a minimal local bootstrap.
 - **Git LFS** (for model binaries): `brew install git-lfs && git lfs install`
   - Required to download Python (.pkl) and R (.rds) model files
   - See **[docs/GIT_LFS_GUIDE.md](docs/GIT_LFS_GUIDE.md)** for comprehensive guide
+
+### Git Worktrees (Parallel Development)
+
+| Worktree | Directory | Purpose |
+|----------|-----------|---------|
+| Main | `nfl-analytics/` | Primary development |
+| Experiments | `../nfl-experiments/` | Model experiments |
+| Dissertation | `../nfl-dissertation/` | LaTeX compilation |
+| Hotfix | `../nfl-hotfix/` | Quick fixes |
+| Backtest | `../nfl-backtest/` | Long-running tests |
+
+```bash
+git worktree list    # View all worktrees
+```
 
 ## Quick Start
 
@@ -84,12 +98,12 @@ Rscript setup_packages.R
 
 **Load schedules** (idempotent, 1999–2024):
 ```bash
-Rscript --vanilla data/ingest_schedules.R
+Rscript --vanilla R/ingestion/ingest_schedules.R
 ```
 
 **Ingest play-by-play** (1999-2024, ~3-5 minutes):
 ```bash
-Rscript --vanilla data/ingest_pbp.R
+Rscript --vanilla R/ingestion/ingest_pbp.R
 ```
 
 **Ingest historical odds** (requires `ODDS_API_KEY` in `.env`):
@@ -245,27 +259,26 @@ stats = queue.get_queue_status()
 print('Task distribution:', stats)
 "
 
-# Check for sync conflicts
+# Check queue status
 python -c "
-from py.compute.sync.conflict_resolver import conflict_resolver
-conflicts = conflict_resolver.detect_database_conflicts('compute_queue.db')
-print('Sync conflicts:', conflicts)
+from py.compute.task_queue import TaskQueue
+queue = TaskQueue()
+print('Queue status:', queue.get_queue_status())
 "
 ```
 
-### 8. 6-Way Bayesian Ensemble (v6.2)
+### 8. 5-Way Bayesian Ensemble (v6.2)
 
 **Status: Production Ready (Dec 9, 2025)**
 
 **Ensemble Architecture**:
 | Component | Weight | Model Type |
 |-----------|--------|------------|
-| State-Space | 24% | Kalman filter with time decay |
-| Hierarchical | 24% | brms hierarchical Bayesian |
-| XGBoost | 20% | Gradient boosting (293 features) |
-| Informative Priors | 12% | Domain-informed Bayesian |
-| Hybrid | 10% | Combined approach |
-| GNN | 10% | Graph Neural Network (player interactions) |
+| State-Space | 27% | Kalman filter with time decay |
+| Hierarchical | 27% | brms hierarchical Bayesian |
+| XGBoost | 23% | Gradient boosting (342 features) |
+| Informative Priors | 13% | Domain-informed Bayesian |
+| Hybrid | 10% | Static-incremental combined |
 
 **2025 Holdout Results (Dec 9)**:
 - **Spread accuracy**: 74.9% (179 games)
@@ -280,7 +293,7 @@ Rscript R/train_informative_priors_v2_canonical.R
 Rscript R/state_space/train_state_space_v2_canonical.R
 
 # Train XGBoost (Python)
-uv run python py/models/train_xgboost_v4.py
+uv run python py/models/train_xgboost_canonical.py
 
 # Generate ensemble predictions
 uv run python py/ensemble/enhanced_ensemble_v6_production.py
@@ -301,9 +314,9 @@ See **CLAUDE.md** for complete feature documentation.
 Train CQL agent for offline RL betting strategy:
 
 ```bash
-# Generate enhanced features (157 columns with 29 advanced metrics)
-.venv/Scripts/python.exe py/features/asof_features_enhanced.py \
-  --output data/processed/features/asof_team_features_enhanced.csv
+# Generate unified features (342 columns)
+.venv/Scripts/python.exe py/features/asof_features_unified.py \
+  --output data/processed/features/asof_team_features.csv
 
 # Create RL logged dataset (5,146 games, 2006-2024)
 .venv/Scripts/python.exe py/rl/dataset.py \
@@ -328,8 +341,8 @@ Train CQL agent for offline RL betting strategy:
 - Match Rate: 98.5% (policy matches logged behavior)
 - Estimated Policy Reward: 1.75% (vs 1.41% baseline = **24% improvement**)
 - Final Loss: 0.1070 (75% reduction from initial)
-- Model: `models/cql/best_model.pth` (207KB)
 - Training Log: `models/cql/cql_training_log.json` (2000 epochs)
+- Model artifacts managed via Git LFS
 
 **Platform Support**:
 - **Windows 11 + RTX 4090**: CUDA 12.9, PyTorch 2.8.0+cu129 (recommended for training)
@@ -419,7 +432,7 @@ This project includes comprehensive unit tests, integration tests, and CI/CD wor
 ### Quick Test Commands
 ```bash
 # Setup testing environment (one-time)
-bash scripts/setup_testing.sh
+bash scripts/dev/setup_testing.sh
 
 # Run unit tests (fast, no DB required)
 pytest tests/unit -m unit
@@ -500,16 +513,12 @@ nfl-analytics/
 │   │   │   ├── power_analysis.py              # Sample size & power
 │   │   │   ├── experimental_design/           # A/B testing framework
 │   │   │   └── reporting/                     # Quarto/LaTeX integration
-│   │   ├── sync/                              # 🆕 Google Drive sync infrastructure
-│   │   │   ├── machine_manager.py             # Hardware detection & fingerprinting
-│   │   │   ├── file_locks.py                  # Cross-platform file locking
-│   │   │   └── conflict_resolver.py           # Sync conflict resolution
 │   │   ├── hardware/                          # 🆕 Hardware-aware task routing
 │   │   │   └── task_router.py                 # M4 vs 4090 task optimization
 │   │   ├── task_queue.py                      # Priority-based task management (WAL mode)
 │   │   ├── adaptive_scheduler.py              # Multi-armed bandit + hardware routing
 │   │   ├── performance_tracker.py             # Statistical performance tracking
-│   │   └── compute_worker.py                  # Distributed worker system
+│   │   └── worker.py                          # Distributed worker system
 │   ├── features/                              # Feature engineering
 │   ├── models/                                # ML models
 │   ├── pricing/                               # Pricing & risk management
@@ -536,14 +545,14 @@ nfl-analytics/
 - **renv.lock**: R package versions
 - **pytest.ini**: Test configuration
 - **.pre-commit-config.yaml**: Pre-commit hook configuration
-- **run_compute.py**: 🆕 Main compute system entry point
+- **scripts/compute/run_compute.py**: 🆕 Main compute system entry point
 
 ## Database
 
 - **Host**: `localhost:5544`
 - **Database**: `devdb01`
 - **User**: `dro`
-- **Platform**: PostgreSQL 16 + TimescaleDB (time-series optimization)
+- **Platform**: PostgreSQL 17 + TimescaleDB (time-series optimization)
 - **Total Size**: ~2.5 GB across 56 tables
 
 ### Architecture
@@ -585,10 +594,10 @@ The database uses a **5-schema design** for clean separation of concerns:
 Full documentation and lineage: `docs/database/schema.md`.
 ER diagram: `docs/database/erd.md` (PNG: `docs/database/erd.png`).
 
-**Current Data**:
-- Games: 6,991 rows (1999-2024)
-- Plays: 1,230,857 rows (1999-2024)
-- Odds: 820,080 rows (Sept 2023 - Feb 2025, 16 bookmakers, 3 markets)
+**Current Data** (as of Dec 2025):
+- Games: 7,263 rows (1999-2025)
+- Plays: 1,254,173 rows (1999-2025)
+- Odds: Integration via `py/ingest_odds_smart.py` (requires API key)
 
 ## Notes
 

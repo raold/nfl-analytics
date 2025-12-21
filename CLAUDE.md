@@ -9,7 +9,7 @@
 | Ensemble | v6.2 + equal-weight props | 54.5% spread (games), 44.25 MAE (props) |
 | Features | 342 total (Phase 2 + Synthetic) | Base 305 + 37 synthetic/research |
 | Database | 56 tables, 1.25M plays | PostgreSQL + Redis |
-| Dissertation | 664 pages | Compiles cleanly |
+| Dissertation | 693 pages | Compiles cleanly |
 | Infrastructure | 8/9 Docker services | ~105ms inference |
 
 **Critical Files:** `py/ensemble/enhanced_ensemble_v6_production.py`, `py/ensemble/strategy/base.py`, `py/features/game_feature_extractor.py`
@@ -55,7 +55,7 @@
 **Key Directories:**
 - `py/` - Python ML modules (causal, ensemble, RL, features)
 - `R/` - Statistical models (brms, Stan, state-space)
-- `analysis/dissertation/` - 667-page LaTeX dissertation
+- `analysis/dissertation/` - 693-page LaTeX dissertation
 - `models/` - Trained artifacts (~60 files)
 - `docs/` - 400+ documentation files
 

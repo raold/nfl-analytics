@@ -192,7 +192,7 @@ bash scripts/dev/init_dev.sh
 [init] Applying 002_timescale.sql
 ...
 [init] Done. Next steps:
-  - Load schedules: Rscript --vanilla data/ingest_schedules.R
+  - Load schedules: Rscript --vanilla R/ingestion/ingest_schedules.R
   - Ingest odds: python py/ingest_odds_history.py
 ```
 
@@ -247,10 +247,10 @@ Rscript -e "
 
 ```bash
 # Ingest full schedules (1999-2024)
-Rscript --vanilla data/ingest_schedules.R
+Rscript --vanilla R/ingestion/ingest_schedules.R
 
 # Ingest full play-by-play (1999-2024)
-Rscript --vanilla data/ingest_pbp.R
+Rscript --vanilla R/ingestion/ingest_pbp.R
 ```
 
 **Expected data volumes:**

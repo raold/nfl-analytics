@@ -158,7 +158,7 @@ Full pipeline validation:
 |--------|----------|------|--------|-----|--------|
 | `asof_features.py` | 0 | 0 | 0 | 0 | ✅ CLEAN |
 | `asof_features_v2.py` | 0 | 0 | 0 | 0 | ✅ CLEAN |
-| `asof_features_enhanced.py` | 0 | 0 | 0 | 0 | ✅ CLEAN |
+| `asof_features_unified.py` | 0 | 0 | 0 | 0 | ✅ CLEAN |
 | `player_features.py` | 0 | 0 | 0 | 0 | ✅ CLEAN |
 | `bayesian_features.py` | 0 | 0 | 0 | 0 | ✅ CLEAN |
 | `bayesian_player_features.py` | 0 | 0 | 0 | 0 | ✅ CLEAN |

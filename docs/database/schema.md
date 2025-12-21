@@ -91,7 +91,7 @@ See scripts/dev/init_dev.sh for an example of applying the initial schema steps.
 ## Lineage and Ingestion
 
 - R ingestors/backfills populate public tables:
-  - data/ingest_pbp.R → plays (with EPA)
+  - R/ingestion/ingest_pbp.R → plays (with EPA)
   - R/backfill_game_metadata.R → games (stadium, QB, coach, penalties/turnovers, etc.)
   - R/backfill_rosters.R → roster/person tables if present (and enrich downstream joins)
   - R/backfill_pbp_advanced.R → advanced play-level enrichments
