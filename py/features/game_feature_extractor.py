@@ -13,7 +13,7 @@ for game outcome predictions. Single entry point that coordinates feature extrac
 TeamOffensiveFeatures, TeamDefensiveFeatures, NextGen Stats, QBR, Possession Value,
 Playcalling, Opponent-Adjusted, and mart.team_injury_load.
 
-**Features Extracted (305 total):**
+**Features Extracted (342 total = 305 base + 37 synthetic):**
 
 1. Home Team Offensive (27):
    - Prefix: 'home_off_'
@@ -197,6 +197,29 @@ try:
 except ImportError:
     LineMovementFeatures = None
 
+# Synthetic feature engines (Dec 9, 2025)
+# These capture QB-OL synergy, momentum, and research-driven insights
+try:
+    from py.features.synthetic_interaction_features import SyntheticInteractionEngine
+except ImportError:
+    SyntheticInteractionEngine = None
+
+try:
+    from py.features.synthetic_momentum_features import SyntheticMomentumEngine
+except ImportError:
+    SyntheticMomentumEngine = None
+
+try:
+    from py.features.research_driven_features import ResearchDrivenEngine
+except ImportError:
+    ResearchDrivenEngine = None
+
+# Semantic features (LLM-derived sentiment, NER, media signals)
+try:
+    from py.semantic.features.semantic_features import SemanticFeatureExtractor
+except ImportError:
+    SemanticFeatureExtractor = None
+
 import os
 
 import psycopg2
@@ -343,6 +366,37 @@ class GameFeatureExtractor:
         else:
             self.line_movement_extractor = None
             logger.warning("Line Movement extractor unavailable")
+
+        # Synthetic feature engines (Dec 9, 2025)
+        # These add 37 features: QB-OL synergy, momentum, research-driven insights
+        if SyntheticInteractionEngine:
+            self.interaction_engine = SyntheticInteractionEngine(db_config=db_config)
+            logger.info("Synthetic Interaction extractor initialized (11 features)")
+        else:
+            self.interaction_engine = None
+            logger.warning("Synthetic Interaction extractor unavailable")
+
+        if SyntheticMomentumEngine:
+            self.momentum_engine = SyntheticMomentumEngine(db_config=db_config)
+            logger.info("Synthetic Momentum extractor initialized (11 features)")
+        else:
+            self.momentum_engine = None
+            logger.warning("Synthetic Momentum extractor unavailable")
+
+        if ResearchDrivenEngine:
+            self.research_engine = ResearchDrivenEngine(db_config=db_config)
+            logger.info("Research-Driven extractor initialized (15 features)")
+        else:
+            self.research_engine = None
+            logger.warning("Research-Driven extractor unavailable")
+
+        # Semantic features (LLM-derived from news/social media)
+        if SemanticFeatureExtractor:
+            self.semantic_extractor = SemanticFeatureExtractor()
+            logger.info("Semantic Feature extractor initialized (26 features)")
+        else:
+            self.semantic_extractor = None
+            logger.warning("Semantic Feature extractor unavailable")
 
         # Database connection for function-based extractors
         self.db_config = db_config or {
@@ -654,6 +708,71 @@ class GameFeatureExtractor:
                 )
             except Exception as e:
                 logger.warning(f"Failed to extract line movement features: {e}")
+
+        # ========================================================================
+        # Synthetic Features (Dec 9, 2025) - 37 total features
+        # ========================================================================
+
+        # Add synthetic interaction features (11 features)
+        # QB-OL synergy, defensive balance, explosive mismatch
+        if self.interaction_engine:
+            try:
+                interaction_features = self.interaction_engine.extract_features(
+                    home_team, away_team, season, week
+                )
+                # Convert dataclass/namedtuple to dict if needed
+                if hasattr(interaction_features, "_asdict"):
+                    interaction_features = interaction_features._asdict()
+                elif hasattr(interaction_features, "__dict__"):
+                    interaction_features = vars(interaction_features)
+                features.update({f"syn_{k}": v for k, v in interaction_features.items()})
+                logger.debug(f"Added {len(interaction_features)} synthetic interaction features")
+            except Exception as e:
+                logger.warning(f"Failed to extract synthetic interaction features: {e}")
+
+        # Add synthetic momentum features (11 features)
+        # Form intensity, pressure consistency, RZ efficiency
+        if self.momentum_engine:
+            try:
+                momentum_features = self.momentum_engine.extract_features(
+                    home_team, away_team, season, week
+                )
+                if hasattr(momentum_features, "_asdict"):
+                    momentum_features = momentum_features._asdict()
+                elif hasattr(momentum_features, "__dict__"):
+                    momentum_features = vars(momentum_features)
+                features.update({f"mom_{k}": v for k, v in momentum_features.items()})
+                logger.debug(f"Added {len(momentum_features)} synthetic momentum features")
+            except Exception as e:
+                logger.warning(f"Failed to extract synthetic momentum features: {e}")
+
+        # Add research-driven features (15 features)
+        # nfelo EPA weighting (1.6:1.0), coaching rationality, injury curves
+        if self.research_engine:
+            try:
+                research_features = self.research_engine.extract_features(
+                    home_team, away_team, season, week
+                )
+                if hasattr(research_features, "_asdict"):
+                    research_features = research_features._asdict()
+                elif hasattr(research_features, "__dict__"):
+                    research_features = vars(research_features)
+                features.update({f"res_{k}": v for k, v in research_features.items()})
+                logger.debug(f"Added {len(research_features)} research-driven features")
+            except Exception as e:
+                logger.warning(f"Failed to extract research-driven features: {e}")
+
+        # Add semantic features (26 features)
+        # LLM-derived sentiment, NER injury severity, media buzz, public overreaction
+        if self.semantic_extractor:
+            try:
+                semantic_features = self.semantic_extractor.extract_features(
+                    home_team, away_team, season, week
+                )
+                features.update({f"sem_{k}": v for k, v in semantic_features.items()})
+                logger.debug(f"Added {len(semantic_features)} semantic features")
+            except Exception as e:
+                logger.warning(f"Failed to extract semantic features: {e}")
 
         # Validate: Check for NaN values
         nan_features = [k for k, v in features.items() if pd.isna(v)]
