@@ -1,0 +1,316 @@
+% !TEX root = ../main/main.tex
+% Section: Semantic Stack for LLM-Powered Feature Engineering
+% Created: December 21, 2025
+% Purpose: Document LLM integration for semantic feature extraction
+
+\section{Semantic Stack: LLM-Powered Feature Engineering}
+\label{sec:semantic-stack}
+
+\subsection{Motivation: Beyond Quantitative Features}
+
+The 342-feature quantitative pipeline documented in Chapters~3--4 captures structured performance metrics: EPA, success rates, NextGen tracking data, and derived statistics. However, NFL betting markets also respond to \textit{unstructured} information: injury reports, social media sentiment, coaching commentary, and media narratives. This section documents the ``Semantic Stack''---a layered LLM architecture designed to extract actionable features from unstructured text sources.
+
+\paragraph{The Information Gap.}
+Consider a typical injury report: ``Patrick Mahomes questionable with ankle injury.'' A human bettor immediately processes:
+
+\begin{itemize}[itemsep=2pt,parsep=0pt]
+    \item \textbf{Entity recognition:} Mahomes = elite QB, ankle = mobility-affecting
+    \item \textbf{Status interpretation:} ``Questionable'' = 50-75\% chance of playing, but if playing, likely limited
+    \item \textbf{Market impact:} Line should move 2-4 points if ruled out; 0.5-1 point if limited
+    \item \textbf{Historical pattern:} Mahomes has played through injuries before (2022 AFC Championship)
+\end{itemize}
+
+Traditional feature engineering cannot capture this reasoning chain. The Semantic Stack bridges this gap through structured LLM inference.
+
+\paragraph{Expected Impact.}
+Based on prior work in sports analytics NLP~\cite{Ramirez2023} and market sentiment analysis~\cite{Chen2024}, we target:
+
+\begin{itemize}[itemsep=2pt,parsep=0pt]
+    \item \textbf{Win rate uplift:} +1.5\% to +2.5\% (from 54.5\% to 56-57\%)
+    \item \textbf{Props MAE reduction:} -5 to -10 yards
+    \item \textbf{Value bet identification:} 5-10 additional opportunities per week
+\end{itemize}
+
+\subsection{Architecture Overview}
+
+The Semantic Stack implements a four-layer architecture, from data ingestion through decision support (Figure~\ref{fig:semantic-stack-architecture}).
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm,
+    layer/.style={rectangle, draw=accentblue, fill=accentblue!10, rounded corners, minimum height=1.5cm, minimum width=11cm, font=\small},
+    component/.style={rectangle, draw=black, fill=gray!10, rounded corners, minimum height=0.8cm, font=\scriptsize}
+]
+
+% Layer 4: Decision Support
+\node[layer] (layer4) {Layer 4: Decision Support Interface};
+\node[component, below=0.3cm of layer4.west, anchor=west, xshift=0.5cm] (vbd) {ValueBetDetector};
+\node[component, right=0.3cm of vbd] (expl) {LLM Explanations};
+\node[component, right=0.3cm of expl] (hitl) {Human-in-the-Loop};
+
+% Layer 3: Feature Engineering
+\node[layer, below=1.5cm of layer4] (layer3) {Layer 3: Semantic Feature Engineering (26 features)};
+\node[component, below=0.3cm of layer3.west, anchor=west, xshift=0.5cm] (sent) {Sentiment (24h, 7d)};
+\node[component, right=0.3cm of sent] (inj) {Injury Severity};
+\node[component, right=0.3cm of inj] (media) {Media Buzz};
+\node[component, right=0.3cm of media] (match) {Matchup Signals};
+
+% Layer 2: LLM Inference
+\node[layer, below=1.5cm of layer3] (layer2) {Layer 2: LLM Processing Services};
+\node[component, below=0.3cm of layer2.west, anchor=west, xshift=0.5cm] (ollama) {Ollama (qwen3:8b)};
+\node[component, right=0.3cm of ollama] (mlx) {MLX (Apple Silicon)};
+\node[component, right=0.3cm of mlx] (gemini) {Gemini Flash};
+\node[component, right=0.3cm of gemini] (claude) {Claude API};
+
+% Layer 1: Data Ingestion
+\node[layer, below=1.5cm of layer2] (layer1) {Layer 1: Data Ingestion};
+\node[component, below=0.3cm of layer1.west, anchor=west, xshift=0.5cm] (espn) {ESPN News};
+\node[component, right=0.3cm of espn] (twitter) {Twitter/X};
+\node[component, right=0.3cm of twitter] (injury) {Injury Records};
+\node[component, right=0.3cm of injury] (db) {84K+ Historical};
+
+% Arrows
+\draw[->, thick] (layer1) -- (layer2);
+\draw[->, thick] (layer2) -- (layer3);
+\draw[->, thick] (layer3) -- (layer4);
+
+% Labels
+\node[left=0.1cm of layer4.west, font=\scriptsize\bfseries] {L4};
+\node[left=0.1cm of layer3.west, font=\scriptsize\bfseries] {L3};
+\node[left=0.1cm of layer2.west, font=\scriptsize\bfseries] {L2};
+\node[left=0.1cm of layer1.west, font=\scriptsize\bfseries] {L1};
+
+\end{tikzpicture}
+\caption{Semantic Stack Architecture. Four-layer design from data ingestion (L1) through decision support (L4). Layer 2 implements fallback chain for inference reliability: local models (Ollama, MLX) preferred, API fallback (Gemini, Claude) for complex queries or availability issues. Layer 3 generates 26 semantic features integrated into existing GameFeatureExtractor pipeline. Layer 4 provides human-readable explanations for value bet recommendations.}
+\label{fig:semantic-stack-architecture}
+\end{figure}
+
+\subsection{Layer 1: Data Ingestion Pipeline}
+
+\paragraph{News Sources.}
+The \texttt{NewsIngester} module (\texttt{py/semantic/ingestion/news\_ingester.py}) aggregates content from:
+
+\begin{itemize}[itemsep=2pt,parsep=0pt]
+    \item \textbf{ESPN API:} Official news, injury reports, game previews (primary source)
+    \item \textbf{Team RSS feeds:} Official team announcements
+    \item \textbf{Beat reporter Twitter:} Verified NFL insiders (Schefter, Rapoport, etc.)
+\end{itemize}
+
+Each article is classified by type (injury, trade, game preview, general) using keyword matching with word-boundary enforcement to prevent false positives (e.g., ``linebacker'' falsely matching ``back'' injury keyword).
+
+\paragraph{Social Media Integration.}
+The \texttt{SocialIngester} module (\texttt{py/semantic/ingestion/social\_ingester.py}) implements tiered source credibility:
+
+\begin{table}[htbp]
+\centering
+\caption{Social Media Source Tiers}
+\label{tab:social-tiers}
+\small
+\begin{tabular}{@{} l l S[table-format=1.1] l @{}}
+\toprule
+\textbf{Tier} & \textbf{Sources} & \textbf{Weight} & \textbf{Examples} \\
+\midrule
+Tier 1 & Official accounts & 1.0 & @NFL, @Chiefs, @Ravens \\
+Tier 2 & Verified insiders & 0.8 & @AdamSchefter, @RapSheet \\
+Tier 3 & Beat reporters & 0.5 & Team-specific journalists \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Historical Training Data.}
+The \texttt{AnnotationPipeline} module (\texttt{py/semantic/training/annotation\_pipeline.py}) generates training data from 84,000+ historical injury records (2009--2025). Key statistics:
+
+\begin{itemize}[itemsep=2pt,parsep=0pt]
+    \item \textbf{NER training:} 5,000 samples (4,500 train / 500 validation)
+    \item \textbf{Sentiment training:} 2,000 samples from game outcomes (2022--2025)
+    \item \textbf{Entity labels:} PLAYER, TEAM, INJURY, STATUS, POSITION
+\end{itemize}
+
+\subsection{Layer 2: LLM Inference Architecture}
+
+\paragraph{Design Philosophy: Local-First with Fallback.}
+Given a \$50--100/month API budget constraint and available local GPU resources (RTX 4090 on Windows, M4 on Mac), the inference architecture prioritizes self-hosted models with API fallback for reliability.
+
+\paragraph{Fallback Chain.}
+The \texttt{SemanticInferenceClient} (\texttt{py/semantic/models/inference.py}) implements automatic failover:
+
+\begin{enumerate}[itemsep=2pt,parsep=0pt]
+    \item \textbf{MLX (Apple Silicon):} Qwen2.5-7B-Instruct-4bit, fastest on M4
+    \item \textbf{Ollama (qwen3:8b):} Chat endpoint with 240-second timeout
+    \item \textbf{Gemini Flash:} Rate-limited API fallback
+    \item \textbf{Claude API:} Final fallback for complex reasoning
+\end{enumerate}
+
+\paragraph{Critical Implementation Detail.}
+During development (December 2025), we discovered that qwen3:8b's \texttt{generate} endpoint returns empty responses for entity extraction prompts. The solution: use the \texttt{chat} endpoint with structured messages. This endpoint switch resolved 100\% of empty response issues.
+
+\paragraph{Timeout Configuration.}
+Complex NER and sentiment queries on qwen3:8b require up to 240 seconds (4 minutes) for thorough analysis. The original 60-second default caused frequent timeouts; increasing to 240 seconds eliminated timeout failures while maintaining acceptable latency for batch processing.
+
+\begin{table}[htbp]
+\centering
+\caption{LLM Inference Configuration}
+\label{tab:llm-config}
+\small
+\begin{tabular}{@{} l l l S[table-format=3.0] @{}}
+\toprule
+\textbf{Model} & \textbf{Platform} & \textbf{Endpoint} & \textbf{Timeout (s)} \\
+\midrule
+qwen3:8b & Ollama & /api/chat & 240 \\
+Qwen2.5-7B-Instruct-4bit & MLX & Local & 120 \\
+gemini-2.5-flash & API & REST & 60 \\
+claude-3-sonnet & API & REST & 60 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Layer 3: Semantic Feature Engineering}
+
+The \texttt{SemanticFeatureExtractor} (\texttt{py/semantic/features/semantic\_features.py}) generates 26 features organized into per-team (11 each) and matchup-level (4) categories.
+
+\paragraph{Per-Team Features (11 per team, 22 total).}
+Each team receives:
+
+\begin{itemize}[itemsep=2pt,parsep=0pt]
+    \item \texttt{sentiment\_24h}: News/social sentiment over past 24 hours ($-1$ to $+1$)
+    \item \texttt{sentiment\_7d\_trend}: Week-over-week sentiment change
+    \item \texttt{injury\_severity\_llm}: LLM-assessed injury impact (1--5 scale)
+    \item \texttt{key\_player\_risk}: Probability of star player absence
+    \item \texttt{media\_buzz\_volume}: Normalized media attention (0--1)
+    \item \texttt{coaching\_change}: Boolean for recent staff changes
+    \item \texttt{roster\_churn}: Player turnover indicator
+    \item \texttt{public\_overreaction}: Market sentiment extremity
+    \item \texttt{contrarian\_signal}: Inverse public sentiment
+    \item Additional derived features (momentum, stability)
+\end{itemize}
+
+\paragraph{Matchup Features (4).}
+
+\begin{itemize}[itemsep=2pt,parsep=0pt]
+    \item \texttt{sentiment\_differential}: Home minus away sentiment
+    \item \texttt{injury\_advantage}: Relative injury situation
+    \item \texttt{media\_attention\_ratio}: Coverage imbalance
+    \item \texttt{combined\_semantic\_edge}: Composite signal (weighted combination)
+\end{itemize}
+
+\paragraph{Integration with GameFeatureExtractor.}
+Semantic features are automatically extracted and prefixed with \texttt{sem\_} when integrated into the main feature pipeline:
+
+\begin{verbatim}
+features = extractor.extract_game_features(game_id)
+# Semantic features: features['sem_home_sentiment_24h'],
+#                    features['sem_injury_advantage'], etc.
+\end{verbatim}
+
+This prefix convention enables easy identification and ablation of semantic features during model training.
+
+\subsection{Layer 4: Decision Support Interface}
+
+\paragraph{ValueBetDetector.}
+The \texttt{ValueBetDetector} (\texttt{py/production/value\_bet\_detector.py}) identifies value bets where model probability exceeds market-implied probability by a configurable threshold (default: 3\%).
+
+Key capabilities:
+
+\begin{itemize}[itemsep=2pt,parsep=0pt]
+    \item \textbf{Edge calculation:} $\text{Edge} = P_{\text{model}} - P_{\text{market}}$
+    \item \textbf{Expected value:} EV per \$100 bet
+    \item \textbf{Kelly fraction:} Optimal bet sizing (capped at 25\%)
+    \item \textbf{Confidence assessment:} HIGH/MEDIUM/LOW based on edge magnitude and probability calibration
+\end{itemize}
+
+\paragraph{LLM-Generated Explanations.}
+For each value bet, the system generates a 2--3 sentence justification:
+
+\begin{quote}
+\textit{``Model identifies 5.2\% edge on Ravens -3.5. Key factor: Strong offensive matchup advantage. Market may be undervaluing Baltimore's rushing attack against Dallas' weakened defensive line.''}
+\end{quote}
+
+These explanations are generated via the semantic inference client, providing human-readable context for the human-in-the-loop decision process.
+
+\paragraph{Human-in-the-Loop Design.}
+Per user configuration, all bets require human approval. The decision support interface presents:
+
+\begin{enumerate}[itemsep=2pt,parsep=0pt]
+    \item Quantitative metrics (edge, EV, Kelly sizing)
+    \item Semantic insights (sentiment, injury impact, media signals)
+    \item LLM-generated explanation
+    \item Risk factors (key player uncertainty, model variance)
+\end{enumerate}
+
+This design philosophy---\textit{augment rather than replace human judgment}---aligns with responsible AI deployment in high-stakes financial contexts.
+
+\subsection{Training and Fine-Tuning Pipeline}
+
+\paragraph{Annotation Pipeline.}
+The \texttt{AnnotationPipeline} converts database records to training format:
+
+\begin{enumerate}[itemsep=2pt,parsep=0pt]
+    \item \textbf{NER samples:} Injury reports $\to$ entity-labeled training examples
+    \item \textbf{Sentiment samples:} Game outcomes $\to$ sentiment-labeled examples
+    \item \textbf{Export formats:} Ollama JSONL + Modelfile, MLX JSONL
+\end{enumerate}
+
+\paragraph{Fine-Tuning Utilities.}
+The \texttt{fine\_tune.py} module supports two approaches:
+
+\begin{enumerate}[itemsep=2pt,parsep=0pt]
+    \item \textbf{Ollama custom model:} Creates specialized model via Modelfile (system prompt customization, not true fine-tuning)
+    \item \textbf{MLX LoRA:} True fine-tuning on Apple Silicon using LoRA adapters (rank=8, 16 layers)
+\end{enumerate}
+
+\paragraph{Validation Framework.}
+The \texttt{validate\_model} function tests NER performance on held-out cases:
+
+\begin{verbatim}
+test_cases = [
+    {"text": "Patrick Mahomes questionable with ankle injury",
+     "expected_entities": ["Patrick Mahomes", "ankle", "questionable"]},
+    {"text": "Chiefs list Travis Kelce as doubtful",
+     "expected_entities": ["Chiefs", "Travis Kelce", "doubtful"]},
+]
+results = validate_model("nfl-ner", test_cases)
+# Returns: accuracy, per-case results, missing entities
+\end{verbatim}
+
+\subsection{Performance Considerations}
+
+\paragraph{Latency Budget.}
+The existing quantitative pipeline maintains $<500$ms end-to-end latency. Semantic features are computed asynchronously:
+
+\begin{itemize}[itemsep=2pt,parsep=0pt]
+    \item \textbf{Pre-computation:} Sentiment/injury scores computed every 15 minutes
+    \item \textbf{Caching:} Redis cache with content-hash keys
+    \item \textbf{Async processing:} Non-blocking LLM calls during feature extraction
+\end{itemize}
+
+\paragraph{Cost Management.}
+With \$50--100/month API budget:
+
+\begin{itemize}[itemsep=2pt,parsep=0pt]
+    \item Local inference (Ollama/MLX): \$0 per query
+    \item Gemini Flash fallback: $\sim$\$50/month allocation
+    \item Claude API: $\sim$\$25/month for complex reasoning validation
+\end{itemize}
+
+\subsection{Chapter Summary}
+
+The Semantic Stack represents a systematic approach to integrating LLM capabilities into production sports analytics. Key innovations:
+
+\begin{enumerate}[itemsep=2pt,parsep=0pt]
+    \item \textbf{Local-first architecture:} Self-hosted models (Ollama, MLX) minimize costs while API fallback ensures reliability
+    \item \textbf{26 semantic features:} Sentiment, injury severity, media signals integrated into existing pipeline
+    \item \textbf{Human-in-the-loop:} LLM explanations support, rather than replace, human decision-making
+    \item \textbf{Training pipeline:} 7,000+ annotated samples from historical NFL data
+\end{enumerate}
+
+This work extends the 11-agent infrastructure (Section~\ref{sec:agent-infrastructure}) with LLM-powered semantic understanding, targeting the +1.5--2.5\% win rate uplift necessary to move from marginal profitability to consistent returns.
+
+\paragraph{Future Work.}
+Phase 2 priorities include:
+\begin{itemize}[itemsep=2pt,parsep=0pt]
+    \item RAG integration for historical context retrieval
+    \item A/B testing semantic features on 2025 holdout
+    \item Fine-tuned NER model validation
+    \item MLX vs Ollama performance benchmarking
+\end{itemize}
