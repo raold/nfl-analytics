@@ -151,6 +151,7 @@ class MLXClient:
 
         try:
             from mlx_lm import generate
+            from mlx_lm.sample_utils import make_sampler
 
             # Load model
             mlx_model, tokenizer = self._load_model(model)
@@ -162,6 +163,9 @@ class MLXClient:
             else:
                 full_prompt = prompt
 
+            # Create sampler with temperature
+            sampler = make_sampler(temperature)
+
             # Generate
             start = time.time()
 
@@ -170,7 +174,7 @@ class MLXClient:
                 tokenizer,
                 prompt=full_prompt,
                 max_tokens=max_tokens,
-                temp=temperature,
+                sampler=sampler,
                 verbose=False,
             )
 
