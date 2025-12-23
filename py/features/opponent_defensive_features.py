@@ -203,7 +203,7 @@ class OpponentDefensiveFeatures:
         WHERE game_id = ANY(%s)
           AND defteam = %s
           AND epa IS NOT NULL
-          AND (pass = TRUE OR rush = TRUE);
+          AND (pass = 1 OR rush = 1);
         """
 
         cursor.execute(query, (game_ids, team))
@@ -295,7 +295,7 @@ class OpponentDefensiveFeatures:
         FROM plays
         WHERE game_id = ANY(%s)
           AND defteam = %s
-          AND pass = TRUE;
+          AND pass = 1;
         """
 
         cursor.execute(query, (game_ids, team))

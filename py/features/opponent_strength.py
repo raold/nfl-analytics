@@ -171,7 +171,7 @@ class OpponentStrengthEngine:
                      FROM plays p
                      WHERE p.game_id = g.game_id
                        AND p.defteam = g.home_team
-                       AND p.pass = TRUE
+                       AND p.pass = 1
                        AND p.epa IS NOT NULL),
                     0.0
                 ) AS pass_def_epa_allowed,
@@ -180,7 +180,7 @@ class OpponentStrengthEngine:
                      FROM plays p
                      WHERE p.game_id = g.game_id
                        AND p.defteam = g.home_team
-                       AND p.rush = TRUE
+                       AND p.rush = 1
                        AND p.epa IS NOT NULL),
                     0.0
                 ) AS rush_def_epa_allowed
@@ -210,7 +210,7 @@ class OpponentStrengthEngine:
                      FROM plays p
                      WHERE p.game_id = g.game_id
                        AND p.defteam = g.away_team
-                       AND p.pass = TRUE
+                       AND p.pass = 1
                        AND p.epa IS NOT NULL),
                     0.0
                 ) AS pass_def_epa_allowed,
@@ -219,7 +219,7 @@ class OpponentStrengthEngine:
                      FROM plays p
                      WHERE p.game_id = g.game_id
                        AND p.defteam = g.away_team
-                       AND p.rush = TRUE
+                       AND p.rush = 1
                        AND p.epa IS NOT NULL),
                     0.0
                 ) AS rush_def_epa_allowed

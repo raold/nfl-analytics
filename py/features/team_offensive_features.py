@@ -299,7 +299,7 @@ class TeamOffensiveFeatures:
             AVG(CASE WHEN yards_gained > 10 THEN 1.0 ELSE 0.0 END) as explosive_play_rate,
 
             -- Stuff rate (runs at/behind LOS)
-            AVG(CASE WHEN rush = TRUE AND yards_gained <= 0 THEN 1.0 ELSE 0.0 END) as stuff_rate,
+            AVG(CASE WHEN rush = 1 AND yards_gained <= 0 THEN 1.0 ELSE 0.0 END) as stuff_rate,
 
             -- First down rate
             AVG(CASE WHEN first_down = 1 THEN 1.0 ELSE 0.0 END) as first_down_rate,
@@ -309,18 +309,18 @@ class TeamOffensiveFeatures:
                 FILTER (WHERE down = 3) as third_down_conv_rate,
 
             -- Pass EPA metrics
-            AVG(epa) FILTER (WHERE pass = TRUE) as pass_epa_per_play,
-            AVG(CASE WHEN success = 1 THEN 1.0 ELSE 0.0 END) FILTER (WHERE pass = TRUE) as pass_success_rate,
-            AVG(yards_gained) FILTER (WHERE pass = TRUE) as avg_yds_per_pass,
+            AVG(epa) FILTER (WHERE pass = 1) as pass_epa_per_play,
+            AVG(CASE WHEN success = 1 THEN 1.0 ELSE 0.0 END) FILTER (WHERE pass = 1) as pass_success_rate,
+            AVG(yards_gained) FILTER (WHERE pass = 1) as avg_yds_per_pass,
             AVG(CASE WHEN complete_pass = 1 THEN 1.0 ELSE 0.0 END)
-                FILTER (WHERE pass = TRUE) as completion_pct,
+                FILTER (WHERE pass = 1) as completion_pct,
             AVG(CASE WHEN sack = 1 THEN 1.0 ELSE 0.0 END)
                 FILTER (WHERE qb_dropback = 1) as sack_rate,
 
             -- Rush EPA metrics
-            AVG(epa) FILTER (WHERE rush = TRUE) as rush_epa_per_play,
-            AVG(CASE WHEN success = 1 THEN 1.0 ELSE 0.0 END) FILTER (WHERE rush = TRUE) as rush_success_rate,
-            AVG(yards_gained) FILTER (WHERE rush = TRUE) as avg_yds_per_rush,
+            AVG(epa) FILTER (WHERE rush = 1) as rush_epa_per_play,
+            AVG(CASE WHEN success = 1 THEN 1.0 ELSE 0.0 END) FILTER (WHERE rush = 1) as rush_success_rate,
+            AVG(yards_gained) FILTER (WHERE rush = 1) as avg_yds_per_rush,
 
             -- Turnover rate
             AVG(CASE WHEN interception = 1 OR fumble_lost = 1 THEN 1.0 ELSE 0.0 END) as turnover_rate,
@@ -426,23 +426,21 @@ class TeamOffensiveFeatures:
         conn = self._connect_db()
         game_ids = [g[0] for g in games]
 
-        # Query red zone drives (drives ending in red zone)
+        # Query red zone efficiency (play-level approximation since no drive column)
+        # Counts TDs per red zone opportunity using game-level aggregation
         query = """
-        WITH red_zone_drives AS (
-            SELECT
-                game_id,
-                drive,
-                MAX(CASE WHEN touchdown = 1 THEN 1 ELSE 0 END) as drive_td
-            FROM plays
-            WHERE game_id = ANY(%s)
-              AND posteam = %s
-              AND yardline_100 <= 20
-              AND yardline_100 IS NOT NULL
-            GROUP BY game_id, drive
-        )
         SELECT
-            AVG(drive_td) as red_zone_td_rate
-        FROM red_zone_drives;
+            COALESCE(
+                SUM(CASE WHEN touchdown = 1 THEN 1.0 ELSE 0.0 END)
+                / NULLIF(COUNT(DISTINCT game_id), 0),
+                0.0
+            ) as rz_tds_per_game,
+            COUNT(*) as rz_plays
+        FROM plays
+        WHERE game_id = ANY(%s)
+          AND posteam = %s
+          AND yardline_100 <= 20
+          AND yardline_100 IS NOT NULL;
         """
 
         cursor = conn.cursor()
@@ -488,63 +486,46 @@ class TeamOffensiveFeatures:
         # Time of possession: sum of play durations for posteam
         # Points: home_score if home_team, away_score if away_team
         # Yards: sum of yards_gained
-        # Scoring drives: drives ending in TD or FG
+        # Scoring rate: estimated from TDs / (plays / 6) since no drive/FG result columns
         query = """
-        WITH game_stats AS (
+        SELECT
+            AVG(top_seconds) as avg_top,
+            AVG(plays) as avg_plays,
+            AVG(points_scored) as avg_points,
+            AVG(total_yards) as avg_yards,
+            AVG(pass_yards) as avg_pass_yards,
+            AVG(rush_yards) as avg_rush_yards,
+            -- Scoring rate approximation: TDs / estimated_drives (no FG result column)
+            COALESCE(
+                AVG(CASE WHEN plays > 0 THEN
+                    touchdowns::float / NULLIF(plays / 6.0, 0)
+                ELSE NULL END),
+                0.35
+            ) as scoring_drives_pct
+        FROM (
             SELECT
                 p.game_id,
-                -- Time of possession (seconds)
                 SUM(CASE WHEN p.posteam = %s THEN 1 ELSE 0 END) * 40 as top_seconds,
-
-                -- Plays per game
                 COUNT(*) FILTER (WHERE p.posteam = %s) as plays,
-
-                -- Total yards
                 SUM(p.yards_gained) FILTER (WHERE p.posteam = %s) as total_yards,
-
-                -- Pass yards
-                SUM(p.yards_gained) FILTER (WHERE p.posteam = %s AND p.pass = TRUE) as pass_yards,
-
-                -- Rush yards
-                SUM(p.yards_gained) FILTER (WHERE p.posteam = %s AND p.rush = TRUE) as rush_yards,
-
-                -- Points scored
+                SUM(p.yards_gained) FILTER (WHERE p.posteam = %s AND p.pass = 1) as pass_yards,
+                SUM(p.yards_gained) FILTER (WHERE p.posteam = %s AND p.rush = 1) as rush_yards,
                 MAX(CASE
                     WHEN g.home_team = %s THEN g.home_score
                     WHEN g.away_team = %s THEN g.away_score
                     ELSE NULL
-                END) as points_scored
-
+                END) as points_scored,
+                SUM(CASE WHEN p.posteam = %s AND p.touchdown = 1 THEN 1 ELSE 0 END) as touchdowns
             FROM plays p
             LEFT JOIN games g ON p.game_id = g.game_id
             WHERE p.game_id = ANY(%s)
               AND p.play_type IN ('pass', 'run')
             GROUP BY p.game_id
-        ),
-        drive_stats AS (
-            SELECT
-                game_id,
-                drive,
-                MAX(CASE WHEN touchdown = 1 OR field_goal_result = 'made' THEN 1 ELSE 0 END) as scoring_drive
-            FROM plays
-            WHERE game_id = ANY(%s)
-              AND posteam = %s
-            GROUP BY game_id, drive
-        )
-        SELECT
-            AVG(gs.top_seconds) as avg_top,
-            AVG(gs.plays) as avg_plays,
-            AVG(gs.points_scored) as avg_points,
-            AVG(gs.total_yards) as avg_yards,
-            AVG(gs.pass_yards) as avg_pass_yards,
-            AVG(gs.rush_yards) as avg_rush_yards,
-            AVG(ds.scoring_drive) as scoring_drives_pct
-        FROM game_stats gs
-        LEFT JOIN drive_stats ds ON gs.game_id = ds.game_id;
+        ) game_stats;
         """
 
         cursor = conn.cursor()
-        cursor.execute(query, (team, team, team, team, team, team, team, game_ids, game_ids, team))
+        cursor.execute(query, (team, team, team, team, team, team, team, team, game_ids))
         result = cursor.fetchone()
 
         cursor.close()

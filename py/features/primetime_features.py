@@ -13,7 +13,7 @@ due to increased public attention and betting volume.
 - MNF games have highest TV ratings and betting handle
 
 **Key Features**:
-1. `is_thursday_night`: TNF game flag (already in DB)
+1. `is_thursday_night`: TNF game flag (computed from kickoff day/time)
 2. `is_sunday_night`: SNF game flag (NBC primetime ~8:20pm ET)
 3. `is_monday_night`: MNF game flag (ESPN/ABC ~8:15pm ET)
 4. `is_primetime`: Any primetime game (TNF, SNF, or MNF)
@@ -27,11 +27,12 @@ due to increased public attention and betting volume.
 - No leakage concerns
 
 **Note on Kickoff Times**:
-- Kickoff is stored as DATE in PostgreSQL (not TIMESTAMP)
-- We identify games by day-of-week patterns instead of exact times
-- TNF: Thursdays (already flagged in DB)
-- SNF: Sundays with late kickoff (8:15-8:30 PM ET)
-- MNF: Mondays (any game)
+- Kickoff is stored as TIMESTAMP in PostgreSQL with +00 timezone
+- However, values appear to be ET times (not true UTC)
+- We identify games by day-of-week + hour patterns (treating hours as ET)
+- TNF: Thursday DOW=4, hour >= 19 (7pm+ ET)
+- SNF: Sunday DOW=0, hour >= 19 (7pm+ ET)
+- MNF: Monday DOW=1, hour >= 19 (7pm+ ET)
 
 Author: Claude Code (Opus 4.5)
 Date: November 27, 2025
@@ -107,7 +108,6 @@ class PrimetimeFeaturesEngine:
             kickoff,
             home_team,
             away_team,
-            is_thursday_night,
             EXTRACT(DOW FROM kickoff) as day_of_week,
             EXTRACT(HOUR FROM kickoff) as kickoff_hour
         FROM games
@@ -125,22 +125,22 @@ class PrimetimeFeaturesEngine:
         return self._compute_features_from_row(row)
 
     def _compute_features_from_row(self, row: pd.Series) -> dict[str, any]:
-        """Compute primetime features from a game row."""
+        """Compute primetime features from a game row.
+
+        Note: Database stores kickoff times in what appears to be ET
+        but labeled as +00 (UTC). We treat hour values as ET times.
+        """
         day_of_week = int(row["day_of_week"]) if pd.notna(row["day_of_week"]) else -1
         kickoff_hour = int(row["kickoff_hour"]) if pd.notna(row["kickoff_hour"]) else -1
 
-        # Database flag (may be inaccurate)
-        db_thursday_flag = bool(row.get("is_thursday_night", False))
+        # TNF: Thursday evening (DOW=4, hour >= 19 for 7pm+ ET)
+        is_thursday_night = day_of_week == 4 and kickoff_hour >= 19
 
-        # TNF: Thursday 8pm ET = Friday ~1am UTC (DOW=5 with early hours)
-        # Or use database flag if available
-        is_thursday_night = db_thursday_flag or (day_of_week == 5 and kickoff_hour <= 5)
+        # MNF: Monday evening (DOW=1, hour >= 19 for 7pm+ ET)
+        is_monday_night = day_of_week == 1 and kickoff_hour >= 19
 
-        # MNF: Monday 8pm ET = Tuesday ~1am UTC (DOW=2 with early hours)
-        is_monday_night = day_of_week == 2 and kickoff_hour <= 5
-
-        # SNF: Sunday 8:15pm ET = Monday ~1am UTC (DOW=1 with early hours)
-        is_sunday_night = day_of_week == 1 and kickoff_hour <= 5
+        # SNF: Sunday evening (DOW=0, hour >= 19 for 7pm+ ET)
+        is_sunday_night = day_of_week == 0 and kickoff_hour >= 19
 
         # Any primetime game
         is_primetime = is_thursday_night or is_monday_night or is_sunday_night
@@ -153,12 +153,12 @@ class PrimetimeFeaturesEngine:
         is_tnf_home_disadvantage = is_thursday_night  # Simplified
 
         # Weekend early game (1pm ET Sunday - often lower attention)
-        is_early_sunday = day_of_week == 0 and 15 <= kickoff_hour <= 19  # Sunday ~1pm ET in UTC
+        # Hour 12-14 = 12pm-2pm ET (early window)
+        is_early_sunday = day_of_week == 0 and 12 <= kickoff_hour <= 14
 
         # Late afternoon game (4pm ET Sunday)
-        is_late_afternoon = (day_of_week == 0 and 20 <= kickoff_hour <= 23) or (
-            day_of_week == 1 and kickoff_hour == 0
-        )
+        # Hour 16-18 = 4pm-6pm ET (late afternoon window)
+        is_late_afternoon = day_of_week == 0 and 16 <= kickoff_hour <= 18
 
         features = {
             "is_thursday_night": is_thursday_night,
@@ -230,7 +230,6 @@ class PrimetimeFeaturesEngine:
             kickoff,
             home_team,
             away_team,
-            is_thursday_night,
             EXTRACT(DOW FROM kickoff) as day_of_week,
             EXTRACT(HOUR FROM kickoff) as kickoff_hour
         FROM games
@@ -274,7 +273,6 @@ class PrimetimeFeaturesEngine:
             g.home_score,
             g.away_score,
             g.spread_close,
-            g.is_thursday_night,
             EXTRACT(DOW FROM g.kickoff) as day_of_week,
             EXTRACT(HOUR FROM g.kickoff) as kickoff_hour
         FROM games g

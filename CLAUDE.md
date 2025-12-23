@@ -1,6 +1,6 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** December 21, 2025 | **Version:** 6.3 | **Status:** Production Ready (Grade A+)
+**Last Updated:** December 22, 2025 | **Version:** 6.4 | **Status:** Production Ready (Grade A+)
 
 ## Quick Status
 
@@ -8,12 +8,13 @@
 |-----------|-------|------------|
 | Ensemble | v6.2 + equal-weight props | 54.5% spread (games), 44.25 MAE (props) |
 | Features | 368 total (Phase 2 + Synthetic + Semantic) | Base 305 + 37 synthetic + 26 semantic |
-| Semantic Stack | NEW (Dec 21) | Ollama/MLX inference, 26 LLM features |
-| Database | 56 tables, 1.25M plays | PostgreSQL + Redis |
+| Semantic Stack | Complete (Dec 21) | Ollama/MLX inference, 26 LLM features |
+| **Feedback Loop** | **NEW (Dec 22)** | **Weekly learning system, 10 modules** |
+| Database | 64 tables, 1.25M plays | PostgreSQL + Redis |
 | Dissertation | 693 pages | Compiles cleanly |
 | Infrastructure | 8/9 Docker services | ~105ms inference |
 
-**Critical Files:** `py/ensemble/enhanced_ensemble_v6_production.py`, `py/ensemble/strategy/base.py`, `py/features/game_feature_extractor.py`
+**Critical Files:** `py/ensemble/enhanced_ensemble_v6_production.py`, `py/ensemble/strategy/base.py`, `py/features/game_feature_extractor.py`, `py/feedback/`
 
 **Quick Links:** [DATABASE_QUICK_REFERENCE](docs/database/DATABASE_QUICK_REFERENCE.md) | [SQL_PATTERNS](docs/database/SQL_PATTERNS.md) | [ARCHITECTURE](docs/ARCHITECTURE_REFERENCE.md)
 
@@ -299,6 +300,146 @@ bets = detector.detect_value_bets(predictions)
 
 ---
 
+## Feedback Loop System (Weekly Learning)
+
+**Status:** Complete (Dec 22, 2025)
+**Goal:** Close the loop between predictions and outcomes, enabling continuous learning and LLM fine-tuning
+
+### Architecture
+
+```
+py/feedback/
+├── outcome_updater.py        # Phase 6.1: Update actuals after games
+├── semantic_attribution.py   # Phase 6.2: Track feature contribution
+├── ensemble_weight_adjuster.py # Phase 6.3: Adjust weights on performance
+├── retrain_trigger.py        # Phase 6.4: Detect retraining needs
+├── annotation_generator.py   # Phase 6.5: Generate LLM training data
+├── meta_learner.py           # Phase 7.1: Bidirectional Model↔Semantic learning
+├── feature_memory.py         # Phase 7.2: Rolling feature performance tracking
+├── auto_feature_selector.py  # Phase 7.3: Automatic feature enable/disable
+├── prompt_evolver.py         # Phase 7.4: Evolve LLM prompts from outcomes
+├── semantic_ab_test.py       # Phase 8.1: A/B test semantic vs non-semantic
+└── __init__.py               # Module exports (10 components)
+```
+
+### Components Summary
+
+| Phase | Component | Purpose |
+|-------|-----------|---------|
+| 6.1 | WeeklyOutcomeUpdater | Populate `ml.game_predictions.actual_*` after games complete |
+| 6.2 | SemanticAttributionTracker | SHAP-like attribution for semantic features |
+| 6.3 | EnsembleWeightAdjuster | Inverse-MAE weighted adjustment with shrinkage |
+| 6.4 | RetrainTrigger | Detect MAE degradation, accuracy drop, calibration drift |
+| 6.5 | AnnotationGenerator | Generate JSONL for LLM fine-tuning (sentiment + NER) |
+| 7.1 | SemanticMetaLearner | Bidirectional: Model→Semantic and Semantic→Model |
+| 7.2 | FeaturePerformanceMemory | Rolling 8-week memory of feature contributions |
+| 7.3 | AutoFeatureSelector | States: probation → active → disabled |
+| 7.4 | PromptEvolver | Evolve LLM prompts based on prediction outcomes |
+| 8.1 | SemanticABTest | McNemar test for paired accuracy comparison |
+
+### Database Tables (8 new)
+
+| Table | Purpose |
+|-------|---------|
+| `ml.feedback_runs` | Weekly orchestration runs + summaries |
+| `ml.semantic_attribution` | Per-game feature attribution scores |
+| `ml.feature_performance` | Rolling feature contribution tracking |
+| `ml.feature_selection_state` | Feature status (active/disabled/probation) |
+| `ml.prompt_versions` | LLM prompt versioning for evolution |
+| `ml.prompt_ab_tests` | Prompt A/B test configurations |
+| `ml.ab_test_status` | A/B test metadata and state |
+| `ml.ab_test_results` | Per-game control vs treatment predictions |
+
+### Weekly Workflow
+
+```bash
+# TUESDAY (after Week N games complete)
+python scripts/run_weekly_feedback.py --season 2025 --week N
+
+# What it does:
+# 1. Update ml.game_predictions with actual scores
+# 2. Compute semantic feature attribution (SHAP-like)
+# 3. Check retrain triggers (alerts if fired)
+# 4. Generate annotations for LLM fine-tuning
+# 5. Log summary to ml.feedback_runs
+
+# Options:
+python scripts/run_weekly_feedback.py --season 2025 --week 16 --dry-run
+python scripts/run_weekly_feedback.py --season 2025 --week 16 --auto-adjust
+```
+
+### A/B Testing (2025 Holdout)
+
+```bash
+# Compare semantic vs non-semantic on 2025 holdout
+python scripts/ab_test_semantic_2025.py --weeks 1-16
+
+# Output:
+# ============================================================
+# 2025 HOLDOUT A/B TEST: Semantic Features
+# ============================================================
+# Games analyzed: 195 (Weeks 1-16)
+#
+# SPREAD PREDICTION:
+#   Control (no semantic):  XX.X% accuracy
+#   Treatment (semantic):   XX.X% accuracy
+#   Lift: +X.X%
+#   McNemar p-value: 0.XXX (significant at α=0.05)
+```
+
+### Usage
+
+```python
+# Weekly feedback orchestration
+from py.feedback import WeeklyFeedbackOrchestrator
+orchestrator = WeeklyFeedbackOrchestrator()
+result = orchestrator.run(season=2025, week=16)
+if result.triggers_fired:
+    print(f"Retraining recommended: {result.triggers_fired}")
+
+# Meta-learning insights
+from py.feedback import SemanticMetaLearner
+learner = SemanticMetaLearner()
+result = learner.update_from_outcomes(season=2025, week=16)
+for insight in result.feature_insights:
+    print(f"{insight.feature_name}: {insight.recommendation}")
+
+# Automatic feature selection
+from py.feedback import AutoFeatureSelector
+selector = AutoFeatureSelector()
+selection = selector.evaluate_features(season=2025, week=16)
+selector.apply_selection(selection)  # Updates ml.feature_selection_state
+
+# A/B testing
+from py.feedback import SemanticABTest
+test = SemanticABTest()
+test_id = test.setup_test(season=2025, start_week=1)
+results = test.analyze_results(test_id)
+test.print_results(results)
+```
+
+### Feature Lifecycle
+
+```
+NEW FEATURE
+    │
+    ▼
+┌─────────────┐  positive contribution  ┌─────────────┐
+│  PROBATION  │ ───────────────────────▶│   ACTIVE    │
+│  (weight=0.5)│  (2+ weeks strong)     │ (weight=1.0)│
+└─────────────┘                         └─────────────┘
+    │                                        │
+    │ negative contribution                  │ moderate negative
+    │ (early detection)                      │ (4+ weeks)
+    ▼                                        ▼
+┌─────────────┐◀────────────────────────┌─────────────┐
+│  DISABLED   │    demotion path        │  PROBATION  │
+│ (weight=0.0)│                         │  (review)   │
+└─────────────┘                         └─────────────┘
+```
+
+---
+
 ## Enforcement Framework
 
 **Purpose:** Catch errors at commit time through automated validation routing.
@@ -332,7 +473,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ---
 
-## Current Status (Dec 21, 2025)
+## Current Status (Dec 22, 2025)
 
 **Completed:**
 - 2025 Holdout Validation: 74.9% spread accuracy, 44.25 MAE props (Dec 9)
@@ -354,8 +495,15 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
   - News/social ingestion, NER/sentiment training data (5K + 2K samples)
   - ValueBetDetector with LLM-generated explanations
   - Fine-tuning utilities for Ollama Modelfile and MLX LoRA
+- **Weekly Feedback Loop (Dec 22):** Complete bidirectional learning system
+  - 10 modules across 3 phases (Phase 6: Feedback, Phase 7: Meta-Learning, Phase 8: A/B Testing)
+  - 8 new database tables for tracking (ml.feedback_runs, ml.feature_performance, etc.)
+  - Automatic feature selection: probation → active → disabled lifecycle
+  - LLM prompt evolution based on prediction outcomes
+  - McNemar test for A/B significance on 2025 holdout
+  - Weekly orchestrator: `scripts/run_weekly_feedback.py`
 
-**Key Findings (Dec 13-21):**
+**Key Findings (Dec 13-22):**
 - Season-based temporal split prevents data leakage (train on seasons < max, validate on max)
 - RMSE is correct uncertainty estimate (not MAE * 0.5)
 - Context managers prevent connection leaks in high-load scenarios
@@ -363,10 +511,12 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 - **Feature pruning trade-off discovered** (Dec 14): More features = better spread MAE, fewer = better win AUC
 - **Best XGBoost config**: reg_alpha=1.0, reg_lambda=2.0 (only 0.09% improvement over baseline)
 - **qwen3:8b requires chat endpoint** (Dec 21): generate endpoint returns empty, use chat with 240s timeout
+- **Bidirectional meta-learning** (Dec 22): Model performance informs semantic features, semantic patterns suggest new features
 
 **In Progress:**
 - Test fine-tuned NER model on holdout data
 - Compare MLX vs Ollama inference performance (latency/accuracy benchmarks)
+- Run 2025 A/B test when Week 17 predictions are generated
 
 **Strategic Decisions:**
 - BNN research abandoned (Nov 9) - 84 hours, 6 approaches, only BNN v3.1 Rushing remains
@@ -374,6 +524,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 - Dual-weight strategy adopted (Nov 27) - different domains need different weights
 - ValidatorRegistry pattern adopted (Dec 13) - Strategy pattern for validation
 - **Feature optimization tested, baseline retained (Dec 14)** - see ADR-011
+- **Feedback loop with automatic feature selection (Dec 22)** - see ADR-012
 
 **Recent Work:** [docs/milestones/RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY.md)
 
@@ -388,7 +539,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 | Architecture | [ARCHITECTURE_REFERENCE](docs/ARCHITECTURE_REFERENCE.md), [COMPONENT_DEEP_DIVES](docs/COMPONENT_DEEP_DIVES.md) |
 | Milestones | [RECENT_WORK_HISTORY](docs/milestones/RECENT_WORK_HISTORY.md), [docs/milestones/](docs/milestones/) |
 | Synthesis | [DIRICHLET_OPTIMIZATION](docs/synthesis/DIRICHLET_WEIGHT_OPTIMIZATION_SYNTHESIS_NOV27.md) |
-| ADRs | [docs/adr/](docs/adr/) (009: Dynamic weights, 011: Feature optimization) |
+| ADRs | [docs/adr/](docs/adr/) (009: Dynamic weights, 011: Feature optimization, 012: Feedback loop) |
 
 ---
 
@@ -430,7 +581,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ---
 
-**Version:** 6.1 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
+**Version:** 6.4 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
 
 **Project Rules:**
 - Never take shortcuts, never use synthetic data

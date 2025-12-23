@@ -266,10 +266,10 @@ class OpponentAdjustedFeatures:
         SELECT
             AVG(p.epa) as league_avg_epa,
             STDDEV(p.epa) as league_std_epa,
-            AVG(CASE WHEN p.pass = TRUE THEN p.epa ELSE NULL END) as league_avg_pass_epa,
-            STDDEV(CASE WHEN p.pass = TRUE THEN p.epa ELSE NULL END) as league_std_pass_epa,
-            AVG(CASE WHEN p.rush = TRUE THEN p.epa ELSE NULL END) as league_avg_rush_epa,
-            STDDEV(CASE WHEN p.rush = TRUE THEN p.epa ELSE NULL END) as league_std_rush_epa
+            AVG(CASE WHEN p.pass = 1 THEN p.epa ELSE NULL END) as league_avg_pass_epa,
+            STDDEV(CASE WHEN p.pass = 1 THEN p.epa ELSE NULL END) as league_std_pass_epa,
+            AVG(CASE WHEN p.rush = 1 THEN p.epa ELSE NULL END) as league_avg_rush_epa,
+            STDDEV(CASE WHEN p.rush = 1 THEN p.epa ELSE NULL END) as league_std_rush_epa
         FROM plays p
         INNER JOIN games g ON p.game_id = g.game_id
         WHERE (
@@ -277,7 +277,7 @@ class OpponentAdjustedFeatures:
                 OR (g.season = %s AND g.week < %s)
               )
           AND g.game_type = 'REG'
-          AND (p.pass = TRUE OR p.rush = TRUE)
+          AND (p.pass = 1 OR p.rush = 1)
           AND p.epa IS NOT NULL;
         """
 
@@ -338,13 +338,13 @@ class OpponentAdjustedFeatures:
         query = """
         SELECT
             AVG(p.epa) as league_avg_epa,
-            AVG(CASE WHEN p.pass = TRUE THEN p.epa ELSE NULL END) as league_avg_pass_epa,
-            AVG(CASE WHEN p.rush = TRUE THEN p.epa ELSE NULL END) as league_avg_rush_epa
+            AVG(CASE WHEN p.pass = 1 THEN p.epa ELSE NULL END) as league_avg_pass_epa,
+            AVG(CASE WHEN p.rush = 1 THEN p.epa ELSE NULL END) as league_avg_rush_epa
         FROM plays p
         INNER JOIN games g ON p.game_id = g.game_id
         WHERE g.season = %s
           AND g.game_type = 'REG'
-          AND (p.pass = TRUE OR p.rush = TRUE)
+          AND (p.pass = 1 OR p.rush = 1)
           AND p.epa IS NOT NULL;
         """
 
@@ -465,12 +465,12 @@ class OpponentAdjustedFeatures:
         SELECT
             game_id,
             AVG(epa) as avg_epa_allowed,
-            AVG(CASE WHEN pass = TRUE THEN epa ELSE NULL END) as avg_pass_epa_allowed,
-            AVG(CASE WHEN rush = TRUE THEN epa ELSE NULL END) as avg_rush_epa_allowed
+            AVG(CASE WHEN pass = 1 THEN epa ELSE NULL END) as avg_pass_epa_allowed,
+            AVG(CASE WHEN rush = 1 THEN epa ELSE NULL END) as avg_rush_epa_allowed
         FROM plays
         WHERE game_id = ANY(%s)
           AND defteam = %s
-          AND (pass = TRUE OR rush = TRUE)
+          AND (pass = 1 OR rush = 1)
           AND epa IS NOT NULL
         GROUP BY game_id;
         """
@@ -563,12 +563,12 @@ class OpponentAdjustedFeatures:
         SELECT
             game_id,
             AVG(epa) as avg_off_epa,
-            AVG(CASE WHEN pass = TRUE THEN epa ELSE NULL END) as avg_pass_epa,
-            AVG(CASE WHEN rush = TRUE THEN epa ELSE NULL END) as avg_rush_epa
+            AVG(CASE WHEN pass = 1 THEN epa ELSE NULL END) as avg_pass_epa,
+            AVG(CASE WHEN rush = 1 THEN epa ELSE NULL END) as avg_rush_epa
         FROM plays
         WHERE game_id = ANY(%s)
           AND posteam = %s
-          AND (pass = TRUE OR rush = TRUE)
+          AND (pass = 1 OR rush = 1)
           AND epa IS NOT NULL
         GROUP BY game_id;
         """

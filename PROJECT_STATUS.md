@@ -1,8 +1,101 @@
 # PROJECT_STATUS.md - NFL Analytics Project Status
 
-**Last Updated:** December 21, 2025
-**Version:** v6.3 Semantic Stack + GNN Integration + 6-Way Ensemble
-**Focus:** ✅ **SEMANTIC STACK PHASE 1 COMPLETE** - LLM-powered NER, sentiment, value bet explanations
+**Last Updated:** December 22, 2025
+**Version:** v6.4 Weekly Feedback Loop + Semantic Stack + GNN Integration + 6-Way Ensemble
+**Focus:** ✅ **WEEKLY FEEDBACK LOOP COMPLETE** - Bidirectional learning, A/B testing, automatic feature selection
+
+---
+
+## 🚀 MAJOR MILESTONE (Dec 22, 2025)
+
+> **Weekly Feedback Loop Complete - Bidirectional Learning System**
+
+### Feedback Loop Overview
+
+Implemented a complete weekly feedback loop that closes the gap between predictions and outcomes, enabling continuous improvement of semantic features and LLM fine-tuning.
+
+| Phase | Component | Status | Purpose |
+|-------|-----------|--------|---------|
+| **6.1** | WeeklyOutcomeUpdater | ✅ Complete | Populate `ml.game_predictions.actual_*` after games |
+| **6.2** | SemanticAttributionTracker | ✅ Complete | SHAP-like attribution for semantic features |
+| **6.3** | EnsembleWeightAdjuster | ✅ Complete | Inverse-MAE weighted adjustment with shrinkage |
+| **6.4** | RetrainTrigger | ✅ Complete | Detect MAE degradation, accuracy drop, calibration drift |
+| **6.5** | AnnotationGenerator | ✅ Complete | Generate JSONL for LLM fine-tuning |
+| **7.1** | SemanticMetaLearner | ✅ Complete | Bidirectional: Model→Semantic and Semantic→Model |
+| **7.2** | FeaturePerformanceMemory | ✅ Complete | Rolling 8-week feature contribution tracking |
+| **7.3** | AutoFeatureSelector | ✅ Complete | Feature lifecycle: probation → active → disabled |
+| **7.4** | PromptEvolver | ✅ Complete | Evolve LLM prompts based on prediction outcomes |
+| **8.1** | SemanticABTest | ✅ Complete | McNemar test for paired accuracy comparison |
+
+### New Database Tables (8)
+
+| Table | Purpose |
+|-------|---------|
+| `ml.feedback_runs` | Weekly orchestration runs + summaries |
+| `ml.semantic_attribution` | Per-game feature attribution scores |
+| `ml.feature_performance` | Rolling feature contribution tracking |
+| `ml.feature_selection_state` | Feature status (active/disabled/probation) |
+| `ml.prompt_versions` | LLM prompt versioning for evolution |
+| `ml.prompt_ab_tests` | Prompt A/B test configurations |
+| `ml.ab_test_status` | A/B test metadata and state |
+| `ml.ab_test_results` | Per-game control vs treatment predictions |
+
+### Key Files Added
+
+```
+New Files (Dec 22, 2025):
+├── py/feedback/
+│   ├── __init__.py               # Module exports (10 components)
+│   ├── outcome_updater.py        # Phase 6.1
+│   ├── semantic_attribution.py   # Phase 6.2
+│   ├── ensemble_weight_adjuster.py # Phase 6.3
+│   ├── retrain_trigger.py        # Phase 6.4
+│   ├── annotation_generator.py   # Phase 6.5
+│   ├── meta_learner.py           # Phase 7.1
+│   ├── feature_memory.py         # Phase 7.2
+│   ├── auto_feature_selector.py  # Phase 7.3
+│   ├── prompt_evolver.py         # Phase 7.4
+│   └── semantic_ab_test.py       # Phase 8.1
+├── scripts/
+│   ├── run_weekly_feedback.py    # Weekly orchestrator CLI
+│   ├── weekly_outcome_update.py  # Standalone outcome updater
+│   └── ab_test_semantic_2025.py  # 2025 holdout A/B test
+└── sql/migrations/
+    └── create_feedback_tables.sql # 8 new tables
+```
+
+### Weekly Workflow
+
+```bash
+# TUESDAY (after Week N games complete)
+python scripts/run_weekly_feedback.py --season 2025 --week N
+
+# What it does:
+# 1. Update ml.game_predictions with actual scores
+# 2. Compute semantic feature attribution (SHAP-like)
+# 3. Check retrain triggers (alerts if fired)
+# 4. Generate annotations for LLM fine-tuning
+# 5. Log summary to ml.feedback_runs
+
+# A/B Test 2025 Holdout
+python scripts/ab_test_semantic_2025.py --weeks 1-16
+```
+
+### Feature Lifecycle
+
+```
+NEW FEATURE → PROBATION (weight=0.5)
+                 │
+                 ├── positive contribution (2+ weeks) → ACTIVE (weight=1.0)
+                 │
+                 └── negative contribution → DISABLED (weight=0.0)
+```
+
+### Next Steps
+
+1. **Run 2025 A/B test** when Week 17 predictions are generated
+2. **Monitor feature selection** after first production week
+3. **Evaluate prompt evolution** effectiveness on 2025 holdout
 
 ---
 

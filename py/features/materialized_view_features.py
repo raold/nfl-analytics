@@ -170,7 +170,7 @@ home_rolling AS (
     wins AS home_wins,
     losses AS home_losses
   FROM mv_team_rolling_stats
-  WHERE is_home = TRUE
+  WHERE is_home = 1
 ),
 away_rolling AS (
   SELECT
@@ -199,7 +199,7 @@ away_rolling AS (
     wins AS away_wins,
     losses AS away_losses
   FROM mv_team_rolling_stats
-  WHERE is_home = FALSE
+  WHERE is_home = 0
 ),
 matchup_stats AS (
   SELECT

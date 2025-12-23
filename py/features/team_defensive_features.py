@@ -306,15 +306,15 @@ class TeamDefensiveFeatures:
             COUNT(*) as total_plays,
             AVG(epa) as avg_epa,
             AVG(CASE WHEN success = 1 THEN 1.0 ELSE 0.0 END) as success_rate,
-            AVG(CASE WHEN pass = TRUE THEN epa ELSE NULL END) as pass_epa,
-            AVG(CASE WHEN rush = TRUE THEN epa ELSE NULL END) as rush_epa,
+            AVG(CASE WHEN pass = 1 THEN epa ELSE NULL END) as pass_epa,
+            AVG(CASE WHEN rush = 1 THEN epa ELSE NULL END) as rush_epa,
             SUM(CASE WHEN interception = 1 OR fumble_lost = 1 THEN 1 ELSE 0 END)::float
                 / NULLIF(COUNT(*), 0) as turnover_rate
         FROM plays
         WHERE game_id = ANY(%s)
           AND defteam = %s
           AND epa IS NOT NULL
-          AND (pass = TRUE OR rush = TRUE)
+          AND (pass = 1 OR rush = 1)
         GROUP BY game_id;
         """
 
@@ -402,19 +402,19 @@ class TeamDefensiveFeatures:
         SELECT
             game_id,
             AVG(CASE WHEN yards_gained >= 10 THEN 1.0 ELSE 0.0 END) as explosive_rate,
-            AVG(CASE WHEN rush = TRUE AND yards_gained <= 0 THEN 1.0 ELSE 0.0 END)
+            AVG(CASE WHEN rush = 1 AND yards_gained <= 0 THEN 1.0 ELSE 0.0 END)
                 as stuff_rate,
             AVG(CASE WHEN first_down = 1 THEN 1.0 ELSE 0.0 END) as first_down_rate,
-            AVG(CASE WHEN down = 3 AND third_down_converted = TRUE THEN 1.0
-                     WHEN down = 3 AND third_down_converted = FALSE THEN 0.0
+            AVG(CASE WHEN down = 3 AND (first_down = 1 OR touchdown = 1) THEN 1.0
+                     WHEN down = 3 THEN 0.0
                      ELSE NULL END) as third_down_conv_rate,
-            AVG(CASE WHEN goal_to_go = 1 AND touchdown = 1 THEN 1.0
-                     WHEN goal_to_go = 1 THEN 0.0
+            AVG(CASE WHEN yardline_100 <= 20 AND touchdown = 1 THEN 1.0
+                     WHEN yardline_100 <= 20 THEN 0.0
                      ELSE NULL END) as red_zone_td_rate
         FROM plays
         WHERE game_id = ANY(%s)
           AND defteam = %s
-          AND (pass = TRUE OR rush = TRUE)
+          AND (pass = 1 OR rush = 1)
         GROUP BY game_id;
         """
 
@@ -515,7 +515,7 @@ class TeamDefensiveFeatures:
         FROM plays
         WHERE game_id = ANY(%s)
           AND defteam = %s
-          AND pass = TRUE
+          AND pass = 1
         GROUP BY game_id;
         """
 
@@ -605,7 +605,7 @@ class TeamDefensiveFeatures:
         FROM plays
         WHERE game_id = ANY(%s)
           AND defteam = %s
-          AND rush = TRUE
+          AND rush = 1
         GROUP BY game_id;
         """
 
@@ -699,26 +699,28 @@ class TeamDefensiveFeatures:
         points_results = cursor.fetchall()
 
         # Query 2: Yards allowed and penalty rate (from plays table)
+        # Note: scoring_drives_pct approximated from TDs / (plays / 6) since no drive column
         query_yards = """
         SELECT
             game_id,
             SUM(yards_gained) as total_yards,
-            SUM(CASE WHEN pass = TRUE THEN yards_gained ELSE 0 END) as pass_yards,
-            SUM(CASE WHEN rush = TRUE THEN yards_gained ELSE 0 END) as rush_yards,
-            COUNT(DISTINCT CASE WHEN fixed_drive_result IN ('Touchdown', 'Field goal')
-                               THEN drive ELSE NULL END)::float
-                / NULLIF(COUNT(DISTINCT drive), 0) as scoring_drives_pct,
-            SUM(CASE WHEN penalty = 1 AND penalty_team = %s THEN 1 ELSE 0 END)::float
+            SUM(CASE WHEN pass = 1 THEN yards_gained ELSE 0 END) as pass_yards,
+            SUM(CASE WHEN rush = 1 THEN yards_gained ELSE 0 END) as rush_yards,
+            CASE WHEN COUNT(*) > 0 THEN
+                SUM(CASE WHEN touchdown = 1 THEN 1 ELSE 0 END)::float
+                / NULLIF(COUNT(*)::float / 6.0, 0)
+            ELSE 0.35 END as scoring_drives_pct,
+            SUM(CASE WHEN penalty = 1 THEN 1 ELSE 0 END)::float
                 / NULLIF(COUNT(*), 0) as penalty_rate,
             AVG(CASE WHEN sack = 1 OR qb_hit = 1 THEN 1.0 ELSE 0.0 END) as blitz_proxy
         FROM plays
         WHERE game_id = ANY(%s)
           AND defteam = %s
-          AND (pass = TRUE OR rush = TRUE)
+          AND (pass = 1 OR rush = 1)
         GROUP BY game_id;
         """
 
-        cursor.execute(query_yards, (team, game_ids, team))
+        cursor.execute(query_yards, (game_ids, team))
         yards_results = cursor.fetchall()
 
         cursor.close()
@@ -830,7 +832,7 @@ class TeamDefensiveFeatures:
         LEFT JOIN games g ON p.game_id = g.game_id
         WHERE p.game_id = ANY(%s)
           AND p.defteam = %s
-          AND (p.pass = TRUE OR p.rush = TRUE)
+          AND (p.pass = 1 OR p.rush = 1)
           AND p.epa IS NOT NULL
         GROUP BY p.game_id;
         """

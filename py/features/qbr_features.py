@@ -538,15 +538,15 @@ class QBRFeatures:
         )
         SELECT
             SUM(passing_yards) as total_pass_yds,
-            SUM(CASE WHEN pass = TRUE AND touchdown = 1 THEN 1 ELSE 0 END) as total_pass_td,
+            SUM(CASE WHEN pass = 1 AND touchdown = 1 THEN 1 ELSE 0 END) as total_pass_td,
             SUM(CASE WHEN interception = 1 THEN 1 ELSE 0 END) as total_int,
             SUM(CASE WHEN sack = 1 THEN ABS(yards_gained) ELSE 0 END) as total_sack_yds,
-            COUNT(*) FILTER (WHERE pass_attempt = TRUE) as total_attempts,
+            COUNT(*) FILTER (WHERE pass_attempt = 1) as total_attempts,
             SUM(CASE WHEN sack = 1 THEN 1 ELSE 0 END) as total_sacks
         FROM plays
         WHERE game_id IN (SELECT game_id FROM recent_games)
           AND posteam = %s
-          AND (pass_attempt = TRUE OR sack = 1);
+          AND (pass_attempt = 1 OR sack = 1);
         """
 
         cursor.execute(

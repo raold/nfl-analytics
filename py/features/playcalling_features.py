@@ -79,7 +79,7 @@ correlate with game outcomes and betting value.
 - Verified against docs/database/DATABASE_QUICK_REFERENCE.md
 - Uses canonical SQL patterns from docs/database/SQL_PATTERNS.md
 - Primary tables: plays (1.2M rows), games (7,263 rows)
-- Key columns: down, fourth_down_converted, air_yards, wpa, wp, qtr
+- Key columns: down, first_down (for 4th down conversions), air_yards, wpa, wp, qtr
 
 **Integration:**
 - Call get_team_playcalling_features(conn, team, season, week)
@@ -270,10 +270,11 @@ def get_team_playcalling_features(
 
             fourth_down_stats AS (
                 -- Fourth down aggressiveness metrics
+                -- Note: first_down = 1 on 4th down indicates a successful conversion
                 SELECT
                     COUNT(*) FILTER (WHERE p.play_type IN ('pass', 'run')) as fourth_down_attempts,
                     COUNT(*) as fourth_down_opportunities,
-                    COUNT(*) FILTER (WHERE p.fourth_down_converted = true) as fourth_down_conversions,
+                    COUNT(*) FILTER (WHERE p.first_down = 1) as fourth_down_conversions,
                     COUNT(DISTINCT rg.game_id) as num_games
                 FROM recent_games rg
                 JOIN plays p ON p.game_id = rg.game_id
