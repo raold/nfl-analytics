@@ -174,10 +174,16 @@ production_models:
       Retained for historical reference only.
 
   # 7. XGBoost v4 - Ridge Residuals (Two-Stage Orthogonalization)
+  # ⚠️ DISABLED Dec 17, 2025: Target leakage discovered
   xgboost_v4_ridge_residuals:
     name: "XGBoost v4 Ridge Residuals"
-    status: "production"
+    status: "disabled"  # WAS: "production"
     approved_date: "2025-11-15"
+    disabled_date: "2025-12-17"
+    disabled_reason: |
+      TARGET LEAKAGE: residual_feature (actual - ridge_pred) was used as INPUT feature.
+      Feature importance showed 91.4% on residual_feature - the model was seeing the answer.
+      Fix script exists: scripts/xgb_exp7_fixed_leakage.py
     model_type: "two_stage_gradient_boosting"
     framework: "XGBoost + Scikit-learn Ridge"
     file_paths:
@@ -237,7 +243,7 @@ production_models:
       pass_attempts_l3: 0.013
       completions_pct_l3: 0.012
       home_away_encoded: 0.012
-    ensemble_weight: 0.20  # Replaces xgboost_v2 in ensemble v6
+    ensemble_weight: 0.00  # DISABLED: Was 0.23, set to 0 due to leakage (Dec 17, 2025)
     use_cases:
       - "Orthogonalization of opponent defensive features"
       - "Two-stage modeling (linear opponent effects + non-linear residuals)"
@@ -464,9 +470,9 @@ ensemble:
       weight: 0.27  # Bayesian hierarchical model
       status: "CONVERGED"
     - model: "xgboost_v4_ridge"
-      weight: 0.23  # XGBoost v4 Ridge Residuals (4.70 ± 0.40 MAE across 2022-2024)
-      status: "PRODUCTION"
-      description: "Two-stage: Ridge opponent baseline + XGBoost residual learning"
+      weight: 0.00  # DISABLED Dec 17, 2025: Target leakage (residual_feature)
+      status: "DISABLED"
+      description: "Two-stage: Ridge opponent baseline + XGBoost residual learning. FIX: scripts/xgb_exp7_fixed_leakage.py"
     - model: "informative_priors_v2"
       weight: 0.13  # Informative priors Bayesian model
       status: "PRODUCTION"
@@ -481,7 +487,7 @@ ensemble:
     - stage: "1_ensemble_aggregation"
       operation: "weighted_average"
       models: ["state_space_v2", "hierarchical_v2", "xgboost_v4_ridge", "informative_priors_v2", "hybrid_static_incremental_v1"]
-      weights: [0.27, 0.27, 0.23, 0.13, 0.10]
+      weights: [0.35, 0.35, 0.00, 0.15, 0.15]  # Updated Dec 17, 2025: XGBoost disabled, redistributed
       adaptive_reoptimization: false  # Static weights for v6.0
     - stage: "2_uncertainty_combination"
       operation: "variance_pooling"
@@ -601,6 +607,12 @@ metadata:
   total_models_tracked: 16
 
   changelog:
+    "2025-12-23 (v6.3)":
+      - "⚠️ XGBOOST V4 RIDGE DISABLED: Target leakage discovered (residual_feature = actual - pred)"
+      - "Feature importance: 91.4% on residual_feature - model was seeing the answer"
+      - "Fix script available: scripts/xgb_exp7_fixed_leakage.py"
+      - "Ensemble weights redistributed: State-Space 35%, Hierarchical 35%, XGB 0%, Priors 15%, Hybrid 15%"
+      - "Registry files synchronized with enhanced_ensemble_v6_production.py (was showing 23% when code had 0%)"
     "2025-12-08 (v6.2)":
       - "✅ ALL R MODELS RETRAINED: Full refresh with 117K historical odds records"
       - "✅ STATE-SPACE V2: 3.7 GB model, Rhat=1.0014, ESS=6438, 27.5 min training"

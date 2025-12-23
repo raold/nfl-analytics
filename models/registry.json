@@ -90,28 +90,31 @@
   "ensemble_v6_dirichlet_weights": [
     {
       "name": "ensemble_v6_dirichlet_weights",
-      "version": "v6.1.0",
-      "created_at": "2025-11-27T05:33:00.212402",
+      "version": "v6.3.0",
+      "created_at": "2025-12-23T06:30:00.000000",
       "author": "NFL Analytics Team",
-      "description": "Ensemble v6.1 with updated Dirichlet weights. Configuration: State-Space v2 (27%), Hierarchical v2 (27%), XGBoost v4 Ridge (23%), Informative Priors v2 (13%), Hybrid Static-Incremental (10%). Temperature scaling T=0.5534. Updated in enhanced_ensemble_v6_production.py and strategy/base.py.",
+      "description": "Ensemble v6.3 with XGBoost v4 Ridge DISABLED due to target leakage. Configuration: State-Space v2 (35%), Hierarchical v2 (35%), XGBoost v4 Ridge (0% - DISABLED), Informative Priors v2 (15%), Hybrid Static-Incremental (15%). Leakage discovered Dec 17, 2025: residual_feature (actual - pred) was used as input, giving 91.4% feature importance.",
       "metrics": {
-        "expected_mae": 34.0,
+        "expected_mae": 38.0,
         "expected_calibration": 0.9,
-        "expected_roi": 0.065
+        "expected_roi": 0.055
       },
       "artifacts": {
         "ensemble": "py/ensemble/enhanced_ensemble_v6_production.py",
         "strategy": "py/ensemble/strategy/base.py",
-        "weights_doc": "docs/adr/009-abandon-ensemble-v7-meta-learning.md"
+        "weights_doc": "docs/adr/009-abandon-ensemble-v7-meta-learning.md",
+        "leakage_fix": "scripts/xgb_exp7_fixed_leakage.py"
       },
-      "parent_version": "v6.0.0",
+      "parent_version": "v6.1.0",
       "status": "prod",
       "tags": [
         "production",
         "ensemble",
         "dirichlet",
-        "static-weights"
-      ]
+        "static-weights",
+        "xgboost-disabled"
+      ],
+      "notes": "XGBoost v4 Ridge disabled Dec 17, 2025 due to target leakage. Fix script available."
     }
   ],
   "fourth_down_cql_grid": [
