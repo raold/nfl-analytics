@@ -45,6 +45,10 @@ from sklearn.linear_model import RidgeCV
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import StandardScaler
 
+# --- Configuration ---
+TEST_SEASON = datetime.now().year  # Dynamically use current year as test season
+# --- End Configuration ---
+
 # Load environment variables
 load_dotenv()
 
@@ -82,8 +86,8 @@ class RidgeResidualsFixed:
         self.results = {}
 
     def fetch_training_data(self) -> pd.DataFrame:
-        """Fetch training data (2018-2024)."""
-        logger.info("Fetching training data (2018-2024)...")
+        """Fetch training data (2018-2025)."""
+        logger.info(f"Fetching training data (2018-{TEST_SEASON})...")
 
         query = """
         WITH player_game_stats AS (
@@ -106,7 +110,7 @@ class RidgeResidualsFixed:
             JOIN games g ON p.game_id = g.game_id
             WHERE p.passer_player_id IS NOT NULL
               AND g.season >= 2018
-              AND g.season <= 2024
+              AND g.season <= 2025
               AND g.week > 0
             GROUP BY g.game_id, g.season, g.week, g.home_team, g.away_team,
                      p.passer_player_id, p.passer_player_name, p.posteam
@@ -201,7 +205,7 @@ class RidgeResidualsFixed:
 
     def prepare_features(self, df: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
         """Prepare feature sets."""
-        logger.info("Preparing features (train: 2018-2023, test: 2024)...")
+        logger.info(f"Preparing features (train: 2018-{TEST_SEASON-1}, test: {TEST_SEASON})...")
 
         # Add rolling averages
         df = df.sort_values(["player_id", "season", "week"]).copy()
@@ -217,8 +221,8 @@ class RidgeResidualsFixed:
         df["completions_pct_l3"] = (df["completions_l3"] / df["pass_attempts_l3"]).fillna(0.5)
 
         # Split data
-        train_df = df[df.season < 2024].copy()
-        test_df = df[df.season == 2024].copy()
+        train_df = df[df.season < TEST_SEASON].copy()
+        test_df = df[df.season == TEST_SEASON].copy()
 
         # Define feature sets
         self.ridge_features = ["opp_def_epa_exp", "opp_points_allowed_avg", "matchup_difficulty"]
