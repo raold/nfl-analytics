@@ -1,0 +1,20 @@
+{
+  "version": "2.0.0",
+  "created_at": "2025-12-23T09:33:54.482484",
+  "training_seasons": [
+    2022,
+    2023,
+    2024
+  ],
+  "feature_count": 382,
+  "validation_metrics": {
+    "spread_mae": 10.449868202209473,
+    "spread_rmse": 13.537889221739041,
+    "total_mae": 10.080146789550781,
+    "total_rmse": 13.09943333921715,
+    "win_prob_auc": 0.6911756720065164,
+    "win_prob_accuracy": 0.6286764705882353
+  },
+  "spread_uncertainty": 13.537889221739041,
+  "total_uncertainty": 13.09943333921715
+}

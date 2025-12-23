@@ -1,14 +1,15 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** December 22, 2025 | **Version:** 6.4 | **Status:** Production Ready (Grade A+)
+**Last Updated:** December 23, 2025 | **Version:** 6.5 | **Status:** Production Ready (Grade A+)
 
 ## Quick Status
 
 | Component | State | Key Metric |
 |-----------|-------|------------|
 | Ensemble | v6.2 + equal-weight props | 54.5% spread (games), 44.25 MAE (props) |
-| Features | 368 total (Phase 2 + Synthetic + Semantic) | Base 305 + 37 synthetic + 26 semantic |
+| Features | 382 total (Phase 2 + Synthetic + Semantic) | Base 305 + 37 synthetic + 38 semantic (v2) |
 | Semantic Stack | Complete (Dec 21) | Ollama/MLX inference, 26 LLM features |
+| **Game Outcome Model** | **v2 PRODUCTION (Dec 23)** | **382 features, +4.6% win accuracy, 10.45 spread MAE** |
 | **Feedback Loop** | **NEW (Dec 22)** | **Weekly learning system, 10 modules** |
 | Database | 64 tables, 1.25M plays | PostgreSQL + Redis |
 | Dissertation | 693 pages | Compiles cleanly |
@@ -502,6 +503,12 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
   - LLM prompt evolution based on prediction outcomes
   - McNemar test for A/B significance on 2025 holdout
   - Weekly orchestrator: `scripts/run_weekly_feedback.py`
+- **Game Outcome Model v2 PROMOTED TO PRODUCTION (Dec 23):** Semantic-enhanced XGBoost models
+  - 382 features (344 base + 38 semantic LLM-derived features)
+  - Spread MAE: 10.45, Total MAE: 10.08, Win Prob AUC: 0.691
+  - A/B test: +4.6% win accuracy improvement vs v1 (non-semantic baseline)
+  - SHAP analysis: sem_away_media_buzz_volume in top 50 features
+  - Production artifacts: `models/production/game_outcome_v2/`
 
 **Key Findings (Dec 13-22):**
 - Season-based temporal split prevents data leakage (train on seasons < max, validate on max)
@@ -581,7 +588,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ---
 
-**Version:** 6.4 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
+**Version:** 6.5 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
 
 **Project Rules:**
 - Never take shortcuts, never use synthetic data
