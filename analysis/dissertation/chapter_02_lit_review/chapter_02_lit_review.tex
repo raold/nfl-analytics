@@ -636,6 +636,117 @@ The surveyed literature illustrates a continuum from interpretable generative mo
 \section{Related Work Beyond Football}
 Insights from other sports transfer imperfectly but inform modeling choices, particularly for low-scoring games (soccer, hockey) where Poisson-type models excel and for sequential decision domains (basketball substitutions, baseball bullpen management) where RL ideas have matured. We adapt ideas on tempo, possession value, and injury priors to the NFL context.
 
+\section{Sequence Models and Attention Mechanisms}
+\label{sec:sequence-attention}
+
+Recent advances in deep learning have produced transformer architectures that excel at sequential prediction tasks. Originally developed for natural language processing \citep{vaswani2017attention}, these attention-based models have since revolutionized time series forecasting and offer promising directions for sports analytics.
+
+\subsection{Transformer Architectures for Time Series}
+
+The canonical transformer architecture \citep{vaswani2017attention} computes attention weights that allow each position in a sequence to attend to all other positions, capturing long-range dependencies without the vanishing gradient problems of recurrent networks. For time series applications, several specialized variants have emerged.
+
+\textbf{Informer} \citep{zhou2021informer} introduces ProbSparse self-attention, reducing the $O(n^2)$ complexity of standard attention to $O(n \log n)$, enabling efficient long-sequence forecasting. This is particularly relevant for NFL prediction where team performance trajectories span 17-week seasons with complex temporal dependencies.
+
+\textbf{Temporal Fusion Transformer (TFT)} \citep{lim2021temporal} combines multi-horizon forecasting with interpretable attention mechanisms. Its variable selection network identifies which static (team identity, stadium) and dynamic (injuries, form) features matter at each prediction horizon. The interpretability aligns with our emphasis on understanding model behavior rather than black-box predictions.
+
+Recent surveys \citep{wen2023transformers,nie2023time} establish transformers as state-of-the-art for probabilistic forecasting when sufficient training data exists. However, they caution that simpler models (linear, ETS) can outperform transformers on short series with limited samples---a relevant consideration for NFL's 272-game annual corpus.
+
+\subsection{Hybrid Attention-State-Space Models}
+
+A promising research direction combines transformer attention with state-space dynamics. The Autoformer \citep{wu2021autoformer} decomposes series into trend and seasonal components before applying attention, achieving improvements on standard benchmarks. For NFL applications, this could capture the interaction between team strength evolution (state-space) and game-specific contextual factors (attention).
+
+\textbf{Implications for this work.} While our current State-Space v2 model assumes Markov dynamics (each week depends only on the previous state), attention mechanisms could relax this assumption, allowing long-range dependencies (e.g., performance against specific opponent types) to inform predictions. We propose transformer-based extensions as a primary research vector in \Cref{subsec:future-transformer}.
+
+\section{Causal Inference in Sports Analytics}
+\label{sec:causal-inference}
+
+Sports prediction typically focuses on association (``teams with high EPA tend to win'') rather than causation (``increasing EPA causes higher win probability''). This distinction becomes critical when (i) evaluating interventions (coaching decisions, personnel changes), (ii) adjusting for confounders (opponent strength, game context), and (iii) avoiding spurious correlations that degrade out-of-sample performance.
+
+\subsection{Foundational Frameworks}
+
+Two complementary frameworks dominate causal inference: the potential outcomes framework \citep{imbens2015causal} and the structural causal model (SCM) approach based on directed acyclic graphs (DAGs) \citep{pearl2009causality}.
+
+The \textbf{potential outcomes framework} defines causal effects as contrasts between outcomes under different treatment assignments. For example, the effect of a coaching change on win probability would compare $Y^{(1)}$ (wins under new coach) with $Y^{(0)}$ (wins had old coach remained). The fundamental problem---we observe only one potential outcome per unit---motivates matching, propensity weighting, and instrumental variable approaches.
+
+The \textbf{DAG framework} represents causal assumptions graphically, with nodes for variables and directed edges for causal relationships. DAGs identify confounders requiring adjustment, mediators that should not be adjusted, and colliders that introduce spurious associations when conditioned upon. For NFL prediction, a DAG clarifies that adjusting for opponent strength (a confounder of QB performance $\to$ game outcome) is essential, while adjusting for garbage-time stats (a mediator) would bias skill estimates.
+
+\subsection{Methods for Sports Applications}
+
+\citet{hernan2020causal} provide accessible treatment of causal inference methods in observational studies, emphasizing target trial emulation. Key techniques applicable to sports include:
+
+\textbf{Instrumental Variables (IVs)} exploit exogenous variation to identify causal effects. In NFL contexts, weather provides a natural instrument: extreme cold affects passing efficiency causally, but is unrelated to team quality. Coaching changes (particularly mid-season firings) may serve as instruments for organizational dysfunction.
+
+\textbf{Propensity Score Methods} balance treated and control groups on observed confounders. For evaluating play-calling decisions, one might estimate the propensity to pass given game state, then weight outcomes inversely to assess the causal effect of passing versus running.
+
+Recent work has begun applying causal methods to sports analytics. \citet{debacco2024causal} demonstrate causal framing for soccer crossing decisions, and surveys \citep{wang2024causaldeep,farhana2024timeseries} connect causal inference to deep learning and time series. These methods offer a principled approach to the opponent-player confound that motivated our Ridge Residuals orthogonalization (\Cref{subsec:fwl-theorem}).
+
+\subsection{Implications for This Work}
+
+Our Ridge Residuals methodology can be viewed through a causal lens: the two-stage regression removes confounding by opponent quality, isolating the ``pure skill'' component of QB performance. Future work could formalize this as a causal estimand (e.g., average treatment effect of quarterback on margin conditional on opponent). DAG-based feature selection could systematically identify which variables to include versus exclude, potentially improving upon our current heuristic feature engineering. We develop these directions as a research priority in \Cref{subsec:future-causal}.
+
+\section{Large Language Models in Sports Analytics}
+\label{sec:llm-sports}
+
+Large Language Models (LLMs) have emerged as powerful tools for processing unstructured text, extracting entities, and performing complex reasoning. Their application to sports analytics remains nascent but offers significant potential for incorporating information sources beyond structured statistics.
+
+\subsection{Sports-Specific Benchmarks and Capabilities}
+
+Recent benchmarks evaluate LLM performance on sports understanding tasks. \citet{xia2024sportsllm} survey language and multimodal models in sports, cataloging datasets across 8 sports and 8 task types (commentary generation, QA, summarization). They find that while general-purpose LLMs achieve reasonable performance on factual queries, domain-specific fine-tuning significantly improves tasks requiring temporal reasoning (``Did Team A improve after Week 8?'') or statistical interpretation.
+
+\textbf{SCBench} \citep{sclar2024scbench} specifically evaluates video-language models on sports commentary, testing temporal grounding (``When did the touchdown occur?''), causal reasoning (``Why was the pass incomplete?''), and context integration. The benchmark reveals that current models struggle with precise temporal localization and causal chains spanning multiple plays---capabilities essential for real-time sports analysis.
+
+The \textbf{SPORTU benchmark} \citep{sportu2024} provides comprehensive evaluation of multimodal LLMs across sports understanding tasks, identifying gaps in spatial reasoning (field position, player movement) and rule comprehension.
+
+\subsection{Retrieval-Augmented Generation for Sports}
+
+Retrieval-Augmented Generation (RAG) \citep{lewis2020rag} combines LLM reasoning with external knowledge retrieval, addressing hallucination risks in sports contexts where factual accuracy matters. \citet{li2025soccerrag} demonstrate RAG integration for soccer analytics, retrieving relevant historical matches and statistics before generating predictions or explanations.
+
+For NFL applications, RAG architectures could integrate:
+\begin{itemize}
+  \item Play-by-play databases for historical context
+  \item Injury reports for real-time roster updates
+  \item News articles for sentiment and narrative signals
+  \item Official rule books for edge-case resolution
+\end{itemize}
+
+\subsection{Sentiment and Entity Extraction}
+
+LLMs excel at Named Entity Recognition (NER) for injury reports (``Patrick Mahomes [PLAYER] is questionable [STATUS] with ankle [BODY\_PART]'') and sentiment analysis of media coverage (``Coach frustrated after loss'' $\to$ negative sentiment). These capabilities inform our Semantic Stack implementation (\Cref{chap:lessons-learned}), which uses LLM-derived features for injury severity assessment and media buzz quantification.
+
+\textbf{Hallucination risks.} A critical limitation is that LLMs may generate plausible but incorrect information (hallucinations), particularly for recent events or obscure players. We mitigate this through grounded retrieval (only use LLM outputs when supported by retrieved documents) and human-in-the-loop validation for high-stakes decisions. Our Semantic Stack implementation represents a first step; \Cref{subsec:future-llm} outlines research directions for deeper multi-modal integration.
+
+\section{Production Machine Learning Systems}
+\label{sec:mlops-production}
+
+Deploying machine learning models in production environments introduces challenges beyond model accuracy: reproducibility, monitoring, versioning, and governance. The emerging field of MLOps (Machine Learning Operations) codifies best practices for maintaining reliable ML systems at scale.
+
+\subsection{MLOps Frameworks and Maturity Models}
+
+\citet{lwakatare2025mlops} propose an empirical framework for MLOps adoption, defining maturity levels from ad-hoc experimentation through automated pipelines to continuous training. Their taxonomy distinguishes:
+\begin{itemize}
+  \item \textbf{Data management}: Version control for datasets, schema validation, drift detection
+  \item \textbf{Model lifecycle}: Experiment tracking, model registry, deployment automation
+  \item \textbf{Monitoring}: Performance dashboards, alerting, rollback procedures
+  \item \textbf{Governance}: Audit trails, access controls, bias testing
+\end{itemize}
+
+\citet{kumara2025navigation} survey practitioner experiences with MLOps tools, finding that integration complexity and skill gaps are primary adoption barriers. They recommend starting with lightweight experiment tracking (MLflow, Weights \& Biases) before progressing to full pipeline orchestration.
+
+\subsection{Model Monitoring and Drift Detection}
+
+Production models degrade when input distributions shift (data drift) or the relationship between inputs and outputs changes (concept drift). For NFL prediction, drift sources include:
+\begin{itemize}
+  \item \textbf{Rule changes} (e.g., 2023 kickoff rule modifications alter special teams metrics)
+  \item \textbf{Strategic evolution} (league-wide shift toward passing, reducing historical analogs)
+  \item \textbf{Roster turnover} (quarterback migrations invalidate team-level priors)
+\end{itemize}
+
+Detection methods include statistical tests (KL divergence, KS test) on feature distributions and performance monitoring (tracking MAE/Brier score by week). \citet{hubbard2024mlproduction} and industry guidance \citep{google2024mlops} recommend automated alerts when metrics exceed thresholds, triggering retraining or manual review.
+
+\subsection{Relevance to This Work}
+
+Our production architecture (\Cref{chap:arch}) implements several MLOps principles: containerized pipelines for reproducibility, model registry for version control, and multi-season validation gates before production deployment. The defense-in-depth framework (\Cref{tab:defense-in-depth-condensed}) catches errors at multiple stages, from unit tests through historical validation. \Cref{subsec:future-mlops} details our roadmap for formalizing drift detection with automated monitoring dashboards and A/B testing infrastructure for ensemble weight updates.
+
 \section{Extended Notes on Calibration}
 Calibration is both a statistical and an operational concern. A predictor can be perfectly calibrated and yet economically uninteresting if it lacks resolution; conversely, extremely sharp predictions can be economically harmful if they are miscalibrated. We therefore emphasize a portfolio of diagnostics: reliability diagrams with uncertainty bands, calibration slope/intercept for binary outcomes, PIT histograms for distributions, and CRPS to integrate sharpness and calibration into a single score. We also highlight the practical benefits of over-conservative probability outputs in risk-constrained decision problems.
 

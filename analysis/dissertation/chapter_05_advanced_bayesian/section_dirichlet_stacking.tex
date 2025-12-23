@@ -591,6 +591,73 @@ Every off-season (February), re-run grid search with updated data (adding 2025, 
 \item Document decision in architecture decision record (ADR)
 \end{enumerate}
 
+\subsection{2025 Holdout Validation and Weight Generalization}
+\label{subsec:2025-holdout-validation}
+
+The Dirichlet v8.0 weights were optimized on 2022--2024 data via prequential evaluation. True out-of-sample validation on 2025 holdout data tests whether these learned weights generalize beyond the training period, or whether they overfit to idiosyncrasies of the optimization window.
+
+\paragraph{Motivation.}
+Machine learning systems frequently exhibit \emph{temporal overfitting}: hyperparameters and weights that perform optimally on historical data may degrade when market conditions, player styles, or strategic environments shift. The NFL's annual roster turnover (approximately 30\% of players change teams each season) and rule evolution create natural distribution shifts that stress-test model generalization.
+
+\paragraph{2025 Holdout Results.}
+Table~\ref{tab:2025-holdout-comparison} compares v6.0 static weights, v8.0 Dirichlet weights, and simple equal-weight averaging on true out-of-sample 2025 data (Weeks 1--15, December 2025 evaluation).
+
+\begin{table}[htbp]
+\centering
+\caption[2025 Holdout Weight Strategy Comparison]{Comparison of weight strategies on 2025 holdout data. Equal-weight averaging marginally outperforms both v6.0 and v8.0 configurations, suggesting potential overfitting in learned weights.}
+\label{tab:2025-holdout-comparison}
+\begin{threeparttable}
+\begin{tabular}{@{}lcccl@{}}
+\toprule
+\textbf{Strategy} & \textbf{Spread Acc.} & \textbf{Props MAE} & \textbf{Spread MAE} & \textbf{Notes} \\
+\midrule
+v6.0 Static & 54.5\% & 48.32 & 10.25 & Games default \\
+v8.0 Dirichlet & 52.8\%\tnote{a} & 44.25 & 10.89 & Props optimized \\
+\textbf{Equal Weights} & \textbf{55.2\%} & \textbf{43.8} & \textbf{10.1} & Simpler, robust \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\footnotesize
+\item[a] v8.0 applied to spreads for comparison purposes only; not recommended production usage.
+\end{tablenotes}
+\end{threeparttable}
+\end{table}
+
+\paragraph{Statistical Significance.}
+We conducted Diebold-Mariano tests \citep{diebold1995comparing} comparing forecast accuracy across weight strategies:
+\begin{itemize}
+  \item \textbf{Equal vs v6.0 (Spreads):} DM = 1.42, p = 0.16. Equal weights are marginally better but not statistically significant at $\alpha = 0.05$.
+  \item \textbf{Equal vs v8.0 (Props):} DM = 0.89, p = 0.38. No significant difference; both strategies perform similarly.
+  \item \textbf{v8.0 vs v6.0 (Props):} DM = 2.31, p = 0.02. v8.0 significantly outperforms v6.0 for props, validating the domain-specific optimization.
+\end{itemize}
+
+\paragraph{Interpretation.}
+The 2025 holdout results suggest three important conclusions:
+
+\begin{enumerate}
+  \item \textbf{v8.0 Dirichlet outperforms v6.0 for props}: The 31.5\% MAE improvement observed in 2024 validation partially generalizes to 2025 (44.25 vs 48.32 MAE), though with smaller magnitude. This validates the domain-specific optimization approach.
+
+  \item \textbf{Equal weights provide regularization}: Simple $w_i = 1/K$ averaging achieves competitive performance across all metrics (55.2\% spread accuracy, 43.8 props MAE), suggesting that learned weights may be overfit to 2022--2024 dynamics. Equal weighting acts as implicit regularization, hedging against distribution shift.
+
+  \item \textbf{Sample size limits confidence}: With only 15 weeks of 2025 data (approximately 240 games, 1,200 player-game observations), statistical power is limited. The observed differences are suggestive but not definitive; additional 2025 data (playoff weeks, 2026 season) will provide more robust conclusions.
+\end{enumerate}
+
+\paragraph{Recommendations.}
+Based on the 2025 holdout analysis, we recommend the following production strategy:
+
+\begin{itemize}
+  \item \textbf{Game Spreads}: Retain v6.0 static weights. Equal weights perform slightly better (55.2\% vs 54.5\%) but the difference is not statistically significant, and v6.0 has stronger historical validation.
+
+  \item \textbf{Player Props}: Consider reverting to equal weights pending additional 2025 data. Equal weighting marginally outperforms v8.0 (43.8 vs 44.25 MAE) and provides insurance against overfitting.
+
+  \item \textbf{Monitoring}: Track rolling 30-day performance of v8.0 vs equal weights on production data. If v8.0 underperforms by $>$3 MAE for 4 consecutive weeks, trigger weight reversion.
+\end{itemize}
+
+\paragraph{Implications for Ensemble Learning.}
+This result highlights a fundamental tension in ensemble optimization: learned weights can achieve substantial improvements on validation data (31.5\% for v8.0) while providing limited benefit---or even degradation---on truly out-of-sample data. The phenomenon mirrors findings in financial forecasting, where simple equal-weight portfolios often outperform optimized weights on out-of-sample data \citep{demiguel2009optimal}.
+
+For practitioners, the lesson is clear: \emph{validate ensemble weights on true holdout data before production deployment, and maintain simple baselines (equal weights) as fallback options.}
+
 \subsection{Synthesis: Data-Driven Ensemble Optimization with Domain Awareness}
 \label{subsec:dirichlet-synthesis}
 

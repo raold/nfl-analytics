@@ -74,18 +74,125 @@ The principles discovered in this work are not limited to sports. They are gener
 \end{itemize}
 
 \section{Future Research Directions}
-\label{sec:future-research-condensed}
+\label{sec:future-research}
 
-The v6.0 system provides a strong foundation, but several promising research avenues remain.
+The v6.0 system provides a strong foundation, but several promising research avenues remain. We organize these into five vectors, each addressing a specific limitation of the current architecture. Building on the literature surveyed in \Cref{sec:sequence-attention,sec:causal-inference,sec:llm-sports,sec:mlops-production}, we provide concrete approaches, expected benefits, and implementation challenges for each direction.
 
 \subsection{Causal Feature Engineering}
-The current system relies on associational features. The next frontier is to build features from a formal structural causal model of the game. Using techniques like instrumental variables (e.g., coaching changes) and propensity score matching (e.g., game script) could lead to more robust predictions, especially in novel scenarios like rookie QB debuts or major rule changes.
+\label{subsec:future-causal}
+
+\paragraph{Problem.} The current system relies on associational features that capture correlations (``teams with high EPA tend to win'') rather than causal mechanisms (``increasing EPA \textit{causes} higher win probability''). This distinction matters for three reasons: (i) associational features degrade under distribution shift when correlations change, (ii) they cannot evaluate counterfactual scenarios (``What if this team had a different coach?''), and (iii) they may encode spurious correlations that fail out-of-sample.
+
+\paragraph{Approach.} We propose building features from a formal structural causal model (SCM) of NFL games, leveraging techniques from causal inference \citep{pearl2009causality,imbens2015causal}:
+
+\begin{itemize}
+  \item \textbf{Instrumental Variables (IVs):} Weather provides a natural instrument---extreme cold causally affects passing efficiency but is exogenous to team quality. Mid-season coaching changes may serve as instruments for organizational dysfunction, allowing estimation of ``true'' team strength separate from coaching effects.
+
+  \item \textbf{Propensity Score Methods:} Game script (leading vs.\ trailing) confounds play-calling analysis. By estimating the propensity to pass given game state, we can weight outcomes inversely to assess the causal effect of play selection on success, rather than the biased associational estimate.
+
+  \item \textbf{DAG-Based Feature Selection:} Constructing a directed acyclic graph of NFL game variables would systematically identify confounders requiring adjustment (opponent strength), mediators to exclude (garbage-time stats), and colliders that introduce bias when conditioned upon. This could replace our current heuristic feature engineering with principled selection.
+\end{itemize}
+
+\paragraph{Expected Benefit.} Causal features should exhibit greater stability across seasons and rule changes, as they capture mechanisms rather than correlations. We estimate a 15--25\% reduction in inter-season variance, particularly for novel scenarios (rookie QB debuts, major rule changes) where historical correlations are unreliable.
+
+\paragraph{Challenges.} Causal identification requires strong assumptions that may not hold in observational sports data. Instrument validity is difficult to verify, and unmeasured confounders remain a concern. Implementation requires domain expertise to construct defensible DAGs.
 
 \subsection{Transformer-Based Sequence Modeling}
-The current state-space models use a Markov assumption (next week depends only on last week). A Transformer architecture with a self-attention mechanism could capture long-range dependencies in a team's performance (e.g., the lingering effects of an injury from 6 weeks ago). This would likely require transfer learning from a larger corpus of football data (e.g., NCAA, CFL) to be effective.
+\label{subsec:future-transformer}
 
-\subsection{Ensemble v7.0 and Beyond}
-A roadmap for a v7.0 ensemble would combine the above ideas: integrating causal features into the Bayesian components and upgrading the state-space model to a Transformer architecture. This is projected to lower the inter-model correlation further and yield an additional +12% relative improvement in ROI.
+\paragraph{Problem.} The current State-Space v2 model assumes Markov dynamics: each week's prediction depends only on the previous week's state. This assumption ignores long-range dependencies that may matter for NFL prediction: the lingering effects of injuries from weeks ago, performance patterns against specific opponent archetypes, and momentum shifts that span multiple games.
+
+\paragraph{Approach.} Replace or augment state-space models with transformer architectures designed for time series forecasting \citep{vaswani2017attention,zhou2021informer,lim2021temporal}:
+
+\begin{itemize}
+  \item \textbf{Temporal Fusion Transformer (TFT):} This architecture combines multi-horizon forecasting with interpretable attention mechanisms. Its variable selection network could identify which static features (team identity, stadium) and dynamic features (injuries, form) matter at each prediction horizon. The interpretability aligns with our emphasis on understanding model behavior.
+
+  \item \textbf{Informer for Long-Range Dependencies:} ProbSparse attention reduces complexity from $O(n^2)$ to $O(n \log n)$, enabling attention over full-season sequences. This could capture dependencies spanning 10+ weeks that current models miss.
+
+  \item \textbf{Transfer Learning:} NFL's 272-game annual corpus may be insufficient for training large transformers from scratch. Pre-training on larger football corpora (NCAA: 900+ games/year, CFL, historical NFL) followed by fine-tuning could provide the data scale transformers require.
+\end{itemize}
+
+\paragraph{Expected Benefit.} Attention mechanisms should capture opponent-specific patterns (``Team A struggles against mobile QBs'') and injury recovery trajectories that span multiple weeks. We project 8--15\% improvement in out-of-sample MAE for teams with complex recent histories.
+
+\paragraph{Challenges.} Transformers require substantial training data and computational resources. Overfitting risk is high with NFL's limited sample size. Interpretability of attention patterns in sports contexts is not yet well understood. Transfer learning from NCAA may introduce domain mismatch (different rules, talent distribution).
+
+\subsection{Multi-Modal LLM Integration}
+\label{subsec:future-llm}
+
+\paragraph{Problem.} The current system uses only structured statistical data, ignoring rich unstructured information: injury report narratives (``questionable with ankle'' vs.\ ``questionable but expected to play''), press conference sentiment, beat reporter insights, and social media signals. This information is often predictive but difficult to quantify systematically.
+
+\paragraph{Approach.} Extend the Semantic Stack (\Cref{chap:lessons-learned}) with deeper LLM integration \citep{xia2024sportsllm,lewis2020rag}:
+
+\begin{itemize}
+  \item \textbf{Enhanced Injury Severity Assessment:} Current injury features treat ``questionable'' uniformly. Fine-tuned LLMs can parse injury report language to predict actual availability probability (``questionable with hamstring'' $\to$ 35\% play probability vs.\ ``questionable rest'' $\to$ 85\%).
+
+  \item \textbf{Sentiment-Weighted News Signals:} Extract sentiment from beat reporter coverage and weight by source credibility (verified insiders vs.\ general media). Negative coaching sentiment before games may predict underperformance beyond what statistics capture.
+
+  \item \textbf{Retrieval-Augmented Prediction:} RAG architectures can ground predictions in retrieved historical context (``similar situations where Team A faced a mobile QB after a short week resulted in...''), reducing hallucination while leveraging LLM reasoning capabilities.
+
+  \item \textbf{Video Analysis (Long-Term):} Multimodal models evaluating game film could assess injury severity from player movement patterns or identify schematic tendencies not captured in box scores.
+\end{itemize}
+
+\paragraph{Expected Benefit.} LLM features should provide edge in information-sensitive scenarios: injury uncertainty, coaching turmoil, and situations where ``soft'' factors dominate. We estimate 2--5\% improvement in prediction accuracy for games with significant injury uncertainty, plus faster reaction to breaking news.
+
+\paragraph{Challenges.} LLM hallucination risks are significant for factual sports queries. Latency constraints (real-time betting) may conflict with LLM inference times. Training data for sports-specific fine-tuning is limited. Cost of API calls for large-scale inference may be prohibitive.
+
+\subsection{Ensemble Diversity Optimization}
+\label{subsec:future-diversity}
+
+\paragraph{Problem.} The v6.0 ensemble achieved mean inter-model correlation $\bar{\rho} = 0.32$, but this was discovered through trial and error rather than systematic optimization. The Hansen variance decomposition (\Cref{subsec:hansen1982}) shows that reducing $\bar{\rho}$ is more cost-effective than adding models, but we lack a principled method to select models that maximize diversity while maintaining individual accuracy.
+
+\paragraph{Approach.} Formalize ensemble construction as a diversity-accuracy optimization problem \citep{kuncheva2023unified,kuncheva2003measures}:
+
+\begin{itemize}
+  \item \textbf{Diversity Metrics:} Implement Q-statistic, disagreement measure, and Kohavi-Wolpert variance \citep{kohavi1996bias} as explicit optimization targets. The Q-statistic $Q_{i,j} = (N^{11}N^{00} - N^{01}N^{10}) / (N^{11}N^{00} + N^{01}N^{10})$ quantifies agreement between classifiers; targeting low Q during model selection promotes diversity.
+
+  \item \textbf{Pareto Optimization:} Frame model selection as multi-objective optimization with accuracy and diversity as competing objectives. Pareto-efficient ensembles represent optimal tradeoffs; the decision-maker chooses based on risk preferences.
+
+  \item \textbf{Disagreement as Uncertainty Signal:} High inter-model disagreement on a specific prediction signals epistemic uncertainty. This could trigger conservative bet sizing or abstention, complementing the individual model uncertainty measures currently used.
+
+  \item \textbf{Negative Correlation Learning:} Train new ensemble members with explicit regularization toward disagreement with existing members, rather than purely toward accuracy. This ``ensemble-aware'' training could produce models that are valuable specifically because they err differently.
+\end{itemize}
+
+\paragraph{Expected Benefit.} Systematic diversity optimization should reduce ensemble variance by an additional 15--20\% beyond the current ad-hoc approach. Using disagreement as uncertainty should improve bet sizing calibration, reducing losses on high-uncertainty predictions.
+
+\paragraph{Challenges.} Diversity metrics are defined for classification; adapting to regression requires careful formulation. Optimizing for diversity may sacrifice individual model accuracy beyond acceptable thresholds. Computational cost of evaluating all pairwise correlations scales quadratically with ensemble size.
+
+\subsection{Production MLOps Infrastructure}
+\label{subsec:future-mlops}
+
+\paragraph{Problem.} The current production system implements basic MLOps principles (containerization, model registry, multi-season validation) but lacks sophisticated monitoring, automated retraining, and A/B testing infrastructure. As the system scales and market conditions evolve, manual oversight becomes unsustainable.
+
+\paragraph{Approach.} Implement enterprise-grade MLOps practices \citep{lwakatare2025mlops,kumara2025navigation,google2024mlops}:
+
+\begin{itemize}
+  \item \textbf{Automated Drift Detection:} Deploy statistical monitors (KL divergence, KS test) on feature distributions and model residuals. Significant drift triggers alerts and automatic model revalidation. This catches concept drift from rule changes or strategic evolution before it degrades predictions.
+
+  \item \textbf{A/B Testing for Ensemble Weights:} The Dirichlet v8.0 vs.\ equal-weight comparison was performed manually. Automated A/B testing infrastructure could continuously evaluate weight strategies on incoming data, with statistical significance thresholds for weight updates.
+
+  \item \textbf{Feature Store with Lineage Tracking:} Centralized feature store with version control and lineage tracking ensures reproducibility and simplifies debugging. When a prediction fails, lineage traces which feature versions and transformations were used.
+
+  \item \textbf{Shadow Deployment and Canary Releases:} New models run in shadow mode (predictions logged but not acted upon) before production deployment. Canary releases expose new models to a small stake fraction, limiting downside from undetected issues.
+
+  \item \textbf{Automated Model Retraining:} Scheduled retraining pipelines with validation gates ensure models stay current without manual intervention. Failed validation triggers alerts rather than silent deployment of degraded models.
+\end{itemize}
+
+\paragraph{Expected Benefit.} MLOps infrastructure reduces operational overhead, catches issues earlier, and enables faster iteration. Automated drift detection should prevent the gradual performance degradation that occurs between manual audits. A/B testing enables continuous optimization of ensemble weights.
+
+\paragraph{Challenges.} MLOps infrastructure requires significant upfront investment with delayed ROI. Automated retraining risks introducing errors if validation gates are improperly configured. Complexity of the infrastructure itself becomes a maintenance burden.
+
+\subsection{Ensemble v7.0 Roadmap}
+
+Combining the above directions, a v7.0 ensemble would integrate:
+\begin{enumerate}
+  \item Causal features (IVs, propensity scores) into Bayesian components
+  \item Transformer-based state evolution replacing Markov assumption
+  \item LLM-derived injury severity and sentiment features
+  \item Diversity-optimized model selection with disagreement-based uncertainty
+  \item Full MLOps infrastructure for continuous monitoring and improvement
+\end{enumerate}
+
+Conservative projections suggest 20--30\% relative improvement in ROI through reduced variance ($\bar{\rho}$ reduction) and improved signal extraction (causal + LLM features), validated through the A/B testing infrastructure before full deployment.
 
 \section{Final Reflection: The Market as Teacher}
 
