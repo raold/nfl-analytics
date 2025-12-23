@@ -54,6 +54,7 @@ class InjuryItem:
     status: str
     injury_type: str
     updated_at: datetime
+    severity_score: float | None = None  # 0.0-1.0, LLM-assessed severity
 
 
 class SemanticRepository:
@@ -208,7 +209,8 @@ class SemanticRepository:
         """
         if before:
             query = """
-            SELECT id, athlete_id, athlete_name, team, status, injury_type, updated_at
+            SELECT id, athlete_id, athlete_name, team, status, injury_type,
+                   updated_at, severity_score
             FROM semantic.injury_snapshots
             WHERE team = %s AND updated_at < %s
             ORDER BY updated_at DESC
@@ -216,7 +218,8 @@ class SemanticRepository:
             params = (team, before)
         else:
             query = """
-            SELECT id, athlete_id, athlete_name, team, status, injury_type, updated_at
+            SELECT id, athlete_id, athlete_name, team, status, injury_type,
+                   updated_at, severity_score
             FROM semantic.injury_snapshots
             WHERE team = %s
             ORDER BY updated_at DESC
@@ -237,7 +240,103 @@ class SemanticRepository:
                 status=row["status"],
                 injury_type=row["injury_type"] or "",
                 updated_at=row["updated_at"],
+                severity_score=row.get("severity_score"),
             )
+            for row in rows
+        ]
+
+    def get_injury_history(
+        self,
+        team: str,
+        before: datetime,
+        days: int = 14,
+    ) -> list[InjuryItem]:
+        """
+        Get injury history for temporal dynamics calculations.
+
+        Used for computing exponential decay of injury impact over time.
+
+        Args:
+            team: Team abbreviation
+            before: Only include injuries updated before this time
+            days: How many days of history to retrieve
+
+        Returns:
+            List of InjuryItem objects with updated_at timestamps
+        """
+        query = """
+        SELECT id, athlete_id, athlete_name, team, status, injury_type,
+               updated_at, severity_score
+        FROM semantic.injury_snapshots
+        WHERE team = %s
+          AND updated_at < %s
+          AND updated_at >= %s
+        ORDER BY updated_at DESC
+        """
+
+        since = before - timedelta(days=days)
+
+        with self._get_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (team, before, since))
+                rows = cur.fetchall()
+
+        return [
+            InjuryItem(
+                id=row["id"],
+                athlete_id=row["athlete_id"] or "",
+                athlete_name=row["athlete_name"] or "",
+                team=row["team"],
+                status=row["status"],
+                injury_type=row["injury_type"] or "",
+                updated_at=row["updated_at"],
+                severity_score=row.get("severity_score"),
+            )
+            for row in rows
+        ]
+
+    def get_sentiment_timeseries(
+        self,
+        team: str,
+        before: datetime,
+        points: int = 7,
+    ) -> list[tuple[datetime, float]]:
+        """
+        Get daily sentiment values for derivative calculation.
+
+        Returns sentiment averages per day for computing velocity (dσ/dt)
+        and acceleration (d²σ/dt²) using finite differences.
+
+        Args:
+            team: Team abbreviation
+            before: Only include sentiment before this time
+            points: Number of days of data to retrieve
+
+        Returns:
+            List of (date, avg_sentiment) tuples, newest first
+        """
+        query = """
+        SELECT DATE(n.published_at) as sentiment_date,
+               AVG(s.sentiment) as avg_sentiment
+        FROM semantic.sentiment_scores s
+        JOIN semantic.news_snapshots n ON s.news_id = n.id
+        WHERE s.team = %s
+          AND n.published_at < %s
+          AND n.published_at >= %s
+        GROUP BY DATE(n.published_at)
+        ORDER BY sentiment_date DESC
+        LIMIT %s
+        """
+
+        since = before - timedelta(days=points)
+
+        with self._get_connection() as conn:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
+                cur.execute(query, (team, before, since, points))
+                rows = cur.fetchall()
+
+        return [
+            (row["sentiment_date"], float(row["avg_sentiment"]))
             for row in rows
         ]
 

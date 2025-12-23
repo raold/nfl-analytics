@@ -17,12 +17,43 @@ Usage:
 """
 
 import logging
+import math
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 logger = logging.getLogger(__name__)
+
+# Injury-specific decay rates (λ per day) based on typical recovery times
+# Formula: half_life = ln(2) / λ
+INJURY_DECAY_RATES = {
+    # Season-ending injuries (very slow decay)
+    "ACL": 0.005,        # ~140 day half-life
+    "Achilles": 0.006,   # ~115 day half-life
+    "Torn": 0.008,       # ~87 day half-life (generic torn)
+
+    # Multi-week injuries
+    "Knee": 0.03,        # ~23 day half-life
+    "Shoulder": 0.04,    # ~17 day half-life
+    "Ribs": 0.035,       # ~20 day half-life
+
+    # 1-2 week injuries
+    "Concussion": 0.15,  # ~5 day half-life (protocol-based)
+    "Hamstring": 0.08,   # ~9 day half-life
+    "Ankle": 0.10,       # ~7 day half-life
+    "Calf": 0.09,        # ~8 day half-life
+    "Quadriceps": 0.08,  # ~9 day half-life
+    "Groin": 0.07,       # ~10 day half-life
+
+    # Minor injuries (fast decay)
+    "Rest": 0.50,        # ~1.4 day half-life
+    "Illness": 0.40,     # ~1.7 day half-life
+    "Personal": 0.60,    # ~1.2 day half-life
+
+    # Default for unknown injuries
+    "Default": 0.05,     # ~14 day half-life
+}
 
 
 @dataclass
@@ -75,9 +106,25 @@ class TeamSemanticState:
     # Public perception
     public_overreaction_score: float = 0.0  # 0-1, higher = more reactive
 
+    # =========================================================================
+    # TEMPORAL DYNAMICS FEATURES (ODE-inspired)
+    # =========================================================================
+    # Injury dynamics: dI/dt = -λ*I + S(t) where λ varies by injury type
+    injury_impact_decay: float = 0.0       # Σ(severity × e^(-λ×days)) integrated
+    injury_velocity: float = 0.0           # d(impact)/dt - rate of injury change
+    recovery_momentum: float = 0.0         # Players returning from injury
+
+    # Sentiment dynamics: dσ/dt = α*(news) - β*σ (damped oscillator)
+    sentiment_velocity: float = 0.0        # dσ/dt - first derivative
+    sentiment_acceleration: float = 0.0   # d²σ/dt² - second derivative
+
+    # Media attention decay
+    media_half_life: float = 0.0           # Days since peak media coverage
+
     def to_feature_dict(self, prefix: str = "") -> dict[str, float]:
         """Convert to feature dictionary with optional prefix."""
         return {
+            # Original 11 features
             f"{prefix}sentiment_24h": self.sentiment_24h,
             f"{prefix}sentiment_7d_trend": self.sentiment_7d_trend,
             f"{prefix}sentiment_confidence": self.sentiment_confidence,
@@ -89,6 +136,13 @@ class TeamSemanticState:
             f"{prefix}coaching_change": float(self.coaching_change_detected),
             f"{prefix}scheme_mentions": float(self.scheme_mention_count),
             f"{prefix}public_overreaction": self.public_overreaction_score,
+            # Temporal dynamics (6 new features per team = 12 total)
+            f"{prefix}injury_impact_decay": self.injury_impact_decay,
+            f"{prefix}injury_velocity": self.injury_velocity,
+            f"{prefix}recovery_momentum": self.recovery_momentum,
+            f"{prefix}sentiment_velocity": self.sentiment_velocity,
+            f"{prefix}sentiment_acceleration": self.sentiment_acceleration,
+            f"{prefix}media_half_life": self.media_half_life,
         }
 
 
@@ -99,7 +153,9 @@ class SemanticFeatureExtractor:
     Combines news sentiment, social media signals, and LLM-derived
     insights into features for the betting model ensemble.
 
-    Features per team (11 each, 22 total + 4 matchup):
+    Features per team (17 each, 34 total + 4 matchup = 38 total):
+
+    Original features (11):
     - sentiment_24h: Weighted sentiment from last 24h
     - sentiment_7d_trend: Sentiment trend direction
     - sentiment_confidence: LLM confidence in sentiment
@@ -112,6 +168,14 @@ class SemanticFeatureExtractor:
     - scheme_mentions: Count of scheme-related news
     - public_overreaction: Overreaction indicator (0-1)
 
+    Temporal dynamics features (6, ODE-inspired):
+    - injury_impact_decay: Σ(severity × e^(-λ×days)) with injury-specific λ
+    - injury_velocity: d(impact)/dt, rate of injury situation change
+    - recovery_momentum: Players returning from injury
+    - sentiment_velocity: dσ/dt, first derivative of sentiment
+    - sentiment_acceleration: d²σ/dt², second derivative of sentiment
+    - media_half_life: Days since peak media attention
+
     Matchup features (4):
     - sentiment_differential: home - away sentiment
     - injury_advantage: home vs away injury severity
@@ -119,7 +183,7 @@ class SemanticFeatureExtractor:
     - narrative_momentum: combined narrative direction
     """
 
-    FEATURE_COUNT = 26  # 11 per team + 4 matchup
+    FEATURE_COUNT = 38  # 17 per team (11 original + 6 temporal) + 4 matchup
 
     def __init__(
         self,
@@ -188,6 +252,179 @@ class SemanticFeatureExtractor:
                 logger.warning(f"Failed to initialize social ingester: {e}")
         return self._social_ingester
 
+    # =========================================================================
+    # TEMPORAL DYNAMICS COMPUTATION (ODE-Inspired)
+    # =========================================================================
+
+    def _get_decay_rate(self, injury_type: str) -> float:
+        """
+        Get injury-specific decay rate (λ) for exponential decay.
+
+        Args:
+            injury_type: Injury type string from database
+
+        Returns:
+            Decay rate λ (per day), where half-life = ln(2)/λ
+        """
+        if not injury_type:
+            return INJURY_DECAY_RATES["Default"]
+
+        injury_upper = injury_type.upper()
+        for key, rate in INJURY_DECAY_RATES.items():
+            if key.upper() in injury_upper:
+                return rate
+
+        return INJURY_DECAY_RATES["Default"]
+
+    def _compute_injury_decay(
+        self,
+        injuries: list,
+        as_of: datetime,
+    ) -> tuple[float, float, float]:
+        """
+        Compute exponentially decayed injury impact using first-order ODE.
+
+        Solves: dI/dt = -λ*I + S(t)
+        Where:
+          - I(t) = total injury impact at time t
+          - λ = injury-specific healing rate
+          - S(t) = shock function (new injuries)
+
+        The solution is: I(t) = Σ(severity × e^(-λ×days_since))
+
+        Args:
+            injuries: List of InjuryItem objects with severity_score and updated_at
+            as_of: Reference time for decay calculation
+
+        Returns:
+            Tuple of (total_decay_impact, injury_velocity, recovery_momentum)
+            - total_decay_impact: Σ(severity × e^(-λ×days))
+            - injury_velocity: d(impact)/dt using 7-day lookback
+            - recovery_momentum: Rate of players recovering (returning)
+        """
+        if not injuries:
+            return (0.0, 0.0, 0.0)
+
+        total_impact = 0.0
+        impact_7d_ago = 0.0
+        recovering_count = 0
+
+        for injury in injuries:
+            # Get severity (default to 0.5 if not scored)
+            severity = injury.severity_score if injury.severity_score is not None else 0.5
+
+            # Calculate days since injury update
+            if injury.updated_at:
+                delta = as_of - injury.updated_at
+                days_old = max(0, delta.total_seconds() / 86400)
+            else:
+                days_old = 7  # Default if no timestamp
+
+            # Get decay rate for this injury type
+            λ = self._get_decay_rate(injury.injury_type)
+
+            # Apply exponential decay: I(t) = I₀ × e^(-λt)
+            decayed_impact = severity * math.exp(-λ * days_old)
+            total_impact += decayed_impact
+
+            # Calculate what impact would be 7 days ago for velocity
+            days_old_7 = days_old + 7
+            impact_7d_ago += severity * math.exp(-λ * days_old_7)
+
+            # Count players in recovery status (Questionable/Probable moving to Active)
+            if injury.status in ("Questionable", "Probable"):
+                recovering_count += 1
+
+        # Normalize impacts
+        total_impact = min(1.0, total_impact / 5.0)  # Cap at 5 severe injuries
+        impact_7d_ago = min(1.0, impact_7d_ago / 5.0)
+
+        # Velocity: d(impact)/dt ≈ (current - 7d_ago) / 7
+        injury_velocity = (total_impact - impact_7d_ago) / 7.0
+
+        # Recovery momentum: fraction of roster potentially returning
+        recovery_momentum = min(1.0, recovering_count / 10.0)
+
+        return (
+            round(total_impact, 4),
+            round(injury_velocity, 4),
+            round(recovery_momentum, 4),
+        )
+
+    def _compute_sentiment_derivatives(
+        self,
+        team: str,
+        as_of: datetime,
+    ) -> tuple[float, float, float]:
+        """
+        Compute sentiment velocity and acceleration using finite differences.
+
+        Models sentiment as damped oscillator: dσ/dt = α*(news) - β*σ
+        Uses central difference for derivatives:
+          - velocity: dσ/dt ≈ (σ(t+h) - σ(t-h)) / 2h
+          - acceleration: d²σ/dt² ≈ (σ(t+h) - 2σ(t) + σ(t-h)) / h²
+
+        Args:
+            team: Team abbreviation
+            as_of: Reference time for calculation
+
+        Returns:
+            Tuple of (sentiment_velocity, sentiment_acceleration, media_half_life)
+            - sentiment_velocity: dσ/dt (rate of sentiment change)
+            - sentiment_acceleration: d²σ/dt² (momentum of change)
+            - media_half_life: Days since peak media attention
+        """
+        repository = self._get_repository()
+        if not repository:
+            return (0.0, 0.0, 0.0)
+
+        try:
+            # Get daily sentiment values for past 7 days
+            timeseries = repository.get_sentiment_timeseries(
+                team=team,
+                before=as_of,
+                points=7,
+            )
+
+            if len(timeseries) < 3:
+                # Not enough data for derivatives
+                return (0.0, 0.0, 0.0)
+
+            # Sort by date (oldest to newest for derivative calculation)
+            timeseries_sorted = sorted(timeseries, key=lambda x: x[0])
+            sentiments = [s for _, s in timeseries_sorted]
+
+            # Central difference for velocity (use most recent 3 points)
+            # dσ/dt ≈ (σ(t) - σ(t-2h)) / 2h where h = 1 day
+            if len(sentiments) >= 3:
+                velocity = (sentiments[-1] - sentiments[-3]) / 2.0
+            else:
+                velocity = sentiments[-1] - sentiments[0]
+
+            # Central difference for acceleration
+            # d²σ/dt² ≈ (σ(t) - 2σ(t-h) + σ(t-2h)) / h²
+            if len(sentiments) >= 3:
+                acceleration = sentiments[-1] - 2 * sentiments[-2] + sentiments[-3]
+            else:
+                acceleration = 0.0
+
+            # Media half-life: find peak and calculate days since
+            max_idx = sentiments.index(max(sentiments, key=abs))
+            days_since_peak = len(sentiments) - 1 - max_idx
+
+            # Normalize to 0-1 scale (7 days = 1.0)
+            media_half_life = min(1.0, days_since_peak / 7.0)
+
+            return (
+                round(velocity, 4),
+                round(acceleration, 4),
+                round(media_half_life, 4),
+            )
+
+        except Exception as e:
+            logger.warning(f"Failed to compute sentiment derivatives for {team}: {e}")
+            return (0.0, 0.0, 0.0)
+
     def extract_features(
         self,
         home_team: str,
@@ -210,21 +447,21 @@ class SemanticFeatureExtractor:
                    If None, uses current time (for live predictions)
 
         Returns:
-            Dictionary with 26 semantic features
+            Dictionary with 38 semantic features (17 per team + 4 matchup)
         """
         cache_key = f"{home_team}_{away_team}_{season}_{week}"
 
         # Check cache
         if use_cache and cache_key in self._cache:
             cached_time, cached_features = self._cache[cache_key]
-            if (datetime.now() - cached_time).seconds < self.config.cache_ttl:
+            if (datetime.now(timezone.utc) - cached_time).seconds < self.config.cache_ttl:
                 logger.debug(f"Using cached semantic features for {cache_key}")
                 return cached_features
 
         start_time = time.time()
 
-        # Use current time if as_of not specified
-        query_time = as_of or datetime.now()
+        # Use current time if as_of not specified (timezone-aware for DB compat)
+        query_time = as_of or datetime.now(timezone.utc)
 
         # Extract team-level semantic states
         home_state = self._extract_team_state(home_team, as_of=query_time)
@@ -255,7 +492,7 @@ class SemanticFeatureExtractor:
         )
 
         # Cache results
-        self._cache[cache_key] = (datetime.now(), features)
+        self._cache[cache_key] = (datetime.now(timezone.utc), features)
 
         elapsed = (time.time() - start_time) * 1000
         logger.info(f"Extracted {len(features)} semantic features in {elapsed:.1f}ms")
@@ -277,7 +514,7 @@ class SemanticFeatureExtractor:
         Returns:
             TeamSemanticState with all features populated
         """
-        query_time = as_of or datetime.now()
+        query_time = as_of or datetime.now(timezone.utc)
         state = TeamSemanticState(team=team, timestamp=query_time)
 
         # Try database first (preferred for temporal safety)
@@ -336,6 +573,37 @@ class SemanticFeatureExtractor:
                     )
                     state.injury_severity_llm = min(1.0, total_severity / 5.0)
                     state.key_player_risk = min(1.0, len(injuries) / 20.0)
+
+                # =========================================================
+                # TEMPORAL DYNAMICS (ODE-inspired features)
+                # =========================================================
+
+                # Get injury history for temporal decay calculation
+                injury_history = repository.get_injury_history(
+                    team=team,
+                    before=query_time,
+                    days=14,  # 2-week lookback for decay
+                )
+
+                # Compute injury decay, velocity, and recovery momentum
+                (
+                    state.injury_impact_decay,
+                    state.injury_velocity,
+                    state.recovery_momentum,
+                ) = self._compute_injury_decay(injury_history, query_time)
+
+                # Compute sentiment derivatives (velocity, acceleration)
+                (
+                    state.sentiment_velocity,
+                    state.sentiment_acceleration,
+                    state.media_half_life,
+                ) = self._compute_sentiment_derivatives(team, query_time)
+
+                logger.debug(
+                    f"Temporal dynamics for {team}: "
+                    f"injury_decay={state.injury_impact_decay:.3f}, "
+                    f"sentiment_vel={state.sentiment_velocity:.3f}"
+                )
 
                 return state
 
@@ -460,8 +728,10 @@ class SemanticFeatureExtractor:
         return state
 
     def get_feature_names(self) -> list[str]:
-        """Get list of all semantic feature names."""
+        """Get list of all semantic feature names (38 total)."""
         prefixes = ["home_", "away_"]
+
+        # Original 11 features per team
         team_features = [
             "sentiment_24h", "sentiment_7d_trend", "sentiment_confidence",
             "injury_mentions", "injury_severity_llm", "key_player_risk",
@@ -469,12 +739,22 @@ class SemanticFeatureExtractor:
             "scheme_mentions", "public_overreaction",
         ]
 
+        # Temporal dynamics features (6 per team, ODE-inspired)
+        temporal_features = [
+            "injury_impact_decay",     # Σ(severity × e^(-λ×days))
+            "injury_velocity",         # d(impact)/dt
+            "recovery_momentum",       # Players returning
+            "sentiment_velocity",      # dσ/dt
+            "sentiment_acceleration",  # d²σ/dt²
+            "media_half_life",         # Days since peak attention
+        ]
+
         names = []
         for prefix in prefixes:
-            for feat in team_features:
+            for feat in team_features + temporal_features:
                 names.append(f"{prefix}{feat}")
 
-        # Matchup features
+        # Matchup features (4)
         names.extend([
             "sentiment_differential",
             "injury_advantage",
