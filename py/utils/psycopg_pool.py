@@ -39,7 +39,7 @@ from contextlib import contextmanager
 
 try:
     import psycopg
-    from psycopg import pool
+    from psycopg_pool import ConnectionPool
 
     PSYCOPG_VERSION = 3
 except ImportError:
@@ -108,7 +108,7 @@ class Psycopg3PoolManager:
 
         # Initialize connection pool
         try:
-            self.pool = pool.ConnectionPool(
+            self.pool = ConnectionPool(
                 self.conninfo,
                 min_size=min_size,
                 max_size=max_size,
