@@ -404,5 +404,80 @@
         "production-ready"
       ]
     }
+  ],
+  "game_outcome_model_v2": [
+    {
+      "name": "game_outcome_model_v2",
+      "version": "v2.0.0",
+      "created_at": "2025-12-23T09:33:54.482484",
+      "author": "Claude Code",
+      "description": "Game Outcome Model v2 with 382 features including 38 semantic LLM-derived features. Trained on 2022-2024 data. A/B test vs v1 showed +4.6% win accuracy improvement with semantic features. SHAP analysis shows sem_away_media_buzz_volume in top 50 features.",
+      "metrics": {
+        "spread_mae": 10.45,
+        "spread_rmse": 13.54,
+        "total_mae": 10.08,
+        "total_rmse": 13.10,
+        "win_prob_auc": 0.691,
+        "win_prob_accuracy": 0.629,
+        "feature_count": 382,
+        "semantic_feature_count": 38,
+        "ab_test_win_accuracy_lift": 0.046
+      },
+      "artifacts": {
+        "spread_model": "models/staging/game_outcome_v2/spread_model.json",
+        "total_model": "models/staging/game_outcome_v2/total_model.json",
+        "win_prob_model": "models/staging/game_outcome_v2/win_prob_model.json",
+        "metadata": "models/staging/game_outcome_v2/metadata.json",
+        "feature_names": "models/staging/game_outcome_v2/feature_names.json",
+        "shap_values": "models/staging/game_outcome_v2/shap_values.pkl"
+      },
+      "parent_version": "v1.0.0",
+      "status": "staging",
+      "tags": [
+        "game-level",
+        "xgboost",
+        "semantic-features",
+        "llm-derived",
+        "multi-output",
+        "ab-tested"
+      ]
+    }
+  ],
+  "xgboost_v4_ridge_residuals_validation": [
+    {
+      "name": "xgboost_v4_ridge_residuals_validation",
+      "version": "v4.1.0-validation",
+      "created_at": "2025-12-23T10:12:08.000000",
+      "author": "Claude Code",
+      "description": "DEFINITIVE VALIDATION of XGBoost v4 Ridge Residuals after fixing target leakage. The original 4.27 MAE was entirely fake - residual_feature (actual - ridge_pred) was used as input, allowing model to memorize answers. FIXED model removes residual from input; XGBoost predicts residuals from player features only. RESULT: Fixed MAE = 59.14 yards, 47% WORSE than 40.20 baseline. Ridge R²=0.006 shows opponent features explain almost nothing. CONCLUSION: XGBoost v4 Ridge should remain permanently DISABLED.",
+      "metrics": {
+        "original_claimed_mae": 4.27,
+        "fixed_mae": 59.14,
+        "baseline_mae": 40.20,
+        "improvement_vs_baseline": -18.94,
+        "improvement_pct": -47.12,
+        "ridge_r2": 0.0061,
+        "ridge_only_mae": 59.87,
+        "train_residual_std": 82.78,
+        "test_residual_std": 75.90,
+        "train_games": 4130,
+        "train_seasons": "2018-2024",
+        "test_season": 2025
+      },
+      "artifacts": {
+        "validation_script": "scripts/xgb_exp7_fixed_leakage.py",
+        "output_log": "/tmp/xgb_fixed_leakage_output.log"
+      },
+      "parent_version": "v4.0.0",
+      "status": "disabled",
+      "tags": [
+        "validation",
+        "leakage-fix",
+        "disabled",
+        "ridge-residuals",
+        "failed-gate"
+      ],
+      "notes": "Decision gate MAE < 38 FAILED. Do not re-enable without fundamentally different approach."
+    }
   ]
 }
