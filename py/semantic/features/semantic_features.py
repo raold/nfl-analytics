@@ -125,6 +125,7 @@ class SemanticFeatureExtractor:
         self,
         config: SemanticFeatureConfig | None = None,
         inference_client: Any | None = None,
+        repository: Any | None = None,
     ):
         """
         Initialize semantic feature extractor.
@@ -132,14 +133,27 @@ class SemanticFeatureExtractor:
         Args:
             config: Feature extraction configuration
             inference_client: SemanticInferenceClient instance
+            repository: SemanticRepository for database access (preferred)
         """
         self.config = config or SemanticFeatureConfig()
         self._inference = inference_client
         self._cache: dict[str, tuple[datetime, dict]] = {}
 
-        # Lazy-load components
+        # Database repository (preferred) or legacy ingesters
+        self._repository = repository
         self._news_ingester = None
         self._social_ingester = None
+
+    def _get_repository(self):
+        """Lazy-load database repository."""
+        if self._repository is None:
+            try:
+                from py.database.semantic_repository import SemanticRepository
+                self._repository = SemanticRepository()
+                logger.info("Using database for semantic features")
+            except Exception as e:
+                logger.warning(f"Failed to initialize repository: {e}")
+        return self._repository
 
     def _get_inference_client(self):
         """Lazy-load inference client."""
@@ -181,6 +195,7 @@ class SemanticFeatureExtractor:
         season: int,
         week: int,
         use_cache: bool = True,
+        as_of: datetime | None = None,
     ) -> dict[str, float]:
         """
         Extract all semantic features for a game matchup.
@@ -191,6 +206,8 @@ class SemanticFeatureExtractor:
             season: Season year
             week: Week number
             use_cache: Whether to use cached results
+            as_of: Extract features as of this timestamp (for temporal safety)
+                   If None, uses current time (for live predictions)
 
         Returns:
             Dictionary with 26 semantic features
@@ -206,9 +223,12 @@ class SemanticFeatureExtractor:
 
         start_time = time.time()
 
+        # Use current time if as_of not specified
+        query_time = as_of or datetime.now()
+
         # Extract team-level semantic states
-        home_state = self._extract_team_state(home_team)
-        away_state = self._extract_team_state(away_team)
+        home_state = self._extract_team_state(home_team, as_of=query_time)
+        away_state = self._extract_team_state(away_team, as_of=query_time)
 
         # Build feature dictionary
         features = {}
@@ -242,19 +262,87 @@ class SemanticFeatureExtractor:
 
         return features
 
-    def _extract_team_state(self, team: str) -> TeamSemanticState:
+    def _extract_team_state(
+        self,
+        team: str,
+        as_of: datetime | None = None,
+    ) -> TeamSemanticState:
         """
         Extract semantic state for a single team.
 
         Args:
             team: Team abbreviation
+            as_of: Only use data published BEFORE this time (temporal safety)
 
         Returns:
             TeamSemanticState with all features populated
         """
-        state = TeamSemanticState(team=team, timestamp=datetime.now())
+        query_time = as_of or datetime.now()
+        state = TeamSemanticState(team=team, timestamp=query_time)
 
-        # Get news for team
+        # Try database first (preferred for temporal safety)
+        repository = self._get_repository()
+        if repository:
+            try:
+                # Get news from database (temporal-safe query)
+                news_items = repository.get_recent_news(
+                    team=team,
+                    before=query_time,
+                    hours=self.config.news_lookback_hours,
+                    limit=20,
+                )
+
+                if news_items:
+                    # Count injury mentions
+                    state.injury_mentions = sum(
+                        1 for n in news_items
+                        if n.category == "injury"
+                    )
+
+                    # Calculate media buzz (normalized by expected volume)
+                    state.media_buzz_volume = min(1.0, len(news_items) / 20.0)
+
+                    # Detect coaching changes
+                    state.coaching_change_detected = any(
+                        n.category == "coaching" for n in news_items
+                    )
+
+                    # Calculate scheme mentions
+                    state.scheme_mention_count = sum(
+                        1 for n in news_items
+                        if "scheme" in n.title.lower() or "playbook" in n.title.lower()
+                    )
+
+                    logger.debug(f"Got {len(news_items)} news items for {team} from database")
+
+                # Get sentiment from database
+                sentiment = repository.get_team_sentiment(
+                    team=team,
+                    before=query_time,
+                    hours=24,
+                )
+                if sentiment:
+                    state.sentiment_24h = sentiment.sentiment
+                    state.sentiment_confidence = sentiment.confidence
+                    logger.debug(f"Got sentiment {sentiment.sentiment:.2f} for {team}")
+
+                # Get injuries from database
+                injuries = repository.get_team_injuries(team=team, before=query_time)
+                if injuries:
+                    # Calculate injury severity based on status
+                    severity_map = {"Out": 1.0, "IR": 1.0, "Doubtful": 0.8, "Questionable": 0.4}
+                    total_severity = sum(
+                        severity_map.get(inj.status, 0.2) for inj in injuries[:10]
+                    )
+                    state.injury_severity_llm = min(1.0, total_severity / 5.0)
+                    state.key_player_risk = min(1.0, len(injuries) / 20.0)
+
+                return state
+
+            except Exception as e:
+                logger.warning(f"Database query failed for {team}, falling back: {e}")
+
+        # Fallback to legacy live sources (if database unavailable)
         news_ingester = self._get_news_ingester()
         if news_ingester:
             try:
@@ -287,7 +375,7 @@ class SemanticFeatureExtractor:
             except Exception as e:
                 logger.warning(f"Failed to fetch news for {team}: {e}")
 
-        # Get social signals
+        # Get social signals (legacy fallback)
         social_ingester = self._get_social_ingester()
         if social_ingester:
             try:
