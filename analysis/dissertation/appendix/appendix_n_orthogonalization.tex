@@ -1142,5 +1142,68 @@ This case study demonstrates critical validation principles:
   \item \textbf{Document failures honestly.} This appendix preserves the flawed results (Section~\ref{sec:multiseas-validation}) alongside corrected results (Table~\ref{tab:corrected-multiseas-validation}) to prevent future researchers from repeating the mistake.
 \end{enumerate}
 
+\subsection{December 2025 Holdout Validation: Complete Failure}
+\label{sec:dec-2025-failure}
+
+A rigorous holdout validation on 2025 season data (Weeks 1--16) revealed that even the ``corrected'' Ridge Residuals methodology \textbf{fails catastrophically} on truly out-of-sample data.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{2025 Holdout Validation: Ridge Residuals Failure}
+\label{tab:2025-holdout-failure}
+\begin{tabular}{@{}lS[table-format=2.2]l@{}}
+\toprule
+\textbf{Metric} & {\textbf{Value}} & \textbf{Notes} \\
+\midrule
+Ridge R$^2$ (Stage 1) & 0.0061 & Explains only 0.6\% variance \\
+Ridge MAE (opponent only) & 59.87 & Very poor baseline \\
+Final MAE (Ridge + XGB) & 59.14 & 47\% worse than baseline \\
+Baseline XGBoost MAE & 40.20 & Simple approach wins \\
+\midrule
+\textbf{Delta vs Baseline} & {+18.94} & \textbf{FAILURE: Method hurts predictions} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Why 2022--2024 Results Don't Generalize.}
+The corrected results (Table~\ref{tab:corrected-multiseas-validation}) showing 18\% improvement on 2022--2024 data do not generalize to 2025. Several factors explain this failure:
+
+\begin{enumerate}[itemsep=2pt,parsep=0pt]
+    \item \textbf{Ridge Stage 1 is fundamentally weak:} R$^2 = 0.006$ means opponent features explain only 0.6\% of passing yard variance. The residuals are essentially the original target with minor perturbation.
+
+    \item \textbf{Residual magnitude overwhelms XGBoost:} With residuals having standard deviation of 76--83 yards (similar to original target), XGBoost cannot learn meaningful patterns from player rolling averages.
+
+    \item \textbf{Distribution shift:} 2025 NFL dynamics (rule changes, new offensive schemes, personnel turnover) render 2022--2024 patterns non-transferable.
+
+    \item \textbf{The approach is architecturally flawed:} Two-stage residual fitting requires a strong Stage 1 model. A Ridge model that explains $< 1\%$ variance cannot provide useful residuals.
+\end{enumerate}
+
+\paragraph{Production Status Update.}
+Based on this validation failure, \textbf{XGBoost v4 Ridge Residuals is permanently DISABLED} (0\% ensemble weight). The model registry documents this decision:
+
+\begin{verbatim}
+models/registry.json:
+  "xgboost_v4_ridge_residuals": {
+    "status": "DISABLED",
+    "weight": 0.0,
+    "reason": "2025 holdout MAE 59.14 (47% worse than baseline)",
+    "disabled_date": "2025-12-17"
+  }
+\end{verbatim}
+
+\paragraph{Revised Lessons.}
+This failure adds critical lessons beyond the original leakage discovery:
+
+\begin{enumerate}[itemsep=2pt,parsep=0pt]
+    \item \textbf{Holdout validation must be truly held out:} Testing on 2022--2024 while training on 2018--2024 is not a true holdout. Only 2025 (never seen during development) exposed the real failure.
+
+    \item \textbf{R$^2$ near zero is a fatal signal:} A Stage 1 model explaining $< 1\%$ variance cannot support residual-based architectures.
+
+    \item \textbf{Multi-season improvement can be spurious:} 18\% improvement on 2022--2024 was likely due to subtle data leakage, overfitting to training distribution, or statistical noise.
+
+    \item \textbf{Decision gates prevent wasted effort:} The MAE $< 38$ decision gate (per ADR-011) immediately rejected this model, preventing integration into production.
+\end{enumerate}
+
 \paragraph{Final Note.}
-The corrected Ridge Residuals methodology provides genuine, validated improvement (18\% MAE reduction) through principled orthogonalization. The journey from 88\% (flawed) to 18\% (corrected) was painful but essential for scientific integrity. The production v6.0 ensemble uses only the corrected, validated implementation.
+The Ridge Residuals methodology was theoretically motivated (opponent-player confound removal via Gram-Schmidt orthogonalization) but \textbf{empirically failed}. The ``corrected'' 2022--2024 results (Table~\ref{tab:corrected-multiseas-validation}) should be viewed with skepticism given 2025 holdout failure. This case study now documents \textit{two} failures: the original target leakage (88\% fake improvement) and the architectural failure (corrected model 47\% worse than baseline on true holdout). The production v6.0 ensemble excludes XGBoost v4 entirely.

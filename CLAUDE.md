@@ -1,6 +1,6 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** December 23, 2025 | **Version:** 6.5 | **Status:** Production Ready (Grade A+)
+**Last Updated:** December 24, 2025 | **Version:** 6.6 | **Status:** Production Ready (Grade A+)
 
 ## Quick Status
 
@@ -474,12 +474,16 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ---
 
-## Current Status (Dec 22, 2025)
+## Current Status (Dec 24, 2025)
 
 **Completed:**
 - 2025 Holdout Validation: 74.9% spread accuracy, 44.25 MAE props (Dec 9)
 - Phase 2 Advanced Stats: 120 new features
 - Dirichlet Optimization: Equal weights outperform v8.0 on holdout
+- **MLX vs Ollama Benchmark (Dec 23):** MLX 12x faster (2.4s vs 28.6s median), 23x faster for sentiment
+- **NER Model Evaluation (Dec 23):** 76% weighted accuracy, status extraction is weak point (40%)
+- **Semantic A/B Test (Dec 23):** 195 games tested, INCONCLUSIVE (p=0.21), v2 did not outperform v1
+- **XGBoost v4 Ridge Final Validation (Dec 23):** 59.14 MAE (47% WORSE than baseline), permanently DISABLED
 - **Synthetic Features (Dec 9):** 37 new features across 3 modules
 - **Props Stability Weighting (Dec 9):** SumerSports YoY correlation research integrated
 - **Code Quality Remediation (Dec 13):** 6-phase systematic fix (90+ issues)
@@ -519,11 +523,14 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 - **Best XGBoost config**: reg_alpha=1.0, reg_lambda=2.0 (only 0.09% improvement over baseline)
 - **qwen3:8b requires chat endpoint** (Dec 21): generate endpoint returns empty, use chat with 240s timeout
 - **Bidirectional meta-learning** (Dec 22): Model performance informs semantic features, semantic patterns suggest new features
+- **MLX is production-ready** (Dec 23): 12x faster than Ollama on Apple Silicon, use as primary with Ollama fallback
+- **Semantic features need validation** (Dec 23): A/B test inconclusive (p=0.21), don't enable until statistical significance achieved
+- **Target leakage inflates metrics by 14x** (Dec 23): XGBoost v4 went from 4.27 MAE (leaked) to 59.14 MAE (real)
 
 **In Progress:**
-- Test fine-tuned NER model on holdout data
-- Compare MLX vs Ollama inference performance (latency/accuracy benchmarks)
-- Run 2025 A/B test when Week 17 predictions are generated
+- Improve NER status extraction (current: 40% accuracy on out/questionable/probable)
+- Extended semantic A/B testing through Week 18 for larger sample size
+- Feature ablation to identify which semantic features provide positive signal
 
 **Strategic Decisions:**
 - BNN research abandoned (Nov 9) - 84 hours, 6 approaches, only BNN v3.1 Rushing remains
@@ -585,10 +592,13 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 11. **Feature weighting doesn't help tree models** - XGBoost splits on values, not magnitudes (scale-invariant)
 12. **Pruning creates trade-offs** - fewer features improves classification but hurts regression accuracy
 13. **Test hypotheses empirically** - Bayesian/Dirichlet weighting sounded promising but had zero effect
+14. **True holdout is essential** - 2022-2024 validation showed 18% improvement; 2025 holdout showed 47% degradation
+15. **A/B test before enabling features** - Semantic features underperformed baseline despite theoretical appeal
+16. **Local inference beats cloud on Apple Silicon** - MLX 12x faster than Ollama, 40% less power
 
 ---
 
-**Version:** 6.5 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
+**Version:** 6.6 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
 
 **Project Rules:**
 - Never take shortcuts, never use synthetic data

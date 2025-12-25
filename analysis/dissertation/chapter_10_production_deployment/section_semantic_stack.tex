@@ -293,6 +293,67 @@ With \$50--100/month API budget:
     \item Claude API: $\sim$\$25/month for complex reasoning validation
 \end{itemize}
 
+\subsection{Empirical Validation: MLX vs Ollama Benchmark}
+\label{sec:mlx-ollama-benchmark}
+
+A comprehensive benchmark (December 2025) compared inference performance on Apple M4 Silicon across three task types: injury assessment, sentiment analysis, and named entity recognition. Results strongly favor MLX for production deployment.
+
+\begin{table}[htbp]
+\centering
+\caption{MLX vs Ollama Inference Benchmark on Mac M4}
+\label{tab:mlx-benchmark}
+\small
+\begin{tabular}{@{} l S[table-format=5.0] S[table-format=4.0] S[table-format=2.1] @{}}
+\toprule
+\textbf{Metric} & {\textbf{Ollama (ms)}} & {\textbf{MLX (ms)}} & {\textbf{Speedup}} \\
+\midrule
+Median (p50) & 28627 & 2379 & 12.0 \\
+Mean & 31060 & 3323 & 9.3 \\
+p95 & 62656 & 7996 & 7.8 \\
+Min & 14197 & 536 & 26.5 \\
+Max & 62656 & 7996 & 7.8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Task-Specific Performance.}
+Sentiment analysis showed the most dramatic improvement, with MLX achieving 23$\times$ faster median latency (723ms vs 16,783ms). NER tasks showed 7.6$\times$ improvement (3,926ms vs 29,719ms). Despite latency differences, throughput remained similar ($\sim$17 tokens/second) due to MLX's batch optimization versus Ollama's streaming approach.
+
+\paragraph{Resource Efficiency.}
+MLX consumed approximately 40\% less power (8--12W vs 15--20W) and 33\% less memory (4GB vs 6GB) while achieving superior latency. This efficiency stems from Metal GPU optimization specifically targeting Apple Silicon's unified memory architecture.
+
+\paragraph{Production Recommendation.}
+Based on these results, MLX (Qwen2.5-7B-Instruct-4bit) is designated the primary inference backend for Mac deployments, with Ollama retained as cross-platform fallback for CI/CD environments running on Linux.
+
+\subsection{NER Model Evaluation}
+\label{sec:ner-evaluation}
+
+The fine-tuned NER model (\texttt{nfl-ner:latest}) was evaluated on a held-out test set of 20 injury report sentences. Overall weighted accuracy reached 76\%, with significant variation across entity types.
+
+\begin{table}[htbp]
+\centering
+\caption{NER Model Performance by Entity Type}
+\label{tab:ner-accuracy}
+\small
+\begin{tabular}{@{} l l S[table-format=2.0] @{}}
+\toprule
+\textbf{Entity Type} & \textbf{Performance} & {\textbf{Accuracy (\%)}} \\
+\midrule
+Player Name & Strong & 95 \\
+Team & Strong & 95 \\
+Position & Strong & 90 \\
+Injury Type & Moderate & 80 \\
+\textbf{Status (out/questionable)} & \textbf{Weak} & \textbf{40} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Status Extraction as Bottleneck.}
+The model reliably extracts player names, teams, and injury types, but struggles with injury status classification (out, questionable, probable, doubtful). In 4 of 5 holdout cases, the model extracted entities like ``ankle injury'' but missed the critical ``questionable'' status. This limitation impacts the accuracy of the \texttt{injury\_severity\_llm} feature.
+
+\paragraph{Implications.}
+Status extraction accuracy is a priority for Phase 2 fine-tuning. Current mitigation: weight injury-related semantic features conservatively in ensemble integration until status extraction improves.
+
 \subsection{Chapter Summary}
 
 The Semantic Stack represents a systematic approach to integrating LLM capabilities into production sports analytics. Key innovations:
@@ -306,11 +367,47 @@ The Semantic Stack represents a systematic approach to integrating LLM capabilit
 
 This work extends the 11-agent infrastructure (Section~\ref{sec:agent-infrastructure}) with LLM-powered semantic understanding, targeting the +1.5--2.5\% win rate uplift necessary to move from marginal profitability to consistent returns.
 
+\subsection{A/B Testing: Semantic Features on 2025 Holdout}
+\label{sec:semantic-ab-test}
+
+A rigorous A/B test compared spread prediction accuracy with and without semantic features using the 2025 holdout dataset (195 games, Weeks 1--14). Results were \textbf{inconclusive}.
+
+\begin{table}[htbp]
+\centering
+\caption{Semantic Features A/B Test Results (2025 Holdout)}
+\label{tab:semantic-ab-test}
+\small
+\begin{tabular}{@{} l S[table-format=2.1] S[table-format=2.1] @{}}
+\toprule
+\textbf{Model} & {\textbf{Spread Accuracy (\%)}} & {\textbf{Spread MAE}} \\
+\midrule
+Control (no semantic, v1) & 58.5 & 10.2 \\
+Treatment (with semantic, v2) & 51.8 & 10.8 \\
+\midrule
+\textbf{Difference} & {-6.7} & {+0.6} \\
+\textbf{McNemar p-value} & \multicolumn{2}{c}{0.21 (not significant)} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Interpretation.}
+The semantic-enhanced model (v2) underperformed the baseline on this holdout set, though the difference was not statistically significant ($p = 0.21$, McNemar test). Several explanations warrant investigation:
+
+\begin{enumerate}[itemsep=2pt,parsep=0pt]
+    \item \textbf{Feature engineering quality:} NER status extraction weakness (Section~\ref{sec:ner-evaluation}) may inject noise into injury severity features
+    \item \textbf{Distribution shift:} 2025 data patterns may differ from 2022--2024 training distribution
+    \item \textbf{Signal dilution:} 26 additional features may overwhelm rather than complement quantitative signals
+    \item \textbf{Sample size:} 195 games may be insufficient to detect a 1--2\% true effect size
+\end{enumerate}
+
+\paragraph{Lessons Learned.}
+This result validates the importance of rigorous A/B testing before production deployment. Had semantic features been enabled based solely on theoretical appeal or training set performance, they would have degraded 2025 predictions. The negative result is documented here in the spirit of ``honest failure accounting'' (Section~\ref{sec:honest-failures}), which argues that null or negative results are essential for building credible research.
+
 \paragraph{Future Work.}
-Phase 2 priorities include:
+Phase 2 priorities, informed by empirical validation:
 \begin{itemize}[itemsep=2pt,parsep=0pt]
-    \item RAG integration for historical context retrieval
-    \item A/B testing semantic features on 2025 holdout
-    \item Fine-tuned NER model validation
-    \item MLX vs Ollama performance benchmarking
+    \item \textbf{RAG integration:} Historical context retrieval for situational awareness
+    \item \textbf{NER status improvement:} Additional training data focused on status extraction (out/questionable/probable)
+    \item \textbf{Feature ablation:} Identify which semantic features (if any) provide positive signal
+    \item \textbf{Extended A/B testing:} Continue monitoring through 2025 Week 18 for larger sample size
 \end{itemize}
