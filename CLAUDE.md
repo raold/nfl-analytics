@@ -474,9 +474,24 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ---
 
-## Current Status (Dec 24, 2025)
+## Current Status (Dec 28, 2025)
 
 **Completed:**
+- **True SHAP Implementation (Dec 28, H2):** Replaced heuristic attribution with TreeExplainer
+  - `semantic_attribution.py` now uses `shap.TreeExplainer` on production XGBoost models
+  - Computes real Shapley values for 38 semantic features (`sem_*` prefix)
+  - Graceful fallback to heuristic when SHAP unavailable
+  - Enables accurate feature importance measurement for semantic pipeline
+- **NER STATUS Extraction Fix (Dec 28, H4):** Fixed train-test mismatch in NER system prompt
+  - Root cause: Training data had STATUS labels but inference prompt didn't list STATUS category
+  - Added STATUS to system prompt with valid values: out, doubtful, questionable, probable
+  - **Validation: 0%→100% STATUS extraction** (exceeds 70% target)
+  - File: `py/semantic/models/inference.py:56-60`
+- **Rest Differential & BTB Detection (Dec 28):** Fixed `rest_differential=0` placeholder in game_feature_extractor.py
+  - 7 new features: rest_differential, home/away_days_rest, is_home/away_short_week, is_home/away_long_week
+  - **Strong 2025 signal**: Home +3 days rest = 69.2% cover, Away +3 days = 44.4% (25 point swing!)
+  - r=0.146 correlation with ATS outcome (meaningful for sports betting)
+  - Total features now 348 (305 base + 37 synthetic + 6 rest/BTB)
 - 2025 Holdout Validation: 74.9% spread accuracy, 44.25 MAE props (Dec 9)
 - Phase 2 Advanced Stats: 120 new features
 - Dirichlet Optimization: Equal weights outperform v8.0 on holdout
@@ -528,9 +543,9 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 - **Target leakage inflates metrics by 14x** (Dec 23): XGBoost v4 went from 4.27 MAE (leaked) to 59.14 MAE (real)
 
 **In Progress:**
-- Improve NER status extraction (current: 40% accuracy on out/questionable/probable)
 - Extended semantic A/B testing through Week 18 for larger sample size
 - Feature ablation to identify which semantic features provide positive signal
+- Spoke 1 Research: Kalman Filter on EPA trends, GP injury recovery curves (Week 2-3)
 
 **Strategic Decisions:**
 - BNN research abandoned (Nov 9) - 84 hours, 6 approaches, only BNN v3.1 Rushing remains

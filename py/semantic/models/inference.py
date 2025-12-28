@@ -54,7 +54,8 @@ class InferenceResult:
 # System prompts for different tasks
 SYSTEM_PROMPTS = {
     "ner": """You are an NFL entity extraction expert. Extract entities from the text in JSON format.
-Categories: PLAYER, TEAM, INJURY, DATE, GAME, COACH, POSITION
+Categories: PLAYER, TEAM, POSITION, INJURY, STATUS, DATE, GAME, COACH
+STATUS values are: out, doubtful, questionable, probable (injury availability designations)
 Output format: {"entities": [{"text": "...", "type": "...", "confidence": 0.0-1.0}]}
 Be precise and only extract clearly mentioned entities.""",
     "sentiment": """You are an NFL sentiment analyst. Analyze the sentiment of news about NFL teams and players.
@@ -143,7 +144,8 @@ class SemanticInferenceClient:
         Returns:
             Dict with entities list
         """
-        prompt = f"Extract entities from the following NFL text:\n\n{text}"
+        # Match training data prompt format exactly
+        prompt = f"Extract NFL entities from the following text:\n\n{text}"
         result = self._generate(
             prompt=prompt,
             system=SYSTEM_PROMPTS["ner"],

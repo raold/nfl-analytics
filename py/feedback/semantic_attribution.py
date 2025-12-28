@@ -2,7 +2,10 @@
 Semantic Feature Attribution Tracker.
 
 Tracks which semantic features contributed to correct/incorrect predictions
-using SHAP-like attribution analysis.
+using TRUE SHAP (TreeExplainer) attribution analysis.
+
+Updated Dec 28, 2025: Replaced heuristic attribution with actual SHAP values
+from XGBoost TreeExplainer for accurate feature importance measurement.
 
 Usage:
     tracker = SemanticAttributionTracker()
@@ -11,6 +14,7 @@ Usage:
 
 import json
 import logging
+import pickle
 import sys
 from pathlib import Path
 
@@ -26,6 +30,13 @@ import numpy as np
 import pandas as pd
 import psycopg2
 from psycopg2.extras import RealDictCursor, execute_values
+
+try:
+    import shap
+    import xgboost as xgb
+    SHAP_AVAILABLE = True
+except ImportError:
+    SHAP_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +70,9 @@ class SemanticAttributionTracker:
     # Semantic feature prefixes
     SEMANTIC_PREFIX = "sem_"
 
+    # Production model directory
+    PRODUCTION_MODEL_DIR = Path(__file__).parent.parent.parent / "models" / "production" / "game_outcome_v2"
+
     def __init__(
         self,
         host: str = "localhost",
@@ -66,8 +80,15 @@ class SemanticAttributionTracker:
         database: str = "devdb01",
         user: str = "dro",
         password: str = "sicillionbillions",
+        use_true_shap: bool = True,
     ):
-        """Initialize with database connection parameters."""
+        """
+        Initialize with database connection parameters.
+
+        Args:
+            use_true_shap: If True, use TreeExplainer for real SHAP values.
+                          If False or SHAP unavailable, use heuristic fallback.
+        """
         self.conn_params = {
             "host": host,
             "port": port,
@@ -75,6 +96,55 @@ class SemanticAttributionTracker:
             "user": user,
             "password": password,
         }
+        self.use_true_shap = use_true_shap and SHAP_AVAILABLE
+        self._models_loaded = False
+        self._spread_model = None
+        self._spread_explainer = None
+        self._feature_names = None
+        self._feature_scaler = None
+
+        if self.use_true_shap:
+            self._load_production_models()
+
+    def _load_production_models(self) -> bool:
+        """
+        Load production XGBoost models and create SHAP TreeExplainer.
+
+        Returns:
+            True if models loaded successfully, False otherwise.
+        """
+        if self._models_loaded:
+            return True
+
+        try:
+            # Load spread model (primary for attribution)
+            spread_path = self.PRODUCTION_MODEL_DIR / "spread_model.json"
+            if not spread_path.exists():
+                logger.warning(f"Spread model not found: {spread_path}")
+                return False
+
+            self._spread_model = xgb.XGBRegressor()
+            self._spread_model.load_model(str(spread_path))
+
+            # Load feature names
+            feature_names_path = self.PRODUCTION_MODEL_DIR / "feature_names.json"
+            if feature_names_path.exists():
+                with open(feature_names_path) as f:
+                    self._feature_names = json.load(f)
+            else:
+                logger.warning("Feature names not found")
+
+            # Create TreeExplainer (fast for tree models)
+            self._spread_explainer = shap.TreeExplainer(self._spread_model)
+
+            self._models_loaded = True
+            logger.info(f"Loaded production model with {len(self._feature_names or [])} features")
+            return True
+
+        except Exception as e:
+            logger.warning(f"Failed to load production models: {e}")
+            self._models_loaded = False
+            return False
 
     def _get_connection(self):
         """Get database connection."""
@@ -118,6 +188,42 @@ class SemanticAttributionTracker:
 
         return df
 
+    def extract_all_features_for_game(
+        self,
+        home_team: str,
+        away_team: str,
+        season: int,
+        week: int,
+    ) -> tuple[dict[str, float], dict[str, float]]:
+        """
+        Extract ALL features for a game, returning both full and semantic subsets.
+
+        Returns:
+            Tuple of (all_features, semantic_features)
+        """
+        try:
+            from py.features.game_feature_extractor import GameFeatureExtractor
+
+            extractor = GameFeatureExtractor()
+            all_features = extractor.extract_game_features(
+                home_team=home_team,
+                away_team=away_team,
+                season=season,
+                week=week,
+            )
+
+            # Extract semantic features subset
+            semantic_features = {
+                k: v for k, v in all_features.items()
+                if k.startswith(self.SEMANTIC_PREFIX)
+            }
+
+            return all_features, semantic_features
+
+        except Exception as e:
+            logger.warning(f"Failed to extract features: {e}")
+            return {}, {}
+
     def extract_semantic_features_for_game(
         self,
         home_team: str,
@@ -154,17 +260,98 @@ class SemanticAttributionTracker:
         self,
         semantic_features: dict[str, float],
         prediction_error: float,
-        spread_correct: bool
+        spread_correct: bool,
+        all_features: dict[str, float] | None = None,
     ) -> dict[str, float]:
         """
         Compute attribution scores for semantic features for a single game.
 
+        Uses TRUE SHAP values via TreeExplainer when available, falling back
+        to a heuristic when SHAP is not available.
+
+        Args:
+            semantic_features: Dict of semantic feature name → value
+            prediction_error: Absolute spread error
+            spread_correct: Whether spread prediction was correct
+            all_features: Complete feature dict for SHAP (optional)
+
+        Returns:
+            Dict of feature name → attribution score (SHAP values for semantic features)
+        """
+        if not semantic_features:
+            return {}
+
+        # Try True SHAP first
+        if self.use_true_shap and self._models_loaded and all_features:
+            return self._compute_true_shap_attribution(
+                all_features, semantic_features
+            )
+
+        # Fallback to heuristic
+        return self._compute_heuristic_attribution(
+            semantic_features, prediction_error, spread_correct
+        )
+
+    def _compute_true_shap_attribution(
+        self,
+        all_features: dict[str, float],
+        semantic_features: dict[str, float],
+    ) -> dict[str, float]:
+        """
+        Compute TRUE SHAP attribution using TreeExplainer.
+
+        Args:
+            all_features: Complete feature dict (all 382 features)
+            semantic_features: Subset of semantic features to attribute
+
+        Returns:
+            Dict of semantic feature name → SHAP value
+        """
+        try:
+            # Build feature vector in correct order
+            if not self._feature_names:
+                logger.warning("Feature names not loaded")
+                return {}
+
+            # Create feature array in model's expected order
+            X = np.zeros((1, len(self._feature_names)))
+            for i, name in enumerate(self._feature_names):
+                if name in all_features:
+                    X[0, i] = all_features[name]
+
+            # Compute SHAP values (returns array of shape [1, n_features])
+            shap_values = self._spread_explainer.shap_values(X)
+
+            # Extract SHAP values for semantic features only
+            attributions = {}
+            for i, name in enumerate(self._feature_names):
+                # Only include semantic features
+                sem_name = name if name.startswith(self.SEMANTIC_PREFIX) else f"{self.SEMANTIC_PREFIX}{name}"
+                if sem_name in semantic_features or name in semantic_features:
+                    # Use the actual feature name from semantic_features
+                    key = name if name in semantic_features else sem_name
+                    if key in semantic_features:
+                        attributions[key] = float(shap_values[0, i])
+
+            logger.debug(f"Computed SHAP for {len(attributions)} semantic features")
+            return attributions
+
+        except Exception as e:
+            logger.warning(f"SHAP computation failed: {e}, falling back to heuristic")
+            return {}
+
+    def _compute_heuristic_attribution(
+        self,
+        semantic_features: dict[str, float],
+        prediction_error: float,
+        spread_correct: bool
+    ) -> dict[str, float]:
+        """
+        Compute heuristic attribution (fallback when SHAP unavailable).
+
         Uses a simplified attribution based on:
         - Feature magnitude (larger values → stronger signal)
         - Direction alignment with prediction accuracy
-
-        For true SHAP, you'd need the model and background data.
-        This is a heuristic that works well for ranking features.
 
         Args:
             semantic_features: Dict of feature name → value
@@ -174,9 +361,6 @@ class SemanticAttributionTracker:
         Returns:
             Dict of feature name → attribution score
         """
-        if not semantic_features:
-            return {}
-
         attributions = {}
 
         # Baseline: average feature magnitude
@@ -192,14 +376,9 @@ class SemanticAttributionTracker:
             norm_magnitude = abs(value) / (avg_magnitude + 1e-6)
 
             # Attribution: positive if feature helped, negative if hurt
-            # Approximation: features with high magnitude that correlated
-            # with correct predictions get positive attribution
             if spread_correct:
-                # Correct prediction: feature helped
-                attributions[name] = norm_magnitude * 0.1  # Scale down
+                attributions[name] = norm_magnitude * 0.1
             else:
-                # Wrong prediction: feature may have hurt
-                # Higher error + high magnitude = negative attribution
                 error_weight = min(prediction_error / 10.0, 1.0)
                 attributions[name] = -norm_magnitude * error_weight * 0.1
 
@@ -240,24 +419,34 @@ class SemanticAttributionTracker:
 
         for _, row in predictions.iterrows():
             try:
-                # Extract semantic features
-                sem_features = self.extract_semantic_features_for_game(
-                    home_team=row["home_team"],
-                    away_team=row["away_team"],
-                    season=season,
-                    week=week
-                )
+                # Extract features - use all features for True SHAP, semantic only for heuristic
+                all_features = None
+                if self.use_true_shap and self._models_loaded:
+                    all_features, sem_features = self.extract_all_features_for_game(
+                        home_team=row["home_team"],
+                        away_team=row["away_team"],
+                        season=season,
+                        week=week
+                    )
+                else:
+                    sem_features = self.extract_semantic_features_for_game(
+                        home_team=row["home_team"],
+                        away_team=row["away_team"],
+                        season=season,
+                        week=week
+                    )
 
                 if not sem_features:
                     continue
 
                 result.games_with_semantic += 1
 
-                # Compute attribution
+                # Compute attribution (uses SHAP if all_features provided, else heuristic)
                 attributions = self.compute_game_attribution(
                     semantic_features=sem_features,
                     prediction_error=row["abs_spread_error"],
-                    spread_correct=row["spread_correct"]
+                    spread_correct=row["spread_correct"],
+                    all_features=all_features,
                 )
 
                 # Track totals for ranking

@@ -13,7 +13,7 @@ for game outcome predictions. Single entry point that coordinates feature extrac
 TeamOffensiveFeatures, TeamDefensiveFeatures, NextGen Stats, QBR, Possession Value,
 Playcalling, Opponent-Adjusted, and mart.team_injury_load.
 
-**Features Extracted (342 total = 305 base + 37 synthetic):**
+**Features Extracted (348 total = 305 base + 37 synthetic + 6 rest/BTB):**
 
 1. Home Team Offensive (27):
    - Prefix: 'home_off_'
@@ -39,11 +39,14 @@ Playcalling, Opponent-Adjusted, and mart.team_injury_load.
    - Examples: away_def_epa_allowed_per_play, away_def_sack_rate, away_def_points_allowed_per_game
    - Includes: away_def_epa_std_4wk, away_def_points_allowed_std_4wk, away_def_epa_consistency_score
 
-5. Derived Matchup Features (4):
+5. Derived Matchup Features (7):
    - offensive_mismatch: home_off_epa - away_def_epa (positive = home advantage)
    - defensive_mismatch: away_off_epa - home_def_epa (positive = away advantage)
    - pace_difference: home_plays_per_game - away_plays_per_game (positive = home faster)
-   - rest_differential: Currently 0 (future: days since last game difference)
+   - rest_differential: home_days_rest - away_days_rest (positive = home more rested)
+   - home_days_rest, away_days_rest: Days since last game for each team
+   - is_home_short_week, is_away_short_week: 1 if < 6 days rest (Thursday game)
+   - is_home_long_week, is_away_long_week: 1 if > 9 days rest (bye week)
 
 6. Injury Features (12):
    - Home team (5): home_injury_total, home_injury_severity_index, home_qb_out,
@@ -522,7 +525,14 @@ class GameFeatureExtractor:
         features["offensive_mismatch"] = self._compute_offensive_mismatch(home_off, away_def)
         features["defensive_mismatch"] = self._compute_defensive_mismatch(away_off, home_def)
         features["pace_difference"] = self._compute_pace_difference(home_off, away_off)
-        features["rest_differential"] = 0  # Future: days_since_last_game
+
+        # Rest differential and back-to-back detection (H1 + H3 - Dec 28, 2025)
+        _, rest_features = self._get_rest_differential(home_team, away_team, season, week)
+        features.update(rest_features)
+        logger.debug(
+            f"Rest features: diff={rest_features['rest_differential']:.1f}, "
+            f"home={rest_features['home_days_rest']:.1f}d, away={rest_features['away_days_rest']:.1f}d"
+        )
 
         # Add injury features
         try:
@@ -957,6 +967,132 @@ class GameFeatureExtractor:
 
         pace_diff = home_pace - away_pace
         return pace_diff
+
+    def _get_rest_differential(
+        self, home_team: str, away_team: str, season: int, week: int
+    ) -> tuple[float, dict[str, float]]:
+        """
+        Compute rest differential and related features from games table.
+
+        Uses kickoff timestamps to calculate days since last game for each team.
+        Positive rest_differential means home team has more rest.
+
+        Args:
+            home_team: Home team abbreviation
+            away_team: Away team abbreviation
+            season: Target season
+            week: Target week
+
+        Returns:
+            Tuple of (rest_differential, features_dict) where features_dict contains:
+            {
+                'rest_differential': float,  # home_days - away_days
+                'home_days_rest': float,     # Days since home team's last game
+                'away_days_rest': float,     # Days since away team's last game
+                'is_home_short_week': int,   # 1 if home < 6 days rest (BTB)
+                'is_away_short_week': int,   # 1 if away < 6 days rest (BTB)
+                'is_home_long_week': int,    # 1 if home > 9 days rest
+                'is_away_long_week': int,    # 1 if away > 9 days rest
+            }
+        """
+        default_features = {
+            "rest_differential": 0.0,
+            "home_days_rest": 7.0,
+            "away_days_rest": 7.0,
+            "is_home_short_week": 0,
+            "is_away_short_week": 0,
+            "is_home_long_week": 0,
+            "is_away_long_week": 0,
+        }
+
+        try:
+            conn = psycopg2.connect(**self.db_config)
+            try:
+                with conn.cursor() as cur:
+                    # Get current game kickoff
+                    cur.execute(
+                        """
+                        SELECT kickoff FROM games
+                        WHERE season = %s AND week = %s
+                        AND home_team = %s AND away_team = %s
+                        """,
+                        (season, week, home_team, away_team),
+                    )
+                    result = cur.fetchone()
+                    if not result or result[0] is None:
+                        logger.debug(
+                            f"No kickoff found for {away_team}@{home_team} S{season}W{week}"
+                        )
+                        return 0.0, default_features
+
+                    current_kickoff = result[0]
+
+                    # Get home team's previous game (as home OR away)
+                    cur.execute(
+                        """
+                        SELECT MAX(kickoff) FROM games
+                        WHERE season = %s AND week < %s
+                        AND (home_team = %s OR away_team = %s)
+                        AND kickoff IS NOT NULL
+                        """,
+                        (season, week, home_team, home_team),
+                    )
+                    home_prev = cur.fetchone()[0]
+
+                    # Get away team's previous game (as home OR away)
+                    cur.execute(
+                        """
+                        SELECT MAX(kickoff) FROM games
+                        WHERE season = %s AND week < %s
+                        AND (home_team = %s OR away_team = %s)
+                        AND kickoff IS NOT NULL
+                        """,
+                        (season, week, away_team, away_team),
+                    )
+                    away_prev = cur.fetchone()[0]
+
+                    # Calculate days rest (default 7 for Week 1)
+                    if home_prev is None:
+                        home_days_rest = 7.0
+                    else:
+                        delta = current_kickoff - home_prev
+                        home_days_rest = delta.total_seconds() / 86400  # Convert to days
+
+                    if away_prev is None:
+                        away_days_rest = 7.0
+                    else:
+                        delta = current_kickoff - away_prev
+                        away_days_rest = delta.total_seconds() / 86400
+
+                    rest_differential = home_days_rest - away_days_rest
+
+                    # BTB detection thresholds
+                    SHORT_WEEK_THRESHOLD = 6.0  # < 6 days = short week (Thu after Sun)
+                    LONG_WEEK_THRESHOLD = 9.0   # > 9 days = long week (bye or Sun after Thu)
+
+                    features = {
+                        "rest_differential": round(rest_differential, 2),
+                        "home_days_rest": round(home_days_rest, 2),
+                        "away_days_rest": round(away_days_rest, 2),
+                        "is_home_short_week": 1 if home_days_rest < SHORT_WEEK_THRESHOLD else 0,
+                        "is_away_short_week": 1 if away_days_rest < SHORT_WEEK_THRESHOLD else 0,
+                        "is_home_long_week": 1 if home_days_rest > LONG_WEEK_THRESHOLD else 0,
+                        "is_away_long_week": 1 if away_days_rest > LONG_WEEK_THRESHOLD else 0,
+                    }
+
+                    logger.debug(
+                        f"Rest: {home_team}={home_days_rest:.1f}d, {away_team}={away_days_rest:.1f}d, "
+                        f"diff={rest_differential:.1f}"
+                    )
+
+                    return rest_differential, features
+
+            finally:
+                conn.close()
+
+        except Exception as e:
+            logger.warning(f"Failed to compute rest differential: {e}")
+            return 0.0, default_features
 
     def _get_injury_features(
         self, home_team: str, away_team: str, season: int, week: int
