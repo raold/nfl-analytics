@@ -545,7 +545,8 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 **In Progress:**
 - Extended semantic A/B testing through Week 18 for larger sample size
 - Feature ablation to identify which semantic features provide positive signal
-- Spoke 1 Research: Kalman Filter on EPA trends, GP injury recovery curves (Week 2-3)
+- **S1.1 Kalman EPA Filter (Dec 28):** `py/features/kalman_epa_filter.py` - Local Level model with CUSUM regime detection
+- **S1.2 GP Injury Recovery (Dec 28):** `py/features/gp_injury_recovery.py` - Matern 5/2 kernel, logit-bounded output
 
 **Strategic Decisions:**
 - BNN research abandoned (Nov 9) - 84 hours, 6 approaches, only BNN v3.1 Rushing remains
