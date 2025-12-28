@@ -8,12 +8,13 @@ This module implements a weekly feedback loop that:
 4. Triggers retraining when accuracy degrades
 5. Generates annotations for LLM fine-tuning
 6. Provides meta-learning for bidirectional improvement
+7. WHY System for prediction explainability (Dec 28, 2025)
 
 Components:
 -----------
 Phase 6: Weekly Feedback Loop
     - WeeklyOutcomeUpdater: Update predictions with actual outcomes
-    - SemanticAttributionTracker: Track feature contribution
+    - SemanticAttributionTracker: Track feature contribution (True SHAP)
     - EnsembleWeightAdjuster: Adjust weights based on performance
     - RetrainTrigger: Detect when retraining is needed
     - AnnotationGenerator: Generate LLM training data
@@ -27,6 +28,11 @@ Phase 7: Meta-Learning System
 
 Phase 8: A/B Testing
     - SemanticABTest: Compare semantic vs non-semantic predictions
+
+Phase 9: WHY System (Dec 28, 2025)
+    - ModelErrorDecomposer: Track which ensemble component caused errors
+    - TemporalCausalityTracker: Trace News→Sentiment→Feature→Prediction→Outcome
+    - FeatureInteractionAnalyzer: Detect semantic × base feature synergies
 
 Usage:
 ------
@@ -76,6 +82,11 @@ from py.feedback.prompt_evolver import PromptEvolver
 # Phase 8: A/B Testing
 from py.feedback.semantic_ab_test import SemanticABTest
 
+# Phase 9: WHY System (Dec 28, 2025)
+from py.feedback.model_error_decomposition import ModelErrorDecomposer
+from py.feedback.temporal_causality import TemporalCausalityTracker
+from py.feedback.feature_interactions import FeatureInteractionAnalyzer
+
 __all__ = [
     # Phase 6
     "WeeklyOutcomeUpdater",
@@ -90,4 +101,8 @@ __all__ = [
     "PromptEvolver",
     # Phase 8
     "SemanticABTest",
+    # Phase 9: WHY System
+    "ModelErrorDecomposer",
+    "TemporalCausalityTracker",
+    "FeatureInteractionAnalyzer",
 ]

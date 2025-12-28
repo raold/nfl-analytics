@@ -1,13 +1,13 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** December 24, 2025 | **Version:** 6.6 | **Status:** Production Ready (Grade A+)
+**Last Updated:** December 28, 2025 | **Version:** 6.7 | **Status:** Production Ready (Grade A+)
 
 ## Quick Status
 
 | Component | State | Key Metric |
 |-----------|-------|------------|
 | Ensemble | v6.2 + equal-weight props | 54.5% spread (games), 44.25 MAE (props) |
-| Features | 382 total (Phase 2 + Synthetic + Semantic) | Base 305 + 37 synthetic + 38 semantic (v2) |
+| Features | 400 total (Phase 2 + Synthetic + Semantic + Dynamic) | Base 305 + 37 synthetic + 38 semantic + 16 Kalman/GP + 6 rest |
 | Semantic Stack | Complete (Dec 21) | Ollama/MLX inference, 26 LLM features |
 | **Game Outcome Model** | **v2 PRODUCTION (Dec 23)** | **382 features, +4.6% win accuracy, 10.45 spread MAE** |
 | **Feedback Loop** | **NEW (Dec 22)** | **Weekly learning system, 10 modules** |
@@ -62,7 +62,7 @@
 - `models/` - Trained artifacts (~60 files)
 - `docs/` - 400+ documentation files
 
-**Features (368 total):**
+**Features (384 total):**
 
 | Category | Count | Module |
 |----------|-------|--------|
@@ -80,6 +80,8 @@
 | **Synthetic Momentum** | 11 | `synthetic_momentum_features.py` |
 | **Research-Driven** | 15 | `research_driven_features.py` |
 | **Semantic (LLM)** | 26 | `py/semantic/features/semantic_features.py` (NEW) |
+| **Kalman EPA** | 8 | `py/features/kalman_epa_filter.py` (NEW) |
+| **GP Injury Recovery** | 8 | `py/features/gp_injury_recovery.py` (NEW) |
 | Props Stability | N/A | `py/ensemble/props_stability_weights.py` |
 
 **Entry Points:**
@@ -88,6 +90,8 @@
 - `SyntheticMomentumEngine` - Form intensity, pressure consistency, RZ efficiency
 - `ResearchDrivenEngine` - nfelo EPA weighting (1.6:1.0), coaching rationality
 - `SemanticFeatureExtractor` - LLM-derived sentiment, injury severity, media signals (NEW)
+- `KalmanEPAFilter` - Team EPA regime detection with CUSUM (NEW)
+- `InjuryRecoveryGP` - Uncertainty-aware injury recovery curves (NEW)
 
 ---
 
@@ -303,24 +307,27 @@ bets = detector.detect_value_bets(predictions)
 
 ## Feedback Loop System (Weekly Learning)
 
-**Status:** Complete (Dec 22, 2025)
+**Status:** Complete (Dec 28, 2025) - includes WHY System
 **Goal:** Close the loop between predictions and outcomes, enabling continuous learning and LLM fine-tuning
 
 ### Architecture
 
 ```
 py/feedback/
-├── outcome_updater.py        # Phase 6.1: Update actuals after games
-├── semantic_attribution.py   # Phase 6.2: Track feature contribution
-├── ensemble_weight_adjuster.py # Phase 6.3: Adjust weights on performance
-├── retrain_trigger.py        # Phase 6.4: Detect retraining needs
-├── annotation_generator.py   # Phase 6.5: Generate LLM training data
-├── meta_learner.py           # Phase 7.1: Bidirectional Model↔Semantic learning
-├── feature_memory.py         # Phase 7.2: Rolling feature performance tracking
-├── auto_feature_selector.py  # Phase 7.3: Automatic feature enable/disable
-├── prompt_evolver.py         # Phase 7.4: Evolve LLM prompts from outcomes
-├── semantic_ab_test.py       # Phase 8.1: A/B test semantic vs non-semantic
-└── __init__.py               # Module exports (10 components)
+├── outcome_updater.py           # Phase 6.1: Update actuals after games
+├── semantic_attribution.py      # Phase 6.2: Track feature contribution (True SHAP)
+├── ensemble_weight_adjuster.py  # Phase 6.3: Adjust weights on performance
+├── retrain_trigger.py           # Phase 6.4: Detect retraining needs
+├── annotation_generator.py      # Phase 6.5: Generate LLM training data
+├── meta_learner.py              # Phase 7.1: Bidirectional Model↔Semantic learning
+├── feature_memory.py            # Phase 7.2: Rolling feature performance tracking
+├── auto_feature_selector.py     # Phase 7.3: Automatic feature enable/disable
+├── prompt_evolver.py            # Phase 7.4: Evolve LLM prompts from outcomes
+├── semantic_ab_test.py          # Phase 8.1: A/B test semantic vs non-semantic
+├── model_error_decomposition.py # Phase 9.1: WHY - Error attribution per model
+├── temporal_causality.py        # Phase 9.2: WHY - Trace prediction chain
+├── feature_interactions.py      # Phase 9.3: WHY - Semantic × base synergies
+└── __init__.py                  # Module exports (13 components)
 ```
 
 ### Components Summary
@@ -337,8 +344,11 @@ py/feedback/
 | 7.3 | AutoFeatureSelector | States: probation → active → disabled |
 | 7.4 | PromptEvolver | Evolve LLM prompts based on prediction outcomes |
 | 8.1 | SemanticABTest | McNemar test for paired accuracy comparison |
+| 9.1 | ModelErrorDecomposer | C_i = w_i × (Y - Ŷ_i) per-model error contribution |
+| 9.2 | TemporalCausalityTracker | Trace News→Sentiment→Feature→Prediction→Outcome |
+| 9.3 | FeatureInteractionAnalyzer | SHAP interaction values for semantic × base synergies |
 
-### Database Tables (8 new)
+### Database Tables (11 new)
 
 | Table | Purpose |
 |-------|---------|
@@ -350,6 +360,9 @@ py/feedback/
 | `ml.prompt_ab_tests` | Prompt A/B test configurations |
 | `ml.ab_test_status` | A/B test metadata and state |
 | `ml.ab_test_results` | Per-game control vs treatment predictions |
+| `ml.model_error_decomposition` | Per-model error contributions (WHY) |
+| `ml.causal_chains` | Temporal causality tracking (WHY) |
+| `ml.feature_interactions` | Semantic × base feature synergies (WHY) |
 
 ### Weekly Workflow
 
@@ -492,6 +505,22 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
   - **Strong 2025 signal**: Home +3 days rest = 69.2% cover, Away +3 days = 44.4% (25 point swing!)
   - r=0.146 correlation with ATS outcome (meaningful for sports betting)
   - Total features now 348 (305 base + 37 synthetic + 6 rest/BTB)
+- **S1.1: Kalman EPA Filter (Dec 28):** `py/features/kalman_epa_filter.py` - Team EPA regime detection
+  - Local Level (Random Walk + Noise) state-space model
+  - CUSUM on standardized innovations for regime change detection
+  - Noise parameters: σ_v²=0.025 (observation), σ_w²=0.001 (process) calibrated for NFL EPA
+  - Features: kalman_epa, kalman_epa_uncertainty, kalman_cusum_up/down, kalman_regime_change
+- **S1.2: GP Injury Recovery (Dec 28):** `py/features/gp_injury_recovery.py` - Uncertainty-aware recovery curves
+  - Kernel: Matern 5/2 + Constant + White Noise (Gemini consultation)
+  - Logit transform for bounded [0, 100%] performance output
+  - Hierarchical per injury category: muscle, structural, concussion, other
+  - Features: gp_recovery_pct, gp_recovery_lower_95, gp_recovery_upper_95, injury_days_since_return
+- **S2: WHY System Complete (Dec 28):** 3 new modules in `py/feedback/` for prediction explainability
+  - `model_error_decomposition.py`: C_i = w_i × (Y - Ŷ_i) signed contribution per model
+  - `temporal_causality.py`: Trace News→Sentiment→Feature→Prediction→Outcome chain
+  - `feature_interactions.py`: SHAP interaction_values for semantic × base synergies
+  - New tables: ml.model_error_decomposition, ml.causal_chains, ml.feature_interactions
+  - Gemini MCP consultation for mathematical formulations
 - 2025 Holdout Validation: 74.9% spread accuracy, 44.25 MAE props (Dec 9)
 - Phase 2 Advanced Stats: 120 new features
 - Dirichlet Optimization: Equal weights outperform v8.0 on holdout
@@ -529,7 +558,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
   - SHAP analysis: sem_away_media_buzz_volume in top 50 features
   - Production artifacts: `models/production/game_outcome_v2/`
 
-**Key Findings (Dec 13-22):**
+**Key Findings (Dec 13-28):**
 - Season-based temporal split prevents data leakage (train on seasons < max, validate on max)
 - RMSE is correct uncertainty estimate (not MAE * 0.5)
 - Context managers prevent connection leaks in high-load scenarios
@@ -541,12 +570,16 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 - **MLX is production-ready** (Dec 23): 12x faster than Ollama on Apple Silicon, use as primary with Ollama fallback
 - **Semantic features need validation** (Dec 23): A/B test inconclusive (p=0.21), don't enable until statistical significance achieved
 - **Target leakage inflates metrics by 14x** (Dec 23): XGBoost v4 went from 4.27 MAE (leaked) to 59.14 MAE (real)
+- **Kalman filter noise ratio** (Dec 28): σ_w²/σ_v² = 4% optimal for NFL EPA (slow underlying, noisy observations)
+- **GP injury recovery** (Dec 28): Matern 5/2 preferred for once-differentiable recovery curves, logit transform bounds output
+- **Gemini MCP for research** (Dec 28): Effective for mathematical consultation (kernel design, state-space parameters)
+- **Error decomposition formula** (Dec 28): C_i = w_i × (Y - Ŷ_i) enables per-model attribution
+- **SHAP interactions** (Dec 28): O(M² × N × T) complexity - subsample to ~2000 for tractability
 
 **In Progress:**
 - Extended semantic A/B testing through Week 18 for larger sample size
 - Feature ablation to identify which semantic features provide positive signal
-- **S1.1 Kalman EPA Filter (Dec 28):** `py/features/kalman_epa_filter.py` - Local Level model with CUSUM regime detection
-- **S1.2 GP Injury Recovery (Dec 28):** `py/features/gp_injury_recovery.py` - Matern 5/2 kernel, logit-bounded output
+- Integration testing of S1 (Kalman/GP) and S2 (WHY System) with production pipeline
 
 **Strategic Decisions:**
 - BNN research abandoned (Nov 9) - 84 hours, 6 approaches, only BNN v3.1 Rushing remains
