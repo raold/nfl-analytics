@@ -237,6 +237,15 @@ try:
 except ImportError:
     InjuryRecoveryGP = None
 
+# Feature weights configuration (Dec 31, 2025)
+# Controls which feature groups are enabled/disabled via config
+try:
+    from py.config.feature_weights import is_feature_enabled
+except ImportError:
+    # Fallback: all features enabled if config module not available
+    def is_feature_enabled(group_name: str) -> bool:
+        return True
+
 import os
 
 import psycopg2
@@ -822,7 +831,8 @@ class GameFeatureExtractor:
 
         # Add Kalman EPA features (18 features: 8 per team + 2 matchup)
         # State-space EPA trends with regime change detection
-        if self.kalman_filter:
+        # DISABLED via feature_weights.yaml (Dec 31, 2025) - provides negative signal
+        if self.kalman_filter and is_feature_enabled("kalman_epa"):
             try:
                 kalman_matchup = self.kalman_filter.get_matchup_features(
                     home_team, away_team, season, week
@@ -835,11 +845,14 @@ class GameFeatureExtractor:
                 )
             except Exception as e:
                 logger.warning(f"Failed to extract Kalman EPA features: {e}")
+        elif self.kalman_filter and not is_feature_enabled("kalman_epa"):
+            logger.debug("Kalman EPA features DISABLED via feature_weights config")
 
         # Add GP Injury Recovery features (aggregated by team)
         # Note: This is a placeholder - full implementation requires player-level injury data
         # For now, we use the exponential baseline which doesn't require player lookups
-        if self.gp_recovery:
+        # DISABLED via feature_weights.yaml (Dec 31, 2025) - GP never trains, uses fake data
+        if self.gp_recovery and is_feature_enabled("gp_injury"):
             try:
                 # Get team-level injury severity from existing features
                 home_severity = features.get("home_injury_severity_index", 0)
@@ -868,6 +881,8 @@ class GameFeatureExtractor:
                 )
             except Exception as e:
                 logger.warning(f"Failed to extract GP recovery features: {e}")
+        elif self.gp_recovery and not is_feature_enabled("gp_injury"):
+            logger.debug("GP Injury Recovery features DISABLED via feature_weights config")
 
         # Validate: Check for NaN values
         nan_features = [k for k, v in features.items() if pd.isna(v)]

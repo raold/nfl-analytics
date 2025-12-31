@@ -485,8 +485,17 @@ def get_team_possession_value_features(
     # Note: This table likely doesn't exist, so we'll fall back to plays-based query
     # Keeping this for potential future use if drives table is created
 
-    # Fallback query using plays table (primary method since drives table doesn't exist)
-    # This query computes drive starts from play-by-play data using fixed_drive
+    # NOTE: This feature is currently DISABLED due to schema limitation
+    # The nflverse plays table does not contain a 'drive' or 'fixed_drive' column
+    # to identify drive boundaries. The query below will fail with:
+    #   "column p.fixed_drive does not exist"
+    #
+    # To fix properly, would need to infer drives from play sequences (posteam changes,
+    # kickoffs, turnovers, punts). For now, returning league averages.
+    #
+    # TODO: Implement drive inference from play sequence when this feature is needed
+    #
+    # Original query (preserved for future implementation):
     fallback_query = """
     WITH recent_games AS (
         SELECT game_id, season, week
@@ -500,7 +509,7 @@ def get_team_possession_value_features(
     drive_starts AS (
         SELECT
             p.game_id,
-            p.fixed_drive,
+            p.drive,  -- Column does NOT exist in nflverse schema!
             p.posteam,
             MIN(p.yardline_100) AS start_yards_to_endzone
         FROM plays p
@@ -508,7 +517,7 @@ def get_team_possession_value_features(
           AND p.game_id IN (SELECT game_id FROM recent_games)
           AND p.play_type IN ('pass', 'run')  -- Only offensive plays
           AND p.yardline_100 IS NOT NULL
-        GROUP BY p.game_id, p.fixed_drive, p.posteam
+        GROUP BY p.game_id, p.drive, p.posteam
     )
     SELECT
         100 - AVG(start_yards_to_endzone) AS avg_starting_field_position,
@@ -517,55 +526,36 @@ def get_team_possession_value_features(
     FROM drive_starts
     """
 
-    try:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            # Use plays-based query directly (drives table doesn't exist in current schema)
-            cur.execute(fallback_query, (season, week, team, team, n_games, team))
-            result = cur.fetchone()
+    # Return league averages immediately since drive column doesn't exist
+    # This avoids repeated SQL errors and log pollution
+    logger.debug(f"Returning league average possession values for {team} (drive column unavailable in schema)")
+    return {
+        "avg_starting_field_position": 25.0,  # Touchback position
+        "avg_possession_value": 1.5,  # League average EP
+        "pace_factor": 1.0,  # Neutral pace
+        "possessions_per_game": LEAGUE_AVG_POSSESSIONS,
+    }
 
-            if result is None or result["total_drives"] == 0:
-                # No data available, return league averages
-                logger.warning(f"No possession data for {team} in {season} week {week}")
-                return {
-                    "avg_starting_field_position": 25.0,  # Touchback position
-                    "avg_possession_value": 1.5,  # League average EP
-                    "pace_factor": 1.0,  # Neutral pace
-                    "possessions_per_game": LEAGUE_AVG_POSSESSIONS,
-                }
-
-            # Extract metrics
-            avg_field_pos = float(result["avg_starting_field_position"] or 25.0)
-            possessions_per_game = float(result["possessions_per_game"] or LEAGUE_AVG_POSSESSIONS)
-
-            # Compute average possession value (EP from average starting position)
-            # Assume 1st & 10 at average starting position
-            avg_yards_to_endzone = 100 - avg_field_pos
-            avg_possession_value = get_expected_points(
-                field_position=int(avg_yards_to_endzone), down=1, yards_to_go=10
-            )
-
-            # Compute pace factor (relative to league average)
-            pace_factor = possessions_per_game / LEAGUE_AVG_POSSESSIONS
-
-            return {
-                "avg_starting_field_position": avg_field_pos,
-                "avg_possession_value": avg_possession_value,
-                "pace_factor": pace_factor,
-                "possessions_per_game": possessions_per_game,
-            }
-
-    except Exception as e:
-        import traceback
-
-        logger.error(f"Error computing possession value features: {e}")
-        logger.error(f"Traceback: {traceback.format_exc()}")
-        # Return league averages on error
-        return {
-            "avg_starting_field_position": 25.0,
-            "avg_possession_value": 1.5,
-            "pace_factor": 1.0,
-            "possessions_per_game": LEAGUE_AVG_POSSESSIONS,
-        }
+    # NOTE: Code below is unreachable until drive column is available in schema
+    # Preserved for future implementation when drive inference is added
+    #
+    # try:
+    #     with conn.cursor(cursor_factory=RealDictCursor) as cur:
+    #         cur.execute(fallback_query, (season, week, team, team, n_games, team))
+    #         result = cur.fetchone()
+    #
+    #         if result is None or result["total_drives"] == 0:
+    #             logger.warning(f"No possession data for {team} in {season} week {week}")
+    #             return defaults...
+    #
+    #         avg_field_pos = float(result["avg_starting_field_position"] or 25.0)
+    #         possessions_per_game = float(result["possessions_per_game"] or LEAGUE_AVG_POSSESSIONS)
+    #         ...compute possession_value and pace_factor...
+    #         return computed_values
+    #
+    # except Exception as e:
+    #     logger.error(f"Error computing possession value features: {e}")
+    #     return defaults
 
 
 # ============================================================================

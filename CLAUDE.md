@@ -1,13 +1,13 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** December 28, 2025 | **Version:** 6.7 | **Status:** Production Ready (Grade A+)
+**Last Updated:** December 31, 2025 | **Version:** 6.8 | **Status:** Production Ready (Grade A+)
 
 ## Quick Status
 
 | Component | State | Key Metric |
 |-----------|-------|------------|
 | Ensemble | v6.2 + equal-weight props | 54.5% spread (games), 44.25 MAE (props) |
-| Features | 400 total (Phase 2 + Synthetic + Semantic + Dynamic) | Base 305 + 37 synthetic + 38 semantic + 16 Kalman/GP + 6 rest |
+| Features | 386 active (Kalman/GP disabled) | Base 305 + 37 synthetic + 38 semantic + 6 rest |
 | Semantic Stack | Complete (Dec 21) | Ollama/MLX inference, 26 LLM features |
 | **Game Outcome Model** | **v2 PRODUCTION (Dec 23)** | **382 features, +4.6% win accuracy, 10.45 spread MAE** |
 | **Feedback Loop** | **NEW (Dec 22)** | **Weekly learning system, 10 modules** |
@@ -38,16 +38,30 @@
 
 **2025 Holdout Update (Dec 9):** Equal-weight averaging outperformed Dirichlet v8.0 on true out-of-sample 2025 data. Consider using simple average for props until more data confirms v8.0 generalization.
 
-### Services
+### Docker Services (8 containers)
 
-| Service | Port | Purpose |
-|---------|------|---------|
-| PostgreSQL | 5544 | `postgresql://dro:sicillionbillions@localhost:5544/devdb01` |
-| Redis | 6379 | Prediction caching |
-| FastAPI | 8000 | API endpoint |
-| Streamlit | 8501 | Dashboard |
-| Prometheus | 9090 | Metrics |
-| Grafana | 3000 | Monitoring |
+| Service | Container | Port | Purpose |
+|---------|-----------|------|---------|
+| PostgreSQL | nfl-analytics-pg-1 | 5544 | `postgresql://dro:sicillionbillions@localhost:5544/devdb01` |
+| Redis | nfl-analytics-redis | 6379 | Prediction caching |
+| FastAPI | nfl-analytics-api | 8000 | API endpoint |
+| Streamlit | nfl-analytics-streamlit | 8501 | Dashboard |
+| Prometheus | nfl-analytics-prometheus | 9090 | Metrics |
+| Grafana | nfl-analytics-grafana | 3000 | Monitoring |
+| Node Exporter | nfl-analytics-node-exporter | 9100 | Host metrics |
+| Postgres Exporter | nfl-analytics-postgres-exporter | 9187 | DB metrics |
+
+**Docker Networking:** Use `DB_HOST=host.docker.internal` from containers, `localhost` from host.
+
+### Python Environment (uv)
+
+```bash
+uv sync                    # Install all dependencies from pyproject.toml
+uv pip install <pkg>       # Add package
+uv pip list               # List installed packages (79+ packages)
+```
+
+**Key:** pyproject.toml manages dependencies, uv.lock pins versions.
 
 ---
 
@@ -80,8 +94,8 @@
 | **Synthetic Momentum** | 11 | `synthetic_momentum_features.py` |
 | **Research-Driven** | 15 | `research_driven_features.py` |
 | **Semantic (LLM)** | 26 | `py/semantic/features/semantic_features.py` (NEW) |
-| **Kalman EPA** | 8 | `py/features/kalman_epa_filter.py` (NEW) |
-| **GP Injury Recovery** | 8 | `py/features/gp_injury_recovery.py` (NEW) |
+| ~~Kalman EPA~~ | ~~18~~ | `py/features/kalman_epa_filter.py` (**DISABLED** ADR-015) |
+| ~~GP Injury Recovery~~ | ~~17~~ | `py/features/gp_injury_recovery.py` (**DISABLED** ADR-015) |
 | Props Stability | N/A | `py/ensemble/props_stability_weights.py` |
 
 **Entry Points:**
@@ -90,8 +104,8 @@
 - `SyntheticMomentumEngine` - Form intensity, pressure consistency, RZ efficiency
 - `ResearchDrivenEngine` - nfelo EPA weighting (1.6:1.0), coaching rationality
 - `SemanticFeatureExtractor` - LLM-derived sentiment, injury severity, media signals (NEW)
-- `KalmanEPAFilter` - Team EPA regime detection with CUSUM (NEW)
-- `InjuryRecoveryGP` - Uncertainty-aware injury recovery curves (NEW)
+- ~~`KalmanEPAFilter`~~ - Team EPA regime detection with CUSUM (**DISABLED** - negative signal)
+- ~~`InjuryRecoveryGP`~~ - Uncertainty-aware injury recovery curves (**DISABLED** - GP never trains)
 
 ---
 
@@ -487,9 +501,20 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ---
 
-## Current Status (Dec 28, 2025)
+## Current Status (Dec 31, 2025)
 
 **Completed:**
+- **Kalman/GP Features DISABLED (Dec 31):** ADR-015 documents decision to disable negative-signal features
+  - Created `py/config/feature_weights.yaml` for feature group enable/disable via config
+  - Kalman EPA (18 features): -10.2pp accuracy drop in A/B test
+  - GP Injury (17 features): GP never trained, used fake estimated data
+  - Code preserved with weight=0.0 for potential future iteration
+- **Possession Value Schema Fix (Dec 31):** `fixed_drive` column doesn't exist in nflverse schema
+  - Returns league averages instead of failing with SQL errors
+  - TODO: Implement drive inference from play sequences if feature needed
+- **Docker Networking Fix (Dec 31):** Fixed hardcoded localhost:5544 in feature extractors
+  - SemanticRepository, KalmanEPAFilter now use `get_db_config()` with env vars
+  - v2.1 training went from 22% → 71.6% non-zero features after fix
 - **True SHAP Implementation (Dec 28, H2):** Replaced heuristic attribution with TreeExplainer
   - `semantic_attribution.py` now uses `shap.TreeExplainer` on production XGBoost models
   - Computes real Shapley values for 38 semantic features (`sem_*` prefix)
@@ -602,7 +627,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 | Architecture | [ARCHITECTURE_REFERENCE](docs/ARCHITECTURE_REFERENCE.md), [COMPONENT_DEEP_DIVES](docs/COMPONENT_DEEP_DIVES.md) |
 | Milestones | [RECENT_WORK_HISTORY](docs/milestones/RECENT_WORK_HISTORY.md), [docs/milestones/](docs/milestones/) |
 | Synthesis | [DIRICHLET_OPTIMIZATION](docs/synthesis/DIRICHLET_WEIGHT_OPTIMIZATION_SYNTHESIS_NOV27.md) |
-| ADRs | [docs/adr/](docs/adr/) (009: Dynamic weights, 011: Feature optimization, 012: Feedback loop) |
+| ADRs | [docs/adr/](docs/adr/) (009: Dynamic weights, 011: Feature optimization, 012: Feedback loop, 015: Kalman/GP disabled) |
 
 ---
 
@@ -644,10 +669,14 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 14. **True holdout is essential** - 2022-2024 validation showed 18% improvement; 2025 holdout showed 47% degradation
 15. **A/B test before enabling features** - Semantic features underperformed baseline despite theoretical appeal
 16. **Local inference beats cloud on Apple Silicon** - MLX 12x faster than Ollama, 40% less power
+17. **More features can mean worse models** - 423 features with Kalman/GP underperformed 382 feature v2 baseline
+18. **Config-based feature gating** - YAML config allows disabling features without code changes (easy iteration)
+19. **Check schema before writing SQL** - `fixed_drive` column didn't exist, causing silent failures
+20. **Fake data is worse than no data** - GP injury recovery using estimated days provided negative signal
 
 ---
 
-**Version:** 6.6 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
+**Version:** 6.8 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
 
 **Project Rules:**
 - Never take shortcuts, never use synthetic data

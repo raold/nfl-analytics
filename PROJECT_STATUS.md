@@ -1,12 +1,43 @@
 # PROJECT_STATUS.md - NFL Analytics Project Status
 
-**Last Updated:** December 22, 2025
-**Version:** v6.4 Weekly Feedback Loop + Semantic Stack + GNN Integration + 6-Way Ensemble
-**Focus:** ✅ **WEEKLY FEEDBACK LOOP COMPLETE** - Bidirectional learning, A/B testing, automatic feature selection
+**Last Updated:** December 31, 2025
+**Version:** v6.8 - Kalman/GP Features Disabled + Docker Networking Fix
+**Focus:** ✅ **PRODUCTION CLEANUP** - Feature validation, config-based gating, infrastructure audit
 
 ---
 
-## 🚀 MAJOR MILESTONE (Dec 22, 2025)
+## 🚀 LATEST UPDATE (Dec 31, 2025)
+
+> **Kalman/GP Features Disabled via Config (ADR-015)**
+
+### Investigation Results
+
+| Feature Set | Signal | Action |
+|-------------|--------|--------|
+| Kalman EPA (18 features) | NEGATIVE (-10.2pp accuracy) | Disabled (weight=0) |
+| GP Injury (17 features) | NOISE (GP never trains) | Disabled (weight=0) |
+
+### New Files (Dec 31)
+
+```
+py/config/
+├── __init__.py           # Package exports
+├── feature_weights.yaml  # Feature group enable/disable config
+└── feature_weights.py    # Config loader with is_feature_enabled()
+
+docs/adr/
+└── 015-kalman-gp-features-disabled.md  # ADR documenting decision
+```
+
+### Infrastructure Fixes
+
+- **Docker networking:** Fixed hardcoded `localhost:5544` → `get_db_config()` with env vars
+- **Possession value:** `fixed_drive` column missing in schema → returns league averages
+- **Feature count:** 423 → 388 active features (35 disabled via config)
+
+---
+
+## Previous Milestone (Dec 22, 2025)
 
 > **Weekly Feedback Loop Complete - Bidirectional Learning System**
 

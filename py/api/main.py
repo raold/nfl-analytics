@@ -91,7 +91,7 @@ from pathlib import Path
 import numpy as np
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 # Add project root to path
 project_root = str(Path(__file__).parent.parent.parent)
@@ -205,8 +205,9 @@ class PredictionRequest(BaseModel):
         description="Confidence level for interval (0.5-0.99)",
     )
 
-    @validator("stat_type")
-    def validate_stat_type(self, v):
+    @field_validator("stat_type")
+    @classmethod
+    def validate_stat_type(cls, v: str) -> str:
         valid_stats = {
             "passing_yards",
             "passing_tds",
@@ -260,13 +261,7 @@ class EnsembleWeights(BaseModel):
     bnn: float = Field(..., ge=0.0, le=1.0)
     xgboost: float = Field(..., ge=0.0, le=1.0)
     state_space: float = Field(..., ge=0.0, le=1.0)
-
-    @validator("*")
-    def weights_sum_to_one(self, v):
-        # Note: This validates individual fields; sum check in model
-        if not (0.0 <= v <= 1.0):
-            raise ValueError("Weight must be between 0.0 and 1.0")
-        return v
+    # Note: Range validation handled by Field constraints (ge=0.0, le=1.0)
 
 
 class PredictionResponse(BaseModel):
