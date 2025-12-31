@@ -13,7 +13,7 @@ for game outcome predictions. Single entry point that coordinates feature extrac
 TeamOffensiveFeatures, TeamDefensiveFeatures, NextGen Stats, QBR, Possession Value,
 Playcalling, Opponent-Adjusted, and mart.team_injury_load.
 
-**Features Extracted (348 total = 305 base + 37 synthetic + 6 rest/BTB):**
+**Features Extracted (383 total = 305 base + 37 synthetic + 6 rest/BTB + 18 Kalman + 17 GP):**
 
 1. Home Team Offensive (27):
    - Prefix: 'home_off_'
@@ -223,6 +223,20 @@ try:
 except ImportError:
     SemanticFeatureExtractor = None
 
+# Kalman EPA Filter (Dec 28, 2025 - S1.1)
+# State-space model for EPA trend detection with regime change indicators
+try:
+    from py.features.kalman_epa_filter import KalmanEPAFilter
+except ImportError:
+    KalmanEPAFilter = None
+
+# GP Injury Recovery (Dec 28, 2025 - S1.2)
+# Gaussian Process model for injury recovery curves with uncertainty
+try:
+    from py.features.gp_injury_recovery import InjuryRecoveryGP
+except ImportError:
+    InjuryRecoveryGP = None
+
 import os
 
 import psycopg2
@@ -400,6 +414,24 @@ class GameFeatureExtractor:
         else:
             self.semantic_extractor = None
             logger.warning("Semantic Feature extractor unavailable")
+
+        # Kalman EPA Filter (Dec 28, 2025 - S1.1)
+        # State-space EPA trends with regime change detection
+        if KalmanEPAFilter:
+            self.kalman_filter = KalmanEPAFilter(db_config=db_config)
+            logger.info("Kalman EPA Filter initialized (18 features)")
+        else:
+            self.kalman_filter = None
+            logger.warning("Kalman EPA Filter unavailable")
+
+        # GP Injury Recovery (Dec 28, 2025 - S1.2)
+        # Gaussian Process recovery curves with uncertainty
+        if InjuryRecoveryGP:
+            self.gp_recovery = InjuryRecoveryGP(db_config=db_config)
+            logger.info("GP Injury Recovery initialized (8 features per injury)")
+        else:
+            self.gp_recovery = None
+            logger.warning("GP Injury Recovery unavailable")
 
         # Database connection for function-based extractors
         self.db_config = db_config or {
@@ -784,6 +816,59 @@ class GameFeatureExtractor:
             except Exception as e:
                 logger.warning(f"Failed to extract semantic features: {e}")
 
+        # ========================================================================
+        # Dec 28, 2025 Features (S1.1 + S1.2) - Kalman EPA + GP Injury Recovery
+        # ========================================================================
+
+        # Add Kalman EPA features (18 features: 8 per team + 2 matchup)
+        # State-space EPA trends with regime change detection
+        if self.kalman_filter:
+            try:
+                kalman_matchup = self.kalman_filter.get_matchup_features(
+                    home_team, away_team, season, week
+                )
+                features.update({f"kal_{k}": v for k, v in kalman_matchup.items()})
+                logger.debug(
+                    f"Added {len(kalman_matchup)} Kalman EPA features "
+                    f"(home_epa={kalman_matchup.get('home_kalman_epa', 0):.3f}, "
+                    f"regime_diff={kalman_matchup.get('home_kalman_regime_change', 0) - kalman_matchup.get('away_kalman_regime_change', 0)})"
+                )
+            except Exception as e:
+                logger.warning(f"Failed to extract Kalman EPA features: {e}")
+
+        # Add GP Injury Recovery features (aggregated by team)
+        # Note: This is a placeholder - full implementation requires player-level injury data
+        # For now, we use the exponential baseline which doesn't require player lookups
+        if self.gp_recovery:
+            try:
+                # Get team-level injury severity from existing features
+                home_severity = features.get("home_injury_severity_index", 0)
+                away_severity = features.get("away_injury_severity_index", 0)
+
+                # Approximate days since return based on severity
+                # High severity = recent injury = fewer days recovered
+                home_days = max(0, int(14 - home_severity * 2))  # 0-14 days
+                away_days = max(0, int(14 - away_severity * 2))
+
+                # Get GP recovery features for home team
+                home_gp = self.gp_recovery.get_recovery_features(home_days, "unknown")
+                features.update({f"gp_home_{k}": v for k, v in home_gp.items()})
+
+                # Get GP recovery features for away team
+                away_gp = self.gp_recovery.get_recovery_features(away_days, "unknown")
+                features.update({f"gp_away_{k}": v for k, v in away_gp.items()})
+
+                # Add differential
+                features["gp_recovery_diff"] = home_gp.get("gp_recovery_pct", 100) - away_gp.get("gp_recovery_pct", 100)
+
+                logger.debug(
+                    f"Added {len(home_gp) * 2 + 1} GP recovery features "
+                    f"(home={home_gp.get('gp_recovery_pct', 100):.1f}%, "
+                    f"away={away_gp.get('gp_recovery_pct', 100):.1f}%)"
+                )
+            except Exception as e:
+                logger.warning(f"Failed to extract GP recovery features: {e}")
+
         # Validate: Check for NaN values
         nan_features = [k for k, v in features.items() if pd.isna(v)]
         if nan_features:
@@ -1131,14 +1216,8 @@ class GameFeatureExtractor:
                 'injury_spread_adjustment': float,  # estimated spread impact
             }
         """
-        # Connect to database
-        conn = psycopg2.connect(
-            host="localhost",
-            port=5544,
-            dbname="devdb01",
-            user="dro",
-            password=os.getenv("DB_PASSWORD", "sicillionbillions"),
-        )
+        # Connect to database using centralized config
+        conn = psycopg2.connect(**self.db_config)
 
         try:
             with conn.cursor() as cur:

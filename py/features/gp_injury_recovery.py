@@ -95,17 +95,19 @@ class InjuryRecoveryGP:
     # Default recovery curve parameters (exponential decay baseline)
     DEFAULT_TAU = 14.0  # Days to ~63% recovery
 
-    def __init__(self, use_gpytorch: bool = False):
+    def __init__(self, use_gpytorch: bool = False, db_config: dict = None):
         """
         Initialize GP model.
 
         Args:
             use_gpytorch: If True, use GPyTorch (GPU-accelerated).
                          If False, use sklearn (simpler, CPU-only).
+            db_config: Database configuration for fetching training data.
         """
         self.use_gpytorch = use_gpytorch and GPYTORCH_AVAILABLE
         self._models: dict[str, any] = {}  # Category -> trained GP
         self._trained = False
+        self.db_config = db_config
 
     def _create_sklearn_kernel(self):
         """Create sklearn GP kernel: Matern 5/2 + Constant + White."""
