@@ -11,6 +11,7 @@ Usage:
 """
 
 import logging
+import os
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
@@ -66,19 +67,19 @@ class SemanticRepository:
 
     def __init__(
         self,
-        host: str = "localhost",
-        port: int = 5544,
-        database: str = "devdb01",
-        user: str = "dro",
-        password: str = "sicillionbillions",
+        host: str = None,
+        port: int = None,
+        database: str = None,
+        user: str = None,
+        password: str = None,
     ):
-        """Initialize with database connection parameters."""
+        """Initialize with database connection parameters (uses env vars as defaults)."""
         self.conn_params = {
-            "host": host,
-            "port": port,
-            "database": database,
-            "user": user,
-            "password": password,
+            "host": host or os.getenv("DB_HOST", "localhost"),
+            "port": port or int(os.getenv("DB_PORT", "5544")),
+            "database": database or os.getenv("DB_NAME", "devdb01"),
+            "user": user or os.getenv("DB_USER", "dro"),
+            "password": password or os.getenv("DB_PASSWORD", "sicillionbillions"),
         }
         logger.info("SemanticRepository initialized")
 
