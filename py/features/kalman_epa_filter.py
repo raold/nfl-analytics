@@ -15,6 +15,7 @@ Usage:
 """
 
 import logging
+import os
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -22,6 +23,20 @@ import numpy as np
 import psycopg2
 
 logger = logging.getLogger(__name__)
+
+# Import centralized DB config
+try:
+    from py.utils.db_config import get_db_config
+except ImportError:
+    # Fallback for standalone usage
+    def get_db_config():
+        return {
+            "host": os.getenv("DB_HOST", "localhost"),
+            "port": int(os.getenv("DB_PORT", "5544")),
+            "dbname": os.getenv("DB_NAME", "devdb01"),
+            "user": os.getenv("DB_USER", "dro"),
+            "password": os.getenv("DB_PASSWORD", "sicillionbillions"),
+        }
 
 
 @dataclass
@@ -56,10 +71,7 @@ class KalmanEPAFilter:
     CUSUM_K = 0.5  # Reference value
     CUSUM_H = 4.0  # Control limit
 
-    # Database config
-    DB_CONFIG = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-
-    def __init__(self, sigma_v_sq: float = None, sigma_w_sq: float = None):
+    def __init__(self, sigma_v_sq: float = None, sigma_w_sq: float = None, db_config: dict = None):
         """
         Initialize filter with optional custom noise parameters.
 
@@ -110,10 +122,8 @@ class KalmanEPAFilter:
         """
 
         try:
-            conn = psycopg2.connect(
-                host="localhost", port=5544, dbname="devdb01",
-                user="dro", password="sicillionbillions"
-            )
+            db_config = get_db_config()
+            conn = psycopg2.connect(**db_config)
             with conn.cursor() as cur:
                 cur.execute(query, {"team": team, "season": season, "week": week})
                 result = [(row[0], row[1], float(row[2])) for row in cur.fetchall()]
