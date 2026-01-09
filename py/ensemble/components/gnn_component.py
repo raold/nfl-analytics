@@ -30,6 +30,7 @@ import numpy as np
 import torch
 
 from py.ensemble.strategy.base import ModelPrediction, ModelType
+from py.models.hierarchical_gnn_v1 import NFLGraph
 
 logger = logging.getLogger(__name__)
 

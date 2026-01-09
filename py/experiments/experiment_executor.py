@@ -22,6 +22,7 @@ import psycopg2
 
 # Import causal modules
 from causal.panel_constructor import PanelConstructor
+from causal.diff_in_diff import DiffInDiffEstimator
 
 # Causal imports will be done per-method as needed to avoid import errors
 

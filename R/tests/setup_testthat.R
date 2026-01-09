@@ -315,7 +315,7 @@ test_that("batch updates are faster than row-by-row", {
 
   # Measure row-by-row insertion time
   start_row_by_row <- Sys.time()
-  for (i in 1:nrow(test_data)) {
+  for (i in seq_len(nrow(test_data))) {
     dbExecute(conn, sprintf("
       INSERT INTO %s (id, value) VALUES ($1, $2)
     ", test_table), params = list(test_data$id[i], test_data$value[i]))

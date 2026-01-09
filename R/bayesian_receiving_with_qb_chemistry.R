@@ -345,7 +345,7 @@ dbExecute(conn, "DELETE FROM mart.bayesian_player_ratings WHERE stat_type = 'rec
 cat("Deleted old ratings\n")
 
 # Insert new ratings (including qb_id for chemistry tracking)
-for (i in 1:nrow(ratings_df)) {
+for (i in seq_len(nrow(ratings_df))) {
   row <- ratings_df[i, ]
 
   sql <- glue("

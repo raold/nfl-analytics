@@ -649,7 +649,7 @@ cat(sprintf(
 ))
 
 cat("\nCLV by Strategy:\n")
-for (i in 1:nrow(clv_stats)) {
+for (i in seq_len(nrow(clv_stats))) {
   cat(sprintf("  %s:\n", clv_stats$strategy[i]))
   cat(sprintf("    Mean CLV: %.3f points\n", clv_stats$mean_clv[i]))
   cat(sprintf("    Positive CLV: %.1f%%\n", clv_stats$positive_clv_pct[i]))

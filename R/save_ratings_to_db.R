@@ -69,7 +69,7 @@ dbExecute(conn, "DELETE FROM mart.bayesian_player_ratings WHERE stat_type = 'pas
 
 cat("Inserting ratings using SQL...\n")
 
-for (i in 1:nrow(ratings_df)) {
+for (i in seq_len(nrow(ratings_df))) {
   row <- ratings_df[i, ]
 
   sql <- sprintf(

@@ -176,7 +176,7 @@ generate_predictions <- function(model, model_name, player_games) {
   # Progress bar
   pb <- txtProgressBar(min = 0, max = nrow(player_games), style = 3)
 
-  for (i in 1:nrow(player_games)) {
+  for (i in seq_len(nrow(player_games))) {
     game <- player_games[i, ]
 
     start_time <- Sys.time()
