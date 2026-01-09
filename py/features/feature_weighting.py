@@ -31,11 +31,7 @@ class FeatureWeighter:
     reducing noise from low-signal features without eliminating them entirely.
     """
 
-    def __init__(
-        self,
-        feature_importance: pd.DataFrame,
-        importance_col: str = "combined_shap"
-    ):
+    def __init__(self, feature_importance: pd.DataFrame, importance_col: str = "combined_shap"):
         """Initialize with feature importance data.
 
         Args:
@@ -47,10 +43,7 @@ class FeatureWeighter:
 
         # Create feature -> importance mapping
         self.importance_map = dict(
-            zip(
-                self.importance_df["feature"],
-                self.importance_df[importance_col]
-            )
+            zip(self.importance_df["feature"], self.importance_df[importance_col])
         )
 
         # Precompute weights using different methods
@@ -120,7 +113,9 @@ class FeatureWeighter:
     def get_weights(
         self,
         feature_names: list[str],
-        method: Literal["dirichlet", "softmax", "bayesian_shrinkage", "power_law", "rank_based"] = "bayesian_shrinkage"
+        method: Literal[
+            "dirichlet", "softmax", "bayesian_shrinkage", "power_law", "rank_based"
+        ] = "bayesian_shrinkage",
     ) -> np.ndarray:
         """Get weights for specified features.
 
@@ -147,8 +142,10 @@ class FeatureWeighter:
     def transform(
         self,
         X: pd.DataFrame,
-        method: Literal["dirichlet", "softmax", "bayesian_shrinkage", "power_law", "rank_based"] = "bayesian_shrinkage",
-        scale_factor: float = 1.0
+        method: Literal[
+            "dirichlet", "softmax", "bayesian_shrinkage", "power_law", "rank_based"
+        ] = "bayesian_shrinkage",
+        scale_factor: float = 1.0,
     ) -> pd.DataFrame:
         """Apply feature weighting to feature matrix.
 
@@ -218,14 +215,14 @@ class FeatureWeighter:
             "min_importance": importances.min(),
             "n_zero_importance": (importances < 1e-6).sum(),
             "n_above_median": (importances > self.median_importance).sum(),
-            "top_10_pct_share": np.sort(importances)[-int(self.n_features * 0.1):].sum() / importances.sum(),
-            "bottom_50_pct_share": np.sort(importances)[:int(self.n_features * 0.5)].sum() / importances.sum(),
+            "top_10_pct_share": np.sort(importances)[-int(self.n_features * 0.1) :].sum()
+            / importances.sum(),
+            "bottom_50_pct_share": np.sort(importances)[: int(self.n_features * 0.5)].sum()
+            / importances.sum(),
         }
 
     def get_pruning_candidates(
-        self,
-        threshold: float = 0.001,
-        min_keep: int = 100
+        self, threshold: float = 0.001, min_keep: int = 100
     ) -> tuple[list[str], list[str]]:
         """Identify features that could be pruned vs kept.
 
@@ -268,7 +265,7 @@ class BayesianFeatureShrinker:
         feature_importance: pd.DataFrame,
         importance_col: str = "combined_shap",
         global_shrinkage: float = 0.3,
-        local_shrinkage: bool = True
+        local_shrinkage: bool = True,
     ):
         """Initialize Bayesian shrinker.
 
@@ -365,17 +362,14 @@ class BayesianFeatureShrinker:
         Returns:
             List of effective feature names
         """
-        return [
-            feat for feat, factor in self.shrinkage_factors.items()
-            if factor >= threshold
-        ]
+        return [feat for feat, factor in self.shrinkage_factors.items() if factor >= threshold]
 
 
 def create_weighted_training_data(
     X: pd.DataFrame,
     shap_csv_path: str = "data/feature_importance_shap.csv",
     method: str = "bayesian_shrinkage",
-    scale_factor: float = 1.0
+    scale_factor: float = 1.0,
 ) -> pd.DataFrame:
     """Convenience function to create weighted training data.
 
@@ -410,7 +404,9 @@ if __name__ == "__main__":
     print("\n=== Importance Distribution ===")
     summary = weighter.get_summary()
     print(f"  Total features:       {summary['n_features']}")
-    print(f"  Zero importance:      {summary['n_zero_importance']} ({summary['n_zero_importance']/summary['n_features']*100:.1f}%)")
+    print(
+        f"  Zero importance:      {summary['n_zero_importance']} ({summary['n_zero_importance']/summary['n_features']*100:.1f}%)"
+    )
     print(f"  Above median:         {summary['n_above_median']}")
     print(f"  Top 10% share:        {summary['top_10_pct_share']*100:.1f}% of total importance")
     print(f"  Bottom 50% share:     {summary['bottom_50_pct_share']*100:.1f}% of total importance")
@@ -430,7 +426,9 @@ if __name__ == "__main__":
 
     for threshold in [0.9, 0.7, 0.5, 0.3]:
         effective = shrinker.get_effective_features(threshold=threshold)
-        print(f"  Kappa >= {threshold}: {len(effective):3d} features retain {threshold*100:.0f}%+ signal")
+        print(
+            f"  Kappa >= {threshold}: {len(effective):3d} features retain {threshold*100:.0f}%+ signal"
+        )
 
     print("\n=== Weighting Method Comparison ===")
     top_features = weighter.importance_df.nlargest(5, "combined_shap")["feature"].tolist()

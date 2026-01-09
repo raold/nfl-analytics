@@ -6,7 +6,6 @@ Feature weighting allows us to keep all features but reduce the influence
 of low-signal features rather than eliminating them entirely.
 """
 
-import json
 import numpy as np
 import pandas as pd
 import xgboost as xgb
@@ -14,9 +13,11 @@ from pathlib import Path
 from datetime import datetime
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import warnings
+
 warnings.filterwarnings("ignore")
 
 import sys
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from py.features.feature_weighting import FeatureWeighter, BayesianFeatureShrinker
@@ -103,22 +104,14 @@ def train_and_evaluate(df: pd.DataFrame, weighting_method: str, shap_csv: str):
 
     # Train spread model
     spread_model = xgb.XGBRegressor(**XGB_PARAMS)
-    spread_model.fit(
-        X_train, y_train_spread,
-        eval_set=[(X_val, y_val_spread)],
-        verbose=False
-    )
+    spread_model.fit(X_train, y_train_spread, eval_set=[(X_val, y_val_spread)], verbose=False)
     y_pred_spread = spread_model.predict(X_val)
     spread_mae = mean_absolute_error(y_val_spread, y_pred_spread)
     spread_rmse = np.sqrt(mean_squared_error(y_val_spread, y_pred_spread))
 
     # Train total model
     total_model = xgb.XGBRegressor(**XGB_PARAMS)
-    total_model.fit(
-        X_train, y_train_total,
-        eval_set=[(X_val, y_val_total)],
-        verbose=False
-    )
+    total_model.fit(X_train, y_train_total, eval_set=[(X_val, y_val_total)], verbose=False)
     y_pred_total = total_model.predict(X_val)
     total_mae = mean_absolute_error(y_val_total, y_pred_total)
     total_rmse = np.sqrt(mean_squared_error(y_val_total, y_pred_total))
@@ -181,7 +174,9 @@ def main():
     results_df = pd.DataFrame(results)
     baseline = results_df[results_df["method"] == "none"].iloc[0]
 
-    print(f"\n{'Method':<25} {'Spread MAE':>12} {'Δ vs Base':>12} {'Total MAE':>12} {'Δ vs Base':>12}")
+    print(
+        f"\n{'Method':<25} {'Spread MAE':>12} {'Δ vs Base':>12} {'Total MAE':>12} {'Δ vs Base':>12}"
+    )
     print("-" * 70)
 
     for _, row in results_df.iterrows():
@@ -190,7 +185,9 @@ def main():
         spread_pct = (spread_delta / baseline["spread_mae"]) * 100
         total_pct = (total_delta / baseline["total_mae"]) * 100
 
-        print(f"{row['method']:<25} {row['spread_mae']:>12.4f} {spread_pct:>+11.2f}% {row['total_mae']:>12.4f} {total_pct:>+11.2f}%")
+        print(
+            f"{row['method']:<25} {row['spread_mae']:>12.4f} {spread_pct:>+11.2f}% {row['total_mae']:>12.4f} {total_pct:>+11.2f}%"
+        )
 
     # Recommendations
     print("\n" + "=" * 70)

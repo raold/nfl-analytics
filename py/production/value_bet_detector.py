@@ -144,6 +144,7 @@ class ValueBetDetector:
         if self._inference is None and self.use_llm_explanations:
             try:
                 from py.semantic.models.inference import SemanticInferenceClient
+
                 self._inference = SemanticInferenceClient()
                 logger.info("Initialized inference client for LLM explanations")
             except Exception as e:
@@ -443,15 +444,17 @@ Provide a concise, professional explanation:"""
         ]
 
         for i, bet in enumerate(value_bets, 1):
-            lines.extend([
-                f"#{i}: {bet.away_team} @ {bet.home_team}",
-                f"    Bet: {bet.bet_side} ({bet.odds})",
-                f"    Edge: {bet.edge_pct} | EV: ${bet.expected_value:.2f}/100",
-                f"    Confidence: {bet.confidence.value.upper()}",
-                f"    Recommended: {bet.recommended_size:.1%} bankroll",
-                f"    Justification: {bet.explanation}",
-                "",
-            ])
+            lines.extend(
+                [
+                    f"#{i}: {bet.away_team} @ {bet.home_team}",
+                    f"    Bet: {bet.bet_side} ({bet.odds})",
+                    f"    Edge: {bet.edge_pct} | EV: ${bet.expected_value:.2f}/100",
+                    f"    Confidence: {bet.confidence.value.upper()}",
+                    f"    Recommended: {bet.recommended_size:.1%} bankroll",
+                    f"    Justification: {bet.explanation}",
+                    "",
+                ]
+            )
 
         return "\n".join(lines)
 

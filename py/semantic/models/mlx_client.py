@@ -118,9 +118,7 @@ class MLXClient:
             return self._model, self._tokenizer
 
         except ImportError:
-            raise ImportError(
-                "MLX LM not installed. Install with: pip install mlx-lm"
-            )
+            raise ImportError("MLX LM not installed. Install with: pip install mlx-lm")
 
     def generate(
         self,

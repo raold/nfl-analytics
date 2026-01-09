@@ -11,16 +11,12 @@ Usage:
     suggestions = learner.suggest_llm_improvements()
 """
 
-import json
 import logging
 import sys
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import numpy as np
-import pandas as pd
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
@@ -35,12 +31,13 @@ logger = logging.getLogger(__name__)
 @dataclass
 class FeatureInsight:
     """Insight about a semantic feature's performance."""
+
     feature_name: str
     mean_contribution: float
     std_contribution: float
     games_evaluated: int
     accuracy_when_high: float  # Accuracy when feature value is high
-    accuracy_when_low: float   # Accuracy when feature value is low
+    accuracy_when_low: float  # Accuracy when feature value is low
     recommendation: str  # 'keep', 'boost', 'demote', 'drop', 'investigate'
     reason: str
 
@@ -48,6 +45,7 @@ class FeatureInsight:
 @dataclass
 class LLMSuggestion:
     """Suggestion for LLM improvement."""
+
     action: str  # 'refine_prompt', 'add_training_data', 'adjust_threshold'
     feature: str
     issue: str
@@ -59,6 +57,7 @@ class LLMSuggestion:
 @dataclass
 class PatternDiscovery:
     """Discovered pattern from semantic data."""
+
     pattern_name: str
     description: str
     correlation_with_outcome: float
@@ -70,6 +69,7 @@ class PatternDiscovery:
 @dataclass
 class MetaLearnerResult:
     """Complete result of meta-learning analysis."""
+
     season: int
     week: int
     games_analyzed: int = 0
@@ -89,7 +89,7 @@ class MetaLearnerResult:
         return sorted(
             [f for f in self.feature_insights if f.mean_contribution > 0],
             key=lambda x: x.mean_contribution,
-            reverse=True
+            reverse=True,
         )
 
     @property
@@ -97,7 +97,7 @@ class MetaLearnerResult:
         """Underperforming features (negative contribution)."""
         return sorted(
             [f for f in self.feature_insights if f.mean_contribution < 0],
-            key=lambda x: x.mean_contribution
+            key=lambda x: x.mean_contribution,
         )
 
 
@@ -129,7 +129,7 @@ class SemanticMetaLearner:
         database: str = "devdb01",
         user: str = "dro",
         password: str = "sicillionbillions",
-        lookback_weeks: int = 4
+        lookback_weeks: int = 4,
     ):
         """Initialize meta-learner."""
         self.conn_params = {
@@ -145,11 +145,7 @@ class SemanticMetaLearner:
         """Get database connection."""
         return psycopg2.connect(**self.conn_params)
 
-    def update_from_outcomes(
-        self,
-        season: int,
-        week: int
-    ) -> MetaLearnerResult:
+    def update_from_outcomes(self, season: int, week: int) -> MetaLearnerResult:
         """
         Update meta-learner based on game outcomes.
 
@@ -194,12 +190,7 @@ class SemanticMetaLearner:
 
         return result
 
-    def _get_attribution_data(
-        self,
-        season: int,
-        start_week: int,
-        end_week: int
-    ) -> list[dict]:
+    def _get_attribution_data(self, season: int, start_week: int, end_week: int) -> list[dict]:
         """Get attribution data for analysis."""
         query = """
         SELECT
@@ -221,10 +212,7 @@ class SemanticMetaLearner:
                 cur.execute(query, (season, start_week, end_week))
                 return [dict(row) for row in cur.fetchall()]
 
-    def _compute_feature_stats(
-        self,
-        attributions: list[dict]
-    ) -> dict[str, dict]:
+    def _compute_feature_stats(self, attributions: list[dict]) -> dict[str, dict]:
         """Compute statistics for each feature."""
         feature_data = {}
 
@@ -245,9 +233,7 @@ class SemanticMetaLearner:
                     }
 
                 feature_data[name]["values"].append(value)
-                feature_data[name]["contributions"].append(
-                    contribs.get(name, 0.0)
-                )
+                feature_data[name]["contributions"].append(contribs.get(name, 0.0))
 
                 # Track accuracy by value level
                 is_high = abs(value) > self.HIGH_VALUE_THRESHOLD
@@ -278,10 +264,7 @@ class SemanticMetaLearner:
 
         return stats
 
-    def _generate_feature_insights(
-        self,
-        stats: dict[str, dict]
-    ) -> list[FeatureInsight]:
+    def _generate_feature_insights(self, stats: dict[str, dict]) -> list[FeatureInsight]:
         """Generate insights for each feature."""
         insights = []
 
@@ -302,30 +285,32 @@ class SemanticMetaLearner:
                 reason = f"Negative contribution ({mean_c:.4f})"
             elif abs(acc_high - acc_low) > 0.1:
                 recommendation = "investigate"
-                reason = f"Accuracy varies by value level ({acc_high:.1%} high vs {acc_low:.1%} low)"
+                reason = (
+                    f"Accuracy varies by value level ({acc_high:.1%} high vs {acc_low:.1%} low)"
+                )
             else:
                 recommendation = "keep"
                 reason = "Neutral contribution, stable performance"
 
-            insights.append(FeatureInsight(
-                feature_name=name,
-                mean_contribution=mean_c,
-                std_contribution=s["std_contribution"],
-                games_evaluated=s["games"],
-                accuracy_when_high=acc_high,
-                accuracy_when_low=acc_low,
-                recommendation=recommendation,
-                reason=reason
-            ))
+            insights.append(
+                FeatureInsight(
+                    feature_name=name,
+                    mean_contribution=mean_c,
+                    std_contribution=s["std_contribution"],
+                    games_evaluated=s["games"],
+                    accuracy_when_high=acc_high,
+                    accuracy_when_low=acc_low,
+                    recommendation=recommendation,
+                    reason=reason,
+                )
+            )
 
         # Sort by absolute contribution
         insights.sort(key=lambda x: abs(x.mean_contribution), reverse=True)
         return insights
 
     def _generate_llm_suggestions(
-        self,
-        insights: list[FeatureInsight],
-        attributions: list[dict]
+        self, insights: list[FeatureInsight], attributions: list[dict]
     ) -> list[LLMSuggestion]:
         """Generate suggestions for LLM improvement."""
         suggestions = []
@@ -333,54 +318,54 @@ class SemanticMetaLearner:
         for insight in insights:
             if insight.recommendation in ["drop", "demote"]:
                 # Feature hurts predictions - analyze why
-                issue = self._analyze_negative_feature(
-                    insight.feature_name, attributions
+                issue = self._analyze_negative_feature(insight.feature_name, attributions)
+                suggestions.append(
+                    LLMSuggestion(
+                        action="refine_prompt",
+                        feature=insight.feature_name,
+                        issue=issue,
+                        suggestion=f"Reduce weight or refine extraction for {insight.feature_name}",
+                        priority="high" if insight.recommendation == "drop" else "medium",
+                        evidence={
+                            "mean_contribution": insight.mean_contribution,
+                            "games": insight.games_evaluated,
+                        },
+                    )
                 )
-                suggestions.append(LLMSuggestion(
-                    action="refine_prompt",
-                    feature=insight.feature_name,
-                    issue=issue,
-                    suggestion=f"Reduce weight or refine extraction for {insight.feature_name}",
-                    priority="high" if insight.recommendation == "drop" else "medium",
-                    evidence={
-                        "mean_contribution": insight.mean_contribution,
-                        "games": insight.games_evaluated
-                    }
-                ))
 
             elif insight.recommendation == "investigate":
-                suggestions.append(LLMSuggestion(
-                    action="add_training_data",
-                    feature=insight.feature_name,
-                    issue=f"Inconsistent performance across value ranges",
-                    suggestion=f"Add more training examples for edge cases",
-                    priority="medium",
-                    evidence={
-                        "accuracy_high": insight.accuracy_when_high,
-                        "accuracy_low": insight.accuracy_when_low
-                    }
-                ))
+                suggestions.append(
+                    LLMSuggestion(
+                        action="add_training_data",
+                        feature=insight.feature_name,
+                        issue=f"Inconsistent performance across value ranges",
+                        suggestion=f"Add more training examples for edge cases",
+                        priority="medium",
+                        evidence={
+                            "accuracy_high": insight.accuracy_when_high,
+                            "accuracy_low": insight.accuracy_when_low,
+                        },
+                    )
+                )
 
             elif insight.recommendation == "boost":
-                suggestions.append(LLMSuggestion(
-                    action="adjust_threshold",
-                    feature=insight.feature_name,
-                    issue="Strong positive contributor",
-                    suggestion=f"Increase weight for {insight.feature_name}",
-                    priority="medium",
-                    evidence={
-                        "mean_contribution": insight.mean_contribution,
-                        "games": insight.games_evaluated
-                    }
-                ))
+                suggestions.append(
+                    LLMSuggestion(
+                        action="adjust_threshold",
+                        feature=insight.feature_name,
+                        issue="Strong positive contributor",
+                        suggestion=f"Increase weight for {insight.feature_name}",
+                        priority="medium",
+                        evidence={
+                            "mean_contribution": insight.mean_contribution,
+                            "games": insight.games_evaluated,
+                        },
+                    )
+                )
 
         return suggestions
 
-    def _analyze_negative_feature(
-        self,
-        feature_name: str,
-        attributions: list[dict]
-    ) -> str:
+    def _analyze_negative_feature(self, feature_name: str, attributions: list[dict]) -> str:
         """Analyze why a feature has negative contribution."""
         # Check if feature is worse when confident (high value)
         high_value_errors = []
@@ -405,11 +390,7 @@ class SemanticMetaLearner:
 
         return "Feature not predictive of outcomes"
 
-    def _discover_patterns(
-        self,
-        season: int,
-        week: int
-    ) -> list[PatternDiscovery]:
+    def _discover_patterns(self, season: int, week: int) -> list[PatternDiscovery]:
         """
         Discover new patterns in semantic data.
 
@@ -435,11 +416,7 @@ class SemanticMetaLearner:
 
         return patterns
 
-    def _check_momentum_pattern(
-        self,
-        season: int,
-        week: int
-    ) -> PatternDiscovery | None:
+    def _check_momentum_pattern(self, season: int, week: int) -> PatternDiscovery | None:
         """Check if sentiment momentum predicts outcomes."""
         # This would require historical sentiment data
         # For now, return placeholder if we have the data
@@ -461,16 +438,12 @@ class SemanticMetaLearner:
                 correlation_with_outcome=0.0,  # Would compute from data
                 suggested_feature="sem_sentiment_3d_momentum",
                 sample_size=count,
-                confidence=0.5
+                confidence=0.5,
             )
 
         return None
 
-    def _check_injury_clustering(
-        self,
-        season: int,
-        week: int
-    ) -> PatternDiscovery | None:
+    def _check_injury_clustering(self, season: int, week: int) -> PatternDiscovery | None:
         """Check if multiple injuries in same week predict underperformance."""
         query = """
         SELECT team, COUNT(*) as injury_count
@@ -493,25 +466,18 @@ class SemanticMetaLearner:
                 correlation_with_outcome=0.0,
                 suggested_feature="sem_injury_cluster_indicator",
                 sample_size=len(teams),
-                confidence=0.6
+                confidence=0.6,
             )
 
         return None
 
-    def _check_buzz_upset_correlation(
-        self,
-        season: int,
-        week: int
-    ) -> PatternDiscovery | None:
+    def _check_buzz_upset_correlation(self, season: int, week: int) -> PatternDiscovery | None:
         """Check if media buzz spikes before upsets."""
         # Would need to correlate buzz with upset outcomes
         # Placeholder for now
         return None
 
-    def _suggest_feature_weights(
-        self,
-        stats: dict[str, dict]
-    ) -> dict[str, float]:
+    def _suggest_feature_weights(self, stats: dict[str, dict]) -> dict[str, float]:
         """
         Suggest feature weights based on rolling performance.
 
@@ -541,10 +507,7 @@ class SemanticMetaLearner:
         return weights
 
     def compute_feature_contribution(
-        self,
-        game_id: str,
-        prediction: dict,
-        actual: dict
+        self, game_id: str, prediction: dict, actual: dict
     ) -> dict[str, float]:
         """
         Compute marginal contribution of each semantic feature for a single game.
@@ -559,7 +522,9 @@ class SemanticMetaLearner:
         if not features:
             return {}
 
-        correct = (prediction.get("predicted_spread", 0) > 0) == (actual.get("actual_spread", 0) > 0)
+        correct = (prediction.get("predicted_spread", 0) > 0) == (
+            actual.get("actual_spread", 0) > 0
+        )
         error = abs(prediction.get("predicted_spread", 0) - actual.get("actual_spread", 0))
 
         # Compute contributions
@@ -602,11 +567,7 @@ class SemanticMetaLearner:
         result = self.update_from_outcomes(2025, week)
         return result.llm_suggestions
 
-    def discover_new_patterns(
-        self,
-        season: int,
-        weeks: list[int]
-    ) -> list[PatternDiscovery]:
+    def discover_new_patterns(self, season: int, weeks: list[int]) -> list[PatternDiscovery]:
         """
         Discover patterns across multiple weeks.
 
@@ -663,5 +624,7 @@ if __name__ == "__main__":
 
     if result.weight_suggestions:
         print("\nWeight Suggestions:")
-        for feat, weight in sorted(result.weight_suggestions.items(), key=lambda x: x[1], reverse=True)[:5]:
+        for feat, weight in sorted(
+            result.weight_suggestions.items(), key=lambda x: x[1], reverse=True
+        )[:5]:
             print(f"  {feat}: {weight}")

@@ -9,6 +9,7 @@ Action space: 5 discrete actions (no_bet, bet_home, bet_away, bet_over, bet_unde
 Bet sizing: Kelly criterion with experiment-based adjustments
 """
 
+import os
 from dataclasses import dataclass
 
 import gymnasium as gym

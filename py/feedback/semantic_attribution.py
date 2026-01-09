@@ -14,7 +14,6 @@ Usage:
 
 import json
 import logging
-import pickle
 import sys
 from pathlib import Path
 
@@ -24,7 +23,6 @@ if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -34,6 +32,7 @@ from psycopg2.extras import RealDictCursor, execute_values
 try:
     import shap
     import xgboost as xgb
+
     SHAP_AVAILABLE = True
 except ImportError:
     SHAP_AVAILABLE = False
@@ -44,6 +43,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class AttributionResult:
     """Result of attribution analysis."""
+
     season: int
     week: int
     games_analyzed: int = 0
@@ -71,7 +71,9 @@ class SemanticAttributionTracker:
     SEMANTIC_PREFIX = "sem_"
 
     # Production model directory
-    PRODUCTION_MODEL_DIR = Path(__file__).parent.parent.parent / "models" / "production" / "game_outcome_v2"
+    PRODUCTION_MODEL_DIR = (
+        Path(__file__).parent.parent.parent / "models" / "production" / "game_outcome_v2"
+    )
 
     def __init__(
         self,
@@ -150,11 +152,7 @@ class SemanticAttributionTracker:
         """Get database connection."""
         return psycopg2.connect(**self.conn_params)
 
-    def get_predictions_with_outcomes(
-        self,
-        season: int,
-        week: int
-    ) -> pd.DataFrame:
+    def get_predictions_with_outcomes(self, season: int, week: int) -> pd.DataFrame:
         """
         Get predictions that have actual outcomes.
 
@@ -214,8 +212,7 @@ class SemanticAttributionTracker:
 
             # Extract semantic features subset
             semantic_features = {
-                k: v for k, v in all_features.items()
-                if k.startswith(self.SEMANTIC_PREFIX)
+                k: v for k, v in all_features.items() if k.startswith(self.SEMANTIC_PREFIX)
             }
 
             return all_features, semantic_features
@@ -225,12 +222,7 @@ class SemanticAttributionTracker:
             return {}, {}
 
     def extract_semantic_features_for_game(
-        self,
-        home_team: str,
-        away_team: str,
-        season: int,
-        week: int,
-        as_of: datetime | None = None
+        self, home_team: str, away_team: str, season: int, week: int, as_of: datetime | None = None
     ) -> dict[str, float]:
         """
         Extract semantic features for a specific game.
@@ -242,11 +234,7 @@ class SemanticAttributionTracker:
 
             extractor = SemanticFeatureExtractor()
             features = extractor.extract_features(
-                home_team=home_team,
-                away_team=away_team,
-                season=season,
-                week=week,
-                as_of=as_of
+                home_team=home_team, away_team=away_team, season=season, week=week, as_of=as_of
             )
 
             # Add prefix for consistency
@@ -283,9 +271,7 @@ class SemanticAttributionTracker:
 
         # Try True SHAP first
         if self.use_true_shap and self._models_loaded and all_features:
-            return self._compute_true_shap_attribution(
-                all_features, semantic_features
-            )
+            return self._compute_true_shap_attribution(all_features, semantic_features)
 
         # Fallback to heuristic
         return self._compute_heuristic_attribution(
@@ -326,7 +312,11 @@ class SemanticAttributionTracker:
             attributions = {}
             for i, name in enumerate(self._feature_names):
                 # Only include semantic features
-                sem_name = name if name.startswith(self.SEMANTIC_PREFIX) else f"{self.SEMANTIC_PREFIX}{name}"
+                sem_name = (
+                    name
+                    if name.startswith(self.SEMANTIC_PREFIX)
+                    else f"{self.SEMANTIC_PREFIX}{name}"
+                )
                 if sem_name in semantic_features or name in semantic_features:
                     # Use the actual feature name from semantic_features
                     key = name if name in semantic_features else sem_name
@@ -341,10 +331,7 @@ class SemanticAttributionTracker:
             return {}
 
     def _compute_heuristic_attribution(
-        self,
-        semantic_features: dict[str, float],
-        prediction_error: float,
-        spread_correct: bool
+        self, semantic_features: dict[str, float], prediction_error: float, spread_correct: bool
     ) -> dict[str, float]:
         """
         Compute heuristic attribution (fallback when SHAP unavailable).
@@ -385,10 +372,7 @@ class SemanticAttributionTracker:
         return attributions
 
     def compute_week_attribution(
-        self,
-        season: int,
-        week: int,
-        save_to_db: bool = True
+        self, season: int, week: int, save_to_db: bool = True
     ) -> AttributionResult:
         """
         Compute attribution for all games in a week.
@@ -426,14 +410,14 @@ class SemanticAttributionTracker:
                         home_team=row["home_team"],
                         away_team=row["away_team"],
                         season=season,
-                        week=week
+                        week=week,
                     )
                 else:
                     sem_features = self.extract_semantic_features_for_game(
                         home_team=row["home_team"],
                         away_team=row["away_team"],
                         season=season,
-                        week=week
+                        week=week,
                     )
 
                 if not sem_features:
@@ -455,18 +439,20 @@ class SemanticAttributionTracker:
                     feature_totals[name].append(value)
 
                 # Prepare for database
-                all_attributions.append({
-                    "game_id": row["game_id"],
-                    "season": season,
-                    "week": week,
-                    "prediction_correct": row["spread_correct"],
-                    "prediction_error": row["abs_spread_error"],
-                    "predicted_spread": row["predicted_spread"],
-                    "actual_spread": row["actual_spread"],
-                    "semantic_features": sem_features,
-                    "feature_attributions": attributions,
-                    "total_semantic_contribution": sum(attributions.values()),
-                })
+                all_attributions.append(
+                    {
+                        "game_id": row["game_id"],
+                        "season": season,
+                        "week": week,
+                        "prediction_correct": row["spread_correct"],
+                        "prediction_error": row["abs_spread_error"],
+                        "predicted_spread": row["predicted_spread"],
+                        "actual_spread": row["actual_spread"],
+                        "semantic_features": sem_features,
+                        "feature_attributions": attributions,
+                        "total_semantic_contribution": sum(attributions.values()),
+                    }
+                )
 
             except Exception as e:
                 result.errors.append(f"Error for {row['game_id']}: {e}")
@@ -475,11 +461,7 @@ class SemanticAttributionTracker:
         # Compute top features by average attribution
         if feature_totals:
             result.top_features = {
-                name: {
-                    "mean": np.mean(values),
-                    "std": np.std(values),
-                    "count": len(values)
-                }
+                name: {"mean": np.mean(values), "std": np.std(values), "count": len(values)}
                 for name, values in feature_totals.items()
             }
 
@@ -526,10 +508,7 @@ class SemanticAttributionTracker:
         return inserted
 
     def compute_rolling_attribution(
-        self,
-        season: int,
-        end_week: int,
-        lookback_weeks: int = 4
+        self, season: int, end_week: int, lookback_weeks: int = 4
     ) -> pd.DataFrame:
         """
         Compute rolling average attribution by semantic feature.
@@ -571,7 +550,7 @@ class SemanticAttributionTracker:
                     feature_stats[name] = {
                         "values": [],
                         "correct_values": [],
-                        "incorrect_values": []
+                        "incorrect_values": [],
                     }
 
                 feature_stats[name]["values"].append(value)
@@ -583,14 +562,20 @@ class SemanticAttributionTracker:
         # Build DataFrame
         records = []
         for name, stats in feature_stats.items():
-            records.append({
-                "feature": name,
-                "mean_attribution": np.mean(stats["values"]),
-                "std_attribution": np.std(stats["values"]),
-                "mean_when_correct": np.mean(stats["correct_values"]) if stats["correct_values"] else 0,
-                "mean_when_incorrect": np.mean(stats["incorrect_values"]) if stats["incorrect_values"] else 0,
-                "games_count": len(stats["values"]),
-            })
+            records.append(
+                {
+                    "feature": name,
+                    "mean_attribution": np.mean(stats["values"]),
+                    "std_attribution": np.std(stats["values"]),
+                    "mean_when_correct": (
+                        np.mean(stats["correct_values"]) if stats["correct_values"] else 0
+                    ),
+                    "mean_when_incorrect": (
+                        np.mean(stats["incorrect_values"]) if stats["incorrect_values"] else 0
+                    ),
+                    "games_count": len(stats["values"]),
+                }
+            )
 
         df = pd.DataFrame(records)
         if not df.empty:
@@ -653,9 +638,7 @@ if __name__ == "__main__":
         if result.top_features:
             print("\nTop features by attribution:")
             sorted_features = sorted(
-                result.top_features.items(),
-                key=lambda x: x[1]["mean"],
-                reverse=True
+                result.top_features.items(), key=lambda x: x[1]["mean"], reverse=True
             )
             for name, stats in sorted_features[:5]:
                 print(f"  {name}: mean={stats['mean']:.4f}, std={stats['std']:.4f}")

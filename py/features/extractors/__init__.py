@@ -52,20 +52,20 @@ from py.features.extractors.opponent_adjusted import OpponentAdjustedFeatureExtr
 
 __all__ = [
     # Base classes
-    'FeatureExtractorStrategy',
-    'GameLevelExtractorStrategy',
-    'FeatureExtractionError',
-    'FeatureExtractionResult',
-    'ExtractionLevel',
-    'FeaturePriority',
+    "FeatureExtractorStrategy",
+    "GameLevelExtractorStrategy",
+    "FeatureExtractionError",
+    "FeatureExtractionResult",
+    "ExtractionLevel",
+    "FeaturePriority",
     # Registry
-    'FeatureRegistry',
-    'ExtractionSummary',
-    'create_default_registry',
+    "FeatureRegistry",
+    "ExtractionSummary",
+    "create_default_registry",
     # Concrete extractors
-    'OffensiveFeatureExtractor',
-    'DefensiveFeatureExtractor',
-    'NextGenFeatureExtractor',
-    'QBRFeatureExtractor',
-    'OpponentAdjustedFeatureExtractor',
+    "OffensiveFeatureExtractor",
+    "DefensiveFeatureExtractor",
+    "NextGenFeatureExtractor",
+    "QBRFeatureExtractor",
+    "OpponentAdjustedFeatureExtractor",
 ]

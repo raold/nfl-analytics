@@ -17,7 +17,7 @@ import hashlib
 import logging
 import re
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class RotoWireNewsItem:
     """Structured news item from RotoWire."""
+
     id: str
     title: str
     description: str
@@ -46,29 +47,93 @@ class RotoWireNewsItem:
 
 # NFL team abbreviation patterns for extraction
 NFL_TEAM_PATTERNS = {
-    "Cardinals": "ARI", "Falcons": "ATL", "Ravens": "BAL", "Bills": "BUF",
-    "Panthers": "CAR", "Bears": "CHI", "Bengals": "CIN", "Browns": "CLE",
-    "Cowboys": "DAL", "Broncos": "DEN", "Lions": "DET", "Packers": "GB",
-    "Texans": "HOU", "Colts": "IND", "Jaguars": "JAX", "Chiefs": "KC",
-    "Raiders": "LV", "Chargers": "LAC", "Rams": "LAR", "Dolphins": "MIA",
-    "Vikings": "MIN", "Patriots": "NE", "Saints": "NO", "Giants": "NYG",
-    "Jets": "NYJ", "Eagles": "PHI", "Steelers": "PIT", "49ers": "SF",
-    "Seahawks": "SEA", "Buccaneers": "TB", "Titans": "TEN", "Commanders": "WAS",
+    "Cardinals": "ARI",
+    "Falcons": "ATL",
+    "Ravens": "BAL",
+    "Bills": "BUF",
+    "Panthers": "CAR",
+    "Bears": "CHI",
+    "Bengals": "CIN",
+    "Browns": "CLE",
+    "Cowboys": "DAL",
+    "Broncos": "DEN",
+    "Lions": "DET",
+    "Packers": "GB",
+    "Texans": "HOU",
+    "Colts": "IND",
+    "Jaguars": "JAX",
+    "Chiefs": "KC",
+    "Raiders": "LV",
+    "Chargers": "LAC",
+    "Rams": "LAR",
+    "Dolphins": "MIA",
+    "Vikings": "MIN",
+    "Patriots": "NE",
+    "Saints": "NO",
+    "Giants": "NYG",
+    "Jets": "NYJ",
+    "Eagles": "PHI",
+    "Steelers": "PIT",
+    "49ers": "SF",
+    "Seahawks": "SEA",
+    "Buccaneers": "TB",
+    "Titans": "TEN",
+    "Commanders": "WAS",
     # Also match abbreviations directly
-    "ARI": "ARI", "ATL": "ATL", "BAL": "BAL", "BUF": "BUF", "CAR": "CAR",
-    "CHI": "CHI", "CIN": "CIN", "CLE": "CLE", "DAL": "DAL", "DEN": "DEN",
-    "DET": "DET", "GB": "GB", "HOU": "HOU", "IND": "IND", "JAX": "JAX",
-    "KC": "KC", "LV": "LV", "LAC": "LAC", "LAR": "LAR", "MIA": "MIA",
-    "MIN": "MIN", "NE": "NE", "NO": "NO", "NYG": "NYG", "NYJ": "NYJ",
-    "PHI": "PHI", "PIT": "PIT", "SF": "SF", "SEA": "SEA", "TB": "TB",
-    "TEN": "TEN", "WAS": "WAS",
+    "ARI": "ARI",
+    "ATL": "ATL",
+    "BAL": "BAL",
+    "BUF": "BUF",
+    "CAR": "CAR",
+    "CHI": "CHI",
+    "CIN": "CIN",
+    "CLE": "CLE",
+    "DAL": "DAL",
+    "DEN": "DEN",
+    "DET": "DET",
+    "GB": "GB",
+    "HOU": "HOU",
+    "IND": "IND",
+    "JAX": "JAX",
+    "KC": "KC",
+    "LV": "LV",
+    "LAC": "LAC",
+    "LAR": "LAR",
+    "MIA": "MIA",
+    "MIN": "MIN",
+    "NE": "NE",
+    "NO": "NO",
+    "NYG": "NYG",
+    "NYJ": "NYJ",
+    "PHI": "PHI",
+    "PIT": "PIT",
+    "SF": "SF",
+    "SEA": "SEA",
+    "TB": "TB",
+    "TEN": "TEN",
+    "WAS": "WAS",
 }
 
 # Injury-related keywords
 INJURY_KEYWORDS = [
-    "injury", "injured", "hurt", "out", "questionable", "doubtful",
-    "ir", "inactive", "dnp", "limited", "full practice", "concussion",
-    "ankle", "knee", "hamstring", "shoulder", "back", "illness",
+    "injury",
+    "injured",
+    "hurt",
+    "out",
+    "questionable",
+    "doubtful",
+    "ir",
+    "inactive",
+    "dnp",
+    "limited",
+    "full practice",
+    "concussion",
+    "ankle",
+    "knee",
+    "hamstring",
+    "shoulder",
+    "back",
+    "illness",
 ]
 
 
@@ -103,6 +168,7 @@ class RotoWireClient:
         """Lazy-initialize async crawler."""
         if self._crawler is None:
             from crawl4ai import AsyncWebCrawler
+
             self._crawler = AsyncWebCrawler(verbose=False)
         return self._crawler
 
@@ -201,16 +267,18 @@ class RotoWireClient:
                 content = f"{title}|{analysis}"
                 content_id = hashlib.sha256(content.encode()).hexdigest()[:12]
 
-                items.append(RotoWireNewsItem(
-                    id=content_id,
-                    title=title,
-                    description=analysis[:500] if analysis else headline,
-                    url=self.NEWS_URL,
-                    published_at=datetime.utcnow(),
-                    teams=list(set(teams)),
-                    players=[player] if player else [],
-                    category=category,
-                ))
+                items.append(
+                    RotoWireNewsItem(
+                        id=content_id,
+                        title=title,
+                        description=analysis[:500] if analysis else headline,
+                        url=self.NEWS_URL,
+                        published_at=datetime.utcnow(),
+                        teams=list(set(teams)),
+                        players=[player] if player else [],
+                        category=category,
+                    )
+                )
             except Exception as e:
                 logger.debug("Failed to parse entry: %s", e)
 
@@ -219,17 +287,38 @@ class RotoWireClient:
     def _team_name_to_abbrev(self, team_name: str) -> str | None:
         """Convert full team name to abbreviation."""
         name_map = {
-            "Arizona Cardinals": "ARI", "Atlanta Falcons": "ATL", "Baltimore Ravens": "BAL",
-            "Buffalo Bills": "BUF", "Carolina Panthers": "CAR", "Chicago Bears": "CHI",
-            "Cincinnati Bengals": "CIN", "Cleveland Browns": "CLE", "Dallas Cowboys": "DAL",
-            "Denver Broncos": "DEN", "Detroit Lions": "DET", "Green Bay Packers": "GB",
-            "Houston Texans": "HOU", "Indianapolis Colts": "IND", "Jacksonville Jaguars": "JAX",
-            "Kansas City Chiefs": "KC", "Las Vegas Raiders": "LV", "Los Angeles Chargers": "LAC",
-            "Los Angeles Rams": "LAR", "Miami Dolphins": "MIA", "Minnesota Vikings": "MIN",
-            "New England Patriots": "NE", "New Orleans Saints": "NO", "New York Giants": "NYG",
-            "New York Jets": "NYJ", "Philadelphia Eagles": "PHI", "Pittsburgh Steelers": "PIT",
-            "San Francisco 49ers": "SF", "Seattle Seahawks": "SEA", "Tampa Bay Buccaneers": "TB",
-            "Tennessee Titans": "TEN", "Washington Commanders": "WAS",
+            "Arizona Cardinals": "ARI",
+            "Atlanta Falcons": "ATL",
+            "Baltimore Ravens": "BAL",
+            "Buffalo Bills": "BUF",
+            "Carolina Panthers": "CAR",
+            "Chicago Bears": "CHI",
+            "Cincinnati Bengals": "CIN",
+            "Cleveland Browns": "CLE",
+            "Dallas Cowboys": "DAL",
+            "Denver Broncos": "DEN",
+            "Detroit Lions": "DET",
+            "Green Bay Packers": "GB",
+            "Houston Texans": "HOU",
+            "Indianapolis Colts": "IND",
+            "Jacksonville Jaguars": "JAX",
+            "Kansas City Chiefs": "KC",
+            "Las Vegas Raiders": "LV",
+            "Los Angeles Chargers": "LAC",
+            "Los Angeles Rams": "LAR",
+            "Miami Dolphins": "MIA",
+            "Minnesota Vikings": "MIN",
+            "New England Patriots": "NE",
+            "New Orleans Saints": "NO",
+            "New York Giants": "NYG",
+            "New York Jets": "NYJ",
+            "Philadelphia Eagles": "PHI",
+            "Pittsburgh Steelers": "PIT",
+            "San Francisco 49ers": "SF",
+            "Seattle Seahawks": "SEA",
+            "Tampa Bay Buccaneers": "TB",
+            "Tennessee Titans": "TEN",
+            "Washington Commanders": "WAS",
         }
         # Try exact match first
         if team_name in name_map:
@@ -249,9 +338,9 @@ class RotoWireClient:
         items = []
 
         # Split into sections (Crawl4AI often produces ## headers for articles)
-        sections = re.split(r'\n(?=##?\s)', markdown)
+        sections = re.split(r"\n(?=##?\s)", markdown)
 
-        for section in sections[:limit * 2]:  # Check more than limit (some may be invalid)
+        for section in sections[: limit * 2]:  # Check more than limit (some may be invalid)
             if len(items) >= limit:
                 break
 
@@ -266,21 +355,21 @@ class RotoWireClient:
 
     def _parse_news_section(self, section: str) -> RotoWireNewsItem | None:
         """Parse a single news section."""
-        lines = section.strip().split('\n')
+        lines = section.strip().split("\n")
         if not lines:
             return None
 
         # Extract title from first line (often markdown header)
         title = lines[0].strip()
-        title = re.sub(r'^#+\s*', '', title)  # Remove markdown headers
-        title = re.sub(r'\[|\]|\(.*?\)', '', title)  # Remove markdown links
+        title = re.sub(r"^#+\s*", "", title)  # Remove markdown headers
+        title = re.sub(r"\[|\]|\(.*?\)", "", title)  # Remove markdown links
 
         if len(title) < 10 or len(title) > 300:
             return None
 
         # Description is the rest of the text
-        description = ' '.join(lines[1:]).strip()
-        description = re.sub(r'\s+', ' ', description)  # Normalize whitespace
+        description = " ".join(lines[1:]).strip()
+        description = re.sub(r"\s+", " ", description)  # Normalize whitespace
 
         if len(description) < 20:
             return None
@@ -313,7 +402,7 @@ class RotoWireClient:
         """Extract NFL team abbreviations from text."""
         teams = []
         for pattern, abbrev in NFL_TEAM_PATTERNS.items():
-            if re.search(rf'\b{pattern}\b', text, re.IGNORECASE):
+            if re.search(rf"\b{pattern}\b", text, re.IGNORECASE):
                 if abbrev not in teams:
                     teams.append(abbrev)
         return teams
@@ -321,7 +410,7 @@ class RotoWireClient:
     def _extract_players(self, text: str) -> list[str]:
         """Extract player names from text (heuristic)."""
         # Look for capitalized name patterns (First Last)
-        pattern = r'\b([A-Z][a-z]+\s+[A-Z][a-z]+)\b'
+        pattern = r"\b([A-Z][a-z]+\s+[A-Z][a-z]+)\b"
         matches = re.findall(pattern, text)
 
         # Filter out common non-player words
@@ -336,7 +425,7 @@ class RotoWireClient:
 
         def has_word(keywords: list[str]) -> bool:
             """Check if any keyword appears as a whole word."""
-            return any(re.search(rf'\b{re.escape(kw)}\b', text_lower) for kw in keywords)
+            return any(re.search(rf"\b{re.escape(kw)}\b", text_lower) for kw in keywords)
 
         # Check in order of specificity (trade/coaching first since they're less common)
         if has_word(["trade", "traded", "acquire", "signing"]):
@@ -356,6 +445,7 @@ class RotoWireClient:
         """Check if RotoWire is accessible."""
         try:
             import time
+
             start = time.time()
 
             crawler = await self._get_crawler()
@@ -381,7 +471,6 @@ class RotoWireClient:
 
 async def test_rotowire_client():
     """Quick test of RotoWire client."""
-    import asyncio
 
     client = RotoWireClient()
 
@@ -401,5 +490,6 @@ async def test_rotowire_client():
 
 if __name__ == "__main__":
     import asyncio
+
     logging.basicConfig(level=logging.INFO)
     asyncio.run(test_rotowire_client())

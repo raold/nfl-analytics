@@ -37,11 +37,11 @@ def _get_yaml():
     if _yaml is None:
         try:
             import yaml
+
             _yaml = yaml
         except ImportError:
             raise ImportError(
-                "PyYAML is required for feature weights config. "
-                "Install with: pip install pyyaml"
+                "PyYAML is required for feature weights config. " "Install with: pip install pyyaml"
             )
     return _yaml
 
@@ -63,10 +63,7 @@ def load_config() -> dict[str, Any]:
     config_path = Path(__file__).parent / "feature_weights.yaml"
 
     if not config_path.exists():
-        logger.warning(
-            "Feature weights config not found at %s, all features enabled",
-            config_path
-        )
+        logger.warning("Feature weights config not found at %s, all features enabled", config_path)
         return {"feature_groups": {}}
 
     with open(config_path, "r") as f:
@@ -97,10 +94,7 @@ def get_feature_weight(group_name: str) -> float:
     try:
         return float(weight)
     except (TypeError, ValueError):
-        logger.warning(
-            "Invalid weight for group %s: %s, defaulting to 1.0",
-            group_name, weight
-        )
+        logger.warning("Invalid weight for group %s: %s, defaulting to 1.0", group_name, weight)
         return 1.0
 
 
@@ -174,10 +168,7 @@ def _log_disabled_on_import():
     try:
         disabled = get_disabled_groups()
         if disabled:
-            logger.info(
-                "Feature groups DISABLED (weight=0): %s",
-                ", ".join(disabled)
-            )
+            logger.info("Feature groups DISABLED (weight=0): %s", ", ".join(disabled))
     except Exception:
         # Don't fail import if config can't be loaded
         pass
@@ -185,5 +176,6 @@ def _log_disabled_on_import():
 
 # Only log in non-test environments
 import sys
+
 if "pytest" not in sys.modules:
     _log_disabled_on_import()

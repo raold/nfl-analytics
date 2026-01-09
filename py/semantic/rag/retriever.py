@@ -66,10 +66,38 @@ class GameContextRetriever:
         """
         if teams is None:
             teams = [
-                "ARI", "ATL", "BAL", "BUF", "CAR", "CHI", "CIN", "CLE",
-                "DAL", "DEN", "DET", "GB", "HOU", "IND", "JAX", "KC",
-                "LA", "LAC", "LV", "MIA", "MIN", "NE", "NO", "NYG",
-                "NYJ", "PHI", "PIT", "SEA", "SF", "TB", "TEN", "WAS",
+                "ARI",
+                "ATL",
+                "BAL",
+                "BUF",
+                "CAR",
+                "CHI",
+                "CIN",
+                "CLE",
+                "DAL",
+                "DEN",
+                "DET",
+                "GB",
+                "HOU",
+                "IND",
+                "JAX",
+                "KC",
+                "LA",
+                "LAC",
+                "LV",
+                "MIA",
+                "MIN",
+                "NE",
+                "NO",
+                "NYG",
+                "NYJ",
+                "PHI",
+                "PIT",
+                "SEA",
+                "SF",
+                "TB",
+                "TEN",
+                "WAS",
             ]
 
         if seasons is None:
@@ -108,8 +136,10 @@ class GameContextRetriever:
         # Add to vector store
         if contexts_list:
             texts = [ctx.text for ctx in contexts_list]
-            metadata = [ctx.metadata | {"game_id": ctx.game_id, "season": ctx.season, "week": ctx.week}
-                       for ctx in contexts_list]
+            metadata = [
+                ctx.metadata | {"game_id": ctx.game_id, "season": ctx.season, "week": ctx.week}
+                for ctx in contexts_list
+            ]
             self.vector_store.add(texts=texts, metadata=metadata)
 
             # Track indexed games

@@ -17,8 +17,6 @@ Usage:
 import json
 import logging
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -41,6 +39,7 @@ ENSEMBLE_WEIGHTS = {
 @dataclass
 class ErrorDecomposition:
     """Result of decomposing prediction error by model."""
+
     game_id: str
     actual_spread: float
     ensemble_prediction: float
@@ -55,7 +54,7 @@ class ErrorDecomposition:
 
     # Attribution
     most_responsible: str = ""  # Model with largest negative contribution
-    most_helpful: str = ""      # Model with largest positive contribution
+    most_helpful: str = ""  # Model with largest positive contribution
 
     def to_dict(self) -> dict:
         return {

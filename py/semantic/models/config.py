@@ -5,7 +5,7 @@ Optimized for RTX 3090/4090 (24GB VRAM).
 Uses 4-bit quantization for Mistral-7B to fit alongside other models.
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
@@ -85,6 +85,7 @@ MODELS = {
 }
 
 # Total VRAM estimate: ~9GB (leaving room for batching on 24GB GPU)
+
 
 # API fallback configuration (when local models unavailable or for validation)
 @dataclass

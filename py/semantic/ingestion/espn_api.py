@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 class ESPNCategory(Enum):
     """News categories from ESPN API."""
+
     INJURY = "injury"
     LINEUP = "lineup"
     COACHING = "coaching"
@@ -38,6 +39,7 @@ class ESPNCategory(Enum):
 @dataclass
 class ESPNNewsItem:
     """Structured news item from ESPN API."""
+
     id: str
     title: str
     description: str
@@ -59,6 +61,7 @@ class ESPNNewsItem:
 @dataclass
 class ESPNInjuryItem:
     """Structured injury item from ESPN API."""
+
     id: str
     athlete_id: str
     athlete_name: str
@@ -81,13 +84,38 @@ class ESPNInjuryItem:
 
 # ESPN Team ID to abbreviation mapping
 ESPN_TEAM_IDS = {
-    1: "ATL", 2: "BUF", 3: "CHI", 4: "CIN", 5: "CLE",
-    6: "DAL", 7: "DEN", 8: "DET", 9: "GB", 10: "TEN",
-    11: "IND", 12: "KC", 13: "LV", 14: "LAR", 15: "MIA",
-    16: "MIN", 17: "NE", 18: "NO", 19: "NYG", 20: "NYJ",
-    21: "PHI", 22: "ARI", 23: "PIT", 24: "LAC", 25: "SF",
-    26: "SEA", 27: "TB", 28: "WAS", 29: "CAR", 30: "JAX",
-    33: "BAL", 34: "HOU"
+    1: "ATL",
+    2: "BUF",
+    3: "CHI",
+    4: "CIN",
+    5: "CLE",
+    6: "DAL",
+    7: "DEN",
+    8: "DET",
+    9: "GB",
+    10: "TEN",
+    11: "IND",
+    12: "KC",
+    13: "LV",
+    14: "LAR",
+    15: "MIA",
+    16: "MIN",
+    17: "NE",
+    18: "NO",
+    19: "NYG",
+    20: "NYJ",
+    21: "PHI",
+    22: "ARI",
+    23: "PIT",
+    24: "LAC",
+    25: "SF",
+    26: "SEA",
+    27: "TB",
+    28: "WAS",
+    29: "CAR",
+    30: "JAX",
+    33: "BAL",
+    34: "HOU",
 }
 
 # Reverse mapping
@@ -104,7 +132,9 @@ class ESPNApiClient:
 
     # API endpoints
     NEWS_URL = "https://site.api.espn.com/apis/site/v2/sports/football/nfl/news"
-    TEAM_INJURIES_URL = "https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/teams/{team_id}/injuries"
+    TEAM_INJURIES_URL = (
+        "https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/teams/{team_id}/injuries"
+    )
     INJURY_DETAIL_URL = "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/{season}/athletes/{athlete_id}/injuries/{injury_id}"
     ATHLETE_URL = "http://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/{season}/athletes/{athlete_id}"
 
@@ -138,10 +168,12 @@ class ESPNApiClient:
         self.session.mount("https://", adapter)
 
         # Set headers to look like a browser
-        self.session.headers.update({
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-            "Accept": "application/json",
-        })
+        self.session.headers.update(
+            {
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
+                "Accept": "application/json",
+            }
+        )
 
         logger.info("ESPNApiClient initialized (timeout=%.1fs, retries=%d)", timeout, max_retries)
 
@@ -299,18 +331,20 @@ class ESPNApiClient:
                     if len(parts) >= 2:
                         athlete_id = parts[-3] if "athletes" in parts else ""
                         injury_id = parts[-1].split("?")[0]
-                        items.append(ESPNInjuryItem(
-                            id=injury_id,
-                            athlete_id=athlete_id,
-                            athlete_name="",
-                            team_id=str(team_id),
-                            team_abbrev=team,
-                            status="Unknown",
-                            injury_type="Unknown",
-                            injury_location="",
-                            updated_at=datetime.utcnow(),
-                            fantasy_status="",
-                        ))
+                        items.append(
+                            ESPNInjuryItem(
+                                id=injury_id,
+                                athlete_id=athlete_id,
+                                athlete_name="",
+                                team_id=str(team_id),
+                                team_abbrev=team,
+                                status="Unknown",
+                                injury_type="Unknown",
+                                injury_location="",
+                                updated_at=datetime.utcnow(),
+                                fantasy_status="",
+                            )
+                        )
             except Exception as e:
                 logger.warning("Failed to parse injury: %s", e)
 

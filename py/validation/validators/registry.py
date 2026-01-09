@@ -185,10 +185,7 @@ class ValidatorRegistry:
         """
         if category is None:
             return list(self._validators.keys())
-        return [
-            name for name, v in self._validators.items()
-            if v.category == category
-        ]
+        return [name for name, v in self._validators.items() if v.category == category]
 
     def validate_all(
         self,
@@ -216,10 +213,7 @@ class ValidatorRegistry:
         if validators:
             to_run = [n for n in to_run if n in validators]
         if categories:
-            to_run = [
-                n for n in to_run
-                if self._validators[n].category in categories
-            ]
+            to_run = [n for n in to_run if self._validators[n].category in categories]
 
         # Run each validator
         for name in to_run:
@@ -307,6 +301,8 @@ def create_default_validator_registry() -> ValidatorRegistry:
     registry.register(SchemaValidator())
     registry.register(FeatureRangeValidator())
 
-    logger.info(f"Created default validator registry with {len(registry.list_validators())} validators")
+    logger.info(
+        f"Created default validator registry with {len(registry.list_validators())} validators"
+    )
 
     return registry

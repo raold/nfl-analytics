@@ -18,7 +18,6 @@ import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -32,6 +31,7 @@ logger = logging.getLogger(__name__)
 try:
     import shap
     import xgboost as xgb
+
     SHAP_AVAILABLE = True
 except ImportError:
     SHAP_AVAILABLE = False
@@ -41,16 +41,18 @@ except ImportError:
 @dataclass
 class FeatureInteraction:
     """A detected feature interaction."""
-    feature1: str          # First feature (typically semantic)
-    feature2: str          # Second feature (typically base)
+
+    feature1: str  # First feature (typically semantic)
+    feature2: str  # Second feature (typically base)
     mean_abs_interaction: float  # Mean absolute SHAP interaction value
-    direction: str         # "synergistic" or "antagonistic"
+    direction: str  # "synergistic" or "antagonistic"
     samples_analyzed: int
 
 
 @dataclass
 class InteractionAnalysisResult:
     """Result of interaction analysis."""
+
     total_features: int
     semantic_features: int
     base_features: int
@@ -72,7 +74,9 @@ class FeatureInteractionAnalyzer:
     which semantic features have the strongest synergies.
     """
 
-    PRODUCTION_MODEL_DIR = Path(__file__).parent.parent.parent / "models" / "production" / "game_outcome_v2"
+    PRODUCTION_MODEL_DIR = (
+        Path(__file__).parent.parent.parent / "models" / "production" / "game_outcome_v2"
+    )
     SEMANTIC_PREFIX = "sem_"
 
     def __init__(
@@ -240,10 +244,16 @@ class FeatureInteractionAnalyzer:
         n_samples = interaction_values.shape[0]
 
         # Identify feature groups
-        sem_indices = [i for i, name in enumerate(feature_names) if name.startswith(self.SEMANTIC_PREFIX)]
-        base_indices = [i for i, name in enumerate(feature_names) if not name.startswith(self.SEMANTIC_PREFIX)]
+        sem_indices = [
+            i for i, name in enumerate(feature_names) if name.startswith(self.SEMANTIC_PREFIX)
+        ]
+        base_indices = [
+            i for i, name in enumerate(feature_names) if not name.startswith(self.SEMANTIC_PREFIX)
+        ]
 
-        logger.info(f"Analyzing {len(sem_indices)} semantic × {len(base_indices)} base interactions")
+        logger.info(
+            f"Analyzing {len(sem_indices)} semantic × {len(base_indices)} base interactions"
+        )
 
         interactions = []
 
@@ -265,13 +275,15 @@ class FeatureInteractionAnalyzer:
                 direction = "synergistic" if mean_signed > 0 else "antagonistic"
 
                 if mean_abs > 0.001:  # Filter out negligible interactions
-                    interactions.append(FeatureInteraction(
-                        feature1=sem_name,
-                        feature2=base_name,
-                        mean_abs_interaction=float(mean_abs),
-                        direction=direction,
-                        samples_analyzed=n_samples,
-                    ))
+                    interactions.append(
+                        FeatureInteraction(
+                            feature1=sem_name,
+                            feature2=base_name,
+                            mean_abs_interaction=float(mean_abs),
+                            direction=direction,
+                            samples_analyzed=n_samples,
+                        )
+                    )
 
         # Sort by interaction strength
         interactions.sort(key=lambda x: x.mean_abs_interaction, reverse=True)
@@ -325,7 +337,9 @@ class FeatureInteractionAnalyzer:
 
         # Count feature types
         if self._feature_names:
-            result.semantic_features = len([f for f in self._feature_names if f.startswith(self.SEMANTIC_PREFIX)])
+            result.semantic_features = len(
+                [f for f in self._feature_names if f.startswith(self.SEMANTIC_PREFIX)]
+            )
             result.base_features = len(self._feature_names) - result.semantic_features
 
         # Compute interaction values
@@ -351,8 +365,7 @@ class FeatureInteractionAnalyzer:
             sem_scores[sem_name].append(interaction.mean_abs_interaction)
 
         result.semantic_feature_scores = {
-            name: float(np.mean(scores))
-            for name, scores in sem_scores.items()
+            name: float(np.mean(scores)) for name, scores in sem_scores.items()
         }
 
         result.compute_time_seconds = time.time() - start_time
@@ -453,9 +466,7 @@ class FeatureInteractionAnalyzer:
 
         with self._get_connection() as conn:
             df = pd.read_sql_query(
-                query,
-                conn,
-                params=(season, top_n_semantic, season, top_n_base, season)
+                query, conn, params=(season, top_n_semantic, season, top_n_base, season)
             )
 
         if df.empty:
@@ -522,7 +533,9 @@ def test_interactions():
         # Create synthetic example
         print("\n--- Synthetic Example ---")
         interactions = [
-            FeatureInteraction("sem_injury_severity", "days_rest_differential", 0.15, "synergistic", 1000),
+            FeatureInteraction(
+                "sem_injury_severity", "days_rest_differential", 0.15, "synergistic", 1000
+            ),
             FeatureInteraction("sem_sentiment_24h", "home_epa_pass", 0.12, "synergistic", 1000),
             FeatureInteraction("sem_media_buzz", "primetime_flag", 0.08, "antagonistic", 1000),
         ]

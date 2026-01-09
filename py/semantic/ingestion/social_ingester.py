@@ -20,7 +20,6 @@ Usage:
 import hashlib
 import logging
 import os
-import re
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
@@ -151,14 +150,30 @@ OFFICIAL_TEAM_ACCOUNTS = {
 
 # Breaking news keywords
 BREAKING_KEYWORDS = [
-    "breaking", "just in", "confirmed", "official", "announced",
-    "source:", "per source", "i'm told", "hearing", "expected to",
+    "breaking",
+    "just in",
+    "confirmed",
+    "official",
+    "announced",
+    "source:",
+    "per source",
+    "i'm told",
+    "hearing",
+    "expected to",
 ]
 
 # Injury keywords for classification
 INJURY_KEYWORDS = [
-    "injury", "injured", "questionable", "doubtful", "out",
-    "dnp", "limited", "full practice", "ir", "pup",
+    "injury",
+    "injured",
+    "questionable",
+    "doubtful",
+    "out",
+    "dnp",
+    "limited",
+    "full practice",
+    "ir",
+    "pup",
 ]
 
 
@@ -532,14 +547,10 @@ class SocialIngester:
             time_weight = 0.5 ** (hours_old / 12)
 
             # Calculate engagement weight (log scale)
-            engagement_weight = 1.0 + 0.1 * (post.engagement_score ** 0.5)
+            engagement_weight = 1.0 + 0.1 * (post.engagement_score**0.5)
 
             # Combine weights
-            total_weight = (
-                post.credibility_weight *
-                time_weight *
-                engagement_weight
-            )
+            total_weight = post.credibility_weight * time_weight * engagement_weight
 
             for team in post.teams:
                 team_scores[team].append((post.sentiment, total_weight))
@@ -573,9 +584,7 @@ class SocialIngester:
                 "category": post.category.value,
                 "teams": post.teams,
                 "engagement": post.engagement_score,
-                "hours_ago": round(
-                    (datetime.now() - post.timestamp).total_seconds() / 3600, 1
-                ),
+                "hours_ago": round((datetime.now() - post.timestamp).total_seconds() / 3600, 1),
             }
             for post in posts
         ]

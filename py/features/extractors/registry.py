@@ -113,12 +113,13 @@ class FeatureRegistry:
     def _default_db_config(self) -> dict:
         """Get default database configuration."""
         import os
+
         return {
-            'host': os.environ.get('POSTGRES_HOST', 'localhost'),
-            'port': int(os.environ.get('POSTGRES_PORT', '5544')),
-            'dbname': os.environ.get('POSTGRES_DB', 'devdb01'),
-            'user': os.environ.get('POSTGRES_USER', 'dro'),
-            'password': os.environ.get('POSTGRES_PASSWORD', 'sicillionbillions'),
+            "host": os.environ.get("POSTGRES_HOST", "localhost"),
+            "port": int(os.environ.get("POSTGRES_PORT", "5544")),
+            "dbname": os.environ.get("POSTGRES_DB", "devdb01"),
+            "user": os.environ.get("POSTGRES_USER", "dro"),
+            "password": os.environ.get("POSTGRES_PASSWORD", "sicillionbillions"),
         }
 
     def register(self, extractor: FeatureExtractorStrategy) -> None:
@@ -152,8 +153,7 @@ class FeatureRegistry:
     def _update_extraction_order(self) -> None:
         """Update the extraction order based on priorities."""
         self._extraction_order = sorted(
-            self._extractors.keys(),
-            key=lambda n: self._extractors[n].priority.value
+            self._extractors.keys(), key=lambda n: self._extractors[n].priority.value
         )
 
     def get_extractor(self, name: str) -> Optional[FeatureExtractorStrategy]:
@@ -270,7 +270,7 @@ class FeatureRegistry:
                         if self.fail_on_critical:
                             raise FeatureExtractionError(
                                 result.extractor_name,
-                                f"Critical extractor failed: {result.error_message}"
+                                f"Critical extractor failed: {result.error_message}",
                             )
 
         finally:
@@ -324,8 +324,11 @@ class FeatureRegistry:
                 future_to_extractor = {
                     executor.submit(
                         extractor.safe_extract,
-                        team, season, week, conn,
-                        opponent if extractor.requires_opponent else None
+                        team,
+                        season,
+                        week,
+                        conn,
+                        opponent if extractor.requires_opponent else None,
                     ): extractor
                     for extractor in extractors
                 }
@@ -345,8 +348,7 @@ class FeatureRegistry:
             # Sequential extraction
             for extractor in extractors:
                 result = extractor.safe_extract(
-                    team, season, week, conn,
-                    opponent if extractor.requires_opponent else None
+                    team, season, week, conn, opponent if extractor.requires_opponent else None
                 )
                 results.append(result)
 

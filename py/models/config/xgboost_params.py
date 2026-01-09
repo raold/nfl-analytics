@@ -21,49 +21,38 @@ DEFAULT_XGB_PARAMS: dict[str, Any] = {
     "n_estimators": 500,
     # 500 trees provides good fit without overfitting
     # Early stopping prevents using all 500 if validation loss plateaus
-
     "max_depth": 8,
     # Depth 8 captures complex feature interactions (e.g., QB-OL synergy)
     # NFL data has ~300 features; deeper trees risk overfitting small samples
-
     "min_child_weight": 5,
     # Minimum sum of instance weights in child node
     # Higher values prevent overfitting to rare game scenarios
-
     # === Learning Rate & Regularization ===
     "learning_rate": 0.03,
     # Low learning rate (0.03) combined with high n_estimators
     # Provides smoother convergence and better generalization
-
     "gamma": 1,
     # Minimum loss reduction for split
     # Value of 1 prevents splits that provide marginal improvement
-
     "reg_alpha": 0.1,
     # L1 regularization (Lasso)
     # Encourages sparse feature selection (helpful with 300+ features)
-
     "reg_lambda": 1,
     # L2 regularization (Ridge)
     # Prevents large weights, improves generalization
-
     # === Sampling ===
     "subsample": 0.8,
     # Row subsampling (80% of training data per tree)
     # Reduces overfitting, adds stochastic element
-
     "colsample_bytree": 0.8,
     # Column subsampling (80% of features per tree)
     # Reduces correlation between trees, improves ensemble diversity
-
     # === Training Behavior ===
     "random_state": 42,
     # Reproducibility seed
-
     "early_stopping_rounds": 50,
     # Stop if validation metric doesn't improve for 50 rounds
     # Prevents overfitting and reduces training time
-
     "eval_metric": "mae",
     # Mean Absolute Error for regression tasks
     # Better for spread/total prediction than RMSE (less sensitive to outliers)
@@ -119,10 +108,8 @@ def get_xgb_params(
 FEATURE_IMPORTANCE_CONFIG = {
     "min_importance_threshold": 0.001,
     # Features below this threshold may be pruned
-
     "top_n_features": 50,
     # Number of top features to display in reports
-
     "shap_sample_size": 100,
     # Number of samples for SHAP value computation
     # SHAP is O(n * 2^depth), so we sample for efficiency

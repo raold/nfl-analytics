@@ -11,8 +11,6 @@ Usage:
 
 import logging
 from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Any
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -23,6 +21,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class UpdateResult:
     """Result of outcome update operation."""
+
     season: int
     games_with_scores: int = 0
     predictions_found: int = 0
@@ -125,10 +124,7 @@ class WeeklyOutcomeUpdater:
                 return [dict(row) for row in cur.fetchall()]
 
     def get_predictions_needing_update(
-        self,
-        season: int,
-        week: int,
-        force: bool = False
+        self, season: int, week: int, force: bool = False
     ) -> list[dict]:
         """
         Get predictions that need outcome updates.
@@ -165,11 +161,7 @@ class WeeklyOutcomeUpdater:
                 return [dict(row) for row in cur.fetchall()]
 
     def update_week(
-        self,
-        season: int,
-        week: int,
-        dry_run: bool = False,
-        force: bool = False
+        self, season: int, week: int, dry_run: bool = False, force: bool = False
     ) -> UpdateResult:
         """
         Update all predictions for a week with actual outcomes.
@@ -247,20 +239,23 @@ class WeeklyOutcomeUpdater:
                         updated += 1
                     else:
                         try:
-                            cur.execute(update_query, (
-                                outcome["home_score"],
-                                outcome["away_score"],
-                                outcome["actual_total"],
-                                outcome["actual_spread"],
-                                outcome["home_won"],
-                                outcome["actual_spread"],  # For spread_error
-                                outcome["actual_total"],   # For total_error
-                                outcome["home_score"],     # For home_score_error
-                                outcome["away_score"],     # For away_score_error
-                                outcome["actual_spread"],  # For abs_spread_error
-                                outcome["actual_total"],   # For abs_total_error
-                                pred["id"]
-                            ))
+                            cur.execute(
+                                update_query,
+                                (
+                                    outcome["home_score"],
+                                    outcome["away_score"],
+                                    outcome["actual_total"],
+                                    outcome["actual_spread"],
+                                    outcome["home_won"],
+                                    outcome["actual_spread"],  # For spread_error
+                                    outcome["actual_total"],  # For total_error
+                                    outcome["home_score"],  # For home_score_error
+                                    outcome["away_score"],  # For away_score_error
+                                    outcome["actual_spread"],  # For abs_spread_error
+                                    outcome["actual_total"],  # For abs_total_error
+                                    pred["id"],
+                                ),
+                            )
                             updated += 1
                         except Exception as e:
                             result.errors.append(f"Failed to update {game_id}: {e}")
@@ -274,10 +269,7 @@ class WeeklyOutcomeUpdater:
         return result
 
     def update_season(
-        self,
-        season: int,
-        dry_run: bool = False,
-        force: bool = False
+        self, season: int, dry_run: bool = False, force: bool = False
     ) -> UpdateResult:
         """
         Update all completed weeks in a season.
@@ -366,7 +358,9 @@ if __name__ == "__main__":
     print("\n=== Getting Completed Games ===")
     games = updater.get_completed_games(2025, 13)
     for g in games[:3]:
-        print(f"  {g['game_id']}: {g['home_score']}-{g['away_score']} (spread={g['actual_spread']})")
+        print(
+            f"  {g['game_id']}: {g['home_score']}-{g['away_score']} (spread={g['actual_spread']})"
+        )
 
     print("\n=== Update Summary ===")
     summary = updater.get_update_summary(2025)

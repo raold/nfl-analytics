@@ -195,9 +195,7 @@ class MetaFeatureExtractor:
             # Ensemble Sharpe (mean edge / std edge)
             edges = [p - vegas for p in component_values]
             edge_std = np.std(edges)
-            meta_features["ensemble_sharpe"] = (
-                np.mean(edges) / edge_std if edge_std > 0 else 0
-            )
+            meta_features["ensemble_sharpe"] = np.mean(edges) / edge_std if edge_std > 0 else 0
 
             # Weight concentration (Herfindahl index)
             weights = list(prediction.get("component_weights", {}).values())
@@ -234,9 +232,7 @@ class MetaFeatureExtractor:
         meta_features["recent_win_streak"] = historical_metrics.get("win_streak", 0)
         meta_features["calibration_error"] = historical_metrics.get("brier_score", 0.25)
         meta_features["model_sharpe_ratio"] = historical_metrics.get("sharpe_ratio", 0.0)
-        meta_features["edge_realization_rate"] = historical_metrics.get(
-            "edge_realization", 0.5
-        )
+        meta_features["edge_realization_rate"] = historical_metrics.get("edge_realization", 0.5)
 
         # === UNCERTAINTY QUANTIFICATION ===
         meta_features["prediction_std"] = prediction.get("uncertainty", 0.0)
@@ -470,9 +466,7 @@ class MetaLabelingClassifier:
         df = df.sort_values(["season", "week"]).reset_index(drop=True)
 
         # Prepare features
-        available_features = [
-            f for f in self.feature_extractor.ALL_FEATURES if f in df.columns
-        ]
+        available_features = [f for f in self.feature_extractor.ALL_FEATURES if f in df.columns]
         X = df[available_features].values
         y = df["bet_won"].values
         seasons = df["season"].values
@@ -586,9 +580,7 @@ class MetaLabelingClassifier:
         Returns:
             Mean validation metrics
         """
-        available_features = [
-            f for f in self.feature_extractor.ALL_FEATURES if f in df.columns
-        ]
+        available_features = [f for f in self.feature_extractor.ALL_FEATURES if f in df.columns]
         X = df[available_features].values
         y = df["bet_won"].values
 

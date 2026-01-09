@@ -222,10 +222,14 @@ class HistoricalValidator:
 
             # Validate ensemble components (minimum 3 required)
             # Get valid_predictions from ensemble response
-            valid_predictions = getattr(prediction, 'valid_components', [])
+            valid_predictions = getattr(prediction, "valid_components", [])
             if len(valid_predictions) < 3:
-                logger.warning(f"Component prediction failed for {row['player_name']}: insufficient components")
-                raise RuntimeError(f"Ensemble has fewer than 3 valid components: {len(valid_predictions)}")
+                logger.warning(
+                    f"Component prediction failed for {row['player_name']}: insufficient components"
+                )
+                raise RuntimeError(
+                    f"Ensemble has fewer than 3 valid components: {len(valid_predictions)}"
+                )
 
             # Determine bet side
             if prediction.mean > line:

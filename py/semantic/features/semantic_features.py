@@ -19,8 +19,8 @@ Usage:
 import logging
 import math
 import time
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -29,30 +29,26 @@ logger = logging.getLogger(__name__)
 # Formula: half_life = ln(2) / λ
 INJURY_DECAY_RATES = {
     # Season-ending injuries (very slow decay)
-    "ACL": 0.005,        # ~140 day half-life
-    "Achilles": 0.006,   # ~115 day half-life
-    "Torn": 0.008,       # ~87 day half-life (generic torn)
-
+    "ACL": 0.005,  # ~140 day half-life
+    "Achilles": 0.006,  # ~115 day half-life
+    "Torn": 0.008,  # ~87 day half-life (generic torn)
     # Multi-week injuries
-    "Knee": 0.03,        # ~23 day half-life
-    "Shoulder": 0.04,    # ~17 day half-life
-    "Ribs": 0.035,       # ~20 day half-life
-
+    "Knee": 0.03,  # ~23 day half-life
+    "Shoulder": 0.04,  # ~17 day half-life
+    "Ribs": 0.035,  # ~20 day half-life
     # 1-2 week injuries
     "Concussion": 0.15,  # ~5 day half-life (protocol-based)
-    "Hamstring": 0.08,   # ~9 day half-life
-    "Ankle": 0.10,       # ~7 day half-life
-    "Calf": 0.09,        # ~8 day half-life
+    "Hamstring": 0.08,  # ~9 day half-life
+    "Ankle": 0.10,  # ~7 day half-life
+    "Calf": 0.09,  # ~8 day half-life
     "Quadriceps": 0.08,  # ~9 day half-life
-    "Groin": 0.07,       # ~10 day half-life
-
+    "Groin": 0.07,  # ~10 day half-life
     # Minor injuries (fast decay)
-    "Rest": 0.50,        # ~1.4 day half-life
-    "Illness": 0.40,     # ~1.7 day half-life
-    "Personal": 0.60,    # ~1.2 day half-life
-
+    "Rest": 0.50,  # ~1.4 day half-life
+    "Illness": 0.40,  # ~1.7 day half-life
+    "Personal": 0.60,  # ~1.2 day half-life
     # Default for unknown injuries
-    "Default": 0.05,     # ~14 day half-life
+    "Default": 0.05,  # ~14 day half-life
 }
 
 
@@ -110,16 +106,16 @@ class TeamSemanticState:
     # TEMPORAL DYNAMICS FEATURES (ODE-inspired)
     # =========================================================================
     # Injury dynamics: dI/dt = -λ*I + S(t) where λ varies by injury type
-    injury_impact_decay: float = 0.0       # Σ(severity × e^(-λ×days)) integrated
-    injury_velocity: float = 0.0           # d(impact)/dt - rate of injury change
-    recovery_momentum: float = 0.0         # Players returning from injury
+    injury_impact_decay: float = 0.0  # Σ(severity × e^(-λ×days)) integrated
+    injury_velocity: float = 0.0  # d(impact)/dt - rate of injury change
+    recovery_momentum: float = 0.0  # Players returning from injury
 
     # Sentiment dynamics: dσ/dt = α*(news) - β*σ (damped oscillator)
-    sentiment_velocity: float = 0.0        # dσ/dt - first derivative
-    sentiment_acceleration: float = 0.0   # d²σ/dt² - second derivative
+    sentiment_velocity: float = 0.0  # dσ/dt - first derivative
+    sentiment_acceleration: float = 0.0  # d²σ/dt² - second derivative
 
     # Media attention decay
-    media_half_life: float = 0.0           # Days since peak media coverage
+    media_half_life: float = 0.0  # Days since peak media coverage
 
     def to_feature_dict(self, prefix: str = "") -> dict[str, float]:
         """Convert to feature dictionary with optional prefix."""
@@ -213,6 +209,7 @@ class SemanticFeatureExtractor:
         if self._repository is None:
             try:
                 from py.database.semantic_repository import SemanticRepository
+
                 self._repository = SemanticRepository()
                 logger.info("Using database for semantic features")
             except Exception as e:
@@ -224,9 +221,8 @@ class SemanticFeatureExtractor:
         if self._inference is None:
             try:
                 from py.semantic.models.inference import SemanticInferenceClient
-                self._inference = SemanticInferenceClient(
-                    ollama_timeout=self.config.llm_timeout
-                )
+
+                self._inference = SemanticInferenceClient(ollama_timeout=self.config.llm_timeout)
             except Exception as e:
                 logger.warning(f"Failed to initialize inference client: {e}")
                 self._inference = None
@@ -237,6 +233,7 @@ class SemanticFeatureExtractor:
         if self._news_ingester is None:
             try:
                 from py.semantic.ingestion.news_ingester import NewsIngester
+
                 self._news_ingester = NewsIngester()
             except Exception as e:
                 logger.warning(f"Failed to initialize news ingester: {e}")
@@ -247,6 +244,7 @@ class SemanticFeatureExtractor:
         if self._social_ingester is None:
             try:
                 from py.semantic.ingestion.social_ingester import SocialIngester
+
                 self._social_ingester = SocialIngester()
             except Exception as e:
                 logger.warning(f"Failed to initialize social ingester: {e}")
@@ -477,19 +475,16 @@ class SemanticFeatureExtractor:
         features.update(away_state.to_feature_dict("away_"))
 
         # Matchup features
-        features["sentiment_differential"] = (
-            home_state.sentiment_24h - away_state.sentiment_24h
-        )
+        features["sentiment_differential"] = home_state.sentiment_24h - away_state.sentiment_24h
         features["injury_advantage"] = (
             away_state.injury_severity_llm - home_state.injury_severity_llm
         )  # Positive = home advantage
-        features["media_attention_ratio"] = (
-            home_state.media_buzz_volume / (away_state.media_buzz_volume + 0.01)
+        features["media_attention_ratio"] = home_state.media_buzz_volume / (
+            away_state.media_buzz_volume + 0.01
         )
-        features["narrative_momentum"] = (
-            (home_state.sentiment_7d_trend + 1) / 2 -
-            (away_state.sentiment_7d_trend + 1) / 2
-        )
+        features["narrative_momentum"] = (home_state.sentiment_7d_trend + 1) / 2 - (
+            away_state.sentiment_7d_trend + 1
+        ) / 2
 
         # Cache results
         self._cache[cache_key] = (datetime.now(timezone.utc), features)
@@ -531,10 +526,7 @@ class SemanticFeatureExtractor:
 
                 if news_items:
                     # Count injury mentions
-                    state.injury_mentions = sum(
-                        1 for n in news_items
-                        if n.category == "injury"
-                    )
+                    state.injury_mentions = sum(1 for n in news_items if n.category == "injury")
 
                     # Calculate media buzz (normalized by expected volume)
                     state.media_buzz_volume = min(1.0, len(news_items) / 20.0)
@@ -546,7 +538,8 @@ class SemanticFeatureExtractor:
 
                     # Calculate scheme mentions
                     state.scheme_mention_count = sum(
-                        1 for n in news_items
+                        1
+                        for n in news_items
                         if "scheme" in n.title.lower() or "playbook" in n.title.lower()
                     )
 
@@ -568,9 +561,7 @@ class SemanticFeatureExtractor:
                 if injuries:
                     # Calculate injury severity based on status
                     severity_map = {"Out": 1.0, "IR": 1.0, "Doubtful": 0.8, "Questionable": 0.4}
-                    total_severity = sum(
-                        severity_map.get(inj.status, 0.2) for inj in injuries[:10]
-                    )
+                    total_severity = sum(severity_map.get(inj.status, 0.2) for inj in injuries[:10])
                     state.injury_severity_llm = min(1.0, total_severity / 5.0)
                     state.key_player_risk = min(1.0, len(injuries) / 20.0)
 
@@ -623,10 +614,7 @@ class SemanticFeatureExtractor:
                 )
 
                 # Count injury mentions
-                state.injury_mentions = sum(
-                    1 for n in news_items
-                    if n.category.value == "injury"
-                )
+                state.injury_mentions = sum(1 for n in news_items if n.category.value == "injury")
 
                 # Calculate media buzz (normalized by expected volume)
                 state.media_buzz_volume = min(1.0, len(news_items) / 10.0)
@@ -653,8 +641,7 @@ class SemanticFeatureExtractor:
                 if tweets:
                     total_engagement = sum(t.engagement_score for t in tweets)
                     state.media_buzz_volume = min(
-                        1.0,
-                        state.media_buzz_volume + total_engagement / 100000
+                        1.0, state.media_buzz_volume + total_engagement / 100000
                     )
 
             except Exception as e:
@@ -683,16 +670,12 @@ class SemanticFeatureExtractor:
 
         try:
             # Combine news text for sentiment
-            combined_text = " ".join([
-                f"{n.title}. {n.description}" for n in news_items[:5]
-            ])
+            combined_text = " ".join([f"{n.title}. {n.description}" for n in news_items[:5]])
 
             # Get sentiment
             sentiment_result = inference.analyze_sentiment(combined_text)
             sentiment_map = {"positive": 0.5, "neutral": 0.0, "negative": -0.5}
-            base_sentiment = sentiment_map.get(
-                sentiment_result.get("sentiment", "neutral"), 0.0
-            )
+            base_sentiment = sentiment_map.get(sentiment_result.get("sentiment", "neutral"), 0.0)
             confidence = sentiment_result.get("confidence", 0.5)
 
             # Scale by confidence
@@ -702,20 +685,12 @@ class SemanticFeatureExtractor:
             # Analyze injury severity with NER
             injury_news = [n for n in news_items if n.category.value == "injury"]
             if injury_news:
-                injury_text = " ".join([
-                    f"{n.title}. {n.description}" for n in injury_news[:3]
-                ])
+                injury_text = " ".join([f"{n.title}. {n.description}" for n in injury_news[:3]])
                 entities = inference.extract_entities(injury_text)
 
                 # Count player entities in injury context
-                players = [
-                    e for e in entities.get("entities", [])
-                    if e.get("type") == "PLAYER"
-                ]
-                injuries = [
-                    e for e in entities.get("entities", [])
-                    if e.get("type") == "INJURY"
-                ]
+                players = [e for e in entities.get("entities", []) if e.get("type") == "PLAYER"]
+                injuries = [e for e in entities.get("entities", []) if e.get("type") == "INJURY"]
 
                 # Severity based on player count and injury mentions
                 if players and injuries:
@@ -733,20 +708,27 @@ class SemanticFeatureExtractor:
 
         # Original 11 features per team
         team_features = [
-            "sentiment_24h", "sentiment_7d_trend", "sentiment_confidence",
-            "injury_mentions", "injury_severity_llm", "key_player_risk",
-            "media_buzz_volume", "media_buzz_trend", "coaching_change",
-            "scheme_mentions", "public_overreaction",
+            "sentiment_24h",
+            "sentiment_7d_trend",
+            "sentiment_confidence",
+            "injury_mentions",
+            "injury_severity_llm",
+            "key_player_risk",
+            "media_buzz_volume",
+            "media_buzz_trend",
+            "coaching_change",
+            "scheme_mentions",
+            "public_overreaction",
         ]
 
         # Temporal dynamics features (6 per team, ODE-inspired)
         temporal_features = [
-            "injury_impact_decay",     # Σ(severity × e^(-λ×days))
-            "injury_velocity",         # d(impact)/dt
-            "recovery_momentum",       # Players returning
-            "sentiment_velocity",      # dσ/dt
+            "injury_impact_decay",  # Σ(severity × e^(-λ×days))
+            "injury_velocity",  # d(impact)/dt
+            "recovery_momentum",  # Players returning
+            "sentiment_velocity",  # dσ/dt
             "sentiment_acceleration",  # d²σ/dt²
-            "media_half_life",         # Days since peak attention
+            "media_half_life",  # Days since peak attention
         ]
 
         names = []
@@ -755,12 +737,14 @@ class SemanticFeatureExtractor:
                 names.append(f"{prefix}{feat}")
 
         # Matchup features (4)
-        names.extend([
-            "sentiment_differential",
-            "injury_advantage",
-            "media_attention_ratio",
-            "narrative_momentum",
-        ])
+        names.extend(
+            [
+                "sentiment_differential",
+                "injury_advantage",
+                "media_attention_ratio",
+                "narrative_momentum",
+            ]
+        )
 
         return names
 

@@ -13,7 +13,7 @@ from typing import Any
 
 import torch
 
-from .config import ModelConfig, get_model_config, CACHE_DIR
+from .config import get_model_config, CACHE_DIR
 
 logger = logging.getLogger(__name__)
 
@@ -115,7 +115,9 @@ def load_generation_model(model_name: str = "generation") -> tuple[Any, Any]:
     try:
         from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
     except ImportError:
-        raise ImportError("Install transformers and bitsandbytes: pip install transformers bitsandbytes")
+        raise ImportError(
+            "Install transformers and bitsandbytes: pip install transformers bitsandbytes"
+        )
 
     config = get_model_config(model_name)
     device = get_device()

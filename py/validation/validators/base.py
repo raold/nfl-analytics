@@ -26,19 +26,19 @@ import pandas as pd
 class ValidationSeverity(Enum):
     """Severity level of validation issues."""
 
-    ERROR = 1    # Blocking - must fix before proceeding
+    ERROR = 1  # Blocking - must fix before proceeding
     WARNING = 2  # Non-blocking but should be addressed
-    INFO = 3     # Informational only
+    INFO = 3  # Informational only
 
 
 class ValidationCategory(Enum):
     """Category of validation check."""
 
-    TEMPORAL = "temporal"           # Data leakage, temporal ordering
-    SCHEMA = "schema"               # Column names, types, structure
-    DATA_QUALITY = "data_quality"   # Missing values, outliers
-    FEATURE_RANGE = "feature_range" # Values within expected bounds
-    BUSINESS_RULE = "business_rule" # Domain-specific constraints
+    TEMPORAL = "temporal"  # Data leakage, temporal ordering
+    SCHEMA = "schema"  # Column names, types, structure
+    DATA_QUALITY = "data_quality"  # Missing values, outliers
+    FEATURE_RANGE = "feature_range"  # Values within expected bounds
+    BUSINESS_RULE = "business_rule"  # Domain-specific constraints
 
 
 @dataclass
@@ -100,7 +100,9 @@ class ValidationResult:
 class ValidationError(Exception):
     """Raised when validation cannot complete."""
 
-    def __init__(self, validator_name: str, message: str, original_error: Optional[Exception] = None):
+    def __init__(
+        self, validator_name: str, message: str, original_error: Optional[Exception] = None
+    ):
         self.validator_name = validator_name
         self.message = message
         self.original_error = original_error
@@ -215,20 +217,24 @@ class ValidatorStrategy(ABC):
             result.validator_name = self.name
         except ValidationError as e:
             result.passed = False
-            result.add_issue(ValidationIssue(
-                code=f"{self.name.upper()}_ERROR",
-                message=str(e),
-                severity=ValidationSeverity.ERROR,
-                category=self.category,
-            ))
+            result.add_issue(
+                ValidationIssue(
+                    code=f"{self.name.upper()}_ERROR",
+                    message=str(e),
+                    severity=ValidationSeverity.ERROR,
+                    category=self.category,
+                )
+            )
         except Exception as e:
             result.passed = False
-            result.add_issue(ValidationIssue(
-                code=f"{self.name.upper()}_UNEXPECTED",
-                message=f"Unexpected error: {e}",
-                severity=ValidationSeverity.ERROR,
-                category=self.category,
-            ))
+            result.add_issue(
+                ValidationIssue(
+                    code=f"{self.name.upper()}_UNEXPECTED",
+                    message=f"Unexpected error: {e}",
+                    severity=ValidationSeverity.ERROR,
+                    category=self.category,
+                )
+            )
 
         result.validation_time_ms = (time.time() - start_time) * 1000
         result.context = context or {}
@@ -259,14 +265,16 @@ class DataFrameValidator(ValidatorStrategy):
         """
         missing = [col for col in required if col not in df.columns]
         if missing:
-            result.add_issue(ValidationIssue(
-                code=f"{self.name.upper()}_MISSING_COLS",
-                message=f"Missing required columns: {missing}",
-                severity=ValidationSeverity.ERROR,
-                category=self.category,
-                details={"missing_columns": missing},
-                suggestion=f"Ensure DataFrame has columns: {required}",
-            ))
+            result.add_issue(
+                ValidationIssue(
+                    code=f"{self.name.upper()}_MISSING_COLS",
+                    message=f"Missing required columns: {missing}",
+                    severity=ValidationSeverity.ERROR,
+                    category=self.category,
+                    details={"missing_columns": missing},
+                    suggestion=f"Ensure DataFrame has columns: {required}",
+                )
+            )
             return False
         return True
 
@@ -293,13 +301,15 @@ class DataFrameValidator(ValidatorStrategy):
         cols_with_nulls = null_counts[null_counts > 0]
 
         if not cols_with_nulls.empty:
-            result.add_issue(ValidationIssue(
-                code=f"{self.name.upper()}_NULL_VALUES",
-                message=f"Null values found in columns: {cols_with_nulls.to_dict()}",
-                severity=severity,
-                category=self.category,
-                details={"null_counts": cols_with_nulls.to_dict()},
-                suggestion="Fill or drop null values before proceeding",
-            ))
+            result.add_issue(
+                ValidationIssue(
+                    code=f"{self.name.upper()}_NULL_VALUES",
+                    message=f"Null values found in columns: {cols_with_nulls.to_dict()}",
+                    severity=severity,
+                    category=self.category,
+                    details={"null_counts": cols_with_nulls.to_dict()},
+                    suggestion="Fill or drop null values before proceeding",
+                )
+            )
             return False
         return True

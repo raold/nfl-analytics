@@ -20,6 +20,7 @@ from .inference import SemanticInferenceClient, InferenceBackend, InferenceResul
 # MLX is optional (Apple Silicon only)
 try:
     from .mlx_client import MLXClient, get_mlx_status, check_mlx_available
+
     MLX_AVAILABLE = True
 except ImportError:
     MLX_AVAILABLE = False

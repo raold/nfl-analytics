@@ -279,7 +279,9 @@ def integrated_bet_sizing_workflow():
             f"  Side: {'Home' if ensemble_prediction['predicted_spread'] < ensemble_prediction['vegas_spread'] else 'Away'}"
         )
         logger.info(f"  Spread: {ensemble_prediction['vegas_spread']}")
-        logger.info(f"  Expected value: ${kelly_result.get('expected_value', 0) * kelly_multiplier:.2f}")
+        logger.info(
+            f"  Expected value: ${kelly_result.get('expected_value', 0) * kelly_multiplier:.2f}"
+        )
     else:
         logger.info("\n✗ BET RECOMMENDATION: PASS")
         if kelly_multiplier == 0.0:

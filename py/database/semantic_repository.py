@@ -25,6 +25,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class NewsItem:
     """News item from database."""
+
     id: int
     source: str
     title: str
@@ -38,6 +39,7 @@ class NewsItem:
 @dataclass
 class SentimentScore:
     """Sentiment score from database."""
+
     team: str
     sentiment: float
     confidence: float
@@ -48,6 +50,7 @@ class SentimentScore:
 @dataclass
 class InjuryItem:
     """Injury item from database."""
+
     id: int
     athlete_id: str
     athlete_name: str
@@ -336,10 +339,7 @@ class SemanticRepository:
                 cur.execute(query, (team, before, since, points))
                 rows = cur.fetchall()
 
-        return [
-            (row["sentiment_date"], float(row["avg_sentiment"]))
-            for row in rows
-        ]
+        return [(row["sentiment_date"], float(row["avg_sentiment"])) for row in rows]
 
     def bulk_insert_injuries(self, items: list[dict]) -> int:
         """
@@ -429,7 +429,9 @@ class SemanticRepository:
             latest_article=row["latest_article"],
         )
 
-    def save_sentiment(self, news_id: int, team: str, sentiment: float, confidence: float, model: str) -> None:
+    def save_sentiment(
+        self, news_id: int, team: str, sentiment: float, confidence: float, model: str
+    ) -> None:
         """Save a sentiment score for a news item."""
         query = """
         INSERT INTO semantic.sentiment_scores

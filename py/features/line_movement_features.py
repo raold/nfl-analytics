@@ -45,13 +45,11 @@ import logging
 import os
 from typing import Optional
 
-import numpy as np
 import pandas as pd
 import psycopg2
 
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -135,13 +133,15 @@ class LineMovementFeatures:
         try:
             # Check if odds_history table exists and has data
             with conn.cursor() as cur:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT EXISTS (
                         SELECT FROM information_schema.tables
                         WHERE table_schema = 'public'
                         AND table_name = 'odds_history'
                     );
-                """)
+                """
+                )
                 table_exists = cur.fetchone()[0]
 
             if not table_exists:
@@ -235,11 +235,15 @@ class LineMovementFeatures:
 
             # Reverse line move: movement + low dispersion = strong signal
             # High confidence when books agree and move together
-            reverse_line_move = 1.0 if (
-                abs(spread_movement) > 1.0 and
-                spread_dispersion < 0.5 and
-                books_count >= MIN_BOOKS_FOR_CONSENSUS
-            ) else 0.0
+            reverse_line_move = (
+                1.0
+                if (
+                    abs(spread_movement) > 1.0
+                    and spread_dispersion < 0.5
+                    and books_count >= MIN_BOOKS_FOR_CONSENSUS
+                )
+                else 0.0
+            )
 
             # Consensus movement from opening
             closing_vs_opening = closing_consensus - opening_consensus
@@ -315,8 +319,7 @@ class LineMovementFeatures:
 
             if not row:
                 logger.debug(
-                    f"No game found for {away_team} @ {home_team} "
-                    f"({season} Week {week})"
+                    f"No game found for {away_team} @ {home_team} " f"({season} Week {week})"
                 )
                 return self._get_default_features()
 
@@ -527,6 +530,7 @@ def main():
     try:
         # Use dynamic season: current year if after September, else previous year
         from datetime import datetime
+
         current_month = datetime.now().month
         current_year = datetime.now().year
         sample_season = current_year if current_month >= 9 else current_year - 1

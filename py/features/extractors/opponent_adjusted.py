@@ -132,8 +132,7 @@ class OpponentAdjustedFeatureExtractor(FeatureExtractorStrategy):
 
         if opponent is None:
             raise FeatureExtractionError(
-                self.name,
-                "Opponent-adjusted features require opponent parameter"
+                self.name, "Opponent-adjusted features require opponent parameter"
             )
 
         extractor = self._get_extractor()

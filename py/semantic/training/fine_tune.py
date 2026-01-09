@@ -242,19 +242,23 @@ def validate_model(
                 else:
                     results["failed"] += 1
 
-                results["details"].append({
-                    "text": text,
-                    "expected": expected,
-                    "found": found,
-                    "missing": missing,
-                    "passed": passed,
-                    "response": response.response[:200],
-                })
+                results["details"].append(
+                    {
+                        "text": text,
+                        "expected": expected,
+                        "found": found,
+                        "missing": missing,
+                        "passed": passed,
+                        "response": response.response[:200],
+                    }
+                )
 
         except Exception as e:
             logger.error(f"Validation error: {e}")
 
-    results["accuracy"] = results["passed"] / results["total_cases"] if results["total_cases"] > 0 else 0.0
+    results["accuracy"] = (
+        results["passed"] / results["total_cases"] if results["total_cases"] > 0 else 0.0
+    )
 
     return results
 

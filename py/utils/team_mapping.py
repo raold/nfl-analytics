@@ -31,33 +31,33 @@ CANONICAL_TEAMS = {
     "DAL",  # Dallas Cowboys
     "DEN",  # Denver Broncos
     "DET",  # Detroit Lions
-    "GB",   # Green Bay Packers
+    "GB",  # Green Bay Packers
     "HOU",  # Houston Texans
     "IND",  # Indianapolis Colts
     "JAX",  # Jacksonville Jaguars
-    "KC",   # Kansas City Chiefs
+    "KC",  # Kansas City Chiefs
     "LAC",  # Los Angeles Chargers
     "LAR",  # Los Angeles Rams
-    "LV",   # Las Vegas Raiders
+    "LV",  # Las Vegas Raiders
     "MIA",  # Miami Dolphins
     "MIN",  # Minnesota Vikings
-    "NE",   # New England Patriots
-    "NO",   # New Orleans Saints
+    "NE",  # New England Patriots
+    "NO",  # New Orleans Saints
     "NYG",  # New York Giants
     "NYJ",  # New York Jets
     "PHI",  # Philadelphia Eagles
     "PIT",  # Pittsburgh Steelers
     "SEA",  # Seattle Seahawks
-    "SF",   # San Francisco 49ers
-    "TB",   # Tampa Bay Buccaneers
+    "SF",  # San Francisco 49ers
+    "TB",  # Tampa Bay Buccaneers
     "TEN",  # Tennessee Titans
     "WAS",  # Washington Commanders
 }
 
 # Historical/alternate abbreviations found in nflverse data
 HISTORICAL_TEAMS = {
-    "LA",   # Los Angeles Rams (nflverse uses this, not LAR)
-    "SD",   # San Diego Chargers (pre-2017)
+    "LA",  # Los Angeles Rams (nflverse uses this, not LAR)
+    "SD",  # San Diego Chargers (pre-2017)
     "OAK",  # Oakland Raiders (pre-2020)
     "STL",  # St. Louis Rams (pre-2016)
 }
@@ -67,33 +67,57 @@ VALID_TEAMS = CANONICAL_TEAMS | HISTORICAL_TEAMS
 
 # What the database actually uses (nflverse format)
 VALID_TEAMS_DB = {
-    "ARI", "ATL", "BAL", "BUF", "CAR", "CHI", "CIN", "CLE",
-    "DAL", "DEN", "DET", "GB", "HOU", "IND", "JAX", "KC",
-    "LA",   # Rams - database uses LA, not LAR
+    "ARI",
+    "ATL",
+    "BAL",
+    "BUF",
+    "CAR",
+    "CHI",
+    "CIN",
+    "CLE",
+    "DAL",
+    "DEN",
+    "DET",
+    "GB",
+    "HOU",
+    "IND",
+    "JAX",
+    "KC",
+    "LA",  # Rams - database uses LA, not LAR
     "LAC",  # Chargers
-    "LV",   # Raiders (current)
+    "LV",  # Raiders (current)
     "OAK",  # Raiders (historical)
-    "MIA", "MIN", "NE", "NO", "NYG", "NYJ", "PHI", "PIT",
-    "SD",   # Chargers (historical)
-    "SEA", "SF",
+    "MIA",
+    "MIN",
+    "NE",
+    "NO",
+    "NYG",
+    "NYJ",
+    "PHI",
+    "PIT",
+    "SD",  # Chargers (historical)
+    "SEA",
+    "SF",
     "STL",  # Rams (historical)
-    "TB", "TEN", "WAS",
+    "TB",
+    "TEN",
+    "WAS",
 }
 
 # Mapping from nflverse/database abbreviations to canonical form
 # Use this when the model expects canonical but data has historical
 DB_TO_CANONICAL = {
-    "LA": "LAR",    # Rams: database uses LA, model may expect LAR
-    "SD": "LAC",    # Historical Chargers
-    "OAK": "LV",    # Historical Raiders
-    "STL": "LAR",   # Historical Rams
+    "LA": "LAR",  # Rams: database uses LA, model may expect LAR
+    "SD": "LAC",  # Historical Chargers
+    "OAK": "LV",  # Historical Raiders
+    "STL": "LAR",  # Historical Rams
 }
 
 # Reverse mapping: canonical to database format
 CANONICAL_TO_DB = {
-    "LAR": "LA",    # Model uses LAR, database uses LA
-    "LV": "LV",     # Same in both (post-2020)
-    "LAC": "LAC",   # Same in both
+    "LAR": "LA",  # Model uses LAR, database uses LA
+    "LV": "LV",  # Same in both (post-2020)
+    "LAC": "LAC",  # Same in both
 }
 
 
@@ -141,7 +165,7 @@ def normalize_teams_in_dict(data: dict, team_keys: list[str] = None) -> dict:
         Dictionary with normalized team abbreviations
     """
     if team_keys is None:
-        team_keys = ['home_team', 'away_team', 'team', 'opponent', 'posteam', 'defteam']
+        team_keys = ["home_team", "away_team", "team", "opponent", "posteam", "defteam"]
 
     result = data.copy()
     for key in team_keys:
@@ -191,9 +215,9 @@ def get_franchise_history(team: str) -> list[str]:
         ['LV', 'OAK']
     """
     franchises = {
-        'rams': ['LAR', 'LA', 'STL'],
-        'chargers': ['LAC', 'SD'],
-        'raiders': ['LV', 'OAK'],
+        "rams": ["LAR", "LA", "STL"],
+        "chargers": ["LAC", "SD"],
+        "raiders": ["LV", "OAK"],
     }
 
     team = team.upper().strip()

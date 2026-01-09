@@ -74,9 +74,7 @@ class Settings:
 
     database: DatabaseSettings = DatabaseSettings()
     api: APIIntegrationSettings = APIIntegrationSettings()
-    game_outcome_table: str = os.getenv(
-        "GAME_OUTCOME_TABLE", "ml.game_outcome_predictions"
-    )
+    game_outcome_table: str = os.getenv("GAME_OUTCOME_TABLE", "ml.game_outcome_predictions")
 
 
 @lru_cache()

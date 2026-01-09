@@ -14,7 +14,6 @@ import sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -30,6 +29,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class TriggerCheck:
     """Result of a single trigger check."""
+
     trigger_type: str
     triggered: bool
     current_value: float
@@ -41,6 +41,7 @@ class TriggerCheck:
 @dataclass
 class RetrainTriggerResult:
     """Result of retraining trigger evaluation."""
+
     model_id: str
     season: int
     week: int
@@ -66,9 +67,9 @@ class RetrainTrigger:
 
     # Threshold configuration
     THRESHOLDS = {
-        "mae_degradation": 0.5,     # MAE increased by 0.5+ points
-        "accuracy_drop": 0.05,       # 5% accuracy drop from baseline
-        "calibration_drift": 0.02,   # Brier score increased by 0.02
+        "mae_degradation": 0.5,  # MAE increased by 0.5+ points
+        "accuracy_drop": 0.05,  # 5% accuracy drop from baseline
+        "calibration_drift": 0.02,  # Brier score increased by 0.02
     }
 
     LOOKBACK_WEEKS = 4  # Rolling window for recent performance
@@ -95,11 +96,7 @@ class RetrainTrigger:
         """Get database connection."""
         return psycopg2.connect(**self.conn_params)
 
-    def get_baseline_metrics(
-        self,
-        model_id: str,
-        season: int
-    ) -> dict[str, float]:
+    def get_baseline_metrics(self, model_id: str, season: int) -> dict[str, float]:
         """
         Get baseline metrics from first N weeks of season.
 
@@ -166,11 +163,7 @@ class RetrainTrigger:
         }
 
     def get_recent_metrics(
-        self,
-        model_id: str,
-        season: int,
-        week: int,
-        lookback_weeks: int | None = None
+        self, model_id: str, season: int, week: int, lookback_weeks: int | None = None
     ) -> dict[str, float]:
         """
         Get recent performance metrics (rolling window).
@@ -206,11 +199,7 @@ class RetrainTrigger:
             "games": row["games"] if row else 0,
         }
 
-    def check_mae_trigger(
-        self,
-        baseline: dict,
-        recent: dict
-    ) -> TriggerCheck:
+    def check_mae_trigger(self, baseline: dict, recent: dict) -> TriggerCheck:
         """Check MAE degradation trigger."""
         if recent["mae"] is None or baseline["mae"] is None:
             return TriggerCheck(
@@ -219,7 +208,7 @@ class RetrainTrigger:
                 current_value=0.0,
                 baseline_value=baseline.get("mae", 0.0) or 0.0,
                 threshold=self.THRESHOLDS["mae_degradation"],
-                message="Insufficient data for MAE check"
+                message="Insufficient data for MAE check",
             )
 
         degradation = recent["mae"] - baseline["mae"]
@@ -231,14 +220,10 @@ class RetrainTrigger:
             current_value=recent["mae"],
             baseline_value=baseline["mae"],
             threshold=self.THRESHOLDS["mae_degradation"],
-            message=f"MAE: {recent['mae']:.2f} vs baseline {baseline['mae']:.2f} (delta: {degradation:+.2f})"
+            message=f"MAE: {recent['mae']:.2f} vs baseline {baseline['mae']:.2f} (delta: {degradation:+.2f})",
         )
 
-    def check_accuracy_trigger(
-        self,
-        baseline: dict,
-        recent: dict
-    ) -> TriggerCheck:
+    def check_accuracy_trigger(self, baseline: dict, recent: dict) -> TriggerCheck:
         """Check accuracy drop trigger."""
         if recent["accuracy"] is None or baseline["accuracy"] is None:
             return TriggerCheck(
@@ -247,7 +232,7 @@ class RetrainTrigger:
                 current_value=0.0,
                 baseline_value=baseline.get("accuracy", 0.0) or 0.0,
                 threshold=self.THRESHOLDS["accuracy_drop"],
-                message="Insufficient data for accuracy check"
+                message="Insufficient data for accuracy check",
             )
 
         drop = baseline["accuracy"] - recent["accuracy"]
@@ -259,14 +244,10 @@ class RetrainTrigger:
             current_value=recent["accuracy"],
             baseline_value=baseline["accuracy"],
             threshold=self.THRESHOLDS["accuracy_drop"],
-            message=f"Accuracy: {recent['accuracy']:.1%} vs baseline {baseline['accuracy']:.1%} (drop: {drop:+.1%})"
+            message=f"Accuracy: {recent['accuracy']:.1%} vs baseline {baseline['accuracy']:.1%} (drop: {drop:+.1%})",
         )
 
-    def check_calibration_trigger(
-        self,
-        baseline: dict,
-        recent: dict
-    ) -> TriggerCheck:
+    def check_calibration_trigger(self, baseline: dict, recent: dict) -> TriggerCheck:
         """Check calibration drift trigger."""
         if recent["brier"] is None or baseline["brier"] is None:
             return TriggerCheck(
@@ -275,7 +256,7 @@ class RetrainTrigger:
                 current_value=0.0,
                 baseline_value=baseline.get("brier", 0.0) or 0.0,
                 threshold=self.THRESHOLDS["calibration_drift"],
-                message="Insufficient data for calibration check"
+                message="Insufficient data for calibration check",
             )
 
         drift = recent["brier"] - baseline["brier"]
@@ -287,15 +268,10 @@ class RetrainTrigger:
             current_value=recent["brier"],
             baseline_value=baseline["brier"],
             threshold=self.THRESHOLDS["calibration_drift"],
-            message=f"Brier: {recent['brier']:.3f} vs baseline {baseline['brier']:.3f} (drift: {drift:+.3f})"
+            message=f"Brier: {recent['brier']:.3f} vs baseline {baseline['brier']:.3f} (drift: {drift:+.3f})",
         )
 
-    def check_triggers(
-        self,
-        model_id: str,
-        season: int,
-        week: int
-    ) -> RetrainTriggerResult:
+    def check_triggers(self, model_id: str, season: int, week: int) -> RetrainTriggerResult:
         """
         Check all retraining triggers for a model.
 
@@ -307,11 +283,7 @@ class RetrainTrigger:
         Returns:
             RetrainTriggerResult with all checks and fired triggers
         """
-        result = RetrainTriggerResult(
-            model_id=model_id,
-            season=season,
-            week=week
-        )
+        result = RetrainTriggerResult(model_id=model_id, season=season, week=week)
 
         # Get baseline and recent metrics
         baseline = self.get_baseline_metrics(model_id, season)
@@ -344,10 +316,7 @@ class RetrainTrigger:
 
         return result
 
-    def log_trigger_event(
-        self,
-        result: RetrainTriggerResult
-    ) -> None:
+    def log_trigger_event(self, result: RetrainTriggerResult) -> None:
         """
         Log triggered events to ml.retrain_triggers.
 
@@ -368,28 +337,27 @@ class RetrainTrigger:
             with conn.cursor() as cur:
                 for check in result.triggers_checked:
                     if check.triggered:
-                        cur.execute(query, (
-                            result.model_id,
-                            result.season,
-                            result.week,
-                            check.trigger_type,
-                            check.current_value,
-                            check.threshold,
-                            check.baseline_value,
-                            self.LOOKBACK_WEEKS,
-                            result.games_evaluated,
-                            "logged"  # Action taken
-                        ))
+                        cur.execute(
+                            query,
+                            (
+                                result.model_id,
+                                result.season,
+                                result.week,
+                                check.trigger_type,
+                                check.current_value,
+                                check.threshold,
+                                check.baseline_value,
+                                self.LOOKBACK_WEEKS,
+                                result.games_evaluated,
+                                "logged",  # Action taken
+                            ),
+                        )
             conn.commit()
 
         logger.info(f"Logged {len(result.triggers_fired)} trigger events")
 
     def create_retraining_job(
-        self,
-        model_id: str,
-        triggers: list[str],
-        season: int,
-        week: int
+        self, model_id: str, triggers: list[str], season: int, week: int
     ) -> str:
         """
         Create a retraining job entry.

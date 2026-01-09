@@ -19,9 +19,7 @@ import logging
 import sys
 import time
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
@@ -36,6 +34,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class IngestionResult:
     """Result of running the ingestion pipeline."""
+
     news_fetched: int
     news_inserted: int
     injuries_fetched: int
@@ -142,8 +141,9 @@ class SemanticDataPipeline:
         unique_news = self._deduplicate(all_news, key="content_hash")
         unique_injuries = self._deduplicate(all_injuries, key="content_hash")
 
-        logger.info("After deduplication: %d news, %d injuries",
-                    len(unique_news), len(unique_injuries))
+        logger.info(
+            "After deduplication: %d news, %d injuries", len(unique_news), len(unique_injuries)
+        )
 
         # 5. Insert into database (unless dry run)
         news_inserted = 0
@@ -155,8 +155,9 @@ class SemanticDataPipeline:
             if unique_injuries:
                 injuries_inserted = self.repository.bulk_insert_injuries(unique_injuries)
         else:
-            logger.info("DRY RUN: Would insert %d news, %d injuries",
-                        len(unique_news), len(unique_injuries))
+            logger.info(
+                "DRY RUN: Would insert %d news, %d injuries", len(unique_news), len(unique_injuries)
+            )
 
         total_latency = (time.time() - start_time) * 1000
 
@@ -265,10 +266,7 @@ async def main():
     args = parser.parse_args()
 
     log_level = logging.INFO if args.verbose else logging.WARNING
-    logging.basicConfig(
-        level=log_level,
-        format="%(asctime)s - %(levelname)s - %(message)s"
-    )
+    logging.basicConfig(level=log_level, format="%(asctime)s - %(levelname)s - %(message)s")
 
     teams = args.teams.split(",") if args.teams else None
 

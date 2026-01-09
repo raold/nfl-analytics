@@ -85,5 +85,6 @@ def get_connection():
         psycopg2.connection object
     """
     import psycopg2
+
     config = get_db_config()
     return psycopg2.connect(**config)
