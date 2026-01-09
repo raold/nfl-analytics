@@ -172,48 +172,48 @@ We employ walk-forward analysis with expanding windows:
 \section{Simulation Validation Results}
 \label{sec:sim-validation-results}
 
-\Cref{tab:sim-calibration} presents calibration metrics across 2015--2024 seasons, showing strong agreement between simulated and historical distributions.
+\Cref{tab:sim-calibration} presents aggregate calibration metrics across 2015--2024 seasons. At the \emph{aggregate} level, the simulator matches first-order statistics (mean, standard deviation, key-number masses) reasonably well. However, this masks week-to-week variability that acceptance tests expose.
 
 \begin{table}[t]
   \centering
   \small
-  \caption{Simulation calibration metrics vs historical data (2015--2024 average).}
+  \caption{Simulation calibration metrics vs historical data (2015--2024 aggregate).}
   \label{tab:sim-calibration}
   \begin{tabular}{lcccc}
     \toprule
-    \textbf{Metric}  & \textbf{Historical}  & \textbf{Simulated}  & \textbf{Difference}  & \textbf{Pass?} \\
+    \textbf{Metric}  & \textbf{Historical}  & \textbf{Simulated}  & \textbf{Difference}  & \textbf{Tolerance} \\
     \midrule
-    Mean Margin     & 0.32  & 0.31  & -0.01 & Yes \\
-    Margin Std Dev  & 13.86 & 13.91 & +0.05 & Yes \\
-    P(Margin = 3)   & 0.098 & 0.096 & -0.002 & Yes \\
-    P(Margin = 7)   & 0.082 & 0.084 & +0.002 & Yes \\
-    Kendall's $\tau$ & 0.31 & 0.29 & -0.02 & Yes \\
-    Upper Tail $\lambda_U$ & 0.18 & 0.17 & -0.01 & Yes \\
-    KS Test p-value & -- & 0.42 & -- & Yes \\
+    Mean Margin     & 0.32  & 0.31  & -0.01 & $\pm$0.50 \\
+    Margin Std Dev  & 13.86 & 13.91 & +0.05 & $\pm$1.00 \\
+    P(Margin = 3)   & 0.098 & 0.096 & -0.002 & $\pm$0.01 \\
+    P(Margin = 7)   & 0.082 & 0.084 & +0.002 & $\pm$0.01 \\
+    Kendall's $\tau$ & 0.31 & 0.29 & -0.02 & $\pm$0.05 \\
     \bottomrule
   \end{tabular}
 \end{table}
 
+\noindent\textbf{Important caveat:} Aggregate calibration does not guarantee week-level fidelity. The weekly acceptance tests (Table~\ref{tab:sim-acceptance}) reveal that the margin distribution fails 100\% of weekly tests due to shape mismatches that cancel in aggregate. This limitation---acceptable aggregate statistics masking poor distributional fit---is a key lesson: always test at the operational granularity (weekly), not just aggregate.
+
 \paragraph{Acceptance Test Pass Rates.}
-Across 10 seasons and 4 test categories:
+Table~\ref{tab:sim-acceptance} reports pass rates across 41 weekly evaluations (2023--2025). The results reveal calibration challenges:
 \begin{itemize}
-  \item Margin distribution: 94\% pass rate
-  \item Key-number masses: 91\% pass rate
-  \item Dependence structure: 87\% pass rate
-  \item Friction calibration: 89\% pass rate
+  \item Margin distribution: 0\% pass rate---median EMD deviation of 4.07 exceeds the 2.5 threshold, indicating the Skellam model does not fully capture NFL margin distributions. This is a known limitation addressed in Chapter~\ref{chap:lessons-learned}.
+  \item Key-number masses: 78\% pass rate---the reweighting procedure (\Cref{subsec:key-reweight}) successfully preserves NFL key numbers (3, 7) in most weeks.
+  \item Dependence structure: 63\% pass rate---spread-total correlations vary more than the Gaussian copula assumes, particularly in weather-affected games.
+  \item Home win rate: 100\% pass rate---the simulator correctly reproduces home-field advantage.
 \end{itemize}
 
-Failed tests typically occur early in seasons when sample sizes are small or after rule changes (e.g., 2015 extra point move).
+The 0\% overall gate pass rate (requiring all tests to pass) indicates that margin calibration is the binding constraint. This honest assessment motivates future work on mixture models or game-script-aware margin distributions (\Cref{chap:conclusion}).
 
 \paragraph{Predictive Performance Correlation.}
-Weeks passing all acceptance tests show superior out-of-sample performance:
+Despite margin calibration failures, weeks passing key-number and dependence tests show improved out-of-sample performance. When restricting to weeks where key-mass and dependence tests pass ($\sim$50\% of sample):
 \begin{itemize}
-  \item CLV when tests pass: +18.3 bps (95\% CI: [14.2, 22.4])
-  \item CLV when tests fail: +7.1 bps (95\% CI: [2.3, 11.9])
-  \item Difference significant at $p < 0.001$ (Wilcoxon test)
+  \item CLV in passing weeks: +12.4 bps (95\% CI: [8.1, 16.7])
+  \item CLV in failing weeks: +5.8 bps (95\% CI: [1.2, 10.4])
+  \item Difference significant at $p = 0.018$ (Wilcoxon test)
 \end{itemize}
 
-This validates using acceptance tests as promotion gates—simulation fidelity correlates with realized performance.
+This partial validation suggests that even imperfect simulators provide value---the key-number and dependence tests capture aspects of market efficiency that correlate with realized edge.
 
 \section{Benchmarking Methodology}
 We compare strategies using paired tests across the same simulated paths to reduce variance, and report uncertainty via percentile bands. We also study time-to-recovery after drawdowns and sensitivity to execution latency.
@@ -325,7 +325,7 @@ Vig and slippage vary by book, time, and market. We parameterize friction with p
 }
 
 \chaptersummary{
-We built simulators that turn predictive distributions into bankroll paths under realistic frictions, dependence, and scenario variation. By enforcing acceptance tests against historical data and exposing friction‑calibrated EV, simulation links model edge and risk governance—strengthening the thesis that reliable growth follows from uncertainty + governance.
+We built simulators that convert predictive distributions into bankroll paths under realistic frictions, dependence, and scenario variation. Acceptance tests revealed that aggregate calibration (matching mean, variance, key-number masses) does not guarantee weekly operational fidelity---margin distributions fail acceptance in all tested weeks due to shape mismatches the Skellam model cannot capture. Despite this limitation, weeks passing key-number and dependence tests show statistically significant CLV improvements (+12.4 vs +5.8 bps), validating partial simulator utility. This honest assessment---rather than claiming false 90\%+ pass rates---exemplifies the validation rigor that prevents overconfidence in synthetic backtests.
 }{
-\Cref{chap:results} synthesizes empirical findings: calibration and CLV capture, policy performance under risk constraints, and sensitivity to key assumptions.
+\Cref{chap:results} synthesizes empirical findings: calibration and CLV capture, policy performance under risk constraints, and sensitivity to key assumptions. The simulator limitations documented here inform the conservative interpretation of backtest results in that chapter.
 }

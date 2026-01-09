@@ -60,7 +60,7 @@ We perform grid search over 27 configurations to identify optimal hyperparameter
 
 The optimal configuration is selected via validation Brier score on the 2024 season (285 games). Table~\ref{tab:state-space-hyperparameter-search} shows the top 5 configurations ranked by validation performance.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Top 5 State-Space Hyperparameter Configurations}
 \label{tab:state-space-hyperparameter-search}
@@ -103,7 +103,7 @@ This approach provides calibrated probabilistic forecasts with interpretable unc
 
 Table~\ref{tab:state-space-test-performance} presents comprehensive metrics on the held-out 2025 season (weeks 1--7, 107 games).
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{State-Space Model: Test Set Performance (2025 Season)}
 \label{tab:state-space-test-performance}
@@ -148,7 +148,7 @@ We compared the state-space model against hierarchical graph neural networks (GN
 
 We conducted extensive experiments with 9 GNN configurations, varying embedding dimensions, message passing rounds, and graph structure. Table~\ref{tab:gnn-ablation-results} shows the best-performing configuration.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{GNN Ablation Study Results (Best Configuration)}
 \label{tab:gnn-ablation-results}
@@ -179,7 +179,7 @@ We performed 50-trial Bayesian optimization using Optuna \citep{akiba2019optuna}
 
 Table~\ref{tab:gnn-optuna-best} shows the best trial (\#13 of 50).
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{GNN Optuna: Best Configuration (Trial \#13)}
 \label{tab:gnn-optuna-best}
@@ -215,7 +215,7 @@ Despite extensive hyperparameter tuning (50 trials, 25 pruned), the optimal GNN 
 
 Table~\ref{tab:final-comparison-state-space-gnn} provides a comprehensive comparison across all evaluated metrics.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{State-Space vs GNN: Comprehensive Comparison}
 \label{tab:final-comparison-state-space-gnn}
@@ -271,7 +271,7 @@ The model is implemented in Python using NumPy for efficient matrix operations:
 
 To assess long-term robustness, we generated sequential predictions for all games from 2019--2025 (1,782 games) using the optimal hyperparameters. Table~\ref{tab:state-space-by-season} shows performance by season.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{State-Space Historical Performance (2019--2025)}
 \label{tab:state-space-by-season}

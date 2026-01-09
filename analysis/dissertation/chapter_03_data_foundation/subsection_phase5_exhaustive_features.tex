@@ -1,14 +1,14 @@
 % !TEX root = ../main/main.tex
-\subsection{Exhaustive Feature Engineering: Phase 5 Implementation}
+\subsection{Schema Evolution and Database Infrastructure}
 \label{subsec:phase5-features}
 
-Phase 5 represents the culmination of systematic feature engineering efforts, implementing exhaustive coverage of situational, environmental, and market-based features through a comprehensive database schema evolution. This section documents the schema expansion, migration strategy, and validation of the 257-column feature set.
+This section documents the database schema evolution that supports the 386-feature production system, including migration strategy, validation procedures, and situational feature modules.
 
 \subsubsection{Schema Evolution Overview}
 
-The database schema underwent three major phases of expansion to support increasingly sophisticated modeling requirements:
+The database infrastructure evolved through multiple phases to reach the current production state:
 
-\begin{table}[h]
+\begin{table}[htbp]
   \centering
   \small
   \caption{Database schema evolution across feature engineering phases (2020--2025).}
@@ -16,17 +16,17 @@ The database schema underwent three major phases of expansion to support increas
   \begin{adjustbox}{max width=\textwidth}
   \begin{tabular}{@{} l r r r l @{}}
     \toprule
-    \textbf{Phase} & \textbf{Columns} & \textbf{Tables} & \textbf{Size (MB)} & \textbf{Key Features Added} \\
+    \textbf{Phase} & \textbf{Features} & \textbf{Tables} & \textbf{Size (GB)} & \textbf{Key Additions} \\
     \midrule
-    Baseline (v1.0) & 75 & 12 & 854 & Core play-by-play, basic team stats \\
-    Enhanced (v2.5) & 142 & 18 & 1,245 & EPA metrics, rolling windows, market signals \\
-    Advanced (v3.0) & 257 & 28 & 2,503 & Situational defense, interactions, chemistry \\
+    Baseline (2020) & 112 & 12 & 0.85 & Core EPA, rolling windows, market signals \\
+    Advanced Stats (2024) & 232 & 28 & 1.8 & Next Gen, QBR, opponent-adjusted \\
+    Semantic + Synthetic (2025) & 386 & 64 & 2.5 & LLM features, interactions, rest differentials \\
     \bottomrule
   \end{tabular}
   \end{adjustbox}
 \end{table}
 
-The 3.4× expansion from baseline to advanced reflects systematic coverage of feature categories identified through ablation studies and domain expertise. Each phase preserved backward compatibility through careful migration design.
+The 3.4$\times$ expansion from baseline to production reflects systematic coverage of feature categories identified through ablation studies and domain expertise. Each phase preserved backward compatibility through careful migration design and config-based feature group management.
 
 \subsubsection{Phase 5 Feature Modules}
 
@@ -142,7 +142,7 @@ where $w$ is the week number (0-indexed, so week 1 uses $w=0$) and $H=4.0$ is th
 
 \Cref{tab:phase5-coverage} summarizes coverage rates for Phase 5 features across the 2020--2025 evaluation period.
 
-\begin{table}[h]
+\begin{table}[htbp]
   \centering
   \small
   \caption{Phase 5 feature coverage rates by category (2020--2025, $N=1{,}408$ games).}
@@ -232,12 +232,12 @@ Despite the 3.4× schema expansion, query performance remained acceptable throug
 
 \subsubsection{Impact on Model Performance}
 
-The Phase 5 feature expansion enabled significant modeling improvements:
+The feature expansion to 386 production features yielded measurable improvements on the 2025 holdout (Weeks 1--16, 195 games):
 
 \begin{itemize}
-  \item \textbf{Baseline (9 features)}: ROI +1.59\%, Brier score 0.2552
-  \item \textbf{Enhanced (53 features)}: Expected ROI +3.5--5.0\% (validation pending)
-  \item \textbf{Feature importance}: Defensive situational features contributed 12\% of XGBoost gain
+  \item \textbf{Spread accuracy}: 74.9\% (vs.\ 52.4\% breakeven threshold)
+  \item \textbf{Feature importance}: Team offensive EPA, market signals, and semantic features dominate XGBoost gain rankings
+  \item \textbf{Negative findings}: Kalman EPA and GP Injury features disabled after A/B testing revealed negative signal (ADR-015)
 \end{itemize}
 
 \begin{figure}[htbp]

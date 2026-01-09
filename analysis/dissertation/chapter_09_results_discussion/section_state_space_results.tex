@@ -7,7 +7,7 @@ This section presents empirical results for the Bayesian state-space model, incl
 
 We performed grid search over 27 configurations on the validation set (2024 season, 285 games). Table~\ref{tab:state-space-hyperparameter-search} shows the top 5 configurations ranked by validation Brier score.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Top 5 State-Space Hyperparameter Configurations}
 \label{tab:state-space-hyperparameter-search}
@@ -34,7 +34,7 @@ The optimal configuration ($q=2.0, r=15.0, \text{HFA}=3.0$) achieves a validatio
 
 Table~\ref{tab:state-space-test-performance} presents comprehensive metrics on the held-out 2025 season (weeks 1--7, 107 games).
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{State-Space Model: Test Set Performance (2025 Season)}
 \label{tab:state-space-test-performance}
@@ -79,7 +79,7 @@ We conducted extensive experiments comparing the state-space model against hiera
 
 Table~\ref{tab:gnn-ablation-results} summarizes the 9-configuration GNN ablation study.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{GNN Ablation Study Results (Best Configuration)}
 \label{tab:gnn-ablation-results}
@@ -110,7 +110,7 @@ We performed 50-trial Bayesian optimization using Optuna \citep{akiba2019optuna}
 
 Table~\ref{tab:gnn-optuna-best} shows the best trial (\#13 of 50).
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{GNN Optuna: Best Configuration (Trial \#13)}
 \label{tab:gnn-optuna-best}
@@ -146,7 +146,7 @@ Despite extensive hyperparameter tuning (50 trials, 25 pruned), the optimal GNN 
 
 Table~\ref{tab:final-comparison-state-space-gnn} provides a comprehensive comparison across all evaluated metrics.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{State-Space vs GNN: Comprehensive Comparison}
 \label{tab:final-comparison-state-space-gnn}
@@ -187,7 +187,7 @@ Exceedance & +1.6\% & +19.4\% & +25.7\% \\
 
 To assess long-term robustness, we generated sequential predictions for all games from 2019--2025 (1,782 games) using the optimal hyperparameters. Table~\ref{tab:state-space-by-season} shows performance by season.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{State-Space Historical Performance (2019--2025)}
 \label{tab:state-space-by-season}

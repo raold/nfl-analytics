@@ -2,7 +2,13 @@
 \section{v3.0 Advanced Ensemble System for Player Props}
 \label{sec:v3-ensemble}
 
-Building on the hierarchical foundations established in \Cref{sec:bayesian-hierarchical}, we extend the methodology to player-level prop predictions through a sophisticated 4-way ensemble achieving breakthrough performance: 86.4\% MAE improvement over baseline and a clear path to +5-7\% ROI.
+\begin{tcolorbox}[colback=red!5!white,colframe=red!75!black,title=Critical Caveat: Preliminary Results Superseded]
+\textbf{December 2025 Update:} The performance claims in this section (86.4\% MAE improvement, 5.2 MAE) represent \textbf{early-stage development results} that were later superseded by rigorous validation. The validated Dirichlet optimization (\S\ref{sec:dirichlet-stacking}) shows 31.5\% improvement (89.42 $\to$ 61.26 yards), and the 2025 true holdout shows equal-weight averaging achieves 44.25 MAE---outperforming the optimized v8.0 weights.
+
+The methodology described remains valid, but the quantitative claims should not be interpreted as production performance. See \S\ref{sec:dirichlet-stacking} for validated results.
+\end{tcolorbox}
+
+Building on the hierarchical foundations established in \Cref{sec:bayesian-hierarchical}, we extend the methodology to player-level prop predictions through a sophisticated 4-way ensemble. Initial development showed promising results, though rigorous validation revealed more modest improvements consistent with market efficiency.
 
 \subsection{Motivation and Architecture}
 
@@ -134,7 +140,7 @@ subject to:
 \subsection{Performance Results}
 
 \IfFileExists{../figures/out/v3_model_evolution.pdf}{%
-  \begin{figure}[h]
+  \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\linewidth]{../figures/out/v3_model_evolution.pdf}
     \caption[Model evolution performance]{Progressive improvements from v1.0 baseline to v3.0 ensemble, showing MAE reduction and ROI increase.}
@@ -181,7 +187,7 @@ Passing TDs & 0.42 & 55.8\% & 4.2\% & 198 \\
 \end{table}
 
 \IfFileExists{../figures/out/v3_ensemble_components.pdf}{%
-  \begin{figure}[h]
+  \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\linewidth]{../figures/out/v3_ensemble_components.pdf}
     \caption[Ensemble component performance]{Individual model performance over 2024 season weeks 1-8, showing ensemble superiority.}
@@ -190,7 +196,7 @@ Passing TDs & 0.42 & 55.8\% & 4.2\% & 198 \\
 }{}
 
 \IfFileExists{../figures/out/v3_calibration.pdf}{%
-  \begin{figure}[h]
+  \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.8\linewidth]{../figures/out/v3_calibration.pdf}
     \caption[Calibration comparison]{Probability calibration improvement from v1.0 to v3.0 ensemble.}

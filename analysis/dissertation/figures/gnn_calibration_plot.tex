@@ -19,9 +19,9 @@
 \addplot[dashed, black, thick, domain=0:1] {x};
 \addlegendentry{Perfect calibration}
 
-% Histogram bars (number of predictions per bin)
+% Histogram bars (normalized to 0-1 range, actual counts: 50-90 predictions/bin)
 \addplot[ybar interval, fill=orange!30, fill opacity=0.6, draw=none, forget plot] coordinates {
-    (0.0, 50) (0.1, 60) (0.2, 65) (0.3, 70) (0.4, 65) (0.5, 60) (0.6, 70) (0.7, 65) (0.8, 75) (0.9, 90) (1.0, 0)
+    (0.0, 0.50) (0.1, 0.60) (0.2, 0.65) (0.3, 0.70) (0.4, 0.65) (0.5, 0.60) (0.6, 0.70) (0.7, 0.65) (0.8, 0.75) (0.9, 0.90) (1.0, 0)
 };
 
 % GNN calibration curve

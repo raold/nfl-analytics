@@ -9,7 +9,7 @@ This section presents empirical results from applying the comprehensive profit o
 
 The profit optimization framework integrates with existing components:
 
-\begin{figure}[h]
+\begin{figure}[htbp]
 \centering
 \begin{tikzpicture}[node distance=2cm, auto]
   % Define accent color and styles
@@ -41,35 +41,40 @@ The profit optimization framework integrates with existing components:
 
 \subsection{Backtesting Results}
 
-Comprehensive backtesting on 2022-2024 seasons shows dramatic improvement:
+\textbf{Critical caveat (December 2025):} The results in this section were computed \textbf{before} the comprehensive data leakage investigation (\S\ref{sec:data-leakage-investigation}). The cleaned baseline from that investigation shows \textbf{51.0\% win rate and $-7.5\%$ ROI}---confirming market efficiency for spread betting. The positive ROI claims (+1.7\%) below are therefore \textbf{superseded} and should not be interpreted as validated profitability.
+
+\paragraph{Historical backtest (pre-leakage remediation).}
+The table below preserves original results for methodological transparency, but these figures are \textbf{invalidated}:
 
 \begin{table}[!ht]
 \centering
-\caption{Performance Comparison: Before vs After Optimization}
+\caption{Performance Comparison: Before vs After Optimization \textbf{[INVALIDATED---Pre-Leakage Remediation]}}
 \label{tab:profit-optimization-performance}
 \begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{lrr}
 \toprule
- \textbf{Metric} & \textbf{Before} & \textbf{After} \\
+ \textbf{Metric} & \textbf{Before} & \textbf{After (INVALIDATED)} \\
 \midrule
 Total Bets & 3,247 & 1,134 \\
-Win Rate & 52.8\% & 54.2\% \\
+Win Rate & 52.8\% & 54.2\% \textbf{[Cleaned: 51.0\%]} \\
 Average Edge & 1.8\% & 4.3\% \\
-ROI & -6.2\% & +1.7\% \\
-Sharpe Ratio & -0.31 & 0.58 \\
+ROI & $-6.2\%$ & +1.7\% \textbf{[Cleaned: $-7.5\%$]} \\
+Sharpe Ratio & $-0.31$ & 0.58 \textbf{[Cleaned: $-1.22$]} \\
 Max Drawdown & 18.3\% & 10.7\% \\
-95\% CVaR & -15.2\% & -8.5\% \\
+95\% CVaR & $-15.2\%$ & $-8.5\%$ \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
 \end{table}
 
-Key improvements:
+\textbf{Post-leakage reality:} The profit optimization framework improves \emph{calibration} and \emph{risk management} but does not overcome market efficiency. The cleaned baseline confirms that publicly available data is insufficient to beat the 4.5\% vigorish barrier.
+
+Key \textbf{methodological} improvements (still valid):
 \begin{itemize}
   \item \textbf{65\% reduction in bet volume} through edge-based filtering
-  \item \textbf{7.9\% ROI improvement} from negative to positive territory
-  \item \textbf{42\% reduction in maximum drawdown}
+  \item \textbf{42\% reduction in maximum drawdown} (risk management value)
   \item \textbf{44\% improvement in tail risk} (CVaR)
+  \item \textbf{ROI improvement from $-6.2\%$ to +1.7\% was INVALIDATED}---cleaned baseline shows $-7.5\%$ ROI
 \end{itemize}
 
 \subsection{Component Attribution}

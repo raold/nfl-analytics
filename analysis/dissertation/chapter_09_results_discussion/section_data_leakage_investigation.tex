@@ -32,7 +32,7 @@ WHERE posteam = ?
 This query includes \emph{all} plays for a team, including post-game data from future weeks. For a model predicting Week 5, this contamination incorporated EPA outcomes through Week 18, yielding the absurd 4,469,906\% ROI.
 
 \paragraph{The Fix.}
-We replaced direct aggregation with the \texttt{asof\_features.py} pipeline (\Cref{sec:leakage-architecture}), which enforces strict temporal cutoffs:
+We replaced direct aggregation with the \texttt{asof\_features.py} pipeline (\Cref{subsec:leakage-arch}), which enforces strict temporal cutoffs:
 \begin{lstlisting}[language=Python,basicstyle=\ttfamily\scriptsize]
 df_prior = df[df['kickoff'] <= cutoff_date]  # Only prior games
 \end{lstlisting}
@@ -146,7 +146,7 @@ We identified \emph{three} distinct contamination pathways (post-game EPA, NULL 
 The spread-only baseline (52.2\%) provided a clean reference point that isolated EPA leakage. Every feature pipeline should have a minimal baseline proving feature integrity.
 
 \paragraph{4. Temporal audits must be obsessive.}
-Our defense-in-depth architecture (\Cref{sec:leakage-architecture}) caught two of three leakage sources via SQL constraints and unit tests, but season-level conceptual leakage required domain reasoning to identify. Automated checks are necessary but not sufficient.
+Our defense-in-depth architecture (\Cref{subsec:leakage-arch}) caught two of three leakage sources via SQL constraints and unit tests, but season-level conceptual leakage required domain reasoning to identify. Automated checks are necessary but not sufficient.
 
 \paragraph{5. Document negative findings prominently.}
 This investigation consumed substantial research time but produced our most valuable methodological contribution: a roadmap for rigorous leakage audits in time-series prediction. The scientific community benefits more from documented failures than from inflated claims.

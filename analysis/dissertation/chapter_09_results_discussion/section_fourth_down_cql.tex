@@ -65,7 +65,7 @@ Each configuration trains for 300 epochs with checkpoints at epochs 100, 200, an
 \paragraph{Results.}
 \Cref{tab:cql-grid-search} summarizes the top configurations by agreement rate and reward lift.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{CQL Grid Search Results: Top Configurations}
 \label{tab:cql-grid-search}
@@ -107,7 +107,7 @@ Each configuration trains for 300 epochs with checkpoints at epochs 100, 200, an
 
 The CQL agent's behavior varies by action type:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{CQL Agent: Action-Specific Performance}
 \label{tab:cql-action-analysis}
@@ -130,7 +130,7 @@ FIELD\_GOAL & 1,799 & +1.18 & 78.77\% \\
 
 Agreement with coaching decisions varies systematically by yards-to-go:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{CQL Agreement by Distance to First Down}
 \label{tab:cql-context-agreement}
@@ -167,7 +167,7 @@ For each fourth-down play in our test set ($n=5,885$), we:
 \paragraph{Results.}
 \Cref{tab:cql-nyt-comparison} presents the head-to-head comparison between CQL, NYT Bot, and actual coaching decisions.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{CQL vs.\ NYT 4th Down Bot: Agreement with Coaching Decisions}
 \label{tab:cql-nyt-comparison}

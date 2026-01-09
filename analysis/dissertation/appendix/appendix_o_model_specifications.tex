@@ -91,7 +91,7 @@ y_{it} &: \quad \text{Observed passing yards for player } i \text{ in game } t \
 
 \subsection{MCMC Configuration}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{State-Space v2 MCMC Training Configuration}
 \label{tab:state-space-mcmc}
@@ -116,7 +116,7 @@ Random seed & 42 \\
 
 \subsection{Convergence Diagnostics}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{State-Space v2 Convergence Diagnostics (Nov 8, 2025)}
 \label{tab:state-space-convergence}
@@ -140,7 +140,7 @@ Energy diagnostic (E-BFMI) & 0.94 & >0.3 & $\checkmark$ PASS \\
 
 \subsection{Performance Metrics}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{State-Space v2 Predictive Performance (2024 Holdout, 148 games)}
 \label{tab:state-space-performance}
@@ -212,7 +212,7 @@ t &: \quad \text{Time (game index)} \\
 
 \textbf{Motivation}: Initial 2000-iteration training (Nov 9) produced $\hat{R}$ = 1.0337 (above 1.02 threshold). Retrained Nov 13 with 6000 iterations.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Hierarchical v2 Convergence: 2000 vs 6000 Iterations}
 \label{tab:hierarchical-convergence-improvement}
@@ -234,7 +234,7 @@ Training time (min) & 185.3 & 548.7 & +363.4 & +196.1\% \\
 
 \subsection{Final Convergence Diagnostics (6000 Iterations)}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Hierarchical v2 Final Convergence Diagnostics (Nov 13, 2025)}
 \label{tab:hierarchical-final-convergence}
@@ -256,7 +256,7 @@ Divergences & 42 & <1\% of 6000 & $\checkmark$ PASS \\
 
 \subsection{Performance Metrics}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Hierarchical v2 Predictive Performance (2024 Holdout, 562 games)}
 \label{tab:hierarchical-performance}
@@ -285,6 +285,16 @@ Sharpness (mean interval width) & 192.7 & <210 & $\checkmark$ PASS \\
 
 \section{XGBoost v4 Ridge Residuals (Two-Stage Orthogonalization)}
 \label{sec:xgboost-v4-ridge-appendix}
+
+\begin{center}
+\fbox{\parbox{0.9\textwidth}{%
+\textbf{STATUS: INVALIDATED (December 2025)}
+
+This model was invalidated due to target leakage in the experimental design. Initial validation showed 88\% MAE improvement, but subsequent audit revealed this was an artifact of data contamination. True out-of-sample testing on 2025 data showed the model performs \textbf{47\% worse} than baseline. See Appendix~N for full post-mortem.
+
+\textbf{This model is NOT included in the production ensemble.}
+}}
+\end{center}
 
 \subsection{Architecture Overview}
 
@@ -328,7 +338,7 @@ Two-stage model addressing spurious correlation between player skill and opponen
 \end{itemize}
 
 \textbf{Hyperparameters}:
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{XGBoost v4 Hyperparameters}
 \label{tab:xgboost-v4-hyperparameters}
@@ -355,7 +365,7 @@ Two-stage model addressing spurious correlation between player skill and opponen
 
 \textbf{Protocol}: Rolling origin cross-validation with annual retraining.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{XGBoost v4 Multi-Season Performance}
 \label{tab:xgboost-v4-multisea son}
@@ -386,7 +396,7 @@ Two-stage model addressing spurious correlation between player skill and opponen
 
 \subsection{Feature Importance Analysis}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{XGBoost v4 Feature Importance (Gain Metric)}
 \label{tab:xgboost-v4-importance}
@@ -450,7 +460,7 @@ Enhanced hierarchical model with domain-informed priors:
 
 \subsection{Convergence Improvement: 2000 → 6000 Iterations}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Informative Priors v2 Convergence: 2000 vs 6000 Iterations}
 \label{tab:informative-priors-convergence-improvement}
@@ -472,7 +482,7 @@ Training time (min) & 192.7 & 571.3 & +378.6 & +196.5\% \\
 
 \subsection{Final Convergence Diagnostics (6000 Iterations)}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Informative Priors v2 Final Convergence Diagnostics (Nov 13, 2025)}
 \label{tab:informative-priors-final-convergence}
@@ -492,7 +502,7 @@ Divergences & 177 & <3\% of 6000 & $\checkmark$ PASS (2.95\%) \\
 
 \subsection{Performance Metrics}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Informative Priors v2 Predictive Performance (2024 Holdout, 562 games)}
 \label{tab:informative-priors-performance}
@@ -534,7 +544,7 @@ Hybrid approach balancing stability (static) with adaptation (incremental):
 
 \textbf{Training}: One-time on 2018-2023 historical data (fixed, never retrained)
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Hybrid XGBoost v1 Static Component Hyperparameters}
 \label{tab:hybrid-static-hyperparameters}
@@ -558,7 +568,7 @@ Hybrid approach balancing stability (static) with adaptation (incremental):
 
 \textbf{Training}: Prequential (online) evaluation with sliding window.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Hybrid XGBoost v1 Incremental Component Configuration}
 \label{tab:hybrid-incremental-config}
@@ -588,7 +598,7 @@ Hybrid approach balancing stability (static) with adaptation (incremental):
 
 \subsection{Performance Validation (2022-2024)}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Hybrid XGBoost v1 Multi-Season Performance}
 \label{tab:hybrid-performance}
@@ -705,7 +715,7 @@ y &= r + \gamma \max_{a'} Q_{\theta'}(s', a') \quad \text{(Bellman target)} \\
 
 \subsection{Production Model Performance Matrix}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Production Model Comparison (2024 Holdout)}
 \label{tab:production-model-comparison}
@@ -735,7 +745,7 @@ Hybrid XGBoost v1 & 38.03 & 50.12 & N/A & 11 & 25\% \\
 
 \subsection{Convergence Summary}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Bayesian Model Convergence Summary}
 \label{tab:convergence-summary}
@@ -754,7 +764,7 @@ Informative Priors v2 & 1.0177 & 8,490 & 177 & 6,000 & EXCELLENT \\
 
 \subsection{Multi-Season Consistency}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Multi-Season MAE Consistency (2022-2024)}
 \label{tab:multiseason-consistency}
@@ -781,7 +791,7 @@ A comprehensive out-of-sample validation was conducted using the 2025 NFL season
 
 A simple power ratings model using 2024 point differentials and 2.5-point home field advantage was tested as a baseline for spread prediction performance. This model represents a minimally viable approach to NFL game prediction, leveraging only prior season performance metrics.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Historical Spread Prediction Performance (2020-2025)}
 \label{tab:spread-holdout-2025}
@@ -809,7 +819,7 @@ A simple power ratings model using 2024 point differentials and 2.5-point home f
 
 The three Bayesian models (State-Space v2, Hierarchical v2, Informative Priors v2) were retrained on December 8, 2025 using 2015-2024 data with the canonical training window (see Equation~\ref{eq:decay-function}). Models were then evaluated on 2025 Week 1-14 passing yard predictions.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Player Props (Passing Yards) 2025 Holdout Validation}
 \label{tab:props-holdout-2025}
@@ -868,7 +878,7 @@ These findings informed the decision to maintain static ensemble weights (ADR-00
 
 \subsection{Training Time Summary}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Production Model Training Times (M4 Mac, 10 cores)}
 \label{tab:training-times}
@@ -893,7 +903,7 @@ Temperature Scaler & 2.4 & 0.5 & Annual \\
 
 \subsection{Inference Time Breakdown}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Ensemble v6.0 Inference Time Breakdown (Single Prediction)}
 \label{tab:inference-times}
@@ -922,7 +932,7 @@ Temperature Scaling & 6 & 3.1\% & No \\
 
 \subsection{Software Environment}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Software Version Registry (Pinned to Patch Level)}
 \label{tab:software-versions}
@@ -961,7 +971,7 @@ Docker & 24.0.7 & Containerization \\
 
 \subsection{Random Seeds}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Random Seed Registry}
 \label{tab:random-seeds}

@@ -19,7 +19,7 @@ We validate the evidential regression model (Section~\ref{sec:evidential_learnin
 
 Before examining calibration, we first assess point prediction accuracy. Table~\ref{tab:evidential_point_metrics} presents performance metrics:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Evidential Regression Point Prediction Performance (2024 Test Set)}
 \label{tab:evidential_point_metrics}
@@ -40,7 +40,7 @@ MAPE (\%) & 41.2\% & -- & (expected) \\
 
 Table~\ref{tab:evidential_calibration} presents calibration results at three confidence levels:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Evidential Regression Calibration Results (2024 Test Set)}
 \label{tab:evidential_calibration}
@@ -67,7 +67,7 @@ Table~\ref{tab:evidential_calibration} presents calibration results at three con
 
 Figure~\ref{fig:evidential_calibration} shows the calibration curve and normalized residual plot:
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{../../../results/evidential_calibration.pdf}
     \caption{Evidential regression calibration curve (left) and normalized residual plot (right). The calibration curve reveals severe over-calibration: all predictions fall within even narrow confidence intervals. This indicates the model is too conservative with uncertainty estimates.}
@@ -78,7 +78,7 @@ Figure~\ref{fig:evidential_calibration} shows the calibration curve and normaliz
 
 The over-calibration issue manifests in extremely wide prediction intervals. Table~\ref{tab:evidential_sharpness} quantifies interval widths:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Prediction Interval Widths (90\% Confidence, 2024 Test Set)}
 \label{tab:evidential_sharpness}
@@ -101,7 +101,7 @@ Std interval width & 34,589 & -- & (high variance) \\
 
 Despite calibration failures, evidential regression demonstrates exceptional computational efficiency. Table~\ref{tab:evidential_speed} presents inference speed metrics:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Inference Speed Performance (929 predictions, Apple M4 Pro CPU)}
 \label{tab:evidential_speed}
@@ -130,7 +130,7 @@ Throughput (pred/sec) & 4,444,517 & $>$100 & Pass \\
 
 Figure~\ref{fig:evidential_uncertainty} shows the distribution of aleatoric, epistemic, and total uncertainty:
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \includegraphics[width=\textwidth]{../../../results/evidential_uncertainty_decomposition.pdf}
     \caption{Uncertainty decomposition for evidential regression. Top left: Aleatoric uncertainty (irreducible data noise, mean 2,359 yards). Top right: Epistemic uncertainty (model uncertainty, mean 11,391 yards). Bottom left: Scatter plot shows epistemic dominates aleatoric. Bottom right: Total uncertainty distribution (mean 11,638 yards).}
@@ -166,7 +166,7 @@ The model flagged 93 OOD samples (top 10\% epistemic uncertainty) from 2024 test
 
 Table~\ref{tab:evidential_acceptance_criteria} summarizes acceptance criteria and results:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Evidential Regression Validation Acceptance Criteria}
 \label{tab:evidential_acceptance_criteria}

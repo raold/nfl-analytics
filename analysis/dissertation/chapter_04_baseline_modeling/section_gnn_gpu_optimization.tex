@@ -124,13 +124,14 @@ Training a hierarchical GNN on 9 seasons (2016--2024, 2,367 games) for 100 epoch
 \textbf{Configuration} & \textbf{Time/Epoch} & \textbf{Total (100 epochs)} \\
 \midrule
 Baseline (M4 CPU, 1 season) & 33 min & 55 hours \\
-Baseline (M4 CPU, 9 seasons) & $\sim$5 hours\footnote{Extrapolated from single-season timing.} & $\sim$20 days \\
+Baseline (M4 CPU, 9 seasons) & $\sim$5 hours\footnotemark & $\sim$20 days \\
 Optimized (RTX 4090, 9 seasons) & 24 s & \textbf{40 minutes} \\
 \midrule
 \textbf{Speedup} & \textbf{82.5$\times$} & \textbf{720$\times$} \\
 \bottomrule
 \end{tabular}
 \end{center}
+\footnotetext{Extrapolated from single-season timing.}
 
 \paragraph{Per-epoch breakdown.} For 2,367 games with batch size 128 (15 batches):
 \begin{itemize}
@@ -175,12 +176,13 @@ Baseline (CPU, sequential) & 1.0$\times$ & 1.0$\times$ & 33 min & 45\% \\
 + Mixed precision (FP16) & 2.5$\times$ & 30$\times$ & 66 s & 55\% \\
 + Batch size 128 & 1.4$\times$ & 42$\times$ & 47 s & 48\% \\
 + Async GPU transfers & 1.1$\times$ & 46$\times$ & 43 s & -- \\
-+ 9$\times$ more data & -- & 82.5$\times$\footnote{Per-epoch speedup with 9$\times$ more games.} & 24 s & 33\% \\
++ 9$\times$ more data & -- & 82.5$\times$\footnotemark & 24 s & 33\% \\
 \bottomrule
 \end{tabular}
 \caption{Hierarchical GNN optimization breakdown. Each phase reports marginal speedup and cumulative improvement relative to the CPU baseline. GPU utilization varies due to batch size effects and validation overhead.}
 \label{tab:gnn_optimization_breakdown}
 \end{table}
+\footnotetext{Per-epoch speedup with 9$\times$ more games.}
 
 The dominant contribution came from batch-parallel processing (12$\times$), validating the hypothesis that the original bottleneck was implementation-specific rather than algorithmic.
 

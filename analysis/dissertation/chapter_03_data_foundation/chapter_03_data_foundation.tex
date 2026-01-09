@@ -2,7 +2,7 @@
 \chapter{Data Foundations and Feature Engineering}
 \label{chap:data}
 
-Building on the calibration requirements and market efficiency findings from \Cref{chap:litreview}, this chapter establishes the data foundation that enables reliable probability estimation and uncertainty quantification. We implement a defense-in-depth approach spanning five integrated layers: (i) idempotent ingestion pipelines for play-by-play, odds history, and weather data; (ii) a governed TimescaleDB schema with hypertables, compression, and indexing optimized for time-series analytics; (iii) a feature engineering catalog expanded from 112 baseline to 232 total features (+107\% expansion) through Phase 2 Advanced Stats Integration (\Cref{sec:phase2-advanced-stats}) with strict temporal leakage controls; (iv) data quality gates with drift detection and coverage monitoring; and (v) temporal weighting schemes that address NFL rule changes and market evolution while preserving statistical power.
+Building on the calibration requirements and market efficiency findings from \Cref{chap:litreview}, this chapter establishes the data foundation that enables reliable probability estimation and uncertainty quantification. We implement a defense-in-depth approach spanning five integrated layers: (i) idempotent ingestion pipelines for play-by-play, odds history, and weather data; (ii) a governed PostgreSQL schema with hypertables, compression, and indexing optimized for time-series analytics; (iii) a feature engineering catalog comprising 386 production features across base metrics (305), synthetic interactions (37), semantic/LLM-derived signals (38), and rest differentials (6), with strict temporal leakage controls; (iv) data quality gates with drift detection and coverage monitoring; and (v) temporal weighting schemes that address NFL rule changes and market evolution while preserving statistical power.
 
 The central technical contribution is a multi-layered leakage prevention architecture that enforces as-of semantics through SQL constraints, pandas validation, runtime guards, and unit tests---ensuring that no feature incorporates information unavailable at decision time. This rigor is essential to the thesis: uncertainty quantification is only credible when data integrity is provable and reproducible.
 
@@ -43,7 +43,7 @@ The complete database schema with all core tables, materialized views, and relat
 \subsection{Architecture Evolution and Current State}
 \label{subsec:architecture_evolution}
 
-The NFL analytics system evolved from a monolithic data pipeline to a hybrid Lambda Architecture~\cite{marz2015big}, combining batch processing for historical analysis with stream processing for real-time prediction. This section documents the architectural journey, current state, and identified improvement opportunities.
+The NFL analytics system evolved from a monolithic data pipeline to a hybrid Lambda Architecture~\cite{marz2015big}, combining batch processing for historical analysis with stream processing for real-time prediction. This architectural evolution addresses the well-documented challenges of production ML systems~\cite{sculley2015hidden, polyzotis2017data}, including data validation, feature management, and pipeline reproducibility. This section documents the architectural journey, current state, and identified improvement opportunities.
 
 \subsubsection{Current Architecture Pattern}
 
@@ -98,7 +98,7 @@ Jupyter notebooks with queries & 35 & 2,100 & Ad-hoc analysis \\
 \end{tabular}
 \end{table}
 
-This drift introduces maintenance burden, temporal leakage risk, and performance bottlenecks. Section~\ref{subsec:feature_store_proposal} presents a unified feature store solution.
+This drift introduces maintenance burden, temporal leakage risk, and performance bottlenecks. A unified feature store solution addressing these concerns is presented in \Cref{chap:methods} (\Cref{subsec:feature_store_proposal}).
 
 \subsubsection{Scalability Roadmap}
 
@@ -121,7 +121,7 @@ Query time (p95, ms) & 95 & 142 & 285 & 520 & +447\% \\
 \end{tabular}
 \end{table}
 
-Without intervention, query latency will exceed real-time requirements (\SI{<200}{ms}) by 2028. Section~\ref{sec:performance_optimization} details mitigation strategies.
+Without intervention, query latency will exceed real-time requirements (\SI{<200}{ms}) by 2028. Mitigation strategies including indexing optimization, materialized view caching, and query parallelization are detailed in \Cref{chap:results} (\Cref{sec:performance_optimization}).
 
 \subsection{Timescale Hypertables and Chunking}
 Odds and play-by-play tables are hypertables partitioned by time; chunk sizes balance insert speed with query latency. Compression policies retain recent data uncompressed for writes while compressing historical partitions for analytics.
@@ -137,7 +137,7 @@ With the governed schema in place, we systematically engineer features that bala
 \section{Feature Engineering}
 \label{sec:feature-engineering}
 
-We construct a comprehensive feature catalog spanning baseline production features (112) and advanced analytics modules (120 additional features via Phase 2 integration, detailed in \Cref{sec:phase2-advanced-stats}), totaling 232 features across four baseline taxonomic categories plus five advanced analytics domains. Each feature has documented lineage, update cadence, and leakage controls. The catalog enables modular experimentation while enforcing strict as-of semantics across all 232 features.
+We construct a comprehensive feature catalog comprising 386 production features organized into four taxonomic categories. The feature breakdown is: base metrics (305 features including team offensive/defensive statistics, Next Gen tracking data, QBR metrics, opponent-adjusted ratings, and situational analytics), synthetic interactions (37 features capturing QB-OL synergy, momentum indicators, and research-driven signals), semantic/LLM-derived signals (38 features from news sentiment, injury severity assessment, and media analysis), and rest differentials (6 features). Each feature has documented lineage, update cadence, and leakage controls. The catalog enables modular experimentation while enforcing strict as-of semantics across all features.
 
 \subsection{Feature Catalog and Taxonomy}
 \label{subsec:feature-catalog}
@@ -162,7 +162,7 @@ features:
     description: "Opponent-adjusted offensive EPA/play..."
 \end{lstlisting}
 
-The comprehensive master feature catalog consolidating all 186+ features across baseline, ensemble, and RL models is presented in \Cref{tab:master-features}. Each feature family is documented with temporal safety indicators, source files, and cross-references to chapters that utilize them.
+The comprehensive master feature catalog consolidating all 386 features across baseline, ensemble, and RL models is presented in \Cref{tab:master-features}. Each feature family is documented with temporal safety indicators, source files, and cross-references to chapters that utilize them.
 
 \input{../chapter_03_data_foundation/table_master_features.tex}
 
@@ -247,29 +247,31 @@ Conservative estimate based on literature review and ablation studies:
 
 \begin{table}[htbp]
 \centering
-\caption{Projected ROI Improvement by Feature Category}
+\caption{Projected ROI Improvement by Feature Category (Speculative)}
 \label{tab:roi_projections_features}
 \begin{tabular}{@{}lrrr@{}}
 \toprule
 \textbf{Scenario} & \textbf{Features Added} & \textbf{ROI Delta} & \textbf{Cumulative ROI} \\
 \midrule
-Baseline (current) & 245 & -- & +5.0\% \\
-+ NGS (Phase 1) & +18 & +2.5\% & +7.5\% \\
-+ Market (Phase 2) & +14 & +3.0\% & +10.5\% \\
-+ Injury (Phase 3) & +12 & +1.5\% & +12.0\% \\
-+ PFF (Phase 4) & +22 & +2.0\% & +14.0\% \\
-+ Domain (Phase 5) & +15 & +0.8\% & +14.8\% \\
+Baseline (cleaned, Dec 2025) & 386 & -- & $-7.5\%$ \\
++ NGS (Phase 1) & +18 & +2.5\%? & $-5.0\%$? \\
++ Market (Phase 2) & +14 & +3.0\%? & $-2.0\%$? \\
++ Injury (Phase 3) & +12 & +1.5\%? & $-0.5\%$? \\
++ PFF (Phase 4) & +22 & +2.0\%? & $+1.5\%$? \\
++ Domain (Phase 5) & +15 & +0.8\%? & $+2.3\%$? \\
 \midrule
-\textbf{Full Integration} & \textbf{+81} & \textbf{+9.8\%} & \textbf{+14.8\%} \\
+\textbf{Full Integration} & \textbf{+81} & \textbf{+9.8\%?} & \textbf{+2.3\%?} \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Assumptions:}
+\textbf{Critical caveat (December 2025):} The cleaned baseline from comprehensive data leakage investigation (\S\ref{sec:data-leakage-investigation}) shows \textbf{$-7.5\%$ ROI}, not the +5.0\% previously estimated. These projections are \textbf{speculative} and have not been validated. The ``?'' markers indicate uncertainty about whether these improvements would translate to actual profitability. Given market efficiency confirmed for spread betting with public data, these projections should be treated with skepticism.
+
+\textbf{Original assumptions (now questioned):}
 \begin{itemize}
     \item Linear additivity of ROI (conservative; likely sublinear due to correlation)
     \item No model retraining between phases (underestimates impact)
-    \item 95\% confidence interval: $[+6.2\%, +13.4\%]$ based on bootstrap resampling
+    \item 95\% confidence interval was estimated as $[+6.2\%, +13.4\%]$ based on bootstrap resampling---\textbf{but this assumed positive baseline}
 \end{itemize}
 
 \subsubsection{Acquisition Roadmap}
@@ -327,7 +329,6 @@ This negative result is methodologically important: it demonstrates scientific r
 
 \subsection{Leakage Prevention Architecture}
 \label{subsec:leakage-arch}
-\label{sec:leakage-architecture}  % Alternative label for backward compatibility
 Temporal leakage—the inadvertent use of information unavailable at decision time—is the most insidious threat to predictive validity. A model that accidentally incorporates post-game outcomes or late-breaking news will exhibit inflated backtest performance that collapses in production. We implement a multi-layered defense-in-depth architecture:
 
 \paragraph{1. As-of snapshot mechanism.}
@@ -402,7 +403,7 @@ Manual code review of 6 core feature modules (\texttt{asof\_snapshot.py}, \textt
   \item All rolling windows specify \texttt{min\_periods=1} to gracefully handle early-season data.
 \end{itemize}
 
-This multi-layered approach provides defense-in-depth: SQL constraints prevent leakage at ingestion, pandas operations enforce it during aggregation, validation functions catch it at runtime, and unit tests guard against regressions. The result is a feature pipeline with provable temporal integrity. A comprehensive audit of all 186+ features, automated validation tools, and the complete feature catalog are documented in Appendix~\ref{app:leakage_audit}.
+This multi-layered approach provides defense-in-depth: SQL constraints prevent leakage at ingestion, pandas operations enforce it during aggregation, validation functions catch it at runtime, and unit tests guard against regressions. The result is a feature pipeline with provable temporal integrity. A comprehensive audit of all 386 features, automated validation tools, and the complete feature catalog are documented in \Cref{app:leakage_audit}.
 
 \subsubsection{Temporal Leakage Detection and Mitigation}
 
@@ -471,12 +472,14 @@ All three identified leakage risks (Table~\ref{tab:temporal_leakage}) have been 
     \item \textbf{Season aggregates (SQL:L34):} Added \texttt{WHERE games.game\_id != \%(current\_game\_id)s} to prevent self-contamination. Validated with Test 3.
 \end{enumerate}
 
-Post-remediation validation: 10/10 automated tests pass on full feature suite (186+ features). Zero temporal leakage violations detected in production deployment pipeline (November 2025).
+Post-remediation validation: 10/10 automated tests pass on full feature suite (386 features). Zero temporal leakage violations detected in production deployment pipeline (December 2025).
 
 Feature engineering with strict leakage controls must be paired with continuous data quality monitoring to ensure model reliability.
 
 \section{Data Quality and Governance}
 \label{sec:data-quality}
+
+Production ML systems require robust data quality frameworks to prevent ``data cascades''---downstream failures caused by upstream data issues~\cite{sambasivan2021everyone, breck2019data}. This section documents the automated quality gates, coverage monitoring, and feature importance tracking that ensure reliable predictions.
 
 \subsection{Quality Gates and Validation}
 Automated quality gates execute on every ingestion run:
@@ -564,7 +567,6 @@ Quality monitoring ensures data integrity, but temporal considerations require e
 
 \subsection{Era Effects and Time Decay Weighting}
 \label{subsec:era-effects}
-\label{sec:timeframe-lookback}  % Alternative label for backward compatibility
 The NFL has undergone material structural changes since 1999, including officiating emphases on defensive contact, kickoff/PAT rule changes, quarterback protection, and a secular increase in pass rate and scoring. Betting markets have also evolved substantially with increased liquidity and pricing sophistication. These shifts raise the risk that long lookbacks contaminate modern estimates if older observations are weighted equally.
 
 I adopt a pragmatic two‑tier scope. The core analysis window is \textbf{2015--2025}, which reflects the contemporary rules environment (post‑PAT change) and the current market microstructure. Earlier seasons (1999--2014) are retained only as weak information through an explicit time‑decay weighting scheme and era controls. This approach preserves useful signal in low‑frequency contexts while protecting the model from regime drift.
@@ -644,9 +646,6 @@ To ensure reproducible evaluation, we define dataset cohorts with explicit train
 
 The integration of temporal weighting with dataset cohorts ensures robust evaluation across eras while maintaining leakage-free feature generation.
 
-% Phase 5 Exhaustive Feature Engineering Implementation
-\input{../chapter_03_data_foundation/subsection_phase5_exhaustive_features.tex}
-
 \section{As-Of Feature Generation}
 \label{sec:asof-generation}
 
@@ -665,14 +664,16 @@ The integration of temporal weighting with dataset cohorts ensures robust evalua
   \end{algorithmic}
 \end{algorithm}
 
-% Phase 2 Advanced Stats Integration (November 2025)
+% Advanced Analytics Integration (feature modules and implementation)
 \input{../chapter_03_data_foundation/section_3_5_phase2_advanced_stats.tex}
 
-\chaptersummary{
-This chapter established a reproducible data foundation with five integrated layers: (i) idempotent ingestion pipelines for play-by-play, odds history, and weather data with 92.7\% coverage; (ii) a governed TimescaleDB architecture with staging/core/mart layers, hypertables, and optimized indexing; (iii) a feature catalog expanded from 112 baseline to 232 total features (+107\%) through Phase 2 Advanced Stats Integration, incorporating Next Gen Stats tracking data (46 features), ESPN QBR metrics (20 features), possession value analytics (8 features), playcalling sophistication measures (32 features), and opponent-adjusted efficiency ratings (14 features); (iv) a multi-layered leakage prevention architecture combining SQL constraints, pandas validation, runtime guards, and 15 unit tests achieving 100\% validation success rate; (v) data quality gates with drift detection and coverage monitoring; and (vi) temporal weighting schemes with exponential decay (half-life $H \in \{3,4,5\}$) addressing NFL rule changes and market evolution.
+% Schema Evolution and Database Infrastructure
+\input{../chapter_03_data_foundation/subsection_phase5_exhaustive_features.tex}
 
-The weather hypothesis testing (wind impact on scoring) demonstrated scientific rigor by rejecting conventional wisdom unsupported by empirical evidence ($r=0.0038$, $p=0.90$), guarding against overfitting spurious effects. Phase 2 features target three classes of market inefficiency: situational context (clutch vs.\ garbage time), opponent adjustment (skill vs.\ schedule strength), and tracking data precision (player skill isolated from scheme effects). Expected performance impact: spread MAE reduction of 0.5--1.0 points, cover rate improvement of +2--4 percentage points, ROI boost of +1--2\%. The central contribution---defense-in-depth leakage prevention across all 232 features---is essential to the thesis: uncertainty quantification is only credible when data integrity is provable and reproducible.
+\chaptersummary{
+This chapter established a reproducible data foundation with five integrated layers: (i) idempotent ingestion pipelines for play-by-play, odds history, and weather data with 92.7\% coverage; (ii) a governed PostgreSQL architecture with staging/core/mart layers, hypertables, and optimized indexing across 64 tables and 1.25M plays; (iii) a feature catalog comprising 386 production features across base metrics (305 features including Next Gen Stats tracking, ESPN QBR, opponent-adjusted ratings), synthetic interactions (37 features for QB-OL synergy and momentum), semantic/LLM-derived signals (38 features from news sentiment and injury analysis), and rest differentials (6 features); (iv) a multi-layered leakage prevention architecture combining SQL constraints, pandas validation, runtime guards, and 15 unit tests achieving 100\% validation success rate; (v) data quality gates with drift detection and coverage monitoring; and (vi) temporal weighting schemes with exponential decay (half-life $H \in \{3,4,5\}$) addressing NFL rule changes and market evolution.
+
+The weather hypothesis testing (wind impact on scoring) demonstrated scientific rigor by rejecting conventional wisdom unsupported by empirical evidence ($r=0.0038$, $p=0.90$), guarding against overfitting spurious effects. The feature engineering targets three classes of market inefficiency: situational context (clutch vs.\ garbage time), opponent adjustment (skill vs.\ schedule strength), and tracking data precision (player skill isolated from scheme effects). The central contribution---defense-in-depth leakage prevention across all 386 features---is essential to the thesis: uncertainty quantification is only credible when data integrity is provable and reproducible.
 }{
-With a governed data foundation of 232 validated features ensuring temporal integrity, the next chapter develops calibrated baseline models (GLM, state-space, Bayesian hierarchical, Dixon-Coles) that leverage this expanded feature set to produce reliable probability estimates for spreads, totals, and moneylines.
-% TODO: Add reference when baseline chapter label is defined: \Cref{chap:baseline}
+With a governed data foundation of 386 validated features ensuring temporal integrity, the next chapter (\Cref{chap:methods}) develops calibrated baseline models (GLM, state-space, Bayesian hierarchical, Dixon-Coles) that leverage this expanded feature set to produce reliable probability estimates for spreads, totals, and moneylines.
 }

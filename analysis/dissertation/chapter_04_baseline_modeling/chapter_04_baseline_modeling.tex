@@ -22,7 +22,7 @@ estimated by maximum likelihood with $\ell(\beta)=\sum_i \big[y_i\log p_i+(1-y_i
 \paragraph{Spread-to-win consistency.} For a probit link, Stern's approximation implies $\Pr(\text{win})\approx \Phi(p/\sigma)$ when the spread $p$ is efficient for the mean margin and the margin is approximately normal with sd $\sigma$; we enforce consistency by adding a soft penalty to the loss when predicted win probability deviates from the probit-implied value at the posted $p$.
 
 \subsection{Temporal Weighting, Era Controls, and Validation}
-We adopt the exponential time‑decay weighting introduced in \Cref{sec:timeframe-lookback}, using a default half‑life $H=4$ with sensitivity to $H\in\{3,5\}$. For linear/logistic models we minimize the season‑weighted negative log‑likelihood with rolling recalibration; tree‑based models receive \texttt{sample\_weight}, include season as a feature, and add era indicators for known discontinuities.
+We adopt the exponential time‑decay weighting introduced in \Cref{subsec:era-effects}, using a default half‑life $H=4$ with sensitivity to $H\in\{3,5\}$. For linear/logistic models we minimize the season‑weighted negative log‑likelihood with rolling recalibration; tree‑based models receive \texttt{sample\_weight}, include season as a feature, and add era indicators for known discontinuities.
 
 Time‑series cross‑validation uses blocked, forward‑chaining splits aligned to seasons to prevent leakage. We report out‑of‑sample log loss/Brier and Expected Calibration Error by season, along with a head‑to‑head comparison between recent‑only and decayed‑full training. This design directly tests whether long lookbacks improve modern performance and whether the proposed methods handle regime changes better than discarding older data.
 
@@ -178,10 +178,7 @@ def test_no_future_leakage():
 
 These tests run in CI/CD and block deployment if violations are detected, implementing Rule 3 of the Enforcement Framework (Appendix~\ref{app:technical_debt}).
 
-\section{State-Space Model: Kalman-Filter Strength Ratings}
-\label{sec:state-space-model}
-
-% Include detailed state-space model content
+% Include detailed state-space model content (section header in file)
 \input{../chapter_04_baseline_modeling/section_state_space_model.tex}
 
 % Include XGBoost v4 Ridge Residuals section
@@ -195,6 +192,9 @@ These tests run in CI/CD and block deployment if violations are detected, implem
 
 % Include player-to-game prediction section (feature engineering approach)
 \input{../chapter_04_baseline_modeling/section_player_to_game.tex}
+
+% Include unified baseline comparison section
+\input{../chapter_04_baseline_modeling/section_unified_baseline_comparison.tex}
 
 
 \chaptersummary{

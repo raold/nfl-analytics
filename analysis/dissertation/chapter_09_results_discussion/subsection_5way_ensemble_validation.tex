@@ -33,7 +33,7 @@ where $\hat{y}_i$ is the prediction from model $i$ and $\sigma_i^2$ is its estim
 
 To validate ensemble integration, we tested on a representative Week 10 matchup (Kansas City vs Tampa Bay, 2025 season):
 
-\begin{table}[h]
+\begin{table}[htbp]
   \centering
   \small
   \caption{5-way ensemble predictions for Patrick Mahomes passing yards (Week 10, 2025).}
@@ -63,7 +63,7 @@ The ensemble prediction of 267.7 yards with 90\% CI [258.6, 276.8] represents an
 
 We validated ensemble calibration on 200 held-out predictions from the 2024 season:
 
-\begin{table}[h]
+\begin{table}[htbp]
   \centering
   \small
   \caption{Ensemble calibration metrics on 2024 holdout set ($N=200$ player-games).}
@@ -86,7 +86,7 @@ All confidence intervals achieve coverage within $\pm 3$ percentage points of no
 
 \Cref{tab:ensemble-progression} tracks ensemble performance improvements across model versions:
 
-\begin{table}[h]
+\begin{table}[htbp]
   \centering
   \small
   \caption{Ensemble performance progression (2022--2024 backtest, $N=570$ games).}
@@ -122,28 +122,23 @@ Comparing 5-way ensemble to baseline using paired Diebold-Mariano test on per-ga
   \item Win rate improvement: +5.5 percentage points ($p = 0.002$, significant)
 \end{itemize}
 
-\subsubsection{Expected ROI with CQL Bet Sizing}
+\subsubsection{CQL Bet Sizing: Status and Caveats}
+\label{subsec:cql-bet-sizing-caveats}
 
-The ensemble predictions serve as inputs to the Conservative Q-Learning (CQL) bet sizer, which adjusts stake sizes based on bankroll state and risk gates. Historical validation (2022--2024) suggests:
+The ensemble predictions were designed to serve as inputs to a Conservative Q-Learning (CQL) bet sizer for stake adjustment. However, \textbf{subsequent investigation revealed critical data leakage in the CQL training pipeline} (see ADR-016, \Cref{sec:data-leakage-investigation}). Initial CQL metrics showing +24\% improvement were invalidated when target leakage was identified---the training dataset inadvertently included post-game outcomes that allowed the model to ``see the future.''
 
-\begin{table}[h]
-  \centering
-  \small
-  \caption{Expected performance with CQL bet sizing integration.}
-  \label{tab:cql-expectations}
-  \begin{tabular}{@{} l r r l @{}}
-    \toprule
-    \textbf{Metric} & \textbf{Without CQL} & \textbf{With CQL} & \textbf{Improvement} \\
-    \midrule
-    ROI (\%) & +6.2 & \textbf{+7.7} & +24\% \\
-    Sharpe Ratio & 2.5 & \textbf{2.9} & +16\% \\
-    Max Drawdown (\%) & -9.2 & \textbf{-6.4} & -30\% \\
-    Kelly Fraction & Fixed (0.25) & Dynamic (0.15--0.45) & Adaptive \\
-    \bottomrule
-  \end{tabular}
-\end{table}
+\paragraph{Current Status.}
+CQL betting models require complete retraining with the corrected, leakage-free pipeline. Until retraining is complete, CQL bet sizing is \textbf{disabled} in production. Baseline Kelly criterion ($f=0.25$ fixed fraction) is used instead.
 
-The CQL integration provides a +1.5 percentage point ROI boost through superior bet sizing while reducing maximum drawdown by 30\%. This represents the +24\% improvement over baseline Kelly criterion documented in \Cref{subsec:cql}.
+\paragraph{Expected Realistic Performance.}
+Based on cleaned baseline results showing approximately 50\% win rate and negative ROI on spread markets (\Cref{sec:data-leakage-investigation}), CQL bet sizing is unlikely to produce the +24\% improvement originally claimed. More realistic expectations:
+\begin{itemize}
+  \item \textbf{Best case}: Modest improvement in Sharpe ratio through adaptive position sizing
+  \item \textbf{Expected case}: Similar risk-adjusted returns to fixed Kelly with reduced variance
+  \item \textbf{Note}: Superior bet sizing cannot overcome negative expected value in efficient markets
+\end{itemize}
+
+\textit{The CQL fourth-down decision model (\Cref{sec:fourth-down-cql}) remains valid---it predicts coaching behavior (85.7\% agreement), not betting outcomes, and does not suffer from the same leakage issues.}
 
 \begin{figure}[htbp]
   \centering
@@ -163,7 +158,7 @@ As of November 7, 2025, the 5-way ensemble system is \textbf{production-ready} w
   \item[\checkmark] Feature extraction (leakage-safe, automated)
   \item[\checkmark] Ensemble combination (inverse variance weighting)
   \item[\checkmark] Calibration validation (88.5--93.0\% coverage)
-  \item[\checkmark] CQL bet sizer integration (module exists, needs final wiring)
+  \item[\textbf{$\times$}] CQL bet sizer integration (\textbf{DISABLED}---requires retraining after leakage fix, see ADR-016)
   \item[\textbf{Pending}] Paper trading deployment (database schema designed, execution script needed)
   \item[\textbf{Pending}] Real-time odds fetching (Pinnacle API integration)
   \item[\textbf{Pending}] Monitoring dashboard (Grafana configuration)
@@ -184,7 +179,7 @@ The 2024 holdout was used for model selection (calibration tuning, feature engin
 \paragraph{3. QB-WR chemistry integration incomplete.}
 The sixth model (QB-WR Chemistry) is loaded but not yet activated in production predictions. Integration requires additional validation on receiving yards props.
 
-\paragraph{4. CQL deployment gap.}
-While CQL bet sizing is implemented (\texttt{py/production/\allowbreak cql\_bet\_sizer.py}), it requires final integration with ensemble predictions and paper trading infrastructure.
+\paragraph{4. CQL bet sizing disabled.}
+CQL bet sizing has been \textbf{disabled} pending retraining with the corrected, leakage-free pipeline (see ADR-016). The original CQL training inadvertently included post-game outcomes, producing invalidated metrics. Until retraining is complete, fixed-fraction Kelly ($f=0.25$) is used for bet sizing.
 
 These limitations are addressable through ongoing validation work, with paper trading deployment scheduled for November 2025 to provide real-world validation before live capital deployment.

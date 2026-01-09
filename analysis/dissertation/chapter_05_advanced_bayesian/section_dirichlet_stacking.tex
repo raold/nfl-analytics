@@ -99,7 +99,7 @@ This protocol ensures every prediction at time $t$ uses only data from times $< 
 
 To identify optimal Dirichlet hyperparameters, we conducted exhaustive grid search over 108 configurations spanning three axes:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Dirichlet hyperparameter search space]{Hyperparameter grid search design. 108 total configurations tested via prequential evaluation on 2,543 player passing games (2022--2024).}
 \label{tab:grid-search-space}
@@ -145,7 +145,7 @@ The v6.0 static weights (State-Space 27\%, Hierarchical 27\%, XGBoost v4 23\%, I
 
 \paragraph{Optimal Dirichlet Configuration.}
 Grid search identified the following best configuration (ranked by 2024 validation MAE):
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Optimal Dirichlet hyperparameters]{Best Dirichlet configuration discovered via grid search. Achieved 31.5\% MAE improvement over v6.0 static weights for player passing predictions.}
 \label{tab:optimal-dirichlet-config}
@@ -165,7 +165,7 @@ Scoring Rule & Squared & Gaussian assumption, heavy penalty for large errors \\
 \paragraph{Learned Weight Vector.}
 After warmup on 2022--2023 data, the Dirichlet posterior converged to the following weights (compared to v6.0 static):
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[v6.0 vs v8.0 Dirichlet weight comparison]{Comparison of static v6.0 weights (game-optimized) and learned v8.0 Dirichlet weights (prop-optimized). Bayesian hierarchical models dominate for player props.}
 \label{tab:weight-comparison}
@@ -228,10 +228,10 @@ borrowing strength across players within positions (e.g., all QBs share a common
 
 \paragraph{Empirical Support.}
 To validate this mechanistic interpretation, we decomposed component errors by variance source:
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Component error decomposition by variance source]{Variance decomposition of component errors for player passing predictions. Hierarchical models minimize within-player variance; XGBoost minimizes opponent-driven variance (which is small for props).}
-\label{tab:variance-decomposition}
+\label{tab:component-error-variance}
 \begin{threeparttable}
 \begin{tabular}{@{}lrrr@{}}
 \toprule
@@ -265,7 +265,8 @@ The grid search results motivate a novel \textbf{dual-weight strategy}: maintain
 We define two weight presets as module-level constants in \texttt{py/ensemble/strategy/base.py}:
 \begin{verbatim}
 # v6.0 Weights: Optimized for game-level predictions (spreads, totals)
-# Backtest: 54.5% cover rate, +4.0% ROI on >2pt edge games (2022-2024)
+# NOTE: Backtest claims (54.5%, +4.0% ROI) were computed before
+# leakage remediation. Cleaned baseline (Dec 2025): 51.0% win, -7.5% ROI
 DEFAULT_WEIGHTS_V6 = {
     "state_space_v2": 0.27,
     "hierarchical_v2": 0.27,
@@ -300,7 +301,7 @@ yards_pred = ensemble.predict_player(player_id="00-0019596", week=12)
 \end{verbatim}
 
 \paragraph{Decision Rule.}
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Dual-weight decision matrix]{Decision matrix for selecting v6.0 vs v8.0 weights based on prediction task.}
 \label{tab:dual-weight-decision}
@@ -321,7 +322,7 @@ Player Receptions & v8.0 & Player-specific role (target share) \\
 \end{table}
 
 \paragraph{Validation on 2024 Holdout.}
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[Dual-weight validation performance]{Validation of v6.0 and v8.0 weights on appropriate prediction domains (2024 holdout).}
 \label{tab:dual-weight-validation}
@@ -351,7 +352,7 @@ v8.0 DIRICHLET & Game Spreads & \textit{Not Tested}\tnote{c} & Expected Worse \\
 In prior work (ADR-009, Nov 18, 2025), we documented the rejection of ensemble v7.0's online dynamic weighting after 8.5 hours of multi-season backtesting revealed only +0.01 MAE improvement---essentially zero benefit. This raises a natural question: \emph{How does Dirichlet stacking (v8.0) differ from the rejected meta-learning approach, and why is it acceptable?}
 
 \paragraph{Critical Distinctions.}
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption[ADR-009 dynamic weights vs v8.0 Dirichlet comparison]{Comparison of rejected v7.0 dynamic weighting (ADR-009) versus adopted v8.0 Dirichlet stacking.}
 \label{tab:adr009-vs-dirichlet}
@@ -496,7 +497,7 @@ ONS uses second-order (Hessian) information for faster convergence:
 where $H_t$ is the Hessian and $\Pi_{\Delta_K}$ projects onto the simplex. This requires matrix inversion per update (computational cost) and lacks principled stopping criteria.
 
 \paragraph{Comparison Table.}
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \small
 \caption[Comparison of ensemble weight learning methods]{Comparison of weight learning approaches for ensemble optimization.}

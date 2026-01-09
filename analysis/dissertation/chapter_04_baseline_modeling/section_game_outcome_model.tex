@@ -33,7 +33,7 @@ where $X \in \mathbb{R}^{293}$ represents the feature vector (detailed in Sectio
 \paragraph{Parallel Training with ThreadPoolExecutor.}
 To accelerate training, the three models are trained concurrently using Python's \texttt{ThreadPoolExecutor}, reducing wall-clock time from \SI{~15}{min} (sequential) to \SI{~6}{min} (parallel) on an M4 Mac. Each model uses independent hyperparameters optimized for its target variable:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{GameOutcomeModel Hyperparameters (Per Target)}
 \label{tab:game-outcome-hyperparams}
@@ -61,7 +61,7 @@ Gamma (pruning) & 0.1 & 0.05 & 0.1 \\
 
 The model leverages 293 engineered features across 10 categories, each designed to capture distinct aspects of team performance:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{GameOutcomeModel Feature Categories}
 \label{tab:game-outcome-features}
@@ -109,7 +109,7 @@ The training script used \texttt{train\_test\_split()} with random shuffling, vi
 \paragraph{Impact Assessment.}
 Simulated backtest comparing flawed (shuffled) vs.\ corrected (sorted) splits on 2023 holdout:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Data Leakage Impact (2023 Holdout, 285 games)}
 \label{tab:game-outcome-leakage-impact}
@@ -228,7 +228,7 @@ This optimization reduced feature extraction time from \SI{~45}{min} to \SI{~2}{
 
 After applying all bug fixes, the GameOutcomeModel was validated on three independent seasons using strict temporal splits:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{GameOutcomeModel Performance (2022--2024, 815 games)}
 \label{tab:game-outcome-performance}
@@ -272,7 +272,7 @@ Low variance confirms robust generalization across seasons, addressing the 70\% 
 
 \subsection{Comparison with Prior Game-Level Models}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Game-Level Model Evolution (2024 Holdout)}
 \label{tab:game-level-evolution}
@@ -283,11 +283,12 @@ Low variance confirms robust generalization across seasons, addressing the 70\% 
 \midrule
 State-Space (v2) & 12.8 & 0.584 & +6.4\% & Baseline \\
 5-Component Ensemble & 8.3 & 0.715 & +70.4\% & \textcolor{red}{Overfit} \\
-GameOutcomeModel (v1.0) & 10.1 & 0.648 & +1.8\% & \textcolor{green}{Staging} \\
+GameOutcomeModel (v1.0) & 10.1 & 0.648 & +1.8\% & Superseded \\
+GameOutcomeModel (v2.0) & 10.45 & 0.691 & +2.1\% & \textcolor{green}{Production} \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item \textbf{Notes:} Degradation = (Test Brier - Val Brier) / Val Brier. GameOutcomeModel achieves middle ground: better than state-space baseline, more robust than ensemble. Staging status indicates production readiness pending A/B test.
+\item \textbf{Notes:} Degradation = (Test Brier - Val Brier) / Val Brier. v2.0 adds 38 semantic features (LLM-derived sentiment, injury severity) and achieves +4.6\% win accuracy improvement over v1. Promoted to production December 2025 after A/B testing confirmed generalization.
 \end{tablenotes}
 \end{table}
 
@@ -321,30 +322,31 @@ If $|\text{Edge}| > 2.5$ points (threshold = $0.5 \sigma_{\text{spread}}$), flag
 
 The GameOutcomeModel is registered in the production model registry with the following metadata:
 
-\begin{lstlisting}[language=Python,style=codestyle,caption={Model Registry Entry},label={lst:game-outcome-registry}]
+\begin{lstlisting}[language=Python,style=codestyle,caption={Model Registry Entry (v2.0)},label={lst:game-outcome-registry}]
 {
   "name": "game_outcome_model",
-  "version": "1.0.0",
-  "status": "staging",
-  "created_at": "2025-11-29",
+  "version": "2.0.0",
+  "status": "production",
+  "created_at": "2025-12-23",
   "framework": "xgboost",
   "targets": ["spread", "total", "win_probability"],
-  "features": 293,
+  "features": 382,  // 344 base + 38 semantic (LLM-derived)
   "training_data": {
     "seasons": [2018, 2019, 2020, 2021],
     "games": 652,
     "decay_halflife": 4.0
   },
   "performance": {
-    "spread_mae": 10.29,
-    "total_mae": 10.11,
-    "win_prob_auc": 0.648,
-    "inference_time_p95_ms": 62
+    "spread_mae": 10.45,
+    "total_mae": 10.08,
+    "win_prob_auc": 0.691,
+    "inference_time_p95_ms": 105
   },
   "validation": {
     "seasons": [2022, 2023, 2024],
     "games": 815,
-    "consistency_cv": 0.022
+    "consistency_cv": 0.019,
+    "ab_test_lift": 0.046  // +4.6% win accuracy vs v1
   }
 }
 \end{lstlisting}

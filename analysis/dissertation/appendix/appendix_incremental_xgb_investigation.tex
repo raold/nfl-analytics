@@ -7,7 +7,7 @@ This appendix provides a comprehensive chronology of our incremental XGBoost inv
 
 \subsection{Timeline Summary}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Incremental XGBoost Investigation Timeline}
 \label{tab:investigation-timeline}
@@ -53,7 +53,7 @@ Our initial validation tested incremental XGBoost on the 2024 NFL season with th
 
 Table~\ref{tab:initial-results-incorrect} shows the results that led to our initial breakthrough claim:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Initial 2024 Season Results (INCORRECT - Baseline Error)}
 \label{tab:initial-results-incorrect}
@@ -103,7 +103,7 @@ def train_static_baseline(X_train, y_train):
 
 Two days after celebrating the initial results, we began extending validation to Week 1 of the 2022-2024 historical backtest. This required training the static baseline on 2018-2021 data and testing on 2022 Week 1. The results immediately raised red flags:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{2022 Week 1 Results (Discovery of Error)}
 \label{tab:week1-discovery}
@@ -178,7 +178,7 @@ def train_static_baseline(X_train, y_train):
 
 With the corrected baseline, we reran validation on three NFL seasons. Table~\ref{tab:corrected-multiseason} presents the sobering results:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Corrected Multi-Season Results (Pure Incremental vs Static XGBoost)}
 \label{tab:corrected-multiseason}
@@ -201,7 +201,7 @@ With the corrected baseline, we reran validation on three NFL seasons. Table~\re
 
 To understand why incremental learning underperforms, we analyzed performance by training window size:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Cold-Start Penalty (2024 Season)}
 \label{tab:cold-start-penalty}
@@ -235,7 +235,7 @@ Rather than abandon incremental learning, we systematically tested 8 different o
 \item Update frequency: Every game
 \end{itemize}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Window Size Tuning Results (2024 Season)}
 \label{tab:window-tuning}
@@ -266,7 +266,7 @@ Rather than abandon incremental learning, we systematically tested 8 different o
 \item Update frequency: Every game
 \end{itemize}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Learning Rate Tuning Results (2024 Season)}
 \label{tab:lr-tuning}
@@ -297,7 +297,7 @@ Rather than abandon incremental learning, we systematically tested 8 different o
 \item Learning rate: 0.1 (default)
 \end{itemize}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Update Frequency Results (2024 Season)}
 \label{tab:update-freq}
@@ -327,7 +327,7 @@ Every 10 games & 44.12 & -15.7\% & \ding{55} \\
 \item Learning rate: 0.1 (default)
 \end{itemize}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Feature Selection Results (2024 Season)}
 \label{tab:feature-selection}
@@ -355,7 +355,7 @@ All 67 features (baseline) & 43.02 & -12.9\% & \ding{55} \\
 \item Window size: 100 (default per model)
 \end{itemize}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Incremental Ensemble Results (2024 Season)}
 \label{tab:incremental-ensemble}
@@ -383,7 +383,7 @@ All 67 features (baseline) & 43.02 & -12.9\% & \ding{55} \\
 \item Window size: 100 (default)
 \end{itemize}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Adaptive Learning Rate Results (2024 Season)}
 \label{tab:adaptive-lr}
@@ -411,7 +411,7 @@ Exponential decay & 42.67 & -11.9\% & \ding{55} \\
 \item Learning rate: 0.1 (default)
 \end{itemize}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Warm-Start Results (2024 Season)}
 \label{tab:warm-start}
@@ -438,7 +438,7 @@ Static baseline weights & 39.78 & -4.4\% & \ding{55} \\
 \item Learning rate: 0.1 (default)
 \end{itemize}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Hybrid Blending Results (2024 Season) - BREAKTHROUGH}
 \label{tab:hybrid-blending}
@@ -465,7 +465,7 @@ Static baseline weights & 39.78 & -4.4\% & \ding{55} \\
 
 Table~\ref{tab:hybrid-multiseason-full} presents the complete hybrid model validation:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Hybrid 70/30 Model: Full Multi-Season Validation}
 \label{tab:hybrid-multiseason-full}
@@ -490,7 +490,7 @@ Table~\ref{tab:hybrid-multiseason-full} presents the complete hybrid model valid
 
 We performed paired t-tests to confirm that improvements are not due to chance:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Statistical Significance Tests (Paired t-test)}
 \label{tab:statistical-significance}

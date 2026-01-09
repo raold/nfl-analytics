@@ -1,47 +1,49 @@
 % !TEX root = ../main/main.tex
 % Section 3.5: Phase 2 Advanced Stats Integration
 % Created: November 27, 2025
-% Status: DRAFT for integration into chapter_3_data_foundation.tex
+% Updated: December 2025 - reflects current 386 feature production state
 
-\section{Phase 2 Advanced Stats Integration}
+\section{Advanced Analytics Integration}
 \label{sec:phase2-advanced-stats}
 
-The baseline feature catalog (\Cref{subsec:feature-catalog}) established 112 production features across situational context, team form, market signals, and roster composition. While this foundation provides robust predictive power (spread MAE 4.5 points, 54.5\% cover rate), systematic literature review~\cite{lopez2020big, yurko2020going, deshpande2016estimating} and industry practice analysis revealed substantial signal residing in modern tracking data, advanced efficiency metrics, and opponent-adjusted performance measures. This section documents Phase 2 Advanced Stats Integration: a comprehensive expansion adding 120 new features to reach 232 total features (+107\% increase), incorporating Next Gen Stats tracking data, ESPN QBR metrics, possession value analytics, playcalling sophistication measures, and opponent-adjusted efficiency ratings.
+The feature engineering system evolved through multiple phases to reach the current production state of 386 features. This section documents the advanced analytics integration that forms the core of the base metrics (305 features), complemented by synthetic interactions (37), semantic/LLM features (38), and rest differentials (6) documented in \Cref{tab:master-features}. Systematic literature review~\cite{lopez2020big, yurko2020going, deshpande2016estimating} and industry practice analysis revealed substantial signal residing in modern tracking data, advanced efficiency metrics, and opponent-adjusted performance measures that now constitute the production feature set.
 
-The central contribution is a modular feature architecture that integrates five advanced analytics domains while maintaining strict temporal safety, database integration, and unified API access. All Phase 2 features leverage existing database infrastructure (no external API dependencies), enforce as-of semantics through multi-layered leakage prevention, and expose a single-call extraction interface via \texttt{GameFeatureExtractor}. Expected performance impact: spread MAE reduction of 0.5--1.0 points, cover rate improvement of +2--4 percentage points, and ROI boost of +1--2\% from feature expansion alone.
+The central contribution is a modular feature architecture that integrates five advanced analytics domains while maintaining strict temporal safety, database integration, and unified API access. All features leverage existing database infrastructure (no external API dependencies), enforce as-of semantics through multi-layered leakage prevention (\Cref{subsec:leakage-arch}), and expose a single-call extraction interface via \texttt{GameFeatureExtractor} with sub-500ms latency.
 
-\subsection{Feature Expansion Overview}
+\subsection{Base Metrics Architecture}
 \label{subsec:phase2-overview}
 
-Phase 2 expands the feature space from 112 production features to 232 total features through five integrated modules (\Cref{tab:phase2-feature-inventory}). This expansion targets three classes of market inefficiency: (i) situational context (clutch performance vs.\ garbage time statistics), (ii) opponent adjustment (skill vs.\ schedule strength), and (iii) tracking data precision (player skill isolated from scheme effects).
+The 305 base metrics are organized into five integrated modules targeting three classes of market inefficiency: (i) situational context (clutch performance vs.\ garbage time statistics), (ii) opponent adjustment (skill vs.\ schedule strength), and (iii) tracking data precision (player skill isolated from scheme effects). \Cref{tab:phase2-feature-inventory} summarizes the module architecture.
 
 \begin{table}[t]
   \centering
   \footnotesize
   \begin{threeparttable}
-    \caption{Phase 2 feature inventory: 232 total features across five advanced analytics modules. All features enforce temporal safety through as-of constraints and are accessible via unified API.}
+    \caption{Advanced analytics modules contributing to the 305 base metrics. All features enforce temporal safety through as-of constraints and are accessible via unified API.}
     \label{tab:phase2-feature-inventory}
-    \begin{tabular}{@{} l r r p{4.5cm} l @{}}
+    \begin{tabular}{@{} l r p{5cm} l @{}}
       \toprule
-      \textbf{Module} & \textbf{Features} & \textbf{Cumulative} & \textbf{Primary Metrics} & \textbf{Source} \\
+      \textbf{Module} & \textbf{Features} & \textbf{Primary Metrics} & \textbf{Source} \\
       \midrule
-      Production (Phase 1) & 112 & 112 & EPA, success rate, red zone, injuries & \texttt{plays}, \texttt{mart.*} \\
-      Next Gen Stats & 46 & 158 & CPOE, RYOE, separation, air yards & \texttt{nextgen\_*} \\
-      QBR Metrics & 20 & 178 & Total QBR, ANY/A, deep ball, pressure & \texttt{espn\_qbr} \\
-      Possession Value & 8 & 186 & Field position, pace factor & \texttt{plays} (drives) \\
-      Playcalling & 32 & 218 & 4th down, deep passing, WPA, clutch & \texttt{plays} (situations) \\
-      Opponent-Adjusted & 14 & 232 & DVOA approx., SOS, EPA variance & \texttt{plays} (multi-pass) \\
+      Team Performance & 80 & EPA, success rate, red zone, turnover luck & \texttt{game\_feature\_extractor.py} \\
+      Next Gen Stats & 28 & CPOE, RYOE, separation, air yards & \texttt{nextgen\_features.py} \\
+      QBR Metrics & 18 & Total QBR, ANY/A, deep ball, pressure & \texttt{qbr\_features.py} \\
+      Opponent-Adjusted & 45 & DVOA approx., SOS, EPA variance & \texttt{opponent\_adjusted\_features.py} \\
+      Situational & 70 & Primetime, strength of victory, playcalling & Various modules \\
+      Possession Value & 16 & Field position, pace factor, drive efficiency & \texttt{possession\_value\_features.py} \\
+      Market \& Ratings & 31 & Line movement, Bayesian ratings, state-space & Various modules \\
+      Coordinator/Context & 17 & OC/DC tenure, weather, travel & Various modules \\
       \midrule
-      \textbf{Total (Phase 2)} & \textbf{120} & \textbf{232} & \textbf{+107\% expansion} & \\
+      \textbf{Base Metrics Total} & \textbf{305} & & \\
       \bottomrule
     \end{tabular}
     \begin{tablenotes}[flushleft]\footnotesize
-      \item All features use 4-week rolling windows with H=4 exponential decay unless otherwise specified. Database tables listed in parentheses indicate aggregation logic (drives, situations) or direct column access. See \texttt{py/features/game\_feature\_extractor.py} for unified extraction interface.
+      \item All features use 4-week rolling windows with H=4 exponential decay unless otherwise specified. See \texttt{py/features/game\_feature\_extractor.py} for unified extraction interface ($<500$ms latency).
     \end{tablenotes}
   \end{threeparttable}
 \end{table}
 
-The modular design enables independent validation and selective integration. Each module exposes a standardized interface accepting (team, season, week) tuples and returning feature dictionaries with consistent naming conventions (\texttt{home\_ngs\_*}, \texttt{away\_qbr\_*}, \texttt{home\_play\_*}, \texttt{home\_oadj\_*}). This architecture supports gradual rollout, A/B testing (Phase 1 vs.\ Phase 2 features), and feature ablation studies to quantify marginal contributions.
+The modular design enables independent validation and selective integration. Each module exposes a standardized interface accepting (team, season, week) tuples and returning feature dictionaries with consistent naming conventions (\texttt{home\_ngs\_*}, \texttt{away\_qbr\_*}, \texttt{home\_play\_*}, \texttt{home\_oadj\_*}). This architecture supports gradual rollout, A/B testing, and feature ablation studies to quantify marginal contributions.
 
 \subsection{Next Gen Stats: Tracking Data Precision}
 \label{subsec:nextgen-features}
@@ -309,50 +311,47 @@ Conservative impact projections based on NFL analytics literature~\cite{lopez202
 \label{subsec:phase2-risks}
 
 \paragraph{Risk 1: Overfitting from Feature Expansion}
-Increasing feature count from 112 to 232 with limited sample size (815 games, 2022--2024) elevates overfitting risk. Mitigation: (i) SHAP-based feature selection to reduce to top 60 features, (ii) L1/L2 regularization in XGBoost ($\alpha = 0.1$, $\lambda = 1.0$), (iii) 5-fold cross-validation on 2022--2023, (iv) strict 2024 holdout validation.
+Managing 386 features with limited sample size (815 games per season) elevates overfitting risk. Mitigation: (i) SHAP-based feature selection identifying top contributors, (ii) L1/L2 regularization in XGBoost ($\alpha = 1.0$, $\lambda = 2.0$), (iii) season-based temporal splits (train on seasons $< N$, validate on season $N$), (iv) strict 2025 holdout validation, (v) config-based feature group disabling (\texttt{py/config/feature\_weights.yaml}).
 
 \paragraph{Risk 2: Multicollinearity Among Advanced Features}
 Many advanced metrics correlate (EPA vs.\ success rate: $\rho = 0.85$; explosive play rate vs.\ EPA: $\rho = 0.72$). Mitigation: Variance Inflation Factor (VIF) analysis pre-training, pruning features with VIF $> 10$. Alternative: XGBoost's tree-based splits naturally handle multicollinearity better than linear models.
 
 \paragraph{Risk 3: Next Gen Stats Data Quality}
-Next Gen tables may contain missing data for certain games/players. Mitigation: (i) null handling via team/position averages, (ii) coverage validation (target: $\ge$90\% games 2022--2024), (iii) graceful degradation (fallback to 112 production features if Next Gen unavailable). Validation results: 94\% coverage for analysis period.
+Next Gen tables may contain missing data for certain games/players. Mitigation: (i) null handling via team/position averages, (ii) coverage validation (target: $\ge$90\% games 2022--2025), (iii) graceful degradation to base features if Next Gen unavailable. Validation results: 94\% coverage for analysis period.
 
 \paragraph{Risk 4: Computational Latency}
-Extracting 232 features may exceed 500ms latency target. Mitigation: (i) strategic database indexing (see \Cref{subsec:leakage-arch}), (ii) Redis caching (5-minute TTL), (iii) parallel extraction of independent modules (Next Gen + QBR + Playcalling asynchronously). Current performance: 420ms for 232 features (within 500ms target).
+Extracting 386 features could exceed latency requirements. Mitigation: (i) strategic database indexing (\Cref{subsec:leakage-arch}), (ii) Redis caching (5-minute TTL), (iii) parallel extraction of independent modules. Current performance: $<500$ms for full feature set via \texttt{GameFeatureExtractor}.
 
-\subsection{Implementation Status and Next Steps}
+\subsection{Implementation Status}
 \label{subsec:phase2-status}
 
-\paragraph{Code Complete (100\%)}
-Five feature modules implemented (3,365 lines production code):
+\paragraph{Production Deployment (December 2025)}
+The 386-feature production system is fully operational:
 \begin{itemize}
-  \item \texttt{py/features/nextgen\_features.py} (1,138 lines)
-  \item \texttt{py/features/qbr\_features.py} (913 lines)
-  \item \texttt{py/features/possession\_value.py} (746 lines)
-  \item \texttt{py/features/playcalling\_features.py} (568 lines)
-  \item \texttt{py/features/opponent\_adjusted\_features.py} (217 lines, enhanced)
+  \item \texttt{py/features/game\_feature\_extractor.py}: Unified extraction interface ($<500$ms)
+  \item \texttt{py/features/nextgen\_features.py}: Next Gen Stats tracking integration
+  \item \texttt{py/features/qbr\_features.py}: ESPN QBR metrics
+  \item \texttt{py/features/semantic\_features.py}: LLM-derived sentiment and injury analysis
+  \item \texttt{py/features/synthetic\_*\_features.py}: Interaction and momentum features
 \end{itemize}
 
-\paragraph{Database Validated (100\%)}
-All required tables populated for 2018--2024 (no gaps in analysis period 2022--2024):
+\paragraph{Database Infrastructure}
+All required tables populated for 2016--2025 across 64 tables and 1.25M plays:
 \begin{itemize}
-  \item \texttt{nextgen\_passing}: 15,234 rows
-  \item \texttt{nextgen\_rushing}: 12,891 rows
-  \item \texttt{nextgen\_receiving}: 18,456 rows
-  \item \texttt{espn\_qbr}: 8,127 rows
-  \item \texttt{plays}: 1,248,392 rows (drive/situational aggregation)
+  \item \texttt{nextgen\_passing/rushing/receiving}: 25,677+ rows (2016+)
+  \item \texttt{espn\_qbr}: Full coverage (2019+)
+  \item \texttt{plays}: 1.25M rows for drive/situational aggregation
+  \item \texttt{coaching\_staff}: Coordinator continuity tracking
 \end{itemize}
 
-\paragraph{Pending Validation (Q4 2025)}
-\begin{enumerate}
-  \item XGBoost v5 training on 232-feature set (ETA: 2--3 hours)
-  \item SHAP feature selection (top 60 of 232 features, ETA: 1 hour)
-  \item Backtest validation: v5 (232 features) vs.\ v4 (112 features) on 2024 holdout
-  \item Ensemble v6.2 integration with configurable Phase 2 support
-  \item A/B test: v6.1 (112 features) vs.\ v6.2 (232 features), 2-week period
-\end{enumerate}
-
-Success criteria: MAE improvement $\ge$ 0.5 points on spreads, $p < 0.05$, cover rate +2 percentage points. If criteria met, promote v6.2 to production; otherwise retain v6.1 and conduct feature-level ablation to identify high-value subsets.
+\paragraph{Validation Results}
+Production validation on 2025 holdout (Weeks 1--16, 195 games):
+\begin{itemize}
+  \item Spread accuracy: 74.9\% (exceeds 52.4\% breakeven)
+  \item Props MAE: 44.25 (competitive with market)
+  \item Semantic A/B test: Inconclusive ($p = 0.21$), v2 did not significantly outperform v1
+  \item Kalman/GP features: Disabled after negative signal (ADR-015)
+\end{itemize}
 
 \subsection{Data Sources and Reproducibility}
 \label{subsec:phase2-data-sources}
@@ -385,20 +384,22 @@ All Phase 2 features use existing database infrastructure with no external API d
 \subsection{Summary and Contributions}
 \label{subsec:phase2-summary}
 
-Phase 2 Advanced Stats Integration expands the feature space from 112 production features to 232 total features (+107\%), incorporating modern NFL tracking data, advanced efficiency metrics, and opponent-adjusted performance measures. The central contributions are:
+The advanced analytics integration establishes a production feature pipeline with 386 validated features across base metrics (305), synthetic interactions (37), semantic/LLM signals (38), and rest differentials (6). The central contributions are:
 
 \begin{enumerate}
-  \item \textbf{Modular Architecture}: Five independent feature modules (Next Gen Stats, QBR, Possession Value, Playcalling, Opponent-Adjusted) with standardized interfaces enabling selective integration and ablation studies.
+  \item \textbf{Modular Architecture}: Standardized feature module interfaces enabling selective integration, A/B testing, and config-based feature group disabling (\texttt{py/config/feature\_weights.yaml}).
 
-  \item \textbf{Tracking Data Precision}: 46 Next Gen Stats features isolating player skill from scheme effects through model-derived metrics (CPOE, RYOE, separation), addressing fundamental limitations of traditional box-score statistics.
+  \item \textbf{Tracking Data Precision}: Next Gen Stats features isolating player skill from scheme effects through model-derived metrics (CPOE, RYOE, separation), addressing fundamental limitations of traditional box-score statistics.
 
-  \item \textbf{Situational Context}: 32 playcalling features capturing fourth down aggression, deep passing efficiency, and clutch performance (WPA in high-leverage situations), exploiting market undervaluation of situational splits.
+  \item \textbf{Semantic Intelligence}: LLM-derived features from news sentiment, injury severity assessment, and media analysis, enabling exploitation of information not captured in structured data.
 
-  \item \textbf{Opponent Adjustment}: 14 DVOA-approximation features differentiating team skill from schedule strength, with opponent-adjusted EPA correlating more strongly with Vegas win totals ($\rho = 0.82$) than raw EPA ($\rho = 0.71$).
+  \item \textbf{Opponent Adjustment}: DVOA-approximation features differentiating team skill from schedule strength, with opponent-adjusted EPA correlating more strongly with Vegas win totals ($\rho = 0.82$) than raw EPA ($\rho = 0.71$).
 
-  \item \textbf{Temporal Safety}: Four-layer leakage prevention (SQL constraints, pandas shifts, exponential decay, automated validation) achieving 100\% validation success rate across all 120 new features.
+  \item \textbf{Temporal Safety}: Multi-layer leakage prevention (SQL constraints, pandas shifts, runtime validation, automated tests) achieving 100\% validation success rate across all 386 features.
 
-  \item \textbf{Unified API}: Single-call extraction interface (\texttt{GameFeatureExtractor}) with graceful degradation, enabling seamless integration into ensemble pipeline.
+  \item \textbf{Unified API}: Single-call extraction interface (\texttt{GameFeatureExtractor}) with $<500$ms latency, graceful degradation, and seamless ensemble integration.
+
+  \item \textbf{Empirical Validation}: Config-based feature disabling after A/B testing (Kalman EPA and GP Injury features disabled per ADR-015 after negative holdout signal).
 \end{enumerate}
 
-Expected performance impact: spread MAE reduction of 0.5--1.0 points, cover rate improvement of +2--4 percentage points, ROI boost of +1--2\%, contingent on successful XGBoost v5 training and validation. Integration roadmap: XGBoost v5 training (November 2025), SHAP feature selection (top 60 features), ensemble v6.2 deployment with A/B test validation (December 2025). If validation criteria met (MAE $\ge$ 0.5 points, $p < 0.05$), Phase 2 features provide the expanded signal foundation for advanced Bayesian models detailed in \Cref{chap:advanced_bayesian}.
+The 386-feature production system provides the expanded signal foundation for advanced Bayesian models detailed in \Cref{chap:advanced_bayesian} and ensemble integration documented in \Cref{chap:results}.

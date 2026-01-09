@@ -1,81 +1,80 @@
 % Master Feature Definition Table
 % Comprehensive reference for all feature families used across models
 % Cross-referenced from Chapters 4, 6, 8, and 12
+% Updated: December 2025 - reflects 386 production features
 
 \begin{table}[!ht]
 \centering
 \small
-\caption[Master Feature Catalog]{Master Feature Catalog: All feature families used across baseline, ensemble, and RL models. Features marked \texttt{asof\_safe} use only pre-game information. See feature catalog (\texttt{py/features/catalog.yaml}) for complete definitions.}
+\caption[Master Feature Catalog]{Master Feature Catalog: All 386 production features organized by category. Features marked \texttt{asof\_safe} use only pre-game information. See \texttt{py/features/} for implementation details.}
 \label{tab:master-features}
 \begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{@{}llccl@{}}
 \toprule
-\textbf{Feature Family} & \textbf{Description} & \textbf{Count} & \textbf{AS-OF Safe?} & \textbf{Source} \\
+\textbf{Feature Family} & \textbf{Description} & \textbf{Count} & \textbf{Safe?} & \textbf{Source Module} \\
 \midrule
-\multicolumn{5}{l}{\textit{Team Performance Metrics}} \\
-Team History Base & Cumulative team performance (EPA, margin, win \%) & 15 & \checkmark & \texttt{asof\_features.py} \\
-Team Context & Rest days, travel, prev game result & 9 & \checkmark & \texttt{asof\_features.py} \\
-Team Personnel & QB/coach changes, experience & 7 & \checkmark & \texttt{asof\_features.py} \\
-Team Venue & Surface type (grass/turf), roof (dome/outdoor) & 4 & \checkmark & \texttt{asof\_features.py} \\
+\multicolumn{5}{l}{\textit{Base Metrics (305 features)}} \\
+Team Offensive & EPA, success rate, red zone, explosiveness & 42 & \checkmark & \texttt{game\_feature\_extractor.py} \\
+Team Defensive & Defensive EPA, pressure rate, coverage & 38 & \checkmark & \texttt{game\_feature\_extractor.py} \\
+Next Gen Stats & CPOE, RYOE, separation, air yards, tracking & 28 & \checkmark & \texttt{nextgen\_features.py} \\
+QBR Metrics & Total QBR, ANY/A, deep ball, pressure perf. & 18 & \checkmark & \texttt{qbr\_features.py} \\
+Opponent-Adjusted & DVOA approx., SOS, EPA variance & 45 & \checkmark & \texttt{opponent\_adjusted\_features.py} \\
+Turnover Luck & Fumble recovery rate, INT luck index & 12 & \checkmark & \texttt{turnover\_luck\_features.py} \\
+Primetime & MNF/SNF/TNF performance splits & 8 & \checkmark & \texttt{primetime\_features.py} \\
+Strength of Victory & Quality wins, margin vs SOS & 24 & \checkmark & \texttt{strength\_of\_victory\_features.py} \\
+Possession Value & Field position, pace factor, drive efficiency & 16 & \checkmark & \texttt{possession\_value\_features.py} \\
+Playcalling & 4th down aggression, WPA, clutch performance & 22 & \checkmark & \texttt{playcalling\_features.py} \\
+Coordinator Continuity & OC/DC tenure, new coordinator adjustment & 16 & \checkmark & \texttt{oc\_features.py}, \texttt{dc\_features.py} \\
+Market Signals & Line movement, steam moves, CLV & 14 & \checkmark & \texttt{market\_features.py} \\
+Bayesian Ratings & Posterior strength, uncertainty (SD) & 13 & \checkmark & \texttt{bayesian\_features.py} \\
+State-Space Ratings & Kalman-filtered team strength & 6 & \checkmark & \texttt{train\_state\_space.py} \\
+Other Base & Rest days, travel, venue, weather & 3 & \checkmark & Various \\
 \midrule
-\multicolumn{5}{l}{\textit{Advanced Efficiency Metrics}} \\
-Efficiency Advanced & Success rate, CPOE, air yards, YAC & 12 & \checkmark & \texttt{asof\_features\_enhanced.py} \\
-Turnovers \& Penalties & Turnover rate, penalty yards & 4 & \checkmark & \texttt{asof\_features\_enhanced.py} \\
+\multicolumn{5}{l}{\textit{Synthetic Interactions (37 features)}} \\
+Interaction Features & QB-OL synergy, defensive balance, mismatches & 11 & \checkmark & \texttt{synthetic\_interaction\_features.py} \\
+Momentum Features & Form intensity, pressure consistency, RZ eff. & 11 & \checkmark & \texttt{synthetic\_momentum\_features.py} \\
+Research-Driven & nfelo EPA weighting, coaching rationality & 15 & \checkmark & \texttt{research\_driven\_features.py} \\
 \midrule
-\multicolumn{5}{l}{\textit{Coaching \& Context}} \\
-4th Down Coaching & Go-for-it rate, conversion rate, decision quality & 12 & \checkmark & \texttt{merge\_advanced\_features.py} \\
-Injury Load & Position-specific injury impact scores & 12 & \checkmark & \texttt{merge\_advanced\_features.py} \\
-Playoff Context & Playoff probability, stakes, desperation & 8 & \checkmark & \texttt{merge\_advanced\_features.py} \\
-Coordinator Continuity (OC) & OC continuity, tenure, new OC adjustment & 8 & \checkmark & \texttt{oc\_features.py} \\
-Coordinator Continuity (DC) & DC continuity, tenure, new DC adjustment & 8 & \checkmark & \texttt{dc\_features.py} \\
+\multicolumn{5}{l}{\textit{Semantic/LLM Features (38 features)}} \\
+News Sentiment & 24h/7d sentiment, media buzz volume & 12 & \checkmark & \texttt{semantic\_features.py} \\
+Injury Severity & LLM-assessed impact (1--5 scale) & 10 & \checkmark & \texttt{semantic\_features.py} \\
+Matchup Signals & Sentiment differential, injury advantage & 8 & \checkmark & \texttt{semantic\_features.py} \\
+Contrarian Indicators & Public overreaction, contrarian signal & 8 & \checkmark & \texttt{semantic\_features.py} \\
 \midrule
-\multicolumn{5}{l}{\textit{Matchup Differentials}} \\
-Differentials (Home-Away) & EPA diff, rest diff, success rate diff, etc. & 10 & \checkmark & Derived from base \\
-\midrule
-\multicolumn{5}{l}{\textit{Player-Derived Features (Ch 4)}} \\
-QB Aggregates & Pass yards avg/std, TDs, completion \% & 4 & \checkmark & \texttt{player\_to\_game\_predictor.py} \\
-RB Aggregates & Rush yards avg, yards/carry, TDs & 3 & \checkmark & \texttt{player\_to\_game\_predictor.py} \\
-WR Aggregates & Rec yards avg, receptions, TDs & 3 & \checkmark & \texttt{player\_to\_game\_predictor.py} \\
-Composite Metrics & Total offense, star concentration, differentials & 3 & \checkmark & \texttt{player\_to\_game\_predictor.py} \\
-\midrule
-\multicolumn{5}{l}{\textit{Model-Generated Features (Ch 4)}} \\
-Bayesian Ratings & Posterior mean strength, uncertainty (SD), quantiles & 13 & \checkmark & \texttt{bayesian\_features.py} \\
-State-Space Ratings & Kalman-filtered team strength, covariance & 6 & \checkmark & \texttt{train\_state\_space.py} \\
-\midrule
-\multicolumn{5}{l}{\textit{Market \& Betting Features (Ch 6)}} \\
-Posted Lines & Spread, total, moneyline (opening \& closing) & 6 & \checkmark & External (sportsbooks) \\
-Market Microstructure & Line velocity, cross-book deltas, steam moves & 8 & \checkmark & Betting data providers \\
-Comparative Book Value & Model prob vs market-implied prob (CBV) & 3 & \checkmark & Derived \\
+\multicolumn{5}{l}{\textit{Rest \& Schedule (6 features)}} \\
+Rest Differential & Days rest, short/long week indicators & 6 & \checkmark & \texttt{game\_feature\_extractor.py} \\
 \midrule
 \multicolumn{5}{l}{\textit{Target Variables (POST-GAME ONLY)}} \\
 Game Outcomes & Final score, margin, win, cover, over/under & 7 & \ding{55} & \texttt{games} table \\
 \midrule
-\multicolumn{5}{l}{\textit{Phase 2 Advanced Analytics (\Cref{sec:phase2-advanced-stats})}} \\
-Next Gen Stats & CPOE, RYOE, separation, air yards, tracking metrics & 46 & \checkmark & \texttt{nextgen\_features.py} \\
-QBR Metrics & Total QBR, ANY/A, deep ball, pressure performance & 20 & \checkmark & \texttt{qbr\_features.py} \\
-Possession Value & Starting field position, pace factor & 8 & \checkmark & \texttt{possession\_value.py} \\
-Playcalling Analytics & 4th down aggression, deep passing, WPA, clutch & 32 & \checkmark & \texttt{playcalling\_features.py} \\
-Opponent-Adjusted & DVOA approx., SOS, EPA variance, boom-bust & 14 & \checkmark & \texttt{opponent\_adjusted\_features.py} \\
+\textbf{Base Metrics} & & \textbf{305} & \textbf{305 safe} & \\
+\textbf{Synthetic} & & \textbf{37} & \textbf{37 safe} & \\
+\textbf{Semantic} & & \textbf{38} & \textbf{38 safe} & \\
+\textbf{Rest/Schedule} & & \textbf{6} & \textbf{6 safe} & \\
 \midrule
-\textbf{Baseline Total (Phase 1)} & \textbf{186 features across 21 families} & \textbf{186} & \textbf{179 safe} & --- \\
-\textbf{Phase 2 Total} & \textbf{120 advanced analytics features} & \textbf{120} & \textbf{120 safe} & \textbf{Nov 2025} \\
-\midrule
-\textbf{Grand Total} & \textbf{232 features (+107\% expansion)} & \textbf{232} & \textbf{232 safe} & \textbf{All validated} \\
+\textbf{Grand Total} & \textbf{All production features} & \textbf{386} & \textbf{386 safe} & \textbf{Dec 2025} \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
 \end{table}
 
 \paragraph{Feature Temporal Safety.}
-Features marked \texttt{asof\_safe} (\checkmark) are guaranteed to use only information available before game kickoff. All 232 features (186 baseline + 120 Phase 2 advanced analytics) are validated by 15 unit tests and 2 runtime validators (see Appendix~\ref{app:leakage_audit}). The 7 unsafe features (\ding{55}) are post-game outcomes used only as training targets or evaluation metrics, never as predictors. Coordinator continuity features (OC+DC, 16 features) are derived from the \texttt{coaching\_staff} table with temporal joins ensuring season-year as-of semantics. Phase 2 advanced analytics features (\Cref{sec:phase2-advanced-stats}) add cutting-edge NFL tracking data and efficiency metrics with 100\% temporal safety validation.
+Features marked \texttt{asof\_safe} (\checkmark) are guaranteed to use only information available before game kickoff. All 386 production features are validated by 15 unit tests and 2 runtime validators (see \Cref{app:leakage_audit}). The 7 target variables (\ding{55}) are post-game outcomes used only as training targets or evaluation metrics, never as predictors.
+
+\paragraph{Disabled Features (Not in Production).}
+Two experimental feature groups were disabled after A/B testing revealed negative signal (ADR-015):
+\begin{itemize}
+    \item \textbf{Kalman EPA Filter (18 features):} Team EPA regime detection with CUSUM---disabled due to $-10.2$ percentage point accuracy drop in holdout testing.
+    \item \textbf{GP Injury Recovery (17 features):} Gaussian process recovery curves---disabled because underlying GP models never successfully trained on available data.
+\end{itemize}
+These features remain in the codebase with \texttt{weight=0.0} in \texttt{py/config/feature\_weights.yaml} for potential future iteration.
 
 \paragraph{Cross-References.}
 \begin{itemize}
-    \item \textbf{Chapter 4 (Baseline Models)}: Uses team history, efficiency, player aggregates, Bayesian/state-space ratings
-    \item \textbf{Chapter 5 (RL Design)}: State representation includes model probabilities, CBV, market microstructure, bankroll state
-    \item \textbf{Chapter 6 (Uncertainty \& Betting)}: Incorporates ratings uncertainty (Bayesian SD), market features, CBV for Kelly sizing
-    \item \textbf{Chapter 8 (Results)}: Ablation studies quantify marginal contribution of each family (\Cref{tab:ablations})
-    \item \textbf{Chapter 12 (Profit Optimization)}: Feature engineering for market regimes (line velocity $\to$ steam detection)
+    \item \textbf{\Cref{chap:methods} (Baseline Models):} Uses team metrics, player aggregates, Bayesian/state-space ratings
+    \item \textbf{\Cref{chap:advanced_bayesian} (Advanced Bayesian):} Leverages semantic features for uncertainty quantification
+    \item \textbf{Chapter 6 (RL Design):} State representation includes model probabilities, CBV, market microstructure
+    \item \textbf{\Cref{chap:results} (Results):} Feature ablation studies quantify marginal contribution of each family
 \end{itemize}
 
 \paragraph{Feature Engineering Rationale.}
@@ -83,7 +82,7 @@ The feature catalog balances three principles:
 \begin{enumerate}
     \item \textbf{Temporal safety}: Strict as-of semantics prevent leakage (validated by automated audit)
     \item \textbf{Interpretability}: Each feature has clear definition, calculation method, and domain motivation
-    \item \textbf{Redundancy control}: Rolling windows (last 3/5 games) provide recent signal while expanding averages capture long-term trends
+    \item \textbf{Empirical validation}: Features are retained only if they demonstrate positive signal in A/B testing
 \end{enumerate}
 
-For detailed definitions of all 232 features (186 baseline + 120 Phase 2 advanced analytics), see the feature catalogs at \texttt{py/features/catalog.yaml} (baseline) and Phase 2 module documentation in \Cref{sec:phase2-advanced-stats}. Key ablation results showing the marginal contribution of each family are presented in \Cref{tab:ablations} (Chapter 4).
+For detailed definitions of all 386 features, see the feature modules in \texttt{py/features/} and the unified extraction interface via \texttt{GameFeatureExtractor}.

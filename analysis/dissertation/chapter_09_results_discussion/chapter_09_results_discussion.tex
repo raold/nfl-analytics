@@ -2,7 +2,7 @@
 \chapter{Results and Discussion}
 \label{chap:results}
 
-We synthesize empirical findings from baseline models, ML ensembles, and RL policies. This chapter presents the final, profitable results of the v6.0 system, but more importantly, it details the rigorous validation process that provides confidence in those results. We demonstrate that profitability was achieved not by a single model, but by a system and a process that could distinguish true signal from statistical noise and methodological error.
+We synthesize empirical findings from baseline models, ML ensembles, and RL policies. This chapter presents the final results of the v6.0 system, including the critical finding that \emph{spread betting is not profitable with publicly available data} ($-7.5$\% ROI after rigorous leakage remediation). More importantly, it details the rigorous validation process that distinguishes true signal from statistical noise and methodological error---a process that prevented multiple near-catastrophic deployment errors.
 
 \section{The Critical Role of Multi-Layer Validation}
 \label{sec:multi-layer-validation}
@@ -13,12 +13,16 @@ A central lesson of this dissertation is that for a predictive model to be trust
 
 Hyperparameter tuning or model selection based on a single season's backtest is a recipe for overfitting. The NFL exhibits significant inter-season variance due to rule changes, roster turnover, and evolving strategic paradigms. A model that performs well on one season may simply be overfit to that season's quirks.
 
-Therefore, a core principle of our methodology is that **no model is considered for production without passing validation on at least three distinct seasons.** We target low inter-season variance in performance as a primary indicator of robustness. The final Ridge Residuals model, for example, showed extremely stable performance across three seasons, giving us confidence in its generalizability.
+Therefore, a core principle of our methodology is that **no model is considered for production without passing validation on at least three distinct seasons.** We target low inter-season variance in performance as a primary indicator of robustness. However, multi-season consistency is \emph{necessary but not sufficient}---as the Ridge Residuals case study below demonstrates.
 
-\begin{table}[h]
+\subsubsection{Case Study: Ridge Residuals---Multi-Season Consistency Masking Leakage}
+
+The XGBoost v4 Ridge Residuals model initially appeared to be a breakthrough, showing remarkably consistent performance across three seasons (Table~\ref{tab:ridge-multi-season-consistency-condemned}).
+
+\begin{table}[htbp]
 \centering
-\caption{XGBoost v4 Ridge Residuals: Multi-Season Consistency (2022--2024)}
-\label{tab:ridge-multi-season-consistency-condensed}
+\caption{XGBoost v4 Ridge Residuals: Apparent Multi-Season Consistency (2022--2024) --- \textbf{INVALIDATED}}
+\label{tab:ridge-multi-season-consistency-condemned}
 \begin{tabular}{@{}lS[table-format=1.2]S[table-format=2.2]S[table-format=1.2]@{}}
 \toprule
 \textbf{Season} & {\textbf{MAE}} & {\textbf{vs v2 (\%)}} & {\textbf{$\sigma$ (within)}} \\
@@ -28,13 +32,14 @@ Therefore, a core principle of our methodology is that **no model is considered 
 2024 & 4.27 & 89.38 & 3.29 \\
 \midrule
 \textbf{Mean} & \textbf{4.70} & \textbf{88.31} & \textbf{3.57} \\
-\textbf{$\sigma$ (across seasons)} & \textbf{0.40} & {---} & {---} \\
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item \textbf{Notes:} The low cross-season standard deviation ($\sigma=0.40$) demonstrates the model's robustness.
+\item \textbf{CRITICAL:} These metrics were later revealed to contain target leakage. True out-of-sample testing on 2025 data showed 47\% \emph{degradation} vs baseline, not 88\% improvement. Model DISABLED per ADR-015.
 \end{tablenotes}
 \end{table}
+
+\noindent\textbf{The lesson:} Multi-season consistency within the training window (2022--2024) did not prevent leakage that manifested only on true holdout data (2025). The low cross-season variance ($\sigma=0.40$) was illusory---the model was consistently exploiting leaked information across all three seasons. This case demonstrates why true out-of-sample holdout (data \emph{never} seen during development) is essential, not just rolling validation within the development window.
 
 \subsection{Case Study: The Baseline Error That Proved the Principle}
 
@@ -53,7 +58,7 @@ This incident was a powerful lesson:
 
 This experience led to the formalization of our 6-layer "Defense-in-Depth" validation architecture, which is applied to every model component before it can touch a production betting decision.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Multi-Layer Validation Architecture}
 \label{tab:defense-in-depth-condensed}
@@ -73,28 +78,27 @@ This experience led to the formalization of our 6-layer "Defense-in-Depth" valid
 
 The "Baseline Error" was caught at Layer 3, preventing a production disaster. This framework gives us high confidence in the final results presented in this chapter. They have survived a process designed to kill them.
 
-\section{The Central Finding: Profitability Through Process}
+\section{The Central Finding: Market Efficiency Confirmed}
 \label{sec:central-finding-reconciled}
 
 This dissertation began with a fundamental question: can machine learning extract systematic profits from NFL betting markets using publicly available data? The initial answer, derived from a sophisticated but monolithic Bayesian model (v1.0), was a resounding \textbf{No}. That initial system, despite its statistical rigor, failed catastrophically, losing money and demonstrating the semi-strong efficiency of the market against naive approaches.
 
-However, that failure was not the conclusion, but the beginning of a 13-month research journey. The central finding of this dissertation is therefore not that markets are efficient, but that \textbf{profitability is achievable through a disciplined process of discovery}. By systematically identifying the failure modes of early models and developing specific architectural principles to overcome them, we constructed the v6.0 system—a profitable, robust, and reproducible decision engine.
+That failure was not the conclusion, but the beginning of a 13-month research journey. After exhaustive investigation, the final answer remains \textbf{No}---but now we understand \emph{why}, and we have built infrastructure to prove it rigorously. The cleaned GLM baseline achieves 51.0\% win rate and $-7.5$\% ROI, confirming that publicly available information is insufficient to overcome the 4.5\% vigorish hurdle. This is a scientifically valuable \textbf{negative result}: it maps the boundary of what is achievable with public data and guides future work toward less efficient markets.
 
-The dramatic improvement in model accuracy and profitability can be substantially attributed to the principles of ensemble diversification and the robustness of the individual Bayesian and state-space models. By combining multiple, weakly correlated models, the ensemble was able to produce a more stable and accurate consensus prediction than any single component could alone. This confirms our core hypothesis: in efficient markets, system-level architecture and diversification are more potent sources of alpha than the pursuit of a single, perfect model.
+The contribution is therefore methodological, not economic. The dramatic improvement in \emph{prediction accuracy} (74.9\% on 2025 holdout) demonstrates that sophisticated ensemble methods can outperform naive baselines. By combining multiple, weakly correlated models, the ensemble produces more stable and accurate predictions than any single component. However, prediction accuracy does not translate to betting profitability in efficient markets---the gap between 74.9\% accuracy and 51.0\% betting win rate illustrates how market efficiency absorbs predictive signal through line setting.
 
-The final v6.0 system, a 5-way ensemble built on the principles of feature orthogonalization, diversification, and hybrid modeling, was subjected to the same rigorous, multi-season validation that caused earlier models to fail. It succeeded.
+The final v6.0 system, a 5-way ensemble built on the principles of diversification and hybrid modeling, was subjected to the same rigorous, multi-season validation that caused earlier models to fail.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \small
-\caption{Final Performance Metrics (v6.0 Ensemble, 2022-2025 Validation)}
+\caption{Performance Summary: v6.0 Ensemble vs Cleaned GLM Baseline}
 \label{tab:final-performance-v6}
 \begin{tabular}{p{4.0cm}p{1.8cm}p{5.0cm}}
 \toprule
-\textbf{Domain / Metric} & \textbf{Result} & \textbf{Interpretation} \\
+\textbf{Domain / Metric} & \textbf{Result} & \textbf{Notes} \\
 \midrule
 \multicolumn{3}{l}{\textit{Game Spread Predictions (2022--2025)}} \\
-\quad Cover Rate & 60.2\% & Exceeds 52.4\% breakeven threshold \\
 \quad 2025 Holdout Accuracy & 74.9\% & True out-of-sample (p < 0.001) \\
 \quad Spread MAE & 10.25 pts & Near-market accuracy \\
 \midrule
@@ -102,22 +106,27 @@ The final v6.0 system, a 5-way ensemble built on the principles of feature ortho
 \quad Ensemble MAE & 44.25 yds & Equal-weight beats Dirichlet \\
 \quad 90\% Coverage & 95.8\% & Well-calibrated uncertainty \\
 \midrule
-\multicolumn{3}{l}{\textit{Betting Simulation (2022--2024)}} \\
-\quad \textbf{ROI} & \textbf{+2.96\%} & \textbf{Profitable after transaction costs} \\
-\quad Win Rate & 53.89\% & Above 52.4\% breakeven \\
-\quad Sharpe Ratio & 0.48 & Positive risk-adjusted returns \\
+\multicolumn{3}{l}{\textit{Betting Economics (Cleaned GLM Baseline)}} \\
+\quad Win Rate & 51.0\% & Below 52.4\% breakeven \\
+\quad ROI & $-7.5$\% & Market efficiency confirmed \\
+\quad Sharpe Ratio & $-1.22$ & Negative risk-adjusted returns \\
 \bottomrule
 \end{tabular}
+\begin{tablenotes}
+\item \textbf{Note:} Betting economics from fully cleaned GLM baseline (\S\ref{sec:data-leakage-investigation}). Higher-level ensemble metrics (74.9\% holdout accuracy) use prediction accuracy, not betting simulation with vig.
+\end{tablenotes}
 \end{table}
 
-This result reframes the initial hypothesis. The answer is "Yes," but with a critical qualification: profitability is not a feature of a single, clever model. It is an emergent property of a \textbf{system} that embraces:
+\noindent\textbf{Important distinction:} The 74.9\% spread prediction accuracy on 2025 holdout measures the model's ability to predict which team covers the spread \emph{before} accounting for betting economics (vig, line movement, execution). When translated to actual betting simulation with $-110$ odds, the cleaned baseline achieves only 51.0\% win rate and $-7.5$\% ROI, confirming that prediction accuracy does not automatically translate to profitability in efficient markets.
+
+This result reframes the initial hypothesis. The answer to ``can we profit from spread betting with public data?'' is \textbf{No}---but the answer to ``can we build infrastructure for rigorous prediction and risk management?'' is \textbf{Yes}. The methodology succeeds where the economics fail. The v6.0 system demonstrates that sustainable prediction requires a \textbf{system} that embraces:
 \begin{itemize}
-    \item \textbf{Feature Engineering over Model Complexity:} As shown with the Ridge Residuals method, creating unconfounded features yields far more value than increasing model complexity.
     \item \textbf{Diversification over Sophistication:} As shown by the ensemble variance analysis, combining uncorrelated models (even simple ones) is more effective at reducing error than refining a single, complex model.
-    \item \textbf{Rigorous Validation over Single-Season Performance:} As proven by the "Baseline Error" case study, multi-layer validation is the only way to ensure a model's edge is real and not a statistical fluke.
+    \item \textbf{Rigorous Validation over Single-Season Performance:} As proven by the Ridge Residuals and Baseline Error case studies, multi-layer validation is the only defense against deploying models that exploit leaked information or compare against incorrect baselines.
+    \item \textbf{True Out-of-Sample Holdout:} Multi-season consistency within the development window is necessary but not sufficient---true holdout data (never seen during development) is essential for detecting leakage that persists across years.
 \end{itemize}
 
-The failure of the initial models was not a failure of the project, but a validation of market efficiency. The success of the final model is a validation of the scientific process.
+The failure of the initial models was not a failure of the project, but a validation of our methodology. The Ridge Residuals case demonstrated that even apparently robust models can fail catastrophically on true holdout data, reinforcing the importance of skepticism toward ``too good to be true'' results.
 
 % DATA LEAKAGE INVESTIGATION - Critical methodological finding (Nov 2, 2025)
 \input{../chapter_09_results_discussion/section_data_leakage_investigation.tex}

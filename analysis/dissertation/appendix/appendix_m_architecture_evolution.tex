@@ -19,7 +19,7 @@ The ensemble evolution documented here navigated these constraints through syste
 
 \subsection{Key Performance Progression}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Ensemble Architecture Performance Trajectory (v1.0 → v6.0)}
 \label{tab:performance-trajectory}
@@ -45,7 +45,7 @@ The cumulative improvement of \SI{6.7}{\percent} ROI represents the difference b
 
 \section{Complete Development Timeline}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{13-Month Ensemble Evolution Timeline (Oct 2024 -- Nov 2025)}
 \label{tab:complete-timeline}
@@ -67,7 +67,7 @@ Dec 9, 2025   & v6.0   & 5-way + ELO + adaptive WLS weights & +2.96\% \\
 
 \subsection{Resource Allocation Analysis}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Person-Hours Invested by Component (Total: 787 hours)}
 % \label{tab:resource-allocation} % REMOVED: Duplicate of Chapter 10 line 45 (full data version)
@@ -126,7 +126,7 @@ where $i$ indexes position, $j$ indexes team, $k$ indexes player, $t$ indexes ti
 
 \subsection{Backtest Results: Catastrophic Failure}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{v1.0 Hierarchical Model Performance (2024 Season)}
 \label{tab:v1-performance}
@@ -183,7 +183,7 @@ where $\rho$ is the prediction correlation (empirically $\rho \approx 0.63$ for 
 
 \subsection{Performance Breakthrough}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{v2.5 vs v1.0 Performance Comparison (2024 Holdout)}
 \label{tab:v2-5-vs-v1}
@@ -207,7 +207,7 @@ The \SI{7.57}{\percent} ROI improvement crossed the profitability threshold, val
 
 Analysis of prediction residuals revealed \textbf{complementary error patterns}:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{v2.5 Model Error Patterns (Absolute Residual > 50 yards)}
 \label{tab:v2-5-error-patterns}
@@ -264,7 +264,7 @@ Solved via \texttt{cvxpy} with quadratic programming (QP) solver.
 
 \subsection{Ablation Study: Component Contributions}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{v3.0 Leave-One-Out Ablation Study (2024 Holdout)}
 \label{tab:v3-ablation}
@@ -286,7 +286,7 @@ Drop Informative Priors & 48.9 & +4.95\% & +1.1 & -0.26pp \\
 
 \subsection{CVX vs Equal Weighting}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{v3.0 CVX-Optimized vs Equal Weights (2024 Holdout)}
 \label{tab:v3-cvx-vs-equal}
@@ -388,7 +388,7 @@ where:
 
 \subsection{Ablation Validation: Canonical vs Alternative Windows}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Canonical Training Window Ablation Study (2024 Holdout, State-Space v2)}
 \label{tab:canonical-window-ablation}
@@ -441,7 +441,7 @@ where:
 
 \subsection{Hybrid Performance Validation}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Hybrid XGBoost vs Baseline Architectures (2022--2024 Multi-Season)}
 \label{tab:hybrid-xgboost-performance}
@@ -525,7 +525,7 @@ Recent predictions receive 2--5× more weight than 8-week-old predictions, allow
 
 \subsection{Weight Evolution Across 2024 Season}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{v6.0 Adaptive Weight Drift (Weeks 1--13, 2024 Season)}
 \label{tab:v6-weight-evolution}
@@ -556,7 +556,7 @@ Weight reoptimization contributed \SI{+0.63}{\percent} ROI improvement (Weeks 9-
 
 \subsection{Marginal Contribution by Model}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{v6.0 Marginal Component Contributions (Shapley Values)}
 \label{tab:shapley-contributions}
@@ -577,7 +577,7 @@ ELO Win/Loss & -1.3 yards & +0.42\% & 0.078 \\
 
 \subsection{Interaction Effects}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{v6.0 Pairwise Model Correlations (Prediction Errors)}
 \label{tab:error-correlations}
@@ -604,7 +604,7 @@ ELO Win/Loss & -1.3 yards & +0.42\% & 0.078 \\
 
 Prior architectures (v1.0--v2.5) used ad-hoc training windows. v5.0+ standardized on canonical 2018--2024 + H=4 decay. Statistical validation via Diebold-Mariano tests:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Diebold-Mariano Test: Canonical vs Historical Windows (State-Space v2)}
 \label{tab:dm-test-windows}
@@ -630,7 +630,7 @@ Prior architectures (v1.0--v2.5) used ad-hoc training windows. v5.0+ standardize
 
 \subsection{Evolution: Manual → CVX → Adaptive WLS}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Weight Optimization Method Performance (v2.5 → v6.0)}
 \label{tab:weight-optimization-methods}
@@ -655,7 +655,7 @@ v5.1 & CVX (canonical window) & 44.5 & +2.80\% & +0.46 \\
 
 \subsection{Adaptive WLS Sensitivity Analysis}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{v6.0 Adaptive WLS Halflife Sensitivity (2024 Season)}
 \label{tab:wls-halflife-sensitivity}

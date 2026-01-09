@@ -147,24 +147,28 @@ Each ablation configuration trains for 100 episodes (sufficient for convergence 
 
 \subsection{Expected Performance Improvements}
 
-Based on the empirical ROI/EV scores from \Cref{sec:experiments}, we project the following improvements from experiment-augmented RL:
+\textbf{Critical caveat (December 2025):} These projections were formulated \textbf{before} the comprehensive data leakage investigation (\S\ref{sec:data-leakage-investigation}). The cleaned baseline shows \textbf{51.0\% win rate and $-7.5\%$ ROI}. Any ROI ``improvement'' projections must be understood as starting from this \textbf{negative baseline}---e.g., a +3\% improvement would move from $-7.5\%$ to $-4.5\%$ ROI, still below breakeven.
 
-\paragraph{Conservative estimate (+3--5\% ROI).}
+\paragraph{Original projections (now contextualized against negative baseline).}
+
+\textit{Conservative estimate (originally +3--5\% ROI improvement):}
 Assuming partial feature utilization (agent learns to use $\sim$50\% of experiment signals effectively):
 \begin{itemize}
   \item CVAE-014 (playoff resting): +9.5\% edge $\times$ 0.5 utilization $\times$ 5\% game frequency = +0.24\% ROI
   \item CVAE-010 (injury adjustment): +8.5\% edge $\times$ 0.5 $\times$ 12\% frequency = +0.51\% ROI
   \item CAUSAL-014 (4th down): +3.5\% win prob $\times$ 0.5 $\times$ 20\% frequency = +0.35\% ROI
-  \item Aggregate across 25 experiments: $\sim$+3\% ROI improvement
+  \item \textbf{From cleaned baseline:} $-7.5\%$ + 3\% $\to$ $-4.5\%$ ROI (still negative)
 \end{itemize}
 
-\paragraph{Optimistic estimate (+7--10\% ROI).}
+\textit{Optimistic estimate (originally +7--10\% ROI improvement):}
 Assuming near-perfect feature utilization (agent fully exploits all signals):
 \begin{itemize}
   \item Sum of top-5 experiment edges weighted by frequency $\approx$ +7.2\% ROI
   \item Interaction effects between experiments (e.g., playoff resting + injury) add +1--2\% ROI
-  \item Total improvement: $\sim$+8--10\% ROI
+  \item \textbf{From cleaned baseline:} $-7.5\%$ + 8\% $\to$ +0.5\% ROI (barely positive---unvalidated)
 \end{itemize}
+
+\textbf{Bottom line:} Even optimistic projections would only marginally achieve breakeven when applied to the cleaned baseline. These projections are \textbf{speculative} and have not been validated on leakage-free data.
 
 \paragraph{Risk reduction (15--20\% drawdown improvement).}
 Experiment features that signal uncertainty (injury magnitude, rookie QB variance, coordinator change adaptation period) enable the agent to reduce stake sizes in high-variance situations:

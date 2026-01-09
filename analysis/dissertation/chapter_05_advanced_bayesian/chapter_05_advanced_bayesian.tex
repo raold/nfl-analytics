@@ -102,14 +102,16 @@ Expected ROI & +1.59\% & -- & \textasciitilde 0.0\% \\
 
 Key findings:
 \begin{itemize}
-  \item Bayesian MAE is 8\% worse than market (10.52 vs 9.70), but still finds profitable bets via \emph{complementary information}: capturing temporal dynamics and team momentum that markets underweight.
-  \item ATS win rate of 54.0\% exceeds the 52.4\% breakeven threshold (accounting for -110 vig), yielding +1.59\% expected ROI.
-  \item Bayesian outperforms XGBoost v2 baseline (+0.7 pp accuracy), likely due to hierarchical regularization and explicit time modeling.
+  \item Bayesian MAE is 8\% worse than market (10.52 vs 9.70). While early analysis suggested complementary information capture, subsequent data leakage investigation revealed these gains did not translate to true out-of-sample profitability.
+  \item ATS win rate of 54.0\% initially appeared to exceed breakeven, but \textbf{the cleaned baseline from comprehensive leakage investigation shows 51.0\% win rate and $-7.5\%$ ROI} (see \S\ref{sec:data-leakage-investigation}).
+  \item Bayesian outperforms XGBoost v2 baseline (+0.7 pp accuracy) in calibration, but \textbf{calibration does not imply profitability}.
 \end{itemize}
+
+\textbf{Critical update (December 2025):} The positive ROI claims in this section (+1.59\%, +2.60\%) were computed before comprehensive leakage remediation and are now \textbf{superseded} by the cleaned baseline findings. Market efficiency is confirmed for spread betting with publicly available data.
 
 \subsection{Ensemble Integration}
 
-Standalone Bayesian models are profitable but not elite. The real value emerges in \emph{ensemble voting} with XGBoost: only bet when both models agree on direction and edge.
+Standalone Bayesian models provide calibrated uncertainty but are \textbf{not profitable} at the cleaned baseline. The ensemble integration approach improves calibration but does not overcome market efficiency.
 
 \paragraph{Ensemble Strategy.}
 Weighted average: $p_{\text{ensemble}} = w_B \cdot p_B + w_X \cdot p_X$, where $w_B = 0.25$, $w_X = 0.75$ (recommended weights). Betting rule:
@@ -184,7 +186,7 @@ Bayesian Hierarchical & 10.5 & 52.7\% & Yes (Full Post.) & 18 sec \\
 \end{tabular}
 \end{table}
 
-Bayesian hierarchical models offer the best predictive accuracy and richest uncertainty quantification at modest computational cost. Elo/Glicko suffice for rapid updates but lack the calibration and temporal dynamics needed for profitable betting.
+Bayesian hierarchical models offer the best predictive accuracy and richest uncertainty quantification at modest computational cost. Elo/Glicko suffice for rapid updates but lack the calibration and temporal dynamics needed for reliable probability estimation. \textbf{Note:} While these methods improve calibration, the cleaned baseline (December 2025) confirms that calibration alone does not guarantee profitability---market efficiency remains the binding constraint.
 
 \subsection{Limitations and Future Extensions}
 
@@ -368,13 +370,14 @@ Advanced techniques offer theoretical advantages but face practical constraints:
     \textbf{Method}  & \textbf{Brier Gain}  & \textbf{Compute Cost}  & \textbf{Implemented?} \\
     \midrule
     Current Ensemble & Baseline & 1x & Yes \\
-    + Graph Neural Nets & -0.003 & 0.5--1x\footnote{GPU-optimized implementation achieves 660$\times$ speedup over CPU baseline; see \S\ref{subsec:gnn_gpu_optimization}.} & Yes \\
+    + Graph Neural Nets & -0.003 & 0.5--1x\footnotemark & Yes \\
     + Changepoint Detection & -0.001 & 100x & No \\
     + Dynamic Copulas & -0.0005 & 20x & No \\
     All Combined & -0.004 & 2--5x & Partial \\
     \bottomrule
   \end{tabular}
 \end{table}
+\footnotetext{GPU-optimized implementation achieves 660$\times$ speedup over CPU baseline; see \S\ref{subsec:gnn_gpu_optimization}.}
 
 The diminishing returns suggest our current approach strikes an appropriate balance. Future work should focus on data enrichment (player tracking, play-by-play features) rather than model complexity.
 
@@ -412,7 +415,7 @@ In the spirit of radical transparency that defines this dissertation's methodolo
 
 The initial hypothesis was that BNNs could capture complex nonlinear interactions (e.g., QB skill vs. specific defensive schemes) and quantify epistemic uncertainty more effectively than other methods. The research spanned over three weeks and multiple approaches.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{BNN Passing Model Investigation: Complete Timeline (Oct 14 -- Nov 9, 2025)}
 \label{tab:bnn-timeline-condensed}

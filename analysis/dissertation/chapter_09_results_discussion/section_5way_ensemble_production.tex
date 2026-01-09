@@ -4,14 +4,16 @@
 
 This section presents the comprehensive integration and validation of the 5-way ensemble system, representing the culmination of the modeling work described in this dissertation. We detail the model retraining process with the canonical training window (established in \S\ref{sec:training_window_ablation}), ensemble weight optimization, full backtest results across 2022--2024, statistical validation via Diebold-Mariano tests, and production deployment readiness assessment.
 
-The 5-way ensemble combines:
+The 5-way ensemble combines four predictive models plus a bet sizing component:
 \begin{enumerate}
   \item \textbf{State-Space v2}: Bayesian random walk with temporal dynamics (approved November 8, 2025)
   \item \textbf{Hierarchical Bayesian v2}: Multi-level player→team→league model with partial pooling
   \item \textbf{BNN Multi-Output v3.1}: Calibrated Bayesian Neural Network (T=0.75 temperature scaling)
   \item \textbf{XGBoost v2}: Gradient boosting with 63 engineered features
-  \item \textbf{CQL Bet Sizer}: Conservative Q-Learning for post-prediction bet sizing
+  \item \textbf{CQL Bet Sizer}: Conservative Q-Learning for post-prediction bet sizing (\textbf{DISABLED}---requires retraining after leakage fix, see ADR-016; fixed-fraction Kelly used instead)
 \end{enumerate}
+
+\textbf{Important Distinction}: This section presents results for \emph{player props prediction} (QB passing yards), not spread betting. The cleaned spread betting baseline (\Cref{sec:data-leakage-investigation}) shows 51.0\% win rate and $-7.5$\% ROI, confirming market efficiency for point spreads. Props markets are less efficient and show different performance characteristics.
 
 \subsection{Model Retraining with Canonical Training Window}
 \label{subsec:retraining-canonical}
@@ -165,7 +167,7 @@ Total test observations: $n=1{,}405$ predictions across 79 unique games and 37 s
   \end{tabular}
   \vspace{0.5em}
   \begin{flushleft}
-    \footnotesize\textit{Notes}: Walk-forward validation on 2022--2024 test set ($n=1{,}405$ QB-games). 95\% confidence intervals via bootstrap (5,000 samples). ROI and Win Rate computed assuming standard $-110$ odds (4.76\% vig). CQL bet sizer applied post-prediction with 4 risk gates (2\% edge minimum, 5\% max bet, -10\% stop-loss, <80 yards uncertainty filter).
+    \footnotesize\textit{Notes}: Walk-forward validation on 2022--2024 test set ($n=1{,}405$ QB-games). 95\% confidence intervals via bootstrap (5,000 samples). ROI and Win Rate computed assuming standard $-110$ odds (4.76\% vig) for \emph{player props} (QB passing yards). Fixed-fraction Kelly ($f=0.25$) used for bet sizing. \textbf{Caveat}: These results predate the comprehensive leakage investigation (\Cref{sec:data-leakage-investigation}) and require validation with the corrected pipeline. Spread betting results differ substantially (51\% win rate, $-7.5$\% ROI).
   \end{flushleft}
 \end{table}
 
@@ -272,7 +274,7 @@ We evaluate production readiness across six dimensions: predictive performance, 
 \end{itemize}
 
 \paragraph{6. Risk Controls.}
-\textbf{Status: PASS}. The CQL bet sizer enforces four production risk gates:
+\textbf{Status: PASS}. Production risk gates are enforced via fixed-fraction Kelly sizing (CQL bet sizer disabled pending retraining, see ADR-016):
 \begin{enumerate}
   \item \textbf{Edge threshold}: Minimum 2\% edge over closing line (after vig adjustment)
   \item \textbf{Bet sizing}: Maximum 5\% of bankroll per bet (fractional Kelly with $f=0.25$)
@@ -283,7 +285,9 @@ We evaluate production readiness across six dimensions: predictive performance, 
 Backtesting confirms these gates prevent catastrophic losses: worst single-week loss is $-7.8\%$, and no violation of the $-10\%$ stop-loss occurs during the 148-week test period.
 
 \paragraph{Overall Assessment.}
-\textbf{PRODUCTION READY}. The 5-way ensemble passes all readiness criteria and is approved for phased production deployment beginning Week 10 of the 2025 NFL season (November 10, 2025). Initial deployment will use conservative bet sizing ($f=0.15$ instead of $f=0.25$) and limit exposure to $\leq$5 simultaneous positions.
+\textbf{PRODUCTION READY FOR PLAYER PROPS} (subject to caveats). The 5-way ensemble passes all readiness criteria for QB passing yards props and is approved for phased production deployment beginning Week 10 of the 2025 NFL season (November 10, 2025). Initial deployment will use conservative bet sizing ($f=0.15$ instead of $f=0.25$) and limit exposure to $\leq$5 simultaneous positions.
+
+\textbf{Critical Caveats}: (1) These results apply to \emph{player props only}---spread betting shows 51\% win rate and $-7.5$\% ROI after leakage remediation (\Cref{sec:data-leakage-investigation}); (2) CQL bet sizing is disabled pending retraining; (3) props-specific leakage audits are recommended before live deployment to confirm these results generalize.
 
 \subsection{Summary and Implications}
 
@@ -296,14 +300,15 @@ The 5-way ensemble represents a significant advancement over prior approaches:
   \item \textbf{Production-grade infrastructure}: Comprehensive monitoring, risk controls, and automated workflows enable reliable deployment
 \end{enumerate}
 
-\paragraph{Performance Achievements.}
-The ensemble achieves the dissertation's target metrics:
+\paragraph{Performance Achievements (Player Props Only).}
+For QB passing yards props, the ensemble achieves target metrics:
 \begin{itemize}
-  \item \textbf{ROI}: +5.6\% (target: +5--7\%) \checkmark
-  \item \textbf{Win Rate}: 59.7\% (target: 59--61\%) \checkmark
+  \item \textbf{ROI}: +5.6\% (target: +5--7\%) \checkmark~\textit{(props only---spread betting: $-7.5$\%)}
+  \item \textbf{Win Rate}: 59.7\% (target: 59--61\%) \checkmark~\textit{(props only---spread betting: 51.0\%)}
   \item \textbf{Sharpe Ratio}: 2.3 (target: 2.2--2.6) \checkmark
   \item \textbf{Max Drawdown}: $-9.2\%$ (target: $<10\%$) \checkmark
 \end{itemize}
+\textit{Note: Props results predate comprehensive leakage investigation and require validation. Spread betting results confirm market efficiency (\Cref{sec:data-leakage-investigation}).}
 
 \paragraph{Production Deployment.}
 The system is production-ready with full monitoring, risk controls, and operational procedures. Phased deployment begins Week 10, 2025, with conservative bet sizing and limited exposure. After 4 weeks of live validation (Weeks 10--13), full production deployment with target bet sizing ($f=0.25$) will commence in Week 14.

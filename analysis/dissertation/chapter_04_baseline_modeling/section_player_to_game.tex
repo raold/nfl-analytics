@@ -48,7 +48,7 @@ We use the \texttt{nfl\_data\_py} package to access comprehensive player statist
 
 \subsubsection{Bayesian Player Projections}
 
-Where available, we incorporate posterior distributions from Bayesian hierarchical models (Chapter~\ref{chap:bayesian-models}):
+Where available, we incorporate posterior distributions from Bayesian hierarchical models (Chapter~\ref{chap:advanced_bayesian}):
 
 \begin{itemize}
     \item QB passing yard projections with uncertainty (v2.5 model)
@@ -62,7 +62,7 @@ Where available, we incorporate posterior distributions from Bayesian hierarchic
 
 For each team in each game, we engineer features aggregating player statistics from recent games:
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Player-Derived Team Features}
 \label{tab:player-features}
@@ -161,7 +161,7 @@ These conservative settings prioritize generalization over in-sample fit.
 
 Table~\ref{tab:player-to-game-results} presents performance across train, validation, and test sets.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Player-to-Game Model: Performance Summary}
 \label{tab:player-to-game-results}
@@ -193,7 +193,7 @@ State-Space Brier & 0.2364 & 0.2458 & 0.2615 \\
 
 Table~\ref{tab:feature-importance} shows the top 5 most important features learned by the model.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Top 5 Feature Importance Scores}
 \label{tab:feature-importance}
@@ -221,7 +221,7 @@ Table~\ref{tab:feature-importance} shows the top 5 most important features learn
 \subsection{Comparison to Alternative Approaches}
 \label{sec:gnn-failure}  % Reference point for GNN failure discussion
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Comparison of Game Prediction Approaches (Test Brier Score)}
 \label{tab:approach-comparison}

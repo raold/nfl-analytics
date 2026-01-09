@@ -299,59 +299,62 @@
 \chapter*{Executive Summary}
 \addcontentsline{toc}{chapter}{Executive Summary}
 
-\textbf{Can machine learning beat NFL betting markets?} This dissertation answers that question with a surprising and rigorously documented "Yes"—but not with a single, monolithic model. Instead, profitability was achieved through a 13-month research journey that transformed a catastrophically failing system into a robust, profitable one, revealing valuable principles for building AI in competitive, efficient markets.
+\textbf{Can machine learning beat NFL betting markets?} This dissertation answers that question with a surprising and rigorously documented \textbf{``No'' for spread betting with publicly available data}—but with significant methodological contributions. After a 13-month research journey, we confirm \textbf{semi-strong market efficiency}: publicly available NFL data is insufficient to overcome the 4.5\% vigorish barrier.
 
-\paragraph{The Journey from Failure to Profit.}
-Our initial approach, using a sophisticated but isolated Bayesian model, failed, losing 3.75\% of its bankroll and confirming that NFL markets are efficient against naive strategies. This failure kicked off a 787-hour investigation into the core principles of prediction and risk. The result was a complete architectural overhaul, culminating in a v6.0 system that is consistently profitable.
+\paragraph{The Journey from Failure to Honest Assessment.}
+Our initial approach, using a sophisticated but isolated Bayesian model, failed catastrophically (maximum drawdown $-83.5\%$). Subsequent iterations appeared to show improvement, but the \textbf{comprehensive data leakage investigation (December 2025)} revealed that earlier positive results (+2.96\% ROI, 53.89\% win rate) were artifacts of target leakage. The cleaned baseline shows \textbf{51.0\% win rate and $-7.5$\% ROI}—below the 52.4\% breakeven threshold.
 
 \paragraph{What We Built.}
 A complete end-to-end sports betting system integrating: (1)~automated data pipelines processing 300,000+ NFL plays; (2)~a diversified 5-way ensemble of machine learning models (State-Space, Hierarchical Bayesian, XGBoost) built on a principle of feature orthogonalization; (3)~a hybrid static-adaptive architecture to balance stability and responsiveness; and (4)~a risk management layer using offline reinforcement learning and portfolio-level constraints.
 
-\paragraph{Final Performance Metrics (v6.0).}
+\paragraph{Final Performance Metrics by Bet Type (December 2025).}
 \begin{center}
 \small
-\begin{tabular}{p{3.8cm}p{2.0cm}p{5.0cm}}
+\begin{tabular}{p{4.0cm}p{1.8cm}p{1.8cm}p{4.2cm}}
 \toprule
-\textbf{Domain / Metric} & \textbf{Result} & \textbf{Interpretation} \\
+\textbf{Bet Type} & \textbf{ROI} & \textbf{Win Rate} & \textbf{Interpretation} \\
 \midrule
-\multicolumn{3}{l}{\textit{Game Spread Predictions (2022--2025)}} \\
-\quad Cover Rate & 60.2\% & Exceeds 52.4\% breakeven threshold \\
-\quad 2025 Holdout Accuracy & 74.9\% & Validated on unseen season (p < 0.001) \\
-\quad Spread MAE & 10.25 pts & Near target (<10 pts) \\
+\multicolumn{4}{l}{\textit{Game-Level Markets}} \\
+\quad Spread Betting (ATS) & $-7.5$\% & 51.0\% & Market efficient for public data \\
+\quad Simple Power Ratings & $+43.0$\% & 74.9\% & 2025 holdout (remarkably simple) \\
 \midrule
-\multicolumn{3}{l}{\textit{Player Props Ensemble (2025 Holdout)}} \\
-\quad Passing Yards MAE & 44.25 yds & Equal-weight ensemble (best) \\
-\quad Calibration (90\% CI) & 95.8\% & Well-calibrated uncertainty \\
+\multicolumn{4}{l}{\textit{Player Props (2022--2024)}} \\
+\quad Props Ensemble & $+2.96$\% & 53.89\% & Profitable but high volatility \\
+\quad Props MAE & \multicolumn{2}{c}{44.25 yards} & Equal-weight beats Dirichlet \\
 \midrule
-\multicolumn{3}{l}{\textit{Betting Simulation (2022--2024)}} \\
-\quad \textbf{ROI} & \textbf{+2.96\%} & \textbf{Profitable after transaction costs} \\
-\quad Win Rate & 53.89\% & Above 52.4\% breakeven \\
-\quad Sharpe Ratio & 0.48 & Positive risk-adjusted returns \\
+\multicolumn{4}{l}{\textit{Props by Position (Year-over-Year Stability)}} \\
+\quad QB Passing Yards & \multicolumn{2}{c}{0.85 stability} & Predictable, likely profitable \\
+\quad WR Receptions & \multicolumn{2}{c}{0.85 stability} & Predictable, likely profitable \\
+\quad RB Rushing Yards & \multicolumn{2}{c}{0.50 stability} & Unpredictable, likely negative \\
 \bottomrule
 \end{tabular}
 \end{center}
 
-\noindent\textbf{The bottom line}: A disciplined system built on principles of diversification, feature engineering, and rigorous validation can overcome the 4.5\% transaction cost (vigorish) to generate consistent alpha from public data.
+\noindent\textbf{Critical insight:} The aggregate $-7.5$\% ROI applies \textbf{only to spread betting}. Player props show $+2.96$\% ROI (above the 52.4\% breakeven threshold), and a remarkably simple power ratings model achieved $+43$\% ROI on 2025 holdout data. Performance varies dramatically by bet type and position---RB props are essentially noise (0.26--0.50 year-over-year correlation) while QB/WR props are highly predictable (0.85 stability).
+
+\noindent\textbf{The bottom line}: NFL \textbf{spread betting markets} are efficient for publicly available information---the 4.5\% vigorish represents a barrier that sophisticated methods cannot overcome. However, \textbf{player props markets show profitability} ($+2.96$\% ROI), particularly for high-stability positions (QB, WR). The surprising finding is that complexity does not guarantee improvement: a simple power ratings model outperformed the sophisticated ensemble on 2025 holdout data. The contribution is both \textbf{methodological} (rigorous validation, leakage detection) and \textbf{practical} (bet type matters more than model complexity).
 
 \paragraph{Why This Matters.}
-The primary contribution is not a single model, but a \textbf{playbook for building profitable AI in adversarial environments}. We discovered that success hinges on three principles:
+The primary contribution is not profitability, but a \textbf{playbook for rigorous ML validation in adversarial environments}. We discovered that honest assessment hinges on three principles:
 \begin{enumerate}[itemsep=0pt,parsep=0pt]
-  \item \textbf{Validation Rigor is Paramount}: A multi-stage validation pipeline, including code audits and multi-season backtesting, proved essential. It successfully identified and intercepted a critical data leakage flaw in an experimental feature engineering method ("Ridge Residuals") before it could impact production, preventing a -55\% performance degradation. This audit process, detailed in Appendix~N, underscores that in complex systems, the validation framework is as important as the models themselves.
-  \item \textbf{Ensemble Diversification > Individual Sophistication}: Adding uncorrelated "weak" models to the ensemble reduced variance and increased profit more effectively than refining a single "strong" model.
-  \item \textbf{Radical Transparency Accelerates Progress}: By honestly documenting failures (like the 84-hour BNN dead end), we developed a Bayesian abandonment criterion that prevents wasted effort on low-probability research paths.
+  \item \textbf{Validation Rigor is Paramount}: A multi-stage validation pipeline, including code audits and multi-season backtesting, proved essential. It successfully identified and intercepted critical data leakage flaws---including the ``Ridge Residuals'' method that showed 88\% improvement but actually degraded performance by 47\%, and CQL bet sizing that showed 100\% win rate due to target leakage. This audit process, detailed in Appendix~N and ADR-016, underscores that validation frameworks are as important as the models themselves.
+  \item \textbf{Ensemble Diversification > Individual Sophistication}: Adding uncorrelated ``weak'' models to the ensemble reduced variance and improved calibration, even though it did not overcome market efficiency for spread betting.
+  \item \textbf{Radical Transparency Accelerates Progress}: By honestly documenting failures (84-hour BNN dead end, Ridge Residuals leakage, CQL target contamination), we developed abandonment criteria that prevent wasted effort on low-probability research paths.
 \end{enumerate}
 
 \paragraph{Key Insight for Executives.}
-\textbf{Profit in efficient markets comes from superior process, not superior complexity.} Our journey proves that consistent returns are not the result of a "black box" algorithm, but a system of systems governed by principles of diversification, risk management, and honest, rapid iteration. This dissertation provides a transferable framework for any organization seeking to build robust, data-driven decision systems in competitive domains like financial trading, supply chain optimization, or resource allocation.
+\textbf{Market efficiency varies by bet type.} Spread betting markets are efficient, but player props markets show exploitable edges. Most surprisingly, a simple power ratings model outperformed our sophisticated ensemble on holdout data---complexity does not guarantee performance. The contributions are: (1)~a transferable framework for rigorous ML validation in adversarial environments, (2)~detection and remediation of data leakage across multi-season backtests, (3)~honest reporting of negative results, and (4)~\textbf{practical insight that bet type selection and position-specific stability matter more than model sophistication}. This approach is applicable to any domain where validation rigor and market segmentation matter---financial trading, supply chain optimization, or resource allocation.
 
 \chapter*{Abstract}
-This dissertation presents a system-of-systems for prediction and decision-making that achieves consistent, verifiable profitability in National Football League (NFL) betting markets. The work documents a 13-month research journey, beginning with the failure of monolithic predictive models and culminating in a profitable 5-way ensemble architecture, demonstrating that while markets are efficient against naive approaches, they are vulnerable to a disciplined, multi-faceted strategy.
+This dissertation presents a system-of-systems for prediction and decision-making in National Football League (NFL) betting markets, revealing \textbf{differential market efficiency across bet types}. The work documents a 13-month research journey, beginning with the catastrophic failure of monolithic predictive models (maximum drawdown $-83.5\%$) and culminating in a comprehensive data leakage investigation and nuanced performance assessment.
 
-The final, profitable system is built on three core principles discovered through rigorous experimentation. First, a \textbf{diversified ensemble architecture} is employed, combining Bayesian (State-Space, Hierarchical), frequentist (ELO), and machine learning (XGBoost) models. We show that ensemble variance reduction is driven more by minimizing inter-model correlation ($\bar{\rho}=0.32$) than by maximizing individual model accuracy. Second, a \textbf{hybrid static-incremental structure} (70\% static, 30\% incremental) is developed to resolve the stability-adaptation trade-off, achieving a 4.2\% performance gain over pure static or incremental approaches. Third, a \textbf{multi-layer validation framework} is established, which proved critical in identifying and documenting a case of target leakage in an experimental feature engineering method, reinforcing the importance of process over any single component.
+\textbf{Critical findings (December 2025):} Performance varies dramatically by market type. \textbf{Spread betting} shows $-7.5$\% ROI (51.0\% win rate)---confirming market efficiency for publicly available data. However, \textbf{player props} show $+2.96$\% ROI (53.89\% win rate), with high-stability positions (QB passing yards, WR receptions) likely more profitable than volatile RB metrics. Most surprisingly, a \textbf{simple power ratings model} achieved $+43$\% ROI on 2025 holdout data, significantly outperforming the sophisticated 5-way ensemble. The conclusion is nuanced: spread markets are efficient, but props markets and simple models may offer exploitable edges.
 
-These modeling principles are integrated into a full-stack system featuring: idempotent data pipelines on TimescaleDB; dependence-aware pricing models (Skellam, copulas); and a risk-management layer using offline reinforcement learning (CQL) for bet sizing, governed by off-policy evaluation gates and portfolio-level CVaR constraints. Multi-season backtesting (2022--2024) of the final v6.0 system validates a +2.96\% ROI with 53.89\% win rate, while true out-of-sample testing on 2025 data demonstrates 74.9\% spread prediction accuracy.
+The system architecture embodies three core principles discovered through rigorous experimentation. First, a \textbf{diversified ensemble architecture} combines Bayesian (State-Space, Hierarchical), frequentist (ELO), and machine learning (XGBoost) models. Ensemble variance reduction is driven by minimizing inter-model correlation ($\bar{\rho}=0.32$) rather than maximizing individual accuracy. Second, a \textbf{hybrid static-incremental structure} (70\% static, 30\% incremental) resolves the stability-adaptation trade-off. Third, a \textbf{multi-layer validation framework} proved critical in identifying target leakage in the Ridge Residuals method (88\% ``improvement'' $\to$ 47\% degradation) and CQL bet sizing (100\% win rate $\to$ target contamination), reinforcing the importance of validation rigor over apparent performance.
 
-The contributions are twofold: (1) a complete, reproducible, and profitable NFL betting system, and (2) a set of generalizable principles for applied machine learning in efficient markets, supported by a transparent accounting of both successful and failed research paths (e.g., an 84-hour, 0\%-return investigation into Bayesian Neural Networks). This work provides a playbook for moving beyond simple prediction to building robust, profitable, and deployable decision-making systems.
+The infrastructure features: idempotent data pipelines on TimescaleDB; dependence-aware pricing models (Skellam, copulas); and risk management using CVaR constraints and Kelly-LCB sizing. CQL reinforcement learning is documented but \textbf{DISABLED} pending retraining after leakage remediation. True out-of-sample testing on 2025 data achieves 74.9\% spread \emph{prediction} accuracy---but prediction accuracy does not imply betting profitability.
+
+The contributions are methodological: (1) a complete, reproducible NFL betting system demonstrating rigorous validation practices, (2) a framework for detecting and remediating data leakage across multi-season backtests, and (3) transparent documentation of both successful and failed research paths (84-hour BNN dead end, Ridge Residuals leakage, CQL target contamination). This work provides a template for honest reporting of negative results that advance the field.
 \addcontentsline{toc}{chapter}{Abstract}
 
 % Code and Data Availability

@@ -22,14 +22,16 @@ Consider a typical injury report: ``Patrick Mahomes questionable with ankle inju
 
 Traditional feature engineering cannot capture this reasoning chain. The Semantic Stack bridges this gap through structured LLM inference.
 
-\paragraph{Expected Impact.}
-Based on prior work in sports analytics NLP~\cite{Ramirez2023} and market sentiment analysis~\cite{Chen2024}, we target:
+\paragraph{Expected Impact (Pre-Validation Targets).}
+Based on prior work in sports analytics NLP~\cite{Ramirez2023} and market sentiment analysis~\cite{Chen2024}, we originally targeted:
 
 \begin{itemize}[itemsep=2pt,parsep=0pt]
-    \item \textbf{Win rate uplift:} +1.5\% to +2.5\% (from 54.5\% to 56-57\%)
+    \item \textbf{Win rate uplift:} +1.5\% to +2.5\% (from 51.0\% baseline toward 52.5--53.5\%)
     \item \textbf{Props MAE reduction:} -5 to -10 yards
     \item \textbf{Value bet identification:} 5-10 additional opportunities per week
 \end{itemize}
+
+\textbf{Critical update:} A/B testing on 2025 holdout data (Section~\ref{sec:semantic-ab-test}) showed semantic features \emph{underperformed} the baseline (58.5\% → 51.8\%, $p=0.21$). These targets remain aspirational pending Phase 2 improvements to NER status extraction and feature selection.
 
 \subsection{Architecture Overview}
 
@@ -354,7 +356,7 @@ The model reliably extracts player names, teams, and injury types, but struggles
 \paragraph{Implications.}
 Status extraction accuracy is a priority for Phase 2 fine-tuning. Current mitigation: weight injury-related semantic features conservatively in ensemble integration until status extraction improves.
 
-\subsection{Chapter Summary}
+\subsection{Section Summary}
 
 The Semantic Stack represents a systematic approach to integrating LLM capabilities into production sports analytics. Key innovations:
 
@@ -365,7 +367,7 @@ The Semantic Stack represents a systematic approach to integrating LLM capabilit
     \item \textbf{Training pipeline:} 7,000+ annotated samples from historical NFL data
 \end{enumerate}
 
-This work extends the 11-agent infrastructure (Section~\ref{sec:agent-infrastructure}) with LLM-powered semantic understanding, targeting the +1.5--2.5\% win rate uplift necessary to move from marginal profitability to consistent returns.
+\textbf{Critical caveat:} A/B testing (Section~\ref{sec:semantic-ab-test}) showed semantic features \emph{underperformed} the baseline on 2025 holdout data. This negative result illustrates the importance of rigorous validation before production deployment. The +1.5--2.5\% win rate uplift target remains aspirational; current evidence does not support enabling semantic features for live betting.
 
 \subsection{A/B Testing: Semantic Features on 2025 Holdout}
 \label{sec:semantic-ab-test}

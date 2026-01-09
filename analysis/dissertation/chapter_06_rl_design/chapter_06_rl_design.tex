@@ -158,14 +158,14 @@ The DR estimate equals $Q(s_0,\pi(s_0))$ plus this correction; if $Q(s_0,\pi(s_0
 We report training curves (return vs. gradient steps) with shaded interquartile bands and study sensitivity to key hyperparameters (entropy scale, target smoothing, clipping). \Cref{fig:rl-curves} shows typical convergence; \Cref{fig:hparam-sens} shows EV under a grid.
 \begin{figure}[t]
   \centering
-  \IfFileExists{../figures/rl_learning_curves.png}{\includegraphics[width=0.85\linewidth]{../figures/rl_learning_curves.png}}{\fbox{\parbox{0.8\linewidth}{\centering Learning curves placeholder}}}
+  \includegraphics[width=0.85\linewidth]{../figures/rl_learning_curves.png}
   \caption{Offline RL learning curves (median and IQR across seeds).}
   \label{fig:rl-curves}
 \end{figure}
 
 \begin{figure}[t]
   \centering
-  \IfFileExists{../figures/hparam_sensitivity.png}{\includegraphics[width=0.85\linewidth]{../figures/hparam_sensitivity.png}}{\fbox{\parbox{0.8\linewidth}{\centering Hyperparameter sensitivity grid placeholder}}}
+  \includegraphics[width=0.85\linewidth]{../figures/hparam_sensitivity.png}
   \caption{Sensitivity of EV and calibration to key hyperparameters (entropy scale, target smoothing, clip).}
   \label{fig:hparam-sens}
 \end{figure}
@@ -327,21 +327,30 @@ We compare the RL policy to a stateless baseline: place a bet when comparative b
 
 \paragraph{Metrics and setup.} On 2020--2024 we report Brier/CLV/ROI/Max drawdown and a utilization‑adjusted Sharpe that accounts for idle weeks. Policies are frozen on validation and evaluated on holdout weeks.
 
-\IfFileExists{../figures/out/rl_vs_baseline_table.tex}{\input{../figures/out/rl_vs_baseline_table.tex}}{%
-  \begin{table}[t]
-    \centering
-    \caption{Core ablation (placeholder): RL vs stateless baseline across seasons; columns are Brier, CLV (bps), ROI (\%), Max DD (\%).}
-    \begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{lrrrr}
-      \toprule
- \textbf{Policy} & \textbf{Brier $\downarrow$} & \textbf{CLV (bps) $\uparrow$} & \textbf{ROI (\%) $\uparrow$} & \textbf{Max DD (\%) $\downarrow$} \\
-      \midrule
-      Kelly‑LCB (CBV\,$>\,\tau$) & -- & -- & -- & -- \\
-      RL (IQL/CQL/TD3+BC) & -- & -- & -- & -- \\
-      \bottomrule
-    \end{tabular}
-\end{adjustbox}
-  \end{table}}
+% RL vs baseline table with actual 2023-2024 holdout results
+\begin{table}[t]
+  \centering
+  \small
+  \caption[RL vs stateless baseline]{Baseline policy performance on 2023--2024 holdout (570 games). Metrics computed with proper temporal split and outcomes loaded separately to prevent data leakage.}
+  \label{tab:rl-vs-baseline}
+  \begin{threeparttable}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    Policy & Win Rate & ROI (\%) & Sharpe & Max DD (\%) & Bets \\
+    \midrule
+    Random & 50.5\% & $-$3.5 & $-$0.04 & 0.0 & 283 \\
+    Market ($p > 0.52$) & 50.9\% & $-$2.8 & $-$0.03 & 0.0 & 334 \\
+    Kelly-LCB & --- & --- & --- & --- & 0 \\
+    \midrule
+    \multicolumn{6}{l}{\textit{CQL policies pending retraining with leakage-free pipeline}} \\
+    \bottomrule
+  \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item Note: Kelly-LCB made no bets due to conservative edge threshold (5\%). CQL models require retraining with the corrected dataset that excludes post-game outcomes. The near-50\% win rates and negative ROI reflect market efficiency and the 4.5\% breakeven threshold imposed by standard $-110$ odds.
+  \end{tablenotes}
+  \end{threeparttable}
+\end{table}
 
 \paragraph{Pessimism sensitivity.} Equation~8.1.2 uses a lower quantile for $p$ to discount Kelly. We sweep $\alpha\in\{0.05,0.10\}$ and report growth/drawdown trade‑offs.
 
@@ -442,8 +451,8 @@ Dataset diagnostics from the feature catalog (\texttt{py/features/catalog.yaml})
   \item \textbf{Temporal density}: No gaps exceeding 14 days within regular seasons; playoff games handled separately.
 \end{itemize}
 
-\paragraph{ER Diagram.}
-[ER diagram: staging, core, and mart layers to be inserted here once the latest schema export is rendered. The three-layer architecture (staging for raw ingestion, core for validated games/plays, mart for materialized features) ensures reproducible pipelines with explicit as-of timestamps at every layer.]
+\paragraph{Data Architecture.}
+The three-layer architecture---staging for raw ingestion, core for validated games/plays, mart for materialized features---ensures reproducible pipelines with explicit as-of timestamps at every layer. Schema documentation and entity-relationship diagrams are maintained in \texttt{docs/database/} and updated with each migration.
 
 Full coverage statistics and temporal distribution details are documented in the automated leakage audit (Appendix~\ref{app:leakage_audit}), which certifies that all dataset cohorts maintain strict temporal integrity for offline RL training and OPE evaluation.
 

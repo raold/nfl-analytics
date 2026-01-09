@@ -747,9 +747,11 @@ This enables adaptive modeling without manual recalibration.
 \section{System Architecture and Ensemble Deployment}
 \label{sec:system_architecture}
 
-The production system deploys a conservative ensemble strategy informed by bootstrap stress testing. Three voting strategies were evaluated: Majority voting (71.4\% win rate, 35 bets/season, CVaR -0.05\%), Weighted voting (66.7\% win rate, 48 bets, CVaR -0.34\%), and Thompson Sampling (59.4\% win rate, 217 bets, CVaR -1.29\%). The critical finding: volume and resilience trade off. Majority voting survives all stress scenarios with minimal tail risk, while Thompson Sampling achieves higher baseline returns (+1.43\% vs +0.36\%) but suffers 26× worse CVaR under adversarial conditions.
+The production system deploys a conservative ensemble strategy informed by bootstrap stress testing. \textbf{Critical update (December 2025):} Following comprehensive data leakage investigation (\S\ref{sec:data-leakage-investigation}), the cleaned baseline achieves only \textbf{51.0\% win rate and $-7.5$\% ROI}. The win rates originally reported in this section (71.4\%, 66.7\%, 59.4\%) were computed before leakage remediation and are now invalidated. Market efficiency has been confirmed: publicly available data is insufficient to overcome the 4.5\% vigorish hurdle.
 
-The production architecture deploys Majority voting as the baseline strategy, with Thompson Sampling available as an aggressive upgrade contingent on sustained win‑rate thresholds. The ensemble combines XGBoost v2 (Brier 0.1715, 11 features), Conservative Q‑Learning Config 4 (reward 0.0381), and Implicit Q‑Learning (expectile 0.9, reward 0.0375). Majority voting requires at least 2 of 3 models to agree; Thompson Sampling weights models by historical Sharpe ratio and explores exploitation trade‑offs via multi‑armed bandit logic.
+\textbf{Pre-leakage metrics (historical reference only):} Three voting strategies were evaluated: Majority voting (71.4\% win rate, 35 bets/season), Weighted voting (66.7\% win rate, 48 bets), and Thompson Sampling (59.4\% win rate, 217 bets). These metrics reflected training data leakage and should not be used for production planning.
+
+\textbf{Post-leakage reality:} The cleaned ensemble achieves $\sim$51\% win rate, confirming semi-strong market efficiency. The production architecture now serves primarily as \emph{research infrastructure} for testing hypotheses and validating methodologies, rather than as a profitable betting system. CQL betting policies are \textbf{DISABLED} pending retraining after the leakage fix (ADR-016). The remaining ensemble combines XGBoost v2 (Brier 0.2515) with Kelly-based position sizing using fixed 1/4 Kelly fractions.
 
 \paragraph{Deployment Decision Rules.}
 \begin{itemize}
@@ -769,12 +771,22 @@ Fractional Kelly sizing optimizes long‑run bankroll growth while constraining 
 f^* = \frac{p \cdot b - (1 - p)}{b}
 \]
 
-For NFL spread betting with $p = 0.65$ (65\% win rate) and $b = 1.91$ (American -110 odds = decimal 1.91):
+\textbf{Critical reality check:} The cleaned baseline (\S\ref{sec:data-leakage-investigation}) achieves only $p = 0.51$ (51\% win rate). At standard $-110$ odds ($b = 1.91$):
 \[
-f^* = \frac{0.65 \cdot 1.91 - 0.35}{1.91} = \frac{1.2415 - 0.35}{1.91} = \frac{0.8915}{1.91} \approx 0.467 \quad (46.7\% \text{ of bankroll})
+f^* = \frac{0.51 \cdot 1.91 - 0.49}{1.91} = \frac{0.9741 - 0.49}{1.91} = \frac{0.4841}{1.91} \approx 0.253 \quad (25.3\% \text{ of bankroll})
 \]
 
-Full Kelly is aggressive: a single loss wipes out 46.7\% of the bankroll. Fractional Kelly (1/4 or 1/2 Kelly) reduces volatility while preserving most of the growth rate. With initial bankroll \$10,000:
+However, this assumes the 51\% win rate is certain. In practice, the true win rate may be 49--53\%, making Kelly sizing highly sensitive to estimation error. With uncertain edge, even ``optimal'' Kelly can lead to ruin. More critically, at 51\% win rate, the expected value per bet is:
+\[
+\text{EV} = 0.51 \times 0.91 - 0.49 \times 1.00 = 0.4641 - 0.49 = -0.026 \quad (-2.6\% \text{ per bet})
+\]
+
+This confirms \textbf{Kelly sizing cannot overcome negative expected value}. If the true win rate is below the 52.4\% breakeven threshold, no position sizing strategy can produce long-term profits.
+
+\paragraph{Historical Context (Pre-Leakage Metrics).}
+The original analysis assumed $p = 0.65$ (65\% win rate), which would yield $f^* \approx 46.7\%$---aggressive but theoretically profitable. This assumption was invalidated by the data leakage investigation. The Kelly mathematics below are preserved for educational purposes but should not be applied to spread betting without first achieving win rates above 52.4\%.
+
+With initial bankroll \$10,000 and \textbf{assuming} a profitable edge exists:
 
 \paragraph{1/4 Kelly (Conservative).}
 $f = 0.467 / 4 = 0.117$ (11.7\% of bankroll = \$1,170 per bet). Max bet constraint: 2\% of bankroll = \$200. Effective stake: \texttt{min}(0.117 × bankroll, 0.02 × bankroll) = \$200.
@@ -962,81 +974,80 @@ Real‑time play‑by‑play, injury reports, depth charts, referee assignments.
 \end{itemize}
 \textbf{Expected edge}: +0.5--1\% from enhanced injury and referee data. \textbf{Recommendation}: Deploy after 100 profitable bets (bankroll \$15K+).
 
-\paragraph{Data Source Roadmap.}
+\paragraph{Data Source Roadmap: Revised Post-Leakage.}
+The original roadmap projected 59--75\% win rates with incremental data investments. These projections are \textbf{INVALIDATED} by the cleaned baseline (51.0\% win rate, $-7.5$\% ROI).
+
+\textbf{Revised roadmap (research-focused, not profit-seeking):}
 \begin{enumerate}
-\item \textbf{Year 1}: Use free sources (nflfastR, nflverse, The Odds API). Expected: 59--71\% win rate, +0.36--1.43\% ROI.
-\item \textbf{Year 2 (after 50 profitable bets)}: Add PFF Elite (\$300/year). Expected: +0.5--1\% incremental EV → total 60--72\% win rate.
-\item \textbf{Year 3 (after 100 profitable bets)}: Add NextGen Stats (\$5--10K/year). Expected: +1--2\% incremental EV → total 61--74\% win rate.
-\item \textbf{Year 4 (after 150 profitable bets)}: Add SportsRadar (\$10--20K/year). Expected: +0.5--1\% incremental EV → total 61.5--75\% win rate.
+\item \textbf{Year 1}: Use free sources (nflfastR, nflverse, The Odds API). \textbf{Expected: 51\% win rate, $-7.5$\% ROI.} Focus on methodology validation, not profit.
+\item \textbf{Year 2+}: Add premium data \textbf{only if}:
+  \begin{itemize}
+    \item True out-of-sample holdout shows win rate $>$52.4\% (breakeven threshold)
+    \item The edge persists across multiple independent test periods
+    \item The data source provides demonstrable lift in rigorous A/B testing
+  \end{itemize}
+\item \textbf{Alternative path}: Pivot to less efficient markets (player props, live betting, alt lines) where market efficiency may be weaker.
 \end{enumerate}
 
-Costs are justified only after validating performance with free data. Premature investment risks sunk costs if early results underperform.
+\textbf{Key insight}: Premium data subscriptions (\$300--\$20K/year) cannot overcome a negative-EV baseline. Investment should follow demonstrated profitability, not precede it.
 
 \section{Expected Returns and Deployment Timeline}
 \label{sec:expected_returns}
 
-\paragraph{Year 1 Projections (Majority Voting, Free Data).}
+\textbf{Critical Disclaimer:} The projections in this section were written before the comprehensive data leakage investigation (\S\ref{sec:data-leakage-investigation}). The cleaned baseline shows \textbf{51.0\% win rate and $-7.5$\% ROI}, confirming that spread betting with publicly available data is \emph{not profitable}. The projections below are retained for historical context and methodological illustration, but should not be used for actual bankroll planning.
+
+\paragraph{Post-Leakage Reality Check.}
+\begin{itemize}
+\item \textbf{Cleaned win rate:} 51.0\% (below 52.4\% breakeven)
+\item \textbf{Cleaned ROI:} $-7.5$\% per bet
+\item \textbf{Expected outcome:} For 35 bets × \$200 = \$7,000 wagered, expected loss = \$7,000 × 7.5\% = \$525
+\item \textbf{Ending bankroll:} \$10,000 $-$ \$525 = \textbf{\$9,475}
+\end{itemize}
+
+Line shopping and early-week betting may reduce losses marginally (+0.5--1\% EV each), but cannot overcome a $-7.5$\% baseline:
+\begin{itemize}
+\item Combined ROI: $-7.5$\% + 0.5\% + 0.5\% = $-6.5$\% per bet (still negative)
+\item Expected loss: \$7,000 × 6.5\% = \$455
+\item Ending bankroll: \$9,545
+\end{itemize}
+
+\textbf{Realistic Year 1 Outcome}: Loss of \$455--\$525 (4.5--5.3\% of bankroll).
+
+\paragraph{Pre-Leakage Projections (Historical Reference Only).}
+The original projections assumed 71.4\% win rate and +0.36\% ROI per bet. These metrics were invalidated by the leakage fix. They are preserved below for methodological illustration only:
+
 \begin{itemize}
 \item Starting bankroll: \$10,000
 \item Bets per season: 35 (Majority voting, conservative)
 \item Avg bet size: \$200 (2\% of bankroll with Kelly constraints)
-\item Win rate: 71.4\% (historical backtest)
-\item ROI: +0.36\% per bet
-\item Expected profit: 35 bets × \$200 × 0.36\% = +\$25 per season
-\item Ending bankroll: \$10,025 (baseline, no line shopping or EWB)
+\item Win rate: 71.4\% (\textbf{INVALIDATED}---actual cleaned rate is 51.0\%)
+\item ROI: +0.36\% per bet (\textbf{INVALIDATED}---actual is $-7.5$\%)
 \end{itemize}
 
-With line shopping (+0.5\% EV) and EWB (+0.5\% EV):
+\textbf{Lesson learned}: Multi-season backtests can mask target leakage. True out-of-sample holdout validation is essential before projecting returns.
+
+\paragraph{Year 2+ Projections: Pre-Leakage (INVALIDATED).}
+The following projections assumed profitable baselines that were invalidated by the leakage investigation:
+
 \begin{itemize}
-\item Combined ROI: +0.36\% + 0.5\% + 0.5\% = +1.36\% per bet
-\item Expected profit: 35 × \$200 × 1.36\% = +\$95
-\item Ending bankroll: \$10,095
+\item Year 2 with PFF Elite: Assumed 72.4\% win rate (\textbf{INVALID})
+\item Thompson Sampling: Assumed 59.4\% win rate (\textbf{INVALID})
+\item Data subscriptions (PFF \$300/year, NextGen \$5--10K/year): Not cost-effective without profitable baseline
 \end{itemize}
 
-Conservative scenario (win rate drops to 65\%):
-\begin{itemize}
-\item ROI: -0.2\% per bet (below breakeven at -110 vig)
-\item Expected profit: 35 × \$200 × (-0.2\%) = -\$14
-\item Ending bankroll: \$9,986
-\end{itemize}
+\textbf{Post-Leakage Assessment}: With 51.0\% win rate and $-7.5$\% ROI, additional data sources cannot overcome the fundamental market efficiency barrier. Premium data subscriptions would add to losses rather than generate returns.
 
-\textbf{Year 1 Range}: \$9,986--\$10,095 (median \$10,040, +0.4\% growth).
+\paragraph{Revised Recommendation.}
+Given the cleaned baseline confirms market efficiency:
 
-\paragraph{Year 2 Projections (Majority + PFF Elite).}
-\begin{itemize}
-\item Starting bankroll: \$10,040
-\item Bets per season: 35 (Majority voting)
-\item Avg bet size: \$200
-\item Win rate: 72.4\% (71.4\% + 1\% from PFF)
-\item ROI: +1.86\% per bet (base 1.36\% + 0.5\% PFF)
-\item Expected profit: 35 × \$200 × 1.86\% = +\$130
-\item PFF cost: -\$300
-\item Net profit: +\$130 - \$300 = -\$170 (loss in Year 2 due to upfront cost)
-\item Ending bankroll: \$9,870
-\end{itemize}
+\begin{enumerate}
+\item \textbf{Do NOT invest in premium data sources} (PFF, NextGen, SportsRadar) until a profitable edge is demonstrated on truly held-out data
+\item \textbf{Use the infrastructure for research}, not production betting
+\item \textbf{Focus on less efficient markets}: Player props, live betting, and niche markets may offer opportunities unavailable in spread markets
+\item \textbf{Validate any claimed edge} on data never seen during model development
+\end{enumerate}
 
-However, PFF amortizes over multiple seasons. Years 3--5 with PFF:
-\begin{itemize}
-\item Profit per year: +\$130
-\item Cost per year: -\$300 (assuming annual subscription)
-\item Net: -\$170 per year (PFF not cost‑effective at 35 bets/season)
-\end{itemize}
-
-\textbf{Conclusion}: PFF is cost‑effective only if bet volume increases to 80+ bets/season (Thompson Sampling). At 217 bets/season (Thompson), PFF profit = 217 × \$200 × 0.5\% = +\$217, justifying the \$300 cost.
-
-\paragraph{Thompson Sampling Projections (Year 2+).}
-If win rate sustains > 60\% after 25 bets, upgrade to Thompson:
-\begin{itemize}
-\item Bets per season: 217 (historical backtest)
-\item Win rate: 59.4\% (baseline)
-\item ROI: +1.43\% per bet (baseline) + 1.0\% (line shopping + EWB) = +2.43\%
-\item Expected profit: 217 × \$200 × 2.43\% = +\$1,054
-\item Ending bankroll: \$11,054
-\end{itemize}
-
-Risk: Thompson CVaR(95\%) = -1.29\% (27 units loss in worst 5\% of outcomes). For bankroll \$10K, worst‑case loss = \$270. Requires strong risk tolerance.
-
-\textbf{Year 2 Range (Thompson)}: \$9,730--\$11,054 (median \$10,540, +5.4\% growth).
+The Thompson Sampling and multi-year projections originally documented here (showing \$10K → \$11K growth) reflected the pre-leakage fantasy, not post-leakage reality. They are omitted from the revised chapter to prevent misuse.
 
 \paragraph{8‑Week Deployment Timeline.}
 \begin{itemize}
@@ -1054,7 +1065,15 @@ Risk: Thompson CVaR(95\%) = -1.29\% (27 units loss in worst 5\% of outcomes). Fo
 \input{../chapter_10_production_deployment/section_semantic_stack}
 
 \chaptersummary{
-This chapter documented the production deployment roadmap, from research to real‑money betting. We introduced Claude AI integration for semantic research exploration (Section~\ref{sec:claude_integration}), enabling conversational hypothesis testing, post‑mortem analysis, and feature discovery through natural language queries—a novel contribution to sports betting analytics. The integration leverages the full analytics stack (PostgreSQL, R, Python, Quarto) while maintaining statistical rigor (permutation tests, FDR correction, bootstrap CIs). We detailed ensemble deployment (Section~\ref{sec:system_architecture}): Majority voting as baseline, Thompson Sampling as aggressive upgrade with kill switches. Fractional Kelly sizing (Section~\ref{sec:kelly_sizing}) implements dynamic scaling (1/4 → 1/2 Kelly). Line shopping infrastructure (Section~\ref{sec:line_shopping}) targets 15 Virginia sportsbooks with expected +0.5\% EV gain. Early‑week betting strategy (Section~\ref{sec:early_week}) validates +0.5\% EV from Tuesday--Wednesday bets on road underdogs. Player props extension (Section~\ref{sec:props}) targets 53--55\% win rates. Monitoring infrastructure (Section~\ref{sec:monitoring}) includes weekly bootstrap stress tests, Thompson switching logic, and Streamlit dashboard. Data source evaluation (Section~\ref{sec:data_sources}): NFL Pro = low value, PFF Elite = \$300/year + 0.5--1\% EV, NextGen Stats = \$5--10K/year + 1--2\% EV. The Semantic Stack (Section~\ref{sec:semantic-stack}) extends the system with LLM-powered feature engineering: 26 semantic features (sentiment, injury severity, media signals) extracted via local inference (Ollama, MLX) with API fallback, integrated into the GameFeatureExtractor pipeline, and supported by a ValueBetDetector with LLM-generated explanations. Expected Year 1 returns: \$10,000 → \$10,040--\$10,095 with free data and operational edges. The 8‑week deployment timeline enables staged rollout with risk controls, ready for full‑scale deployment by Week 9 after validating performance on 25+ bets. The critical insight remains: \textbf{SIGNAL > COMPUTE}. Operational improvements deliver more value than GPU scaling or complex deep learning.
+This chapter documented the production deployment infrastructure, with a \textbf{critical update following data leakage investigation}: the cleaned baseline achieves only 51.0\% win rate and $-7.5$\% ROI, confirming that spread betting with publicly available data is \emph{not profitable}. The infrastructure serves primarily as research tooling, not a profitable betting system.
+
+We introduced Claude AI integration for semantic research exploration (Section~\ref{sec:claude_integration}), enabling conversational hypothesis testing, post‑mortem analysis, and feature discovery through natural language queries—a novel contribution to sports betting analytics. The integration leverages the full analytics stack (PostgreSQL, R, Python, Quarto) while maintaining statistical rigor (permutation tests, FDR correction, bootstrap CIs).
+
+Key infrastructure components documented: ensemble deployment (Section~\ref{sec:system_architecture}) with CQL \textbf{DISABLED} pending retraining; Kelly sizing (Section~\ref{sec:kelly_sizing}) with critical caveat that optimal sizing cannot overcome negative expected value; line shopping infrastructure (Section~\ref{sec:line_shopping}) providing +0.5\% EV (insufficient to overcome $-7.5$\% baseline); early‑week betting strategy (Section~\ref{sec:early_week}); and monitoring infrastructure (Section~\ref{sec:monitoring}).
+
+The Semantic Stack (Section~\ref{sec:semantic-stack}) extends the system with LLM-powered feature engineering: 26 semantic features extracted via local inference (Ollama, MLX). \textbf{However, A/B testing showed semantic features underperformed the baseline} (58.5\% → 51.8\%), illustrating the importance of rigorous validation before deployment.
+
+\textbf{Revised expectation}: Year 1 returns with spread betting are projected at \textbf{$-$\$455 to $-$\$525 loss} (4.5--5.3\% of \$10K bankroll). The critical insight: \textbf{market efficiency dominates}. No amount of operational optimization can overcome a negative-EV baseline. Future work should focus on less efficient markets (props, live betting) or alternative approaches (arbitrage, market making).
 }{
 Chapter~\ref{chap:conclusion} synthesizes findings, discusses contributions to sports betting analytics and AI‑assisted research, and outlines future work including live in‑game extensions and causal inference integration.
 }

@@ -7,9 +7,11 @@
 
 \section{Introduction: The 13-Month Journey}
 
-This dissertation documented a 13-month research journey that transformed a catastrophically failing prediction system into a profitable production ensemble. The trajectory---from an initial -83.5\% maximum drawdown to a final +2.96\% return on investment (ROI) with 74.9\% spread prediction accuracy on 2025 holdout data---was not a story of finding a single "magic bullet" algorithm. Rather, it was a process of disciplined iteration, honest failure assessment, and methodological discovery.
+This dissertation documented a 13-month research journey through the development, validation, and ultimately the \textbf{honest assessment of limitations} of an NFL prediction system. The trajectory---from an initial $-83.5$\% maximum drawdown through multiple model iterations to a final comprehensive data leakage investigation---was not a story of finding a "magic bullet" algorithm. Rather, it was a process of disciplined iteration, honest failure assessment, and methodological discovery that ultimately confirmed \textbf{market efficiency for spread betting with publicly available data}.
 
-This concluding chapter synthesizes the highest-level lessons from that journey. It summarizes the key technical discoveries, which are now integrated into the main body of the dissertation, and focuses on the transferable "meta-lessons" regarding research process, validation, and building robust AI systems in adversarial, efficient markets.
+\textbf{Critical update (December 2025):} The cleaned baseline from the data leakage investigation (\S\ref{sec:data-leakage-investigation}) shows \textbf{51.0\% win rate and $-7.5$\% ROI}---below the 52.4\% breakeven threshold. Earlier claims of +2.96\% ROI were computed before comprehensive leakage remediation and are now invalidated. The 74.9\% spread prediction accuracy on 2025 holdout reflects \emph{prediction accuracy}, not betting profitability after vig.
+
+This chapter synthesizes the highest-level lessons from that journey, focusing on the transferable "meta-lessons" regarding research process, validation, and building robust AI systems in adversarial, efficient markets. The primary contribution is \textbf{methodological}, not economic: we demonstrate how to rigorously validate (and invalidate) ML systems in adversarial environments.
 
 \section{Summary of Key Technical Discoveries}
 
@@ -20,7 +22,7 @@ The successful v6.0 ensemble was built upon three core technical principles that
 
     \item \textbf{Ensemble Diversification > Individual Sophistication.} The v1.0 system failed because it relied on a single model. The profitable v6.0 system succeeded by combining five weakly correlated models. As shown by the variance decomposition analysis in \Cref{sec:unified-baseline-comparison}, adding a simple, uncorrelated model (like ELO) was more effective at reducing overall error than further refining a single, sophisticated one.
 
-    \item \textbf{Hybrid Architectures Resolve the Stability-Adaptation Dilemma.} NFL markets are non-stationary. We found that neither pure static models (which suffer from concept drift) nor pure incremental models (which overfit to noise) were optimal. The solution, detailed in \Cref{sec:hybrid-architecture}, was a hybrid 70/30 blend of a static and an incremental model, which achieved a +4.2\% performance improvement over either pure approach.
+    \item \textbf{Hybrid Architectures Resolve the Stability-Adaptation Dilemma.}\label{itm:hybrid-architecture} NFL markets are non-stationary. We found that neither pure static models (which suffer from concept drift) nor pure incremental models (which overfit to noise) were optimal. The solution, detailed in Chapter~\ref{chap:methods}, was a hybrid 70/30 blend of a static and an incremental model, which achieved a +4.2\% performance improvement over either pure approach.
 \end{enumerate}
 
 \section{Meta-Lessons in Applied Research}
@@ -58,6 +60,7 @@ Follow-up experiments revealed a nuanced finding: hard feature pruning \textit{d
 Full experimental details are provided in \Cref{sec:feature-optimization}.
 
 \subsection{Honest Failure Accounting Builds Credibility}
+\label{sec:honest-failures}
 This dissertation transparently documents its most significant failures. This is not self-flagellation; it is a core tenet of the scientific method. By detailing what didn't work and why, we (1) prevent future researchers from repeating the same mistakes, (2) provide a more credible foundation for our successful results, and (3) map the true boundaries of what is feasible in this problem domain.
 
 \section{Transferable Insights Beyond NFL Betting}
@@ -76,7 +79,7 @@ The principles discovered in this work are not limited to sports. They are gener
 \section{Future Research Directions}
 \label{sec:future-research}
 
-The v6.0 system provides a strong foundation, but several promising research avenues remain. We organize these into five vectors, each addressing a specific limitation of the current architecture. Building on the literature surveyed in \Cref{sec:sequence-attention,sec:causal-inference,sec:llm-sports,sec:mlops-production}, we provide concrete approaches, expected benefits, and implementation challenges for each direction.
+The v6.0 system provides a strong foundation, but several promising research avenues remain. We organize these into five vectors, each addressing a specific limitation of the current architecture. Building on the literature surveyed in Chapter~\ref{chap:litreview}, we provide concrete approaches, expected benefits, and implementation challenges for each direction.
 
 \subsection{Causal Feature Engineering}
 \label{subsec:future-causal}
@@ -140,7 +143,7 @@ The v6.0 system provides a strong foundation, but several promising research ave
 \subsection{Ensemble Diversity Optimization}
 \label{subsec:future-diversity}
 
-\paragraph{Problem.} The v6.0 ensemble achieved mean inter-model correlation $\bar{\rho} = 0.32$, but this was discovered through trial and error rather than systematic optimization. The Hansen variance decomposition (\Cref{subsec:hansen1982}) shows that reducing $\bar{\rho}$ is more cost-effective than adding models, but we lack a principled method to select models that maximize diversity while maintaining individual accuracy.
+\paragraph{Problem.} The v6.0 ensemble achieved mean inter-model correlation $\bar{\rho} = 0.32$, but this was discovered through trial and error rather than systematic optimization. The Hansen variance decomposition (Chapter~\ref{chap:advanced_bayesian}) shows that reducing $\bar{\rho}$ is more cost-effective than adding models, but we lack a principled method to select models that maximize diversity while maintaining individual accuracy.
 
 \paragraph{Approach.} Formalize ensemble construction as a diversity-accuracy optimization problem \citep{kuncheva2023unified,kuncheva2003measures}:
 
@@ -196,6 +199,8 @@ Conservative projections suggest 20--30\% relative improvement in ROI through re
 
 \section{Final Reflection: The Market as Teacher}
 
-The journey from a -83.5\% drawdown to a +2.96\% ROI (with 74.9\% spread accuracy on 2025 holdout) was not a linear path to a better algorithm. It was a process of learning from an unforgiving teacher: the market. The market taught that diversification is non-negotiable, that feature engineering is paramount, that multi-season validation is mandatory, and that sunk costs are sunk.
+The journey from a $-83.5$\% drawdown through multiple model iterations to a final cleaned baseline of \textbf{51.0\% win rate and $-7.5$\% ROI} was not a linear path to profitability---it was a path to \emph{understanding}. The market taught that diversification is non-negotiable, that feature engineering is paramount, that multi-season validation is mandatory, and that \textbf{target leakage can persist across years of apparently successful backtests}.
 
-This dissertation's primary contribution is the documentation of that process. It provides a playbook for how to build systems that learn, adapt, and ultimately succeed in complex, adversarial environments. For any practitioner building predictive systems, the lessons are clear: Embrace failures as data. Formalize abandonment criteria. Diversify ruthlessly. Validate robustly. And above all, **make features do the work, not models.**
+The most important lesson: \textbf{the market is efficient}. After exhaustive methodology development and rigorous validation, spread betting with publicly available data remains unprofitable. This is not a failure of methodology but a \emph{confirmation of market efficiency theory}---and a valuable negative result for the field.
+
+This dissertation's primary contribution is the documentation of that process. It provides a playbook for how to build systems that learn, adapt, and \textbf{honestly assess their limitations} in complex, adversarial environments. For any practitioner building predictive systems, the lessons are clear: Embrace failures as data. Formalize abandonment criteria. Diversify ruthlessly. Validate robustly. \textbf{Trust only true out-of-sample holdouts.} And above all, \textbf{accept negative results with the same rigor as positive ones}.

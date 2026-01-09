@@ -1,18 +1,23 @@
 \begin{table}[t]
   \centering
   \small
-  \caption[RL vs stateless baseline]{RL vs stateless baseline performance (335 test samples, real backtest). CQL policies trained with Conservative Q-Learning on logged betting data.}
+  \caption[RL vs stateless baseline]{Baseline policy performance on 2023--2024 holdout (570 games). Metrics computed with proper temporal split and outcomes loaded separately to prevent data leakage.}
   \label{tab:rl-vs-baseline}
+  \begin{threeparttable}
   \begin{tabular}{lrrrrr}
     \toprule
     Policy & Win Rate & ROI (\%) & Sharpe & Max DD (\%) & Bets \\
     \midrule
-    Random & 41.1\% & +34.4 & 0.68 & 100.0 & 168 \\
-    Market (flat) & 45.5\% & +41.4 & 0.91 & 0.0 & 200 \\
-    Kelly-LCB & 77.7\% & +66.4 & 1.33 & 9.7 & 139 \\
+    Random & 50.5\% & $-$3.5 & $-$0.04 & 0.0 & 283 \\
+    Market ($p > 0.52$) & 50.9\% & $-$2.8 & $-$0.03 & 0.0 & 334 \\
+    Kelly-LCB & --- & --- & --- & --- & 0 \\
     \midrule
-    CQL (single) & 93.1\% & +79.7 & 1.73 & 5.6 & 145 \\
-    CQL (ensemble) & 100.0\% & +91.0 & $\infty$ & 0.0 & 82 \\
+    \multicolumn{6}{l}{\textit{CQL policies pending retraining with leakage-free pipeline}} \\
     \bottomrule
   \end{tabular}
+  \begin{tablenotes}
+    \small
+    \item Note: Kelly-LCB made no bets due to conservative edge threshold (5\%). CQL models require retraining with the corrected dataset that excludes post-game outcomes. The near-50\% win rates and negative ROI reflect market efficiency and the 4.5\% breakeven threshold imposed by standard $-110$ odds.
+  \end{tablenotes}
+  \end{threeparttable}
 \end{table}

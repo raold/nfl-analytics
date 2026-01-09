@@ -3,14 +3,15 @@
 % Comprehensive comparison of 6 UQ methods across 6 dimensions
 % Created: November 9, 2025
 
+\begin{landscape}
 \begin{table}[p]
   \centering
   \caption[Uncertainty quantification methods comparison]{Uncertainty quantification methods: comprehensive comparison across six dimensions. Methods are ranked by computational cost (MCMC slowest, evidential fastest) and evaluated on coverage guarantees, assumptions, interpretability, and suitability for temporal drift.}
   \label{tab:uq-comparison}
   \begin{threeparttable}
-  \small
+  \scriptsize
   \setlength{\tabcolsep}{3pt}
-  \renewcommand{\arraystretch}{1.25}
+  \renewcommand{\arraystretch}{1.0}
   \begin{tabularx}{\linewidth}{@{} l X X X X X @{}}
     \toprule
     \textbf{Method} & \textbf{Coverage Guarantee} & \textbf{Assumptions} & \textbf{Computation} & \textbf{Interpretability} & \textbf{Temporal Drift} \\
@@ -72,7 +73,7 @@
   \end{tabularx}
 
   \begin{tablenotes}[flushleft]
-    \footnotesize
+    \tiny
     \item[a] $I$ iterations, $T$ MCMC samples, $n$ data points; matrix inversions dominate for hierarchical models.
     \item[b] $m$ calibration samples; sorting residuals for quantile computation.
     \item[c] $K$ models in ensemble; quadratic programming (QP) for stacking weights via PSIS-LOO.
@@ -85,7 +86,7 @@
         \item \emph{Interpretability}: Transparency of uncertainty sources and tuning parameters.
         \item \emph{Temporal Drift}: Suitability for non-stationary data (roster changes, rule evolution).
       \end{itemize}
-    \item \textbf{Empirical Results} (Chapters~\ref{chap:baseline}--\ref{chap:results}, 2022--2024 test seasons):
+    \item \textbf{Empirical Results} (Chapters~\ref{chap:methods}--\ref{chap:results}, 2022--2024 test seasons):
       \begin{itemize}[leftmargin=*, itemsep=1pt, parsep=0pt]
         \item \textbf{Bayesian MCMC}: 91.2\% coverage (target 90\%), 18$\times$ slowest; gold standard for pre-game.
         \item \textbf{MC Dropout}: 90.1\% coverage, 410ms; abandoned for multi-output tasks (Appendix~\ref{app:bnn-investigation}).
@@ -98,3 +99,4 @@
   \end{tablenotes}
   \end{threeparttable}
 \end{table}
+\end{landscape}

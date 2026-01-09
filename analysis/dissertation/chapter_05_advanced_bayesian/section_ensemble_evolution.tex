@@ -3,7 +3,7 @@
 % Created: November 15, 2025
 % Purpose: Document 4-version evolution, failures, and production maturation
 
-\section{Ensemble Evolution: From Research to Production (v3.0 $\to$ v6.0)}
+\section{Ensemble Evolution: From Research to Production (v3.0 \texorpdfstring{$\to$}{->} v6.0)}
 \label{sec:ensemble-evolution}
 
 \subsection{Overview and Motivation}
@@ -123,25 +123,27 @@ Informative Priors v2 & 15 & 53.12 & 87.4\% & Expert knowledge, domain constrain
 \end{tablenotes}
 \end{table}
 
-\paragraph{Validation Results (2024 Holdout).}
+\paragraph{Validation Results (2024 Holdout)---Player Props Domain.}
+\textbf{Note:} These metrics are for \textbf{player props} (passing yards) prediction, not spread betting.
 \begin{itemize}[itemsep=2pt,parsep=0pt]
     \item \textbf{MAE:} 40.0 yards (vs 47.77 best single model)
-    \item \textbf{ROI:} 5.5\% (exceeding 5-7\% target lower bound)
-    \item \textbf{Win Rate:} 58.5\% (target: 59-62\%)
+    \item \textbf{Win Rate:} 58.5\% (on props bets with edge filter)
     \item \textbf{Sharpe Ratio:} 1.85 (target: 2.2-2.6)
 \end{itemize}
 
+\textbf{Critical caveat (December 2025):} The ROI claims in this section (5.5\%, 7.5\%) were computed before comprehensive data leakage investigation. For \textbf{spread betting}, the cleaned baseline shows 51.0\% win rate and $-7.5\%$ ROI---confirming market efficiency. Props betting may have different efficiency characteristics (see \S\ref{sec:data-leakage-investigation} for distinction between domains).
+
 \paragraph{Production Approval (November 8, 2025).}
-v5.0 passed all 5 deployment gates:
+v5.0 passed deployment gates for \textbf{props prediction} (not spread betting profitability):
 \begin{enumerate}[itemsep=2pt,parsep=0pt]
     \item $\checkmark$ MAE < 45 yards (achieved 40.0)
-    \item $\checkmark$ ROI > 5\% (achieved 5.5\%)
+    \item \textbf{ROI gate superseded}---see December 2025 leakage investigation
     \item $\checkmark$ Calibration > 85\% (achieved 90.2\%)
     \item $\checkmark$ All components converged (Rhat < 1.01, ESS > 400)
     \item $\checkmark$ Temporal validation passed (3-season backtest 2022-2024)
 \end{enumerate}
 
-Status: $\checkmark$ \textbf{APPROVED BASELINE} (Nov 8, 2025).
+Status: \textbf{APPROVED FOR PROPS PREDICTION} (Nov 8, 2025). Spread betting profitability NOT validated.
 
 \subsection{v5.1: Hybrid XGBoost Upgrade (November 14, 2025)}
 
