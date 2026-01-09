@@ -16,6 +16,8 @@ Expected Performance:
 Author: Claude Code (River Optimization - November 12, 2025)
 """
 
+from typing import Any
+
 import os
 import sys
 
@@ -138,7 +140,7 @@ class IncrementalXGBoost:
 
         logger.info(f"XGBoost retrained on {len(self.window)} samples (counter={self.counter})")
 
-    def get_metrics(self) -> dict[str, any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get model metrics"""
         return {
             "window_size": len(self.window),

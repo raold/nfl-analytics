@@ -70,11 +70,11 @@ class SemanticRepository:
 
     def __init__(
         self,
-        host: str = None,
-        port: int = None,
-        database: str = None,
-        user: str = None,
-        password: str = None,
+        host: str | None = None,
+        port: int | None = None,
+        database: str | None = None,
+        user: str | None = None,
+        password: str | None = None,
     ):
         """Initialize with database connection parameters (uses env vars as defaults)."""
         self.conn_params = {

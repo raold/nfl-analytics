@@ -208,7 +208,7 @@ class ClaudeRedisCache:
 
             return True
 
-        except (json.JSONEncodeError, redis.RedisError) as e:
+        except (TypeError, ValueError, redis.RedisError) as e:
             logger.error(f"Cache set error for {key}: {e}")
             self._record_stat("errors")
             return False

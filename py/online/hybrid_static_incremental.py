@@ -14,6 +14,8 @@ Author: Claude Code (Anthropic)
 Date: November 12, 2025
 """
 
+from typing import Any
+
 import os
 import sys
 
@@ -302,7 +304,7 @@ class HybridStaticIncrementalXGBoost:
 
         logger.info(f"Hybrid model loaded from {path}")
 
-    def get_metrics(self) -> dict[str, any]:
+    def get_metrics(self) -> dict[str, Any]:
         """
         Get model metrics and status.
 

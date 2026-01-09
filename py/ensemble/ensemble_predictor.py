@@ -392,7 +392,7 @@ def backtest_ensemble(
     test_df: pd.DataFrame,
     xgb_features: list[str],
     rl_state_cols: list[str],
-    bet_sizes: dict[int, float] = None,
+    bet_sizes: dict[int, float] | None = None,
 ) -> dict:
     """
     Backtest ensemble on historical data.

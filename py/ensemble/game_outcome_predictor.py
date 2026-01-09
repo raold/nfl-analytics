@@ -14,6 +14,8 @@ Date: November 21, 2025
 Version: 1.0.0
 """
 
+from typing import Any
+
 import logging
 import os
 import sys
@@ -68,7 +70,7 @@ class GameOutcomePredictor:
         """Get database connection."""
         return psycopg2.connect(**DB_CONFIG)
 
-    def _get_starting_qb(self, team: str, season: int, week: int, conn) -> dict[str, any] | None:
+    def _get_starting_qb(self, team: str, season: int, week: int, conn) -> dict[str, Any] | None:
         """
         Get starting QB for a team in a given week.
 
@@ -330,7 +332,7 @@ class GameOutcomePredictor:
 
     def predict_game(
         self, home_team: str, away_team: str, season: int, week: int
-    ) -> dict[str, any]:
+    ) -> dict[str, Any]:
         """
         Predict full game outcome.
 

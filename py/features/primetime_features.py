@@ -38,6 +38,8 @@ Author: Claude Code (Opus 4.5)
 Date: November 27, 2025
 """
 
+from typing import Any
+
 import logging
 import warnings
 
@@ -90,7 +92,7 @@ class PrimetimeFeaturesEngine:
         """Create database connection."""
         return psycopg2.connect(**self.db_config)
 
-    def compute_primetime_features(self, game_id: str) -> dict[str, any]:
+    def compute_primetime_features(self, game_id: str) -> dict[str, Any]:
         """
         Compute primetime features for a single game.
 
@@ -124,7 +126,7 @@ class PrimetimeFeaturesEngine:
         row = df.iloc[0]
         return self._compute_features_from_row(row)
 
-    def _compute_features_from_row(self, row: pd.Series) -> dict[str, any]:
+    def _compute_features_from_row(self, row: pd.Series) -> dict[str, Any]:
         """Compute primetime features from a game row.
 
         Note: Database stores kickoff times in what appears to be ET
@@ -197,7 +199,7 @@ class PrimetimeFeaturesEngine:
         else:
             return "OTHER"
 
-    def _neutral_features(self) -> dict[str, any]:
+    def _neutral_features(self) -> dict[str, Any]:
         """Return neutral features when data unavailable."""
         return {
             "is_thursday_night": False,

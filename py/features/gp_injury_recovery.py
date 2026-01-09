@@ -19,6 +19,8 @@ Implementation Notes:
 - Categories: muscle (hamstring, quad, calf), structural (ACL, ankle), other
 """
 
+from typing import Any
+
 import logging
 from dataclasses import dataclass
 
@@ -107,7 +109,7 @@ class InjuryRecoveryGP:
             db_config: Database configuration for fetching training data.
         """
         self.use_gpytorch = use_gpytorch and GPYTORCH_AVAILABLE
-        self._models: dict[str, any] = {}  # Category -> trained GP
+        self._models: dict[str, Any] = {}  # Category -> trained GP
         self._trained = False
         self.db_config = db_config
 
