@@ -26,6 +26,8 @@ Usage:
         --week 7
 """
 
+from typing import Any
+
 import argparse
 import json
 import logging
@@ -62,7 +64,7 @@ class TotalPrediction:
     weather_impact: float  # Expected points impact from weather
     edge: float
     recommended_bet: str | None  # "over", "under", or None
-    weather_factors: dict[str, any]
+    weather_factors: dict[str, Any]
 
 
 class WeatherTotalsModel:

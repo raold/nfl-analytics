@@ -26,10 +26,10 @@ def _get_env(name: str, default: Optional[str] = None) -> Optional[str]:
 class DatabaseSettings:
     """Database configuration loaded from environment variables."""
 
-    host: str = _get_env("DB_HOST", "localhost")
-    port: int = int(_get_env("DB_PORT", "5544"))
-    name: str = _get_env("DB_NAME", "devdb01")
-    user: str = _get_env("DB_USER", "dro")
+    host: str = _get_env("DB_HOST", "localhost") or "localhost"
+    port: int = int(_get_env("DB_PORT", "5544") or "5544")
+    name: str = _get_env("DB_NAME", "devdb01") or "devdb01"
+    user: str = _get_env("DB_USER", "dro") or "dro"
     password: Optional[str] = _get_env("DB_PASSWORD")
 
     def require_password(self) -> str:

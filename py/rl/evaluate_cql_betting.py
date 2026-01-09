@@ -27,12 +27,66 @@ Usage:
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import psycopg
 import torch
 import torch.nn as nn
+
+
+# ============================================================================
+# Database Connection & Outcome Loading
+# ============================================================================
+
+
+def get_connection() -> psycopg.Connection:
+    """Get database connection using environment variables or defaults."""
+    host = os.environ.get("POSTGRES_HOST", "localhost")
+    port = os.environ.get("POSTGRES_PORT", "5544")
+    dbname = os.environ.get("POSTGRES_DB", "devdb01")
+    user = os.environ.get("POSTGRES_USER", "dro")
+    password = os.environ.get("POSTGRES_PASSWORD", "sicillionbillions")
+    return psycopg.connect(host=host, port=port, dbname=dbname, user=user, password=password)
+
+
+def load_game_outcomes(season_start: int = 2019, season_end: int = 2024) -> pd.DataFrame:
+    """
+    Load actual game outcomes from database SEPARATE from features.
+
+    This prevents target leakage by keeping outcomes out of the training pipeline
+    until evaluation time. See ADR-016 for rationale.
+
+    Spread convention in this database:
+    - Positive spread_close = home is FAVORITE (giving points)
+    - Negative spread_close = home is UNDERDOG (receiving points)
+
+    Home covers when: (home_score - away_score) > spread_close
+    Example: KC (home fav by 4, spread=+4) needs margin > 4 to cover
+    Example: KC (home dog by 3, spread=-3) needs margin > -3 to cover (can lose by 2)
+
+    Returns:
+        DataFrame with game_id, season, week, home_score, away_score, spread_close, cover
+    """
+    query = """
+        SELECT
+            game_id,
+            season,
+            week,
+            home_score,
+            away_score,
+            spread_close,
+            CASE WHEN (home_score - away_score) > spread_close THEN 1 ELSE 0 END as cover
+        FROM games
+        WHERE season BETWEEN %s AND %s
+          AND home_score IS NOT NULL
+          AND away_score IS NOT NULL
+    """
+    with get_connection() as conn:
+        df = pd.read_sql(query, conn, params=(season_start, season_end))
+    return df
 
 # ============================================================================
 # Q-Network Architecture (must match cql_agent.py)
@@ -246,8 +300,20 @@ def cql_ensemble_policy(
 # ============================================================================
 
 
-def calculate_metrics(df: pd.DataFrame) -> dict[str, float]:
-    """Calculate betting performance metrics."""
+def calculate_metrics(df: pd.DataFrame, outcomes: pd.DataFrame) -> dict[str, float]:
+    """
+    Calculate betting performance metrics using SEPARATE outcomes data.
+
+    This prevents target leakage by computing rewards only at evaluation time,
+    not during dataset generation. See ADR-016 for rationale.
+
+    Args:
+        df: DataFrame with predictions (must have game_id, predicted_action, bet_size)
+        outcomes: DataFrame from load_game_outcomes() (must have game_id, cover)
+
+    Returns:
+        dict of performance metrics
+    """
     # Filter to actual bets
     bets = df[df["predicted_action"] == 1].copy()
 
@@ -262,18 +328,38 @@ def calculate_metrics(df: pd.DataFrame) -> dict[str, float]:
             "total_return": 0.0,
         }
 
-    # Win/loss outcomes (r column: +0.91 for win, -1.0 for loss at -110 odds)
-    wins = (bets["r"] > 0).sum()
+    # CRITICAL: Merge with actual outcomes (loaded separately to prevent leakage)
+    # Only keep bets where we have outcomes
+    bets = bets.merge(outcomes[["game_id", "cover"]], on="game_id", how="inner")
+
+    if len(bets) == 0:
+        return {
+            "win_rate": 0.0,
+            "roi_pct": 0.0,
+            "sharpe": 0.0,
+            "max_dd_pct": 0.0,
+            "total_bets": 0,
+            "total_staked": 0.0,
+            "total_return": 0.0,
+        }
+
+    # Compute reward from ACTUAL cover outcome (not from leaked r column)
+    # Standard -110 odds: win pays +0.91, loss costs -1.0
+    b = 0.91  # Net odds for -110
+    bets["r_actual"] = bets["cover"] * b + (1 - bets["cover"]) * (-1.0)
+
+    # Win/loss outcomes from actual cover
+    wins = (bets["r_actual"] > 0).sum()
     total_bets = len(bets)
     win_rate = wins / total_bets
 
-    # ROI calculation
+    # ROI calculation using actual rewards
     total_staked = bets["bet_size"].sum()
-    total_return = (bets["r"] * bets["bet_size"]).sum()
+    total_return = (bets["r_actual"] * bets["bet_size"]).sum()
     roi_pct = (total_return / total_staked * 100) if total_staked > 0 else 0.0
 
-    # Sharpe ratio
-    returns = bets["r"] * bets["bet_size"]
+    # Sharpe ratio using actual rewards
+    returns = bets["r_actual"] * bets["bet_size"]
     mean_return = returns.mean()
     std_return = returns.std(ddof=1) if len(returns) > 1 else 0.0
     sharpe = mean_return / std_return if std_return > 0 else 0.0
@@ -302,36 +388,46 @@ def calculate_metrics(df: pd.DataFrame) -> dict[str, float]:
 
 def evaluate_all_policies(
     df: pd.DataFrame,
+    outcomes: pd.DataFrame,
     best_model: QNetwork | None,
     ensemble_models: list[QNetwork] | None,
     state_cols: list[str],
 ) -> dict[str, dict[str, float]]:
-    """Evaluate all policies and return metrics."""
+    """
+    Evaluate all policies and return metrics.
+
+    Args:
+        df: Feature DataFrame (no outcome columns)
+        outcomes: Separate outcomes DataFrame from load_game_outcomes()
+        best_model: Single best CQL model (optional)
+        ensemble_models: List of ensemble CQL models (optional)
+        state_cols: List of state column names for CQL models
+    """
     results = {}
 
     # Baseline 1: Random
     df_random = random_policy(df)
-    results["random"] = calculate_metrics(df_random)
+    results["random"] = calculate_metrics(df_random, outcomes)
 
     # Baseline 2: Market
     df_market = market_policy(df, threshold=0.52)
-    results["market"] = calculate_metrics(df_market)
+    results["market"] = calculate_metrics(df_market, outcomes)
 
     # Baseline 3: Kelly-LCB
     df_kelly = kelly_lcb_policy(df, alpha=0.1, threshold=0.05)
-    results["kelly_lcb"] = calculate_metrics(df_kelly)
+    results["kelly_lcb"] = calculate_metrics(df_kelly, outcomes)
 
     # CQL Single Model
     if best_model is not None:
         df_cql_single = cql_single_policy(df, best_model, state_cols)
-        results["cql_single"] = calculate_metrics(df_cql_single)
+        results["cql_single"] = calculate_metrics(df_cql_single, outcomes)
 
     # CQL Ensemble
     if ensemble_models is not None and len(ensemble_models) > 0:
         df_cql_ensemble = cql_ensemble_policy(
             df, ensemble_models, state_cols, confidence_threshold=0.05
         )
-        results["cql_ensemble"] = calculate_metrics(df_cql_ensemble)
+        results["cql_ensemble"] = calculate_metrics(df_cql_ensemble, outcomes)
 
     return results
 
@@ -350,21 +446,43 @@ def main():
         "--output", type=str, default="results/cql_betting_evaluation.json", help="Output JSON path"
     )
     parser.add_argument(
-        "--test-split", type=float, default=0.2, help="Test set fraction (default: 0.2)"
+        "--train-seasons",
+        type=str,
+        default="2019,2020,2021,2022",
+        help="Comma-separated training seasons (default: 2019-2022)",
+    )
+    parser.add_argument(
+        "--test-seasons",
+        type=str,
+        default="2023,2024",
+        help="Comma-separated test seasons (default: 2023-2024)",
     )
     parser.add_argument("--device", type=str, default="cpu", help="Device (cpu, cuda, mps)")
 
     args = parser.parse_args()
 
+    # Parse season lists
+    train_seasons = [int(s.strip()) for s in args.train_seasons.split(",")]
+    test_seasons = [int(s.strip()) for s in args.test_seasons.split(",")]
+
     # Load data
     df = pd.read_csv(args.data)
     print(f"Loaded {len(df)} samples from {args.data}")
 
-    # Temporal train/test split (last 20% by game_id/season/week)
-    split_idx = int(len(df) * (1 - args.test_split))
-    df_train = df.iloc[:split_idx]
-    df_test = df.iloc[split_idx:]
-    print(f"Train: {len(df_train)} | Test: {len(df_test)}")
+    # FIXED: Season-based temporal split (prevents data leakage across train/test)
+    # This mirrors the XGBoost temporal validation approach per ADR-016
+    df_train = df[df["season"].isin(train_seasons)]
+    df_test = df[df["season"].isin(test_seasons)]
+    print(f"Train seasons: {train_seasons} ({len(df_train)} games)")
+    print(f"Test seasons: {test_seasons} ({len(df_test)} games)")
+
+    # Load actual outcomes SEPARATELY from features (prevents target leakage)
+    print("Loading game outcomes from database...")
+    outcomes = load_game_outcomes(
+        season_start=min(min(train_seasons), min(test_seasons)),
+        season_end=max(max(train_seasons), max(test_seasons)),
+    )
+    print(f"Loaded {len(outcomes)} game outcomes")
 
     # Define state columns
     state_cols = ["spread_close", "total_close", "epa_gap", "market_prob", "p_hat", "edge"]
@@ -403,13 +521,14 @@ def main():
     ensemble_models = load_ensemble(ensemble_dir, ensemble_ids, args.device)
     print(f"Loaded ensemble: {len(ensemble_models)} models")
 
-    # Evaluate on test set
+    # Evaluate on test set with SEPARATE outcomes (prevents leakage)
     print("\nEvaluating policies on test set...")
-    results = evaluate_all_policies(df_test, best_model, ensemble_models, state_cols)
+    results = evaluate_all_policies(df_test, outcomes, best_model, ensemble_models, state_cols)
 
     # Print results
     print("\n" + "=" * 80)
     print("BETTING PERFORMANCE EVALUATION (TEST SET)")
+    print(f"Train: {train_seasons} | Test: {test_seasons}")
     print("=" * 80)
 
     for policy_name, metrics in results.items():
@@ -430,10 +549,13 @@ def main():
 
     output_data = {
         "dataset": args.data,
-        "test_split": args.test_split,
+        "train_seasons": train_seasons,
+        "test_seasons": test_seasons,
+        "train_samples": len(df_train),
         "test_samples": len(df_test),
         "policies": results,
         "ensemble_size": len(ensemble_models),
+        "leakage_fix_applied": True,  # Flag for audit trail
     }
 
     with open(output_path, "w") as f:

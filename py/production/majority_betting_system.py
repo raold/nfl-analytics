@@ -133,8 +133,8 @@ class MajorityBettingSystem:
         max_bet_fraction: float = 0.05,
         min_edge: float = 0.02,
         uncertainty_threshold: float = 0.5,
-        xgb_features: list[str] = None,
-        rl_state_cols: list[str] = None,
+        xgb_features: list[str] | None = None,
+        rl_state_cols: list[str] | None = None,
         device: str = "cpu",
     ):
         """
@@ -218,7 +218,7 @@ class MajorityBettingSystem:
     def get_betting_recommendations(
         self,
         games_df: pd.DataFrame,
-        market_odds: dict[str, int] = None,
+        market_odds: dict[str, int] | None = None,
     ) -> list[dict]:
         """
         Get betting recommendations for upcoming games.
@@ -413,7 +413,7 @@ class MajorityBettingSystem:
     def backtest(
         self,
         games_df: pd.DataFrame,
-        season: int = None,
+        season: int | None = None,
     ) -> dict:
         """
         Backtest on historical data.

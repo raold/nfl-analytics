@@ -47,7 +47,7 @@ def spread_to_prob(spread: float) -> float:
     return np.clip(prob, 0.01, 0.99)
 
 
-def prepare_ensemble_data(input_path: str, output_path: str, season: int = None):
+def prepare_ensemble_data(input_path: str, output_path: str, season: int | None = None):
     """
     Prepare ensemble prediction data.
 

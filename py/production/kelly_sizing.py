@@ -217,7 +217,7 @@ def simulate_kelly_growth(
     n_bets: int,
     kelly_fraction: float = 1.0,
     max_bet_fraction: float = 0.10,
-    seed: int = None,
+    seed: int | None = None,
 ) -> dict:
     """
     Simulate bankroll growth using Kelly criterion.
@@ -293,7 +293,7 @@ def compare_kelly_fractions(
     decimal_odds: float,
     initial_bankroll: float,
     n_bets: int,
-    fractions: list[float] = None,
+    fractions: list[float] | None = None,
     n_simulations: int = 100,
 ) -> dict:
     """

@@ -6,9 +6,13 @@ to estimate win probability, compares to market-implied probabilities to define
 an edge, and derives a soft behavior propensity and target policy probability.
 
 Output CSV columns (one-step per game):
-  game_id, season, week, spread_close, total_close, home_score, away_score,
+  game_id, season, week, spread_close, total_close,
   home_epa_mean, away_epa_mean, epa_gap, market_prob, p_hat,
-  action, r, b_prob, pi_prob, edge
+  action, b_prob, pi_prob, edge
+
+NOTE: Outcomes (home_score, away_score, cover, reward) are NOT included in the
+dataset to prevent target leakage. Use load_game_outcomes() at evaluation time
+to compute metrics from actual results. See ADR-016 for rationale.
 
 Usage:
   python py/rl/dataset.py --output data/rl_logged.csv --season-start 2019 --season-end 2024
@@ -99,7 +103,9 @@ def _market_prob(row: pd.Series) -> float:
 def build_logged_dataset(
     df: pd.DataFrame, b_propensity: float, price_decimal: float
 ) -> pd.DataFrame:
-    b = price_decimal - 1.0  # net odds used for reward
+    # NOTE: price_decimal previously used for reward calc: b = price_decimal - 1.0
+    # Reward is now computed at evaluation time, not here (prevents target leakage)
+    _ = price_decimal  # Kept for API compatibility
 
     # Features and target for a quick logistic baseline
     df_feat = df.copy()
@@ -153,11 +159,13 @@ def build_logged_dataset(
     # Logged action: stochastic draw under behavior propensity (for scaffold reproducibility, use threshold)
     action = ((edge > 0.0) & (df_feat["spread_close"].abs() <= 7.5)).astype(int)
 
-    # Realized cover for home at closing line
-    margin = (df_feat["home_score"] - df_feat["away_score"]).astype(float)
-    cover = (margin > -df_feat["spread_close"].astype(float)).astype(int)
-    r = action * (cover * b + (1 - cover) * (-1.0))
+    # NOTE: Reward computation removed to prevent target leakage.
+    # Rewards should be computed at evaluation time using load_game_outcomes().
+    # Previously this computed: r = action * (cover * b + (1 - cover) * (-1.0))
+    # where cover = (home_score - away_score) > -spread_close
+    # This allowed the model to learn "bet when reward is positive" = cheating.
 
+    # Output ONLY pre-game features, no outcomes
     out = df_feat[
         [
             "game_id",
@@ -165,8 +173,7 @@ def build_logged_dataset(
             "week",
             "spread_close",
             "total_close",
-            "home_score",
-            "away_score",
+            # home_score, away_score REMOVED - these are post-game outcomes
             "home_epa_mean",
             "away_epa_mean",
         ]
@@ -176,7 +183,7 @@ def build_logged_dataset(
     out["p_hat"] = p_hat
     out["edge"] = edge
     out["action"] = action
-    out["r"] = r
+    # r (reward) REMOVED - computed at evaluation time from separate outcomes table
     out["b_prob"] = b_prob
     out["pi_prob"] = pi_prob
     return out

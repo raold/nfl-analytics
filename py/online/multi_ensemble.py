@@ -21,6 +21,8 @@ Expected Performance:
 Author: Claude Code (River Optimization - November 12, 2025)
 """
 
+from typing import Any
+
 import os
 import sys
 
@@ -193,7 +195,7 @@ class MultiOnlineEnsemble:
         if total_weight > 0:
             self.weights = {k: w / total_weight for k, w in self.weights.items()}
 
-    def get_metrics(self) -> dict[str, any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get ensemble metrics and model weights"""
         return {
             "weights": self.weights.copy(),

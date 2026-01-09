@@ -112,8 +112,8 @@ class LineMovementTracker:
         book: str,
         spread: float,
         total: float,
-        moneyline_home: int = None,
-        moneyline_away: int = None,
+        moneyline_home: int | None = None,
+        moneyline_away: int | None = None,
     ):
         """Add a line snapshot to tracker."""
         snapshot = LineSnapshot(

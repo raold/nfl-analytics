@@ -259,10 +259,10 @@ class EVBetSelector:
         self,
         model_prob: float,
         market_odds: int,
-        opposite_odds: int = None,
-        book_name: str = None,
+        opposite_odds: int | None = None,
+        book_name: str | None = None,
         line_velocity: float = 0.0,
-        time_to_kickoff: timedelta = None,
+        time_to_kickoff: timedelta | None = None,
         bankroll: float = 10000.0,
     ) -> dict:
         """
@@ -402,9 +402,9 @@ class EVBetSelector:
     def select_bets(
         self,
         predictions_df: pd.DataFrame,
-        odds_df: pd.DataFrame = None,
+        odds_df: pd.DataFrame | None = None,
         bankroll: float = 10000.0,
-        max_bets: int = None,
+        max_bets: int | None = None,
     ) -> pd.DataFrame:
         """
         Select bets from a DataFrame of predictions.
@@ -494,7 +494,7 @@ def backtest_selector(
     results_file: str,
     min_edge: float = 0.02,
     deadzone: float = 0.002,
-    output_file: str = None,
+    output_file: str | None = None,
 ) -> dict:
     """
     Backtest the EV bet selector on historical data.

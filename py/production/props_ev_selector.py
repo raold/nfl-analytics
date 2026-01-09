@@ -44,8 +44,8 @@ def calculate_prop_edge(
     model_prediction: float,
     model_std: float,
     line_value: float,
-    over_odds: int = None,
-    under_odds: int = None,
+    over_odds: int | None = None,
+    under_odds: int | None = None,
     hold_adjustment: float = 0.0,
 ) -> dict:
     """
@@ -299,9 +299,9 @@ class PropsEVSelector:
         over_odds: int,
         under_odds: int,
         bookmaker: str,
-        game_date: datetime = None,
+        game_date: datetime | None = None,
         bankroll: float = 10000.0,
-        current_exposure: dict = None,
+        current_exposure: dict | None = None,
     ) -> dict:
         """
         Determine if a prop bet should be placed.
@@ -454,7 +454,7 @@ class PropsEVSelector:
         predictions_df: pd.DataFrame,
         prop_lines_df: pd.DataFrame,
         bankroll: float = 10000.0,
-        max_bets: int = None,
+        max_bets: int | None = None,
     ) -> pd.DataFrame:
         """
         Select prop bets from predictions and available lines.

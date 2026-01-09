@@ -39,7 +39,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 
-def run_command(cmd: list[str], description: str = None):
+def run_command(cmd: list[str], description: str | None = None):
     """
     Run a shell command and handle errors.
 

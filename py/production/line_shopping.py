@@ -115,7 +115,7 @@ class OddsAggregator:
     Aggregate odds from multiple sportsbooks and find best lines.
     """
 
-    def __init__(self, books: list[str] = None):
+    def __init__(self, books: list[str] | None = None):
         """
         Initialize odds aggregator.
 
