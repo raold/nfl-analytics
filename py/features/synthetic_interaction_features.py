@@ -48,7 +48,6 @@ from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
-import pandas as pd
 import psycopg2
 
 logger = logging.getLogger(__name__)
@@ -64,7 +63,7 @@ DB_CONFIG = {
 
 # League average constants (calibrated from 2020-2024 data)
 LEAGUE_AVG = {
-    "any_a": 6.0,           # Adjusted net yards per attempt
+    "any_a": 6.0,  # Adjusted net yards per attempt
     "time_to_throw": 2.65,  # Seconds
     "pass_epa_per_play": 0.05,
     "rush_epa_per_play": -0.05,
@@ -75,6 +74,7 @@ LEAGUE_AVG = {
 @dataclass
 class InteractionFeatures:
     """Container for synthetic interaction features."""
+
     qb_ol_synergy: float
     defensive_balance_index: float
     explosive_mismatch: float
@@ -122,11 +122,7 @@ class SyntheticInteractionEngine:
         return psycopg2.connect(**self.db_config)
 
     def compute_qb_ol_synergy(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, team: str, season: int, week: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute QB × OL Synergy feature.
@@ -207,11 +203,7 @@ class SyntheticInteractionEngine:
                 conn.close()
 
     def compute_defensive_balance_index(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, team: str, season: int, week: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute Defensive Balance Index.
@@ -285,7 +277,7 @@ class SyntheticInteractionEngine:
         def_team: str,
         season: int,
         week: int,
-        conn: psycopg2.extensions.connection | None = None
+        conn: psycopg2.extensions.connection | None = None,
     ) -> float:
         """
         Compute Explosive Mismatch ratio.
@@ -345,8 +337,12 @@ class SyntheticInteractionEngine:
             def_row = cur.fetchone()
             cur.close()
 
-            off_explosive = float(off_row[0]) if off_row and off_row[0] else LEAGUE_AVG["explosive_rate"]
-            def_explosive = float(def_row[0]) if def_row and def_row[0] else LEAGUE_AVG["explosive_rate"]
+            off_explosive = (
+                float(off_row[0]) if off_row and off_row[0] else LEAGUE_AVG["explosive_rate"]
+            )
+            def_explosive = (
+                float(def_row[0]) if def_row and def_row[0] else LEAGUE_AVG["explosive_rate"]
+            )
 
             # Compute ratio (avoid division by zero)
             ratio = off_explosive / max(def_explosive, 0.01)
@@ -357,11 +353,7 @@ class SyntheticInteractionEngine:
                 conn.close()
 
     def compute_coaching_confidence(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, team: str, season: int, week: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute Coaching Confidence score.
@@ -386,12 +378,14 @@ class SyntheticInteractionEngine:
             cur = conn.cursor()
 
             # Check if coaching_staff table exists and has data
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT EXISTS (
                     SELECT 1 FROM information_schema.tables
                     WHERE table_name = 'coaching_staff'
                 )
-            """)
+            """
+            )
             has_table = cur.fetchone()[0]
 
             continuity = 0.5  # Default moderate continuity
@@ -441,11 +435,7 @@ class SyntheticInteractionEngine:
                 conn.close()
 
     def compute_injury_replacement_value(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, team: str, season: int, week: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute Injury Replacement Value.
@@ -503,11 +493,7 @@ class SyntheticInteractionEngine:
                 conn.close()
 
     def extract_features(
-        self,
-        home_team: str,
-        away_team: str,
-        season: int,
-        week: int
+        self, home_team: str, away_team: str, season: int, week: int
     ) -> dict[str, Any]:
         """
         Extract all synthetic interaction features for a game.

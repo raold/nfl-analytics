@@ -11,13 +11,11 @@ Usage:
     results = test.analyze_results(test_id)
 """
 
-import json
 import logging
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -35,6 +33,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ABTestConfig:
     """Configuration for an A/B test."""
+
     test_id: str
     description: str
     season: int
@@ -48,6 +47,7 @@ class ABTestConfig:
 @dataclass
 class ABTestResults:
     """Results of an A/B test analysis."""
+
     test_id: str
     games_analyzed: int
 
@@ -110,10 +110,7 @@ class SemanticABTest:
         return psycopg2.connect(**self.conn_params)
 
     def setup_test(
-        self,
-        season: int,
-        start_week: int,
-        description: str = "Semantic features A/B test"
+        self, season: int, start_week: int, description: str = "Semantic features A/B test"
     ) -> str:
         """
         Create a new A/B test.
@@ -137,13 +134,16 @@ class SemanticABTest:
 
         with self._get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(query, (
-                    test_id,
-                    f"Semantic A/B {season} Week {start_week}+",
-                    description,
-                    "ensemble_no_semantic",
-                    "ensemble_with_semantic"
-                ))
+                cur.execute(
+                    query,
+                    (
+                        test_id,
+                        f"Semantic A/B {season} Week {start_week}+",
+                        description,
+                        "ensemble_no_semantic",
+                        "ensemble_with_semantic",
+                    ),
+                )
             conn.commit()
 
         logger.info(f"Created A/B test {test_id}")
@@ -155,7 +155,7 @@ class SemanticABTest:
         game_id: str,
         control_pred: dict,
         treatment_pred: dict,
-        actual: dict | None = None
+        actual: dict | None = None,
     ) -> None:
         """
         Record both control and treatment predictions for a game.
@@ -187,42 +187,46 @@ class SemanticABTest:
                 # Record control prediction
                 control_correct = None
                 if actual and actual.get("actual_spread") is not None:
-                    control_correct = (
-                        (control_pred.get("predicted_spread", 0) > 0) ==
-                        (actual["actual_spread"] > 0)
+                    control_correct = (control_pred.get("predicted_spread", 0) > 0) == (
+                        actual["actual_spread"] > 0
                     )
 
-                cur.execute(query, (
-                    test_id,
-                    game_id,
-                    "control",
-                    control_pred.get("predicted_spread"),
-                    control_pred.get("predicted_total"),
-                    control_pred.get("predicted_home_win_prob"),
-                    actual.get("actual_spread") if actual else None,
-                    actual.get("actual_total") if actual else None,
-                    control_correct
-                ))
+                cur.execute(
+                    query,
+                    (
+                        test_id,
+                        game_id,
+                        "control",
+                        control_pred.get("predicted_spread"),
+                        control_pred.get("predicted_total"),
+                        control_pred.get("predicted_home_win_prob"),
+                        actual.get("actual_spread") if actual else None,
+                        actual.get("actual_total") if actual else None,
+                        control_correct,
+                    ),
+                )
 
                 # Record treatment prediction
                 treatment_correct = None
                 if actual and actual.get("actual_spread") is not None:
-                    treatment_correct = (
-                        (treatment_pred.get("predicted_spread", 0) > 0) ==
-                        (actual["actual_spread"] > 0)
+                    treatment_correct = (treatment_pred.get("predicted_spread", 0) > 0) == (
+                        actual["actual_spread"] > 0
                     )
 
-                cur.execute(query, (
-                    test_id,
-                    game_id,
-                    "treatment",
-                    treatment_pred.get("predicted_spread"),
-                    treatment_pred.get("predicted_total"),
-                    treatment_pred.get("predicted_home_win_prob"),
-                    actual.get("actual_spread") if actual else None,
-                    actual.get("actual_total") if actual else None,
-                    treatment_correct
-                ))
+                cur.execute(
+                    query,
+                    (
+                        test_id,
+                        game_id,
+                        "treatment",
+                        treatment_pred.get("predicted_spread"),
+                        treatment_pred.get("predicted_total"),
+                        treatment_pred.get("predicted_home_win_prob"),
+                        actual.get("actual_spread") if actual else None,
+                        actual.get("actual_total") if actual else None,
+                        treatment_correct,
+                    ),
+                )
 
             conn.commit()
 
@@ -309,7 +313,7 @@ class SemanticABTest:
                 brier_improvement=0.0,
                 winner="inconclusive",
                 confidence=0.0,
-                recommendation="Need more data"
+                recommendation="Need more data",
             )
 
         games_analyzed = len(df)
@@ -326,14 +330,13 @@ class SemanticABTest:
 
         # McNemar test approximation for paired accuracy
         accuracy_p_value = self._mcnemar_test(
-            df["control_correct"].values,
-            df["treatment_correct"].values
+            df["control_correct"].values, df["treatment_correct"].values
         )
 
         # Paired t-test for MAE
         mae_p_value = self._paired_ttest(
             np.abs(df["control_spread"] - df["actual_spread"]).values,
-            np.abs(df["treatment_spread"] - df["actual_spread"]).values
+            np.abs(df["treatment_spread"] - df["actual_spread"]).values,
         )
 
         # Brier score (simplified - using spread prediction as probability proxy)
@@ -342,9 +345,7 @@ class SemanticABTest:
 
         # Determine winner
         winner, confidence, recommendation = self._determine_winner(
-            accuracy_lift, accuracy_p_value,
-            mae_improvement, mae_p_value,
-            games_analyzed
+            accuracy_lift, accuracy_p_value, mae_improvement, mae_p_value, games_analyzed
         )
 
         # Get feature importance
@@ -367,7 +368,7 @@ class SemanticABTest:
             winner=winner,
             confidence=confidence,
             recommendation=recommendation,
-            feature_importance=feature_importance
+            feature_importance=feature_importance,
         )
 
     def _mcnemar_test(self, control: np.ndarray, treatment: np.ndarray) -> float:
@@ -388,6 +389,7 @@ class SemanticABTest:
 
         # Convert to p-value (1 df)
         from scipy import stats
+
         try:
             p_value = 1 - stats.chi2.cdf(chi2, 1)
         except Exception:
@@ -402,6 +404,7 @@ class SemanticABTest:
 
         try:
             from scipy import stats
+
             _, p_value = stats.ttest_rel(control, treatment)
             return p_value if not np.isnan(p_value) else 1.0
         except Exception:
@@ -413,7 +416,7 @@ class SemanticABTest:
         accuracy_p: float,
         mae_improvement: float,
         mae_p: float,
-        games: int
+        games: int,
     ) -> tuple[str, float, str]:
         """Determine winner based on metrics."""
         if games < self.MIN_GAMES_FOR_SIGNIFICANCE:
@@ -431,13 +434,21 @@ class SemanticABTest:
         control_wins_mae = mae_improvement < 0 and mae_significant
 
         if treatment_wins_accuracy and treatment_wins_mae:
-            return "treatment", 0.95, "Treatment (semantic) significantly better on both accuracy and MAE"
+            return (
+                "treatment",
+                0.95,
+                "Treatment (semantic) significantly better on both accuracy and MAE",
+            )
         elif treatment_wins_accuracy:
             return "treatment", 0.85, "Treatment (semantic) significantly better on accuracy"
         elif treatment_wins_mae:
             return "treatment", 0.80, "Treatment (semantic) significantly better on MAE"
         elif control_wins_accuracy and control_wins_mae:
-            return "control", 0.90, "Control (no semantic) significantly better - consider removing semantic features"
+            return (
+                "control",
+                0.90,
+                "Control (no semantic) significantly better - consider removing semantic features",
+            )
         elif control_wins_accuracy or control_wins_mae:
             return "control", 0.75, "Control (no semantic) better on some metrics"
         else:
@@ -483,10 +494,7 @@ class SemanticABTest:
         if not feature_sums:
             return {}
 
-        importance = {
-            name: feature_sums[name] / feature_counts[name]
-            for name in feature_sums
-        }
+        importance = {name: feature_sums[name] / feature_counts[name] for name in feature_sums}
 
         # Normalize to sum to 1.0
         total = sum(abs(v) for v in importance.values())
@@ -522,7 +530,7 @@ class SemanticABTest:
                 start_week=row["start_week"] or 1,
                 control_name="no_semantic",
                 treatment_name="with_semantic",
-                status=row["status"]
+                status=row["status"],
             )
             for row in rows
         ]

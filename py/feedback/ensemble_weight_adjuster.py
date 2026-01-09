@@ -15,7 +15,6 @@ import sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import psycopg2
@@ -32,6 +31,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class WeightAdjustmentResult:
     """Result of weight adjustment analysis."""
+
     season: int
     week: int
     games_analyzed: int = 0
@@ -92,10 +92,7 @@ class EnsembleWeightAdjuster:
         return psycopg2.connect(**self.conn_params)
 
     def get_model_performance(
-        self,
-        season: int,
-        end_week: int,
-        lookback_weeks: int = 4
+        self, season: int, end_week: int, lookback_weeks: int = 4
     ) -> dict[str, dict]:
         """
         Get recent performance metrics by model.
@@ -134,10 +131,7 @@ class EnsembleWeightAdjuster:
             for row in rows
         }
 
-    def compute_inverse_mae_weights(
-        self,
-        performance: dict[str, dict]
-    ) -> dict[str, float]:
+    def compute_inverse_mae_weights(self, performance: dict[str, dict]) -> dict[str, float]:
         """
         Compute weights using inverse-MAE weighting.
 
@@ -148,7 +142,8 @@ class EnsembleWeightAdjuster:
 
         # Filter to models with enough games and valid MAE
         valid_models = {
-            k: v for k, v in performance.items()
+            k: v
+            for k, v in performance.items()
             if v["games"] >= 10 and v["mae"] is not None and v["mae"] > 0
         }
 
@@ -167,7 +162,7 @@ class EnsembleWeightAdjuster:
         self,
         raw_weights: dict[str, float],
         default_weights: dict[str, float] | None = None,
-        shrinkage: float | None = None
+        shrinkage: float | None = None,
     ) -> dict[str, float]:
         """
         Apply shrinkage toward default weights.
@@ -183,10 +178,7 @@ class EnsembleWeightAdjuster:
         for model in defaults:
             if model in raw_weights:
                 # Blend raw weight with default
-                adjusted[model] = (
-                    (1 - shrink) * raw_weights[model] +
-                    shrink * defaults[model]
-                )
+                adjusted[model] = (1 - shrink) * raw_weights[model] + shrink * defaults[model]
             else:
                 # Model not in recent data, use default
                 adjusted[model] = defaults[model]
@@ -202,7 +194,7 @@ class EnsembleWeightAdjuster:
         self,
         current_weights: dict[str, float],
         new_weights: dict[str, float],
-        max_change: float | None = None
+        max_change: float | None = None,
     ) -> dict[str, float]:
         """
         Limit weight changes to prevent drastic shifts.
@@ -230,11 +222,7 @@ class EnsembleWeightAdjuster:
 
         return limited
 
-    def should_adjust(
-        self,
-        current_mae: float,
-        new_mae: float | None
-    ) -> tuple[bool, str]:
+    def should_adjust(self, current_mae: float, new_mae: float | None) -> tuple[bool, str]:
         """
         Determine if weight adjustment is warranted.
 
@@ -250,14 +238,17 @@ class EnsembleWeightAdjuster:
         if improvement >= self.MAE_IMPROVEMENT_THRESHOLD:
             return True, f"MAE improvement of {improvement:.3f} exceeds threshold"
 
-        return False, f"MAE improvement of {improvement:.3f} below threshold ({self.MAE_IMPROVEMENT_THRESHOLD})"
+        return (
+            False,
+            f"MAE improvement of {improvement:.3f} below threshold ({self.MAE_IMPROVEMENT_THRESHOLD})",
+        )
 
     def compute_optimal_weights(
         self,
         season: int,
         end_week: int,
         lookback_weeks: int = 4,
-        current_weights: dict[str, float] | None = None
+        current_weights: dict[str, float] | None = None,
     ) -> WeightAdjustmentResult:
         """
         Compute optimal weights based on recent performance.
@@ -274,7 +265,7 @@ class EnsembleWeightAdjuster:
         result = WeightAdjustmentResult(
             season=season,
             week=end_week,
-            current_weights=current_weights or self.DEFAULT_WEIGHTS.copy()
+            current_weights=current_weights or self.DEFAULT_WEIGHTS.copy(),
         )
 
         # Get recent performance
@@ -297,9 +288,7 @@ class EnsembleWeightAdjuster:
         shrunk_weights = self.apply_shrinkage(raw_weights)
 
         # Limit changes
-        limited_weights = self.limit_weight_changes(
-            result.current_weights, shrunk_weights
-        )
+        limited_weights = self.limit_weight_changes(result.current_weights, shrunk_weights)
 
         result.suggested_weights = limited_weights
 
@@ -320,9 +309,7 @@ class EnsembleWeightAdjuster:
         return result
 
     def _compute_weighted_mae(
-        self,
-        performance: dict[str, dict],
-        weights: dict[str, float]
+        self, performance: dict[str, dict], weights: dict[str, float]
     ) -> float:
         """Compute weighted average MAE for a weight configuration."""
         if not performance:
@@ -342,11 +329,7 @@ class EnsembleWeightAdjuster:
 
         return weighted_mae / total_weight
 
-    def save_weight_adjustment(
-        self,
-        result: WeightAdjustmentResult,
-        applied: bool = False
-    ) -> None:
+    def save_weight_adjustment(self, result: WeightAdjustmentResult, applied: bool = False) -> None:
         """
         Save weight adjustment to feedback_runs.
 
@@ -372,19 +355,12 @@ class EnsembleWeightAdjuster:
 
         with self._get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(query, (
-                    json.dumps(adjustment_data),
-                    applied,
-                    result.season,
-                    result.week
-                ))
+                cur.execute(
+                    query, (json.dumps(adjustment_data), applied, result.season, result.week)
+                )
             conn.commit()
 
-    def apply_weights(
-        self,
-        weights: dict[str, float],
-        version: str | None = None
-    ) -> str:
+    def apply_weights(self, weights: dict[str, float], version: str | None = None) -> str:
         """
         Apply new weights to ensemble configuration.
 
@@ -434,7 +410,9 @@ if __name__ == "__main__":
     print(f"\nModel performance (2024 Weeks 14-17):")
     for model, perf in performance.items():
         if perf["games"] > 0:
-            print(f"  {model}: MAE={perf['mae']:.2f}, Acc={perf['accuracy']:.1%}, Games={perf['games']}")
+            print(
+                f"  {model}: MAE={perf['mae']:.2f}, Acc={perf['accuracy']:.1%}, Games={perf['games']}"
+            )
 
     # Compute optimal weights
     result = adjuster.compute_optimal_weights(2024, 17, lookback_weeks=4)

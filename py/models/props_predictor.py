@@ -319,9 +319,7 @@ class PropsPredictor:
         # Feature cache with 1-hour TTL
         self.feature_cache_ttl = 3600  # 1 hour in seconds
 
-    def _get_cache_key(
-        self, player_id: str, season: int, week: int, opponent: str
-    ) -> str:
+    def _get_cache_key(self, player_id: str, season: int, week: int, opponent: str) -> str:
         """Generate cache key for player features."""
         import hashlib
 
@@ -369,9 +367,7 @@ class PropsPredictor:
                 try:
                     cached = cache.get(cache_key)
                     if cached:
-                        logger.info(
-                            f"✅ Cache HIT: {player_id} features (week {week})"
-                        )
+                        logger.info(f"✅ Cache HIT: {player_id} features (week {week})")
                         return cached
                 except Exception as e:
                     logger.warning(f"Cache read failed: {e}")
@@ -571,13 +567,9 @@ class PropsPredictor:
             conn.close()
 
             if result is None:
-                logger.warning(
-                    f"No features found for {player_id} (season={season}, week={week})"
-                )
+                logger.warning(f"No features found for {player_id} (season={season}, week={week})")
                 # Try fallback to historical average
-                return self._get_historical_average_features(
-                    player_id, season, week
-                )
+                return self._get_historical_average_features(player_id, season, week)
 
             # Convert to dict and fill NaN with 0
             features = dict(result)
@@ -655,9 +647,7 @@ class PropsPredictor:
             conn.close()
 
             if result is None:
-                logger.error(
-                    f"No historical data found for {player_id} - cannot generate features"
-                )
+                logger.error(f"No historical data found for {player_id} - cannot generate features")
                 return None
 
             # Create feature dict with defaults for missing values
@@ -708,9 +698,7 @@ class PropsPredictor:
             features.update(default_features)
             features = {k: (v if v is not None else 0.0) for k, v in features.items()}
 
-            logger.info(
-                f"✅ Historical averages loaded for {player_id} (career stats)"
-            )
+            logger.info(f"✅ Historical averages loaded for {player_id} (career stats)")
             return features
 
         except Exception as e:
@@ -1260,9 +1248,7 @@ def main():
         )
 
         if features is None:
-            logger.error(
-                f"Failed to load features for {args.player_id} - cannot make prediction"
-            )
+            logger.error(f"Failed to load features for {args.player_id} - cannot make prediction")
             return
 
         result = predictor.predict_single(

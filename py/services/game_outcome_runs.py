@@ -73,28 +73,30 @@ def _store_predictions(predictions_df: pd.DataFrame, prediction_run_id: uuid4) -
     """Store predictions to database with proper connection management."""
     records = []
     for _, row in predictions_df.iterrows():
-        records.append({
-            'prediction_run_id': str(prediction_run_id),
-            'game_id': str(row['game_id']),
-            'season': _safe_int(row['season']),
-            'week': _safe_int(row['week']),
-            'home_team': row['home_team'],
-            'away_team': row['away_team'],
-            'kickoff': row['kickoff'],
-            'pred_home_spread': _safe_float(row['pred_home_spread']),
-            'pred_total': _safe_float(row['pred_total']),
-            'pred_home_win_prob': _safe_float(row['pred_home_win_prob']),
-            'spread_std': _safe_float(row['spread_std']),
-            'total_std': _safe_float(row['total_std']),
-            'vegas_spread': _safe_float(row['vegas_spread']),
-            'vegas_total': _safe_float(row['vegas_total']),
-            'actual_home_score': _safe_int(row.get('actual_home_score')),
-            'actual_away_score': _safe_int(row.get('actual_away_score')),
-            'actual_spread': _safe_float(row.get('actual_spread')),
-            'actual_total': _safe_float(row.get('actual_total')),
-            'model_version': row.get('model_version'),
-            'inference_time_ms': _safe_float(row.get('inference_time_ms')),
-        })
+        records.append(
+            {
+                "prediction_run_id": str(prediction_run_id),
+                "game_id": str(row["game_id"]),
+                "season": _safe_int(row["season"]),
+                "week": _safe_int(row["week"]),
+                "home_team": row["home_team"],
+                "away_team": row["away_team"],
+                "kickoff": row["kickoff"],
+                "pred_home_spread": _safe_float(row["pred_home_spread"]),
+                "pred_total": _safe_float(row["pred_total"]),
+                "pred_home_win_prob": _safe_float(row["pred_home_win_prob"]),
+                "spread_std": _safe_float(row["spread_std"]),
+                "total_std": _safe_float(row["total_std"]),
+                "vegas_spread": _safe_float(row["vegas_spread"]),
+                "vegas_total": _safe_float(row["vegas_total"]),
+                "actual_home_score": _safe_int(row.get("actual_home_score")),
+                "actual_away_score": _safe_int(row.get("actual_away_score")),
+                "actual_spread": _safe_float(row.get("actual_spread")),
+                "actual_total": _safe_float(row.get("actual_total")),
+                "model_version": row.get("model_version"),
+                "inference_time_ms": _safe_float(row.get("inference_time_ms")),
+            }
+        )
 
     if not records:
         return 0
@@ -144,16 +146,18 @@ def run_game_outcome_predictions(
         raise ValueError(f"No games found for season {target_season}")
 
     if selected_week:
-        games_df = games_df[games_df['week'] == selected_week]
+        games_df = games_df[games_df["week"] == selected_week]
         if games_df.empty:
             raise ValueError(f"No games for season {target_season} week {selected_week}")
 
-    weeks = sorted(games_df['week'].unique())
+    weeks = sorted(games_df["week"].unique())
     prediction_run_id = uuid4()
     if verbose:
         logger.info(
             "Starting GameOutcomeModel prediction run %s for season %s (weeks: %s)",
-            prediction_run_id, target_season, weeks
+            prediction_run_id,
+            target_season,
+            weeks,
         )
 
     model = GameOutcomeModel(model_dir=model_dir or DEFAULT_MODEL_DIR)
@@ -162,54 +166,67 @@ def run_game_outcome_predictions(
     all_predictions: List[Dict[str, Any]] = []
 
     for week in weeks:
-        week_games = games_df[games_df['week'] == week]
-        batch_payload = [{
-            'game_id': game['game_id'],
-            'home_team': game['home_team'],
-            'away_team': game['away_team'],
-            'season': int(game['season']),
-            'week': int(game['week']),
-            'kickoff': game['kickoff'],
-        } for _, game in week_games.iterrows()]
+        week_games = games_df[games_df["week"] == week]
+        batch_payload = [
+            {
+                "game_id": game["game_id"],
+                "home_team": game["home_team"],
+                "away_team": game["away_team"],
+                "season": int(game["season"]),
+                "week": int(game["week"]),
+                "kickoff": game["kickoff"],
+            }
+            for _, game in week_games.iterrows()
+        ]
 
         batch_predictions = model.predict_games(batch_payload)
         predictions_by_id = {
-            pred['game_id']: pred for pred in batch_predictions if pred.get('game_id')
+            pred["game_id"]: pred for pred in batch_predictions if pred.get("game_id")
         }
 
         for _, game in week_games.iterrows():
-            pred = predictions_by_id.get(game['game_id'])
+            pred = predictions_by_id.get(game["game_id"])
             if not pred:
-                logger.warning("Missing prediction for %s", game['game_id'])
+                logger.warning("Missing prediction for %s", game["game_id"])
                 continue
 
             # Skip predictions that failed (have error key instead of results)
-            if 'error' in pred:
-                logger.warning("Prediction failed for %s: %s", game['game_id'], pred['error'])
+            if "error" in pred:
+                logger.warning("Prediction failed for %s: %s", game["game_id"], pred["error"])
                 continue
 
-            all_predictions.append({
-                'prediction_run_id': str(prediction_run_id),
-                'game_id': game['game_id'],
-                'season': int(game['season']),
-                'week': int(game['week']),
-                'home_team': game['home_team'],
-                'away_team': game['away_team'],
-                'kickoff': game['kickoff'],
-                'pred_home_spread': _safe_float(pred['home_spread']),
-                'pred_total': _safe_float(pred['total_points']),
-                'pred_home_win_prob': _safe_float(pred['home_win_probability']),
-                'spread_std': _safe_float(pred['spread_std']),
-                'total_std': _safe_float(pred['total_std']),
-                'vegas_spread': _safe_float(game['vegas_spread']),
-                'vegas_total': _safe_float(game['vegas_total']),
-                'actual_home_score': _safe_int(game['home_score']),
-                'actual_away_score': _safe_int(game['away_score']),
-                'actual_spread': _safe_float(game['home_score'] - game['away_score']) if pd.notna(game['home_score']) else None,
-                'actual_total': _safe_float(game['home_score'] + game['away_score']) if pd.notna(game['home_score']) else None,
-                'model_version': model.metadata.get('version', 'v1.0.0'),
-                'inference_time_ms': _safe_float(pred.get('inference_time_ms')),
-            })
+            all_predictions.append(
+                {
+                    "prediction_run_id": str(prediction_run_id),
+                    "game_id": game["game_id"],
+                    "season": int(game["season"]),
+                    "week": int(game["week"]),
+                    "home_team": game["home_team"],
+                    "away_team": game["away_team"],
+                    "kickoff": game["kickoff"],
+                    "pred_home_spread": _safe_float(pred["home_spread"]),
+                    "pred_total": _safe_float(pred["total_points"]),
+                    "pred_home_win_prob": _safe_float(pred["home_win_probability"]),
+                    "spread_std": _safe_float(pred["spread_std"]),
+                    "total_std": _safe_float(pred["total_std"]),
+                    "vegas_spread": _safe_float(game["vegas_spread"]),
+                    "vegas_total": _safe_float(game["vegas_total"]),
+                    "actual_home_score": _safe_int(game["home_score"]),
+                    "actual_away_score": _safe_int(game["away_score"]),
+                    "actual_spread": (
+                        _safe_float(game["home_score"] - game["away_score"])
+                        if pd.notna(game["home_score"])
+                        else None
+                    ),
+                    "actual_total": (
+                        _safe_float(game["home_score"] + game["away_score"])
+                        if pd.notna(game["home_score"])
+                        else None
+                    ),
+                    "model_version": model.metadata.get("version", "v1.0.0"),
+                    "inference_time_ms": _safe_float(pred.get("inference_time_ms")),
+                }
+            )
 
     predictions_df = pd.DataFrame(all_predictions)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -234,7 +251,10 @@ def run_game_outcome_predictions(
     if verbose:
         logger.info(
             "Completed run %s: %s games (stored=%s, csv=%s)",
-            prediction_run_id, summary["total_games"], stored, csv_path
+            prediction_run_id,
+            summary["total_games"],
+            stored,
+            csv_path,
         )
 
     return summary

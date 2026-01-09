@@ -10,13 +10,11 @@ Usage:
     selector.apply_selection(selection)
 """
 
-import json
 import logging
 import sys
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -34,13 +32,14 @@ logger = logging.getLogger(__name__)
 @dataclass
 class FeatureSelectionResult:
     """Result of feature selection evaluation."""
+
     season: int
     week: int
     active: list[str] = field(default_factory=list)
     disabled: list[str] = field(default_factory=list)
     probation: list[str] = field(default_factory=list)
     promoted: list[str] = field(default_factory=list)  # Just moved to active
-    demoted: list[str] = field(default_factory=list)   # Just moved to disabled/probation
+    demoted: list[str] = field(default_factory=list)  # Just moved to disabled/probation
     suggested_new: list[str] = field(default_factory=list)  # New features from meta-learner
     changes_made: int = 0
 
@@ -62,10 +61,10 @@ class AutoFeatureSelector:
 
     # Thresholds
     NEGATIVE_WEEKS_TO_DISABLE = 4  # Consecutive weeks with negative contribution
-    POSITIVE_WEEKS_TO_PROMOTE = 2   # Consecutive weeks with positive contribution
-    CONTRIBUTION_POSITIVE = 0.02    # Threshold for "positive" contribution
-    CONTRIBUTION_NEGATIVE = -0.02   # Threshold for "negative" contribution
-    MIN_SAMPLES_TO_EVALUATE = 20    # Minimum games to evaluate a feature
+    POSITIVE_WEEKS_TO_PROMOTE = 2  # Consecutive weeks with positive contribution
+    CONTRIBUTION_POSITIVE = 0.02  # Threshold for "positive" contribution
+    CONTRIBUTION_NEGATIVE = -0.02  # Threshold for "negative" contribution
+    MIN_SAMPLES_TO_EVALUATE = 20  # Minimum games to evaluate a feature
 
     def __init__(
         self,
@@ -116,10 +115,7 @@ class AutoFeatureSelector:
         return {row["feature_name"]: dict(row) for row in rows}
 
     def evaluate_features(
-        self,
-        season: int,
-        week: int,
-        lookback_weeks: int = 4
+        self, season: int, week: int, lookback_weeks: int = 4
     ) -> FeatureSelectionResult:
         """
         Evaluate all features and determine which should be active/disabled.
@@ -176,9 +172,7 @@ class AutoFeatureSelector:
                 continue
 
             # Apply rules
-            new_status = self._determine_status(
-                mean_contrib, current_status, weeks_active
-            )
+            new_status = self._determine_status(mean_contrib, current_status, weeks_active)
 
             # Track changes
             if new_status != current_status:
@@ -204,10 +198,7 @@ class AutoFeatureSelector:
         return result
 
     def _determine_status(
-        self,
-        mean_contribution: float,
-        current_status: str,
-        weeks_active: int
+        self, mean_contribution: float, current_status: str, weeks_active: int
     ) -> str:
         """
         Determine what status a feature should have.
@@ -265,11 +256,7 @@ class AutoFeatureSelector:
         except Exception:
             return []
 
-    def apply_selection(
-        self,
-        selection: FeatureSelectionResult,
-        dry_run: bool = False
-    ) -> None:
+    def apply_selection(self, selection: FeatureSelectionResult, dry_run: bool = False) -> None:
         """
         Apply feature selection to database.
 
@@ -398,12 +385,7 @@ class AutoFeatureSelector:
                 cur.execute(query)
                 return {row["feature_name"]: row["weight_multiplier"] for row in cur.fetchall()}
 
-    def manually_set_status(
-        self,
-        feature_name: str,
-        status: str,
-        reason: str
-    ) -> None:
+    def manually_set_status(self, feature_name: str, status: str, reason: str) -> None:
         """
         Manually set a feature's status.
 

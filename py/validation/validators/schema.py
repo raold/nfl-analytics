@@ -104,17 +104,19 @@ class SchemaValidator(DataFrameValidator):
         result = ValidationResult(validator_name=self.name)
 
         if not isinstance(data, pd.DataFrame):
-            result.add_issue(ValidationIssue(
-                code="SCHEMA_001",
-                message="Data must be a pandas DataFrame",
-                severity=ValidationSeverity.ERROR,
-                category=self.category,
-            ))
+            result.add_issue(
+                ValidationIssue(
+                    code="SCHEMA_001",
+                    message="Data must be a pandas DataFrame",
+                    severity=ValidationSeverity.ERROR,
+                    category=self.category,
+                )
+            )
             return result
 
         df = data
         context = context or {}
-        schema_name = context.get('schema', 'game_features')
+        schema_name = context.get("schema", "game_features")
 
         # Check 1: Duplicate columns
         self._check_duplicate_columns(df, result)
@@ -122,21 +124,23 @@ class SchemaValidator(DataFrameValidator):
         # Check 2: Required columns if schema specified
         if schema_name in self.SCHEMAS:
             schema = self.SCHEMAS[schema_name]
-            self._check_required_columns(df, schema.get('required', []), result)
-            self._check_column_types(df, schema.get('types', {}), result)
-            self._check_naming_conventions(df, schema.get('prefixes', []), result)
+            self._check_required_columns(df, schema.get("required", []), result)
+            self._check_column_types(df, schema.get("types", {}), result)
+            self._check_naming_conventions(df, schema.get("prefixes", []), result)
         else:
             # Basic checks for unknown schemas
             self._check_basic_structure(df, result)
 
         # Check 3: Empty DataFrame
         if len(df) == 0:
-            result.add_issue(ValidationIssue(
-                code="SCHEMA_005",
-                message="DataFrame is empty (0 rows)",
-                severity=ValidationSeverity.WARNING,
-                category=self.category,
-            ))
+            result.add_issue(
+                ValidationIssue(
+                    code="SCHEMA_005",
+                    message="DataFrame is empty (0 rows)",
+                    severity=ValidationSeverity.WARNING,
+                    category=self.category,
+                )
+            )
 
         return result
 
@@ -148,14 +152,16 @@ class SchemaValidator(DataFrameValidator):
         """Check for duplicate column names."""
         duplicates = df.columns[df.columns.duplicated()].tolist()
         if duplicates:
-            result.add_issue(ValidationIssue(
-                code="SCHEMA_002",
-                message=f"Duplicate column names found: {duplicates}",
-                severity=ValidationSeverity.ERROR,
-                category=self.category,
-                details={"duplicate_columns": duplicates},
-                suggestion="Rename or remove duplicate columns",
-            ))
+            result.add_issue(
+                ValidationIssue(
+                    code="SCHEMA_002",
+                    message=f"Duplicate column names found: {duplicates}",
+                    severity=ValidationSeverity.ERROR,
+                    category=self.category,
+                    details={"duplicate_columns": duplicates},
+                    suggestion="Rename or remove duplicate columns",
+                )
+            )
 
     def _check_column_types(
         self,
@@ -170,14 +176,16 @@ class SchemaValidator(DataFrameValidator):
 
             actual_type = str(df[col].dtype)
             if actual_type not in expected:
-                result.add_issue(ValidationIssue(
-                    code="SCHEMA_003",
-                    message=f"Column '{col}' has type '{actual_type}', expected one of {expected}",
-                    severity=ValidationSeverity.WARNING,
-                    category=self.category,
-                    details={"column": col, "actual": actual_type, "expected": expected},
-                    suggestion=f"Convert column with df['{col}'].astype(...)",
-                ))
+                result.add_issue(
+                    ValidationIssue(
+                        code="SCHEMA_003",
+                        message=f"Column '{col}' has type '{actual_type}', expected one of {expected}",
+                        severity=ValidationSeverity.WARNING,
+                        category=self.category,
+                        details={"column": col, "actual": actual_type, "expected": expected},
+                        suggestion=f"Convert column with df['{col}'].astype(...)",
+                    )
+                )
 
     def _check_naming_conventions(
         self,
@@ -190,8 +198,17 @@ class SchemaValidator(DataFrameValidator):
             return
 
         # Skip known special columns
-        skip_cols = {'season', 'week', 'game_id', 'home_team', 'away_team',
-                     'spread_actual', 'total_actual', 'home_score', 'away_score'}
+        skip_cols = {
+            "season",
+            "week",
+            "game_id",
+            "home_team",
+            "away_team",
+            "spread_actual",
+            "total_actual",
+            "home_score",
+            "away_score",
+        }
 
         non_conforming = []
         for col in df.columns:
@@ -202,17 +219,19 @@ class SchemaValidator(DataFrameValidator):
 
         if non_conforming and len(non_conforming) < len(df.columns) * 0.5:
             # Only warn if it's a minority of columns
-            result.add_issue(ValidationIssue(
-                code="SCHEMA_004",
-                message=f"{len(non_conforming)} columns don't follow naming conventions",
-                severity=ValidationSeverity.INFO,
-                category=self.category,
-                details={
-                    "non_conforming": non_conforming[:10],  # Limit to 10
-                    "valid_prefixes": valid_prefixes,
-                },
-                suggestion="Consider using standard prefixes: " + ", ".join(valid_prefixes),
-            ))
+            result.add_issue(
+                ValidationIssue(
+                    code="SCHEMA_004",
+                    message=f"{len(non_conforming)} columns don't follow naming conventions",
+                    severity=ValidationSeverity.INFO,
+                    category=self.category,
+                    details={
+                        "non_conforming": non_conforming[:10],  # Limit to 10
+                        "valid_prefixes": valid_prefixes,
+                    },
+                    suggestion="Consider using standard prefixes: " + ", ".join(valid_prefixes),
+                )
+            )
 
     def _check_basic_structure(
         self,
@@ -222,22 +241,26 @@ class SchemaValidator(DataFrameValidator):
         """Basic structural checks for unknown schemas."""
         # Check for extremely wide DataFrames
         if len(df.columns) > 500:
-            result.add_issue(ValidationIssue(
-                code="SCHEMA_006",
-                message=f"DataFrame has {len(df.columns)} columns (very wide)",
-                severity=ValidationSeverity.INFO,
-                category=self.category,
-                suggestion="Consider feature selection to reduce dimensionality",
-            ))
+            result.add_issue(
+                ValidationIssue(
+                    code="SCHEMA_006",
+                    message=f"DataFrame has {len(df.columns)} columns (very wide)",
+                    severity=ValidationSeverity.INFO,
+                    category=self.category,
+                    suggestion="Consider feature selection to reduce dimensionality",
+                )
+            )
 
         # Check for all-object columns (potential string pollution)
-        object_cols = df.select_dtypes(include=['object']).columns.tolist()
+        object_cols = df.select_dtypes(include=["object"]).columns.tolist()
         if len(object_cols) > len(df.columns) * 0.5:
-            result.add_issue(ValidationIssue(
-                code="SCHEMA_007",
-                message=f"Majority of columns ({len(object_cols)}/{len(df.columns)}) are object type",
-                severity=ValidationSeverity.WARNING,
-                category=self.category,
-                details={"object_columns": object_cols[:20]},
-                suggestion="Convert numeric strings to numeric types",
-            ))
+            result.add_issue(
+                ValidationIssue(
+                    code="SCHEMA_007",
+                    message=f"Majority of columns ({len(object_cols)}/{len(df.columns)}) are object type",
+                    severity=ValidationSeverity.WARNING,
+                    category=self.category,
+                    details={"object_columns": object_cols[:20]},
+                    suggestion="Convert numeric strings to numeric types",
+                )
+            )

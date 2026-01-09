@@ -24,7 +24,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import psycopg2
-from psycopg2.extras import RealDictCursor, execute_values
+from psycopg2.extras import RealDictCursor
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class CausalNode:
     """A node in the causal graph."""
+
     stage: str  # news, sentiment, feature, prediction, outcome
     timestamp: datetime | None
     value: Any
@@ -43,25 +44,31 @@ class CausalNode:
 @dataclass
 class CausalChain:
     """Complete causal chain for a prediction."""
+
     game_id: str
     nodes: dict[str, CausalNode] = field(default_factory=dict)
 
     # Error attribution
     error: float | None = None
     error_direction: str = ""  # "over" or "under"
-    root_cause: str = ""       # Which stage likely caused the error
+    root_cause: str = ""  # Which stage likely caused the error
     root_cause_confidence: float = 0.0
 
     def to_dict(self) -> dict:
         return {
             "game_id": self.game_id,
-            "nodes": {k: {
-                "stage": v.stage,
-                "timestamp": str(v.timestamp) if v.timestamp else None,
-                "value": v.value if not isinstance(v.value, (dict, list)) else json.dumps(v.value),
-                "model_version": v.model_version,
-                "confidence": v.confidence,
-            } for k, v in self.nodes.items()},
+            "nodes": {
+                k: {
+                    "stage": v.stage,
+                    "timestamp": str(v.timestamp) if v.timestamp else None,
+                    "value": (
+                        v.value if not isinstance(v.value, (dict, list)) else json.dumps(v.value)
+                    ),
+                    "model_version": v.model_version,
+                    "confidence": v.confidence,
+                }
+                for k, v in self.nodes.items()
+            },
             "error": self.error,
             "error_direction": self.error_direction,
             "root_cause": self.root_cause,
@@ -72,6 +79,7 @@ class CausalChain:
 @dataclass
 class ErrorDiagnosis:
     """Diagnosis of what went wrong."""
+
     game_id: str
     error: float
     error_direction: str
@@ -222,12 +230,9 @@ class TemporalCausalityTracker:
 
         with self._get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(query, (
-                    timestamp,
-                    json.dumps(sentiment_scores),
-                    model_version,
-                    game_id
-                ))
+                cur.execute(
+                    query, (timestamp, json.dumps(sentiment_scores), model_version, game_id)
+                )
             conn.commit()
 
     def record_features(
@@ -257,12 +262,9 @@ class TemporalCausalityTracker:
 
         with self._get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(query, (
-                    timestamp,
-                    json.dumps(feature_summary),
-                    extractor_version,
-                    game_id
-                ))
+                cur.execute(
+                    query, (timestamp, json.dumps(feature_summary), extractor_version, game_id)
+                )
             conn.commit()
 
     def record_prediction(
@@ -293,12 +295,7 @@ class TemporalCausalityTracker:
 
         with self._get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(query, (
-                    timestamp,
-                    json.dumps(prediction_data),
-                    model_version,
-                    game_id
-                ))
+                cur.execute(query, (timestamp, json.dumps(prediction_data), model_version, game_id))
             conn.commit()
 
     def record_outcome(
@@ -346,13 +343,10 @@ class TemporalCausalityTracker:
 
         with self._get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(update_query, (
-                    timestamp,
-                    json.dumps(outcome_data),
-                    error,
-                    error_direction,
-                    game_id
-                ))
+                cur.execute(
+                    update_query,
+                    (timestamp, json.dumps(outcome_data), error, error_direction, game_id),
+                )
             conn.commit()
 
     def trace_prediction(self, game_id: str) -> CausalChain | None:
@@ -419,7 +413,9 @@ class TemporalCausalityTracker:
         chain.error = float(row["prediction_error"]) if row["prediction_error"] else None
         chain.error_direction = row["error_direction"] or ""
         chain.root_cause = row["root_cause"] or ""
-        chain.root_cause_confidence = float(row["root_cause_confidence"]) if row["root_cause_confidence"] else 0.0
+        chain.root_cause_confidence = (
+            float(row["root_cause_confidence"]) if row["root_cause_confidence"] else 0.0
+        )
 
         return chain
 
@@ -452,11 +448,11 @@ class TemporalCausalityTracker:
 
         # Initialize probabilities
         probs = {
-            "news": 0.1,       # Missing/wrong news
+            "news": 0.1,  # Missing/wrong news
             "sentiment": 0.2,  # Wrong sentiment extraction
-            "feature": 0.2,   # Feature extraction error
-            "prediction": 0.3, # Model weights wrong
-            "random": 0.2,    # Irreducible noise
+            "feature": 0.2,  # Feature extraction error
+            "prediction": 0.3,  # Model weights wrong
+            "random": 0.2,  # Irreducible noise
         }
 
         # Adjust based on available data
@@ -464,7 +460,9 @@ class TemporalCausalityTracker:
             sentiment = chain.nodes["sentiment"].value
             # Low sentiment values suggest weak signal
             if isinstance(sentiment, dict):
-                avg_sentiment = np.mean([abs(v) for v in sentiment.values() if isinstance(v, (int, float))])
+                avg_sentiment = np.mean(
+                    [abs(v) for v in sentiment.values() if isinstance(v, (int, float))]
+                )
                 if avg_sentiment < 0.1:
                     probs["sentiment"] += 0.15
                     probs["prediction"] -= 0.1
@@ -546,12 +544,15 @@ class TemporalCausalityTracker:
 
         with self._get_connection() as conn:
             with conn.cursor() as cur:
-                cur.execute(query, (
-                    diagnosis.primary_cause,
-                    diagnosis.stage_probabilities.get(diagnosis.primary_cause, 0),
-                    json.dumps(diagnosis_json),
-                    game_id
-                ))
+                cur.execute(
+                    query,
+                    (
+                        diagnosis.primary_cause,
+                        diagnosis.stage_probabilities.get(diagnosis.primary_cause, 0),
+                        json.dumps(diagnosis_json),
+                        game_id,
+                    ),
+                )
             conn.commit()
 
     def get_root_cause_summary(

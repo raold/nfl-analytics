@@ -60,60 +60,58 @@ logger = logging.getLogger(__name__)
 # Higher values = more stable/predictive features
 FEATURE_STABILITY = {
     # Highly stable (correlation > 0.60)
-    "target_share": 1.0,              # ~0.70 YoY correlation
-    "targets_per_route_run": 1.0,     # ~0.70 YoY correlation
-    "yards_per_route_run": 0.85,      # ~0.60 YoY correlation
-    "yprr": 0.85,                     # Alias for yards_per_route_run
-    "qb_epa_per_attempt": 0.85,       # ~0.60 YoY correlation
-    "cpoe": 0.80,                     # Completion % over expected ~0.55 corr
-    "air_yards_share": 0.80,          # ~0.55 YoY correlation
-    "adot": 0.75,                     # Average depth of target ~0.50 corr
-
+    "target_share": 1.0,  # ~0.70 YoY correlation
+    "targets_per_route_run": 1.0,  # ~0.70 YoY correlation
+    "yards_per_route_run": 0.85,  # ~0.60 YoY correlation
+    "yprr": 0.85,  # Alias for yards_per_route_run
+    "qb_epa_per_attempt": 0.85,  # ~0.60 YoY correlation
+    "cpoe": 0.80,  # Completion % over expected ~0.55 corr
+    "air_yards_share": 0.80,  # ~0.55 YoY correlation
+    "adot": 0.75,  # Average depth of target ~0.50 corr
     # Moderately stable (correlation 0.40-0.60)
-    "sack_avoidance": 0.70,           # ~0.50 YoY correlation
-    "time_to_throw": 0.70,            # ~0.50 YoY correlation
-    "passer_rating": 0.65,            # ~0.45 YoY correlation
-    "qbr": 0.65,                      # ~0.45 YoY correlation
-    "separation": 0.65,               # ~0.45 YoY correlation (NextGen)
-    "pressure_rate": 0.60,            # ~0.40 YoY correlation
-    "blitz_rate": 0.55,               # ~0.35 YoY correlation
-
+    "sack_avoidance": 0.70,  # ~0.50 YoY correlation
+    "time_to_throw": 0.70,  # ~0.50 YoY correlation
+    "passer_rating": 0.65,  # ~0.45 YoY correlation
+    "qbr": 0.65,  # ~0.45 YoY correlation
+    "separation": 0.65,  # ~0.45 YoY correlation (NextGen)
+    "pressure_rate": 0.60,  # ~0.40 YoY correlation
+    "blitz_rate": 0.55,  # ~0.35 YoY correlation
     # Weakly stable (correlation 0.20-0.40)
-    "rb_yards_after_contact": 0.45,   # ~0.30 YoY correlation
+    "rb_yards_after_contact": 0.45,  # ~0.30 YoY correlation
     "rb_tackle_for_loss_rate": 0.40,  # ~0.30 YoY correlation
-    "rushing_success_rate": 0.40,     # ~0.25 YoY correlation
-    "yac": 0.45,                      # Yards after catch ~0.30 corr
-
+    "rushing_success_rate": 0.40,  # ~0.25 YoY correlation
+    "yac": 0.45,  # Yards after catch ~0.30 corr
     # Essentially noise (correlation < 0.20)
-    "rb_epa_per_attempt": 0.30,       # ~0.05 YoY correlation - downweight!
-    "rushing_epa": 0.30,              # ~0.05 YoY correlation
-    "fumble_rate": 0.35,              # ~0.15 YoY correlation (random)
-    "int_rate": 0.40,                 # ~0.20 YoY correlation (some QB skill)
+    "rb_epa_per_attempt": 0.30,  # ~0.05 YoY correlation - downweight!
+    "rushing_epa": 0.30,  # ~0.05 YoY correlation
+    "fumble_rate": 0.35,  # ~0.15 YoY correlation (random)
+    "int_rate": 0.40,  # ~0.20 YoY correlation (some QB skill)
 }
 
 # Position-specific stability adjustments
 # RB stats are inherently less stable than WR/QB stats
 POSITION_STABILITY_MULTIPLIER = {
-    "QB": 1.0,    # Quarterback stats are most stable
-    "WR": 0.95,   # Wide receiver stats slightly less stable
-    "TE": 0.90,   # Tight end stats moderately stable
-    "RB": 0.65,   # Running back stats are largely unpredictable
+    "QB": 1.0,  # Quarterback stats are most stable
+    "WR": 0.95,  # Wide receiver stats slightly less stable
+    "TE": 0.90,  # Tight end stats moderately stable
+    "RB": 0.65,  # Running back stats are largely unpredictable
 }
 
 # Stat type stability (some props are inherently more predictable)
 STAT_TYPE_STABILITY = {
-    "passing_yards": 0.85,     # Fairly stable
-    "passing_tds": 0.70,       # Moderate stability (more variance)
-    "rushing_yards": 0.50,     # Low stability (depends on game script)
-    "rushing_tds": 0.40,       # Very low (highly random)
-    "receiving_yards": 0.80,   # Moderately stable
-    "receptions": 0.85,        # Very stable (target share driven)
-    "receiving_tds": 0.45,     # Low (red zone dependent)
+    "passing_yards": 0.85,  # Fairly stable
+    "passing_tds": 0.70,  # Moderate stability (more variance)
+    "rushing_yards": 0.50,  # Low stability (depends on game script)
+    "rushing_tds": 0.40,  # Very low (highly random)
+    "receiving_yards": 0.80,  # Moderately stable
+    "receptions": 0.85,  # Very stable (target share driven)
+    "receiving_tds": 0.45,  # Low (red zone dependent)
 }
 
 
 class Position(Enum):
     """NFL positions with stability characteristics."""
+
     QB = "QB"
     WR = "WR"
     TE = "TE"
@@ -122,6 +120,7 @@ class Position(Enum):
 
 class StatType(Enum):
     """Prop stat types."""
+
     PASSING_YARDS = "passing_yards"
     PASSING_TDS = "passing_tds"
     RUSHING_YARDS = "rushing_yards"
@@ -166,9 +165,7 @@ def get_feature_stability(feature_name: str) -> float:
 
 
 def apply_stability_weights(
-    features: pd.DataFrame,
-    feature_columns: list[str] | None = None,
-    inplace: bool = False
+    features: pd.DataFrame, feature_columns: list[str] | None = None, inplace: bool = False
 ) -> pd.DataFrame:
     """
     Apply stability weights to a feature DataFrame.
@@ -238,15 +235,14 @@ class PropsStabilityWeighter:
         >>> adj
         0.966  # Uncertainty slightly decreased
     """
+
     base_uncertainty_multiplier: float = 1.0
-    position_weights: dict[str, float] = field(default_factory=lambda: POSITION_STABILITY_MULTIPLIER.copy())
+    position_weights: dict[str, float] = field(
+        default_factory=lambda: POSITION_STABILITY_MULTIPLIER.copy()
+    )
     stat_type_weights: dict[str, float] = field(default_factory=lambda: STAT_TYPE_STABILITY.copy())
 
-    def get_uncertainty_adjustment(
-        self,
-        position: str,
-        stat_type: str
-    ) -> float:
+    def get_uncertainty_adjustment(self, position: str, stat_type: str) -> float:
         """
         Get uncertainty adjustment factor based on position and stat type.
 
@@ -282,7 +278,7 @@ class PropsStabilityWeighter:
         uncertainty: float,
         position: str,
         stat_type: str,
-        features: dict[str, float] | None = None
+        features: dict[str, float] | None = None,
     ) -> dict[str, Any]:
         """
         Adjust prediction uncertainty based on stability weights.
@@ -303,9 +299,7 @@ class PropsStabilityWeighter:
         # Feature-based adjustment (if features provided)
         if features:
             # Calculate average stability of input features
-            feature_stabilities = [
-                get_feature_stability(k) for k in features.keys()
-            ]
+            feature_stabilities = [get_feature_stability(k) for k in features.keys()]
             avg_stability = np.mean(feature_stabilities) if feature_stabilities else 0.70
 
             # Adjust uncertainty based on feature stability
@@ -327,11 +321,7 @@ class PropsStabilityWeighter:
             "stat_type": stat_type,
         }
 
-    def get_confidence_level(
-        self,
-        position: str,
-        stat_type: str
-    ) -> str:
+    def get_confidence_level(self, position: str, stat_type: str) -> str:
         """
         Get qualitative confidence level for a prop prediction.
 
@@ -373,7 +363,13 @@ def get_prop_predictability_ranking() -> list[dict[str, Any]]:
     for pos, pos_weight in POSITION_STABILITY_MULTIPLIER.items():
         for stat, stat_weight in STAT_TYPE_STABILITY.items():
             # Filter relevant combinations
-            if pos == "QB" and stat in ["rushing_yards", "rushing_tds", "receiving_yards", "receptions", "receiving_tds"]:
+            if pos == "QB" and stat in [
+                "rushing_yards",
+                "rushing_tds",
+                "receiving_yards",
+                "receptions",
+                "receiving_tds",
+            ]:
                 continue
             if pos in ["WR", "TE"] and stat in ["passing_yards", "passing_tds"]:
                 continue
@@ -389,12 +385,14 @@ def get_prop_predictability_ranking() -> list[dict[str, Any]]:
             else:
                 confidence = "LOW"
 
-            rankings.append({
-                "position": pos,
-                "stat_type": stat,
-                "predictability": round(predictability, 3),
-                "confidence": confidence,
-            })
+            rankings.append(
+                {
+                    "position": pos,
+                    "stat_type": stat,
+                    "predictability": round(predictability, 3),
+                    "confidence": confidence,
+                }
+            )
 
     # Sort by predictability descending
     rankings.sort(key=lambda x: x["predictability"], reverse=True)
@@ -405,6 +403,7 @@ def get_prop_predictability_ranking() -> list[dict[str, Any]]:
 # ============================================================================
 # Integration with Ensemble
 # ============================================================================
+
 
 def create_stability_weighted_ensemble_config() -> dict[str, Any]:
     """
@@ -442,11 +441,15 @@ if __name__ == "__main__":
     print("-" * 50)
     rankings = get_prop_predictability_ranking()
     for i, r in enumerate(rankings[:10], 1):
-        print(f"  {i:2d}. {r['position']:3s} {r['stat_type']:18s} {r['predictability']:.3f} ({r['confidence']})")
+        print(
+            f"  {i:2d}. {r['position']:3s} {r['stat_type']:18s} {r['predictability']:.3f} ({r['confidence']})"
+        )
 
     print("\n  ...")
     for r in rankings[-3:]:
-        print(f"      {r['position']:3s} {r['stat_type']:18s} {r['predictability']:.3f} ({r['confidence']})")
+        print(
+            f"      {r['position']:3s} {r['stat_type']:18s} {r['predictability']:.3f} ({r['confidence']})"
+        )
 
     # Demonstrate weighter
     print("\n🎯 Uncertainty Adjustments by Prop Type:")
@@ -478,7 +481,9 @@ if __name__ == "__main__":
         position="RB",
         stat_type="rushing_yards",
     )
-    print(f"  RB Rushing: {rb_result['prediction']:.1f} ± {rb_result['raw_uncertainty']:.1f} → ±{rb_result['adjusted_uncertainty']:.1f} yards")
+    print(
+        f"  RB Rushing: {rb_result['prediction']:.1f} ± {rb_result['raw_uncertainty']:.1f} → ±{rb_result['adjusted_uncertainty']:.1f} yards"
+    )
     print(f"              (×{rb_result['uncertainty_multiplier']:.3f} uncertainty increase)")
 
     # WR receptions (high confidence)
@@ -488,7 +493,9 @@ if __name__ == "__main__":
         position="WR",
         stat_type="receptions",
     )
-    print(f"  WR Receptions: {wr_result['prediction']:.1f} ± {wr_result['raw_uncertainty']:.1f} → ±{wr_result['adjusted_uncertainty']:.1f}")
+    print(
+        f"  WR Receptions: {wr_result['prediction']:.1f} ± {wr_result['raw_uncertainty']:.1f} → ±{wr_result['adjusted_uncertainty']:.1f}"
+    )
     print(f"                 (×{wr_result['uncertainty_multiplier']:.3f} uncertainty)")
 
     print("\n✅ Props Stability Weights module ready!")

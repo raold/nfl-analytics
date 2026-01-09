@@ -10,13 +10,11 @@ Usage:
     suggestions = evolver.suggest_prompt_improvements(analysis)
 """
 
-import json
 import logging
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import psycopg2
@@ -33,6 +31,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class FailureAnalysis:
     """Analysis of why a semantic feature led to wrong predictions."""
+
     feature: str
     total_failures: int
     failure_patterns: list[str]
@@ -44,6 +43,7 @@ class FailureAnalysis:
 @dataclass
 class PromptSuggestion:
     """Suggested improvement to a prompt."""
+
     feature: str
     issue_addressed: str
     current_prompt_summary: str
@@ -55,6 +55,7 @@ class PromptSuggestion:
 @dataclass
 class PromptABTest:
     """A/B test configuration for prompts."""
+
     test_id: str
     feature: str
     baseline_version: str
@@ -84,7 +85,6 @@ class PromptEvolver:
 Rate the overall sentiment on a scale from -1 (very negative) to +1 (very positive).
 Focus on factors that could affect the team's performance.
 Consider: injuries, roster changes, coaching decisions, team morale, and momentum.""",
-
         "injury_severity": """Assess the impact of this injury on {team}'s performance.
 Player: {player}
 Injury: {injury_type}
@@ -92,14 +92,13 @@ Status: {status}
 
 Rate the impact from 1 (minimal) to 5 (severe).
 Consider: player importance, position depth, matchup implications.""",
-
         "ner": """Extract injury-related entities from this NFL news text.
 Identify:
 - PLAYER: Player names mentioned with injury context
 - INJURY: Injury types (ankle, knee, hamstring, concussion, etc.)
 - STATUS: Game status (out, questionable, doubtful, probable)
 
-Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": N}]}"""
+Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": N}]}""",
     }
 
     def __init__(
@@ -128,7 +127,7 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
         feature: str,
         game_ids: list[str] | None = None,
         season: int | None = None,
-        weeks: int = 4
+        weeks: int = 4,
     ) -> FailureAnalysis:
         """
         Analyze why a semantic feature led to wrong predictions.
@@ -148,13 +147,15 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
                 failure_patterns=[],
                 common_issues={},
                 sample_texts=[],
-                severity="minor"
+                severity="minor",
             )
 
         # Analyze patterns
         patterns = self._identify_failure_patterns(failures)
         common_issues = self._identify_common_issues(failures)
-        sample_texts = [f.get("source_text", "")[:200] for f in failures[:5] if f.get("source_text")]
+        sample_texts = [
+            f.get("source_text", "")[:200] for f in failures[:5] if f.get("source_text")
+        ]
 
         # Determine severity
         severity = self._determine_severity(len(failures), patterns)
@@ -165,7 +166,7 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
             failure_patterns=patterns,
             common_issues=common_issues,
             sample_texts=sample_texts,
-            severity=severity
+            severity=severity,
         )
 
     def _get_failures_by_ids(self, feature: str, game_ids: list[str]) -> list[dict]:
@@ -194,12 +195,7 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
                 cur.execute(query, (feature, game_ids))
                 return [dict(row) for row in cur.fetchall()]
 
-    def _get_failures_by_period(
-        self,
-        feature: str,
-        season: int,
-        weeks: int
-    ) -> list[dict]:
+    def _get_failures_by_period(self, feature: str, season: int, weeks: int) -> list[dict]:
         """Get failure cases for a time period."""
         query = """
         SELECT
@@ -239,9 +235,12 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
         categories = [f.get("category") for f in failures if f.get("category")]
         if categories:
             from collections import Counter
+
             top_cat = Counter(categories).most_common(1)
             if top_cat and top_cat[0][1] > len(failures) * 0.5:
-                patterns.append(f"Category bias - {top_cat[0][0]} articles overrepresented in failures")
+                patterns.append(
+                    f"Category bias - {top_cat[0][0]} articles overrepresented in failures"
+                )
 
         # Check for high-error cases
         errors = [f.get("prediction_error", 0) for f in failures]
@@ -251,8 +250,7 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
 
         # Check for sign errors (positive value but negative outcome)
         sign_mismatches = [
-            f for f in failures
-            if f.get("feature_value", 0) > 0  # Predicted positive
+            f for f in failures if f.get("feature_value", 0) > 0  # Predicted positive
         ]
         if len(sign_mismatches) > len(failures) * 0.6:
             patterns.append("Polarity confusion - positive sentiment with negative outcomes")
@@ -301,10 +299,7 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
             return "moderate"
         return "minor"
 
-    def suggest_prompt_improvements(
-        self,
-        analysis: FailureAnalysis
-    ) -> list[PromptSuggestion]:
+    def suggest_prompt_improvements(self, analysis: FailureAnalysis) -> list[PromptSuggestion]:
         """Generate improved prompts addressing identified weaknesses."""
         suggestions = []
 
@@ -314,35 +309,41 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
         # Generate suggestions based on patterns
         for pattern in analysis.failure_patterns:
             if "Overconfident" in pattern:
-                suggestions.append(PromptSuggestion(
-                    feature=analysis.feature,
-                    issue_addressed=pattern,
-                    current_prompt_summary=current_prompt[:100] + "...",
-                    suggested_change="Add uncertainty acknowledgment: 'Express confidence level and note when signal is ambiguous'",
-                    expected_improvement="Reduce extreme predictions by 20-30%",
-                    confidence=0.7
-                ))
+                suggestions.append(
+                    PromptSuggestion(
+                        feature=analysis.feature,
+                        issue_addressed=pattern,
+                        current_prompt_summary=current_prompt[:100] + "...",
+                        suggested_change="Add uncertainty acknowledgment: 'Express confidence level and note when signal is ambiguous'",
+                        expected_improvement="Reduce extreme predictions by 20-30%",
+                        confidence=0.7,
+                    )
+                )
 
             elif "Category bias" in pattern:
                 cat = pattern.split("-")[1].strip().split()[0]
-                suggestions.append(PromptSuggestion(
-                    feature=analysis.feature,
-                    issue_addressed=pattern,
-                    current_prompt_summary=current_prompt[:100] + "...",
-                    suggested_change=f"Add category weighting: 'Weight {cat} articles less heavily'",
-                    expected_improvement="Better category balance",
-                    confidence=0.6
-                ))
+                suggestions.append(
+                    PromptSuggestion(
+                        feature=analysis.feature,
+                        issue_addressed=pattern,
+                        current_prompt_summary=current_prompt[:100] + "...",
+                        suggested_change=f"Add category weighting: 'Weight {cat} articles less heavily'",
+                        expected_improvement="Better category balance",
+                        confidence=0.6,
+                    )
+                )
 
             elif "Polarity confusion" in pattern:
-                suggestions.append(PromptSuggestion(
-                    feature=analysis.feature,
-                    issue_addressed=pattern,
-                    current_prompt_summary=current_prompt[:100] + "...",
-                    suggested_change="Improve polarity detection: 'Carefully distinguish between positive news about opponent vs team'",
-                    expected_improvement="10-15% accuracy improvement on sign",
-                    confidence=0.65
-                ))
+                suggestions.append(
+                    PromptSuggestion(
+                        feature=analysis.feature,
+                        issue_addressed=pattern,
+                        current_prompt_summary=current_prompt[:100] + "...",
+                        suggested_change="Improve polarity detection: 'Carefully distinguish between positive news about opponent vs team'",
+                        expected_improvement="10-15% accuracy improvement on sign",
+                        confidence=0.65,
+                    )
+                )
 
         # Add suggestions based on common issues
         for issue, count in analysis.common_issues.items():
@@ -350,24 +351,28 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
                 continue
 
             if issue == "sarcasm_detection":
-                suggestions.append(PromptSuggestion(
-                    feature=analysis.feature,
-                    issue_addressed=f"Sarcasm missed ({count} cases)",
-                    current_prompt_summary=current_prompt[:100] + "...",
-                    suggested_change="Add sarcasm handling: 'Detect sarcasm/irony and invert sentiment when detected'",
-                    expected_improvement="Better social media analysis",
-                    confidence=0.5
-                ))
+                suggestions.append(
+                    PromptSuggestion(
+                        feature=analysis.feature,
+                        issue_addressed=f"Sarcasm missed ({count} cases)",
+                        current_prompt_summary=current_prompt[:100] + "...",
+                        suggested_change="Add sarcasm handling: 'Detect sarcasm/irony and invert sentiment when detected'",
+                        expected_improvement="Better social media analysis",
+                        confidence=0.5,
+                    )
+                )
 
             elif issue == "injury_impact":
-                suggestions.append(PromptSuggestion(
-                    feature=analysis.feature,
-                    issue_addressed=f"Injury impact misjudged ({count} cases)",
-                    current_prompt_summary=current_prompt[:100] + "...",
-                    suggested_change="Refine injury weighting: 'Consider backup quality and positional depth when assessing injury impact'",
-                    expected_improvement="5-10% MAE reduction on injury games",
-                    confidence=0.6
-                ))
+                suggestions.append(
+                    PromptSuggestion(
+                        feature=analysis.feature,
+                        issue_addressed=f"Injury impact misjudged ({count} cases)",
+                        current_prompt_summary=current_prompt[:100] + "...",
+                        suggested_change="Refine injury weighting: 'Consider backup quality and positional depth when assessing injury impact'",
+                        expected_improvement="5-10% MAE reduction on injury games",
+                        confidence=0.6,
+                    )
+                )
 
         return suggestions
 
@@ -382,11 +387,7 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
         return "sentiment"
 
     def create_prompt_ab_test(
-        self,
-        feature: str,
-        current_prompt: str,
-        new_prompt: str,
-        description: str = ""
+        self, feature: str, current_prompt: str, new_prompt: str, description: str = ""
     ) -> str:
         """
         Set up A/B test for prompt comparison.
@@ -424,7 +425,7 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
         version: str,
         prompt: str,
         is_active: bool = False,
-        is_baseline: bool = False
+        is_baseline: bool = False,
     ) -> None:
         """Store a prompt version."""
         query = """
@@ -479,17 +480,13 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
                 start_date=row["start_date"],
                 games_tested=row["games_tested"] or 0,
                 baseline_accuracy=row["baseline_accuracy"] or 0.0,
-                treatment_accuracy=row["treatment_accuracy"] or 0.0
+                treatment_accuracy=row["treatment_accuracy"] or 0.0,
             )
             for row in rows
         ]
 
     def record_ab_result(
-        self,
-        test_id: str,
-        game_id: str,
-        is_treatment: bool,
-        correct: bool
+        self, test_id: str, game_id: str, is_treatment: bool, correct: bool
     ) -> None:
         """Record a result in an A/B test."""
         query = """
@@ -543,7 +540,7 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
                 "winner": "inconclusive",
                 "p_value": 1.0,
                 "recommendation": "Need more data (min 30 games)",
-                "games": row["games_tested"] if row else 0
+                "games": row["games_tested"] if row else 0,
             }
 
         baseline = row["baseline_accuracy"]
@@ -559,7 +556,7 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
                 "p_value": 0.05,  # Placeholder
                 "recommendation": "Adopt treatment prompt",
                 "lift": lift,
-                "games": games
+                "games": games,
             }
         elif lift < -0.05 and games >= 50:
             return {
@@ -567,15 +564,17 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
                 "p_value": 0.05,
                 "recommendation": "Keep baseline prompt",
                 "lift": lift,
-                "games": games
+                "games": games,
             }
         else:
             return {
                 "winner": "inconclusive",
                 "p_value": 0.5,
-                "recommendation": "Continue testing" if games < 100 else "No significant difference",
+                "recommendation": (
+                    "Continue testing" if games < 100 else "No significant difference"
+                ),
                 "lift": lift,
-                "games": games
+                "games": games,
             }
 
     def apply_winning_prompt(self, test_id: str) -> bool:
@@ -615,11 +614,14 @@ Return as JSON: {"entities": [{"text": "...", "type": "...", "start": N, "end": 
                 cur.execute(update_query, (version, feature))
 
                 # Mark test as complete
-                cur.execute("""
+                cur.execute(
+                    """
                     UPDATE ml.prompt_ab_tests
                     SET status = 'completed', winner = 'treatment'
                     WHERE test_id = %s
-                """, (test_id,))
+                """,
+                    (test_id,),
+                )
 
             conn.commit()
 

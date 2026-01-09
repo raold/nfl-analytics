@@ -246,6 +246,7 @@ except ImportError:
     def is_feature_enabled(group_name: str) -> bool:
         return True
 
+
 import os
 
 import psycopg2
@@ -872,7 +873,9 @@ class GameFeatureExtractor:
                 features.update({f"gp_away_{k}": v for k, v in away_gp.items()})
 
                 # Add differential
-                features["gp_recovery_diff"] = home_gp.get("gp_recovery_pct", 100) - away_gp.get("gp_recovery_pct", 100)
+                features["gp_recovery_diff"] = home_gp.get("gp_recovery_pct", 100) - away_gp.get(
+                    "gp_recovery_pct", 100
+                )
 
                 logger.debug(
                     f"Added {len(home_gp) * 2 + 1} GP recovery features "
@@ -1168,7 +1171,7 @@ class GameFeatureExtractor:
 
                     # BTB detection thresholds
                     SHORT_WEEK_THRESHOLD = 6.0  # < 6 days = short week (Thu after Sun)
-                    LONG_WEEK_THRESHOLD = 9.0   # > 9 days = long week (bye or Sun after Thu)
+                    LONG_WEEK_THRESHOLD = 9.0  # > 9 days = long week (bye or Sun after Thu)
 
                     features = {
                         "rest_differential": round(rest_differential, 2),

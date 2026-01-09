@@ -19,7 +19,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Optional
+from typing import Optional
 
 import psycopg2
 
@@ -71,7 +71,9 @@ class FeatureExtractionResult:
 class FeatureExtractionError(Exception):
     """Raised when feature extraction fails and cannot recover."""
 
-    def __init__(self, extractor_name: str, message: str, original_error: Optional[Exception] = None):
+    def __init__(
+        self, extractor_name: str, message: str, original_error: Optional[Exception] = None
+    ):
         self.extractor_name = extractor_name
         self.message = message
         self.original_error = original_error
@@ -342,8 +344,5 @@ class GameLevelExtractorStrategy(FeatureExtractorStrategy):
         'opponent' is required as away_team.
         """
         if opponent is None:
-            raise FeatureExtractionError(
-                self.name,
-                "Game-level extractors require opponent team"
-            )
+            raise FeatureExtractionError(self.name, "Game-level extractors require opponent team")
         return self.extract_game(team, opponent, season, week, conn)

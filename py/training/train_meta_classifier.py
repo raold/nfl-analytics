@@ -37,19 +37,17 @@ import argparse
 import logging
 import os
 import sys
-from datetime import datetime
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import seaborn as sns
 
 # Add project root to path
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, project_root)
 
-from py.production.meta_labeling_v2 import MetaFeatureExtractor, MetaLabelingClassifier
+from py.production.meta_labeling_v2 import MetaLabelingClassifier
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -325,9 +323,7 @@ def train_meta_classifier(
     return classifier
 
 
-def _generate_training_report(
-    classifier: MetaLabelingClassifier, metrics: dict, output_path: Path
-):
+def _generate_training_report(classifier: MetaLabelingClassifier, metrics: dict, output_path: Path):
     """Generate training report."""
     with open(output_path, "w") as f:
         f.write("=" * 70 + "\n")
@@ -474,9 +470,7 @@ def parse_args():
     parser.add_argument(
         "--output-dir", type=str, default="models", help="Output directory (default: models)"
     )
-    parser.add_argument(
-        "--no-plots", action="store_true", help="Skip generating plots"
-    )
+    parser.add_argument("--no-plots", action="store_true", help="Skip generating plots")
 
     return parser.parse_args()
 

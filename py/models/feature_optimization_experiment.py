@@ -17,11 +17,12 @@ import xgboost as xgb
 from pathlib import Path
 from datetime import datetime
 from sklearn.metrics import mean_absolute_error, mean_squared_error, roc_auc_score
-from itertools import product
 import warnings
+
 warnings.filterwarnings("ignore")
 
 import sys
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from py.features.feature_weighting import FeatureWeighter
@@ -59,9 +60,7 @@ def get_feature_tiers(shap_csv: str) -> dict:
     weighter = FeatureWeighter.from_shap_csv(shap_csv)
 
     # Get pruning candidates
-    keep_features, prune_features = weighter.get_pruning_candidates(
-        threshold=0.001, min_keep=100
-    )
+    keep_features, prune_features = weighter.get_pruning_candidates(threshold=0.001, min_keep=100)
 
     # Get tier breakdown
     tiers = weighter.get_feature_tiers(n_tiers=4)
@@ -79,10 +78,7 @@ def get_feature_tiers(shap_csv: str) -> dict:
 
 
 def train_and_evaluate(
-    df: pd.DataFrame,
-    feature_subset: list | None,
-    xgb_params: dict,
-    experiment_name: str
+    df: pd.DataFrame, feature_subset: list | None, xgb_params: dict, experiment_name: str
 ) -> dict:
     """Train XGBoost and evaluate."""
 
@@ -232,7 +228,9 @@ def experiment_3_colsample(df: pd.DataFrame) -> list:
     results = []
 
     for config in colsample_configs:
-        print(f"\n  Testing: {config['name']} (tree={config['colsample_bytree']}, level={config['colsample_bylevel']})")
+        print(
+            f"\n  Testing: {config['name']} (tree={config['colsample_bytree']}, level={config['colsample_bylevel']})"
+        )
 
         params = BASE_XGB_PARAMS.copy()
         params["colsample_bytree"] = config["colsample_bytree"]
@@ -386,17 +384,23 @@ def main():
     # Find baseline
     baseline = results_df[results_df["experiment"] == "pruning_all"].iloc[0]
 
-    print(f"\nBaseline (all features): Spread MAE={baseline['spread_mae']:.4f}, Total MAE={baseline['total_mae']:.4f}")
+    print(
+        f"\nBaseline (all features): Spread MAE={baseline['spread_mae']:.4f}, Total MAE={baseline['total_mae']:.4f}"
+    )
 
     # Sort by spread MAE
     results_df = results_df.sort_values("spread_mae")
 
-    print(f"\n{'Rank':<5} {'Experiment':<30} {'Features':>10} {'Spread MAE':>12} {'Δ%':>8} {'Total MAE':>12} {'Win AUC':>10}")
+    print(
+        f"\n{'Rank':<5} {'Experiment':<30} {'Features':>10} {'Spread MAE':>12} {'Δ%':>8} {'Total MAE':>12} {'Win AUC':>10}"
+    )
     print("-" * 100)
 
     for i, (_, row) in enumerate(results_df.head(15).iterrows(), 1):
         delta_pct = (row["spread_mae"] - baseline["spread_mae"]) / baseline["spread_mae"] * 100
-        print(f"{i:<5} {row['experiment']:<30} {row['n_features']:>10} {row['spread_mae']:>12.4f} {delta_pct:>+7.2f}% {row['total_mae']:>12.4f} {row['win_auc']:>10.4f}")
+        print(
+            f"{i:<5} {row['experiment']:<30} {row['n_features']:>10} {row['spread_mae']:>12.4f} {delta_pct:>+7.2f}% {row['total_mae']:>12.4f} {row['win_auc']:>10.4f}"
+        )
 
     # Best overall
     best = results_df.iloc[0]

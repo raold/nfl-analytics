@@ -33,7 +33,7 @@ import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, roc_auc_score
 
 from py.features.game_feature_extractor import GameFeatureExtractor
-from py.models.config.xgboost_params import DEFAULT_XGB_PARAMS, CLASSIFIER_XGB_PARAMS
+from py.models.config.xgboost_params import DEFAULT_XGB_PARAMS
 from py.utils.team_mapping import VALID_TEAMS, normalize_team
 
 # Setup logging
@@ -459,22 +459,24 @@ class GameOutcomeModel:
         for game in games:
             try:
                 pred = self.predict(
-                    home_team=game['home_team'],
-                    away_team=game['away_team'],
-                    season=game['season'],
-                    week=game['week'],
+                    home_team=game["home_team"],
+                    away_team=game["away_team"],
+                    season=game["season"],
+                    week=game["week"],
                 )
-                pred['game_id'] = game.get('game_id')
+                pred["game_id"] = game.get("game_id")
                 predictions.append(pred)
             except Exception as e:
                 logger.warning(
                     f"Failed to predict {game.get('away_team')}@{game.get('home_team')}: {e}"
                 )
                 # Return partial result with error
-                predictions.append({
-                    'game_id': game.get('game_id'),
-                    'error': str(e),
-                })
+                predictions.append(
+                    {
+                        "game_id": game.get("game_id"),
+                        "error": str(e),
+                    }
+                )
         return predictions
 
     def _evaluate_models(

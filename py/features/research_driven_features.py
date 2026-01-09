@@ -51,7 +51,6 @@ from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
-import pandas as pd
 import psycopg2
 
 logger = logging.getLogger(__name__)
@@ -66,20 +65,20 @@ DB_CONFIG = {
 }
 
 # Research-based constants
-OPTIMAL_4TH_DOWN_GO_RATE = 0.45    # Analytics suggest 45% of 4th downs should be go decisions
-OPTIMAL_2PT_ATTEMPT_RATE = 0.30   # 2-pt EV (0.982) > kick EV (0.937) suggests more aggression
+OPTIMAL_4TH_DOWN_GO_RATE = 0.45  # Analytics suggest 45% of 4th downs should be go decisions
+OPTIMAL_2PT_ATTEMPT_RATE = 0.30  # 2-pt EV (0.982) > kick EV (0.937) suggests more aggression
 OPTIMAL_1ST_DOWN_PASS_RATE = 0.58  # Pass-heavy on 1st down is generally +EV
 
 # Injury recovery curves (Tofte research)
 INJURY_RECOVERY_FACTORS = {
-    "achilles": 0.80,     # 80% of pre-injury performance
-    "acl": 0.90,          # 90% after year 1 recovery
-    "mcl": 0.95,          # Quick recovery
-    "shoulder": 0.95,     # Quick recovery
-    "concussion": 0.98,   # Near full recovery (cognitive)
-    "ankle": 0.95,        # Quick recovery
-    "knee": 0.90,         # General knee
-    "default": 0.92,      # Unknown injury type
+    "achilles": 0.80,  # 80% of pre-injury performance
+    "acl": 0.90,  # 90% after year 1 recovery
+    "mcl": 0.95,  # Quick recovery
+    "shoulder": 0.95,  # Quick recovery
+    "concussion": 0.98,  # Near full recovery (cognitive)
+    "ankle": 0.95,  # Quick recovery
+    "knee": 0.90,  # General knee
+    "default": 0.92,  # Unknown injury type
 }
 
 # nfelo EPA weighting research
@@ -90,6 +89,7 @@ DEFENSIVE_EPA_WEIGHT = 1.0
 @dataclass
 class ResearchFeatures:
     """Container for research-driven features."""
+
     coaching_rationality_index: float
     rookie_qb_adjustment: float
     career_year_regression: float
@@ -131,11 +131,7 @@ class ResearchDrivenEngine:
         return psycopg2.connect(**self.db_config)
 
     def compute_coaching_rationality_index(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, team: str, season: int, week: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute Coaching Rationality Index.
@@ -230,11 +226,7 @@ class ResearchDrivenEngine:
             two_pt_component = min(two_pt_rate / OPTIMAL_2PT_ATTEMPT_RATE, 1.5)
             pass_component = min(pass_rate / OPTIMAL_1ST_DOWN_PASS_RATE, 1.5)
 
-            rationality = (
-                0.4 * fourth_component +
-                0.3 * two_pt_component +
-                0.3 * pass_component
-            )
+            rationality = 0.4 * fourth_component + 0.3 * two_pt_component + 0.3 * pass_component
 
             return float(np.clip(rationality, 0.0, 1.5))
 
@@ -243,10 +235,7 @@ class ResearchDrivenEngine:
                 conn.close()
 
     def compute_rookie_qb_adjustment(
-        self,
-        player_id: str | None,
-        season: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, player_id: str | None, season: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute Rookie QB Adjustment factor.
@@ -295,7 +284,7 @@ class ResearchDrivenEngine:
                 elif experience_years == 2:
                     return 0.95  # Third year: 5% penalty
                 else:
-                    return 1.0   # Veteran: no penalty
+                    return 1.0  # Veteran: no penalty
             else:
                 return 0.80  # Unknown/new player: assume some penalty
 
@@ -304,10 +293,7 @@ class ResearchDrivenEngine:
                 conn.close()
 
     def compute_career_year_regression(
-        self,
-        player_id: str | None,
-        season: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, player_id: str | None, season: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute Career Year Regression factor.
@@ -373,11 +359,7 @@ class ResearchDrivenEngine:
                 conn.close()
 
     def compute_injury_recovery_factor(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, team: str, season: int, week: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute Injury Recovery Factor for team.
@@ -452,11 +434,7 @@ class ResearchDrivenEngine:
                 conn.close()
 
     def compute_weighted_net_epa(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, team: str, season: int, week: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute Weighted Net EPA using nfelo research findings.
@@ -509,8 +487,7 @@ class ResearchDrivenEngine:
 
                 # Apply nfelo weighting
                 weighted_net = (
-                    OFFENSIVE_EPA_WEIGHT * off_epa -
-                    DEFENSIVE_EPA_WEIGHT * def_epa_allowed
+                    OFFENSIVE_EPA_WEIGHT * off_epa - DEFENSIVE_EPA_WEIGHT * def_epa_allowed
                 ) / (OFFENSIVE_EPA_WEIGHT + DEFENSIVE_EPA_WEIGHT)
 
                 return float(np.clip(weighted_net, -0.4, 0.4))
@@ -522,11 +499,7 @@ class ResearchDrivenEngine:
                 conn.close()
 
     def compute_yac_over_expected(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, team: str, season: int, week: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute YAC Over Expected (YOE) for a team.
@@ -550,10 +523,12 @@ class ResearchDrivenEngine:
             cur = conn.cursor()
 
             # Check if xyac column exists
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT column_name FROM information_schema.columns
                 WHERE table_name = 'plays' AND column_name = 'xyac_mean_yardage'
-            """)
+            """
+            )
             has_xyac = cur.fetchone() is not None
 
             if has_xyac:
@@ -606,7 +581,7 @@ class ResearchDrivenEngine:
         season: int,
         week: int,
         home_qb_id: str | None = None,
-        away_qb_id: str | None = None
+        away_qb_id: str | None = None,
     ) -> dict[str, Any]:
         """
         Extract all research-driven features for a game.
@@ -680,16 +655,14 @@ class ResearchDrivenEngine:
 
             # Differential features
             features["res_coaching_rationality_diff"] = (
-                features["home_res_coaching_rationality"] -
-                features["away_res_coaching_rationality"]
+                features["home_res_coaching_rationality"]
+                - features["away_res_coaching_rationality"]
             )
             features["res_weighted_net_epa_diff"] = (
-                features["home_res_weighted_net_epa"] -
-                features["away_res_weighted_net_epa"]
+                features["home_res_weighted_net_epa"] - features["away_res_weighted_net_epa"]
             )
             features["res_yac_over_expected_diff"] = (
-                features["home_res_yac_over_expected"] -
-                features["away_res_yac_over_expected"]
+                features["home_res_yac_over_expected"] - features["away_res_yac_over_expected"]
             )
 
             return features
@@ -733,9 +706,13 @@ if __name__ == "__main__":
 
     conn = engine._get_connection()
 
-    print(f"\n📈 Coaching Rationality (KC): {engine.compute_coaching_rationality_index('KC', 2024, 12, conn):.3f}")
+    print(
+        f"\n📈 Coaching Rationality (KC): {engine.compute_coaching_rationality_index('KC', 2024, 12, conn):.3f}"
+    )
     print(f"📈 Weighted Net EPA (KC): {engine.compute_weighted_net_epa('KC', 2024, 12, conn):.3f}")
-    print(f"📈 YAC Over Expected (KC): {engine.compute_yac_over_expected('KC', 2024, 12, conn):.3f}")
+    print(
+        f"📈 YAC Over Expected (KC): {engine.compute_yac_over_expected('KC', 2024, 12, conn):.3f}"
+    )
 
     conn.close()
 

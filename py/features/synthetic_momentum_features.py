@@ -43,7 +43,6 @@ from dataclasses import dataclass
 from typing import Any
 
 import numpy as np
-import pandas as pd
 import psycopg2
 
 logger = logging.getLogger(__name__)
@@ -61,6 +60,7 @@ DB_CONFIG = {
 @dataclass
 class MomentumFeatures:
     """Container for synthetic momentum features."""
+
     form_intensity: float
     pressure_consistency: float
     rz_efficiency_diff: float
@@ -98,11 +98,7 @@ class SyntheticMomentumEngine:
         return psycopg2.connect(**self.db_config)
 
     def compute_form_intensity(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, team: str, season: int, week: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute Form Intensity (recent vs medium-term EPA).
@@ -179,11 +175,7 @@ class SyntheticMomentumEngine:
                 conn.close()
 
     def compute_pressure_consistency(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, team: str, season: int, week: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute Pressure Consistency for defensive pass rush.
@@ -256,7 +248,7 @@ class SyntheticMomentumEngine:
         def_team: str,
         season: int,
         week: int,
-        conn: psycopg2.extensions.connection | None = None
+        conn: psycopg2.extensions.connection | None = None,
     ) -> float:
         """
         Compute Red Zone Efficiency Differential.
@@ -330,11 +322,7 @@ class SyntheticMomentumEngine:
                 conn.close()
 
     def compute_momentum_direction(
-        self,
-        team: str,
-        season: int,
-        week: int,
-        conn: psycopg2.extensions.connection | None = None
+        self, team: str, season: int, week: int, conn: psycopg2.extensions.connection | None = None
     ) -> float:
         """
         Compute Momentum Direction (Q1-Q2 vs Q3-Q4 EPA).
@@ -399,11 +387,7 @@ class SyntheticMomentumEngine:
                 conn.close()
 
     def extract_features(
-        self,
-        home_team: str,
-        away_team: str,
-        season: int,
-        week: int
+        self, home_team: str, away_team: str, season: int, week: int
     ) -> dict[str, Any]:
         """
         Extract all synthetic momentum features for a game.
@@ -457,7 +441,8 @@ class SyntheticMomentumEngine:
                 features["home_mom_form_intensity"] - features["away_mom_form_intensity"]
             )
             features["mom_pressure_consistency_diff"] = (
-                features["home_mom_pressure_consistency"] - features["away_mom_pressure_consistency"]
+                features["home_mom_pressure_consistency"]
+                - features["away_mom_pressure_consistency"]
             )
             features["mom_momentum_direction_diff"] = (
                 features["home_mom_momentum_direction"] - features["away_mom_momentum_direction"]

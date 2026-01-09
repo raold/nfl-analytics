@@ -17,7 +17,6 @@ Usage:
 import logging
 import os
 from dataclasses import dataclass, field
-from typing import Optional
 
 import numpy as np
 import psycopg2
@@ -42,9 +41,10 @@ except ImportError:
 @dataclass
 class KalmanState:
     """State of a Kalman filter for one team."""
+
     mu: float = 0.0  # Filtered state estimate
-    P: float = 0.1   # State error covariance
-    cusum_up: float = 0.0   # CUSUM for upward shifts
+    P: float = 0.1  # State error covariance
+    cusum_up: float = 0.0  # CUSUM for upward shifts
     cusum_down: float = 0.0  # CUSUM for downward shifts
     innovations: list = field(default_factory=list)
     n_updates: int = 0
@@ -177,9 +177,7 @@ class KalmanEPAFilter:
 
         return state
 
-    def get_team_features(
-        self, team: str, season: int, week: int
-    ) -> dict[str, float]:
+    def get_team_features(self, team: str, season: int, week: int) -> dict[str, float]:
         """
         Get Kalman-filtered features for a team.
 
@@ -274,8 +272,11 @@ class KalmanEPAFilter:
             home_features["kalman_epa"] - away_features["kalman_epa"], 4
         )
         features["kalman_momentum_diff"] = round(
-            home_features["kalman_cusum_up"] + home_features["kalman_cusum_down"] -
-            away_features["kalman_cusum_up"] - away_features["kalman_cusum_down"], 4
+            home_features["kalman_cusum_up"]
+            + home_features["kalman_cusum_down"]
+            - away_features["kalman_cusum_up"]
+            - away_features["kalman_cusum_down"],
+            4,
         )
 
         return features
@@ -300,9 +301,15 @@ def test_filter():
     for team, season, week in test_cases:
         features = filter.get_team_features(team, season, week)
         print(f"\n{team} (Week {week}):")
-        print(f"  Kalman EPA: {features['kalman_epa']:.4f} ± {features['kalman_epa_uncertainty']:.4f}")
-        print(f"  CUSUM: up={features['kalman_cusum_up']:.2f}, down={features['kalman_cusum_down']:.2f}")
-        print(f"  Regime: {features['kalman_regime_direction']} (change={features['kalman_regime_change']})")
+        print(
+            f"  Kalman EPA: {features['kalman_epa']:.4f} ± {features['kalman_epa_uncertainty']:.4f}"
+        )
+        print(
+            f"  CUSUM: up={features['kalman_cusum_up']:.2f}, down={features['kalman_cusum_down']:.2f}"
+        )
+        print(
+            f"  Regime: {features['kalman_regime_direction']} (change={features['kalman_regime_change']})"
+        )
         print(f"  Observations: {features['kalman_n_observations']}")
 
     # Test matchup

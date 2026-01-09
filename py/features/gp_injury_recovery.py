@@ -21,7 +21,6 @@ Implementation Notes:
 
 import logging
 from dataclasses import dataclass
-from typing import Optional, Tuple
 
 import numpy as np
 
@@ -31,6 +30,7 @@ logger = logging.getLogger(__name__)
 try:
     from sklearn.gaussian_process import GaussianProcessRegressor
     from sklearn.gaussian_process.kernels import Matern, ConstantKernel, WhiteKernel
+
     SKLEARN_GP_AVAILABLE = True
 except ImportError:
     SKLEARN_GP_AVAILABLE = False
@@ -38,6 +38,7 @@ except ImportError:
 try:
     import gpytorch
     import torch
+
     GPYTORCH_AVAILABLE = True
 except ImportError:
     GPYTORCH_AVAILABLE = False
@@ -46,9 +47,10 @@ except ImportError:
 @dataclass
 class RecoveryPrediction:
     """Prediction of player recovery status."""
+
     performance_pct: float  # Expected performance [0, 100]
-    lower_95: float         # 95% credible interval lower bound
-    upper_95: float         # 95% credible interval upper bound
+    lower_95: float  # 95% credible interval lower bound
+    upper_95: float  # 95% credible interval upper bound
     days_since_return: int
     injury_type: str
 
@@ -111,15 +113,11 @@ class InjuryRecoveryGP:
 
     def _create_sklearn_kernel(self):
         """Create sklearn GP kernel: Matern 5/2 + Constant + White."""
-        return (
-            ConstantKernel(1.0, constant_value_bounds=(0.01, 10.0)) *
-            Matern(length_scale=7.0, length_scale_bounds=(1.0, 60.0), nu=2.5) +
-            WhiteKernel(noise_level=0.1, noise_level_bounds=(0.01, 1.0))
-        )
+        return ConstantKernel(1.0, constant_value_bounds=(0.01, 10.0)) * Matern(
+            length_scale=7.0, length_scale_bounds=(1.0, 60.0), nu=2.5
+        ) + WhiteKernel(noise_level=0.1, noise_level_bounds=(0.01, 1.0))
 
-    def exponential_decay_baseline(
-        self, days_since_return: int, tau: float = None
-    ) -> float:
+    def exponential_decay_baseline(self, days_since_return: int, tau: float = None) -> float:
         """
         Baseline exponential decay recovery curve.
 
@@ -221,8 +219,10 @@ def test_recovery():
 
     for days, injury in test_cases:
         pred = gp.predict_recovery(days, injury)
-        print(f"{days:>5} | {pred.injury_type:<12} | {pred.performance_pct:>8.1f}% | "
-              f"[{pred.lower_95:>5.1f}, {pred.upper_95:>5.1f}]")
+        print(
+            f"{days:>5} | {pred.injury_type:<12} | {pred.performance_pct:>8.1f}% | "
+            f"[{pred.lower_95:>5.1f}, {pred.upper_95:>5.1f}]"
+        )
 
     # Test feature extraction
     print("\n" + "=" * 60)

@@ -26,6 +26,7 @@ Example:
   python py/features/asof_features_v2.py --output data/processed/features/asof_team_features_v2.csv \
       --season-start 2020 --validate
 """
+
 from __future__ import annotations
 
 import warnings

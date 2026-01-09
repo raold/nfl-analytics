@@ -15,6 +15,7 @@ Example:
   python py/features/asof_features_enhanced.py --output analysis/features/asof_team_features_enhanced.csv \
       --season-start 2003 --validate
 """
+
 from __future__ import annotations
 
 import warnings

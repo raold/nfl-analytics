@@ -454,7 +454,11 @@ class EnforcementRouter:
             from pathlib import Path
 
             # Skip migration files that CREATE new tables (can't validate against non-existent schema)
-            if content and "migrations/" in file_path and re.search(r"CREATE\s+TABLE", content, re.IGNORECASE):
+            if (
+                content
+                and "migrations/" in file_path
+                and re.search(r"CREATE\s+TABLE", content, re.IGNORECASE)
+            ):
                 return ValidationResult(
                     status=ValidationStatus.PASSED,
                     agent_name="sql_validation",
@@ -848,8 +852,8 @@ class EnforcementRouter:
 
                 # Skip docstring examples (inside triple-quoted strings)
                 # Count triple quotes before match to determine if we're inside a docstring
-                triple_double = content[:match.start()].count('"""')
-                triple_single = content[:match.start()].count("'''")
+                triple_double = content[: match.start()].count('"""')
+                triple_single = content[: match.start()].count("'''")
                 in_docstring = (triple_double % 2 == 1) or (triple_single % 2 == 1)
                 if in_docstring:
                     continue

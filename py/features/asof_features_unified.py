@@ -28,10 +28,8 @@ from __future__ import annotations
 
 import logging
 import os
-import warnings
 from collections.abc import Iterable
 from enum import Enum
-from io import StringIO
 from typing import Any, Optional
 
 import numpy as np
@@ -415,11 +413,13 @@ class AsofFeatureExtractor:
 
         try:
             cur = self.conn.cursor()
-            cur.execute("""
+            cur.execute(
+                """
                 SELECT column_name
                 FROM information_schema.columns
                 WHERE table_name = 'games'
-            """)
+            """
+            )
             existing_cols = {r[0] for r in cur.fetchall()}
             self._v2_columns_available = all(
                 col in existing_cols for col in self.V2_OPTIONAL_COLUMNS
@@ -545,7 +545,9 @@ class AsofFeatureExtractor:
         team_df["prior_games"] = team_group.cumcount()
         team_df["prior_epa_sum"] = team_group["epa_sum"].cumsum() - team_df["epa_sum"]
         team_df["prior_plays"] = team_group["plays"].cumsum() - team_df["plays"]
-        team_df["prior_points_for"] = team_group["_points_for_f"].cumsum() - team_df["_points_for_f"]
+        team_df["prior_points_for"] = (
+            team_group["_points_for_f"].cumsum() - team_df["_points_for_f"]
+        )
         team_df["prior_points_against"] = (
             team_group["_points_against_f"].cumsum() - team_df["_points_against_f"]
         )
@@ -554,13 +556,19 @@ class AsofFeatureExtractor:
 
         with np.errstate(divide="ignore", invalid="ignore"):
             team_df["prior_epa_mean"] = np.where(
-                team_df["prior_plays"] > 0, team_df["prior_epa_sum"] / team_df["prior_plays"], np.nan
+                team_df["prior_plays"] > 0,
+                team_df["prior_epa_sum"] / team_df["prior_plays"],
+                np.nan,
             )
             team_df["prior_margin_avg"] = np.where(
-                team_df["prior_games"] > 0, team_df["prior_margin_sum"] / team_df["prior_games"], np.nan
+                team_df["prior_games"] > 0,
+                team_df["prior_margin_sum"] / team_df["prior_games"],
+                np.nan,
             )
             team_df["prior_points_for_avg"] = np.where(
-                team_df["prior_games"] > 0, team_df["prior_points_for"] / team_df["prior_games"], np.nan
+                team_df["prior_games"] > 0,
+                team_df["prior_points_for"] / team_df["prior_games"],
+                np.nan,
             )
             team_df["prior_points_against_avg"] = np.where(
                 team_df["prior_games"] > 0,
@@ -574,7 +582,9 @@ class AsofFeatureExtractor:
         # Season-specific metrics
         season_group = team_df.groupby(["team", "season"], group_keys=False)
         team_df["season_games_prior"] = season_group.cumcount()
-        team_df["season_margin_prior_sum"] = season_group["_margin_f"].cumsum() - team_df["_margin_f"]
+        team_df["season_margin_prior_sum"] = (
+            season_group["_margin_f"].cumsum() - team_df["_margin_f"]
+        )
         team_df["season_wins_prior"] = season_group["_result_f"].cumsum() - team_df["_result_f"]
         with np.errstate(divide="ignore", invalid="ignore"):
             team_df["season_point_diff_avg"] = np.where(
@@ -646,7 +656,9 @@ class AsofFeatureExtractor:
         team_df["coach_change"] = np.where(
             team_df["prior_games"] > 0, (prev_coach != team_df["coach_name"]).astype(float), 0.0
         )
-        team_df["coach_team_games"] = team_df.groupby(["team", "coach_name"]).cumcount().astype(float)
+        team_df["coach_team_games"] = (
+            team_df.groupby(["team", "coach_name"]).cumcount().astype(float)
+        )
         team_df["coach_total_games"] = team_df.groupby("coach_name").cumcount().astype(float)
 
         # Surface/venue
@@ -656,7 +668,9 @@ class AsofFeatureExtractor:
 
         roof_lower = team_df["roof"]
         team_df["roof_dome"] = roof_lower.isin(["dome", "closed"]).astype(float)
-        team_df["roof_outdoors"] = roof_lower.isin(["outdoors", "open", "retractable"]).astype(float)
+        team_df["roof_outdoors"] = roof_lower.isin(["outdoors", "open", "retractable"]).astype(
+            float
+        )
 
         # Enhanced features (if enabled)
         if self.feature_level in (FeatureLevel.ENHANCED, FeatureLevel.V2):
@@ -716,8 +730,14 @@ class AsofFeatureExtractor:
 
         # Play-level efficiency features
         for col in [
-            "success_rate", "air_yards_mean", "yac_mean", "cpoe_mean",
-            "completion_pct", "wp_q4_mean", "shotgun_rate", "no_huddle_rate",
+            "success_rate",
+            "air_yards_mean",
+            "yac_mean",
+            "cpoe_mean",
+            "completion_pct",
+            "wp_q4_mean",
+            "shotgun_rate",
+            "no_huddle_rate",
         ]:
             if col in team_df.columns:
                 team_df[col] = team_df[col].fillna(0.0 if col != "wp_q4_mean" else 0.5)
@@ -870,17 +890,27 @@ class AsofFeatureExtractor:
         df["kickoff"] = pd.to_datetime(df["kickoff"], errors="coerce")
 
         common_cols = [
-            "game_id", "season", "week", "kickoff",
-            "home_team", "away_team", "home_score", "away_score",
-            "spread_close", "total_close",
+            "game_id",
+            "season",
+            "week",
+            "kickoff",
+            "home_team",
+            "away_team",
+            "home_score",
+            "away_score",
+            "spread_close",
+            "total_close",
         ]
 
         # V2 game-level features (not split by team)
         v2_game_features = []
         if self.feature_level == FeatureLevel.V2:
             v2_game_features = [
-                "is_division_game", "is_thursday_night", "is_short_week",
-                "weather_condition", "division_h2h_variance",
+                "is_division_game",
+                "is_thursday_night",
+                "is_short_week",
+                "weather_condition",
+                "division_h2h_variance",
             ]
 
         home = df[df["is_home"]].copy()
@@ -903,7 +933,12 @@ class AsofFeatureExtractor:
         merged = merged[[c for c in merged.columns if not c.endswith("_dup")]]
 
         # Fill NA values
-        for col in ["home_prior_epa_sum", "home_prior_plays", "away_prior_epa_sum", "away_prior_plays"]:
+        for col in [
+            "home_prior_epa_sum",
+            "home_prior_plays",
+            "away_prior_epa_sum",
+            "away_prior_plays",
+        ]:
             if col in merged.columns:
                 merged[col] = merged[col].fillna(0.0)
 
@@ -949,7 +984,9 @@ class AsofFeatureExtractor:
 
         if self.feature_level == FeatureLevel.V2:
             merged["is_tie"] = (merged["home_margin"] == 0).astype(bool)
-            merged["high_tie_prob"] = (merged["spread_close"].abs() < 1.5).fillna(False).astype(bool)
+            merged["high_tie_prob"] = (
+                (merged["spread_close"].abs() < 1.5).fillna(False).astype(bool)
+            )
 
         merged.sort_values(["season", "week", "game_id"], inplace=True)
         return merged

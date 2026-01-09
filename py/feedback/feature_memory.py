@@ -10,13 +10,10 @@ Usage:
     stats = memory.get_feature_stats('sem_injury_advantage', weeks=8)
 """
 
-import json
 import logging
 import sys
-from dataclasses import dataclass, field
-from datetime import datetime
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -34,6 +31,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class FeatureStats:
     """Statistics for a single feature."""
+
     feature_name: str
     mean_contribution: float
     contribution_when_correct: float
@@ -89,7 +87,7 @@ class FeaturePerformanceMemory:
         features: dict[str, float],
         prediction_error: float,
         correct: bool,
-        contributions: dict[str, float] | None = None
+        contributions: dict[str, float] | None = None,
     ) -> None:
         """
         Record feature values and outcome for one game.
@@ -119,24 +117,24 @@ class FeaturePerformanceMemory:
             with conn.cursor() as cur:
                 for name, value in features.items():
                     contribution = contributions.get(name, 0.0) if contributions else 0.0
-                    cur.execute(query, (
-                        game_id,
-                        season,
-                        week,
-                        name,
-                        value,
-                        prediction_error,
-                        correct,
-                        contribution
-                    ))
+                    cur.execute(
+                        query,
+                        (
+                            game_id,
+                            season,
+                            week,
+                            name,
+                            value,
+                            prediction_error,
+                            correct,
+                            contribution,
+                        ),
+                    )
             conn.commit()
 
         logger.debug(f"Recorded {len(features)} features for game {game_id}")
 
-    def record_batch(
-        self,
-        records: list[dict]
-    ) -> int:
+    def record_batch(self, records: list[dict]) -> int:
         """
         Record multiple games efficiently.
 
@@ -168,16 +166,19 @@ class FeaturePerformanceMemory:
 
                     for name, value in features.items():
                         contribution = contributions.get(name, 0.0)
-                        cur.execute(query, (
-                            rec["game_id"],
-                            rec["season"],
-                            rec["week"],
-                            name,
-                            value,
-                            rec["prediction_error"],
-                            rec["correct"],
-                            contribution
-                        ))
+                        cur.execute(
+                            query,
+                            (
+                                rec["game_id"],
+                                rec["season"],
+                                rec["week"],
+                                name,
+                                value,
+                                rec["prediction_error"],
+                                rec["correct"],
+                                contribution,
+                            ),
+                        )
                         count += 1
             conn.commit()
 
@@ -185,10 +186,7 @@ class FeaturePerformanceMemory:
         return count
 
     def get_feature_stats(
-        self,
-        feature_name: str,
-        weeks: int = 8,
-        season: int | None = None
+        self, feature_name: str, weeks: int = 8, season: int | None = None
     ) -> FeatureStats:
         """
         Get statistics for a specific feature.
@@ -232,7 +230,7 @@ class FeaturePerformanceMemory:
                 correlation_with_error=0.0,
                 stability=1.0,
                 sample_size=len(rows),
-                recommendation="insufficient_data"
+                recommendation="insufficient_data",
             )
 
         # Compute metrics
@@ -266,7 +264,7 @@ class FeaturePerformanceMemory:
             correlation_with_error=float(corr),
             stability=float(stability),
             sample_size=len(rows),
-            recommendation=recommendation
+            recommendation=recommendation,
         )
 
     def _compute_recommendation(
@@ -275,7 +273,7 @@ class FeaturePerformanceMemory:
         corr: float,
         stability: float,
         contrib_correct: float,
-        contrib_incorrect: float
+        contrib_incorrect: float,
     ) -> str:
         """Compute recommendation based on metrics."""
         # Negative contribution = bad feature
@@ -301,10 +299,7 @@ class FeaturePerformanceMemory:
         return "keep"
 
     def get_feature_rankings(
-        self,
-        weeks: int = 8,
-        season: int | None = None,
-        top_n: int | None = None
+        self, weeks: int = 8, season: int | None = None, top_n: int | None = None
     ) -> pd.DataFrame:
         """
         Rank all features by contribution to accuracy.
@@ -361,9 +356,9 @@ class FeaturePerformanceMemory:
                 row["error_correlation"] or 0,
                 row["stability"] or 1.0,
                 row["contrib_correct"] or 0,
-                row["contrib_incorrect"] or 0
+                row["contrib_incorrect"] or 0,
             ),
-            axis=1
+            axis=1,
         )
 
         return df
@@ -414,25 +409,29 @@ class FeaturePerformanceMemory:
                 "total_games": 0,
                 "top_features": [],
                 "weak_features": [],
-                "recommendations": {}
+                "recommendations": {},
             }
 
         total_games = rows[0]["games"] if rows else 0
 
         top = [
             {"name": r["feature_name"], "contribution": r["mean_contribution"]}
-            for r in rows[:5] if r["mean_contribution"] and r["mean_contribution"] > 0
+            for r in rows[:5]
+            if r["mean_contribution"] and r["mean_contribution"] > 0
         ]
 
         weak = [
             {"name": r["feature_name"], "contribution": r["mean_contribution"]}
-            for r in reversed(rows[-5:]) if r["mean_contribution"] and r["mean_contribution"] < 0
+            for r in reversed(rows[-5:])
+            if r["mean_contribution"] and r["mean_contribution"] < 0
         ]
 
         recommendations = {
-            r["feature_name"]: "boost" if (r["mean_contribution"] or 0) > 0.03
-            else "drop" if (r["mean_contribution"] or 0) < -0.03
-            else "keep"
+            r["feature_name"]: (
+                "boost"
+                if (r["mean_contribution"] or 0) > 0.03
+                else "drop" if (r["mean_contribution"] or 0) < -0.03 else "keep"
+            )
             for r in rows
         }
 
@@ -440,13 +439,11 @@ class FeaturePerformanceMemory:
             "total_games": total_games,
             "top_features": top,
             "weak_features": weak,
-            "recommendations": recommendations
+            "recommendations": recommendations,
         }
 
     def export_to_dataframe(
-        self,
-        season: int | None = None,
-        weeks: int | None = None
+        self, season: int | None = None, weeks: int | None = None
     ) -> pd.DataFrame:
         """Export all feature performance data to DataFrame."""
         query = """
@@ -501,7 +498,7 @@ if __name__ == "__main__":
         features=test_features,
         prediction_error=3.5,
         correct=True,
-        contributions=test_contributions
+        contributions=test_contributions,
     )
     print("Recorded test game")
 

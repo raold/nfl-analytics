@@ -16,7 +16,6 @@ import sys
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
@@ -32,6 +31,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class AnnotationStats:
     """Statistics from annotation generation."""
+
     season: int
     week: int
     sentiment_annotations: int = 0
@@ -74,11 +74,7 @@ class AnnotationGenerator:
         """Get database connection."""
         return psycopg2.connect(**self.conn_params)
 
-    def get_games_with_outcomes(
-        self,
-        season: int,
-        week: int
-    ) -> list[dict]:
+    def get_games_with_outcomes(self, season: int, week: int) -> list[dict]:
         """
         Get completed games for annotation generation.
 
@@ -111,11 +107,7 @@ class AnnotationGenerator:
                 return [dict(row) for row in cur.fetchall()]
 
     def get_pregame_news(
-        self,
-        team: str,
-        before: datetime,
-        hours: int = 48,
-        limit: int = 10
+        self, team: str, before: datetime, hours: int = 48, limit: int = 10
     ) -> list[dict]:
         """
         Get news articles published before game time.
@@ -147,11 +139,7 @@ class AnnotationGenerator:
                 cur.execute(query, (team, before, since, limit))
                 return [dict(row) for row in cur.fetchall()]
 
-    def get_pregame_injuries(
-        self,
-        team: str,
-        before: datetime
-    ) -> list[dict]:
+    def get_pregame_injuries(self, team: str, before: datetime) -> list[dict]:
         """
         Get injury reports before game time.
 
@@ -179,11 +167,7 @@ class AnnotationGenerator:
                 cur.execute(query, (team, before))
                 return [dict(row) for row in cur.fetchall()]
 
-    def generate_sentiment_annotations(
-        self,
-        season: int,
-        week: int
-    ) -> list[dict]:
+    def generate_sentiment_annotations(self, season: int, week: int) -> list[dict]:
         """
         Generate sentiment training annotations from game outcomes.
 
@@ -201,14 +185,10 @@ class AnnotationGenerator:
             kickoff = game.get("kickoff") or datetime.now()
 
             # Get news for home team
-            home_news = self.get_pregame_news(
-                game["home_team"], kickoff, hours=48
-            )
+            home_news = self.get_pregame_news(game["home_team"], kickoff, hours=48)
 
             # Get news for away team
-            away_news = self.get_pregame_news(
-                game["away_team"], kickoff, hours=48
-            )
+            away_news = self.get_pregame_news(game["away_team"], kickoff, hours=48)
 
             # Generate annotations for each news item
             for news in home_news:
@@ -219,7 +199,7 @@ class AnnotationGenerator:
                     is_home=True,
                     team_won=game["home_won"],
                     spread=game["actual_spread"],
-                    game_id=game["game_id"]
+                    game_id=game["game_id"],
                 )
                 if annotation:
                     annotations.append(annotation)
@@ -232,7 +212,7 @@ class AnnotationGenerator:
                     is_home=False,
                     team_won=not game["home_won"] if game["home_won"] is not None else None,
                     spread=-game["actual_spread"],  # Invert for away
-                    game_id=game["game_id"]
+                    game_id=game["game_id"],
                 )
                 if annotation:
                     annotations.append(annotation)
@@ -247,7 +227,7 @@ class AnnotationGenerator:
         is_home: bool,
         team_won: bool | None,
         spread: float,
-        game_id: str
+        game_id: str,
     ) -> dict | None:
         """Create a single sentiment training annotation."""
         if not news.get("title"):
@@ -283,24 +263,20 @@ class AnnotationGenerator:
             "messages": [
                 {
                     "role": "user",
-                    "content": f"Analyze the sentiment of this NFL news about {team}: {text}"
+                    "content": f"Analyze the sentiment of this NFL news about {team}: {text}",
                 },
                 {
                     "role": "assistant",
                     "content": f"Sentiment analysis for {team}:\n"
-                              f"- Category: {news.get('category', 'general')}\n"
-                              f"- Outcome context: {'won' if team_won else 'lost' if team_won is not None else 'unknown'} "
-                              f"by {abs(spread):.1f} points\n"
-                              f"- Predictive signal: {'positive' if team_won else 'negative' if team_won is not None else 'neutral'}"
-                }
-            ]
+                    f"- Category: {news.get('category', 'general')}\n"
+                    f"- Outcome context: {'won' if team_won else 'lost' if team_won is not None else 'unknown'} "
+                    f"by {abs(spread):.1f} points\n"
+                    f"- Predictive signal: {'positive' if team_won else 'negative' if team_won is not None else 'neutral'}",
+                },
+            ],
         }
 
-    def generate_ner_annotations(
-        self,
-        season: int,
-        week: int
-    ) -> list[dict]:
+    def generate_ner_annotations(self, season: int, week: int) -> list[dict]:
         """
         Generate NER training annotations from injury news.
 
@@ -327,10 +303,7 @@ class AnnotationGenerator:
 
                 for item in injury_news:
                     annotation = self._create_ner_annotation(
-                        news=item,
-                        injuries=injuries,
-                        team=team,
-                        game_id=game["game_id"]
+                        news=item, injuries=injuries, team=team, game_id=game["game_id"]
                     )
                     if annotation:
                         annotations.append(annotation)
@@ -338,11 +311,7 @@ class AnnotationGenerator:
         return annotations
 
     def _create_ner_annotation(
-        self,
-        news: dict,
-        injuries: list[dict],
-        team: str,
-        game_id: str
+        self, news: dict, injuries: list[dict], team: str, game_id: str
     ) -> dict | None:
         """Create a single NER training annotation."""
         if not news.get("title"):
@@ -359,26 +328,35 @@ class AnnotationGenerator:
             if player_name and player_name.lower() in text.lower():
                 # Find position in text
                 idx = text.lower().find(player_name.lower())
-                entities.append({
-                    "text": player_name,
-                    "type": "PLAYER",
-                    "start": idx,
-                    "end": idx + len(player_name),
-                    "status": injury.get("status"),
-                    "injury_type": injury.get("injury_type")
-                })
+                entities.append(
+                    {
+                        "text": player_name,
+                        "type": "PLAYER",
+                        "start": idx,
+                        "end": idx + len(player_name),
+                        "status": injury.get("status"),
+                        "injury_type": injury.get("injury_type"),
+                    }
+                )
 
         # Also look for injury-related terms
-        injury_terms = ["injured", "out", "questionable", "doubtful", "IR", "ankle", "knee", "hamstring", "concussion"]
+        injury_terms = [
+            "injured",
+            "out",
+            "questionable",
+            "doubtful",
+            "IR",
+            "ankle",
+            "knee",
+            "hamstring",
+            "concussion",
+        ]
         for term in injury_terms:
             if term.lower() in text.lower():
                 idx = text.lower().find(term.lower())
-                entities.append({
-                    "text": term,
-                    "type": "INJURY",
-                    "start": idx,
-                    "end": idx + len(term)
-                })
+                entities.append(
+                    {"text": term, "type": "INJURY", "start": idx, "end": idx + len(term)}
+                )
 
         if not entities:
             return None
@@ -391,15 +369,9 @@ class AnnotationGenerator:
             "entities": entities,
             # Format for Ollama fine-tuning
             "messages": [
-                {
-                    "role": "user",
-                    "content": f"Extract injury-related entities from: {text}"
-                },
-                {
-                    "role": "assistant",
-                    "content": json.dumps({"entities": entities}, indent=2)
-                }
-            ]
+                {"role": "user", "content": f"Extract injury-related entities from: {text}"},
+                {"role": "assistant", "content": json.dumps({"entities": entities}, indent=2)},
+            ],
         }
 
     def export_training_batch(
@@ -407,7 +379,7 @@ class AnnotationGenerator:
         output_dir: Path,
         season: int | None = None,
         weeks: list[int] | None = None,
-        format: str = "jsonl"
+        format: str = "jsonl",
     ) -> AnnotationStats:
         """
         Export annotations for model fine-tuning.
@@ -470,7 +442,9 @@ class AnnotationGenerator:
             # SpaCy format for NER
             self._export_spacy(all_ner, output_dir / "ner_train.spacy")
 
-        logger.info(f"Exported {stats.sentiment_annotations} sentiment, {stats.ner_annotations} NER annotations")
+        logger.info(
+            f"Exported {stats.sentiment_annotations} sentiment, {stats.ner_annotations} NER annotations"
+        )
 
         return stats
 
@@ -485,10 +459,7 @@ class AnnotationGenerator:
         # Convert to SpaCy training format
         spacy_format = []
         for ann in annotations:
-            entities = [
-                (e["start"], e["end"], e["type"])
-                for e in ann.get("entities", [])
-            ]
+            entities = [(e["start"], e["end"], e["type"]) for e in ann.get("entities", [])]
             spacy_format.append((ann["text"], {"entities": entities}))
 
         with open(output_path, "w") as f:
@@ -510,7 +481,9 @@ if __name__ == "__main__":
     if games:
         game = games[0]
         print(f"\nSample game: {game['game_id']}")
-        print(f"  Result: {game['home_team']} {game['home_score']} - {game['away_score']} {game['away_team']}")
+        print(
+            f"  Result: {game['home_team']} {game['home_score']} - {game['away_score']} {game['away_team']}"
+        )
 
         # Get pregame news
         kickoff = game.get("kickoff") or datetime.now()

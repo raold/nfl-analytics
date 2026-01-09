@@ -7,6 +7,7 @@ This bypasses import issues by inlining all necessary code.
 """
 
 import logging
+import os
 import pickle
 from pathlib import Path
 

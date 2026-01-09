@@ -12,7 +12,7 @@ to improve maintainability and enable empirical validation.
 """
 
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict
 
 
 # ==============================================================================
@@ -192,11 +192,11 @@ PRIMETIME_EFFECTS = PrimetimeEffects()
 GAME_SLOT_ENCODING: Dict[str, int] = {
     "UNKNOWN": -1,
     "OTHER": 0,
-    "EARLY_SUNDAY": 1,     # 1pm ET
-    "LATE_AFTERNOON": 2,   # 4pm ET
-    "THURSDAY_NIGHT": 3,   # TNF
-    "SUNDAY_NIGHT": 4,     # SNF
-    "MONDAY_NIGHT": 5,     # MNF
+    "EARLY_SUNDAY": 1,  # 1pm ET
+    "LATE_AFTERNOON": 2,  # 4pm ET
+    "THURSDAY_NIGHT": 3,  # TNF
+    "SUNDAY_NIGHT": 4,  # SNF
+    "MONDAY_NIGHT": 5,  # MNF
 }
 
 
@@ -209,28 +209,28 @@ GAME_SLOT_ENCODING: Dict[str, int] = {
 
 EP_BY_FIELD_POSITION: Dict[int, float] = {
     # Own territory (yards from own end zone)
-    1: -1.50,    # Own 1-yard line
-    5: -1.30,    # Own 5-yard line
-    10: -1.00,   # Own 10-yard line
-    15: -0.70,   # Own 15-yard line
-    20: -0.40,   # Own 20-yard line
-    25: -0.10,   # Own 25-yard line
-    30: 0.20,    # Own 30-yard line
-    35: 0.50,    # Own 35-yard line
-    40: 0.80,    # Own 40-yard line
-    45: 1.10,    # Midfield
-    50: 1.40,    # Opponent 50-yard line
+    1: -1.50,  # Own 1-yard line
+    5: -1.30,  # Own 5-yard line
+    10: -1.00,  # Own 10-yard line
+    15: -0.70,  # Own 15-yard line
+    20: -0.40,  # Own 20-yard line
+    25: -0.10,  # Own 25-yard line
+    30: 0.20,  # Own 30-yard line
+    35: 0.50,  # Own 35-yard line
+    40: 0.80,  # Own 40-yard line
+    45: 1.10,  # Midfield
+    50: 1.40,  # Opponent 50-yard line
     # Opponent territory
-    55: 1.80,    # Opponent 45-yard line
-    60: 2.20,    # Opponent 40-yard line
-    65: 2.70,    # Opponent 35-yard line
-    70: 3.20,    # Opponent 30-yard line
-    75: 3.80,    # Opponent 25-yard line
-    80: 4.40,    # Opponent 20-yard line (FG range)
-    85: 5.00,    # Opponent 15-yard line
-    90: 5.50,    # Opponent 10-yard line (Red zone)
-    95: 6.00,    # Opponent 5-yard line
-    99: 6.30,    # Goal line
+    55: 1.80,  # Opponent 45-yard line
+    60: 2.20,  # Opponent 40-yard line
+    65: 2.70,  # Opponent 35-yard line
+    70: 3.20,  # Opponent 30-yard line
+    75: 3.80,  # Opponent 25-yard line
+    80: 4.40,  # Opponent 20-yard line (FG range)
+    85: 5.00,  # Opponent 15-yard line
+    90: 5.50,  # Opponent 10-yard line (Red zone)
+    95: 6.00,  # Opponent 5-yard line
+    99: 6.30,  # Goal line
 }
 
 

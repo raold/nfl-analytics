@@ -90,7 +90,6 @@ import warnings
 
 import numpy as np
 import pandas as pd
-from psycopg2.extras import RealDictCursor
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -528,7 +527,9 @@ def get_team_possession_value_features(
 
     # Return league averages immediately since drive column doesn't exist
     # This avoids repeated SQL errors and log pollution
-    logger.debug(f"Returning league average possession values for {team} (drive column unavailable in schema)")
+    logger.debug(
+        f"Returning league average possession values for {team} (drive column unavailable in schema)"
+    )
     return {
         "avg_starting_field_position": 25.0,  # Touchback position
         "avg_possession_value": 1.5,  # League average EP

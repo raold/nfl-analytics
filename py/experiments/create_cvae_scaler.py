@@ -7,6 +7,7 @@ This scaler will be used to normalize pre-game features before feeding to cVAE.
 """
 
 import sys
+import os
 from pathlib import Path
 
 # Add project root to path

@@ -20,7 +20,6 @@ import logging
 import os
 import random
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -47,12 +46,14 @@ class NERAnnotation:
         # Format entities as structured output
         entity_list = []
         for start, end, label in self.entities:
-            entity_list.append({
-                "text": self.text[start:end],
-                "type": label,
-                "start": start,
-                "end": end,
-            })
+            entity_list.append(
+                {
+                    "text": self.text[start:end],
+                    "type": label,
+                    "start": start,
+                    "end": end,
+                }
+            )
 
         return {
             "text": self.text,
@@ -200,7 +201,8 @@ class AnnotationPipeline:
         """Fetch injury records from database."""
         with self._get_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT full_name, position, team,
                            report_primary_injury, report_status,
                            practice_status, season, week
@@ -210,7 +212,9 @@ class AnnotationPipeline:
                       AND full_name IS NOT NULL
                     ORDER BY RANDOM()
                     LIMIT %s
-                """, (seasons, limit))
+                """,
+                    (seasons, limit),
+                )
                 return [dict(row) for row in cur.fetchall()]
 
     def _create_ner_annotation(self, injury: dict) -> NERAnnotation | None:
@@ -337,7 +341,8 @@ class AnnotationPipeline:
         """Fetch game records from database."""
         with self._get_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cur:
-                cur.execute("""
+                cur.execute(
+                    """
                     SELECT game_id, season, week,
                            home_team, away_team,
                            home_score, away_score,
@@ -347,7 +352,9 @@ class AnnotationPipeline:
                       AND home_score IS NOT NULL
                     ORDER BY RANDOM()
                     LIMIT %s
-                """, (seasons, limit))
+                """,
+                    (seasons, limit),
+                )
                 return [dict(row) for row in cur.fetchall()]
 
     def _create_sentiment_annotations(self, game: dict) -> list[SentimentAnnotation]:
@@ -375,13 +382,15 @@ class AnnotationPipeline:
             f"{winner} looking strong after Week {week} win against {loser}.",
             f"Impressive performance by {winner}, defense held {loser} to {min(home_score, away_score)} points.",
         ]
-        annotations.append(SentimentAnnotation(
-            text=random.choice(positive_templates),
-            sentiment="positive",
-            confidence=0.9 if win_margin > 14 else 0.7,
-            reasoning=f"Decisive {win_margin}-point victory indicates strong performance",
-            metadata={"game_id": game.get("game_id"), "team": winner},
-        ))
+        annotations.append(
+            SentimentAnnotation(
+                text=random.choice(positive_templates),
+                sentiment="positive",
+                confidence=0.9 if win_margin > 14 else 0.7,
+                reasoning=f"Decisive {win_margin}-point victory indicates strong performance",
+                metadata={"game_id": game.get("game_id"), "team": winner},
+            )
+        )
 
         # Generate negative sentiment for loser
         negative_templates = [
@@ -389,13 +398,15 @@ class AnnotationPipeline:
             f"{loser} struggles continue after Week {week} defeat.",
             f"Concerning performance by {loser}, offense managed only {min(home_score, away_score)} points.",
         ]
-        annotations.append(SentimentAnnotation(
-            text=random.choice(negative_templates),
-            sentiment="negative",
-            confidence=0.9 if win_margin > 14 else 0.7,
-            reasoning=f"Loss by {win_margin} points suggests team struggles",
-            metadata={"game_id": game.get("game_id"), "team": loser},
-        ))
+        annotations.append(
+            SentimentAnnotation(
+                text=random.choice(negative_templates),
+                sentiment="negative",
+                confidence=0.9 if win_margin > 14 else 0.7,
+                reasoning=f"Loss by {win_margin} points suggests team struggles",
+                metadata={"game_id": game.get("game_id"), "team": loser},
+            )
+        )
 
         return annotations
 
@@ -432,11 +443,13 @@ class AnnotationPipeline:
                         }
                     else:  # sentiment
                         prompt = f"Analyze the sentiment of this NFL-related text:\n\n{ann.text}"
-                        response = json.dumps({
-                            "sentiment": ann.sentiment,
-                            "confidence": ann.confidence,
-                            "reasoning": ann.reasoning,
-                        })
+                        response = json.dumps(
+                            {
+                                "sentiment": ann.sentiment,
+                                "confidence": ann.confidence,
+                                "reasoning": ann.reasoning,
+                            }
+                        )
                         record = {
                             "prompt": prompt,
                             "response": response,
@@ -475,15 +488,12 @@ class AnnotationPipeline:
                     "messages": [
                         {
                             "role": "system",
-                            "content": "You are an NFL entity extraction expert. Extract entities as JSON."
+                            "content": "You are an NFL entity extraction expert. Extract entities as JSON.",
                         },
-                        {
-                            "role": "user",
-                            "content": f"Extract entities from: {ann.text}"
-                        },
+                        {"role": "user", "content": f"Extract entities from: {ann.text}"},
                         {
                             "role": "assistant",
-                            "content": json.dumps({"entities": ann.to_jsonl()["entities"]})
+                            "content": json.dumps({"entities": ann.to_jsonl()["entities"]}),
                         },
                     ]
                 }

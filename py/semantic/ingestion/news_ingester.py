@@ -14,7 +14,7 @@ import json
 import logging
 import re
 from dataclasses import asdict, dataclass, field
-from datetime import datetime, timedelta
+from datetime import datetime
 from enum import Enum
 from typing import Any
 
@@ -77,11 +77,33 @@ class NewsItem:
 
 # Injury keywords for classification (use word boundaries for short words)
 INJURY_KEYWORDS = [
-    "injury", "injured", "hurt", "questionable", "doubtful",
-    "probable", "limited", "dnp", "did not practice", "ankle", "knee",
-    "hamstring", "concussion", "shoulder", "hip", "groin",
-    "calf", "quad", "achilles", "torn", "sprain", "strain", "fracture",
-    "surgery", "injured reserve", "pup", "nfi",
+    "injury",
+    "injured",
+    "hurt",
+    "questionable",
+    "doubtful",
+    "probable",
+    "limited",
+    "dnp",
+    "did not practice",
+    "ankle",
+    "knee",
+    "hamstring",
+    "concussion",
+    "shoulder",
+    "hip",
+    "groin",
+    "calf",
+    "quad",
+    "achilles",
+    "torn",
+    "sprain",
+    "strain",
+    "fracture",
+    "surgery",
+    "injured reserve",
+    "pup",
+    "nfi",
 ]
 
 # Short keywords that need word boundary matching
@@ -89,14 +111,32 @@ INJURY_KEYWORDS_EXACT = ["out", "back", "ir"]
 
 # Coaching/lineup keywords
 COACHING_KEYWORDS = [
-    "coach", "fired", "hired", "coordinator", "playcaller", "starter",
-    "benched", "starting", "lineup", "depth chart", "promoted", "demoted",
+    "coach",
+    "fired",
+    "hired",
+    "coordinator",
+    "playcaller",
+    "starter",
+    "benched",
+    "starting",
+    "lineup",
+    "depth chart",
+    "promoted",
+    "demoted",
 ]
 
 # Weather keywords
 WEATHER_KEYWORDS = [
-    "weather", "snow", "rain", "wind", "cold", "dome", "outdoor",
-    "temperature", "forecast", "conditions",
+    "weather",
+    "snow",
+    "rain",
+    "wind",
+    "cold",
+    "dome",
+    "outdoor",
+    "temperature",
+    "forecast",
+    "conditions",
 ]
 
 # Star player patterns (for priority boosting)
@@ -169,14 +209,38 @@ def extract_teams_from_text(text: str) -> list[str]:
     except ImportError:
         # Fallback team list
         TEAM_MAPPING = {
-            "ARI": "Cardinals", "ATL": "Falcons", "BAL": "Ravens", "BUF": "Bills",
-            "CAR": "Panthers", "CHI": "Bears", "CIN": "Bengals", "CLE": "Browns",
-            "DAL": "Cowboys", "DEN": "Broncos", "DET": "Lions", "GB": "Packers",
-            "HOU": "Texans", "IND": "Colts", "JAX": "Jaguars", "KC": "Chiefs",
-            "LAC": "Chargers", "LAR": "Rams", "LV": "Raiders", "MIA": "Dolphins",
-            "MIN": "Vikings", "NE": "Patriots", "NO": "Saints", "NYG": "Giants",
-            "NYJ": "Jets", "PHI": "Eagles", "PIT": "Steelers", "SEA": "Seahawks",
-            "SF": "49ers", "TB": "Buccaneers", "TEN": "Titans", "WAS": "Commanders",
+            "ARI": "Cardinals",
+            "ATL": "Falcons",
+            "BAL": "Ravens",
+            "BUF": "Bills",
+            "CAR": "Panthers",
+            "CHI": "Bears",
+            "CIN": "Bengals",
+            "CLE": "Browns",
+            "DAL": "Cowboys",
+            "DEN": "Broncos",
+            "DET": "Lions",
+            "GB": "Packers",
+            "HOU": "Texans",
+            "IND": "Colts",
+            "JAX": "Jaguars",
+            "KC": "Chiefs",
+            "LAC": "Chargers",
+            "LAR": "Rams",
+            "LV": "Raiders",
+            "MIA": "Dolphins",
+            "MIN": "Vikings",
+            "NE": "Patriots",
+            "NO": "Saints",
+            "NYG": "Giants",
+            "NYJ": "Jets",
+            "PHI": "Eagles",
+            "PIT": "Steelers",
+            "SEA": "Seahawks",
+            "SF": "49ers",
+            "TB": "Buccaneers",
+            "TEN": "Titans",
+            "WAS": "Commanders",
         }
 
     # Abbreviations that could be common words - require UPPERCASE
