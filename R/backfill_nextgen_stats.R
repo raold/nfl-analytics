@@ -336,7 +336,7 @@ safe_db_operation(
         ")
 
         log_message("=== Next Gen Passing Stats Summary ===", level = "INFO")
-        for (i in 1:nrow(passing_summary)) {
+        for (i in seq_len(nrow(passing_summary))) {
           log_message(
             sprintf(
               "  Season %.0f: %.0f QBs, %.0f records, Avg CPOE: %.2f",
@@ -358,7 +358,7 @@ safe_db_operation(
         ")
 
         log_message("=== Next Gen Rushing Stats Summary ===", level = "INFO")
-        for (i in 1:nrow(rushing_summary)) {
+        for (i in seq_len(nrow(rushing_summary))) {
           log_message(
             sprintf(
               "  Season %.0f: %.0f rushers, %.0f records",
@@ -379,7 +379,7 @@ safe_db_operation(
         ")
 
         log_message("=== Next Gen Receiving Stats Summary ===", level = "INFO")
-        for (i in 1:nrow(receiving_summary)) {
+        for (i in seq_len(nrow(receiving_summary))) {
           log_message(
             sprintf(
               "  Season %.0f: %.0f receivers, %.0f records",

@@ -319,7 +319,7 @@ check_table_maintenance <- function(conn) {
       "⚠️  WARNING: %d tables with >20%% dead rows: %s",
       nrow(high_dead_rows), paste(high_dead_rows$table_name, collapse = ", ")
     ), level = "WARNING")
-    for (i in 1:nrow(high_dead_rows)) {
+    for (i in seq_len(nrow(high_dead_rows))) {
       row <- high_dead_rows[i, ]
       store_audit_result(
         conn, "table_maintenance", row$table_name, "dead_row_percentage", "WARNING",
@@ -383,7 +383,7 @@ check_season_coverage <- function(conn) {
 
   log_audit(sprintf("Recent seasons analyzed: %d", nrow(result)))
 
-  for (i in 1:nrow(result)) {
+  for (i in seq_len(nrow(result))) {
     row <- result[i, ]
     log_audit(sprintf("  Season %d: %d data sources", as.integer(row$season), as.integer(row$data_sources)))
   }

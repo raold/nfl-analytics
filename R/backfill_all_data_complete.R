@@ -406,7 +406,7 @@ safe_db_operation(
         ")
 
         log_message("=== ESPN QBR Summary (Last 5 Seasons) ===", level = "INFO")
-        for (i in 1:nrow(qbr_summary)) {
+        for (i in seq_len(nrow(qbr_summary))) {
           log_message(
             sprintf(
               "  Season %.0f: %.0f QBs, %.0f records, Avg QBR: %.2f",
@@ -429,7 +429,7 @@ safe_db_operation(
         ")
 
         log_message("=== PFR Defense Stats Summary (Last 5 Seasons) ===", level = "INFO")
-        for (i in 1:nrow(def_summary)) {
+        for (i in seq_len(nrow(def_summary))) {
           log_message(
             sprintf(
               "  Season %.0f: %.0f defenders, %.0f records",
@@ -451,7 +451,7 @@ safe_db_operation(
         ")
 
         log_message("=== Snap Counts Summary (Last 5 Seasons) ===", level = "INFO")
-        for (i in 1:nrow(snaps_summary)) {
+        for (i in seq_len(nrow(snaps_summary))) {
           log_message(
             sprintf(
               "  Season %.0f: %.0f players, %.0f records",
@@ -474,7 +474,7 @@ safe_db_operation(
         ")
 
         log_message("=== Depth Charts Summary - Starters (Last 5 Seasons) ===", level = "INFO")
-        for (i in 1:nrow(depth_summary)) {
+        for (i in seq_len(nrow(depth_summary))) {
           log_message(
             sprintf(
               "  Season %.0f: %.0f starters, %.0f records",

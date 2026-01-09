@@ -203,7 +203,7 @@ safe_db_operation(
           ORDER BY season
         ")
 
-        for (i in 1:nrow(season_summary)) {
+        for (i in seq_len(nrow(season_summary))) {
           log_message(
             sprintf(
               "Season %.0f: %.0f games with metadata",
@@ -348,7 +348,7 @@ safe_db_operation(
         ")
 
         log_message("=== Roof Type Distribution ===", level = "INFO")
-        for (i in 1:nrow(roof_summary)) {
+        for (i in seq_len(nrow(roof_summary))) {
           log_message(
             sprintf(
               "  %s: %.0f games (%.1f%%)",
@@ -373,7 +373,7 @@ safe_db_operation(
         ")
 
         log_message("=== Top 5 Surface Types ===", level = "INFO")
-        for (i in 1:nrow(surface_summary)) {
+        for (i in seq_len(nrow(surface_summary))) {
           log_message(
             sprintf(
               "  %s: %.0f games",

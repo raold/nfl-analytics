@@ -285,7 +285,7 @@ cat("Deleted old state-space ratings\n")
 
 # Insert new ratings
 n_inserted <- 0
-for (i in 1:nrow(ratings_df)) {
+for (i in seq_len(nrow(ratings_df))) {
   row <- ratings_df[i, ]
 
   tryCatch(
