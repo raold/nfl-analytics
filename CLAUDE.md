@@ -493,6 +493,84 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ---
 
+## LaTeX Tooling & Workflow
+
+**Location:** `analysis/dissertation/main/main.tex` (693 pages)
+
+### Workflow Scripts (`~/.local/bin/diss-*`)
+
+| Command | Alias | Purpose |
+|---------|-------|---------|
+| `diss-watch` | `dw` | Continuous compilation with `latexmk -pdf -pvc` (recompiles on save) |
+| `diss-diff` | `dd` | Generate tracked-changes PDF via `latexdiff-vc` for advisor review |
+| `diss-stats` | `ds` | Word count (`texcount`), page count, font embedding check |
+| `diss-compress` | `dc` | Compress PDF via Ghostscript (ebook/prepress/screen quality) |
+| `diss-clean` | `dclean` | Remove auxiliary files (`.aux`, `.log`, `.bbl`, etc.) |
+| `diss-lint` | `dl` | LaTeX linting via `chktex` and `lacheck` |
+| `diss-figures` | `df` | List/crop/optimize figures (`pdfcrop`, `optipng`) |
+
+**Environment:** `DISS_DIR` points to dissertation main directory (set in `.zshrc`)
+
+### Available LaTeX Tools
+
+**Engines:** `latex`, `pdflatex`, `xelatex`, `lualatex`, `context`, `tex`
+**Build Systems:** `latexmk`, `arara`, `rubber`, `texliveonfly`
+**Bibliography:** `bibtex`, `biber`, `bibtex8`, `bib2bib`, `bibexport`, `bibclean`
+**Linting/QA:** `chktex`, `lacheck`, `latexindent`, `latexdiff`, `latexdiff-vc`, `detex`, `texcount`, `texlogsieve`
+**Indexing:** `makeindex`, `xindy`, `makeglossaries`, `splitindex`
+**DVI/PS:** `dvips`, `dvipdf`, `dvipdfm`, `dvipdfmx`, `ps2pdf`, `pdf2ps`
+**PDF Tools:** `pdfcrop`, `pdfjam`, `pdfinfo`, `pdftotext`, `pdftoppm`, `pdfimages`, `pdffonts`, `pdfseparate`, `pdfunite`, `pdftk`, `qpdf`, `pdfannotextractor`
+**Ghostscript:** `gs`, `ghostscript`, `mutool`
+**Graphics:** `epstopdf`, `eps2pdf`, `svg2pdf`, `img2pdf`, `convert`, `magick`, `inkscape`, `mpost`, `metapost`, `ltximg`
+**Image Optimization:** `optipng`, `pngquant`, `jpegoptim`
+**TeX Live:** `tlmgr`, `texhash`, `mktexlsr`, `fmtutil`, `updmap`, `kpsewhich`, `texdoc`
+**Conversion:** `pandoc`
+**Viewers:** `zathura`, `evince`, `okular`, `mupdf`, `xdg-open`
+
+### Common Workflows
+
+```bash
+# Start continuous compilation (Terminal 1)
+dw                              # or: diss-watch
+
+# Check stats anytime (Terminal 2)
+ds                              # Word count, pages, font check
+
+# Before sending to advisor
+dd HEAD~5                       # Diff against 5 commits ago
+# Output: ~/.diffs/diff_HEAD~5_<timestamp>.pdf
+
+# Before final submission
+ds                              # Verify all fonts embedded
+dc prepress                     # Compress with high quality
+# Output: main-prepress.pdf
+
+# Clean up after compilation
+dclean                          # Remove aux files
+dclean --all                    # Also remove PDF
+
+# Manage figures
+df list                         # Show all figures with sizes
+df crop figure.pdf              # Crop whitespace from single PDF
+df crop-all                     # Crop all PDFs in figures/
+df optimize                     # Optimize PNG file sizes
+
+# Filter noisy LaTeX logs
+latexmk -pdf main.tex 2>&1 | texlogsieve
+```
+
+### Quick LaTeX Aliases (in `.zshrc`)
+
+```bash
+lmk                             # latexmk -pdf
+lmkc                            # latexmk -c (clean aux)
+lmkca                           # latexmk -C (clean all)
+texwc                           # texcount -inc -total
+pdfpg                           # pdfinfo (shows page count)
+```
+
+---
+
 ## Code Style
 
 **Python:** Black formatter, type hints, Google-style docstrings, 100 char max
