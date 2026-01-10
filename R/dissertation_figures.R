@@ -25,7 +25,7 @@ suppressPackageStartupMessages({
 })
 
 # Define output directory
-OUTPUT_DIR <- "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out"
+OUTPUT_DIR <- file.path(Sys.getenv("HOME"), "rice/nfl-analytics/analysis/dissertation/figures/out")
 
 # Create output directory if it doesn't exist
 if (!dir.exists(OUTPUT_DIR)) {
@@ -286,30 +286,32 @@ generate_training_window_ablation <- function(output_dir = OUTPUT_DIR) {
   ) %>%
     mutate(scenario = factor(scenario, levels = scenario))
 
-  # MAE comparison
+  # MAE comparison (clean academic style)
   p1 <- ggplot(ablation_data, aes(x = scenario, y = mae)) +
     geom_col(aes(fill = scenario == "Canonical\n(2018-2024 + H=4)"), width = 0.7) +
     geom_errorbar(aes(ymin = mae - mae_se, ymax = mae + mae_se),
-      width = 0.3, size = 0.8
+      width = 0.25, linewidth = 0.6, color = GREY_DARK
     ) +
-    geom_text(aes(label = sprintf("%.2f", mae)),
-      vjust = -2, size = 3.5, fontface = "bold"
+    geom_text(aes(label = sprintf("%.1f", mae)),
+      vjust = -2, size = 3.2, color = GREY_DARK
     ) +
     scale_fill_manual(
-      values = c("FALSE" = "gray70", "TRUE" = ACCENT_BLUE),
+      values = c("FALSE" = GREY_LIGHT, "TRUE" = ACCENT_BLUE),
       guide = "none"
     ) +
     labs(
-      title = "Training Window Ablation Study (State-Space Model)",
-      subtitle = "148 games (2024 holdout), MAE ± SE",
       x = NULL,
-      y = "Mean Absolute Error (yards)"
+      y = "Mean absolute error (yards)"
     ) +
     theme_dissertation() +
-    theme(panel.grid.major.x = element_blank()) +
+    theme(
+      panel.grid.major.x = element_blank(),
+      plot.title = element_blank(),
+      plot.subtitle = element_blank()
+    ) +
     ylim(40, 55)
 
-  # Statistical significance
+  # Statistical significance (simplified academic style)
   ablation_sig <- ablation_data %>%
     filter(!is.na(p_value)) %>%
     mutate(
@@ -319,44 +321,35 @@ generate_training_window_ablation <- function(output_dir = OUTPUT_DIR) {
         p_value < 0.05 ~ "*",
         TRUE ~ "ns"
       ),
-      sig_color = case_when(
-        p_value < 0.01 ~ "Significant (p<0.01)",
-        p_value < 0.05 ~ "Marginal (p<0.05)",
-        TRUE ~ "Not Significant"
-      )
+      is_significant = p_value < 0.01
     )
 
   p2 <- ggplot(ablation_sig, aes(x = scenario, y = -log10(p_value))) +
-    geom_col(aes(fill = sig_color), width = 0.7) +
+    geom_col(aes(fill = is_significant), width = 0.7) +
     geom_hline(
       yintercept = -log10(0.01), linetype = "dashed",
-      color = "red", size = 0.8
+      color = GREY_MED, linewidth = 0.6
     ) +
     geom_hline(
-      yintercept = -log10(0.05), linetype = "dashed",
-      color = "orange", size = 0.8
+      yintercept = -log10(0.05), linetype = "dotted",
+      color = GREY_MED, linewidth = 0.6
     ) +
-    geom_text(aes(label = sig_level), vjust = -0.5, size = 4, fontface = "bold") +
+    geom_text(aes(label = sig_level), vjust = -0.3, size = 3.5, color = GREY_DARK) +
     scale_fill_manual(
-      values = c(
-        "Significant (p<0.01)" = "red3",
-        "Marginal (p<0.05)" = "orange",
-        "Not Significant" = "gray70"
-      )
+      values = c("FALSE" = GREY_LIGHT, "TRUE" = ACCENT_ORANGE),
+      guide = "none"
     ) +
     annotate("text",
-      x = 0.7, y = -log10(0.01), label = "p=0.01",
-      vjust = -0.5, size = 3, color = "red3"
+      x = 3.4, y = -log10(0.01) + 0.15, label = "p = 0.01",
+      size = 2.8, color = GREY_MED, hjust = 1
     ) +
     annotate("text",
-      x = 0.7, y = -log10(0.05), label = "p=0.05",
-      vjust = -0.5, size = 3, color = "orange"
+      x = 3.4, y = -log10(0.05) + 0.15, label = "p = 0.05",
+      size = 2.8, color = GREY_MED, hjust = 1
     ) +
     labs(
-      title = "Statistical Significance vs. Canonical Window",
-      x = "Alternative Scenario",
-      y = "-log10(p-value)",
-      fill = "Significance"
+      x = "Training window scenario",
+      y = expression(-log[10](italic(p)))
     ) +
     theme_dissertation() +
     theme(panel.grid.major.x = element_blank())
@@ -366,7 +359,7 @@ generate_training_window_ablation <- function(output_dir = OUTPUT_DIR) {
 
   # Save
   output_path <- file.path(output_dir, "training_window_ablation.pdf")
-  ggsave(output_path, combined, width = 8, height = 9, device = "pdf")
+  ggsave(output_path, combined, width = 7, height = 7, device = "pdf")
   cat(sprintf("  ✓ Saved: %s\n", output_path))
 
   invisible(combined)

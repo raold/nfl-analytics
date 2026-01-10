@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate Figure 4.1: Gaussian copula joint exceedance.
+Generate Figure 2.1: Gaussian copula joint exceedance.
 
 Shows the probability of joint exceedance P(Z1>0, Z2>0) as a function of
 correlation rho, comparing empirical simulation to analytic formula:
@@ -12,10 +12,38 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Set publication-quality style
-plt.rcParams["figure.facecolor"] = "white"
-plt.rcParams["axes.facecolor"] = "white"
-plt.rcParams["savefig.facecolor"] = "white"
+# =============================================================================
+# DISSERTATION COLOR PALETTE (synchronized with main.tex / tikz_diagram_style.tex)
+# =============================================================================
+ACCENT_BLUE = "#1f77b4"     # RGB(31,119,180) - Primary
+ACCENT_ORANGE = "#ff7f0e"   # RGB(255,127,14) - Secondary/contrast
+ACCENT_GREEN = "#2ca02c"    # RGB(44,160,44) - Success
+ACCENT_RED = "#d62728"      # RGB(214,39,40) - Warning
+GREY_DARK = "#4d4d4d"       # grey3 = 0.3 - Axes, labels
+GREY_MED = "#808080"        # grey5 = 0.5 - Secondary text
+GREY_LIGHT = "#b3b3b3"      # grey7 = 0.7 - Gridlines
+
+# Set publication-quality style (academic/serif)
+plt.rcParams.update({
+    "figure.facecolor": "white",
+    "axes.facecolor": "white",
+    "savefig.facecolor": "white",
+    "font.family": "serif",
+    "font.serif": ["Computer Modern Roman", "Times New Roman", "DejaVu Serif"],
+    "mathtext.fontset": "cm",
+    "axes.labelsize": 11,
+    "axes.titlesize": 12,
+    "xtick.labelsize": 10,
+    "ytick.labelsize": 10,
+    "legend.fontsize": 9,
+    "axes.linewidth": 0.8,
+    "axes.edgecolor": GREY_DARK,
+    "axes.labelcolor": GREY_DARK,
+    "xtick.color": GREY_MED,
+    "ytick.color": GREY_MED,
+    "grid.color": GREY_LIGHT,
+    "grid.linewidth": 0.5,
+})
 
 
 def analytic_joint_exceedance(rho):
@@ -47,7 +75,7 @@ def empirical_joint_exceedance(rho, n_samples=100000, seed=42):
 
 
 def generate_copula_figure(rho_range=None, n_samples=100000, seed=42):
-    """Generate the copula joint exceedance figure."""
+    """Generate the copula joint exceedance figure with publication-quality styling."""
 
     if rho_range is None:
         rho_range = np.linspace(-0.99, 0.99, 100)
@@ -61,117 +89,83 @@ def generate_copula_figure(rho_range=None, n_samples=100000, seed=42):
         empirical_joint_exceedance(rho, n_samples=n_samples, seed=seed) for rho in rho_empirical
     ]
 
-    # Create figure
-    fig, ax = plt.subplots(figsize=(10, 7), dpi=300)
+    # Create figure with academic proportions
+    fig, ax = plt.subplots(figsize=(7, 5), dpi=300)
 
-    # Plot analytic curve
+    # Plot analytic curve (primary blue)
     ax.plot(
         rho_range,
         analytic_probs,
-        "b-",
-        linewidth=3,
+        color=ACCENT_BLUE,
+        linewidth=2,
         label=r"Analytic: $P = \frac{1}{4} + \frac{1}{2\pi}\arcsin(\rho)$",
         zorder=2,
     )
 
-    # Plot empirical points
+    # Plot empirical points (orange for contrast)
     ax.scatter(
         rho_empirical,
         empirical_probs,
-        color="red",
-        s=60,
-        alpha=0.7,
-        edgecolors="black",
+        color=ACCENT_ORANGE,
+        s=40,
+        alpha=0.8,
+        edgecolors="white",
         linewidth=0.5,
         label=f"Empirical ({n_samples:,} samples)",
         zorder=3,
     )
 
-    # Mark special points
-    special_rhos = [-0.5, 0, 0.5]
-    special_probs = analytic_joint_exceedance(np.array(special_rhos))
+    # Reference lines (subtle, informative)
+    # Independence (ρ=0)
+    ax.axhline(0.25, color=GREY_MED, linestyle="--", linewidth=1, alpha=0.6, zorder=1)
+    ax.text(0.92, 0.26, r"$P=0.25$ (indep.)", fontsize=8, color=GREY_MED, ha="right")
 
-    for rho, prob in zip(special_rhos, special_probs):
-        ax.axvline(rho, color="gray", linestyle=":", alpha=0.4, zorder=1)
-        ax.axhline(prob, color="gray", linestyle=":", alpha=0.4, zorder=1)
+    # Perfect positive (ρ=1)
+    ax.axhline(0.5, color=GREY_MED, linestyle=":", linewidth=1, alpha=0.6, zorder=1)
+    ax.text(0.92, 0.51, r"$P=0.5$ ($\rho=1$)", fontsize=8, color=GREY_MED, ha="right")
 
-        # Annotate
+    # Perfect negative (ρ=-1)
+    ax.axhline(0.0, color=GREY_MED, linestyle=":", linewidth=1, alpha=0.6, zorder=1)
+    ax.text(-0.92, 0.01, r"$P=0$ ($\rho=-1$)", fontsize=8, color=GREY_MED, ha="left")
+
+    # Mark key points with minimal annotations (no tooltip boxes)
+    special_rhos = [0.3]  # Just the NFL-relevant point
+    for rho in special_rhos:
+        prob = analytic_joint_exceedance(rho)
+        ax.plot(rho, prob, "o", color=ACCENT_RED, markersize=8, zorder=4)
         ax.annotate(
-            f"$\\rho$={rho:.1f}\nP={prob:.3f}",
+            rf"$\rho={rho}$" + "\n" + f"$P={prob:.3f}$",
             xy=(rho, prob),
-            xytext=(12, 12),
+            xytext=(15, -20),
             textcoords="offset points",
-            fontsize=11,
-            fontweight="medium",
-            bbox=dict(boxstyle="round,pad=0.4", facecolor="lightyellow", alpha=0.8, edgecolor="gray"),
-            arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=0", lw=1.2, color="gray"),
+            fontsize=9,
+            color=GREY_DARK,
+            arrowprops=dict(arrowstyle="-", color=GREY_MED, lw=0.8),
         )
 
-    # Independence line
-    ax.axhline(
-        0.25,
-        color="green",
-        linestyle="--",
-        linewidth=2,
-        alpha=0.7,
-        label=r"Independence ($\rho=0$): $P=0.25$",
-    )
+    # Labels (no bold, academic style)
+    ax.set_xlabel(r"Correlation ($\rho$)")
+    ax.set_ylabel(r"$\mathbb{P}(Z_1 > 0, Z_2 > 0)$")
 
-    # Perfect positive correlation
-    ax.axhline(
-        0.5,
-        color="orange",
-        linestyle="--",
-        linewidth=2,
-        alpha=0.7,
-        label=r"Perfect positive ($\rho=1$): $P=0.5$",
-    )
-
-    # Perfect negative correlation
-    ax.axhline(
-        0.0,
-        color="purple",
-        linestyle="--",
-        linewidth=2,
-        alpha=0.7,
-        label=r"Perfect negative ($\rho=-1$): $P=0$",
-    )
-
-    # Labels and title
-    ax.set_xlabel("Correlation (rho)", fontsize=14, fontweight="bold")
-    ax.set_ylabel("P(Z1>0, Z2>0)", fontsize=14, fontweight="bold")
-    ax.set_title(
-        "Gaussian Copula Joint Exceedance\n" "Calibration Check for Dependence Modeling",
-        fontsize=16,
-        fontweight="bold",
-        pad=20,
-    )
-
-    # Grid and styling
-    ax.grid(True, alpha=0.3, linestyle="--")
+    # Grid and limits
+    ax.grid(True, alpha=0.4, linestyle="-", linewidth=0.5)
     ax.set_xlim(-1, 1)
-    ax.set_ylim(-0.05, 0.55)
+    ax.set_ylim(-0.02, 0.55)
 
-    # Legend
-    ax.legend(loc="upper left", fontsize=10, framealpha=0.95, edgecolor="black")
-
-    # Add context box
-    context_text = (
-        "Application: NFL spread-total dependence\n"
-        "Typical correlation: $\\rho \\in [0.2, 0.4]$\n"
-        "Joint exceedance: $P \\in [0.28, 0.32]$"
+    # Legend (clean, outside interference)
+    ax.legend(
+        loc="upper left",
+        frameon=True,
+        framealpha=0.95,
+        edgecolor=GREY_LIGHT,
+        fancybox=False,
     )
 
-    ax.text(
-        0.98,
-        0.03,
-        context_text,
-        transform=ax.transAxes,
-        verticalalignment="bottom",
-        horizontalalignment="right",
-        bbox=dict(boxstyle="round,pad=0.5", facecolor="lightblue", alpha=0.7, edgecolor="steelblue"),
-        fontsize=11,
-    )
+    # Spine styling
+    for spine in ["top", "right"]:
+        ax.spines[spine].set_visible(False)
+    for spine in ["bottom", "left"]:
+        ax.spines[spine].set_color(GREY_DARK)
 
     plt.tight_layout()
 
@@ -181,7 +175,7 @@ def generate_copula_figure(rho_range=None, n_samples=100000, seed=42):
 def main():
     """Generate and save the figure."""
 
-    print("Generating Figure 4.1: Copula joint exceedance...")
+    print("Generating Figure 2.1: Copula joint exceedance...")
 
     # Generate figure
     fig = generate_copula_figure(rho_range=np.linspace(-0.99, 0.99, 100), n_samples=100000, seed=42)
@@ -210,7 +204,7 @@ def main():
         )
 
     plt.close()
-    print("\n✓ Figure 4.1 complete")
+    print("\n✓ Figure 2.1 complete")
 
 
 if __name__ == "__main__":

@@ -119,11 +119,11 @@ p3 <- gpu_comparison %>%
   filter(metric == "GPU Utilization (%)") %>%
   ggplot(aes(x = version, y = value, fill = version)) +
   geom_col(show.legend = FALSE) +
-  geom_hline(yintercept = 100, linetype = "dashed", color = "red", alpha = 0.5) +
-  geom_text(aes(label = sprintf("%.0f%%", value)), vjust = -0.5, size = 4) +
+  geom_hline(yintercept = 100, linetype = "dashed", color = "gray50", alpha = 0.7) +
+  geom_text(aes(label = sprintf("%.0f%%", value)), vjust = -0.5, size = 4, color = "gray30") +
   annotate("text", x = 1.5, y = 100, label = "100% (Available)",
-           vjust = -0.5, color = "red", size = 3) +
-  scale_fill_manual(values = c("baseline" = "#d62728", "optimized" = "#2ca02c")) +
+           vjust = -0.5, color = "gray50", size = 3) +
+  scale_fill_manual(values = c("baseline" = "#1f77b4", "optimized" = "#ff7f0e")) +  # Colorblind-safe
   scale_y_continuous(limits = c(0, 110), expand = c(0, 0)) +
   labs(
     title = "GPU Utilization: Baseline vs Optimized",
@@ -211,9 +211,13 @@ latex_lines <- c(
 
 for (i in 1:nrow(comparison_table)) {
   row <- comparison_table[i, ]
+  # Escape % characters for LaTeX
   latex_lines <- c(latex_lines, sprintf(
     "%s & %s & %s & %s \\\\",
-    row$Metric, row$`Baseline (CPU)`, row$`Optimized (GPU)`, row$Improvement
+    gsub("%", "\\\\%", row$Metric),
+    gsub("%", "\\\\%", row$`Baseline (CPU)`),
+    gsub("%", "\\\\%", row$`Optimized (GPU)`),
+    gsub("%", "\\\\%", row$Improvement)
   ))
 }
 

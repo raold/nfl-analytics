@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate Figure 6.5: Baseline calibration reliability diagram.
+Generate Figure 2.2: Baseline calibration reliability diagram.
 
 Shows probability calibration with 95% binomial confidence intervals.
 Perfect calibration follows the diagonal line.
@@ -11,10 +11,38 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Set publication-quality style
-plt.rcParams["figure.facecolor"] = "white"
-plt.rcParams["axes.facecolor"] = "white"
-plt.rcParams["savefig.facecolor"] = "white"
+# =============================================================================
+# DISSERTATION COLOR PALETTE (synchronized with main.tex / tikz_diagram_style.tex)
+# =============================================================================
+ACCENT_BLUE = "#1f77b4"     # RGB(31,119,180) - Primary
+ACCENT_ORANGE = "#ff7f0e"   # RGB(255,127,14) - Secondary/contrast
+ACCENT_GREEN = "#2ca02c"    # RGB(44,160,44) - Success
+ACCENT_RED = "#d62728"      # RGB(214,39,40) - Warning
+GREY_DARK = "#4d4d4d"       # grey3 = 0.3 - Axes, labels
+GREY_MED = "#808080"        # grey5 = 0.5 - Secondary text
+GREY_LIGHT = "#b3b3b3"      # grey7 = 0.7 - Gridlines
+
+# Set publication-quality style (academic/serif)
+plt.rcParams.update({
+    "figure.facecolor": "white",
+    "axes.facecolor": "white",
+    "savefig.facecolor": "white",
+    "font.family": "serif",
+    "font.serif": ["Computer Modern Roman", "Times New Roman", "DejaVu Serif"],
+    "mathtext.fontset": "cm",
+    "axes.labelsize": 11,
+    "axes.titlesize": 12,
+    "xtick.labelsize": 10,
+    "ytick.labelsize": 10,
+    "legend.fontsize": 9,
+    "axes.linewidth": 0.8,
+    "axes.edgecolor": GREY_DARK,
+    "axes.labelcolor": GREY_DARK,
+    "xtick.color": GREY_MED,
+    "ytick.color": GREY_MED,
+    "grid.color": GREY_LIGHT,
+    "grid.linewidth": 0.5,
+})
 
 
 def simulate_predictions_and_outcomes(
@@ -115,7 +143,7 @@ def calculate_calibration_bins(predicted_probs: np.ndarray, outcomes: np.ndarray
 def generate_reliability_diagram(
     n_games: int = 2500, n_bins: int = 10, calibration_error: float = 0.02, seed: int = 42
 ):
-    """Generate the reliability diagram figure."""
+    """Generate the reliability diagram figure with publication-quality styling."""
 
     # Simulate data
     predicted_probs, outcomes = simulate_predictions_and_outcomes(
@@ -127,11 +155,12 @@ def generate_reliability_diagram(
         predicted_probs, outcomes, n_bins=n_bins
     )
 
-    # Create figure
-    fig, ax = plt.subplots(figsize=(10, 10), dpi=300)
+    # Create figure with academic proportions
+    fig, ax = plt.subplots(figsize=(6, 6), dpi=300)
 
     # Perfect calibration diagonal
-    ax.plot([0, 1], [0, 1], "k--", linewidth=2, alpha=0.5, label="Perfect calibration", zorder=1)
+    ax.plot([0, 1], [0, 1], linestyle="--", linewidth=1.5, color=GREY_MED,
+            alpha=0.8, label="Perfect calibration", zorder=1)
 
     # Observed calibration with error bars
     valid_mask = ~np.isnan(observed_freqs)
@@ -144,12 +173,12 @@ def generate_reliability_diagram(
             upper_ci[valid_mask] - observed_freqs[valid_mask],
         ],
         fmt="o",
-        markersize=10,
-        color="steelblue",
-        ecolor="steelblue",
-        elinewidth=2,
-        capsize=5,
-        capthick=2,
+        markersize=8,
+        color=ACCENT_BLUE,
+        ecolor=ACCENT_BLUE,
+        elinewidth=1.5,
+        capsize=4,
+        capthick=1.5,
         label="Observed frequency (95% CI)",
         zorder=3,
     )
@@ -159,20 +188,22 @@ def generate_reliability_diagram(
         bin_centers[valid_mask],
         observed_freqs[valid_mask],
         "-",
-        color="steelblue",
-        linewidth=1.5,
+        color=ACCENT_BLUE,
+        linewidth=1.2,
         alpha=0.7,
         zorder=2,
     )
 
-    # Add histogram showing distribution of predictions
+    # Add subtle histogram showing distribution of predictions (secondary axis)
     ax2 = ax.twinx()
     ax2.hist(
-        predicted_probs, bins=n_bins, alpha=0.15, color="gray", edgecolor="black", linewidth=0.5
+        predicted_probs, bins=n_bins, alpha=0.12, color=GREY_MED,
+        edgecolor=GREY_LIGHT, linewidth=0.5
     )
-    ax2.set_ylabel("Frequency (histogram)", fontsize=12, color="gray")
-    ax2.tick_params(axis="y", labelcolor="gray")
+    ax2.set_ylabel("Frequency", fontsize=9, color=GREY_MED)
+    ax2.tick_params(axis="y", labelcolor=GREY_MED, labelsize=8)
     ax2.grid(False)
+    ax2.spines["right"].set_color(GREY_LIGHT)
 
     # Calculate calibration metrics
     brier_score = np.mean((predicted_probs - outcomes) ** 2)
@@ -182,45 +213,48 @@ def generate_reliability_diagram(
         counts[valid_mask] * np.abs(bin_centers[valid_mask] - observed_freqs[valid_mask])
     ) / np.sum(counts[valid_mask])
 
-    # Add metrics text box
+    # Add metrics as clean text (no box, serif font)
     metrics_text = (
-        f"Calibration Metrics\n"
-        f"──────────────────\n"
-        f"Brier Score: {brier_score:.4f}\n"
-        f"ECE: {ece:.4f}\n"
-        f"Games: {n_games:,}\n"
-        f"Bins: {n_bins}"
+        f"Brier = {brier_score:.4f}\n"
+        f"ECE = {ece:.4f}\n"
+        f"$n$ = {n_games:,}"
     )
 
     ax.text(
-        0.02,
-        0.98,
+        0.04,
+        0.96,
         metrics_text,
         transform=ax.transAxes,
         verticalalignment="top",
         horizontalalignment="left",
-        bbox=dict(boxstyle="round", facecolor="wheat", alpha=0.8),
-        fontsize=10,
-        family="monospace",
+        fontsize=9,
+        color=GREY_DARK,
+        linespacing=1.4,
     )
 
-    # Labels and styling
-    ax.set_xlabel("Predicted Probability", fontsize=14, fontweight="bold")
-    ax.set_ylabel("Observed Frequency", fontsize=14, fontweight="bold")
-    ax.set_title(
-        "Baseline GLM Probability Calibration\n" "Diagonal indicates perfect calibration",
-        fontsize=16,
-        fontweight="bold",
-        pad=20,
-    )
+    # Labels (academic style, no bold)
+    ax.set_xlabel("Predicted probability")
+    ax.set_ylabel("Observed frequency")
 
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.set_aspect("equal")
-    ax.grid(True, alpha=0.3, linestyle="--")
+    ax.grid(True, alpha=0.4, linestyle="-", linewidth=0.5)
 
-    # Legend
-    ax.legend(loc="lower right", fontsize=11, framealpha=0.95)
+    # Legend (clean, minimal)
+    ax.legend(
+        loc="lower right",
+        frameon=True,
+        framealpha=0.95,
+        edgecolor=GREY_LIGHT,
+        fancybox=False,
+    )
+
+    # Spine styling
+    for spine in ["top", "right"]:
+        ax.spines[spine].set_visible(False)
+    for spine in ["bottom", "left"]:
+        ax.spines[spine].set_color(GREY_DARK)
 
     plt.tight_layout()
 
@@ -230,7 +264,7 @@ def generate_reliability_diagram(
 def main():
     """Generate and save the figure."""
 
-    print("Generating Figure 6.5: Baseline calibration diagram...")
+    print("Generating Figure 2.2: Baseline calibration diagram...")
 
     # Generate figure with dissertation-realistic parameters
     fig, brier, ece = generate_reliability_diagram(
@@ -259,7 +293,7 @@ def main():
     print(f"  Expected Calibration Error (ECE): {ece:.4f}")
 
     plt.close()
-    print("\n✓ Figure 6.5 complete")
+    print("\n✓ Figure 2.2 complete")
 
 
 if __name__ == "__main__":
