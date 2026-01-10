@@ -1,0 +1,85 @@
+\documentclass[border=10pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc,fit,backgrounds}
+\usepackage{xcolor}
+
+% Colors from dissertation palette
+\definecolor{accentBlue}{RGB}{31,119,180}
+\definecolor{accentOrange}{RGB}{255,127,14}
+\definecolor{accentGreen}{RGB}{44,160,44}
+
+\begin{document}
+\begin{tikzpicture}[
+    node distance=0.5cm and 0.8cm,
+    table/.style={rectangle, draw=accentBlue, thick, fill=accentBlue!10, rounded corners=3pt, minimum width=2.8cm, minimum height=0.7cm, align=center, font=\footnotesize\bfseries},
+    mltable/.style={rectangle, draw=accentGreen, thick, fill=accentGreen!15, rounded corners=3pt, minimum width=2.8cm, minimum height=0.7cm, align=center, font=\footnotesize\bfseries},
+    view/.style={rectangle, draw=accentOrange, thick, fill=accentOrange!10, rounded corners=3pt, minimum width=2.8cm, minimum height=0.7cm, align=center, font=\footnotesize\bfseries},
+    schemabox/.style={rectangle, draw=gray!40, fill=gray!5, rounded corners=5pt, inner sep=8pt},
+    schemalabel/.style={font=\small\bfseries\ttfamily, fill=white, inner sep=2pt},
+    arrow/.style={-Stealth, thick, gray!50},
+    fkarrow/.style={-Stealth, thick, accentBlue!60, dashed}
+]
+
+% ==================== PUBLIC SCHEMA (Top) ====================
+\node[table] (games) {games (7,263)};
+\node[table, right=0.6cm of games] (plays) {plays (1.25M)};
+\node[table, below=0.4cm of games] (weather) {weather};
+\node[table, below=0.4cm of plays] (injuries) {injuries};
+\node[table, below=0.4cm of weather] (rosters) {rosters};
+\node[table, below=0.4cm of injuries] (odds) {odds\_history};
+\node[table, below=0.4cm of rosters] (players) {players};
+
+% PUBLIC box
+\begin{scope}[on background layer]
+\node[schemabox, fit=(games)(plays)(weather)(injuries)(rosters)(odds)(players), inner sep=12pt] (pubbox) {};
+\end{scope}
+\node[schemalabel, above=0pt of pubbox.north] {PUBLIC Schema};
+
+% ==================== MART SCHEMA (Middle) ====================
+\node[view, below=1.5cm of players, xshift=1.5cm] (gs) {game\_summary};
+\node[view, right=0.6cm of gs] (tepa) {team\_epa};
+\node[view, below=0.4cm of gs] (gw) {game\_weather};
+\node[view, below=0.4cm of tepa] (pgs) {player\_game\_stats};
+\node[view, below=0.4cm of gw] (tpc) {team\_playoff\_ctx};
+\node[view, below=0.4cm of pgs] (til) {team\_injury\_load};
+\node[view, below=0.4cm of tpc, xshift=1.7cm] (gfe) {game\_features\_enh (170+)};
+
+% MART box
+\begin{scope}[on background layer]
+\node[schemabox, fit=(gs)(tepa)(gw)(pgs)(tpc)(til)(gfe), inner sep=12pt] (martbox) {};
+\end{scope}
+\node[schemalabel, above=0pt of martbox.north] {MART Schema (Materialized Views)};
+
+% ==================== ML SCHEMA (Bottom) ====================
+\node[mltable, below=1.5cm of gfe, xshift=-1cm] (mreg) {model\_registry (337)};
+\node[mltable, right=0.6cm of mreg] (rpred) {r\_model\_predictions};
+\node[mltable, below=0.4cm of mreg] (gpred) {game\_predictions};
+\node[mltable, below=0.4cm of rpred] (epred) {ensemble\_predictions};
+\node[mltable, below=0.4cm of gpred] (pmet) {prediction\_metrics};
+\node[mltable, below=0.4cm of epred] (abtest) {ab\_test\_assignments};
+\node[mltable, below=0.4cm of pmet, xshift=1.7cm] (abres) {ab\_test\_results};
+
+% ML box
+\begin{scope}[on background layer]
+\node[schemabox, fit=(mreg)(rpred)(gpred)(epred)(pmet)(abtest)(abres), inner sep=12pt] (mlbox) {};
+\end{scope}
+\node[schemalabel, above=0pt of mlbox.north] {ML Schema (Prediction Cache)};
+
+% ==================== ARROWS ====================
+% PUBLIC to MART
+\draw[arrow] (pubbox.south) -- node[right, font=\scriptsize, text=gray] {aggregates} (martbox.north);
+
+% MART to ML
+\draw[arrow] (martbox.south) -- node[right, font=\scriptsize, text=gray] {features} (mlbox.north);
+
+% Legend
+\node[rectangle, draw=gray!40, fill=white, rounded corners, text width=5.5cm, font=\scriptsize, align=left, below=0.8cm of mlbox] (legend) {
+    \textbf{Schema Legend:}\\[2pt]
+    \textcolor{accentBlue}{\rule{0.6cm}{2.5pt}} Core tables (PUBLIC) -- raw data\\
+    \textcolor{accentOrange}{\rule{0.6cm}{2.5pt}} Materialized views (MART) -- features\\
+    \textcolor{accentGreen}{\rule{0.6cm}{2.5pt}} ML tables -- predictions \& cache\\[3pt]
+    \textbf{Total:} 56 tables, 257 columns, 2.8 GB
+};
+
+\end{tikzpicture}
+\end{document}
