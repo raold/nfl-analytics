@@ -97,13 +97,14 @@ def generate_copula_figure(rho_range=None, n_samples=100000, seed=42):
 
         # Annotate
         ax.annotate(
-            f"rho={rho:.1f}\nP={prob:.3f}",
+            f"$\\rho$={rho:.1f}\nP={prob:.3f}",
             xy=(rho, prob),
-            xytext=(10, 10),
+            xytext=(12, 12),
             textcoords="offset points",
-            fontsize=9,
-            bbox=dict(boxstyle="round,pad=0.3", facecolor="yellow", alpha=0.3),
-            arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=0", lw=1),
+            fontsize=11,
+            fontweight="medium",
+            bbox=dict(boxstyle="round,pad=0.4", facecolor="lightyellow", alpha=0.8, edgecolor="gray"),
+            arrowprops=dict(arrowstyle="->", connectionstyle="arc3,rad=0", lw=1.2, color="gray"),
         )
 
     # Independence line
@@ -157,8 +158,8 @@ def generate_copula_figure(rho_range=None, n_samples=100000, seed=42):
     # Add context box
     context_text = (
         "Application: NFL spread-total dependence\n"
-        "Typical correlation: rho in [0.2, 0.4]\n"
-        "Joint exceedance P in [0.28, 0.32]"
+        "Typical correlation: $\\rho \\in [0.2, 0.4]$\n"
+        "Joint exceedance: $P \\in [0.28, 0.32]$"
     )
 
     ax.text(
@@ -168,9 +169,8 @@ def generate_copula_figure(rho_range=None, n_samples=100000, seed=42):
         transform=ax.transAxes,
         verticalalignment="bottom",
         horizontalalignment="right",
-        bbox=dict(boxstyle="round", facecolor="lightblue", alpha=0.5),
-        fontsize=9,
-        family="monospace",
+        bbox=dict(boxstyle="round,pad=0.5", facecolor="lightblue", alpha=0.7, edgecolor="steelblue"),
+        fontsize=11,
     )
 
     plt.tight_layout()

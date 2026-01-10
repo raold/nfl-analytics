@@ -33,26 +33,86 @@ if (!dir.exists(OUTPUT_DIR)) {
 }
 
 # ============================================================================
-# DESIGN LANGUAGE (from style/tikz_diagram_style.tex)
+# DESIGN LANGUAGE (synchronized with main.tex color palette)
 # ============================================================================
 
-# Color palette
-ACCENT_BLUE <- rgb(31, 119, 180, maxColorValue = 255)
-ACCENT_ORANGE <- rgb(255, 127, 14, maxColorValue = 255)
-LIGHT_GRAY <- rgb(220, 220, 220, maxColorValue = 255)
-DARK_GRAY <- rgb(80, 80, 80, maxColorValue = 255)
+# Primary color palette (colorblind-safe, Tableau 10 inspired)
+ACCENT_BLUE   <- rgb(31, 119, 180, maxColorValue = 255)   # Primary
+ACCENT_ORANGE <- rgb(255, 127, 14, maxColorValue = 255)   # Secondary/contrast
+ACCENT_GREEN  <- rgb(44, 160, 44, maxColorValue = 255)    # Success/positive
+ACCENT_RED    <- rgb(214, 39, 40, maxColorValue = 255)    # Warning/negative
+ACCENT_PURPLE <- rgb(148, 103, 189, maxColorValue = 255)  # Tertiary
+ACCENT_BROWN  <- rgb(140, 86, 75, maxColorValue = 255)    # Neutral category
+ACCENT_PINK   <- rgb(227, 119, 194, maxColorValue = 255)  # Additional
+ACCENT_GRAY   <- rgb(127, 127, 127, maxColorValue = 255)  # Baseline/neutral
 
-# Custom ggplot2 theme for dissertation
-theme_dissertation <- function(base_size = 11) {
-  theme_minimal(base_size = base_size) +
+# Grayscale for axes, grids, secondary elements
+GREY_LIGHT <- rgb(179, 179, 179, maxColorValue = 255)  # grey7 = 0.7
+GREY_MED   <- rgb(128, 128, 128, maxColorValue = 255)  # grey5 = 0.5
+GREY_DARK  <- rgb(77, 77, 77, maxColorValue = 255)     # grey3 = 0.3
+
+# Legacy aliases for backwards compatibility
+LIGHT_GRAY <- rgb(220, 220, 220, maxColorValue = 255)
+DARK_GRAY <- GREY_DARK
+
+# Named palette for scale_color_manual / scale_fill_manual
+DISSERTATION_PALETTE <- c(
+  "blue" = ACCENT_BLUE,
+  "orange" = ACCENT_ORANGE,
+  "green" = ACCENT_GREEN,
+  "red" = ACCENT_RED,
+  "purple" = ACCENT_PURPLE,
+
+  "brown" = ACCENT_BROWN,
+  "pink" = ACCENT_PINK,
+  "gray" = ACCENT_GRAY
+)
+
+# Custom ggplot2 theme for dissertation (publication-ready)
+theme_dissertation <- function(base_size = 11, base_family = "") {
+  theme_minimal(base_size = base_size, base_family = base_family) +
     theme(
-      plot.title = element_text(face = "bold", hjust = 0.5, size = base_size + 2),
-      plot.subtitle = element_text(hjust = 0.5, color = DARK_GRAY, size = base_size),
+      # Title and subtitle
+      plot.title = element_text(
+        face = "bold", hjust = 0.5, size = base_size + 2,
+        margin = margin(b = 8)
+      ),
+      plot.subtitle = element_text(
+        hjust = 0.5, color = GREY_MED, size = base_size,
+        margin = margin(b = 10)
+      ),
+      plot.caption = element_text(
+        hjust = 1, color = GREY_MED, size = base_size - 2,
+        margin = margin(t = 10)
+      ),
+      # Panel
       panel.grid.minor = element_blank(),
+      panel.grid.major = element_line(color = GREY_LIGHT, linewidth = 0.3),
+      panel.background = element_rect(fill = "white", color = NA),
+      plot.background = element_rect(fill = "white", color = NA),
+      # Axes
+      axis.title = element_text(face = "bold", size = base_size, color = GREY_DARK),
+      axis.text = element_text(size = base_size - 1, color = GREY_MED),
+      axis.ticks = element_line(color = GREY_LIGHT, linewidth = 0.3),
+      # Legend
       legend.position = "bottom",
-      legend.title = element_text(face = "bold"),
-      axis.title = element_text(face = "bold")
+      legend.title = element_text(face = "bold", size = base_size - 1),
+      legend.text = element_text(size = base_size - 1),
+      legend.key.size = unit(0.8, "lines"),
+      legend.background = element_rect(fill = "white", color = NA),
+      # Facets
+      strip.text = element_text(face = "bold", size = base_size),
+      strip.background = element_rect(fill = GREY_LIGHT, color = NA)
     )
+}
+
+# Convenience function for discrete color scales
+scale_color_dissertation <- function(...) {
+  scale_color_manual(values = DISSERTATION_PALETTE, ...)
+}
+
+scale_fill_dissertation <- function(...) {
+  scale_fill_manual(values = DISSERTATION_PALETTE, ...)
 }
 
 # ============================================================================

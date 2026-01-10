@@ -38,10 +38,25 @@
 \usepackage{enumitem}          % Control layout of itemize/enumerate
 \usepackage{natbib}            % Natbib for citations (author-year support)
 \usepackage{xcolor}            % Colors (required by todonotes)
-% Global accent palette (colorblind-safe blue)
+% ---------------------------------------------------
+% Global Color Palette (colorblind-safe, Tableau 10 inspired)
+% ---------------------------------------------------
+% Primary accent (existing)
 \definecolor{accentBlue}{RGB}{31,119,180}
 \definecolor{accent_blue}{RGB}{31,119,180}  % Alias for consistency
 \definecolor{accentblue}{RGB}{31,119,180}  % Alias for TikZ diagrams (lowercase)
+% Expanded palette for multi-category data
+\definecolor{accentOrange}{RGB}{255,127,14}   % Secondary/contrast
+\definecolor{accentGreen}{RGB}{44,160,44}     % Success/positive
+\definecolor{accentRed}{RGB}{214,39,40}       % Warning/negative
+\definecolor{accentPurple}{RGB}{148,103,189}  % Tertiary category
+\definecolor{accentBrown}{RGB}{140,86,75}     % Neutral category
+\definecolor{accentPink}{RGB}{227,119,194}    % Additional category
+\definecolor{accentGray}{RGB}{127,127,127}    % Neutral/baseline
+% Grayscale for axes, grids, secondary text
+\definecolor{grey7}{gray}{0.7}    % Light (CI bands, gridlines)
+\definecolor{grey5}{gray}{0.5}    % Medium (secondary text)
+\definecolor{grey3}{gray}{0.3}    % Dark (axes, primary labels)
 \usepackage{tcolorbox}          % Colored boxes for highlights
 \usepackage[disable]{todonotes} % Disable todo notes for clean builds
 \usepackage{fvextra}           % Enhanced verbatim; enables wrapping and customization

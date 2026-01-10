@@ -10,10 +10,10 @@
   \caption[Research gaps in uncertainty quantification literature]{Research gaps in uncertainty quantification literature and dissertation contributions. Four key gaps motivate our implementation of five UQ methods for NFL betting, with empirical validation on 25 seasons (1999--2024, 7,200+ games).}
   \label{tab:literature-gaps}
   \begin{threeparttable}
-  \tiny
-  \setlength{\tabcolsep}{3pt}
-  \renewcommand{\arraystretch}{1.05}
-  \begin{tabularx}{\linewidth}{@{} p{0.18\linewidth} X X X @{}}
+  \scriptsize
+  \setlength{\tabcolsep}{5pt}
+  \renewcommand{\arraystretch}{1.25}
+  \begin{tabularx}{\linewidth}{@{} p{0.15\linewidth} X X X @{}}
     \toprule
     \textbf{Gap} & \textbf{Description} & \textbf{Prior Work} & \textbf{Our Contribution} \\
     \midrule
@@ -48,7 +48,7 @@
   \end{tabularx}
 
   \begin{tablenotes}[flushleft]
-    \tiny
+    \scriptsize
     \item \textbf{Methodology}: Identified gaps via systematic literature review of 50+ papers (2000--2024) across Bayesian inference, conformal prediction, causal inference, online learning, and evidential learning. Search terms: ``uncertainty quantification sports,'' ``conformal prediction temporal,'' ``Bayesian stacking ensemble,'' ``online learning concept drift,'' ``evidential regression.'' Inclusion criteria: peer-reviewed (JMLR, ICML, NeurIPS, JASA) or highly-cited preprints (>100 citations).
     \item \textbf{Validation Datasets}: NFL play-by-play (1999--2024, 300,000+ plays), historical betting odds (2018--2024, 2,400+ games), weather (Meteostat API), injuries (official NFL reports). Train: 1999--2021 (18,000+ plays), calibration: 2022 (256 games), test: 2023--2024 (544 games).
     \item \textbf{Metrics}: (i) Coverage = $\frac{1}{n}\sum_{i=1}^n \mathbb{1}\{y_i \in \hat{C}(x_i)\}$ (target 90\%), (ii) Interval width (sharpness), (iii) Brier score, (iv) CRPS, (v) Inference time (ms per prediction), (vi) ROI = $\frac{\text{Profit}}{\text{Total Wagered}}$ (target >5\%).
