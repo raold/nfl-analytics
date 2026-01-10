@@ -1,0 +1,91 @@
+% titlepage_option1.tex - Custom dissertation title page
+% Option 1: Clean decorative rules (no background motif)
+
+\begin{titlepage}
+\begin{tikzpicture}[remember picture, overlay]
+  % --- Top decorative triple rule ---
+  \draw[line width=0.3pt, accentBlue!50]
+    ([xshift=2.5cm, yshift=-2.8cm]current page.north west) --
+    ([xshift=-2.5cm, yshift=-2.8cm]current page.north east);
+  \draw[line width=1.5pt, accentBlue]
+    ([xshift=4.5cm, yshift=-3cm]current page.north west) --
+    ([xshift=-4.5cm, yshift=-3cm]current page.north east);
+  \draw[line width=0.3pt, accentBlue!50]
+    ([xshift=2.5cm, yshift=-3.2cm]current page.north west) --
+    ([xshift=-2.5cm, yshift=-3.2cm]current page.north east);
+
+  % --- Bottom decorative triple rule ---
+  \draw[line width=0.3pt, accentBlue!50]
+    ([xshift=2.5cm, yshift=2.3cm]current page.south west) --
+    ([xshift=-2.5cm, yshift=2.3cm]current page.south east);
+  \draw[line width=1.5pt, accentBlue]
+    ([xshift=4.5cm, yshift=2.5cm]current page.south west) --
+    ([xshift=-4.5cm, yshift=2.5cm]current page.south east);
+  \draw[line width=0.3pt, accentBlue!50]
+    ([xshift=2.5cm, yshift=2.7cm]current page.south west) --
+    ([xshift=-2.5cm, yshift=2.7cm]current page.south east);
+
+  % --- Corner accents (subtle) ---
+  % Top left
+  \draw[line width=0.8pt, accentBlue!40]
+    ([xshift=2.5cm, yshift=-3.8cm]current page.north west) --
+    ([xshift=2.5cm, yshift=-4.3cm]current page.north west);
+  \draw[line width=0.8pt, accentBlue!40]
+    ([xshift=2.5cm, yshift=-3.8cm]current page.north west) --
+    ([xshift=3cm, yshift=-3.8cm]current page.north west);
+
+  % Top right
+  \draw[line width=0.8pt, accentBlue!40]
+    ([xshift=-2.5cm, yshift=-3.8cm]current page.north east) --
+    ([xshift=-2.5cm, yshift=-4.3cm]current page.north east);
+  \draw[line width=0.8pt, accentBlue!40]
+    ([xshift=-2.5cm, yshift=-3.8cm]current page.north east) --
+    ([xshift=-3cm, yshift=-3.8cm]current page.north east);
+
+  % Bottom left
+  \draw[line width=0.8pt, accentBlue!40]
+    ([xshift=2.5cm, yshift=3.3cm]current page.south west) --
+    ([xshift=2.5cm, yshift=3.8cm]current page.south west);
+  \draw[line width=0.8pt, accentBlue!40]
+    ([xshift=2.5cm, yshift=3.3cm]current page.south west) --
+    ([xshift=3cm, yshift=3.3cm]current page.south west);
+
+  % Bottom right
+  \draw[line width=0.8pt, accentBlue!40]
+    ([xshift=-2.5cm, yshift=3.3cm]current page.south east) --
+    ([xshift=-2.5cm, yshift=3.8cm]current page.south east);
+  \draw[line width=0.8pt, accentBlue!40]
+    ([xshift=-2.5cm, yshift=3.3cm]current page.south east) --
+    ([xshift=-3cm, yshift=3.3cm]current page.south east);
+\end{tikzpicture}
+
+\centering
+\vspace*{4cm}
+
+% Main Title
+{\fontsize{28}{34}\selectfont\bfseries\color{black}%
+Differential Market Efficiency\\[0.3em]
+in NFL Betting}\\[1cm]
+
+% Subtitle line 1
+{\fontsize{17}{22}\selectfont\itshape\color{black!85}%
+A Multi-Method Investigation}\\[2cm]
+
+% Decorative divider
+{\color{accentBlue}\rule{6cm}{0.6pt}}\\[2cm]
+
+% Extended subtitle / thesis statement
+{\fontsize{12}{16}\selectfont\color{black!75}%
+Bayesian Ensembles, Uncertainty Quantification,\\[0.4em]
+and the Limits of Public Information\\[0.4em]
+in Adversarial Prediction Markets}\\[3.5cm]
+
+% Author
+{\fontsize{15}{20}\selectfont\scshape Richard Oldham}\\[1.2cm]
+
+% Date
+{\fontsize{12}{14}\selectfont January 2026}
+
+\vfill
+
+\end{titlepage}

@@ -1,0 +1,90 @@
+% titlepage.tex - Custom dissertation title page
+% Statistical/data motif with calibration curve background
+
+\begin{titlepage}
+\begin{tikzpicture}[remember picture, overlay]
+  % --- Background statistical motif (faded calibration scatter) ---
+  % Represents the quantitative nature of the work
+  \begin{scope}[opacity=0.06]
+    % Diagonal "perfect calibration" reference line
+    \draw[line width=1.5pt, accentBlue]
+      ([xshift=2cm, yshift=2cm]current page.south west) --
+      ([xshift=-2cm, yshift=-2cm]current page.north east);
+
+    % Scattered data points representing model predictions
+    % Clustered around the calibration line with realistic spread
+    \foreach \i in {1,...,120} {
+      \pgfmathsetmacro{\basex}{rand*8 + 10.5}
+      \pgfmathsetmacro{\noise}{rand*2.5}
+      \pgfmathsetmacro{\basey}{\basex + \noise - 1.25}
+      \fill[accentBlue] ([xshift=\basex cm, yshift=\basey cm]current page.south west)
+        circle (2pt);
+    }
+
+    % Additional sparse outliers (representing prediction uncertainty)
+    \foreach \i in {1,...,25} {
+      \pgfmathsetmacro{\basex}{rand*6 + 11}
+      \pgfmathsetmacro{\noise}{rand*4}
+      \pgfmathsetmacro{\basey}{\basex + \noise - 2}
+      \fill[accentBlue!70] ([xshift=\basex cm, yshift=\basey cm]current page.south west)
+        circle (1.5pt);
+    }
+  \end{scope}
+
+  % --- Top decorative line ---
+  \draw[line width=0.4pt, accentBlue!60]
+    ([xshift=3cm, yshift=-3cm]current page.north west) --
+    ([xshift=-3cm, yshift=-3cm]current page.north east);
+  \draw[line width=1.2pt, accentBlue]
+    ([xshift=6cm, yshift=-3.15cm]current page.north west) --
+    ([xshift=-6cm, yshift=-3.15cm]current page.north east);
+  \draw[line width=0.4pt, accentBlue!60]
+    ([xshift=3cm, yshift=-3.3cm]current page.north west) --
+    ([xshift=-3cm, yshift=-3.3cm]current page.north east);
+
+  % --- Bottom decorative line ---
+  \draw[line width=0.4pt, accentBlue!60]
+    ([xshift=3cm, yshift=2.5cm]current page.south west) --
+    ([xshift=-3cm, yshift=2.5cm]current page.south east);
+  \draw[line width=1.2pt, accentBlue]
+    ([xshift=6cm, yshift=2.65cm]current page.south west) --
+    ([xshift=-6cm, yshift=2.65cm]current page.south east);
+  \draw[line width=0.4pt, accentBlue!60]
+    ([xshift=3cm, yshift=2.8cm]current page.south west) --
+    ([xshift=-3cm, yshift=2.8cm]current page.south east);
+\end{tikzpicture}
+
+\centering
+\vspace*{3.5cm}
+
+% Main Title
+{\fontsize{26}{32}\selectfont\bfseries\color{black}%
+Differential Market Efficiency\\[0.3em]
+in NFL Betting}\\[0.8cm]
+
+% Subtitle line 1
+{\fontsize{16}{20}\selectfont\itshape\color{black!85}%
+A Multi-Method Investigation}\\[1.8cm]
+
+% Decorative divider
+{\color{accentBlue}\rule{5cm}{0.8pt}}\\[1.8cm]
+
+% Extended subtitle / thesis statement
+{\fontsize{12}{16}\selectfont\color{black!80}%
+Bayesian Ensembles, Uncertainty Quantification,\\[0.4em]
+and the Limits of Public Information\\[0.4em]
+in Adversarial Prediction Markets}\\[3cm]
+
+% Author
+{\fontsize{14}{18}\selectfont\scshape Richard Oldham}\\[1cm]
+
+% Date
+{\fontsize{12}{14}\selectfont January 2026}
+
+\vfill
+
+% Optional: Institution or degree info (uncomment if needed)
+% {\small\color{black!60} Submitted in partial fulfillment of the requirements\\
+% for the degree of Doctor of Philosophy}
+
+\end{titlepage}

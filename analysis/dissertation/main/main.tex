@@ -113,7 +113,43 @@
     top=1.0in,
     bottom=1.05in
 ]{geometry}                 % Page geometry and margins (simplified)
+\setlength{\headheight}{15pt}  % Fix fancyhdr warning
 \usepackage{pdflscape}      % Landscape pages with proper PDF orientation
+\usepackage{fancyhdr}       % Custom headers/footers for landscape page numbers
+
+% Configure fancyhdr for normal pages
+\pagestyle{fancy}
+\fancyhf{}  % Clear all headers/footers
+\fancyhead[C]{\leftmark}  % Chapter name in header
+\fancyfoot[C]{\thepage}   % Page number centered at bottom
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Plain style for chapter opening pages
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+% Landscape page style with rotated page number at right edge (physical bottom)
+% The page number appears upright when the landscape page is viewed
+\fancypagestyle{landscapestyle}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+  \fancyfoot[R]{%
+    \makebox[0pt][l]{%
+      \raisebox{0.5\textheight}[0pt][0pt]{%
+        \rotatebox{90}{\thepage}%
+      }%
+    }%
+  }%
+}
+% Command to apply landscape page style
+\newcommand{\landscapepagestyle}{\pagestyle{landscapestyle}}
+
 % Avoid todonotes margin width warnings even when disabled
 \setlength{\marginparwidth}{2cm}
 % Make verbatim blocks wrap long lines and set a compact font size
@@ -282,15 +318,10 @@
 
 \frontmatter
 
-% Title Page (you may need to adjust this to your institution's requirements)
-\title{The Orthogonal Quarterback: Feature Engineering as the Key to Profitability%
-\\[0.5em]%
-\large A System-of-Systems Approach to Decomposing Skill and Beating Efficient NFL Markets}            % Replace with your dissertation title
-\author{Richard Oldham}                    % Replace with your name
-\date{\today}                           % You can set a fixed date if preferred
+% Title Page - Custom design with decorative rules
 % Avoid duplicate hyperref anchors on roman pages
 \hypersetup{pageanchor=false}
-\maketitle
+\input{../style/titlepage_option1.tex}
 
 % Front Matter
 % (Optional dedication, abstract, acknowledgments can be included as unnumbered chapters)

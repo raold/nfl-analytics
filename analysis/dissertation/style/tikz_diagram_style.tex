@@ -1,9 +1,7 @@
 % tikz_diagram_style.tex - Standardized TikZ diagram styling
 
-% Define accent color if not already defined
-\@ifundefined{definecolor}{}{%
-  \definecolor{accent}{RGB}{31,119,180}
-}
+% Define accent color (always set to ensure consistency)
+\providecolor{accent}{RGB}{31,119,180}
 
 % Standard flowchart box style - rounded corners with light blue background
 \tikzstyle{flowbox}=[
