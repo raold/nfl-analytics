@@ -508,6 +508,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 | `diss-clean` | `dclean` | Remove auxiliary files (`.aux`, `.log`, `.bbl`, etc.) |
 | `diss-lint` | `dl` | LaTeX linting via `chktex` and `lacheck` |
 | `diss-figures` | `df` | List/crop/optimize figures (`pdfcrop`, `optipng`) |
+| `diss-chapter` | `dchap` | Per-chapter compilation (fast feedback, chapter-specific PDFs) |
 
 **Environment:** `DISS_DIR` points to dissertation main directory (set in `.zshrc`)
 
@@ -530,8 +531,14 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 ### Common Workflows
 
 ```bash
+# Per-chapter compilation (FAST - seconds vs minutes)
+dchap list                      # Show all chapters with build status
+dchap build 3                   # Build chapter 3 → chapter_03_data_foundation.pdf
+dchap watch 5                   # Watch chapter 5, recompile on save
+dchap clean 3                   # Clean chapter 3 build files
+
 # Start continuous compilation (Terminal 1)
-dw                              # or: diss-watch
+dw                              # or: diss-watch (full dissertation)
 
 # Check stats anytime (Terminal 2)
 ds                              # Word count, pages, font check

@@ -1,0 +1,252 @@
+% chapter_preamble.tex - Shared preamble for standalone chapter compilation
+% This file mirrors main.tex preamble but is designed for per-chapter builds
+% Generated: 2026-01-10
+
+\documentclass[12pt]{report}
+
+% ---------------------------------------------------
+% Packages and Configuration (mirrored from main.tex)
+% ---------------------------------------------------
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\floatname{algorithm}{Algorithm}
+\renewcommand{\thealgorithm}{\arabic{chapter}.\arabic{algorithm}}
+\algrenewcommand\algorithmicrequire{\textbf{Require:}}
+\algrenewcommand\algorithmicensure{\textbf{Ensure:}}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{adjustbox}
+\usepackage{ragged2e}
+\usepackage{array}
+\usepackage{threeparttable}
+\usepackage{changepage}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{natbib}
+\usepackage{xcolor}
+
+% Global Color Palette
+\definecolor{accentBlue}{RGB}{31,119,180}
+\definecolor{accent_blue}{RGB}{31,119,180}
+\definecolor{accentblue}{RGB}{31,119,180}
+\definecolor{accentOrange}{RGB}{255,127,14}
+\definecolor{accentGreen}{RGB}{44,160,44}
+\definecolor{accentRed}{RGB}{214,39,40}
+\definecolor{accentPurple}{RGB}{148,103,189}
+\definecolor{accentBrown}{RGB}{140,86,75}
+\definecolor{accentPink}{RGB}{227,119,194}
+\definecolor{accentGray}{RGB}{127,127,127}
+\definecolor{grey7}{gray}{0.7}
+\definecolor{grey5}{gray}{0.5}
+\definecolor{grey3}{gray}{0.3}
+
+\usepackage{tcolorbox}
+\usepackage[disable]{todonotes}
+\usepackage{fvextra}
+\usepackage{alphalph}
+\usepackage{setspace}
+\usepackage[protrusion=true,expansion=true]{microtype}
+\emergencystretch=1em
+
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\pgfplotsset{every axis/.append style={
+  label style={font=\footnotesize},
+  tick label style={font=\scriptsize},
+  title style={font=\footnotesize}
+}}
+
+\usepackage{xparse}
+\usepackage{needspace}
+\usepackage{etoolbox}
+\usepackage{placeins}
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  columns=flexible,
+  keepspaces=true
+}
+\lstdefinestyle{codestyle}{
+  basicstyle=\ttfamily\footnotesize,
+  breaklines=true,
+  breakatwhitespace=false,
+  columns=flexible,
+  keepspaces=true,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  numbersep=5pt,
+  frame=single,
+  frameround=tttt,
+  rulecolor=\color{black!30},
+  backgroundcolor=\color{black!5},
+  showstringspaces=false,
+  tabsize=2,
+  captionpos=b,
+  commentstyle=\color{green!60!black}\itshape,
+  keywordstyle=\color{blue!80!black}\bfseries,
+  stringstyle=\color{red!70!black}
+}
+
+\usepackage{pifont}
+\usepackage{newunicodechar}
+\newunicodechar{✅}{\ding{52}}
+\newunicodechar{❌}{\ding{55}}
+\newunicodechar{⚠}{\ding{43}}
+\newunicodechar{↔}{\ensuremath{\leftrightarrow}}
+\newunicodechar{−}{\ensuremath{-}}
+\newunicodechar{✗}{\ensuremath{\times}}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+
+\usepackage{url}
+\urlstyle{tt}
+\DeclareUrlCommand\filepath{\urlstyle{tt}}
+
+\usepackage[
+    inner=1.25in,
+    outer=1.25in,
+    top=1.0in,
+    bottom=1.05in
+]{geometry}
+\setlength{\headheight}{27.12pt}
+\addtolength{\topmargin}{-12.12pt}
+
+\usepackage{pdflscape}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{\leftmark}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyfoot[C]{\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+  \renewcommand{\footrulewidth}{0pt}
+}
+
+\setlength{\marginparwidth}{2cm}
+\RecustomVerbatimEnvironment{verbatim}{Verbatim}{breaklines,breakanywhere,fontsize=\footnotesize}
+\emergencystretch=2em
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+\preto\section{\Needspace{6\baselineskip}}
+\preto\subsection{\Needspace{5\baselineskip}}
+\preto\subsubsection{\Needspace{4\baselineskip}}
+\hyphenation{miss-speci-fication micro-struc-ture multi-leg mar-gin-par re-weight-ing
+  de-pen-dence-cal-i-bra-tion sys-tem-of-sys-tems off-line-RL
+  mar-ket-mi-cro-struc-ture ma-te-ri-al-ized}
+
+\usepackage{siunitx}
+\usepackage{makecell}
+\usepackage{colortbl}
+\usepackage[titles]{tocloft}
+\sisetup{
+  group-separator = {,},
+  group-minimum-digits = 4,
+  round-mode = places,
+  round-precision = 2,
+  detect-weight = true
+}
+
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{L}{>{\RaggedRight\arraybackslash}X}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+\newcolumntype{N}{S[table-format=3.2]}
+\captionsetup[table]{font=small,labelfont=bf}
+\captionsetup[figure]{font=small,labelfont=bf}
+\renewcommand{\thead}[1]{\multicolumn{1}{c}{\bfseries\makecell{#1}}}
+\newcommand{\baselinerule}{\midrule[0.08em]}
+
+\numberwithin{equation}{section}
+
+\newenvironment{chapquote}[1]{%
+  \def\quotesource{#1}%
+  \begin{quote}
+  \itshape
+}{%
+  \par\vspace{0.5\baselineskip}
+  \raggedleft--- \quotesource
+  \end{quote}
+  \vspace{1\baselineskip}
+}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{example}[theorem]{Example}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\PassOptionsToPackage{hyphens}{url}
+\usepackage[unicode=true,colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\hypersetup{hypertexnames=false}
+\usepackage[nameinlink]{cleveref}
+\crefname{algorithm}{Algorithm}{Algorithms}
+\Crefname{algorithm}{Algorithm}{Algorithms}
+
+\preto\section{\Needspace{4\baselineskip}}
+\preto\subsection{\Needspace{3\baselineskip}}
+\preto\subsubsection{\Needspace{3\baselineskip}}
+
+\renewcommand{\bibname}{References}
+
+% Front/back matter helpers
+\providecommand{\frontmatter}{\pagenumbering{roman}}
+\providecommand{\mainmatter}{\cleardoublepage\pagenumbering{arabic}}
+\providecommand{\backmatter}{\cleardoublepage}
+
+% Footnote helpers
+\providecommand{\mn}[2][0pt]{\footnote{#2}}
+\newcommand{\mnup}[2]{\footnote{#2}}
+\newcommand{\mndown}[2]{\footnote{#2}}
+
+% Literature summary helpers
+\newcommand{\sdesc}[1]{\par\noindent\textbf{Summary.} #1\par}
+\newcommand{\mdesc}[1]{\par\noindent\textbf{Math.} #1\par}
+\newcommand{\appdesc}[1]{\par\noindent\textbf{NFL application.} #1\par}
+\newcommand{\bridge}[1]{\par\noindent\textit{Why this leads to the next:} #1\par}
+\newcommand{\chaptersummary}[2]{%
+  \section*{Chapter Summary}%
+  \addcontentsline{toc}{section}{Chapter Summary}%
+  \noindent #1\par\medskip
+  \noindent\textit{Next:} #2\par
+}
+
+% Math convenience macros
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Var}{\mathrm{Var}}
+\newcommand{\Cov}{\mathrm{Cov}}
+\newcommand{\vect}[1]{\mathbf{#1}}
+\newcommand{\dd}{\mathrm{d}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+\Urlmuskip=0mu plus 1mu
+
+% Graphics path for standalone chapter compilation
+\graphicspath{{../figures/}{../figures/out/}{./}}
+
+% End of preamble - document begins in wrapper file
