@@ -69,8 +69,8 @@ Figure~\ref{fig:evidential_calibration} shows the calibration curve and normaliz
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{../../../results/evidential_calibration.pdf}
-    \caption{Evidential regression calibration curve (left) and normalized residual plot (right). The calibration curve reveals severe over-calibration: all predictions fall within even narrow confidence intervals. This indicates the model is too conservative with uncertainty estimates.}
+    \input{../figures/evidential_calibration.tex}
+    \caption{Evidential regression calibration curve (left) and interval width distribution (right). The calibration curve reveals severe over-calibration: all predictions fall within even narrow confidence intervals (100\% empirical coverage at all levels). Interval widths of 38,285 yards are 255$\times$ wider than the 150-yard target.}
     \label{fig:evidential_calibration}
 \end{figure}
 
@@ -132,8 +132,8 @@ Figure~\ref{fig:evidential_uncertainty} shows the distribution of aleatoric, epi
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=\textwidth]{../../../results/evidential_uncertainty_decomposition.pdf}
-    \caption{Uncertainty decomposition for evidential regression. Top left: Aleatoric uncertainty (irreducible data noise, mean 2,359 yards). Top right: Epistemic uncertainty (model uncertainty, mean 11,391 yards). Bottom left: Scatter plot shows epistemic dominates aleatoric. Bottom right: Total uncertainty distribution (mean 11,638 yards).}
+    \input{../figures/evidential_uncertainty_decomposition.tex}
+    \caption{Uncertainty decomposition for evidential regression. (a) Aleatoric uncertainty distribution (irreducible data noise, mean 2,359 yards). (b) Epistemic uncertainty distribution (model uncertainty, mean 11,391 yards). (c) Scatter plot shows epistemic dominates aleatoric for all samples. (d) Pie chart reveals 97.9\% epistemic fraction---far exceeding the 20--40\% healthy range.}
     \label{fig:evidential_uncertainty}
 \end{figure}
 
