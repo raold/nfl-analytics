@@ -27,7 +27,9 @@ COLORS = {"pass": "#2ecc71", "fail": "#e74c3c", "neutral": "#95a5a6"}  # green  
 
 def load_data():
     """Load simulator acceptance data."""
-    data_path = Path("/Users/dro/rice/nfl-analytics/analysis/results/sim_acceptance.csv")
+    # Use portable path relative to project root
+    project_root = Path(__file__).parent.parent.parent
+    data_path = project_root / "analysis" / "results" / "sim_acceptance.csv"
     df = pd.read_csv(data_path)
 
     # Clean test names for display
@@ -227,8 +229,9 @@ def main():
     print(f"  Seasons: {sorted(df['season'].unique())}")
     print(f"  Tests: {df['test_clean'].nunique()} unique tests")
 
-    # Output directory
-    output_dir = Path("/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out")
+    # Output directory (portable path)
+    project_root = Path(__file__).parent.parent.parent
+    output_dir = project_root / "analysis" / "dissertation" / "figures" / "out"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Create visualizations
