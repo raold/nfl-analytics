@@ -4,16 +4,18 @@
 \centering
 \caption{GNN Training Performance: Before and After GPU Optimization}
 \label{tab:gnn_performance_comparison}
-\begin{tabular}{llll}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llll@{}}
 \toprule
-\textbf{Metric} & \textbf{Baseline (CPU)} & \textbf{Optimized (GPU)} & \textbf{Improvement} \\
+\textbf{Metric} & \textbf{CPU} & \textbf{GPU} & \textbf{Speedup} \\
 \midrule
-Time per epoch (1 season) & 33 min & ~3 min & 11x \\
-Time per epoch (9 seasons) & ~5 hours & 24 s & 750x \\
-Total training (100 epochs) & ~20 days & 40 min & 720x \\
-GPU utilization & 45\% & 33\% & Lower (more data) \\
-VRAM usage & 2.9 GB & 3.0 GB & Minimal increase \\
-Power draw & 45 W & 40 W & Efficient \\
+Time/epoch (1 season) & 33 min & 3 min & 11$\times$ \\
+Time/epoch (9 seasons) & 5 hr & 24 s & 750$\times$ \\
+Training (100 epochs) & 20 days & 40 min & 720$\times$ \\
+GPU utilization & 45\% & 33\% & Lower \\
+VRAM usage & 2.9 GB & 3.0 GB & +3\% \\
+Power draw & 45 W & 40 W & $-$11\% \\
 \bottomrule
 \end{tabular}
 \end{table}

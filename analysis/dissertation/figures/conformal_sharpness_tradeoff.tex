@@ -1,7 +1,7 @@
 % conformal_sharpness_tradeoff.tex - Coverage vs sharpness scatter plot
 % Data validated against BNN calibration results (Dec 2025)
 
-\begin{tikzpicture}
+\begin{tikzpicture}[scale=0.82]
   % Load standardized styles
   \input{../style/tikz_diagram_style.tex}
 
@@ -96,11 +96,8 @@
   };
 
   % Note
-  \node[note, text width=7cm, align=left] at (5.0, -1.0) {
-    \textbf{Pareto frontier:} Temperature scaling (orange, dashed box) dominates all methods:
-    achieves 89.5\% coverage (near-target) with 17-yard intervals. Conformal methods guarantee
-    coverage but sacrifice sharpness (3.7--4.0× wider). BNN baseline (bottom-left) is dangerously
-    overconfident. CQR (red) offers best conformal performance via adaptive widths.
+  \node[note, text width=6cm, align=left, font=\scriptsize] at (4.8, -1.0) {
+    \textbf{Pareto frontier:} Temperature scaling (orange box) achieves 89.5\% coverage with 17-yard intervals. Conformal methods (3.7--4× wider) guarantee coverage but sacrifice sharpness. BNN baseline is overconfident.
   };
 
 \end{tikzpicture}

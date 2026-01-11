@@ -18,29 +18,28 @@ The 305 base metrics are organized into five integrated modules targeting three 
 \begin{table}[t]
   \centering
   \footnotesize
-  \begin{threeparttable}
-    \caption{Advanced analytics modules contributing to the 305 base metrics. All features enforce temporal safety through as-of constraints and are accessible via unified API.}
-    \label{tab:phase2-feature-inventory}
-    \begin{tabular}{@{} l r p{5cm} l @{}}
-      \toprule
-      \textbf{Module} & \textbf{Features} & \textbf{Primary Metrics} & \textbf{Source} \\
-      \midrule
-      Team Performance & 80 & EPA, success rate, red zone, turnover luck & \texttt{game\_feature\_extractor.py} \\
-      Next Gen Stats & 28 & CPOE, RYOE, separation, air yards & \texttt{nextgen\_features.py} \\
-      QBR Metrics & 18 & Total QBR, ANY/A, deep ball, pressure & \texttt{qbr\_features.py} \\
-      Opponent-Adjusted & 45 & DVOA approx., SOS, EPA variance & \texttt{opponent\_adjusted\_features.py} \\
-      Situational & 70 & Primetime, strength of victory, playcalling & Various modules \\
-      Possession Value & 16 & Field position, pace factor, drive efficiency & \texttt{possession\_value\_features.py} \\
-      Market \& Ratings & 31 & Line movement, Bayesian ratings, state-space & Various modules \\
-      Coordinator/Context & 17 & OC/DC tenure, weather, travel & Various modules \\
-      \midrule
-      \textbf{Base Metrics Total} & \textbf{305} & & \\
-      \bottomrule
-    \end{tabular}
-    \begin{tablenotes}[flushleft]\footnotesize
-      \item All features use 4-week rolling windows with H=4 exponential decay unless otherwise specified. See \texttt{py/features/game\_feature\_extractor.py} for unified extraction interface ($<500$ms latency).
-    \end{tablenotes}
-  \end{threeparttable}
+  \caption[Advanced analytics modules (305 base metrics)]{Advanced analytics modules contributing to the 305 base metrics. All features enforce temporal safety through as-of constraints and are accessible via unified API.}
+  \label{tab:phase2-feature-inventory}
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabular}{@{} l r p{4.2cm} l @{}}
+    \toprule
+    \textbf{Module} & \textbf{Feat} & \textbf{Primary Metrics} & \textbf{Source} \\
+    \midrule
+    Team Performance & 80 & EPA, success rate, red zone & \texttt{game\_feature\_extractor.py} \\
+    Next Gen Stats & 28 & CPOE, RYOE, separation & \texttt{nextgen\_features.py} \\
+    QBR Metrics & 18 & Total QBR, ANY/A, deep ball & \texttt{qbr\_features.py} \\
+    Opponent-Adjusted & 45 & DVOA approx., SOS, EPA var & \texttt{opponent\_adjusted.py} \\
+    Situational & 70 & Primetime, SOV, playcalling & Various \\
+    Possession Value & 16 & Field position, pace, drive eff & \texttt{possession\_value.py} \\
+    Market \& Ratings & 31 & Line movement, Bayesian & Various \\
+    Coordinator/Context & 17 & OC/DC tenure, weather & Various \\
+    \midrule
+    \textbf{Total} & \textbf{305} & & \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{1mm}
+  \footnotesize\textit{Note:} All features use 4-week rolling windows with H=4 exponential decay. See \texttt{py/features/\allowbreak game\_feature\_extractor.py} for unified API ($<$500ms latency).
 \end{table}
 
 The modular design enables independent validation and selective integration. Each module exposes a standardized interface accepting (team, season, week) tuples and returning feature dictionaries with consistent naming conventions (\texttt{home\_ngs\_*}, \texttt{away\_qbr\_*}, \texttt{home\_play\_*}, \texttt{home\_oadj\_*}). This architecture supports gradual rollout, A/B testing, and feature ablation studies to quantify marginal contributions.
@@ -121,7 +120,7 @@ ESPN's Total QBR (Quarterback Rating, 0--100 scale) improves upon traditional pa
   \end{equation}
   This metric accounts for touchdown value, interception cost, and sack impact, providing a comprehensive single-number efficiency summary.
 
-  \item \textbf{Deep Ball Metrics} (\texttt{qb\_deep\_ball\_pct\_4wk}, \texttt{qb\_deep\_completion\_rate\_4wk}, \texttt{qb\_deep\_epa\_4wk}): Percentage of attempts, completion rate, and EPA on passes with 15+ air yards. Deep passing ability separates playoff contenders: all four 2024 conference championship teams ranked top-10 in deep passing EPA (threshold: +0.40 EPA per dropback).
+  \item \textbf{Deep Ball Metrics} (\texttt{qb\_deep\_ball\_pct\_4wk}, \texttt{qb\_deep\_\allowbreak completion\_rate\_4wk}, \texttt{qb\_deep\_epa\_4wk}): Percentage of attempts, completion rate, and EPA on passes with 15+ air yards. Deep passing ability separates playoff contenders: all 2024 conference championship teams ranked top-10 (threshold: +0.40 EPA per dropback).
 
   \item \textbf{Pressure Performance} (\texttt{qb\_pressure\_epa\_4wk}): EPA per dropback when under pressure (defender within 2.5 yards within 2.5 seconds of snap). Elite QBs maintain positive EPA under pressure (Mahomes +0.12, Allen +0.08 in 2024); average starters degrade significantly (league mean: -0.31 EPA under pressure).
 \end{itemize}
@@ -214,7 +213,7 @@ The opponent adjustment algorithm:
 \subsubsection{Feature Catalog}
 
 \begin{itemize}
-  \item \textbf{Adjusted EPA} (\texttt{off\_epa\_opponent\_adjusted}, \texttt{def\_epa\_opponent\_adjusted}): Offensive and defensive EPA adjusted for opponent quality. Correlation with Vegas win totals: $\rho = 0.82$ (vs.\ $\rho = 0.71$ for raw EPA).
+  \item \textbf{Adjusted EPA} (\texttt{off\_epa\_\allowbreak opponent\_adjusted}, \texttt{def\_epa\_\allowbreak opponent\_adjusted}): Offensive and defensive EPA adjusted for opponent quality. Correlation with Vegas win totals: $\rho = 0.82$ (vs.\ $\rho = 0.71$ for raw EPA).
 
   \item \textbf{DVOA Approximation} (\texttt{dvoa\_off\_approx}, \texttt{dvoa\_def\_approx}): Normalized opponent-weighted EPA ratings. Positive values indicate above-average efficiency; negative values below-average.
 
@@ -277,7 +276,7 @@ print(list(features.keys())[:5])  # First 5 names
 #   home_play_fourth_down_go_rate, etc.
 \end{lstlisting}
 
-Feature naming convention enforces modularity: \texttt{\{home|away\}\_\{module\}\_\{metric\}}, where module $\in$ \{\texttt{ngs}, \texttt{qbr}, \texttt{poss}, \texttt{play}, \texttt{oadj}\}. This convention enables programmatic feature selection, ablation studies, and modular integration.
+Feature naming convention enforces modularity: \texttt{\{home|away\}\_\allowbreak\{module\}\_\allowbreak\{metric\}}, where module $\in$ \{\texttt{ngs}, \texttt{qbr}, \texttt{poss}, \texttt{play}, \texttt{oadj}\}. This enables feature selection, ablation studies, and modular integration.
 
 \subsection{Expected Performance Impact}
 \label{subsec:phase2-impact}
@@ -311,7 +310,7 @@ Conservative impact projections based on NFL analytics literature~\cite{lopez202
 \label{subsec:phase2-risks}
 
 \paragraph{Risk 1: Overfitting from Feature Expansion}
-Managing 386 features with limited sample size (815 games per season) elevates overfitting risk. Mitigation: (i) SHAP-based feature selection identifying top contributors, (ii) L1/L2 regularization in XGBoost ($\alpha = 1.0$, $\lambda = 2.0$), (iii) season-based temporal splits (train on seasons $< N$, validate on season $N$), (iv) strict 2025 holdout validation, (v) config-based feature group disabling (\texttt{py/config/feature\_weights.yaml}).
+Managing 386 features with limited sample size (815 games per season) elevates overfitting risk. Mitigation: (i) SHAP-based feature selection identifying top contributors, (ii) L1/L2 regularization in XGBoost ($\alpha = 1.0$, $\lambda = 2.0$), (iii) season-based temporal splits (train on seasons $< N$, validate on season $N$), (iv) strict 2025 holdout validation, (v) config-based feature group disabling (\texttt{py/config/\allowbreak feature\_weights.yaml}).
 
 \paragraph{Risk 2: Multicollinearity Among Advanced Features}
 Many advanced metrics correlate (EPA vs.\ success rate: $\rho = 0.85$; explosive play rate vs.\ EPA: $\rho = 0.72$). Mitigation: Variance Inflation Factor (VIF) analysis pre-training, pruning features with VIF $> 10$. Alternative: XGBoost's tree-based splits naturally handle multicollinearity better than linear models.
@@ -328,7 +327,7 @@ Extracting 386 features could exceed latency requirements. Mitigation: (i) strat
 \paragraph{Production Deployment (December 2025)}
 The 386-feature production system is fully operational:
 \begin{itemize}
-  \item \texttt{py/features/game\_feature\_extractor.py}: Unified extraction interface ($<500$ms)
+  \item \texttt{py/features/\allowbreak game\_feature\_extractor.py}: Unified extraction interface ($<500$ms)
   \item \texttt{py/features/nextgen\_features.py}: Next Gen Stats tracking integration
   \item \texttt{py/features/qbr\_features.py}: ESPN QBR metrics
   \item \texttt{py/features/semantic\_features.py}: LLM-derived sentiment and injury analysis
@@ -364,19 +363,19 @@ All Phase 2 features use existing database infrastructure with no external API d
   \begin{threeparttable}
     \caption{Phase 2 data sources: all features leverage existing database tables. Coverage percentages for analysis period (2022--2024).}
     \label{tab:phase2-data-sources}
-    \begin{tabular}{@{} l l r l @{}}
+    \begin{tabular}{@{} l p{4.5cm} r l @{}}
       \toprule
       \textbf{Feature Module} & \textbf{Primary Table(s)} & \textbf{Rows} & \textbf{Coverage} \\
       \midrule
       Next Gen Stats & \texttt{nextgen\_passing}, \texttt{nextgen\_rushing}, \texttt{nextgen\_receiving} & $\sim$15k & 2018--2024 (94\%) \\
       QBR Features & \texttt{espn\_qbr} & $\sim$8k & 2019--2024 (100\%) \\
-      Possession Value & \texttt{plays} (drive aggregation) & 1.25M & 2016--2024 (100\%) \\
-      Playcalling & \texttt{plays} (situational filters) & 1.25M & 2016--2024 (100\%) \\
-      Opponent-Adjusted & \texttt{plays} (multi-pass aggregation) & 1.25M & 2016--2024 (100\%) \\
+      Possession Value & \texttt{plays} (drive agg.) & 1.25M & 2016--2024 (100\%) \\
+      Playcalling & \texttt{plays} (situational) & 1.25M & 2016--2024 (100\%) \\
+      Opponent-Adjusted & \texttt{plays} (multi-pass agg.) & 1.25M & 2016--2024 (100\%) \\
       \bottomrule
     \end{tabular}
     \begin{tablenotes}[flushleft]\footnotesize
-      \item All tables validated for completeness (no missing data gaps for 2022--2024 analysis seasons). Temporal safety enforced via \texttt{WHERE kickoff < target\_date} constraints. Performance: all feature extraction <500ms per game. See \texttt{docs/database/DATABASE\_QUICK\_REFERENCE.md} for schema details.
+      \item All tables validated for completeness (no missing data gaps for 2022--2024 analysis seasons). Temporal safety enforced via \texttt{WHERE kickoff <\ target\_date} constraints. Performance: all feature extraction <500ms per game. See \texttt{docs/database/\allowbreak DATABASE\_QUICK\_REFERENCE.md} for schema details.
     \end{tablenotes}
   \end{threeparttable}
 \end{table}
@@ -387,7 +386,7 @@ All Phase 2 features use existing database infrastructure with no external API d
 The advanced analytics integration establishes a production feature pipeline with 386 validated features across base metrics (305), synthetic interactions (37), semantic/LLM signals (38), and rest differentials (6). The central contributions are:
 
 \begin{enumerate}
-  \item \textbf{Modular Architecture}: Standardized feature module interfaces enabling selective integration, A/B testing, and config-based feature group disabling (\texttt{py/config/feature\_weights.yaml}).
+  \item \textbf{Modular Architecture}: Standardized feature module interfaces enabling selective integration, A/B testing, and config-based feature group disabling (\texttt{py/config/\allowbreak feature\_weights.yaml}).
 
   \item \textbf{Tracking Data Precision}: Next Gen Stats features isolating player skill from scheme effects through model-derived metrics (CPOE, RYOE, separation), addressing fundamental limitations of traditional box-score statistics.
 

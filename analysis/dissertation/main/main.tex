@@ -122,13 +122,20 @@
 % Checkmark and cross symbols for tables
 \newcommand{\cmark}{\ding{51}}  % Checkmark
 \newcommand{\xmark}{\ding{55}}  % X mark
+
+% Breakable file paths - prevents overfull hbox from long \texttt{} paths
+% Use \filepath{} for long paths that should break at /, ., _
+\usepackage{url}
+\urlstyle{tt}  % Use typewriter font for \path and \url
+\DeclareUrlCommand\filepath{\urlstyle{tt}}  % Breakable typewriter font for file paths
 \usepackage[
     inner=1.25in,
     outer=1.25in,
     top=1.0in,
     bottom=1.05in
 ]{geometry}                 % Page geometry and margins (simplified)
-\setlength{\headheight}{15pt}  % Fix fancyhdr warning
+\setlength{\headheight}{27.12pt}  % Fix fancyhdr warning (was 15pt, needs 27.12pt for \leftmark)
+\addtolength{\topmargin}{-12.12pt}  % Compensate for increased headheight
 \usepackage{pdflscape}      % Landscape pages with proper PDF orientation
 \usepackage{fancyhdr}       % Custom headers/footers for landscape page numbers
 
@@ -546,6 +553,8 @@ The code is released under the MIT License for academic and research use. Commer
 \phantomsection
 \addcontentsline{toc}{chapter}{References}  % Include References in TOC
 \bibliographystyle{plainnat}
+\begingroup\sloppy\emergencystretch=3em
 \bibliography{references}  % references.bib is in the same directory as main.tex
+\endgroup
 
 \end{document}
