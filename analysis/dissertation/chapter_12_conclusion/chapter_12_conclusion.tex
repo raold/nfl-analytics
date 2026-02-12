@@ -130,6 +130,20 @@ Despite current unprofitability, this work opens several research directions:
   \item \textbf{Postseason-specific modeling}: Playoff games ($n=13$ in 2025) showed distinct characteristics---tighter spreads, higher-quality opponents, motivational factors absent from regular-season training data. Dedicated playoff features (seed differential, bye-week advantage, playoff experience) merit investigation.
 \end{itemize}
 
+\subsection{Investigation-Driven Research Vectors}
+
+The comprehensive workstream investigation (February 2026) uncovered several patterns that merit further study:
+
+\begin{itemize}
+  \item \textbf{Non-monotonic edge-ATS relationship}: The simple power ratings model achieves 67.6\% ATS in a narrow 3--4 point edge window, but performance degrades to near-random outside this ``sweet spot.'' This suggests the model is most effective in games with moderate uncertainty---neither blowout favorites nor true toss-ups. Understanding \emph{why} this non-monotonic pattern exists (and whether it persists across seasons) could inform selective bet placement strategies.
+
+  \item \textbf{Season phase effects}: Model performance varies systematically by week of season: Weeks 10--13 show the best ATS performance (sufficient data accumulation, all data pipelines active), while Weeks 14--18 show the worst (NextGen tracking data publication ceases mid-season, creating a feature quality cliff). This temporal dependency suggests dynamic feature weighting by week or season phase.
+
+  \item \textbf{Architecture mismatch discovery}: The production v6.0 ensemble (State-Space 27\%, Hierarchical 27\%, XGBoost 23\%, Informative Priors 13\%, Hybrid 10\%) was optimized for \emph{props} prediction, not game-level spread prediction. The ensemble weight allocation was never re-optimized for the game outcome domain. A domain-specific weight optimization for game spreads could yield improvement.
+
+  \item \textbf{Feature health stratification}: As of February 2026, the 382-feature pipeline operates at 73\% fully operational, 14\% degraded (partial data), and 13\% empty (data source unavailable). Prediction quality is directly proportional to feature completeness---a finding consistent with the prediction compression phenomenon documented in \S\ref{subsec:postseason-validation}. Automated feature health monitoring with per-feature staleness alerts is essential for production reliability.
+\end{itemize}
+
 % Profit Optimization Future Work from Ch 12
 \input{../chapter_12_conclusion/section_profit_optimization_future_work.tex}
 
