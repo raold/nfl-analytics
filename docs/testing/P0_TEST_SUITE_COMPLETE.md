@@ -25,7 +25,7 @@ Implemented 5 critical test suites (P0 Quick Wins) targeting the most expensive 
 
 ### 1. R Model Interface Critical Tests (6 hours priority)
 
-**File:** `/Users/dro/rice/nfl-analytics/tests/integration/test_r_model_interface_critical.py`
+**File:** `tests/integration/test_r_model_interface_critical.py`
 
 **Purpose:** Prevent Nov 13-style failures (3.5 hours lost) when R model integration breaks before expensive 18-hour backtests.
 
@@ -59,7 +59,7 @@ pytest tests/integration/test_r_model_interface_critical.py -v -m critical
 
 ### 2. Ensemble v5.1 Smoke Tests (4 hours priority)
 
-**File:** `/Users/dro/rice/nfl-analytics/tests/integration/test_ensemble_v5_smoke.py`
+**File:** `tests/integration/test_ensemble_v5_smoke.py`
 
 **Purpose:** Fast smoke tests to validate ensemble v5.1 loads correctly and produces reasonable predictions.
 
@@ -94,7 +94,7 @@ pytest tests/integration/test_ensemble_v5_smoke.py -v -m critical
 
 ### 3. Temporal Leakage Critical Spot Checks (5 hours priority)
 
-**File:** `/Users/dro/rice/nfl-analytics/tests/integration/test_temporal_leakage_critical.py`
+**File:** `tests/integration/test_temporal_leakage_critical.py`
 
 **Purpose:** Fast spot checks to catch temporal data leakage BEFORE model training.
 
@@ -128,7 +128,7 @@ pytest tests/integration/test_temporal_leakage_critical.py -v -m critical
 
 ### 4. Database Connection Pooling Tests (3 hours priority)
 
-**File:** `/Users/dro/rice/nfl-analytics/tests/integration/test_database_pooling.py`
+**File:** `tests/integration/test_database_pooling.py`
 
 **Purpose:** Tests database connection pooling for concurrent prediction workloads.
 
@@ -161,7 +161,7 @@ pytest tests/integration/test_database_pooling.py -v -m critical
 
 ### 5. Batch Prediction Performance Verification (4 hours priority)
 
-**File:** `/Users/dro/rice/nfl-analytics/tests/integration/test_batch_prediction_perf.py`
+**File:** `tests/integration/test_batch_prediction_perf.py`
 
 **Purpose:** Tests that batch prediction optimizations are correct and performant.
 

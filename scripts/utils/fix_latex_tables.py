@@ -7,6 +7,9 @@ Convert \begin{tablenotes}...\\end{tablenotes} to be wrapped in threeparttable.
 import re
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 
 def fix_table_file(filepath):
     """Fix a single LaTeX table file."""
@@ -45,7 +48,7 @@ def fix_table_file(filepath):
 
 def main():
     # Directory containing LaTeX table files
-    tables_dir = Path("/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out")
+    tables_dir = _PROJECT_ROOT / "analysis/dissertation/figures/out"
 
     # Find all .tex files
     tex_files = list(tables_dir.glob("*.tex"))

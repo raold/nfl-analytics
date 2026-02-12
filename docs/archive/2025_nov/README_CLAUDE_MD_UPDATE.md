@@ -49,7 +49,7 @@ We need to update CLAUDE.md to accurately reflect:
 
 ### File Locations
 
-All files in project root: `/Users/dro/rice/nfl-analytics/`
+All files in project root: ``
 
 ```
 CLAUDE_MD_UPDATE_*.md (6 documents)
@@ -83,7 +83,7 @@ README_CLAUDE_MD_UPDATE.md (this file)
 
 1. **Prepare (5 minutes):**
    ```bash
-   cd /Users/dro/rice/nfl-analytics
+   cd \
    cp CLAUDE.md CLAUDE.md.backup.nov3_2025
    nano CLAUDE.md  # or your preferred editor
    ```
@@ -184,7 +184,7 @@ Add: New "November 7, 2025" section (~170 lines)
 
 ## Key Metrics (Verify Against Source)
 
-**Source File:** `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_2022_2025_metrics.json`
+**Source File:** `analysis/results/historical_validation_5way_2022_2025_metrics.json`
 
 **Metrics to Include:**
 ```
@@ -333,7 +333,7 @@ Nov 7, 5:15 PM   Complete - Ready for next phase
 
 ## Support Documents
 
-All documents in `/Users/dro/rice/nfl-analytics/`:
+All documents in ``:
 
 1. **FINAL_SUMMARY_CLAUDE_MD_UPDATE.md** (460 lines)
    - Complete overview of analysis
@@ -405,7 +405,7 @@ All documents in `/Users/dro/rice/nfl-analytics/`:
 A: Yes. Current documentation contradicts validation results. Critical safety issue.
 
 **Q: How do I know the metrics are correct?**
-A: Check source file: `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_2022_2025_metrics.json`. All metrics mathematically verified.
+A: Check source file: `analysis/results/historical_validation_5way_2022_2025_metrics.json`. All metrics mathematically verified.
 
 **Q: What if we're wrong about the bug?**
 A: Document findings in v4.5 after investigation. This is just marking current status.
@@ -427,17 +427,17 @@ A: You do. This document is for your review.
 ## References
 
 **Backtest Results:**
-- `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_2022_2025_metrics.json`
-- `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_2022_2025.csv`
+- `analysis/results/historical_validation_5way_2022_2025_metrics.json`
+- `analysis/results/historical_validation_5way_2022_2025.csv`
 
 **Backtest Code:**
-- `/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_5way.py`
+- `py/backtest/historical_validation_5way.py`
 
 **Current Documentation:**
-- `/Users/dro/rice/nfl-analytics/CLAUDE.md` (v4.3)
+- `CLAUDE.md` (v4.3)
 
 **This Package:**
-- All files in `/Users/dro/rice/nfl-analytics/CLAUDE_MD_*.md`
+- All files in `CLAUDE_MD_*.md`
 
 ---
 

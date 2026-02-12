@@ -153,7 +153,7 @@ The following improvements are optional (no critical issues remaining):
 
 **Full compilation sequence:**
 ```bash
-cd /Users/dro/rice/nfl-analytics/analysis/dissertation/main
+cd analysis/dissertation/main
 pdflatex -interaction=nonstopmode main.tex
 bibtex main
 pdflatex -interaction=nonstopmode main.tex

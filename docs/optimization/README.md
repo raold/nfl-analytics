@@ -208,9 +208,9 @@ grep "R-hat\|ESS" logs/training_*.log
 - 50-70% reduction in disk I/O
 
 **Documentation:**
-- `/Users/dro/rice/nfl-analytics/docs/DATABASE_OPTIMIZATION_COMPLETE.md`
-- `/Users/dro/rice/nfl-analytics/db/performance_indexes_phase6.sql`
-- `/Users/dro/rice/nfl-analytics/db/health_check.sql`
+- `docs/DATABASE_OPTIMIZATION_COMPLETE.md`
+- `db/performance_indexes_phase6.sql`
+- `db/health_check.sql`
 
 ### Pending Wins (Nov 15, 2025)
 
@@ -270,13 +270,13 @@ open http://localhost:3000
 ## 📚 Related Documentation
 
 ### Database Optimization
-- [DATABASE_OPTIMIZATION_COMPLETE.md](/Users/dro/rice/nfl-analytics/docs/DATABASE_OPTIMIZATION_COMPLETE.md)
-- [db/health_check.sql](/Users/dro/rice/nfl-analytics/db/health_check.sql)
-- [db/optimize_indexes.sql](/Users/dro/rice/nfl-analytics/db/optimize_indexes.sql)
+- [DATABASE_OPTIMIZATION_COMPLETE.md](docs/DATABASE_OPTIMIZATION_COMPLETE.md)
+- [db/health_check.sql](db/health_check.sql)
+- [db/optimize_indexes.sql](db/optimize_indexes.sql)
 
 ### Architecture
-- [ARCHITECTURE_REFERENCE.md](/Users/dro/rice/nfl-analytics/docs/ARCHITECTURE_REFERENCE.md)
-- [COMPONENT_DEEP_DIVES.md](/Users/dro/rice/nfl-analytics/docs/COMPONENT_DEEP_DIVES.md)
+- [ARCHITECTURE_REFERENCE.md](docs/ARCHITECTURE_REFERENCE.md)
+- [COMPONENT_DEEP_DIVES.md](docs/COMPONENT_DEEP_DIVES.md)
 
 ### Performance Analysis (Archive)
 - [BATCH_PREDICTION_DATABASE_OPTIMIZATION.md](BATCH_PREDICTION_DATABASE_OPTIMIZATION.md)

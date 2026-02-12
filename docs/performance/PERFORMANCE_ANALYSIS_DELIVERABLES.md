@@ -18,7 +18,7 @@
 ## Deliverable Files
 
 ### 1. Complete Performance Analysis
-**File:** `/Users/dro/rice/nfl-analytics/docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md`
+**File:** `docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md`
 **Length:** 4,200 lines
 **Contents:**
 - Executive summary with runtime breakdown
@@ -37,7 +37,7 @@
 - Measurement and benchmarking template
 
 ### 2. Step-by-Step Implementation Guide
-**File:** `/Users/dro/rice/nfl-analytics/docs/OPTIMIZATION_IMPLEMENTATION_CHECKLIST.md`
+**File:** `docs/OPTIMIZATION_IMPLEMENTATION_CHECKLIST.md`
 **Length:** 600 lines
 **Contents:**
 - Quick reference table (what to do, when)
@@ -64,7 +64,7 @@
 - Performance benchmarking template
 
 ### 3. Production-Ready Code Examples
-**File:** `/Users/dro/rice/nfl-analytics/scripts/optimize_ensemble_backtest.py`
+**File:** `scripts/optimize_ensemble_backtest.py`
 **Length:** 350 lines
 **Contents:**
 - DatabasePoolManager class (drop-in psycopg2 pool wrapper)
@@ -83,7 +83,7 @@
   - Run with: `python scripts/optimize_ensemble_backtest.py --analyze`
 
 ### 4. Executive Summary
-**File:** `/Users/dro/rice/nfl-analytics/docs/ENSEMBLE_PERFORMANCE_SUMMARY.md`
+**File:** `docs/ENSEMBLE_PERFORMANCE_SUMMARY.md`
 **Length:** 400 lines
 **Contents:**
 - Executive summary with baseline vs optimized runtime
@@ -370,7 +370,7 @@ echo "Phase 2:"; grep "Processing time:" phase2_metrics.txt
 
 **Analysis completed by:** Claude Code (Anthropic)
 **Analysis date:** November 13, 2025
-**Repository:** `/Users/dro/rice/nfl-analytics/`
+**Repository:** ``
 
 For implementation, start with: `/docs/OPTIMIZATION_IMPLEMENTATION_CHECKLIST.md`
 

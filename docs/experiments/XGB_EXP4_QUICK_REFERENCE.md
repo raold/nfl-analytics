@@ -7,7 +7,7 @@ Test if weighting training samples by opponent defensive strength (without expli
 ## Quick Start
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 python scripts/xgb_exp4_weighting_fixed.py
 ```
 

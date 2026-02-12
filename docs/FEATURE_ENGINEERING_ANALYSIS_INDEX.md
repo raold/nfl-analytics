@@ -384,7 +384,7 @@ A: Check: 1) Feature importance, 2) Coverage, 3) Temporal leakage. Then consider
 
 ## Document Locations
 
-All documents in `/Users/dro/rice/nfl-analytics/docs/`:
+All documents in `docs/`:
 
 ```
 docs/

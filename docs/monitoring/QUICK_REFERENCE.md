@@ -94,10 +94,10 @@ python scripts/feature_staleness_monitor.py --init
 
 ## Files
 
-- **Script:** `/Users/dro/rice/nfl-analytics/scripts/feature_staleness_monitor.py`
-- **SQL:** `/Users/dro/rice/nfl-analytics/sql/migrations/create_feature_freshness_metadata.sql`
-- **Cron:** `/Users/dro/rice/nfl-analytics/config/nfl_analytics_crontab.txt` (line 69)
-- **Docs:** `/Users/dro/rice/nfl-analytics/docs/monitoring/`
+- **Script:** `scripts/feature_staleness_monitor.py`
+- **SQL:** `sql/migrations/create_feature_freshness_metadata.sql`
+- **Cron:** `config/nfl_analytics_crontab.txt` (line 69)
+- **Docs:** `docs/monitoring/`
 
 ---
 

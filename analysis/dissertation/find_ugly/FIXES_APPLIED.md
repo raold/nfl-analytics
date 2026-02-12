@@ -50,8 +50,8 @@ Reviewed sample pages:
 
 ## Files Modified
 
-1. `/Users/dro/rice/nfl-analytics/analysis/dissertation/main/main.tex` (lines 283-291)
-2. `/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/shap_local_examples_table.tex` (lines 10-12)
+1. `analysis/dissertation/main/main.tex` (lines 283-291)
+2. `analysis/dissertation/figures/out/shap_local_examples_table.tex` (lines 10-12)
 
 ---
 Generated: 2025-10-18

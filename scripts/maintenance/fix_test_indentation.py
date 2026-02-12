@@ -4,6 +4,9 @@ import re
 import subprocess
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 
 def fix_indentation(content: str) -> str:
     """Fix incorrect indentation after comments in test files."""
@@ -58,7 +61,7 @@ def main():
         ["bash", "-c", 'source .venv/bin/activate && black --check . 2>&1 | grep "Cannot parse"'],
         capture_output=True,
         text=True,
-        cwd="/Users/dro/rice/nfl-analytics",
+        cwd=str(_PROJECT_ROOT),
     )
 
     files_to_fix = []

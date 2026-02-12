@@ -419,7 +419,7 @@ cd analysis/dissertation/ && pdflatex main.tex
 ## 🔖 Useful Links
 
 **Internal**:
-- Code: `/Users/dro/rice/nfl-analytics/`
+- Code: ``
 - Docs: `docs/`
 - Models: `models/`
 - Data: `data/`

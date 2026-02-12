@@ -6,7 +6,7 @@
 ## Summary
 [0;34m🔍 Finding unused columns...[0m
 
-INFO:DataLayerAnalyzer:Lineage loaded from /Users/dro/rice/nfl-analytics/.cache/column_lineage.json (822 columns)
+INFO:DataLayerAnalyzer:Lineage loaded from .cache/column_lineage.json (822 columns)
 ⚠️  Note: Unused column detection requires database schema.
 Currently showing columns that ARE used (inverse).
 

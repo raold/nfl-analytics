@@ -8,7 +8,7 @@
 
 ## Overview
 
-This document provides a detailed analysis of required updates to `/Users/dro/rice/nfl-analytics/CLAUDE.md` based on the November 7, 2025 historical validation backtest of the 5-way ensemble.
+This document provides a detailed analysis of required updates to `CLAUDE.md` based on the November 7, 2025 historical validation backtest of the 5-way ensemble.
 
 **Key Finding:** The comprehensive backtest revealed critical production blockers that must be documented before further development.
 
@@ -16,7 +16,7 @@ This document provides a detailed analysis of required updates to `/Users/dro/ri
 
 ## Current CLAUDE.md Status
 
-**File Location:** `/Users/dro/rice/nfl-analytics/CLAUDE.md`
+**File Location:** `CLAUDE.md`
 **Current Version:** 4.3
 **Last Updated:** November 3, 2025
 **Total Lines:** 1,067
@@ -247,7 +247,7 @@ Add comprehensive "November 7, 2025" section documenting:
 
 All metrics in this update are sourced from verified data files:
 
-**File:** `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_2022_2025_metrics.json`
+**File:** `analysis/results/historical_validation_5way_2022_2025_metrics.json`
 
 **Contents:**
 ```json
@@ -307,17 +307,17 @@ The update should be implemented immediately because:
 The update references several files:
 
 **Backtest Results:**
-- Location: `/Users/dro/rice/nfl-analytics/analysis/results/`
+- Location: `analysis/results/`
 - Files:
   - `historical_validation_5way_2022_2025_metrics.json` - Aggregate metrics
   - `historical_validation_5way_2022_2025.csv` - Trade-by-trade results
 
 **Implementation:**
-- Location: `/Users/dro/rice/nfl-analytics/py/backtest/`
+- Location: `py/backtest/`
 - File: `historical_validation_5way.py` (536 lines)
 
 **Update Plan:**
-- Location: `/Users/dro/rice/nfl-analytics/`
+- Location: ``
 - File: `CLAUDE_MD_UPDATE_PLAN_NOV7.md` (complete specification)
 
 ---

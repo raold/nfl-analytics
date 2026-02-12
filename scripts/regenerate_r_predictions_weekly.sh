@@ -18,7 +18,7 @@ set -euo pipefail  # Exit on error, undefined variables, pipe failures
 # Configuration
 # ==============================================================================
 
-PROJECT_ROOT="/Users/dro/rice/nfl-analytics"
+PROJECT_ROOT="$(cd "$(dirname "")/.." \&\& pwd)"
 LOG_DIR="${PROJECT_ROOT}/logs/r_predictions"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 LOG_FILE="${LOG_DIR}/regeneration_${TIMESTAMP}.log"

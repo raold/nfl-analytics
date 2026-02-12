@@ -5,10 +5,13 @@ Tests database writes, filesystem access, and GitHub operations.
 
 import json
 import sys
+from pathlib import Path
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
 from datetime import datetime
 
 # Add mcp_server to path
-sys.path.insert(0, "/Users/dro/rice/nfl-analytics")
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 from mcp_server.tools.database_write import insert_model_metadata, update_model_status
 from mcp_server.tools.filesystem import get_file_info, list_files, read_json

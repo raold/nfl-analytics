@@ -37,7 +37,7 @@ df.apply(process, axis=1)
 
 ## Files Modified
 
-### 1. `/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_5way.py`
+### 1. `py/backtest/historical_validation_5way.py`
 
 **Status:** FIXED (Nov 13, 2025)
 

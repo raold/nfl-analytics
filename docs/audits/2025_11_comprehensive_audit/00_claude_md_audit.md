@@ -2,7 +2,7 @@
 
 **Audit Date:** November 14, 2025
 **Auditor:** File Search Specialist Agent
-**Target File:** `/Users/dro/rice/nfl-analytics/CLAUDE.md`
+**Target File:** `CLAUDE.md`
 **Purpose:** Validate accuracy and optimize for 19-agent comprehensive audit
 
 ---
@@ -571,7 +571,7 @@ Add quick reference to which agent owns what for the upcoming 19-agent audit:
 
 ### Immediate Updates (Before 19-Agent Audit)
 
-**File:** `/Users/dro/rice/nfl-analytics/CLAUDE.md`
+**File:** `CLAUDE.md`
 
 **Changes:**
 

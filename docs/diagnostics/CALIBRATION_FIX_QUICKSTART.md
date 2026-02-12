@@ -11,7 +11,7 @@ Apply 2 immediate fixes to improve coverage by ~47 pp to **65-70%**.
 ## Fix #1: Aggressive Temperature Scaling (5 minutes)
 
 ### File
-`/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
+`py/models/player_props_ensemble.py`
 
 ### Lines
 423-428
@@ -45,7 +45,7 @@ temperature_map = {
 ## Fix #2: Equal Weighting (2 minutes)
 
 ### File
-`/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
+`py/models/player_props_ensemble.py`
 
 ### Lines
 924-926
@@ -71,7 +71,7 @@ weights = np.ones(len(predictions)) / len(predictions)
 
 ### Rerun Backtest
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 python py/backtest/historical_validation_5way.py \
   --start-season 2022 \
@@ -134,14 +134,14 @@ Coverage Gap: +20-25 pp
 ## Files
 
 ### Modified
-- `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
+- `py/models/player_props_ensemble.py`
 
 ### Analyzed
-- `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_4way_EMERGENCY_FIX.csv`
+- `analysis/results/historical_validation_4way_EMERGENCY_FIX.csv`
 
 ### Documentation
-- `/Users/dro/rice/nfl-analytics/docs/diagnostics/calibration_diagnostic_nov7.md` (full report)
-- `/Users/dro/rice/nfl-analytics/docs/diagnostics/CALIBRATION_DIAGNOSTIC_SUMMARY_NOV7.md` (summary)
+- `docs/diagnostics/calibration_diagnostic_nov7.md` (full report)
+- `docs/diagnostics/CALIBRATION_DIAGNOSTIC_SUMMARY_NOV7.md` (summary)
 
 ---
 

@@ -194,17 +194,17 @@ psql postgresql://dro:${DB_PASSWORD}@localhost:5544/devdb01 \
 
 ```bash
 # Check disk space
-df -h /Users/dro/rice/nfl-analytics/models
+df -h models
 
 # Expected output:
 # Filesystem      Size  Used Avail Use% Mounted on
 # /dev/disk1s1   500G  450G   50G  90% /
 
 # Check models/ directory size
-du -sh /Users/dro/rice/nfl-analytics/models
+du -sh models
 
 # Expected output:
-# 12G   /Users/dro/rice/nfl-analytics/models
+# 12G   models
 ```
 
 **Validation:**
@@ -372,7 +372,7 @@ ps aux | grep <PID>
 **Command:**
 ```bash
 # Navigate to project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Activate R environment (if using renv)
 # Rscript -e 'renv::restore()'
@@ -484,7 +484,7 @@ Next: Train Hierarchical v2
 cat R/state_space/train_state_space_v2_canonical.R.log
 
 # Check disk space
-df -h /Users/dro/rice/nfl-analytics/models
+df -h models
 
 # Verify write permissions
 ls -ld models/bayesian/
@@ -514,7 +514,7 @@ ls -ld models/bayesian/
 **Command:**
 ```bash
 # Navigate to project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Set environment variable for database password
 export DB_PASSWORD=$(grep DB_PASSWORD .env | cut -d '=' -f2)
@@ -644,7 +644,7 @@ Next: Generate 2025 predictions for validation
 **Command:**
 ```bash
 # Navigate to project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Set environment variable for database password
 export DB_PASSWORD=$(grep DB_PASSWORD .env | cut -d '=' -f2)
@@ -738,7 +738,7 @@ Same troubleshooting as Hierarchical v2 (see Step 2 above).
 **Command:**
 ```bash
 # Navigate to project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Activate Python virtual environment
 source .venv/bin/activate
@@ -868,7 +868,7 @@ python py/utils/data_leakage_detector.py --check-split train.csv test.csv
 **Command:**
 ```bash
 # Navigate to project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Activate Python virtual environment
 source .venv/bin/activate
@@ -1223,7 +1223,7 @@ Temperature Scaler: 82.3% coverage ❌ (< 88%)
 
 ```bash
 # Run multi-season validation script
-cd /Users/dro/rice/nfl-analytics
+cd \
 python scripts/xgb_v4_multi_season_validation.py
 ```
 
@@ -1313,7 +1313,7 @@ Mean: 5.20 ± 3.80 yards ❌ (std = 3.80 > 2)
 
 ```bash
 # Run ensemble health check
-cd /Users/dro/rice/nfl-analytics
+cd \
 ./scripts/check_ensemble_health.sh
 
 # Expected output:
@@ -1321,7 +1321,7 @@ cd /Users/dro/rice/nfl-analytics
 # Ensemble Health Monitor
 # ========================================
 # Mode: --check
-# Project: /Users/dro/rice/nfl-analytics
+# Project: \
 #
 # Checking ensemble health...
 #
@@ -1457,7 +1457,7 @@ python py/ensemble/enhanced_ensemble_v6_production.py --verbose
 **Command:**
 ```bash
 # Navigate to project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Run model registry script
 ./scripts/register_production_models.sh --all
@@ -1746,7 +1746,7 @@ docker compose ps | grep fastapi
 
 ```bash
 # Navigate to project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Create production models directory if needed
 mkdir -p models_production/bayesian
@@ -2051,7 +2051,7 @@ docker compose ps | grep fastapi
 **Step 2: Restore Previous Models**
 ```bash
 # Navigate to project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Find latest backup directory
 BACKUP_DIR=$(ls -td models_backup_* | head -1)

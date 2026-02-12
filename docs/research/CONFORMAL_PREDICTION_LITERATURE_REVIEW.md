@@ -451,22 +451,22 @@ Add to `analysis/dissertation/references.bib`:
 ## File Locations
 
 **This Document:**
-- `/Users/dro/rice/nfl-analytics/docs/research/CONFORMAL_PREDICTION_LITERATURE_REVIEW.md`
+- `docs/research/CONFORMAL_PREDICTION_LITERATURE_REVIEW.md`
 
 **References File (to update):**
-- `/Users/dro/rice/nfl-analytics/analysis/dissertation/references.bib`
+- `analysis/dissertation/references.bib`
 
 **Implementation Code (to create):**
-- `/Users/dro/rice/nfl-analytics/py/conformal/` (new module)
-- `/Users/dro/rice/nfl-analytics/py/conformal/split_conformal.py`
-- `/Users/dro/rice/nfl-analytics/py/conformal/cqr.py`
-- `/Users/dro/rice/nfl-analytics/py/conformal/weighted_conformal.py`
+- `py/conformal/` (new module)
+- `py/conformal/split_conformal.py`
+- `py/conformal/cqr.py`
+- `py/conformal/weighted_conformal.py`
 
 **Experiments:**
-- `/Users/dro/rice/nfl-analytics/experiments/conformal_calibration_study.py`
+- `experiments/conformal_calibration_study.py`
 
 **Dissertation Updates:**
-- `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_8_results_discussion/subsection_conformal_vs_temperature.tex` (new)
+- `analysis/dissertation/chapter_8_results_discussion/subsection_conformal_vs_temperature.tex` (new)
 
 ---
 

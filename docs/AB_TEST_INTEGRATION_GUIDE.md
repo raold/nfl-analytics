@@ -70,7 +70,7 @@ python scripts/analyze_ab_test.py --check-deployment
 
 ### Option A: Replace Existing Ensemble (Recommended)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/production/real_time_api.py`
+**File:** `py/production/real_time_api.py`
 
 **Changes:**
 
@@ -258,7 +258,7 @@ ORDER BY m.model_name
 
 ```bash
 # Add to crontab (run daily at 8am)
-0 8 * * * cd /Users/dro/rice/nfl-analytics && python scripts/analyze_ab_test.py --output reports/ab_test_daily.txt
+0 8 * * * cd \ && python scripts/analyze_ab_test.py --output reports/ab_test_daily.txt
 ```
 
 ---
@@ -542,15 +542,15 @@ psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 -c "\dt ml.*"
 
 ## Files Created
 
-1. **`/Users/dro/rice/nfl-analytics/py/production/ab_test_router.py`**
+1. **`py/production/ab_test_router.py`**
    - A/B test router class (600 lines)
    - Deterministic assignment, logging, batch predictions
 
-2. **`/Users/dro/rice/nfl-analytics/scripts/analyze_ab_test.py`**
+2. **`scripts/analyze_ab_test.py`**
    - Statistical analysis script (650 lines)
    - Metrics computation, significance tests, deployment decision
 
-3. **`/Users/dro/rice/nfl-analytics/docs/AB_TEST_INTEGRATION_GUIDE.md`** (this file)
+3. **`docs/AB_TEST_INTEGRATION_GUIDE.md`** (this file)
    - Complete integration guide
    - Example code, SQL queries, troubleshooting
 

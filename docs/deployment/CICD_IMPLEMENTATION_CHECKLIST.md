@@ -655,12 +655,12 @@ git push origin main
 ## Resources
 
 **Documentation:**
-- Full audit: `/Users/dro/rice/nfl-analytics/docs/deployment/CICD_PIPELINE_AUDIT_NOV14.md`
-- Quick start: `/Users/dro/rice/nfl-analytics/docs/deployment/GITHUB_ACTIONS_QUICKSTART.md`
+- Full audit: `docs/deployment/CICD_PIPELINE_AUDIT_NOV14.md`
+- Quick start: `docs/deployment/GITHUB_ACTIONS_QUICKSTART.md`
 - GitHub Actions docs: https://docs.github.com/en/actions
 
 **Workflows:**
-- All workflow files: `/Users/dro/rice/nfl-analytics/.github/workflows/`
+- All workflow files: `.github/workflows/`
 
 **Support:**
 - GitHub CLI: `gh help`

@@ -170,7 +170,7 @@ df = df.merge(
 - Temporal safety with `shift(1)`
 - Coverage reporting
 
-**File Reference:** `/Users/dro/rice/nfl-analytics/py/features/opponent_strength.py` (entire file)
+**File Reference:** `py/features/opponent_strength.py` (entire file)
 
 ---
 
@@ -358,7 +358,7 @@ CSV Cache
 
 All analysis documents in:
 ```
-/Users/dro/rice/nfl-analytics/docs/
+docs/
 
 ├── FEATURE_ENGINEERING_PATTERN_ANALYSIS.md      (Main - 5000 words)
 ├── FEATURE_ENGINEERING_PATTERNS_SUMMARY.md      (2-min summary)

@@ -69,8 +69,8 @@ X_train = X[:split_idx]  # Correct - respects time
 ```
 
 ## Files Created/Modified
-1. `/Users/dro/rice/nfl-analytics/py/models/game_outcome_model_fixed.py` (660 lines)
-2. `/Users/dro/rice/nfl-analytics/docs/fixes/GAME_OUTCOME_MODEL_FIXES_NOV29.md`
+1. `py/models/game_outcome_model_fixed.py` (660 lines)
+2. `docs/fixes/GAME_OUTCOME_MODEL_FIXES_NOV29.md`
 3. Model artifacts in `models/game_outcome_v1/`
 
 ## Next Steps

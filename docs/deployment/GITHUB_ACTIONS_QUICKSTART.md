@@ -12,7 +12,7 @@
 ### Step 1: Create Workflows Directory (2 minutes)
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 mkdir -p .github/workflows
 ```
 

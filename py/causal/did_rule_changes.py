@@ -546,6 +546,9 @@ class DiDRuleChangeAnalyzer:
 
         from scipy.stats import linregress
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
         slope, intercept, r_value, p_value, std_err = linregress(df["time_numeric"], df[outcome])
 
         # Check if trend is flat (slope not significantly different from 0)
@@ -633,7 +636,7 @@ class DiDRuleChangeAnalyzer:
 if __name__ == "__main__":
     # Example usage
     analyzer = DiDRuleChangeAnalyzer()
-    output_dir = Path("/Users/dro/rice/nfl-analytics/analysis/causal_inference/did_results")
+    output_dir = _PROJECT_ROOT / "analysis/causal_inference/did_results"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Run all three analyses

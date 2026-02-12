@@ -9,9 +9,7 @@ import numpy as np
 import pandas as pd
 
 # Load data
-csv_file = Path(
-    "/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_4way_EMERGENCY_FIX.csv"
-)
+csv_file = _PROJECT_ROOT / "analysis/results/historical_validation_4way_EMERGENCY_FIX.csv"
 df = pd.read_csv(csv_file)
 
 # Filter to ensemble predictions
@@ -46,6 +44,9 @@ width_ratio = mean_interval_width / expected_width
 # Calibration curve (simple)
 # For each decile, check if actual fraction matches predicted fraction
 from scipy import stats as sp_stats
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
 predicted_percentiles = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 actual_percentiles = []
@@ -205,7 +206,7 @@ print()
 print("=" * 90)
 
 # Save to simple text file
-output_dir = Path("/Users/dro/rice/nfl-analytics/docs/diagnostics")
+output_dir = _PROJECT_ROOT / "docs/diagnostics"
 output_dir.mkdir(exist_ok=True, parents=True)
 
 with open(output_dir / "calibration_summary_nov7.txt", "w") as f:

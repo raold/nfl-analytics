@@ -5,6 +5,9 @@ from pathlib import Path
 
 import pandas as pd
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 
 def generate_slippage_table():
     """Generate slippage model statistics table with realistic NFL betting data."""
@@ -53,9 +56,7 @@ def generate_slippage_table():
 """
 
     # Save to file
-    output_path = Path(
-        "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/slippage_model_table.tex"
-    )
+    output_path = _PROJECT_ROOT / "analysis/dissertation/figures/out/slippage_model_table.tex"
     output_path.write_text(latex_table)
     print(f"Generated slippage model table: {output_path}")
 
@@ -106,9 +107,7 @@ def generate_acceptance_test_results():
 \end{table}
 """
 
-    output_path = Path(
-        "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/sim_acceptance_table.tex"
-    )
+    output_path = _PROJECT_ROOT / "analysis/dissertation/figures/out/sim_acceptance_table.tex"
     output_path.write_text(latex_table)
     print(f"Generated acceptance test table: {output_path}")
 
@@ -154,9 +153,7 @@ def generate_convergence_diagnostics():
 \end{table}
 """
 
-    output_path = Path(
-        "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/mc_convergence_table.tex"
-    )
+    output_path = _PROJECT_ROOT / "analysis/dissertation/figures/out/mc_convergence_table.tex"
     output_path.write_text(latex_table)
     print(f"Generated convergence diagnostics table: {output_path}")
 

@@ -241,7 +241,7 @@ CRITICAL ACTION ITEMS:
 After these fixes, documentation accuracy will exceed 98%.
 
 ================================================================================
-Audit Report: /Users/dro/rice/nfl-analytics/docs/audits/CLAUDE_MD_ARCHITECTURE_AUDIT_NOV15.md
+Audit Report: docs/audits/CLAUDE_MD_ARCHITECTURE_AUDIT_NOV15.md
 Audit Date: November 15, 2025
 Auditor: Claude Code (Haiku 4.5)
 ================================================================================

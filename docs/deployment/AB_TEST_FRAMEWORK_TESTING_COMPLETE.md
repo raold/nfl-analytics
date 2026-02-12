@@ -207,7 +207,7 @@ bash tests/run_ab_test_suite.sh --e2e
 
 ```bash
 # Navigate to project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Run all A/B test framework tests
 pytest tests/production/test_ab_test_router_comprehensive.py \
@@ -294,17 +294,17 @@ bash tests/run_ab_test_suite.sh --coverage
 ## Files Created
 
 ### Test Files
-1. `/Users/dro/rice/nfl-analytics/tests/production/test_ab_test_router_comprehensive.py` (650 lines)
-2. `/Users/dro/rice/nfl-analytics/tests/integration/test_ab_test_api_integration.py` (550 lines)
-3. `/Users/dro/rice/nfl-analytics/tests/e2e/test_ab_test_e2e.py` (600 lines)
+1. `tests/production/test_ab_test_router_comprehensive.py` (650 lines)
+2. `tests/integration/test_ab_test_api_integration.py` (550 lines)
+3. `tests/e2e/test_ab_test_e2e.py` (600 lines)
 
 ### Documentation
-4. `/Users/dro/rice/nfl-analytics/tests/AB_TEST_COMPREHENSIVE_REPORT.md` (500+ lines)
-5. `/Users/dro/rice/nfl-analytics/tests/AB_TEST_EXECUTION_SUMMARY.md` (700+ lines)
-6. `/Users/dro/rice/nfl-analytics/AB_TEST_FRAMEWORK_TESTING_COMPLETE.md` (this file)
+4. `tests/AB_TEST_COMPREHENSIVE_REPORT.md` (500+ lines)
+5. `tests/AB_TEST_EXECUTION_SUMMARY.md` (700+ lines)
+6. `AB_TEST_FRAMEWORK_TESTING_COMPLETE.md` (this file)
 
 ### Scripts
-7. `/Users/dro/rice/nfl-analytics/tests/run_ab_test_suite.sh` (150 lines)
+7. `tests/run_ab_test_suite.sh` (150 lines)
 
 **Total:** 7 files, 3,150+ lines of test code and documentation
 

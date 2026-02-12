@@ -436,6 +436,6 @@ EOF
 
 ## See Also
 
-- [FILE_ORGANIZATION.md](/Users/dro/rice/nfl-analytics/FILE_ORGANIZATION.md) - File structure rules
-- [docs/DATABASE_QUICK_REFERENCE.md](/Users/dro/rice/nfl-analytics/docs/database/DATABASE_QUICK_REFERENCE.md) - Database schema
-- [CLAUDE.md](/Users/dro/rice/nfl-analytics/CLAUDE.md) - Project overview
+- [FILE_ORGANIZATION.md](FILE_ORGANIZATION.md) - File structure rules
+- [docs/DATABASE_QUICK_REFERENCE.md](docs/database/DATABASE_QUICK_REFERENCE.md) - Database schema
+- [CLAUDE.md](CLAUDE.md) - Project overview

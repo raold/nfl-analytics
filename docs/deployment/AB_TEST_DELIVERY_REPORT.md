@@ -28,7 +28,7 @@ Successfully designed and implemented a comprehensive A/B test framework to vali
 
 ### 1. Production Code
 
-#### `/Users/dro/rice/nfl-analytics/py/production/ab_test_router.py` (600 lines)
+#### `py/production/ab_test_router.py` (600 lines)
 
 **Purpose:** Route predictions between ensemble v5.0 (control) and v5.1 (treatment)
 
@@ -67,7 +67,7 @@ print(f"Prediction: {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f
 
 ### 2. Analysis Script
 
-#### `/Users/dro/rice/nfl-analytics/scripts/analyze_ab_test.py` (650 lines)
+#### `scripts/analyze_ab_test.py` (650 lines)
 
 **Purpose:** Statistical analysis and automated deployment decision
 
@@ -103,7 +103,7 @@ python scripts/analyze_ab_test.py --check-deployment
 
 ### 3. Documentation
 
-#### `/Users/dro/rice/nfl-analytics/docs/AB_TEST_INTEGRATION_GUIDE.md` (700 lines)
+#### `docs/AB_TEST_INTEGRATION_GUIDE.md` (700 lines)
 
 **Contents:**
 - Quick start guide
@@ -122,7 +122,7 @@ python scripts/analyze_ab_test.py --check-deployment
 
 ---
 
-#### `/Users/dro/rice/nfl-analytics/docs/AB_TEST_QUICK_REFERENCE.md` (300 lines)
+#### `docs/AB_TEST_QUICK_REFERENCE.md` (300 lines)
 
 **Contents:**
 - Quick commands (start, check, deploy)
@@ -135,7 +135,7 @@ python scripts/analyze_ab_test.py --check-deployment
 
 ---
 
-#### `/Users/dro/rice/nfl-analytics/docs/AB_TEST_IMPLEMENTATION_COMPLETE.md` (800 lines)
+#### `docs/AB_TEST_IMPLEMENTATION_COMPLETE.md` (800 lines)
 
 **Contents:**
 - Complete implementation summary
@@ -150,7 +150,7 @@ python scripts/analyze_ab_test.py --check-deployment
 
 ### 4. Tests
 
-#### `/Users/dro/rice/nfl-analytics/tests/production/test_ab_test_framework.py` (300 lines)
+#### `tests/production/test_ab_test_framework.py` (300 lines)
 
 **Test Coverage:**
 - ✅ Router initialization and configuration
@@ -197,7 +197,7 @@ VALUES ('ensemble_v5.1', 'ensemble', '5.1', 'passing_yards', 'multi', 'active', 
 
 **Step 3: Integrate into API**
 
-Update `/Users/dro/rice/nfl-analytics/py/production/real_time_api.py`:
+Update `py/production/real_time_api.py`:
 
 ```python
 # BEFORE (line 24):

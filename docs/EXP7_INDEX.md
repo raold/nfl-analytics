@@ -169,7 +169,7 @@ Validation against baseline (40.20 MAE)
 
 ### Step 2: Run the Script (2 minutes)
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 python scripts/xgb_exp7_ridge_fixed.py
 ```
 
@@ -317,20 +317,20 @@ For questions or clarifications:
 
 ```
 Script:
-/Users/dro/rice/nfl-analytics/scripts/xgb_exp7_ridge_fixed.py
+scripts/xgb_exp7_ridge_fixed.py
 
 Documentation:
-/Users/dro/rice/nfl-analytics/docs/EXP7_QUICK_START.md
-/Users/dro/rice/nfl-analytics/docs/EXP7_RIDGE_RESIDUALS_SUMMARY.md
-/Users/dro/rice/nfl-analytics/docs/EXP7_THEORETICAL_JUSTIFICATION.md
-/Users/dro/rice/nfl-analytics/docs/EXP7_INDEX.md (this file)
+docs/EXP7_QUICK_START.md
+docs/EXP7_RIDGE_RESIDUALS_SUMMARY.md
+docs/EXP7_THEORETICAL_JUSTIFICATION.md
+docs/EXP7_INDEX.md (this file)
 
 Models:
-/Users/dro/rice/nfl-analytics/models/ridge_residuals_v7_20251114_171023.pkl
-/Users/dro/rice/nfl-analytics/models/xgb_ridge_residuals_v7_20251114_171023.json
+models/ridge_residuals_v7_20251114_171023.pkl
+models/xgb_ridge_residuals_v7_20251114_171023.json
 
 Results:
-/Users/dro/rice/nfl-analytics/results/xgb_exp7_ridge_results_20251114_171023.json
+results/xgb_exp7_ridge_results_20251114_171023.json
 ```
 
 ---

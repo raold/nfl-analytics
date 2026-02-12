@@ -150,12 +150,12 @@ Issues by Severity:
 Validation Issues:
 
 [ERROR] schema_validation: Column 'game_id' does not exist in table 'mart.player_game_stats'
-  File: /Users/dro/rice/nfl-analytics/dashboard/app.py
+  File: dashboard/app.py
   Line: 1417
   💡 Suggestion: Available columns: player_id, season, week, current_team, passing_yards...
 
 [ERROR] schema_validation: Table 'public.old_table' does not exist in database
-  File: /Users/dro/rice/nfl-analytics/dashboard/app.py
+  File: dashboard/app.py
   Line: 842
   💡 Suggestion: Available tables: public.games, mart.player_game_stats...
 
@@ -745,7 +745,7 @@ result = conn.execute(query).fetchall()
 $ ./scripts/sync_frontend.sh validate-schema
 
 [ERROR] schema_validation: Column 'game_id' does not exist in table 'mart.player_game_stats'
-  File: /Users/dro/rice/nfl-analytics/dashboard/app.py
+  File: dashboard/app.py
   Line: 1417
   💡 Suggestion: Available columns: player_id, season, week, current_team, passing_yards...
 

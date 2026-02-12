@@ -17,6 +17,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 sns.set_style("whitegrid")
 
 
@@ -24,7 +27,7 @@ class PhaseComparator:
     """Compare Phase 1 and Phase 2.1 results"""
 
     def __init__(self):
-        self.results_dir = Path("/Users/dro/rice/nfl-analytics/experiments/calibration")
+        self.results_dir = _PROJECT_ROOT / "experiments/calibration"
         self.phase1_results = self.load_phase1()
         self.phase21_results = self.load_phase21()
 
@@ -305,16 +308,14 @@ def main():
         improvements = comparator.print_comparison()
 
         # Create visualization
-        output_dir = Path("/Users/dro/rice/nfl-analytics/analysis/phase_comparison")
+        output_dir = _PROJECT_ROOT / "analysis/phase_comparison"
         output_dir.mkdir(parents=True, exist_ok=True)
 
         viz_path = output_dir / "phase1_vs_phase21_comparison.png"
         comparator.create_comparison_plot(viz_path)
 
         # Save LaTeX table
-        latex_path = Path(
-            "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/phase_comparison_table.tex"
-        )
+        latex_path = _PROJECT_ROOT / "analysis/dissertation/figures/out/phase_comparison_table.tex"
         comparator.save_latex_table(latex_path)
 
         # Save summary JSON

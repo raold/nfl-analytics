@@ -71,7 +71,7 @@ DOCUMENTS CREATED
 Plus: CLAUDE_MD_UPDATE_COMPLETE.txt (this file)
 
 Total Documentation: ~3,000 lines
-All files in: /Users/dro/rice/nfl-analytics/
+All files in: 
 
 ================================================================================
 CHANGES REQUIRED TO CLAUDE.md
@@ -122,7 +122,7 @@ METRICS VERIFICATION
 ================================================================================
 
 All metrics verified against source data:
-Source: /Users/dro/rice/nfl-analytics/analysis/results/
+Source: analysis/results/
         historical_validation_5way_2022_2025_metrics.json
 
 Metrics Included:
@@ -180,7 +180,7 @@ For Users/Decision Makers (10 minutes):
 
 For Implementers (20 minutes):
   1. Read: CLAUDE_MD_EXACT_TEXT_CHANGES.md
-  2. Open: /Users/dro/rice/nfl-analytics/CLAUDE.md in editor
+  2. Open: CLAUDE.md in editor
   3. Apply: 4 changes in order (all line numbers provided)
   4. Verify: Run checklist commands
   5. Commit: git add CLAUDE.md && git commit && git push
@@ -294,7 +294,7 @@ Expected Completion:       Nov 7, 2025 (Same day)
 SUPPORTING FILES CREATED
 ================================================================================
 
-All files located in: /Users/dro/rice/nfl-analytics/
+All files located in: 
 
 Documentation Files:
   ✓ README_CLAUDE_MD_UPDATE.md

@@ -20,7 +20,7 @@ The API is **technically excellent** (code quality 8/10) but **severely under-do
 
 ### 📋 6 Comprehensive Documents (15,000+ lines)
 
-**Location:** `/Users/dro/rice/nfl-analytics/docs/api/`
+**Location:** `docs/api/`
 
 1. **00_START_HERE.md** (600 lines)
    - Quick 3-minute overview
@@ -354,7 +354,7 @@ END OF WEEK 6:         3 SDKs published, ready for adoption
 ### Documentation (Created Today)
 
 ```
-/Users/dro/rice/nfl-analytics/
+
 ├── docs/api/                          # NEW: API Documentation Hub
 │   ├── 00_START_HERE.md               # Start here (quick overview)
 │   ├── README.md                       # Navigation & status
@@ -370,7 +370,7 @@ END OF WEEK 6:         3 SDKs published, ready for adoption
 ### Code Files (To Be Created Per Plan)
 
 ```
-/Users/dro/rice/nfl-analytics/
+
 ├── api/
 │   ├── auth.py                        # NEW: API key authentication
 │   ├── rate_limiting.py               # NEW: Rate limiting middleware
@@ -491,7 +491,7 @@ END OF WEEK 6:         3 SDKs published, ready for adoption
 ---
 
 ### Quick Reference
-- **Start reading here:** `/Users/dro/rice/nfl-analytics/docs/api/00_START_HERE.md`
-- **Executive summary:** `/Users/dro/rice/nfl-analytics/API_DOCUMENTATION_AUDIT_SUMMARY.md`
-- **Full plan:** `/Users/dro/rice/nfl-analytics/docs/api/OPENAPI_SPECIFICATION_PLAN.md`
-- **Task list:** `/Users/dro/rice/nfl-analytics/docs/api/IMPLEMENTATION_CHECKLIST.md`
+- **Start reading here:** `docs/api/00_START_HERE.md`
+- **Executive summary:** `API_DOCUMENTATION_AUDIT_SUMMARY.md`
+- **Full plan:** `docs/api/OPENAPI_SPECIFICATION_PLAN.md`
+- **Task list:** `docs/api/IMPLEMENTATION_CHECKLIST.md`

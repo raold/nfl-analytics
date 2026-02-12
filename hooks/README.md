@@ -34,7 +34,7 @@ Runs automatically on `git commit`. Example output:
 Running schema validation...
 
 [ERROR] schema_validation: Column 'game_id' does not exist in table 'mart.player_game_stats'
-  File: /Users/dro/rice/nfl-analytics/dashboard/app.py
+  File: dashboard/app.py
   Line: 1417
   💡 Suggestion: Join to games via (season, week) composite key
 

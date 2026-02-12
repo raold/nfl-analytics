@@ -249,10 +249,10 @@ ORDER BY day, m.model_name;
 
 ## Files Reference
 
-- **Router:** `/Users/dro/rice/nfl-analytics/py/production/ab_test_router.py`
-- **Analysis:** `/Users/dro/rice/nfl-analytics/scripts/analyze_ab_test.py`
-- **Guide:** `/Users/dro/rice/nfl-analytics/docs/AB_TEST_INTEGRATION_GUIDE.md`
-- **Quick Ref:** `/Users/dro/rice/nfl-analytics/docs/AB_TEST_QUICK_REFERENCE.md`
+- **Router:** `py/production/ab_test_router.py`
+- **Analysis:** `scripts/analyze_ab_test.py`
+- **Guide:** `docs/AB_TEST_INTEGRATION_GUIDE.md`
+- **Quick Ref:** `docs/AB_TEST_QUICK_REFERENCE.md`
 
 ---
 

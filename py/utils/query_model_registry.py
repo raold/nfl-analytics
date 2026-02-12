@@ -42,6 +42,9 @@ import psycopg2
 from psycopg2.extras import DictCursor
 from tabulate import tabulate
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 # Database connection parameters
 DB_CONFIG = {
     "host": "localhost",
@@ -806,7 +809,7 @@ def check_safe_delete(model_name):
         # Check 5: File size
         model_path = model["model_path"]
         if model_path:
-            full_path = Path("/Users/dro/rice/nfl-analytics") / model_path
+            full_path = _PROJECT_ROOT / model_path
             if full_path.exists():
                 file_size = full_path.stat().st_size
                 click.echo(f"📁 File size: {format_bytes(file_size)}")

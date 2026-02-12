@@ -29,7 +29,7 @@ from pathlib import Path
 # Configuration
 # ============================================================================
 
-PDF_PATH = "/Users/dro/rice/nfl-analytics/analysis/dissertation/main/main.pdf"
+PDF_PATH = str(_PROJECT_ROOT / "analysis/dissertation/main/main.pdf")
 OUTPUT_DIR = Path(__file__).parent / "pages"
 LOG_PATH = Path(PDF_PATH).parent / "main.log"
 TEX_PATH = Path(PDF_PATH).parent / "main.tex"
@@ -107,6 +107,9 @@ def cleanup_directory():
     """Remove the pages directory entirely."""
     if OUTPUT_DIR.exists():
         import shutil
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
         shutil.rmtree(OUTPUT_DIR)
         print("✓ Cleaned up pages directory")

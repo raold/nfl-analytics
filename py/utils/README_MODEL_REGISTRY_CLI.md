@@ -2,7 +2,7 @@
 
 **Author:** Claude Code (Sonnet 4.5)
 **Date:** November 9, 2025
-**Location:** `/Users/dro/rice/nfl-analytics/py/utils/query_model_registry.py`
+**Location:** `py/utils/query_model_registry.py`
 
 ## Overview
 
@@ -529,7 +529,7 @@ The CLI queries these tables in the `ml` schema:
 7. **ml.model_artifacts** - Model files, checkpoints, and artifacts
 8. **ml.production_deployments** - Production deployment tracking
 
-See `/Users/dro/rice/nfl-analytics/db/migrations/025_model_registry.sql` for full schema.
+See `db/migrations/025_model_registry.sql` for full schema.
 
 ---
 
@@ -695,8 +695,8 @@ Potential additions to the CLI:
 
 For issues or questions:
 
-1. Check database schema: `/Users/dro/rice/nfl-analytics/db/migrations/025_model_registry.sql`
-2. Review model registry module: `/Users/dro/rice/nfl-analytics/py/registry/model_registry.py`
+1. Check database schema: `db/migrations/025_model_registry.sql`
+2. Review model registry module: `py/registry/model_registry.py`
 3. Check CLAUDE.md for project context
 4. Run with `--help` flag for command-specific documentation
 

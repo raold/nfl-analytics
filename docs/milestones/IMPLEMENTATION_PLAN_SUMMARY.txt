@@ -366,11 +366,11 @@ REFERENCES & RESOURCES
 ================================================================================
 
 Documentation Files:
-- /Users/dro/rice/nfl-analytics/TEMPERATURE_SCALING_README.md
-- /Users/dro/rice/nfl-analytics/docs/TEMPERATURE_SCALING_EXECUTIVE_SUMMARY.md
-- /Users/dro/rice/nfl-analytics/docs/TEMPERATURE_SCALING_IMPLEMENTATION_PLAN.md
-- /Users/dro/rice/nfl-analytics/docs/TEMPERATURE_SCALING_TECHNICAL_SPEC.md
-- /Users/dro/rice/nfl-analytics/docs/TEMPERATURE_SCALING_QUICK_REFERENCE.md
+- TEMPERATURE_SCALING_README.md
+- docs/TEMPERATURE_SCALING_EXECUTIVE_SUMMARY.md
+- docs/TEMPERATURE_SCALING_IMPLEMENTATION_PLAN.md
+- docs/TEMPERATURE_SCALING_TECHNICAL_SPEC.md
+- docs/TEMPERATURE_SCALING_QUICK_REFERENCE.md
 
 Code References:
 - py/ensemble/enhanced_ensemble_v5.py (target file)
@@ -420,7 +420,7 @@ comprehensive. No further planning needed - only execution required.
 DOCUMENT MANIFEST
 ================================================================================
 
-Location: /Users/dro/rice/nfl-analytics/
+Location: 
 
 Files Created:
 1. TEMPERATURE_SCALING_README.md (10KB)

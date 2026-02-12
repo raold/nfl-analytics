@@ -19,7 +19,7 @@ Complete dissertation content for conformal prediction integration (Phase 1), in
 ## Files Created
 
 ### 1. Chapter 6: Conformal Calibration Theory
-**File:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_6_uncertainty_risk_betting/section_conformal_calibration.tex`
+**File:** `analysis/dissertation/chapter_6_uncertainty_risk_betting/section_conformal_calibration.tex`
 **Lines:** 216
 **Estimated Pages:** 4-5
 
@@ -49,7 +49,7 @@ Complete dissertation content for conformal prediction integration (Phase 1), in
 ---
 
 ### 2. Chapter 8: Empirical Validation Results
-**File:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_8_results_discussion/section_conformal_empirical_validation.tex`
+**File:** `analysis/dissertation/chapter_8_results_discussion/section_conformal_empirical_validation.tex`
 **Lines:** 293
 **Estimated Pages:** 2-3
 
@@ -77,7 +77,7 @@ Complete dissertation content for conformal prediction integration (Phase 1), in
 ---
 
 ### 3. Figure 1: Calibration Curve
-**File:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/conformal_calibration_curve.tex`
+**File:** `analysis/dissertation/figures/conformal_calibration_curve.tex`
 **Lines:** 93
 **Type:** TikZ diagram (10×10 grid)
 
@@ -95,7 +95,7 @@ Complete dissertation content for conformal prediction integration (Phase 1), in
 ---
 
 ### 4. Figure 2: Interval Width Comparison
-**File:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/conformal_interval_width.tex`
+**File:** `analysis/dissertation/figures/conformal_interval_width.tex`
 **Lines:** 85
 **Type:** TikZ histogram
 
@@ -113,7 +113,7 @@ Complete dissertation content for conformal prediction integration (Phase 1), in
 ---
 
 ### 5. Figure 3: Temporal Coverage Stability
-**File:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/conformal_coverage_temporal.tex`
+**File:** `analysis/dissertation/figures/conformal_coverage_temporal.tex`
 **Lines:** 116
 **Type:** TikZ line plot (time series)
 
@@ -132,7 +132,7 @@ Complete dissertation content for conformal prediction integration (Phase 1), in
 ---
 
 ### 6. Figure 4: Coverage-Sharpness Tradeoff
-**File:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/conformal_sharpness_tradeoff.tex`
+**File:** `analysis/dissertation/figures/conformal_sharpness_tradeoff.tex`
 **Lines:** 106
 **Type:** TikZ scatter plot (Pareto frontier)
 
@@ -156,7 +156,7 @@ Complete dissertation content for conformal prediction integration (Phase 1), in
 
 ### Step 1: Add Chapter 6 Section
 
-Edit `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_6_uncertainty_risk_betting/chapter_6_uncertainty_risk_betting.tex`:
+Edit `analysis/dissertation/chapter_6_uncertainty_risk_betting/chapter_6_uncertainty_risk_betting.tex`:
 
 ```latex
 % After section_profit_optimization_results.tex, before \chaptersummary
@@ -165,7 +165,7 @@ Edit `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_6_uncertainty_
 
 ### Step 2: Add Chapter 8 Section
 
-Edit `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_8_results_discussion/chapter_8_results_discussion.tex`:
+Edit `analysis/dissertation/chapter_8_results_discussion/chapter_8_results_discussion.tex`:
 
 ```latex
 % After section_bnn_calibration_study.tex
@@ -175,7 +175,7 @@ Edit `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_8_results_disc
 ### Step 3: Compile PDF
 
 ```bash
-cd /Users/dro/rice/nfl-analytics/analysis/dissertation/main
+cd analysis/dissertation/main
 latexmk -pdf main.tex
 ```
 

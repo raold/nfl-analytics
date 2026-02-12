@@ -630,6 +630,6 @@ Rule 19 prevents a critical production issue (placeholder predictions) from reac
 ---
 
 **Related Files:**
-- Implementation: `/Users/dro/rice/nfl-analytics/py/utils/enforcement_router.py` (lines 1086-1232)
+- Implementation: `py/utils/enforcement_router.py` (lines 1086-1232)
 - Tests: `tests/integration/test_placeholder_detection.py`
 - Configuration: `CLAUDE.md` (Enforcement Framework section)

@@ -6,7 +6,10 @@ Move existing chapter summaries to the end and add missing summaries.
 import re
 from pathlib import Path
 
-DISSERTATION_DIR = Path("/Users/dro/rice/nfl-analytics/analysis/dissertation")
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
+DISSERTATION_DIR = _PROJECT_ROOT / "analysis/dissertation"
 
 # Chapters that need summaries added (identified from audit)
 CHAPTERS_NEEDING_SUMMARIES = {

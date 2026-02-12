@@ -26,7 +26,7 @@ Fixed all 3 CRITICAL data leakage issues identified in Round 1 comprehensive aud
 ## Issue 1: Career Averages Leakage (CRITICAL)
 
 ### Problem
-**File:** `/Users/dro/rice/nfl-analytics/py/models/train_bnn_receiving.py`
+**File:** `py/models/train_bnn_receiving.py`
 **Location:** Lines 94-102 (CTE `player_averages`)
 **Root Cause:** Career statistics computed on full dataset (2020-2024) before train/test split
 
@@ -124,7 +124,7 @@ df_test = df_test.merge(player_stats, on='player_id', how='left')
 ## Issue 2: Test Set Imputation Leakage (CRITICAL)
 
 ### Problem
-**File:** `/Users/dro/rice/nfl-analytics/py/models/train_bnn_receiving.py`
+**File:** `py/models/train_bnn_receiving.py`
 **Location:** Lines 128-129 (old version)
 **Root Cause:** Missing value imputation uses median/mean of entire dataset
 
@@ -197,7 +197,7 @@ def prepare_features(
 ## Issue 3: Ensemble Weight Validation Documentation (CRITICAL)
 
 ### Problem
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_production.py`
+**File:** `py/ensemble/enhanced_ensemble_v6_production.py`
 **Location:** Class docstring (lines 96-174)
 **Root Cause:** Weight renormalization strategy lacked documentation on validation methodology
 
@@ -347,7 +347,7 @@ python scripts/backtest_ensemble_v6_temporal_safe.py
 ## Files Modified
 
 ### 1. BNN Receiving Model (Issue 1 + 2)
-**File:** `/Users/dro/rice/nfl-analytics/py/models/train_bnn_receiving.py`
+**File:** `py/models/train_bnn_receiving.py`
 **Lines Changed:** 526 lines (complete rewrite for temporal safety)
 **Key Changes:**
 - Removed career averages from SQL query (lines 80-120)
@@ -357,7 +357,7 @@ python scripts/backtest_ensemble_v6_temporal_safe.py
 - Added temporal safety documentation throughout
 
 ### 2. Ensemble Weight Validation (Issue 3)
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_production.py`
+**File:** `py/ensemble/enhanced_ensemble_v6_production.py`
 **Lines Changed:** 904 lines (comprehensive documentation added)
 **Key Changes:**
 - Added 78-line WEIGHT VALIDATION METHODOLOGY section (lines 107-164)

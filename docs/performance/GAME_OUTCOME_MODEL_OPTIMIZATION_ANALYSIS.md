@@ -1,7 +1,7 @@
 # Game Outcome Model Performance Optimization Analysis
 
 **Date:** November 29, 2025
-**Model:** `/Users/dro/rice/nfl-analytics/py/models/game_outcome_model.py`
+**Model:** `py/models/game_outcome_model.py`
 **Analyst:** Claude Code (Sonnet 4.5)
 **Current Status:** Functional but sub-optimal
 **Target:** <200ms inference, efficient training on production loads
@@ -1023,9 +1023,9 @@ print(json.dumps(report, indent=2))
 6. Submit PR with benchmarks in description
 
 **Files to Modify:**
-- `/Users/dro/rice/nfl-analytics/py/models/game_outcome_model.py` (main changes)
-- `/Users/dro/rice/nfl-analytics/py/features/game_feature_extractor.py` (accept db_pool)
-- `/Users/dro/rice/nfl-analytics/tests/models/test_game_outcome_model.py` (add perf tests)
+- `py/models/game_outcome_model.py` (main changes)
+- `py/features/game_feature_extractor.py` (accept db_pool)
+- `tests/models/test_game_outcome_model.py` (add perf tests)
 
 **Documentation:**
 - Update CLAUDE.md § Game Outcome Prediction with new performance numbers

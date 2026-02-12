@@ -1,6 +1,6 @@
 # CLAUDE.md Exact Text Changes - November 7, 2025
 
-**File:** `/Users/dro/rice/nfl-analytics/CLAUDE.md`
+**File:** `CLAUDE.md`
 **Current Version:** 4.3 (Last Updated: November 3, 2025)
 **Target Version:** 4.4 (Last Updated: November 7, 2025)
 **Status:** Changes Ready for Implementation
@@ -383,7 +383,7 @@ Classification: Critical documentation update reflecting production blockers
 
 **Step 1: Backup**
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 cp CLAUDE.md CLAUDE.md.backup.nov3_2025
 ```
 

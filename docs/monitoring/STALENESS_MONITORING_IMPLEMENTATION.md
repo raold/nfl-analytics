@@ -9,7 +9,7 @@
 ## What Was Created
 
 ### 1. Main Monitoring Script
-**File:** `/Users/dro/rice/nfl-analytics/scripts/feature_staleness_monitor.py`
+**File:** `scripts/feature_staleness_monitor.py`
 
 **Features:**
 - ✅ Checks 6 critical features/tables
@@ -34,7 +34,7 @@
 ---
 
 ### 2. Database Schema Migration
-**File:** `/Users/dro/rice/nfl-analytics/sql/migrations/create_feature_freshness_metadata.sql`
+**File:** `sql/migrations/create_feature_freshness_metadata.sql`
 
 **Creates:**
 - `metadata` schema (if not exists)
@@ -49,7 +49,7 @@
 ---
 
 ### 3. Cron Job Configuration
-**File:** `/Users/dro/rice/nfl-analytics/config/nfl_analytics_crontab.txt`
+**File:** `config/nfl_analytics_crontab.txt`
 
 **Added:**
 ```cron
@@ -66,7 +66,7 @@
 ### 4. Documentation
 
 #### Main README
-**File:** `/Users/dro/rice/nfl-analytics/docs/monitoring/README.md`
+**File:** `docs/monitoring/README.md`
 
 **Contents:**
 - Overview and components
@@ -86,7 +86,7 @@
 ---
 
 #### Sample Output Documentation
-**File:** `/Users/dro/rice/nfl-analytics/docs/monitoring/FEATURE_STALENESS_SAMPLE_OUTPUT.md`
+**File:** `docs/monitoring/FEATURE_STALENESS_SAMPLE_OUTPUT.md`
 
 **Contents:**
 - Three sample scenarios (OK, STALE, CRITICAL)
@@ -423,14 +423,14 @@ psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \
 ## Files Created/Modified
 
 ### Created Files (5)
-1. ✅ `/Users/dro/rice/nfl-analytics/scripts/feature_staleness_monitor.py` (765 lines)
-2. ✅ `/Users/dro/rice/nfl-analytics/sql/migrations/create_feature_freshness_metadata.sql` (64 lines)
-3. ✅ `/Users/dro/rice/nfl-analytics/docs/monitoring/README.md` (644 lines)
-4. ✅ `/Users/dro/rice/nfl-analytics/docs/monitoring/FEATURE_STALENESS_SAMPLE_OUTPUT.md` (458 lines)
-5. ✅ `/Users/dro/rice/nfl-analytics/docs/monitoring/STALENESS_MONITORING_IMPLEMENTATION.md` (this file)
+1. ✅ `scripts/feature_staleness_monitor.py` (765 lines)
+2. ✅ `sql/migrations/create_feature_freshness_metadata.sql` (64 lines)
+3. ✅ `docs/monitoring/README.md` (644 lines)
+4. ✅ `docs/monitoring/FEATURE_STALENESS_SAMPLE_OUTPUT.md` (458 lines)
+5. ✅ `docs/monitoring/STALENESS_MONITORING_IMPLEMENTATION.md` (this file)
 
 ### Modified Files (1)
-1. ✅ `/Users/dro/rice/nfl-analytics/config/nfl_analytics_crontab.txt` (added cron entry)
+1. ✅ `config/nfl_analytics_crontab.txt` (added cron entry)
 
 **Total Lines Added:** ~2,000 lines (code + documentation)
 

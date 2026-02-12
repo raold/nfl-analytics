@@ -29,7 +29,7 @@ We do NOT:
 | **Nov 13, 2025** | State-Space v2 Model Loading Bug | P4 | 20min effort, $0 revenue | ✅ FIXED |
 | **Nov 9, 2025** | BNN Investigation (6 failed approaches) | P2 | 84h effort, $0 revenue | ✅ TERMINATED |
 
-See `/Users/dro/rice/nfl-analytics/docs/POSTMORTEMS.md` for full summaries.
+See `docs/POSTMORTEMS.md` for full summaries.
 
 ---
 

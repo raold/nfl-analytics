@@ -149,9 +149,9 @@ To reconcile 40.20 vs 57.75 MAE discrepancy:
 ## Files Created/Modified
 
 ### Created
-- `/Users/dro/rice/nfl-analytics/scripts/xgb_exp5_l1_fixed.py` (392 lines)
-- `/Users/dro/rice/nfl-analytics/scripts/xgb_exp5_l1_results.csv` (9 rows)
-- `/Users/dro/rice/nfl-analytics/docs/L1_REGULARIZATION_EXPERIMENT_REPORT.md` (this file)
+- `scripts/xgb_exp5_l1_fixed.py` (392 lines)
+- `scripts/xgb_exp5_l1_results.csv` (9 rows)
+- `docs/L1_REGULARIZATION_EXPERIMENT_REPORT.md` (this file)
 
 ### Output Files
 - **Results CSV:** `scripts/xgb_exp5_l1_results.csv` (all 8 L1 alphas and metrics)

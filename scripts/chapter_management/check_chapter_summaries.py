@@ -4,6 +4,9 @@
 import re
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 
 def check_chapter(chapter_file):
     """Check if chapter has summary and if it's at the end."""
@@ -42,7 +45,7 @@ def check_chapter(chapter_file):
 
 
 def main():
-    dissertation_dir = Path("/Users/dro/rice/nfl-analytics/analysis/dissertation")
+    dissertation_dir = _PROJECT_ROOT / "analysis/dissertation"
 
     # Find all chapter files
     chapter_files = sorted(dissertation_dir.glob("chapter_*/*.tex"))

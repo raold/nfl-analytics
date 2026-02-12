@@ -44,7 +44,7 @@
 
 ### Migration 031 Verification
 
-✅ **File:** `/Users/dro/rice/nfl-analytics/db/migrations/031_add_phase5_high_signal_columns.sql`
+✅ **File:** `db/migrations/031_add_phase5_high_signal_columns.sql`
 ✅ **Columns Added:** ~100 columns across 15 categories
 ✅ **Indexes Created:** 13 performance indexes
 ✅ **Validation Query:** Passed (20+ sampled columns verified)
@@ -141,7 +141,7 @@ Low game counts detected only in **playoff weeks (18-22)**, which is expected:
 
 ### Canonical Window Weighting Implementation
 
-**File:** `/Users/dro/rice/nfl-analytics/py/models/train_xgboost_canonical.py`
+**File:** `py/models/train_xgboost_canonical.py`
 **Function:** `apply_exponential_decay_weights()`
 
 ```python
@@ -525,7 +525,7 @@ ORDER BY g.season;
 
 ```python
 import sys
-sys.path.insert(0, '/Users/dro/rice/nfl-analytics')
+sys.path.insert(0, '\')
 
 import pandas as pd
 import psycopg2

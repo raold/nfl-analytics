@@ -219,7 +219,7 @@ skill = 5.0:  exp(5.0) = 148x    (14800% of average - ABSURD!)
 
 ## Code Changes
 
-**File Modified:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_elo.py`
+**File Modified:** `py/ensemble/enhanced_ensemble_v6_elo.py`
 **Lines Changed:** ~3 lines (skill_factor calculation)
 
 **Git Diff:**

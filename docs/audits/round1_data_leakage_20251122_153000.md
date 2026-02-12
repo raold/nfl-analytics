@@ -32,7 +32,7 @@
 
 ### 1.1 Target Leakage: Career Averages Computed on Full Dataset
 
-**File:** `/Users/dro/rice/nfl-analytics/py/models/train_bnn_receiving.py`
+**File:** `py/models/train_bnn_receiving.py`
 **Lines:** 94-116
 **Severity:** CRITICAL
 
@@ -85,7 +85,7 @@ assert train_df['career_avg_yards'].max() <= train_df['receiving_yards'].max(), 
 
 ### 1.2 Test Set Statistics for Imputation
 
-**File:** `/Users/dro/rice/nfl-analytics/py/models/train_bnn_receiving.py`
+**File:** `py/models/train_bnn_receiving.py`
 **Lines:** 128-129
 **Severity:** CRITICAL
 
@@ -118,7 +118,7 @@ df["avg_yac"] = df["avg_yac"].fillna(train_median_yac)
 
 ### 1.3 Ensemble Weight Renormalization Uses Test Performance
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_production.py`
+**File:** `py/ensemble/enhanced_ensemble_v6_production.py`
 **Lines:** 500-514
 **Severity:** CRITICAL
 
@@ -176,7 +176,7 @@ if total_weight < 0.9:
 
 ### 2.1 Future Data Access in Player Aggregation
 
-**File:** `/Users/dro/rice/nfl-analytics/py/features/player_aggregation_features.py`
+**File:** `py/features/player_aggregation_features.py`
 **Lines:** 176-204
 **Severity:** HIGH
 
@@ -236,7 +236,7 @@ if invalid_count.iloc[0, 0] > 0:
 
 ### 2.2 Missing Temporal Validation in Game Feature Extractor
 
-**File:** `/Users/dro/rice/nfl-analytics/py/features/game_feature_extractor.py`
+**File:** `py/features/game_feature_extractor.py`
 **Lines:** 235-274
 **Severity:** HIGH
 
@@ -285,7 +285,7 @@ def extract_game_features(self, home_team, away_team, season, week, use_cache=Tr
 
 ### 2.3 StandardScaler Fit on Test Set
 
-**File:** `/Users/dro/rice/nfl-analytics/scripts/train_xgboost_player_agg_v5.py`
+**File:** `scripts/train_xgboost_player_agg_v5.py`
 **Lines:** 209-213
 **Severity:** HIGH
 
@@ -324,7 +324,7 @@ df.loc[test_mask, feature_cols] = scaler.transform(df[test_mask][feature_cols])
 
 ### 2.4 Opponent Strength Temporal Leakage
 
-**File:** `/Users/dro/rice/nfl-analytics/py/features/opponent_strength.py`
+**File:** `py/features/opponent_strength.py`
 **Lines:** 296
 **Severity:** HIGH
 
@@ -354,7 +354,7 @@ for idx in df.index:
 
 ### 2.5 R Prediction Lookup Missing Staleness Validation
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/r_prediction_lookup.py`
+**File:** `py/ensemble/r_prediction_lookup.py`
 **Lines:** 176-184
 **Severity:** HIGH
 
@@ -406,7 +406,7 @@ def get_prediction(self, model_name, player_id, season, week, allow_stale=False)
 
 ### 2.6 No Validation of R Model Training Windows
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/r_prediction_lookup.py`
+**File:** `py/ensemble/r_prediction_lookup.py`
 **Lines:** 508-644
 **Severity:** HIGH
 
@@ -465,7 +465,7 @@ def _validate_r_model_training(self, model_name, season, week):
 
 ### 2.7 Ensemble Fallback to League Averages Without Documentation
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_production.py`
+**File:** `py/ensemble/enhanced_ensemble_v6_production.py`
 **Lines:** 661-664, 688-690, 763-764
 **Severity:** HIGH
 
@@ -535,7 +535,7 @@ class EnhancedEnsemble5Way:
 
 ### 3.1 Gini Coefficient on Team Projections
 
-**File:** `/Users/dro/rice/nfl-analytics/py/features/player_aggregation_features.py`
+**File:** `py/features/player_aggregation_features.py`
 **Lines:** 240
 **Severity:** MEDIUM
 
@@ -560,7 +560,7 @@ Gini coefficient and depth ratios are computed on current week's player projecti
 
 ### 3.2 Missing Train/Test Validation in Pipeline
 
-**File:** `/Users/dro/rice/nfl-analytics/py/models/train_bnn_receiving.py`
+**File:** `py/models/train_bnn_receiving.py`
 **Lines:** 346-362
 **Severity:** MEDIUM
 
@@ -605,9 +605,9 @@ if report.has_critical_leakage():
 **Severity:** MEDIUM
 
 **Affected Files:**
-- `/Users/dro/rice/nfl-analytics/py/models/train_xgboost_canonical.py:253`
-- `/Users/dro/rice/nfl-analytics/py/models/bnn_multioutput_pytorch.py:265`
-- `/Users/dro/rice/nfl-analytics/py/models/weather_totals_model.py:238`
+- `py/models/train_xgboost_canonical.py:253`
+- `py/models/bnn_multioutput_pytorch.py:265`
+- `py/models/weather_totals_model.py:238`
 
 **Issue:**
 Imputation uses median/mean of full dataset instead of training set only.
@@ -630,7 +630,7 @@ df[col] = df[col].fillna(train_medians[col])
 
 ### 3.4 Team Defensive Features Rolling Windows
 
-**File:** `/Users/dro/rice/nfl-analytics/py/features/team_defensive_features.py`
+**File:** `py/features/team_defensive_features.py`
 **Lines:** 352-356
 **Severity:** MEDIUM
 
@@ -662,7 +662,7 @@ class TeamDefensiveFeatures:
 
 ### 3.5 No Cross-Validation in Ensemble Weight Selection
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_production.py`
+**File:** `py/ensemble/enhanced_ensemble_v6_production.py`
 **Lines:** 118-124
 **Severity:** MEDIUM
 
@@ -703,13 +703,13 @@ DEFAULT_WEIGHTS = {
 
 ### 3.6-3.12 Additional Medium Priority Issues
 
-**3.6** - `/Users/dro/rice/nfl-analytics/py/features/asof_features.py`: Multiple `.fillna(0.0)` without justification (lines 225-234)
-**3.7** - `/Users/dro/rice/nfl-analytics/py/features/vegas_line_bias_features.py`: Rolling windows use `shift(1)` correctly but no validation
-**3.8** - `/Users/dro/rice/nfl-analytics/py/features/line_matchup_strength.py`: Complex rolling calculations (lines 213, 337) need audit
-**3.9** - `/Users/dro/rice/nfl-analytics/scripts/train_hybrid_xgboost_v1.py`: Sample weights may introduce bias if computed on full dataset
-**3.10** - `/Users/dro/rice/nfl-analytics/py/online/hybrid_static_incremental.py`: Incremental learning may accumulate errors over time
-**3.11** - `/Users/dro/rice/nfl-analytics/py/features/opponent_defensive_features.py`: No validation of opponent feature temporal integrity
-**3.12** - `/Users/dro/rice/nfl-analytics/py/pipeline/drive_aggregation.py`: Drive-level aggregation (line 180) groups correctly but no leakage tests
+**3.6** - `py/features/asof_features.py`: Multiple `.fillna(0.0)` without justification (lines 225-234)
+**3.7** - `py/features/vegas_line_bias_features.py`: Rolling windows use `shift(1)` correctly but no validation
+**3.8** - `py/features/line_matchup_strength.py`: Complex rolling calculations (lines 213, 337) need audit
+**3.9** - `scripts/train_hybrid_xgboost_v1.py`: Sample weights may introduce bias if computed on full dataset
+**3.10** - `py/online/hybrid_static_incremental.py`: Incremental learning may accumulate errors over time
+**3.11** - `py/features/opponent_defensive_features.py`: No validation of opponent feature temporal integrity
+**3.12** - `py/pipeline/drive_aggregation.py`: Drive-level aggregation (line 180) groups correctly but no leakage tests
 
 ---
 

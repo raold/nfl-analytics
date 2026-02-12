@@ -250,7 +250,7 @@ if report.has_critical_issues():
 Add to crontab for weekly security audits:
 ```bash
 # Run security audit every Sunday at 2 AM
-0 2 * * 0 cd /Users/dro/rice/nfl-analytics && ./scripts/security_audit.sh --weekly
+0 2 * * 0 cd \ && ./scripts/security_audit.sh --weekly
 ```
 
 ### Example Output

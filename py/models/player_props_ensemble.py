@@ -127,7 +127,7 @@ class PlayerPropsEnsemble:
         use_bnn_calibrated: bool = False,  # 5th model
         use_qb_wr_chemistry: bool = False,  # 6th model (receiving only)
         use_cql_sizer: bool = False,  # CQL bet sizing (optional)
-        models_dir: str = "/Users/dro/rice/nfl-analytics/models",
+        models_dir: str = str(_PROJECT_ROOT / "models"),
         min_edge: float = 0.025,  # Pinnacle-calibrated (2.5%)
         kelly_fraction: float = 0.35,  # Pinnacle-calibrated (35%)
         max_bet_size: float = 0.05,  # 5% of bankroll max
@@ -1181,6 +1181,9 @@ class PlayerPropsEnsemble:
 def main():
     """CLI for testing ensemble predictions."""
     import argparse
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
     parser = argparse.ArgumentParser(description="Player Props Ensemble Predictor")
     parser.add_argument("--player-id", required=True, help="Player ID (e.g., 00-0036355)")

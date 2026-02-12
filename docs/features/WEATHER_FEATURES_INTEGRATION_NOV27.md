@@ -206,9 +206,9 @@ From published NFL analytics research:
 
 ## Files Created
 
-1. `/Users/dro/rice/nfl-analytics/py/features/weather_features_integration.py` (154 lines)
-2. `/Users/dro/rice/nfl-analytics/scripts/test_weather_features.py` (55 lines)
-3. `/Users/dro/rice/nfl-analytics/docs/features/WEATHER_FEATURES_INTEGRATION_NOV27.md` (this file)
+1. `py/features/weather_features_integration.py` (154 lines)
+2. `scripts/test_weather_features.py` (55 lines)
+3. `docs/features/WEATHER_FEATURES_INTEGRATION_NOV27.md` (this file)
 
 ## References
 

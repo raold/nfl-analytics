@@ -75,7 +75,7 @@ This ensures:
 
 ### Key Code Changes
 
-**File:** `/Users/dro/rice/nfl-analytics/scripts/train_xgboost_player_agg_v5_1.py`
+**File:** `scripts/train_xgboost_player_agg_v5_1.py`
 
 **Changes from v5.0:**
 1. Modified SQL query to compute lag features in database (lines 139-257)
@@ -114,7 +114,7 @@ $ python scripts/check_leakage.sh scripts/train_xgboost_player_agg_v5_1.py
 ### Training the Model
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 python scripts/train_xgboost_player_agg_v5_1.py
 ```
 

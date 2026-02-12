@@ -133,7 +133,7 @@ docker compose version
 ### 1. Build the GPU Training Container
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Build the image (takes 15-20 minutes first time)
 docker compose -f docker-compose.gpu.yml build gpu-trainer
@@ -747,7 +747,7 @@ docker exec -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
 **Cron job for nightly training:**
 ```bash
 # Add to crontab
-0 2 * * * cd /Users/dro/rice/nfl-analytics && bash scripts/docker_gpu_train.sh --all >> logs/cron.log 2>&1
+0 2 * * * cd \ && bash scripts/docker_gpu_train.sh --all >> logs/cron.log 2>&1
 ```
 
 **GitHub Actions (self-hosted runner with GPU):**

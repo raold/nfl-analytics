@@ -391,7 +391,7 @@ docs/audits/
 
 **Audit Date:** November 15, 2025
 **Auditor:** Claude Code (Haiku 4.5)
-**Repository:** /Users/dro/rice/nfl-analytics
+**Repository:** \
 
 For questions about findings, see detailed audit report: [CLAUDE_MD_ARCHITECTURE_AUDIT_NOV15.md](CLAUDE_MD_ARCHITECTURE_AUDIT_NOV15.md)
 

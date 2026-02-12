@@ -52,6 +52,9 @@ import pandas as pd
 import xgboost as xgb
 from sqlalchemy import create_engine
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -352,7 +355,7 @@ def save_results(model, importance_df, mae, rmse, params_dict):
         rmse: Test RMSE score
         params_dict: Dictionary of experiment parameters
     """
-    output_dir = Path("/Users/dro/rice/nfl-analytics/models/xgboost")
+    output_dir = _PROJECT_ROOT / "models/xgboost"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Save model

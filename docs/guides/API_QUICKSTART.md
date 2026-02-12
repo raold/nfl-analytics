@@ -227,7 +227,7 @@ tail -f api.log | grep -i model
 ## Support
 
 - **API Docs**: Visit http://localhost:8000/docs
-- **Project Docs**: See `/Users/dro/rice/nfl-analytics/CLAUDE.md`
+- **Project Docs**: See `CLAUDE.md`
 - **Issues**: Check `docs/API_SERVICE_GUIDE.md` troubleshooting section
 
 ---

@@ -215,17 +215,17 @@ latexmk -pdf main.tex
 ## 📂 Files Modified/Created
 
 ### Created:
-1. `/Users/dro/rice/nfl-analytics/py/backtest/baseline_glm.py` (234 lines)
+1. `py/backtest/baseline_glm.py` (234 lines)
 2. 10 PNGs in `analysis/dissertation/figures/out/`
 
 ### Modified:
-1. `/Users/dro/rice/nfl-analytics/py/analysis/generate_reliability_panels.py`
+1. `py/analysis/generate_reliability_panels.py`
    - Line 40: python → python3
    - Line 46-47: Removed --calibration and --cv-folds args
    - Line 90: Default start season 2003 → 2015
    - Line 107: Default features CSV path updated
 
-2. `/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/glm_reliability_panel.tex`
+2. `analysis/dissertation/figures/out/glm_reliability_panel.tex`
    - Complete rewrite with correct relative paths
    - Reduced from 22 panels to 11 panels
    - Fixed paths: `reliability_diagram_sYEAR.png` → `../figures/out/reliability_diagram_sYEAR.png`

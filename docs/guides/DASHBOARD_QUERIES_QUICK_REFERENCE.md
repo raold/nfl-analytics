@@ -2,7 +2,7 @@
 
 **Created**: November 22, 2025
 **Status**: Production Ready ✅
-**Location**: `/Users/dro/rice/nfl-analytics/dashboard/queries/`
+**Location**: `dashboard/queries/`
 
 ## 30-Second Overview
 
@@ -405,7 +405,7 @@ if len(slow) > 0:
 ### Import Error
 ```python
 # Make sure you're in project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 from dashboard.queries.predictions import PredictionQueries
 ```
 

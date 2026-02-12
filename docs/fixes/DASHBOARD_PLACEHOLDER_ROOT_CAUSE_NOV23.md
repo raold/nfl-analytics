@@ -12,7 +12,7 @@ The `/api/v1/predict/game` endpoint (`py/api/routes/game_predictions.py:1190-129
 
 ### Code Location
 
-**File:** `/Users/dro/rice/nfl-analytics/py/api/routes/game_predictions.py`
+**File:** `py/api/routes/game_predictions.py`
 **Lines:** 1227-1239
 
 ```python

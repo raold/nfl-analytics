@@ -32,6 +32,9 @@ from scipy import stats
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -82,7 +85,7 @@ class PSMWeatherFamiliarityAnalyzer:
     def __init__(
         self,
         db_url: str = "postgresql://dro:sicillionbillions@localhost:5544/devdb01",
-        weather_data_path: str = "/Users/dro/rice/nfl-analytics/data/historical_weather_2018_2024.csv",
+        weather_data_path: str = str(_PROJECT_ROOT / "data/historical_weather_2018_2024.csv"),
     ):
         """Initialize with database and weather data."""
         self.db_url = db_url
@@ -469,7 +472,7 @@ class PSMWeatherFamiliarityAnalyzer:
 if __name__ == "__main__":
     # Example usage
     analyzer = PSMWeatherFamiliarityAnalyzer()
-    output_dir = Path("/Users/dro/rice/nfl-analytics/analysis/causal_inference/psm_results")
+    output_dir = _PROJECT_ROOT / "analysis/causal_inference/psm_results"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     # Run analyses

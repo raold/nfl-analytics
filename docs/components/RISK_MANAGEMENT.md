@@ -117,7 +117,7 @@ Each gate is **independent** - failure at any gate blocks the bet.
 
 ### 1. Risk Gates System
 
-**File:** `/Users/dro/rice/nfl-analytics/py/production/risk_gates.py` (585 lines)
+**File:** `py/production/risk_gates.py` (585 lines)
 
 **Purpose:** 4-tier risk gate system for production betting
 
@@ -134,7 +134,7 @@ Each gate is **independent** - failure at any gate blocks the bet.
 
 ### 2. Kelly Criterion Sizing
 
-**File:** `/Users/dro/rice/nfl-analytics/py/production/kelly_sizing.py` (523 lines)
+**File:** `py/production/kelly_sizing.py` (523 lines)
 
 **Purpose:** Kelly criterion bet sizing with fractional Kelly for risk management
 
@@ -162,7 +162,7 @@ Fractional Kelly: f = fraction * f*
 
 ### 3. Enhanced Kelly Sizing
 
-**File:** `/Users/dro/rice/nfl-analytics/py/production/kelly_sizing_enhanced.py` (350+ lines)
+**File:** `py/production/kelly_sizing_enhanced.py` (350+ lines)
 
 **Purpose:** Extended Kelly with edge decay and CVaR constraints
 
@@ -176,7 +176,7 @@ Fractional Kelly: f = fraction * f*
 
 ### 4. CQL Bet Sizer
 
-**File:** `/Users/dro/rice/nfl-analytics/py/production/cql_bet_sizer.py` (401 lines)
+**File:** `py/production/cql_bet_sizer.py` (401 lines)
 
 **Purpose:** RL-based bet sizing using Conservative Q-Learning agent
 
@@ -190,7 +190,7 @@ Fractional Kelly: f = fraction * f*
 
 ### 5. CVaR Optimization
 
-**File:** `/Users/dro/rice/nfl-analytics/py/risk/cvar_lp.py` (215 lines)
+**File:** `py/risk/cvar_lp.py` (215 lines)
 
 **Purpose:** CVaR stake sizing via Rockafellar-Uryasev LP formulation
 
@@ -208,7 +208,7 @@ Subject to:   0 ≤ stakes ≤ cap
 
 ### 6. Betting Validator
 
-**File:** `/Users/dro/rice/nfl-analytics/py/utils/betting_validator.py` (500+ lines)
+**File:** `py/utils/betting_validator.py` (500+ lines)
 
 **Purpose:** Pre-deployment validation for betting strategies
 

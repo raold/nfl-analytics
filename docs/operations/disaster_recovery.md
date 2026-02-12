@@ -219,7 +219,7 @@ docker-compose stop postgres
 #### 3. Run Restore Script
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Interactive restore (recommended)
 ./scripts/maintenance/restore.sh

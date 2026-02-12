@@ -721,15 +721,15 @@ Target:              500 ms   ✅ ACHIEVED
 - [database_erd.md](database_erd.md) - Database schema relationships
 
 **Database Documentation:**
-- [DATABASE_QUICK_REFERENCE.md](/Users/dro/rice/nfl-analytics/docs/database/DATABASE_QUICK_REFERENCE.md)
-- [SQL_PATTERNS.md](/Users/dro/rice/nfl-analytics/docs/database/SQL_PATTERNS.md)
+- [DATABASE_QUICK_REFERENCE.md](docs/database/DATABASE_QUICK_REFERENCE.md)
+- [SQL_PATTERNS.md](docs/database/SQL_PATTERNS.md)
 
 **Performance Analysis:**
-- [BATCH_PREDICTION_OPTIMIZATION.md](/Users/dro/rice/nfl-analytics/docs/performance/BATCH_PREDICTION_OPTIMIZATION.md)
+- [BATCH_PREDICTION_OPTIMIZATION.md](docs/performance/BATCH_PREDICTION_OPTIMIZATION.md)
 
 **Project Documentation:**
-- [CLAUDE.md](/Users/dro/rice/nfl-analytics/CLAUDE.md) - Project overview
-- [ARCHITECTURE_REFERENCE.md](/Users/dro/rice/nfl-analytics/docs/ARCHITECTURE_REFERENCE.md)
+- [CLAUDE.md](CLAUDE.md) - Project overview
+- [ARCHITECTURE_REFERENCE.md](docs/ARCHITECTURE_REFERENCE.md)
 
 ---
 
@@ -753,4 +753,4 @@ Target:              500 ms   ✅ ACHIEVED
 
 **Diagram Created:** November 15, 2025
 **Maintained By:** Data Engineering Team
-**Contact:** See [CLAUDE.md](/Users/dro/rice/nfl-analytics/CLAUDE.md) for questions
+**Contact:** See [CLAUDE.md](CLAUDE.md) for questions

@@ -195,21 +195,21 @@
 
 ### Script
 ```
-/Users/dro/rice/nfl-analytics/scripts/xgb_v3_2_l1_regularization.py
+scripts/xgb_v3_2_l1_regularization.py
 ```
 
 ### Documentation
 ```
-/Users/dro/rice/nfl-analytics/docs/BFS_EXPERIMENT_5_L1_REGULARIZATION.md
-/Users/dro/rice/nfl-analytics/docs/BFS_EXPERIMENT_5_QUICK_START.md
-/Users/dro/rice/nfl-analytics/docs/BFS_EXPERIMENT_5_EXPECTED_OUTPUTS.md
-/Users/dro/rice/nfl-analytics/BFS_EXPERIMENT_5_CHECKLIST.md
+docs/BFS_EXPERIMENT_5_L1_REGULARIZATION.md
+docs/BFS_EXPERIMENT_5_QUICK_START.md
+docs/BFS_EXPERIMENT_5_EXPECTED_OUTPUTS.md
+BFS_EXPERIMENT_5_CHECKLIST.md
 ```
 
 ### Output (Created After Running)
 ```
-/Users/dro/rice/nfl-analytics/models/xgboost/passing_xgboost_v3_2_l1.pkl
-/Users/dro/rice/nfl-analytics/models/xgboost/passing_xgboost_v3_2_l1_metadata.json
+models/xgboost/passing_xgboost_v3_2_l1.pkl
+models/xgboost/passing_xgboost_v3_2_l1_metadata.json
 ```
 
 ---

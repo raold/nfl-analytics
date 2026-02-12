@@ -18,7 +18,7 @@ from pathlib import Path
 import psycopg2
 
 # Add project root to path
-project_root = "/Users/dro/rice/nfl-analytics"
+project_root = str(_PROJECT_ROOT)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
@@ -33,6 +33,9 @@ from py.causal.structural_causal_models import create_nfl_rushing_dag
 from py.causal.synthetic_control import SyntheticControl
 from py.causal.treatment_definitions import TreatmentDefiner
 from py.causal.validation import CausalValidator
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
 warnings.filterwarnings("ignore")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s:%(name)s:%(message)s")

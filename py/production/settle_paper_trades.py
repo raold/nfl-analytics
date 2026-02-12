@@ -26,7 +26,7 @@ Usage:
     python py/production/settle_paper_trades.py --dry-run
 
     # Add to crontab:
-    0 12 * * * cd /Users/dro/rice/nfl-analytics && uv run python py/production/settle_paper_trades.py
+    0 12 * * * cd $PROJECT_ROOT && uv run python py/production/settle_paper_trades.py
 """
 
 import argparse

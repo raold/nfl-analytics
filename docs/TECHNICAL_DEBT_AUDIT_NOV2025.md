@@ -1,7 +1,7 @@
 # Technical Debt Audit - NFL Analytics Project
 **Date:** November 9, 2025
 **Auditor:** Claude Code (Sonnet 4.5)
-**Project Root:** `/Users/dro/rice/nfl-analytics`
+**Project Root:** `\`
 **Codebase Size:** 383 Python files, 70 R scripts, 59 SQL migrations, 384 test files
 
 ---
@@ -169,7 +169,7 @@ This comprehensive audit examined 512 source files across Python, R, SQL, and co
 - Database ports hardcoded to `5544`
 - API endpoints hardcoded to `localhost:8000`
 - No environment distinction (dev/staging/prod)
-- Model paths hardcoded (`/Users/dro/rice/nfl-analytics/models/`)
+- Model paths hardcoded (`models/`)
 - No secrets rotation capability
 
 **Remediation (16 hours):**
@@ -230,7 +230,7 @@ This comprehensive audit examined 512 source files across Python, R, SQL, and co
 
 **Pattern Found:**
 ```python
-sys.path.append("/Users/dro/rice/nfl-analytics")  # 25+ files
+sys.path.append("\")  # 25+ files
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))  # 30+ files
 ```
 

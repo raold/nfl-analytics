@@ -194,12 +194,12 @@ Ranked by **gain** (total reduction in loss):
 ### Saved Files
 
 **Model**:
-- **Path**: `/Users/dro/rice/nfl-analytics/models/xgboost/passing_xgboost_v2_canonical.pkl`
+- **Path**: `models/xgboost/passing_xgboost_v2_canonical.pkl`
 - **Size**: 599 KB
 - **Format**: XGBoost binary (UBJSON)
 
 **Metadata**:
-- **Path**: `/Users/dro/rice/nfl-analytics/models/xgboost/passing_xgboost_v2_canonical_metadata.json`
+- **Path**: `models/xgboost/passing_xgboost_v2_canonical_metadata.json`
 - **Size**: 2.3 KB
 - **Contents**:
   - Training configuration

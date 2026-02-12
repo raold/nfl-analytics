@@ -27,7 +27,7 @@ Comprehensive audit of temporal data leakage in the NFL analytics pipeline revea
 
 ### 1. Vegas Line Bias Features - CRITICAL ❌
 
-**File**: `/Users/dro/rice/nfl-analytics/py/features/vegas_line_bias_features.py`
+**File**: `py/features/vegas_line_bias_features.py`
 **Lines**: 248-286
 **Severity**: CRITICAL - Using same-game outcomes in features
 
@@ -84,7 +84,7 @@ df["as_favorite_ats_pct"] = (
 
 ### 2. Defensive Game Script Indicators - HIGH ⚠️
 
-**File**: `/Users/dro/rice/nfl-analytics/py/features/defensive_game_script_indicators.py`
+**File**: `py/features/defensive_game_script_indicators.py`
 **Line**: 370
 **Severity**: HIGH - In-game EPA used without shift
 
@@ -117,7 +117,7 @@ game_plays["epa_roll5"] = game_plays["epa"].shift(1).rolling(window, min_periods
 
 ### 3. Play-by-Play Aggregation - MODERATE ⚠️
 
-**File**: `/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_5way.py`
+**File**: `py/backtest/historical_validation_5way.py`
 **Lines**: 104-148
 **Severity**: MODERATE - No temporal filtering on aggregated stats
 
@@ -172,7 +172,7 @@ features = pd.merge_asof(
 
 ### 4. Ensemble Variance Shrinkage - MODERATE ⚠️
 
-**File**: `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
+**File**: `py/models/player_props_ensemble.py`
 **Lines**: 932-936
 **Severity**: MODERATE - Mathematical issue, not data leakage
 
@@ -221,7 +221,7 @@ ensemble_std = np.sum(stds * weights)
 
 ### 5. Temperature Scaling - IMPROVEMENT OPPORTUNITY 💡
 
-**File**: `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
+**File**: `py/models/player_props_ensemble.py`
 **Lines**: 398-451
 **Status**: Already implemented, needs verification
 
@@ -256,7 +256,7 @@ Temperature scaling happens BEFORE ensemble averaging, so ensemble variance form
 
 ### 6. Defensive Situational Strength - SAFE ✅
 
-**File**: `/Users/dro/rice/nfl-analytics/py/features/defensive_situational_strength.py`
+**File**: `py/features/defensive_situational_strength.py`
 **Status**: ✅ NO LEAKAGE (within-game aggregation is correct)
 
 **Why This Is Safe**:
@@ -281,7 +281,7 @@ This is correct because we're summarizing what happened IN that game, not using 
 
 ### 7. asof_features.py - GOLD STANDARD ✅
 
-**File**: `/Users/dro/rice/nfl-analytics/py/features/asof_features.py`
+**File**: `py/features/asof_features.py`
 **Lines**: 283-301
 **Status**: ✅ PERFECT - All rolling stats use `.shift(1)`
 

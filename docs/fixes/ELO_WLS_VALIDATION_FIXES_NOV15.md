@@ -244,7 +244,7 @@ The fixes enable the following validation protocol:
 
 ### 1. Dry Run (Single Game)
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Test single prediction
 python -c "

@@ -235,7 +235,7 @@ uv run python py/backtest/historical_validation_5way.py \
 
 ## Summary of Changes
 
-### File: `/Users/dro/rice/nfl-analytics/CLAUDE.md`
+### File: `CLAUDE.md`
 
 **Changes Required:**
 
@@ -272,7 +272,7 @@ uv run python py/backtest/historical_validation_5way.py \
 **Validation:**
 
 The metrics in this plan are sourced from:
-- File: `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_2022_2025_metrics.json`
+- File: `analysis/results/historical_validation_5way_2022_2025_metrics.json`
 - Test: 2,120 bets from 2022-2025 Week 10
 - Models: 5-way ensemble with CQL bet sizing
 - Bankroll: $10,000 starting, $1,005 ending (-90%)

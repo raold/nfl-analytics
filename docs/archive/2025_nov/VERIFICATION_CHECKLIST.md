@@ -23,7 +23,7 @@
 
 **Command:**
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 Rscript R/test_hierarchical_v2_new_levels.R
 ```
 
@@ -46,7 +46,7 @@ Rscript R/test_hierarchical_v2_new_levels.R
 
 **Command:**
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 Rscript R/generate_2025_predictions_all_v2.R
 ```
 
@@ -159,7 +159,7 @@ head -20 analysis/results/hierarchical_v2_2025_holdout.csv
 ### If All Tests Pass ✅
 
 1. **Document Success:**
-   - Update `/Users/dro/rice/nfl-analytics/docs/fixes/FIX_SUMMARY_2025-11-10.md` with verification timestamp
+   - Update `docs/fixes/FIX_SUMMARY_2025-11-10.md` with verification timestamp
    - Add entry to project changelog
 
 2. **Proceed to Next Phase:**
@@ -195,25 +195,25 @@ head -20 analysis/results/hierarchical_v2_2025_holdout.csv
 ## File Locations Reference
 
 ### Modified Files
-- `/Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R` - Main fix
+- `R/generate_2025_predictions_all_v2.R` - Main fix
 
 ### Created Files
-- `/Users/dro/rice/nfl-analytics/R/test_hierarchical_v2_new_levels.R` - Test script
-- `/Users/dro/rice/nfl-analytics/docs/fixes/HIERARCHICAL_V2_NEW_LEVELS_FIX.md` - Technical docs
-- `/Users/dro/rice/nfl-analytics/docs/fixes/FIX_SUMMARY_2025-11-10.md` - Quick summary
-- `/Users/dro/rice/nfl-analytics/VERIFICATION_CHECKLIST.md` - This file
+- `R/test_hierarchical_v2_new_levels.R` - Test script
+- `docs/fixes/HIERARCHICAL_V2_NEW_LEVELS_FIX.md` - Technical docs
+- `docs/fixes/FIX_SUMMARY_2025-11-10.md` - Quick summary
+- `VERIFICATION_CHECKLIST.md` - This file
 
 ### Model Files (Read-Only)
-- `/Users/dro/rice/nfl-analytics/models/bayesian/passing_yards_hierarchical_v2.rds`
-- `/Users/dro/rice/nfl-analytics/models/bayesian/passing_informative_priors_v2.rds`
-- `/Users/dro/rice/nfl-analytics/models/bayesian/simplified_random_walk_v2.rds`
+- `models/bayesian/passing_yards_hierarchical_v2.rds`
+- `models/bayesian/passing_informative_priors_v2.rds`
+- `models/bayesian/simplified_random_walk_v2.rds`
 
 ### Expected Output Files
-- `/Users/dro/rice/nfl-analytics/analysis/results/hierarchical_v2_2025_holdout.csv`
-- `/Users/dro/rice/nfl-analytics/analysis/results/informative_priors_v2_2025_holdout.csv`
-- `/Users/dro/rice/nfl-analytics/analysis/results/state_space_v2_2025_holdout.csv`
-- `/Users/dro/rice/nfl-analytics/analysis/results/all_v2_models_2025_predictions.csv`
-- `/Users/dro/rice/nfl-analytics/analysis/results/all_models_2025_comparison_v2.csv`
+- `analysis/results/hierarchical_v2_2025_holdout.csv`
+- `analysis/results/informative_priors_v2_2025_holdout.csv`
+- `analysis/results/state_space_v2_2025_holdout.csv`
+- `analysis/results/all_v2_models_2025_predictions.csv`
+- `analysis/results/all_models_2025_comparison_v2.csv`
 
 ---
 

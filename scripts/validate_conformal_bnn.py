@@ -19,14 +19,15 @@ Author: Claude Code
 """
 
 import sys
+from pathlib import Path
 
-sys.path.append("/Users/dro/rice/nfl-analytics")
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 import argparse
 import json
 import logging
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt

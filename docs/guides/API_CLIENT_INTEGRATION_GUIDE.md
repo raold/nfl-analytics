@@ -560,9 +560,9 @@ api = APIClient(enable_cache=True)
 
 ## Related Files
 
-- **API Implementation:** `/Users/dro/rice/nfl-analytics/api/models.py`
-- **Dashboard Integration:** `/Users/dro/rice/nfl-analytics/dashboard/app.py`
-- **Patch File:** `/Users/dro/rice/nfl-analytics/dashboard/game_predictions_patch.py`
+- **API Implementation:** `api/models.py`
+- **Dashboard Integration:** `dashboard/app.py`
+- **Patch File:** `dashboard/game_predictions_patch.py`
 
 ## Support
 
@@ -571,7 +571,7 @@ For issues or questions:
 1. Check error logs in dashboard output
 2. Verify API health: `api.get_health()`
 3. Check API logs: `docker logs nfl-analytics-api`
-4. Review `/Users/dro/rice/nfl-analytics/api/main.py` for API implementation
+4. Review `api/main.py` for API implementation
 
 ---
 

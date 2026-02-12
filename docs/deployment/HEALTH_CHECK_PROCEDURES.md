@@ -539,7 +539,7 @@ EOF
 
 ```bash
 # Add to crontab (run at 8:00 AM daily)
-# 0 8 * * * /Users/dro/rice/nfl-analytics/scripts/quick_health_check.sh >> /var/log/nfl_health_check.log 2>&1
+# 0 8 * * * scripts/quick_health_check.sh >> /var/log/nfl_health_check.log 2>&1
 
 # Alternative: Use systemd timer or GitHub Actions
 ```

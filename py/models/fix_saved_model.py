@@ -5,7 +5,10 @@ Fix the existing saved model by adding training shapes
 import pickle
 from pathlib import Path
 
-model_path = Path("/Users/dro/rice/nfl-analytics/models/bayesian/bnn_simpler_v2.pkl")
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
+model_path = _PROJECT_ROOT / "models/bayesian/bnn_simpler_v2.pkl"
 
 print("Loading existing model...")
 with open(model_path, "rb") as f:

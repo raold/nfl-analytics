@@ -258,10 +258,10 @@ LIMIT 10;
 ## Working Examples in Codebase
 
 **Verified correct implementations:**
-1. `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6.py` (lines 218-223)
-2. `/Users/dro/rice/nfl-analytics/py/models/train_xgboost_canonical.py` (lines 150-155)
-3. `/Users/dro/rice/nfl-analytics/R/train_hierarchical_v2_production.R` (lines 81-86)
-4. `/Users/dro/rice/nfl-analytics/R/state_space/train_state_space_v2_canonical.R` (lines 73-78)
+1. `py/ensemble/enhanced_ensemble_v6.py` (lines 218-223)
+2. `py/models/train_xgboost_canonical.py` (lines 150-155)
+3. `R/train_hierarchical_v2_production.R` (lines 81-86)
+4. `R/state_space/train_state_space_v2_canonical.R` (lines 73-78)
 
 **When in doubt:** Copy from these files!
 

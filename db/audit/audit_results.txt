@@ -22,7 +22,7 @@
  ======== TABLE INVENTORY ========
 (1 row)
 
-psql:/Users/dro/rice/nfl-analytics/db/audit/comprehensive_dba_audit.sql:36: ERROR:  column "tablename" does not exist
+psql:db/audit/comprehensive_dba_audit.sql:36: ERROR:  column "tablename" does not exist
 LINE 4:         tablename,
                 ^
                     section                    
@@ -284,7 +284,7 @@ LINE 4:         tablename,
  ======== NULL VALUES IN KEY COLUMNS ========
 (1 row)
 
-psql:/Users/dro/rice/nfl-analytics/db/audit/comprehensive_dba_audit.sql:184: ERROR:  column "gsis_id" does not exist
+psql:db/audit/comprehensive_dba_audit.sql:184: ERROR:  column "gsis_id" does not exist
 LINE 19:     COUNT(*) FILTER (WHERE gsis_id IS NULL) as null_gsis_id,
                                     ^
                               section                               

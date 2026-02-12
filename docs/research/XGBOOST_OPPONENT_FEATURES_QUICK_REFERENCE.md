@@ -169,7 +169,7 @@ grid_search.fit(X_train, y_train)
 
 ## Full Documentation
 
-See `/Users/dro/rice/nfl-analytics/docs/research/XGBOOST_OPPONENT_FEATURES_RESEARCH.md` for:
+See `docs/research/XGBOOST_OPPONENT_FEATURES_RESEARCH.md` for:
 - Complete theoretical justification
 - Full code implementations
 - Literature references (13 sources)

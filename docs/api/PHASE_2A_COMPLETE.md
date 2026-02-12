@@ -339,7 +339,7 @@ Successfully completed Phase 2 Part A of the API documentation project, deliveri
 
 ## Files Created
 
-**Location:** `/Users/dro/rice/nfl-analytics/docs/api/`
+**Location:** `docs/api/`
 
 1. `endpoint_reference.md` (1,084 lines)
 2. `error_catalog.md` (854 lines)
@@ -401,7 +401,7 @@ Successfully completed Phase 2 Part A of the API documentation project, deliveri
 ## Appendix: File Locations
 
 ```
-/Users/dro/rice/nfl-analytics/docs/api/
+docs/api/
 ├── README.md (updated)
 ├── endpoint_reference.md (NEW)
 ├── error_catalog.md (NEW)

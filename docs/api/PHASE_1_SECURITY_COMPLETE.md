@@ -623,7 +623,7 @@ pytest tests/integration/test_api_security.py --cov=api.auth --cov=api.middlewar
 
 **For API Support:**
 - **Email:** support@nfl-analytics.com
-- **Documentation:** `/Users/dro/rice/nfl-analytics/docs/api/`
+- **Documentation:** `docs/api/`
 - **API Docs:** http://localhost:8000/docs
 
 ---

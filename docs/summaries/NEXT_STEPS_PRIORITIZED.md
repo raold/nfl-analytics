@@ -195,7 +195,7 @@ echo "=== Tuesday Retraining Complete ==="
 crontab -e
 
 # Add weekly Tuesday job at 8am
-0 8 * * 2 /Users/dro/rice/nfl-analytics/scripts/weekly_retraining.sh >> /Users/dro/rice/nfl-analytics/logs/weekly_$(date +\%Y\%m\%d).log 2>&1
+0 8 * * 2 scripts/weekly_retraining.sh >> logs/weekly_$(date +\%Y\%m\%d).log 2>&1
 ```
 
 **3. Email Alerts** (`scripts/send_alerts.py`):

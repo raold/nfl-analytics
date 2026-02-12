@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS ml.meta_predictions (
     meta_model_version TEXT NOT NULL,
 
     -- Constraints
-    CONSTRAINT fk_game FOREIGN KEY (game_id) REFERENCES games(game_id) ON DELETE CASCADE,
+    CONSTRAINT fk_game FOREIGN KEY (game_id) REFERENCES public.games(game_id) ON DELETE CASCADE,
     CONSTRAINT unique_prediction UNIQUE (game_id, bet_type, predicted_at)
 );
 

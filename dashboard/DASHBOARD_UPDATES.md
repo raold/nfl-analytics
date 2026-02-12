@@ -103,7 +103,7 @@ Updated `docker-compose.yml`:
 
 Model file scanning handles multiple paths:
 - `/app/models` (Docker container)
-- `/Users/dro/rice/nfl-analytics/models` (local development)
+- `models` (local development)
 - `../models` (relative path)
 
 Gracefully falls back with informative messages if models directory not found.

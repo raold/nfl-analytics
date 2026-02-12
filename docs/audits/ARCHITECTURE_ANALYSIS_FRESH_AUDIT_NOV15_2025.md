@@ -50,7 +50,7 @@
 
 ### 2.1 API Layer (FastAPI) ✅ COMPLETE
 
-**Location:** `/Users/dro/rice/nfl-analytics/api/`
+**Location:** `api/`
 
 **Architecture:**
 ```
@@ -95,7 +95,7 @@ api/
 
 ### 2.2 Pre-Commit Enforcement Router ✅ COMPLETE
 
-**Location:** `/Users/dro/rice/nfl-analytics/py/utils/enforcement_router.py` (200 lines)
+**Location:** `py/utils/enforcement_router.py` (200 lines)
 
 **Validation Rules (15 total):**
 
@@ -133,7 +133,7 @@ api/
 
 ### 2.3 Ensemble v6.0 Production (5-Way) ✅ DEPLOYED
 
-**Location:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_production.py`
+**Location:** `py/ensemble/enhanced_ensemble_v6_production.py`
 
 **Architecture:**
 ```python
@@ -181,7 +181,7 @@ Stage 2: XGBoost (residual learning)
 
 ### 2.4 Ensemble v6_ELO (Experimental) ⚠️ DEPRECATED
 
-**Location:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_elo.py`
+**Location:** `py/ensemble/enhanced_ensemble_v6_elo.py`
 
 **Status:** ❌ DEPRECATED (moved to `models/deprecated/enhanced_ensemble_v6_elo_unimplemented.py`)
 
@@ -220,7 +220,7 @@ DEFAULT_WEIGHTS = {
 
 ### 2.5 WLS Adaptive Weight Optimization ⚠️ EXPERIMENTAL
 
-**Location:** `/Users/dro/rice/nfl-analytics/py/ensemble/adaptive_wls_weights.py`
+**Location:** `py/ensemble/adaptive_wls_weights.py`
 
 **Purpose:** Optimize ensemble weights using Weighted Least Squares (WLS)
 
@@ -523,12 +523,12 @@ grep -r "google.*drive" docs/architecture/ docs/decisions/
 
 ### 6.1 Critical Dependencies Missing from Root requirements.txt
 
-**Root `/Users/dro/rice/nfl-analytics/requirements.txt`:**
+**Root `requirements.txt`:**
 - ❌ `rpy2` NOT listed (122 files import it)
 - ❌ `psycopg2-binary` NOT listed (193 total usages across 122 files)
 - ❌ `psycopg` (psycopg3) used in `api/main.py:30` but not in root requirements
 
-**API-specific `/Users/dro/rice/nfl-analytics/api/requirements.txt`:**
+**API-specific `api/requirements.txt`:**
 - ✅ `rpy2>=3.5.0` (line 21)
 - ✅ `psycopg2-binary>=2.9.0` (line 22)
 
@@ -888,4 +888,4 @@ pandas>=2.0.0
 
 ---
 
-**File Location:** `/Users/dro/rice/nfl-analytics/docs/audits/ARCHITECTURE_ANALYSIS_FRESH_AUDIT_NOV15_2025.md`
+**File Location:** `docs/audits/ARCHITECTURE_ANALYSIS_FRESH_AUDIT_NOV15_2025.md`

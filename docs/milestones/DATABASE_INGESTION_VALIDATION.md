@@ -84,7 +84,7 @@ Week 20 | 2025-01-19 | BUF 27 vs BAL 25 (Divisional Round)
 
 ## Ingestion Scripts
 
-**Location:** `/Users/dro/rice/nfl-analytics/R/ingestion/`
+**Location:** `R/ingestion/`
 
 1. **ingest_schedules.R** - Populates `games` table from nflreadr
    - Uses cached snapshot: `data/raw/nflverse_schedules_1999_2024.rds`

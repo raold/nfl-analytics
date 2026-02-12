@@ -33,7 +33,7 @@ In the **24 hours since the last expertise audit**, the following production-cri
 
 ### 1. FastAPI Authentication (CRITICAL - Production Security)
 
-**File:** `/Users/dro/rice/nfl-analytics/api/auth/api_key_auth.py` (492 lines)
+**File:** `api/auth/api_key_auth.py` (492 lines)
 
 **Expertise Required:**
 - JWT token generation and validation
@@ -74,7 +74,7 @@ In the **24 hours since the last expertise audit**, the following production-cri
 
 ### 2. Redis Rate Limiting Middleware (CRITICAL - Production Availability)
 
-**File:** `/Users/dro/rice/nfl-analytics/api/middleware/rate_limiter.py` (413 lines)
+**File:** `api/middleware/rate_limiter.py` (413 lines)
 
 **Expertise Required:**
 - Redis sorted sets (ZSET) for sliding window tracking
@@ -117,7 +117,7 @@ In the **24 hours since the last expertise audit**, the following production-cri
 
 ### 3. Adaptive WLS Weight Optimization (CRITICAL - Ensemble Performance)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/adaptive_wls_weights.py` (493 lines)
+**File:** `py/ensemble/adaptive_wls_weights.py` (493 lines)
 
 **Expertise Required:**
 - Weighted Least Squares (WLS) optimization
@@ -162,8 +162,8 @@ In the **24 hours since the last expertise audit**, the following production-cri
 ### 4. ELO Rating System (HIGH RISK - Prediction Feature)
 
 **Files:**
-- `/Users/dro/rice/nfl-analytics/py/features/opponent_strength.py` (~200 lines)
-- `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_elo.py` (deprecated?)
+- `py/features/opponent_strength.py` (~200 lines)
+- `py/ensemble/enhanced_ensemble_v6_elo.py` (deprecated?)
 
 **Expertise Required:**
 - ELO rating mathematics (k-factor, rating updates)
@@ -205,7 +205,7 @@ In the **24 hours since the last expertise audit**, the following production-cri
 
 ### 5. Pre-commit Enforcement Framework (MEDIUM RISK - Code Quality)
 
-**File:** `/Users/dro/rice/nfl-analytics/.pre-commit-config.yaml` (158 lines, 15+ hooks)
+**File:** `.pre-commit-config.yaml` (158 lines, 15+ hooks)
 
 **Expertise Required:**
 - Git pre-commit hooks (installation, bypass)
@@ -816,8 +816,8 @@ Despite 2,600 lines of new production code in 24 hours, bus factor remains 1 bec
 
 **Document Version:** 1.0 (Nov 15 Update)
 **Related Documents:**
-- [04_expertise_map.md](/Users/dro/rice/nfl-analytics/docs/audits/2025_11_comprehensive_audit/04_expertise_map.md) - Nov 14 baseline
-- [CLAUDE.md](/Users/dro/rice/nfl-analytics/CLAUDE.md) - Project master documentation
-- [AGENT_COORDINATOR_GUIDE.md](/Users/dro/rice/nfl-analytics/docs/AGENT_COORDINATOR_GUIDE.md) - Agent system
+- [04_expertise_map.md](docs/audits/2025_11_comprehensive_audit/04_expertise_map.md) - Nov 14 baseline
+- [CLAUDE.md](CLAUDE.md) - Project master documentation
+- [AGENT_COORDINATOR_GUIDE.md](docs/AGENT_COORDINATOR_GUIDE.md) - Agent system
 
 **Next Review:** November 22, 2025 (weekly during rapid development)

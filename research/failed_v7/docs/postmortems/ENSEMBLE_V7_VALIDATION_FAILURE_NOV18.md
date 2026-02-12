@@ -606,7 +606,7 @@ if abs(mae_diff) < 0.5:  # <0.5 yards difference
 
 ## Appendix A: Complete Validation Logs
 
-**Location**: `/Users/dro/rice/nfl-analytics/results/validation_v7_nov18_current.log`
+**Location**: `results/validation_v7_nov18_current.log`
 
 **Size**: 4.7 MB (32,124 lines)
 

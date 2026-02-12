@@ -17,6 +17,9 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 # Set style
 sns.set_style("whitegrid")
 plt.rcParams["figure.figsize"] = (12, 8)
@@ -270,8 +273,8 @@ $\sigma$ & MAE (yards) & RMSE (yards) & 90\% Coverage & 68\% Coverage & Error (p
 def main():
     """Run Phase 1 calibration analysis"""
 
-    results_dir = Path("/Users/dro/rice/nfl-analytics/experiments/calibration")
-    output_dir = Path("/Users/dro/rice/nfl-analytics/analysis/phase1_summary")
+    results_dir = _PROJECT_ROOT / "experiments/calibration"
+    output_dir = _PROJECT_ROOT / "analysis/phase1_summary"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print("=" * 80)
@@ -294,9 +297,7 @@ def main():
     analyzer.create_visualization(viz_path)
 
     # Save LaTeX table
-    latex_path = Path(
-        "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/phase1_prior_sensitivity_table.tex"
-    )
+    latex_path = _PROJECT_ROOT / "analysis/dissertation/figures/out/phase1_prior_sensitivity_table.tex"
     analyzer.save_latex_table(latex_path)
 
     print("\n" + "=" * 80)

@@ -9,7 +9,7 @@
 
 set -e
 
-PROJECT_ROOT="/Users/dro/rice/nfl-analytics"
+PROJECT_ROOT="\"
 cd "$PROJECT_ROOT"
 
 echo "=========================================="

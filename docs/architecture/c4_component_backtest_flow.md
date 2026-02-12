@@ -539,13 +539,13 @@ graph TB
 ## Related Documentation
 
 **Backtest Scripts:**
-- [historical_validation_4way_optimized.py](/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_4way_optimized.py) - Optimized validator
-- [historical_validation_5way.py](/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_5way.py) - Baseline (unoptimized)
+- [historical_validation_4way_optimized.py](py/backtest/historical_validation_4way_optimized.py) - Optimized validator
+- [historical_validation_5way.py](py/backtest/historical_validation_5way.py) - Baseline (unoptimized)
 
 **Optimization Infrastructure:**
-- [database_pool.py](/Users/dro/rice/nfl-analytics/py/utils/database_pool.py) - Database pooling
-- [feature_cache.py](/Users/dro/rice/nfl-analytics/py/utils/feature_cache.py) - Feature caching
-- [ensemble_health_monitor.py](/Users/dro/rice/nfl-analytics/py/utils/ensemble_health_monitor.py) - Pre-flight checks
+- [database_pool.py](py/utils/database_pool.py) - Database pooling
+- [feature_cache.py](py/utils/feature_cache.py) - Feature caching
+- [ensemble_health_monitor.py](py/utils/ensemble_health_monitor.py) - Pre-flight checks
 
 **Architecture Documentation:**
 - [sequence_training_workflow.md](sequence_training_workflow.md) - Training workflow
@@ -553,7 +553,7 @@ graph TB
 - [c4_component_training_pipeline.md](c4_component_training_pipeline.md) - Training pipeline
 
 **Performance Analysis:**
-- [BATCH_PREDICTION_OPTIMIZATION.md](/Users/dro/rice/nfl-analytics/docs/performance/BATCH_PREDICTION_OPTIMIZATION.md)
+- [BATCH_PREDICTION_OPTIMIZATION.md](docs/performance/BATCH_PREDICTION_OPTIMIZATION.md)
 
 ---
 
@@ -578,4 +578,4 @@ graph TB
 
 **Diagram Created:** November 15, 2025
 **Maintained By:** Architecture Team
-**Contact:** See [CLAUDE.md](/Users/dro/rice/nfl-analytics/CLAUDE.md) for questions
+**Contact:** See [CLAUDE.md](CLAUDE.md) for questions

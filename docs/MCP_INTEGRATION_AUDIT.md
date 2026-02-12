@@ -30,7 +30,7 @@ This audit identifies **12 high-value MCP integration opportunities** for the NF
 
 ### Existing MCP Infrastructure
 
-**Location:** `/Users/dro/rice/nfl-analytics/mcp_server/`
+**Location:** `mcp_server/`
 
 **Current Implementation:**
 - **Transport:** stdio mode
@@ -212,10 +212,10 @@ npm install -g @modelcontextprotocol/server-filesystem
     "command": "npx",
     "args": [
       "-y", "@modelcontextprotocol/server-filesystem",
-      "/Users/dro/rice/nfl-analytics/models",
-      "/Users/dro/rice/nfl-analytics/analysis/results",
-      "/Users/dro/rice/nfl-analytics/logs",
-      "/Users/dro/rice/nfl-analytics/data"
+      "models",
+      "analysis/results",
+      "logs",
+      "data"
     ]
   }
 }
@@ -789,7 +789,7 @@ networks:
 
 ### Existing MCP Server Enhancement
 
-**Current Implementation:** `/Users/dro/rice/nfl-analytics/mcp_server/server.py`
+**Current Implementation:** `mcp_server/server.py`
 
 **Enhancement Approach:**
 

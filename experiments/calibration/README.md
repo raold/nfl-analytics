@@ -91,4 +91,4 @@ All experiments include:
 
 ## References
 
-See main documentation: `/Users/dro/rice/nfl-analytics/docs/BNN_CALIBRATION_EXPLORATION.md`
+See main documentation: `docs/BNN_CALIBRATION_EXPLORATION.md`

@@ -4,7 +4,7 @@
 
 ```bash
 # Navigate to project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Run grid search (15-25 minutes)
 python scripts/xgb_v3_2_l1_regularization.py 2>&1 | tee xgb_v3_2_l1_results.log
@@ -247,7 +247,7 @@ A: Try reducing alpha values (opponent features might be useful). Check feature 
 
 ## Script Details
 
-**File:** `/Users/dro/rice/nfl-analytics/scripts/xgb_v3_2_l1_regularization.py`
+**File:** `scripts/xgb_v3_2_l1_regularization.py`
 **Lines:** 999
 **Dependencies:** pandas, xgboost, scikit-learn, psycopg2
 **Database:** PostgreSQL (devdb01)

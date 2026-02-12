@@ -36,8 +36,8 @@ Rscript --vanilla data/ingest_pbp.R
 **Issue:** The paths reference non-existent `data/` directory. Actual files are located in `R/ingestion/` directory.
 
 **Evidence:**
-- File exists at: `/Users/dro/rice/nfl-analytics/R/ingestion/ingest_schedules.R`
-- File exists at: `/Users/dro/rice/nfl-analytics/R/ingestion/ingest_pbp.R`
+- File exists at: `R/ingestion/ingest_schedules.R`
+- File exists at: `R/ingestion/ingest_pbp.R`
 - No `data/ingest_schedules.R` file exists in repository
 
 **Severity:** CRITICAL

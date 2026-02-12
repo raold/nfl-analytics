@@ -407,7 +407,7 @@ def test_something(ensemble, fixture):
 ls tests/conftest.py
 
 # Run from project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 pytest tests/unit/test_ensemble_v7_components.py
 ```
 

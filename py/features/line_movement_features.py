@@ -38,7 +38,7 @@ Opening lines represent early-week consensus; closing lines represent final mark
 Author: Claude Code
 Date: December 8, 2025
 Task: Phase 1 Line Movement Feature Implementation
-Reference: /Users/dro/.claude/plans/unified-crafting-babbage.md
+Reference: ~/.claude/plans/unified-crafting-babbage.md
 """
 
 import logging

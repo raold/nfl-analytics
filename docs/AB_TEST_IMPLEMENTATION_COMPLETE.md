@@ -29,7 +29,7 @@ Implemented comprehensive A/B test framework to validate ensemble v5.1 improveme
 
 ### 1. Production Code
 
-**`/Users/dro/rice/nfl-analytics/py/production/ab_test_router.py`** (600 lines)
+**`py/production/ab_test_router.py`** (600 lines)
 
 **Purpose:** Route predictions between ensemble v5.0 (control) and v5.1 (treatment)
 
@@ -67,7 +67,7 @@ print(f"Prediction: {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f
 
 ### 2. Analysis Script
 
-**`/Users/dro/rice/nfl-analytics/scripts/analyze_ab_test.py`** (650 lines)
+**`scripts/analyze_ab_test.py`** (650 lines)
 
 **Purpose:** Statistical analysis and deployment decision
 
@@ -147,7 +147,7 @@ Reasons:
 
 ### 3. Documentation
 
-**`/Users/dro/rice/nfl-analytics/docs/AB_TEST_INTEGRATION_GUIDE.md`** (700 lines)
+**`docs/AB_TEST_INTEGRATION_GUIDE.md`** (700 lines)
 
 **Contents:**
 - Quick start guide
@@ -165,7 +165,7 @@ Reasons:
 
 ---
 
-**`/Users/dro/rice/nfl-analytics/docs/AB_TEST_QUICK_REFERENCE.md`** (300 lines)
+**`docs/AB_TEST_QUICK_REFERENCE.md`** (300 lines)
 
 **Contents:**
 - Quick commands (start, check, deploy)
@@ -180,7 +180,7 @@ Reasons:
 
 ### 4. Tests
 
-**`/Users/dro/rice/nfl-analytics/tests/production/test_ab_test_framework.py`** (300 lines)
+**`tests/production/test_ab_test_framework.py`** (300 lines)
 
 **Test Coverage:**
 - ✅ Router initialization and configuration

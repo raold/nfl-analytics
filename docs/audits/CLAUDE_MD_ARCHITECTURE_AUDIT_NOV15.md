@@ -3,7 +3,7 @@
 **Audit Scope:** Technical accuracy of documented architecture against actual codebase
 **Audit Date:** November 15, 2025
 **Auditor:** Claude Code (Haiku 4.5)
-**Repository:** /Users/dro/rice/nfl-analytics
+**Repository:** \
 
 ---
 

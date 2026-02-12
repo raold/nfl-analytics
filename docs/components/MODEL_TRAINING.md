@@ -135,7 +135,7 @@ models/
 
 **Purpose:** Player-level hierarchical model with team/position random effects
 
-**Training Script:** `/Users/dro/rice/nfl-analytics/R/train_hierarchical_v2_canonical.R`
+**Training Script:** `R/train_hierarchical_v2_canonical.R`
 
 **Formula:**
 ```r
@@ -189,7 +189,7 @@ fit <- brm(
 
 **Purpose:** Random walk model with player-specific skill trajectories
 
-**Training Script:** `/Users/dro/rice/nfl-analytics/R/state_space/train_state_space_v2_canonical.R`
+**Training Script:** `R/state_space/train_state_space_v2_canonical.R`
 
 **Model:** Two-level random walk
 ```
@@ -258,7 +258,7 @@ model {
 
 **Purpose:** Incorporate domain knowledge via informative priors
 
-**Training Script:** `/Users/dro/rice/nfl-analytics/R/train_informative_priors_v2_canonical.R`
+**Training Script:** `R/train_informative_priors_v2_canonical.R`
 
 **Formula:** Same as Hierarchical v2, but with stronger priors
 
@@ -303,7 +303,7 @@ priors <- c(
 
 **Purpose:** Gradient boosted trees for player performance prediction
 
-**Training Script:** `/Users/dro/rice/nfl-analytics/py/models/train_xgboost_canonical.py`
+**Training Script:** `py/models/train_xgboost_canonical.py`
 
 **Features:**
 - Player stats: attempts, yards, TDs (last 3 games, season avg)
@@ -389,7 +389,7 @@ model.fit(
 5. Simplified architecture (underfitting)
 6. Hybrid BNN+XGBoost (marginal gains)
 
-**Documentation:** See `/Users/dro/rice/nfl-analytics/analysis/dissertation/main/appendix_bnn_investigation.tex` (780 lines)
+**Documentation:** See `analysis/dissertation/main/appendix_bnn_investigation.tex` (780 lines)
 
 **Key Learnings:**
 - Feature engineering critical (lag/rolling caused leakage)
@@ -607,7 +607,7 @@ CREATE TABLE ml.model_metadata (
 
 ### Registration Workflow
 
-**Script:** `/Users/dro/rice/nfl-analytics/scripts/register_model.py`
+**Script:** `scripts/register_model.py`
 
 ```python
 from py.utils.model_registry import ModelRegistry
@@ -644,7 +644,7 @@ registry.register_model(
 
 ### YAML Manifest
 
-**File:** `/Users/dro/rice/nfl-analytics/models/MODEL_REGISTRY.yaml`
+**File:** `models/MODEL_REGISTRY.yaml`
 
 ```yaml
 models:
@@ -1335,10 +1335,10 @@ The **Model Training Pipeline** provides:
 ✅ **Reliability**: Convergence gates, automated validation
 
 **Key Files:**
-- R training scripts: `/Users/dro/rice/nfl-analytics/R/train_*.R`
-- Python training scripts: `/Users/dro/rice/nfl-analytics/py/models/train_*.py`
-- Model registry: `/Users/dro/rice/nfl-analytics/scripts/model_registry.py`
-- Validation scripts: `/Users/dro/rice/nfl-analytics/scripts/validate_*.py`
+- R training scripts: `R/train_*.R`
+- Python training scripts: `py/models/train_*.py`
+- Model registry: `scripts/model_registry.py`
+- Validation scripts: `scripts/validate_*.py`
 
 ---
 

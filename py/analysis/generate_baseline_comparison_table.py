@@ -18,7 +18,7 @@ class BaselineModelComparator:
     """Generate comprehensive comparison table for baseline models"""
 
     def __init__(self):
-        self.models_dir = Path("/Users/dro/rice/nfl-analytics/models")
+        self.models_dir = _PROJECT_ROOT / "models"
         self.results = {}
         self.load_all_results()
 
@@ -246,9 +246,7 @@ def main():
         comparator.print_summary()
 
         # Generate LaTeX table
-        output_path = Path(
-            "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/baseline_comparison_table.tex"
-        )
+        output_path = _PROJECT_ROOT / "analysis/dissertation/figures/out/baseline_comparison_table.tex"
         comparator.generate_latex_table(output_path)
 
         print("\n✓ Baseline comparison table generated successfully")
@@ -259,6 +257,9 @@ def main():
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
         traceback.print_exc()
         return 1

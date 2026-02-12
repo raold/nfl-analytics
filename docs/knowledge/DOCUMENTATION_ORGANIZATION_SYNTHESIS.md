@@ -589,7 +589,7 @@ git commit -m "test"  # Should succeed
 #!/bin/bash
 # Weekly file organization audit (run via cron)
 
-PROJECT_ROOT="/Users/dro/rice/nfl-analytics"
+PROJECT_ROOT="\"
 cd "$PROJECT_ROOT"
 
 VIOLATIONS=$(find . -maxdepth 1 -type f \( -name "*.md" -o -name "*.txt" \) ! -name "README.md" ! -name "CLAUDE.md" ! -name "SETUP.md" ! -name "CONTRIBUTING.md" ! -name "FILE_ORGANIZATION.md" 2>/dev/null)
@@ -614,7 +614,7 @@ fi
 crontab -e
 
 # Add line:
-0 9 * * 1 /Users/dro/rice/nfl-analytics/scripts/weekly_file_organization_audit.sh
+0 9 * * 1 scripts/weekly_file_organization_audit.sh
 ```
 
 ### 4. Template System for Common Documents
@@ -705,7 +705,7 @@ git commit -m "docs: add Nov 15 session summary (in archive, not root)"
 
 **Execution:**
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 ./scripts/cleanup_root_directory.sh --execute
 git add -A
 git commit -m "docs: reorganize 15 root files per FILE_ORGANIZATION.md"
@@ -962,10 +962,10 @@ git commit -m "docs: reorganize 15 root files per FILE_ORGANIZATION.md"
 ## References
 
 **Source Documents:**
-- `/Users/dro/rice/nfl-analytics/docs/archive/2025_nov/FILE_ORGANIZATION_SURVEY_NOV15.md`
-- `/Users/dro/rice/nfl-analytics/scripts/cleanup_root_directory.sh`
-- `/Users/dro/rice/nfl-analytics/docs/archive/2025_nov/FILE_CLEANUP_QUICK_START.md`
-- `/Users/dro/rice/nfl-analytics/FILE_ORGANIZATION.md`
+- `docs/archive/2025_nov/FILE_ORGANIZATION_SURVEY_NOV15.md`
+- `scripts/cleanup_root_directory.sh`
+- `docs/archive/2025_nov/FILE_CLEANUP_QUICK_START.md`
+- `FILE_ORGANIZATION.md`
 
 **Related Documentation:**
 - `CLAUDE.md` - AI assistant instructions (file naming conventions)
@@ -1019,7 +1019,7 @@ git commit -m "docs: reorganize 15 root files per FILE_ORGANIZATION.md"
 ## Appendix B: Proposed Directory Structure (After Cleanup)
 
 ```
-/Users/dro/rice/nfl-analytics/
+
 ├── README.md                      ✅ Permitted (8 files only)
 ├── CLAUDE.md
 ├── SETUP.md

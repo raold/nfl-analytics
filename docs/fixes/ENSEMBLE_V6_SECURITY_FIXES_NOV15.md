@@ -1,7 +1,7 @@
 # Enhanced Ensemble v6 Production - Security & Reliability Fixes
 
 **Date:** November 15, 2025
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_production.py`
+**File:** `py/ensemble/enhanced_ensemble_v6_production.py`
 **Severity:** Medium (Security) + High (Reliability)
 **Status:** ✅ COMPLETE
 

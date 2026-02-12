@@ -64,7 +64,7 @@ grep "Improvement" output.log
 
 ## Deep Analysis Framework (If Needed)
 
-**Full documentation:** `/Users/dro/rice/nfl-analytics/docs/research/XGBOOST_INTERACTION_FAILURE_ANALYSIS.md`
+**Full documentation:** `docs/research/XGBOOST_INTERACTION_FAILURE_ANALYSIS.md`
 
 ### 5 Complementary Analyses
 
@@ -186,10 +186,10 @@ RUN: Experiment 1 (interactions)
 
 ## Key Files
 
-1. **Experiment Script:** `/Users/dro/rice/nfl-analytics/scripts/fix_opponent_features_interactions.py`
-2. **Full Analysis Framework:** `/Users/dro/rice/nfl-analytics/docs/research/XGBOOST_INTERACTION_FAILURE_ANALYSIS.md`
-3. **Research Background:** `/Users/dro/rice/nfl-analytics/docs/research/XGBOOST_OPPONENT_FEATURES_RESEARCH.md`
-4. **Session Status:** `/Users/dro/rice/nfl-analytics/SESSION_STATUS_NOV14.md`
+1. **Experiment Script:** `scripts/fix_opponent_features_interactions.py`
+2. **Full Analysis Framework:** `docs/research/XGBOOST_INTERACTION_FAILURE_ANALYSIS.md`
+3. **Research Background:** `docs/research/XGBOOST_OPPONENT_FEATURES_RESEARCH.md`
+4. **Session Status:** `SESSION_STATUS_NOV14.md`
 5. **Models:**
    - Baseline: `models/xgboost/passing_xgboost_v2_canonical.pkl`
    - v3.0: `models/xgboost/passing_xgboost_v3_with_opponent_strength.pkl`

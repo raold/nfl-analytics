@@ -42,7 +42,7 @@ Test loaded 3 sample games from 2025 Week 1 and generated predictions:
 **Result:** SUCCESS (after fix)
 
 #### Issue Found and Fixed
-**File:** `/Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R` (lines 200-206)
+**File:** `R/generate_2025_predictions_all_v2.R` (lines 200-206)
 
 **Problem:** State-Space model loading code was incorrect:
 ```r
@@ -135,7 +135,7 @@ All predictions passed sanity checks:
 ## Fix Verification: Player_Season Factor Levels
 
 ### The Fix (Applied Nov 10)
-**File:** `/Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R` (line 107)
+**File:** `R/generate_2025_predictions_all_v2.R` (line 107)
 
 **What was fixed:**
 ```r
@@ -246,7 +246,7 @@ Based on validation results:
 ## Files Modified
 
 ### Script Fixed
-- **File:** `/Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R`
+- **File:** `R/generate_2025_predictions_all_v2.R`
 - **Lines:** 200-216 (State-Space model loading and parameter extraction)
 - **Change Type:** Bug fix (dimensional array handling)
 - **Impact:** Enables State-Space validation to complete successfully

@@ -210,22 +210,22 @@ py/features/causal_features_v1.py
 ===== ABSOLUTE FILE PATHS =====
 
 Test Files:
-/Users/dro/rice/nfl-analytics/tests/unit/test_ensemble_v7_components.py
-/Users/dro/rice/nfl-analytics/tests/integration/test_ensemble_v7_integration.py
-/Users/dro/rice/nfl-analytics/tests/integration/test_ensemble_v7_sql.py
+tests/unit/test_ensemble_v7_components.py
+tests/integration/test_ensemble_v7_integration.py
+tests/integration/test_ensemble_v7_sql.py
 
 Documentation:
-/Users/dro/rice/nfl-analytics/docs/testing/ENSEMBLE_V7_TEST_GUIDE.md
-/Users/dro/rice/nfl-analytics/docs/testing/ENSEMBLE_V7_PYTEST_COMMANDS.md
+docs/testing/ENSEMBLE_V7_TEST_GUIDE.md
+docs/testing/ENSEMBLE_V7_PYTEST_COMMANDS.md
 
 Summary:
-/Users/dro/rice/nfl-analytics/ENSEMBLE_V7_TEST_SUMMARY.md
-/Users/dro/rice/nfl-analytics/GENERATED_FILES_MANIFEST.txt (this file)
+ENSEMBLE_V7_TEST_SUMMARY.md
+GENERATED_FILES_MANIFEST.txt (this file)
 
 ===== USAGE INSTRUCTIONS =====
 
 Step 1: Navigate to project root
-  cd /Users/dro/rice/nfl-analytics
+  cd \
 
 Step 2: Run all tests
   pytest tests/unit/test_ensemble_v7_components.py \

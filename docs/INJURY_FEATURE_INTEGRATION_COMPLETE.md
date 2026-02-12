@@ -106,7 +106,7 @@ spread_adjustment -= away_oline_injuries * 0.5
 
 ### 4. Code Changes
 
-**Modified File**: `/Users/dro/rice/nfl-analytics/py/features/game_feature_extractor.py`
+**Modified File**: `py/features/game_feature_extractor.py`
 
 **Changes Made**:
 
@@ -166,7 +166,7 @@ WHERE season = %s
 
 ### 6. Testing & Validation
 
-**Test Script**: `/Users/dro/rice/nfl-analytics/scripts/test_injury_feature_integration.py`
+**Test Script**: `scripts/test_injury_feature_integration.py`
 
 **Test Results**:
 ```
@@ -286,7 +286,7 @@ print(f"Spread adjustment: {features['injury_spread_adjustment']:.1f} points")
 ## Data Lineage
 
 **Source**: NFL injury reports (official team injury designations)
-**Processing**: `/Users/dro/rice/nfl-analytics/R/features/injury_load_features.R`
+**Processing**: `R/features/injury_load_features.R`
 **Storage**: `mart.team_injury_load` table (PostgreSQL)
 **Integration**: `py/features/game_feature_extractor.py`
 **Usage**: All game outcome prediction models

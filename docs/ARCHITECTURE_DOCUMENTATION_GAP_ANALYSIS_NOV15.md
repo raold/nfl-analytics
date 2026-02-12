@@ -39,7 +39,7 @@
 ### ✅ Verified Diagrams
 
 #### 1. Data Ingestion Component Diagram
-**File:** `/Users/dro/rice/nfl-analytics/docs/architecture/c4_component_data_ingestion.md`
+**File:** `docs/architecture/c4_component_data_ingestion.md`
 
 **Mermaid Syntax:** ✅ VALID
 - 110-line `graph TB` diagram
@@ -62,7 +62,7 @@
 ---
 
 #### 2. Odds Polling Component Diagram
-**File:** `/Users/dro/rice/nfl-analytics/docs/architecture/c4_component_odds_polling.md`
+**File:** `docs/architecture/c4_component_odds_polling.md`
 
 **Mermaid Syntax:** ✅ VALID
 - 113-line `graph TB` diagram
@@ -88,7 +88,7 @@
 ---
 
 #### 3. Training Pipeline Component Diagram
-**File:** `/Users/dro/rice/nfl-analytics/docs/architecture/c4_component_training_pipeline.md`
+**File:** `docs/architecture/c4_component_training_pipeline.md`
 
 **Mermaid Syntax:** ✅ VALID
 - 160-line `graph TB` diagram
@@ -117,7 +117,7 @@
 ---
 
 #### 4. Prediction Flow Sequence Diagram
-**File:** `/Users/dro/rice/nfl-analytics/docs/architecture/sequence_prediction_flow.md`
+**File:** `docs/architecture/sequence_prediction_flow.md`
 
 **Mermaid Syntax:** ✅ VALID
 - 92-line sequence diagram
@@ -148,7 +148,7 @@
 ---
 
 #### 5. Training Workflow Sequence Diagram
-**File:** `/Users/dro/rice/nfl-analytics/docs/architecture/sequence_training_workflow.md`
+**File:** `docs/architecture/sequence_training_workflow.md`
 
 **Mermaid Syntax:** ✅ VALID
 - 136-line sequence diagram

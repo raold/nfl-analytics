@@ -259,9 +259,9 @@
 
 ## Related Files
 
-**Gap Analysis:** `/Users/dro/rice/nfl-analytics/docs/ARCHITECTURE_DOCUMENTATION_GAP_ANALYSIS_NOV15.md`
+**Gap Analysis:** `docs/ARCHITECTURE_DOCUMENTATION_GAP_ANALYSIS_NOV15.md`
 
-**Diagram Index:** `/Users/dro/rice/nfl-analytics/docs/architecture/README.md`
+**Diagram Index:** `docs/architecture/README.md`
 
 **Completed Diagrams:**
 - `docs/architecture/c4_component_data_ingestion.md` (453 lines)

@@ -170,7 +170,7 @@ temperature_map = {
 
 **Implementation:**
 
-1. Edit `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
+1. Edit `py/models/player_props_ensemble.py`
 2. Locate `_apply_temperature_scaling()` method (lines 398-451)
 3. Update `temperature_map` values as shown above
 4. Rerun backtest: `python py/backtest/historical_validation_5way.py --start-season 2022 --end-season 2024`
@@ -214,7 +214,7 @@ weights = np.ones(len(predictions)) / len(predictions)
 
 **Implementation:**
 
-1. Edit `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
+1. Edit `py/models/player_props_ensemble.py`
 2. Locate ensemble aggregation (lines 924-926)
 3. Replace inverse variance weighting with equal weighting
 4. Rerun backtest
@@ -323,9 +323,9 @@ This requires retraining all models (longer-term fix):
 
 ## Files Analyzed
 
-- **Backtest Results:** `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_4way_EMERGENCY_FIX.csv`
-- **Ensemble Implementation:** `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
-- **Backtest Script:** `/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_5way.py`
+- **Backtest Results:** `analysis/results/historical_validation_4way_EMERGENCY_FIX.csv`
+- **Ensemble Implementation:** `py/models/player_props_ensemble.py`
+- **Backtest Script:** `py/backtest/historical_validation_5way.py`
 
 ---
 

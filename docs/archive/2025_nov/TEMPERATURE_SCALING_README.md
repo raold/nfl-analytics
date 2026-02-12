@@ -513,7 +513,7 @@ When this is complete, you should see:
 
 ## Document Index
 
-All temperature scaling documentation is located in `/Users/dro/rice/nfl-analytics/docs/`:
+All temperature scaling documentation is located in `docs/`:
 
 1. **TEMPERATURE_SCALING_EXECUTIVE_SUMMARY.md** - Start here for decisions
 2. **TEMPERATURE_SCALING_IMPLEMENTATION_PLAN.md** - Complete implementation guide

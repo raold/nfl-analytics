@@ -8,7 +8,10 @@ import subprocess
 import sys
 from pathlib import Path
 
-PDF_PATH = "/Users/dro/rice/nfl-analytics/analysis/dissertation/main/main.pdf"
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
+PDF_PATH = str(_PROJECT_ROOT / "analysis/dissertation/main/main.pdf")
 OUTPUT_DIR = Path(__file__).parent / "pages"
 DPI = 150
 

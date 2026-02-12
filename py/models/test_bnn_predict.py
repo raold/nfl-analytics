@@ -3,10 +3,10 @@ Quick test to verify the broadcast shape bug is fixed
 """
 
 import sys
-
-sys.path.append("/Users/dro/rice/nfl-analytics")
-
 from pathlib import Path
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 import numpy as np
 from bnn_simpler_v2 import SimplerBNNv2
@@ -15,7 +15,7 @@ print("Testing BNN v2 prediction fix...")
 print("=" * 60)
 
 # Load saved model
-model_path = Path("/Users/dro/rice/nfl-analytics/models/bayesian/bnn_simpler_v2.pkl")
+model_path = _PROJECT_ROOT / "models/bayesian/bnn_simpler_v2.pkl"
 model = SimplerBNNv2.load(model_path)
 
 # Create small test data (different size than training)

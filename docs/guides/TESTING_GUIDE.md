@@ -141,7 +141,7 @@ Total Passing: 513.5 yards
 
 ```bash
 # Navigate to project directory
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Start Streamlit
 streamlit run dashboard/app.py

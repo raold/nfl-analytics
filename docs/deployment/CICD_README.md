@@ -211,7 +211,7 @@ This subdirectory contains comprehensive CI/CD pipeline documentation for the NF
 
 ## Support
 
-**Internal Docs:** All files in `/Users/dro/rice/nfl-analytics/docs/deployment/`
+**Internal Docs:** All files in `docs/deployment/`
 **External Resources:**
 - GitHub Actions: https://docs.github.com/en/actions
 - GitHub CLI: https://cli.github.com/manual/

@@ -337,7 +337,7 @@ python py/backtest/compare_backtests.py \
 
 **8.3.4 Conformal Prediction vs. Temperature Scaling**
 
-**Add to:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_8_results_discussion/subsection_conformal_vs_temperature.tex`
+**Add to:** `analysis/dissertation/chapter_8_results_discussion/subsection_conformal_vs_temperature.tex`
 
 **Content:**
 ```latex
@@ -472,8 +472,8 @@ quantiles_cache = cqr.predict(X_all)  # Precompute
 ---
 
 **Files:**
-- **This guide:** `/Users/dro/rice/nfl-analytics/docs/research/CONFORMAL_QUICK_START.md`
-- **Full review:** `/Users/dro/rice/nfl-analytics/docs/research/CONFORMAL_PREDICTION_LITERATURE_REVIEW.md`
-- **BibTeX:** `/Users/dro/rice/nfl-analytics/docs/research/CONFORMAL_PREDICTION_BIBTEX.txt`
+- **This guide:** `docs/research/CONFORMAL_QUICK_START.md`
+- **Full review:** `docs/research/CONFORMAL_PREDICTION_LITERATURE_REVIEW.md`
+- **BibTeX:** `docs/research/CONFORMAL_PREDICTION_BIBTEX.txt`
 
 **Status:** ✅ Ready to implement Week 1 (Basic Split Conformal)

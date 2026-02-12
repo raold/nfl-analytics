@@ -399,7 +399,7 @@ ls -lh config/ab_test_config.yaml
 ## APPLY INSTRUCTIONS
 
 **Method 1: Manual Edit**
-1. Open `/Users/dro/rice/nfl-analytics/CLAUDE.md`
+1. Open `CLAUDE.md`
 2. Apply changes in order: 1→9
 3. Save file
 4. Verify: `git diff CLAUDE.md | head -50`

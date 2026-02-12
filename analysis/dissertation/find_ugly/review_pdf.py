@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 # Configuration
-PDF_PATH = "/Users/dro/rice/nfl-analytics/analysis/dissertation/main/main.pdf"
+PDF_PATH = str(_PROJECT_ROOT / "analysis/dissertation/main/main.pdf")
 OUTPUT_DIR = Path(__file__).parent / "pages"
 BATCH_SIZE = 12
 DPI = 150  # Balance between quality and file size
@@ -69,6 +69,9 @@ def cleanup_directory():
     """Remove the pages directory entirely."""
     if OUTPUT_DIR.exists():
         import shutil
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
         shutil.rmtree(OUTPUT_DIR)
         print("✓ Cleaned up pages directory")

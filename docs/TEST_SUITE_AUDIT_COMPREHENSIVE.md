@@ -662,7 +662,7 @@ def test_detect_hardcoded_database_password():
     # Scan codebase
     auditor = SecurityAuditor()
     report = auditor.scan_codebase(
-        path="/Users/dro/rice/nfl-analytics",
+        path="\",
         exclude_dirs={".git", "venv", ".venv"}
     )
 

@@ -451,6 +451,6 @@
 
 ---
 
-**File Location**: `/Users/dro/rice/nfl-analytics/docs/milestones/RECENT_WORK_HISTORY.md`
+**File Location**: `docs/milestones/RECENT_WORK_HISTORY.md`
 **Version**: 1.0
 **Last Updated**: November 8, 2025

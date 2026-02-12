@@ -157,7 +157,7 @@ FROM games WHERE game_id = '2025_12_BUF_HOU';
 Add to cron for automatic score collection:
 ```bash
 # Every 15 minutes during game days (Sunday/Monday/Thursday)
-*/15 * * * 0,1,4 cd /Users/dro/rice/nfl-analytics && uv run python py/data/update_live_scores.py >> /tmp/live_scores.log 2>&1
+*/15 * * * 0,1,4 cd \ && uv run python py/data/update_live_scores.py >> /tmp/live_scores.log 2>&1
 ```
 
 ---
@@ -296,7 +296,7 @@ uv run python py/data/update_live_scores.py
 
 **Weekly Prediction Generation** (Saturday 10am ET):
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 python scripts/generate_game_predictions_v6.py --season 2025 --week 13
 ```
 

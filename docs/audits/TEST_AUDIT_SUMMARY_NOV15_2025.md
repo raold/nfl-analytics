@@ -2,7 +2,7 @@
 
 **Date:** November 15, 2025
 **Status:** Complete
-**Location:** `/Users/dro/rice/nfl-analytics/docs/`
+**Location:** `docs/`
 
 ---
 
@@ -196,12 +196,12 @@ After:   [██████████████████░░░░] 75
 ## File Locations
 
 ```
-/Users/dro/rice/nfl-analytics/docs/
+docs/
 ├── TEST_COVERAGE_AUDIT_NOV15_2025.md              # Main audit (75+ pages)
 ├── TEST_IMPLEMENTATION_PLAN_NOV15_2025.md          # Implementation guide (60+ pages)
 └── TEST_QUICK_START_GUIDE.md                       # Quick reference (30+ pages)
 
-/Users/dro/rice/nfl-analytics/
+
 └── TEST_AUDIT_SUMMARY_NOV15_2025.md                # This file (executive summary)
 ```
 

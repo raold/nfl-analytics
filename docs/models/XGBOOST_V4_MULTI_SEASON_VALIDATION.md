@@ -47,7 +47,7 @@ For each test year (2022, 2023, 2024):
 
 ### Validation Script
 
-**Location:** `/Users/dro/rice/nfl-analytics/scripts/xgb_v4_multi_season_validation.py`
+**Location:** `scripts/xgb_v4_multi_season_validation.py`
 
 **Features:**
 - Multi-season training and evaluation (2022, 2023, 2024)
@@ -59,13 +59,13 @@ For each test year (2022, 2023, 2024):
 
 **Usage:**
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 python scripts/xgb_v4_multi_season_validation.py
 ```
 
 ### Comprehensive Tests
 
-**Location:** `/Users/dro/rice/nfl-analytics/tests/models/test_xgboost_v4_validation.py`
+**Location:** `tests/models/test_xgboost_v4_validation.py`
 
 **Test Coverage:**
 1. **Ridge Coefficient Stability** (3 tests)
@@ -107,7 +107,7 @@ python scripts/xgb_v4_multi_season_validation.py
 
 **Usage:**
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 pytest tests/models/test_xgboost_v4_validation.py -v --tb=short
 ```
 

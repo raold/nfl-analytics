@@ -155,10 +155,10 @@ def execute_daily_paper_trading():
 ```bash
 # Add to crontab
 # Run daily at 10 AM EST (before games)
-0 10 * * * cd /Users/dro/rice/nfl-analytics && uv run python py/paper_trading/execute_daily.py
+0 10 * * * cd \ && uv run python py/paper_trading/execute_daily.py
 
 # Run nightly at 2 AM EST (settle bets)
-0 2 * * * cd /Users/dro/rice/nfl-analytics && uv run python py/paper_trading/settle_positions.py
+0 2 * * * cd \ && uv run python py/paper_trading/settle_positions.py
 ```
 
 ---

@@ -19,7 +19,7 @@
 
 ### ✅ Step 1: Create Master Query Method (30 min)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
+**File:** `py/ensemble/enhanced_ensemble_v5.py`
 **Location:** After line 315
 
 **Code to add:**
@@ -107,7 +107,7 @@ print('✅ Master query works!')
 
 ### ✅ Step 2: Refactor State-Space Method (15 min)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
+**File:** `py/ensemble/enhanced_ensemble_v5.py`
 **Location:** Lines 316-430
 
 **Changes:**
@@ -149,7 +149,7 @@ with patch.object(ensemble, '_get_db_connection') as mock_conn:
 
 ### ✅ Step 3: Refactor XGBoost Method (15 min)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
+**File:** `py/ensemble/enhanced_ensemble_v5.py`
 **Location:** Lines 522-656
 
 **Changes:**
@@ -168,7 +168,7 @@ with patch.object(ensemble, '_get_db_connection') as mock_conn:
 
 ### ✅ Step 4: Refactor R Models Method (20 min)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
+**File:** `py/ensemble/enhanced_ensemble_v5.py`
 **Location:** Lines 914-1043
 
 **Changes:**
@@ -184,7 +184,7 @@ with patch.object(ensemble, '_get_db_connection') as mock_conn:
 
 ### ✅ Step 5: Update predict_batch() (30 min)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
+**File:** `py/ensemble/enhanced_ensemble_v5.py`
 **Location:** Lines 1045-1197
 
 **Changes:**
@@ -272,7 +272,7 @@ Returns:
 
 ### ✅ Step 6: Testing & Validation (30 min)
 
-**Create test script:** `/Users/dro/rice/nfl-analytics/scripts/test_batch_prediction_phase3.py`
+**Create test script:** `scripts/test_batch_prediction_phase3.py`
 
 ```python
 #!/usr/bin/env python3
@@ -431,13 +431,13 @@ RISK GATES
 
 ### ✅ Step 7: Documentation (15 min)
 
-**Create:** `/Users/dro/rice/nfl-analytics/docs/performance/BATCH_PREDICTION_PHASE3_COMPLETE.md`
+**Create:** `docs/performance/BATCH_PREDICTION_PHASE3_COMPLETE.md`
 
-**Update:** `/Users/dro/rice/nfl-analytics/CLAUDE.md`
+**Update:** `CLAUDE.md`
 - Section: "Key Components → 6. Online Learning"
 - Add: "Phase 3: Database optimization (3.5x speedup, 186ms inference)"
 
-**Update:** `/Users/dro/rice/nfl-analytics/docs/performance/BATCH_PREDICTION_PHASE2_COMPLETE.md`
+**Update:** `docs/performance/BATCH_PREDICTION_PHASE2_COMPLETE.md`
 - Add at bottom: "See BATCH_PREDICTION_PHASE3_COMPLETE.md for further optimization (3.5x speedup)"
 
 ---

@@ -28,7 +28,7 @@ After removing Google Drive sync code (3,500 lines on Nov 14, 2025), **5 orphane
 # Reason: Auto-generated stubs for deleted module (365 lines)
 # Action: DELETE ENTIRE FILE
 
-rm /Users/dro/rice/nfl-analytics/tests/unit/test_sync_manager.py
+rm tests/unit/test_sync_manager.py
 ```
 
 **Verification:**
@@ -86,7 +86,7 @@ tests = [
 ```
 
 **Manual Edit:**
-1. Open `/Users/dro/rice/nfl-analytics/containers/test_redis_setup.py`
+1. Open `containers/test_redis_setup.py`
 2. Delete line 19
 3. Delete lines 152-191 (entire `test_sync_manager()` function)
 4. Delete `("Sync Manager", test_sync_manager),` from tests list (around line 235)
@@ -167,7 +167,7 @@ from sync_manager import GoogleDriveSyncManager
 ```
 
 **Manual Edit:**
-1. Open `/Users/dro/rice/nfl-analytics/scripts/compute/run_compute.py`
+1. Open `scripts/compute/run_compute.py`
 2. Delete line 63 (`from sync_manager import GoogleDriveSyncManager`)
 3. Delete lines 561-579 (sync_manager instantiation block)
 4. Delete lines 596-598 (sync_manager cleanup in KeyboardInterrupt handler)
@@ -191,7 +191,7 @@ grep -r "sync_manager\|GoogleDriveSyncManager" py/ tests/ scripts/ containers/ \
 # Expected: 0 results
 
 # 2. Verify imports resolve (no ModuleNotFoundError)
-cd /Users/dro/rice/nfl-analytics
+cd \
 python3 -c "import sys; sys.path.insert(0, 'py'); from py.compute.redis_worker import RedisComputeWorker; print('✅ Imports working')"
 
 # 3. Run test suite (should skip deleted test)

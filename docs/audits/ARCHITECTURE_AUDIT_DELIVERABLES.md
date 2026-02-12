@@ -16,7 +16,7 @@ This architecture audit provides a **complete C4 model documentation plan** for 
 ---
 
 ## Deliverable 1: Comprehensive Architecture Audit
-**File:** `/Users/dro/rice/nfl-analytics/docs/C4_MODEL_ARCHITECTURE_AUDIT_NOV15.md`
+**File:** `docs/C4_MODEL_ARCHITECTURE_AUDIT_NOV15.md`
 **Lines:** 6,200+
 **Format:** Markdown with detailed sections
 
@@ -62,7 +62,7 @@ This architecture audit provides a **complete C4 model documentation plan** for 
 ---
 
 ## Deliverable 2: Implementation Guide
-**File:** `/Users/dro/rice/nfl-analytics/docs/C4_DIAGRAMS_IMPLEMENTATION_GUIDE.md`
+**File:** `docs/C4_DIAGRAMS_IMPLEMENTATION_GUIDE.md`
 **Lines:** 3,500+
 **Format:** Markdown with code templates and examples
 
@@ -133,7 +133,7 @@ This architecture audit provides a **complete C4 model documentation plan** for 
 ---
 
 ## Deliverable 3: Executive Summary
-**File:** `/Users/dro/rice/nfl-analytics/C4_ARCHITECTURE_AUDIT_SUMMARY.md`
+**File:** `C4_ARCHITECTURE_AUDIT_SUMMARY.md`
 **Lines:** 1,500+
 **Format:** Markdown with quick reference tables
 
@@ -290,14 +290,14 @@ This architecture audit provides a **complete C4 model documentation plan** for 
 ### Core Deliverables
 ```bash
 # Main audit documents (3 files, 10,500+ lines)
-/Users/dro/rice/nfl-analytics/docs/C4_MODEL_ARCHITECTURE_AUDIT_NOV15.md
-/Users/dro/rice/nfl-analytics/docs/C4_DIAGRAMS_IMPLEMENTATION_GUIDE.md
-/Users/dro/rice/nfl-analytics/C4_ARCHITECTURE_AUDIT_SUMMARY.md  (this file)
+docs/C4_MODEL_ARCHITECTURE_AUDIT_NOV15.md
+docs/C4_DIAGRAMS_IMPLEMENTATION_GUIDE.md
+C4_ARCHITECTURE_AUDIT_SUMMARY.md  (this file)
 ```
 
 ### Existing Diagrams (3/14 complete)
 ```bash
-/Users/dro/rice/nfl-analytics/docs/audits/2025_11_comprehensive_audit/06_architecture_diagrams/
+docs/audits/2025_11_comprehensive_audit/06_architecture_diagrams/
 ├── c4_context.md                    # System boundaries, external actors
 ├── c4_container.md                  # Docker services, networking
 ├── c4_component_ensemble.md         # 4-way ensemble architecture
@@ -306,7 +306,7 @@ This architecture audit provides a **complete C4 model documentation plan** for 
 
 ### Queued Diagrams (11/14 to be created)
 ```bash
-/Users/dro/rice/nfl-analytics/docs/
+docs/
 ├── C4_DATA_INGESTION_COMPONENT.md   # Phase 2 (Nov 18)
 ├── C4_ODDS_POLLING_COMPONENT.md     # Phase 2 (Nov 19)
 ├── C4_TRAINING_PIPELINE_COMPONENT.md # Phase 2 (Nov 20)

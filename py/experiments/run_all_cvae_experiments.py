@@ -6,13 +6,13 @@ Each experiment is independent and can be run individually or as part of this su
 """
 
 import sys
+from pathlib import Path
 
-sys.path.append("/Users/dro/rice/nfl-analytics")
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 import logging
 import subprocess
-from pathlib import Path
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger(__name__)
 

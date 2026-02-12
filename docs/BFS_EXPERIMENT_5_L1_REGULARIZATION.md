@@ -606,7 +606,7 @@ Either way, we'll have a clear decision point to move forward.
 
 ---
 
-**Script Location:** `/Users/dro/rice/nfl-analytics/scripts/xgb_v3_2_l1_regularization.py`
-**Metadata Location:** `/Users/dro/rice/nfl-analytics/models/xgboost/passing_xgboost_v3_2_l1_metadata.json`
+**Script Location:** `scripts/xgb_v3_2_l1_regularization.py`
+**Metadata Location:** `models/xgboost/passing_xgboost_v3_2_l1_metadata.json`
 **Date Created:** November 14, 2025
 **Status:** ✅ Ready for Execution

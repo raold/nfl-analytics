@@ -368,21 +368,21 @@ event_id                          market  home_team              away_team      
 ## Appendix: File Locations
 
 ### Code
-- Feature engineering: `/Users/dro/rice/nfl-analytics/scripts/engineer_market_features.py`
-- Odds service: `/Users/dro/rice/nfl-analytics/py/data/odds_update_service.py`
-- Quick start: `/Users/dro/rice/nfl-analytics/scripts/odds_quickstart.sh`
+- Feature engineering: `scripts/engineer_market_features.py`
+- Odds service: `py/data/odds_update_service.py`
+- Quick start: `scripts/odds_quickstart.sh`
 
 ### Data
-- 2024 features: `/Users/dro/rice/nfl-analytics/data/market_features_2024.csv`
-- Validation report: `/Users/dro/rice/nfl-analytics/data/market_features_2024.validation.json`
+- 2024 features: `data/market_features_2024.csv`
+- Validation report: `data/market_features_2024.validation.json`
 
 ### Documentation
-- Integration guide: `/Users/dro/rice/nfl-analytics/docs/market/ODDS_API_INTEGRATION.md`
-- Deliverables (this file): `/Users/dro/rice/nfl-analytics/docs/market/MARKET_FEATURES_DELIVERABLES.md`
+- Integration guide: `docs/market/ODDS_API_INTEGRATION.md`
+- Deliverables (this file): `docs/market/MARKET_FEATURES_DELIVERABLES.md`
 
 ### Database
 - Schema: `public.odds_history` (583K records)
-- Migration: `/Users/dro/rice/nfl-analytics/db/migrations/009_odds_optimization.sql`
+- Migration: `db/migrations/009_odds_optimization.sql`
 
 ---
 

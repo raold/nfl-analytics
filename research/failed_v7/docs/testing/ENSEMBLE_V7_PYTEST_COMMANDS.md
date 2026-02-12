@@ -11,7 +11,7 @@
 
 ### Run All Tests (Recommended)
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Run all 75 tests with verbose output
 pytest tests/unit/test_ensemble_v7_components.py \
@@ -203,7 +203,7 @@ pytest tests/ -k "Causal" -v
 ```
 ======================== test session starts ==========================
 platform darwin -- Python 3.10.x, pytest-7.x.x
-rootdir: /Users/dro/rice/nfl-analytics
+rootdir: \
 plugins: cov-4.x.x, mock-3.x.x
 collected 75 items
 
@@ -355,7 +355,7 @@ echo "✅ All Ensemble v7 tests passed!"
 ### Import Error: "No module named 'py'"
 ```bash
 # Solution: Run from project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 pytest tests/unit/test_ensemble_v7_components.py -v
 ```
 

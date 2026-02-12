@@ -10,14 +10,14 @@ Target: 75%+ accuracy on 2024 test set
 """
 
 import sys
+from pathlib import Path
 
-sys.path.append("/Users/dro/rice/nfl-analytics")
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 import json
 import logging
 from datetime import datetime
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
 import psycopg2
@@ -471,7 +471,7 @@ def main():
         logger.info(f"  {feature:30s}: {score:.1f}")
 
     # Save model
-    model_dir = Path("/Users/dro/rice/nfl-analytics/models/xgboost")
+    model_dir = _PROJECT_ROOT / "models/xgboost"
     model_dir.mkdir(parents=True, exist_ok=True)
     model_path = model_dir / "xgboost_touchdowns_v1.json"
     predictor.save_model(str(model_path))

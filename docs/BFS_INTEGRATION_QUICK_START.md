@@ -31,7 +31,7 @@ plays table (raw)
 
 ## Step 1: Create Feature Generator
 
-**File:** `/Users/dro/rice/nfl-analytics/py/features/bfs_features.py`
+**File:** `py/features/bfs_features.py`
 
 **Template from:** `py/features/opponent_strength.py` (use as reference)
 
@@ -342,7 +342,7 @@ ensemble_pred = (
 
 ## Questions?
 
-See full analysis: `/Users/dro/rice/nfl-analytics/docs/FEATURE_ENGINEERING_PATTERN_ANALYSIS.md`
+See full analysis: `docs/FEATURE_ENGINEERING_PATTERN_ANALYSIS.md`
 
 Key contacts:
 - Feature generation: Data Layer Agent

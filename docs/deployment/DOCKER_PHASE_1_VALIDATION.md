@@ -9,7 +9,7 @@
 
 ### docker-compose.yml
 
-- [x] File exists: `/Users/dro/rice/nfl-analytics/docker-compose.yml`
+- [x] File exists: `docker-compose.yml`
 - [x] Valid YAML syntax (docker-compose config passes)
 - [x] 341 lines total
 - [x] Properly formatted with sections

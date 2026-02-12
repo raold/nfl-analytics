@@ -75,7 +75,7 @@ Successfully implemented a comprehensive Frontend Engineering Agent that prevent
 
 ```
 [ERROR] schema_validation: Column 'game_id' does not exist in table 'mart.player_game_stats'
-  File: /Users/dro/rice/nfl-analytics/dashboard/app.py
+  File: dashboard/app.py
   Line: 1417
   💡 Suggestion: Available columns: player_id, season, week, current_team...
 ```

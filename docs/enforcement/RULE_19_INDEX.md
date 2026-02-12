@@ -313,7 +313,7 @@ To validate Rule 19 implementation:
 ## Reference Links
 
 ### Code
-- **Implementation:** `/Users/dro/rice/nfl-analytics/py/utils/enforcement_router.py`
+- **Implementation:** `py/utils/enforcement_router.py`
   - Lines 337-348: Rule definition
   - Lines 1086-1232: Validator method
   - Lines 1312-1314: Convenience decorator
@@ -327,7 +327,7 @@ To validate Rule 19 implementation:
 - [RULE_19_IMPLEMENTATION_COMPLETE.md](RULE_19_IMPLEMENTATION_COMPLETE.md) - Status (15 min)
 
 ### Related Enforcement Rules
-- [ENFORCEMENT_FRAMEWORK_COMPLETE.md](/Users/dro/rice/nfl-analytics/docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md) - Full framework (18 rules total)
+- [ENFORCEMENT_FRAMEWORK_COMPLETE.md](docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md) - Full framework (18 rules total)
 
 ---
 

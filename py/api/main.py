@@ -725,7 +725,7 @@ async def lifespan(app: FastAPI):
 # FastAPI Application
 # ============================================================================
 
-print("[DEBUG main.py:716] About to create FastAPI app")
+logger.debug("About to create FastAPI app")
 app = FastAPI(
     title="NFL Props Prediction API",
     description="Production-grade NFL player prop predictions with Bayesian uncertainty quantification",
@@ -734,29 +734,25 @@ app = FastAPI(
     openapi_url="/openapi.json",
     lifespan=lifespan,
 )
-print("[DEBUG main.py:725] FastAPI app created successfully")
+logger.debug("FastAPI app created successfully")
 
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[os.getenv("CORS_ORIGINS", "*").split(",")],
+    allow_origins=os.getenv("CORS_ORIGINS", "*").split(","),
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
 # Include routers
-print(
-    f"[DEBUG main.py:{735}] About to register game_predictions router"
-)  # Direct output for debugging
+logger.debug("About to register game_predictions router")
 try:
-    print(f"[DEBUG main.py:{737}] game_predictions.router = {game_predictions.router}")
+    logger.debug("game_predictions.router = %s", game_predictions.router)
     app.include_router(game_predictions.router, prefix="/api/v1", tags=["game_predictions"])
     logger.info("Game predictions router loaded successfully")
-    print(f"[DEBUG main.py:{740}] Game predictions router registered successfully")
 except Exception as e:
-    logger.error(f"Failed to load game predictions router: {e}", exc_info=True)
-    print(f"[DEBUG main.py:{743}] ERROR registering game_predictions router: {e}")
+    logger.error("Failed to load game predictions router: %s", e, exc_info=True)
 
 # Import and include props predictions router
 try:

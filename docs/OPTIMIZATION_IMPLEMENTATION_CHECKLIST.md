@@ -626,5 +626,5 @@ Create `docs/OPTIMIZATION_BENCHMARKS.md` and update after each phase:
 
 **Detailed instructions for each optimization available above.**
 
-Questions? See `/Users/dro/rice/nfl-analytics/docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md`
+Questions? See `docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md`
 

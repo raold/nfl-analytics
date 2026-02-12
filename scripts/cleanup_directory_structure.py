@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 # Root directory
-ROOT = Path("/Users/dro/rice/nfl-analytics")
+ROOT = _PROJECT_ROOT
 
 # Define organizational structure
 CLEANUP_PLAN = {
@@ -168,7 +168,7 @@ def execute_cleanup(dry_run=True):
     print("=" * 60)
     print(
         """
-    /Users/dro/rice/nfl-analytics/
+    
     ├── README.md                 (project overview)
     ├── requirements.txt          (Python dependencies)
     ├── .gitignore
@@ -238,6 +238,9 @@ def analyze_remaining_files():
 
 if __name__ == "__main__":
     import sys
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
     # Default to dry run
     dry_run = "--execute" not in sys.argv

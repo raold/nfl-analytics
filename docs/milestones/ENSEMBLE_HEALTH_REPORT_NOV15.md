@@ -327,5 +327,5 @@ ensemble_std_calibrated = ensemble_std / temperature
 
 **Report Generated:** November 15, 2025
 **Author:** Claude Code (Sonnet 4.5)
-**Test Script:** /Users/dro/rice/nfl-analytics/test_ensemble_v6_health.py
-**Version Tested:** /Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_elo.py
+**Test Script:** test_ensemble_v6_health.py
+**Version Tested:** py/ensemble/enhanced_ensemble_v6_elo.py

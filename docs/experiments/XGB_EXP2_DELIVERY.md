@@ -25,7 +25,7 @@ cat models/xgboost/xgb_exp2_clustering_summary.json
 ## Deliverables Checklist
 
 ### ✅ Main Script
-- **File:** `/Users/dro/rice/nfl-analytics/scripts/xgb_exp2_clustering_fixed.py`
+- **File:** `scripts/xgb_exp2_clustering_fixed.py`
 - **Size:** 505 lines (fully commented)
 - **Status:** Syntax validated, tested
 - **Functions:** 6 (load_data, create_clusters, assign_clusters, prepare_features, train_evaluate, main)
@@ -200,7 +200,7 @@ models/xgboost/
 
 ### Created Files
 ```
-/Users/dro/rice/nfl-analytics/
+
 ├── scripts/xgb_exp2_clustering_fixed.py           (505 lines - MAIN SCRIPT)
 ├── docs/XGB_EXP2_CLUSTERING_GUIDE.md              (400 lines - COMPREHENSIVE)
 ├── docs/XGB_EXPERIMENTS_README.md                 (500 lines - FRAMEWORK)

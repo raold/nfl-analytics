@@ -1670,7 +1670,7 @@ is_high_wind = CASE
 
 ## 10. Validation Script
 
-**Created:** `/Users/dro/rice/nfl-analytics/scripts/validate_sports_analytics.sh`
+**Created:** `scripts/validate_sports_analytics.sh`
 
 **Usage:**
 ```bash

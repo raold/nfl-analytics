@@ -410,7 +410,7 @@ If ensemble is blocked, we could deploy a **single-model baseline**:
 ## Test Artifacts
 
 ### Test Script
-- **File:** `/Users/dro/rice/nfl-analytics/test_4way_ensemble.py`
+- **File:** `test_4way_ensemble.py`
 - **Lines:** 172
 - **Runtime:** 31.9 seconds
 

@@ -12,6 +12,9 @@ Date: November 16, 2025
 import re
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 # ============================================================================
 # NFL DOMAIN KNOWLEDGE
 # ============================================================================
@@ -333,7 +336,7 @@ def main():
         "py/ensemble/adaptive_wls_weights_v2.py",
     ]
 
-    base_path = Path("/Users/dro/rice/nfl-analytics")
+    base_path = _PROJECT_ROOT
 
     print("=" * 70)
     print("SPORTS ANALYTICS VALIDATOR - v7.0 CODE REVIEW")

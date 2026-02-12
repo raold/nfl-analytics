@@ -22,7 +22,7 @@ Conducted comprehensive incident audit for 2025, identifying **13 total incident
 ## Deliverables
 
 ### 1. ELO Bug Postmortem ✅ COMPLETE
-**File:** `/Users/dro/rice/nfl-analytics/docs/milestones/postmortems/2025_11_15_elo_skill_factor_bug.md`
+**File:** `docs/milestones/postmortems/2025_11_15_elo_skill_factor_bug.md`
 
 **Contents:**
 - Complete incident analysis (2.5 hours investigation + fix)
@@ -40,7 +40,7 @@ Conducted comprehensive incident audit for 2025, identifying **13 total incident
 ---
 
 ### 2. Incident Inventory ✅ COMPLETE
-**File:** `/Users/dro/rice/nfl-analytics/docs/milestones/postmortems/INCIDENT_INVENTORY_2025.md`
+**File:** `docs/milestones/postmortems/INCIDENT_INVENTORY_2025.md`
 
 **Contents:**
 - Complete catalog of 13 incidents (Jan 1 - Nov 15, 2025)
@@ -65,7 +65,7 @@ Conducted comprehensive incident audit for 2025, identifying **13 total incident
 ---
 
 ### 3. Postmortems Index Updated ✅ COMPLETE
-**File:** `/Users/dro/rice/nfl-analytics/docs/milestones/postmortems/README.md`
+**File:** `docs/milestones/postmortems/README.md`
 
 **Changes:**
 - Added PM7 (ELO bug) as complete
@@ -393,11 +393,11 @@ Conducted comprehensive incident audit for 2025, identifying **13 total incident
 ## Files Created/Updated
 
 ### Created (2 new files)
-1. `/Users/dro/rice/nfl-analytics/docs/milestones/postmortems/2025_11_15_elo_skill_factor_bug.md` (comprehensive postmortem)
-2. `/Users/dro/rice/nfl-analytics/docs/milestones/postmortems/INCIDENT_INVENTORY_2025.md` (complete incident catalog)
+1. `docs/milestones/postmortems/2025_11_15_elo_skill_factor_bug.md` (comprehensive postmortem)
+2. `docs/milestones/postmortems/INCIDENT_INVENTORY_2025.md` (complete incident catalog)
 
 ### Updated (1 existing file)
-3. `/Users/dro/rice/nfl-analytics/docs/milestones/postmortems/README.md` (index with 4 new incidents, systemic patterns)
+3. `docs/milestones/postmortems/README.md` (index with 4 new incidents, systemic patterns)
 
 ### Total Work
 - **Lines Written:** ~2,500 lines of documentation

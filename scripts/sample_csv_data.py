@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 import pandas as pd
+from pathlib import Path
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
 df = pd.read_csv(
-    "/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_4way_EMERGENCY_FIX.csv"
+    str(_PROJECT_ROOT / "analysis/results/historical_validation_4way_EMERGENCY_FIX.csv")
 )
 
 print(f"Total rows: {len(df)}")

@@ -1329,11 +1329,11 @@ The **Prediction Engine v5.1** provides:
 ✅ **Scalable**: Vectorized batch predictions (200-500 pred/s)
 
 **Key Files**:
-- Production ensemble: `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
-- FastAPI service: `/Users/dro/rice/nfl-analytics/api/main.py`
-- Batched R interface: `/Users/dro/rice/nfl-analytics/py/ensemble/r_model_interface_batched.py`
-- Temperature scaling: `/Users/dro/rice/nfl-analytics/py/calibration/temperature_scaling.py`
-- Backtest validation: `/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_4way.py`
+- Production ensemble: `py/ensemble/enhanced_ensemble_v5.py`
+- FastAPI service: `api/main.py`
+- Batched R interface: `py/ensemble/r_model_interface_batched.py`
+- Temperature scaling: `py/calibration/temperature_scaling.py`
+- Backtest validation: `py/backtest/historical_validation_4way.py`
 
 ---
 

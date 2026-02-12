@@ -81,7 +81,7 @@ Implemented XGBoost v3.1 as a **postmortem fix** for the XGBoost v3 performance 
 
 ### 1. Training Script (733 lines)
 
-**Path:** `/Users/dro/rice/nfl-analytics/py/models/train_xgboost_v3_1_aligned_window.py`
+**Path:** `py/models/train_xgboost_v3_1_aligned_window.py`
 
 **Purpose:** Train XGBoost v3.1 with aligned window and feature coverage audit.
 
@@ -111,7 +111,7 @@ python py/models/train_xgboost_v3_1_aligned_window.py
 
 ### 2. Validation Script (244 lines)
 
-**Path:** `/Users/dro/rice/nfl-analytics/scripts/validate_xgboost_v3_1.py`
+**Path:** `scripts/validate_xgboost_v3_1.py`
 
 **Purpose:** Quick validation on small sample before full training (saves compute time).
 

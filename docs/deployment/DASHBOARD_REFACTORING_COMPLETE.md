@@ -214,7 +214,7 @@ def main():
 **Replace original immediately (higher risk):**
 
 ```bash
-cd /Users/dro/rice/nfl-analytics/dashboard
+cd dashboard
 cp app.py app_backup_$(date +%Y%m%d).py  # Safety backup
 mv app_refactored.py app.py
 ```
@@ -530,7 +530,7 @@ dashboard/
 If refactored version has critical bugs:
 
 ```bash
-cd /Users/dro/rice/nfl-analytics/dashboard
+cd dashboard
 
 # Option 1: Revert to backup
 mv app.py app_refactored_broken.py

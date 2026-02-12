@@ -1,6 +1,6 @@
 # BNN Conformal Prediction Test Suite
 
-**Test File:** `/Users/dro/rice/nfl-analytics/tests/unit/test_bnn_conformal.py`
+**Test File:** `tests/unit/test_bnn_conformal.py`
 
 **Module Under Test:** `py/models/bnn_conformal.py`
 

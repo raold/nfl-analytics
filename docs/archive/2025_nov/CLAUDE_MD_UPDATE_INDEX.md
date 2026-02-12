@@ -31,7 +31,7 @@ This index provides a roadmap to the complete CLAUDE.md update documentation pac
 - Decision to proceed with updates
 - Stakeholder communication
 
-**Location:** `/Users/dro/rice/nfl-analytics/CLAUDE_MD_UPDATE_EXECUTIVE_SUMMARY.md`
+**Location:** `CLAUDE_MD_UPDATE_EXECUTIVE_SUMMARY.md`
 
 ---
 
@@ -53,7 +53,7 @@ This index provides a roadmap to the complete CLAUDE.md update documentation pac
 - Verifying what changed
 - Git workflow
 
-**Location:** `/Users/dro/rice/nfl-analytics/CLAUDE_MD_EXACT_TEXT_CHANGES.md`
+**Location:** `CLAUDE_MD_EXACT_TEXT_CHANGES.md`
 
 ---
 
@@ -74,7 +74,7 @@ This index provides a roadmap to the complete CLAUDE.md update documentation pac
 - Verifying completeness
 - Specification review
 
-**Location:** `/Users/dro/rice/nfl-analytics/CLAUDE_MD_UPDATE_PLAN_NOV7.md`
+**Location:** `CLAUDE_MD_UPDATE_PLAN_NOV7.md`
 
 ---
 
@@ -96,7 +96,7 @@ This index provides a roadmap to the complete CLAUDE.md update documentation pac
 - Understanding implications
 - Quality assurance
 
-**Location:** `/Users/dro/rice/nfl-analytics/CLAUDE_MD_ANALYSIS_NOV7.md`
+**Location:** `CLAUDE_MD_ANALYSIS_NOV7.md`
 
 ---
 
@@ -115,7 +115,7 @@ This index provides a roadmap to the complete CLAUDE.md update documentation pac
 ### For Implementers (Developers)
 
 1. Read: **CLAUDE_MD_EXACT_TEXT_CHANGES.md** (skip intro, go to Change 1)
-2. Open: `/Users/dro/rice/nfl-analytics/CLAUDE.md` in editor
+2. Open: `CLAUDE.md` in editor
 3. Apply: 4 changes in order (lines shown in document)
 4. Verify: Checklist at bottom of changes document
 5. Commit: Use provided git commit message
@@ -190,14 +190,14 @@ After implementing, verify:
 ## 📁 Related Files
 
 **Backtest Results (Source Data):**
-- `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_2022_2025_metrics.json`
-- `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_2022_2025.csv`
+- `analysis/results/historical_validation_5way_2022_2025_metrics.json`
+- `analysis/results/historical_validation_5way_2022_2025.csv`
 
 **Backtest Implementation:**
-- `/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_5way.py`
+- `py/backtest/historical_validation_5way.py`
 
 **Target File:**
-- `/Users/dro/rice/nfl-analytics/CLAUDE.md`
+- `CLAUDE.md`
 
 **Current Version:** 4.3 (1,067 lines)
 **Target Version:** 4.4 (~1,210 lines)
@@ -208,7 +208,7 @@ After implementing, verify:
 
 ### Step 1: Prepare (5 minutes)
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 # Backup current version
 cp CLAUDE.md CLAUDE.md.backup.nov3_2025
 # Open in editor

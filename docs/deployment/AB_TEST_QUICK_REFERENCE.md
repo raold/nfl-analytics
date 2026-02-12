@@ -225,4 +225,4 @@ vim docs/postmortems/ab_test_rollback_$(date +%Y%m%d).md
 
 **Version:** 1.0
 **Last Updated:** November 14, 2025
-**Full Checklist:** `/Users/dro/rice/nfl-analytics/docs/deployment/A_B_TEST_DEPLOYMENT_CHECKLIST.md`
+**Full Checklist:** `docs/deployment/A_B_TEST_DEPLOYMENT_CHECKLIST.md`

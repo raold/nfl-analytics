@@ -401,12 +401,12 @@ Speedup: 1.54x (35% faster)
 ## Files Created
 
 **Documentation:**
-- `/Users/dro/rice/nfl-analytics/docs/optimization/09_performance_analysis.md` (comprehensive analysis)
-- `/Users/dro/rice/nfl-analytics/docs/optimization/PHASE6_PERFORMANCE_CHECKLIST.md` (this file)
+- `docs/optimization/09_performance_analysis.md` (comprehensive analysis)
+- `docs/optimization/PHASE6_PERFORMANCE_CHECKLIST.md` (this file)
 
 **Scripts:**
-- `/Users/dro/rice/nfl-analytics/scripts/optimize_mcmc_m4.sh` (MCMC optimization)
-- `/Users/dro/rice/nfl-analytics/db/performance_indexes_phase6.sql` (SQL indexes)
+- `scripts/optimize_mcmc_m4.sh` (MCMC optimization)
+- `db/performance_indexes_phase6.sql` (SQL indexes)
 
 **Backups:**
 - `backups/mcmc_config_YYYYMMDD_HHMMSS/*.R` (original R scripts)

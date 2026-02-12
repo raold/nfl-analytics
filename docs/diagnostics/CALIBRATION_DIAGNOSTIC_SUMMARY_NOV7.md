@@ -157,7 +157,7 @@ If coverage < 85%, apply Recommendation #3 (model retraining).
 
 ## Files Modified
 
-1. `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
+1. `py/models/player_props_ensemble.py`
    - Lines 423-428: Temperature scaling values
    - Lines 924-926: Ensemble weighting method
 
@@ -165,11 +165,11 @@ If coverage < 85%, apply Recommendation #3 (model retraining).
 
 ## Files Analyzed
 
-1. `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_4way_EMERGENCY_FIX.csv`
+1. `analysis/results/historical_validation_4way_EMERGENCY_FIX.csv`
    - Current coverage: 18.61%
    - ~3,000+ predictions (2022-2024)
 
-2. `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
+2. `py/models/player_props_ensemble.py`
    - Temperature scaling implementation
    - Ensemble weighting method
 

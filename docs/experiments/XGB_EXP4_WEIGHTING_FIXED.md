@@ -186,7 +186,7 @@ When successful (MAE < 40.20):
 ### Quick Start
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 python scripts/xgb_exp4_weighting_fixed.py
 ```
 

@@ -42,7 +42,7 @@ Redis Phase 2 focuses on migrating core infrastructure components from in-memory
 
 **Testing:**
 ```bash
-DB_PASSWORD=sicillionbillions PYTHONPATH=/Users/dro/rice/nfl-analytics \
+DB_PASSWORD=sicillionbillions PYTHONPATH=\ \
   python3 py/data/repository/base.py
 
 # Results:

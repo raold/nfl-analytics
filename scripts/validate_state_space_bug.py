@@ -9,10 +9,14 @@ due to low variance, causing 191-yard MAE.
 
 import numpy as np
 import pandas as pd
+from pathlib import Path
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
 # Load backtest results
 df = pd.read_csv(
-    "/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_FIXED_2022_2024.csv"
+    str(_PROJECT_ROOT / "analysis/results/historical_validation_5way_FIXED_2022_2024.csv")
 )
 
 print("=" * 80)

@@ -227,7 +227,7 @@ uv run python scripts/weekly_ensemble_reoptimization.py \
 
 ```bash
 # Add to crontab
-0 6 * * 1 cd /Users/dro/rice/nfl-analytics && \
+0 6 * * 1 cd \ && \
     uv run python scripts/weekly_ensemble_reoptimization.py \
     --season 2024 \
     --week AUTO \

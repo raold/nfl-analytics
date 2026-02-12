@@ -220,7 +220,7 @@ player_idx_clipped = np.clip(player_idx_test, 0, n_training_players - 1)
 ## References
 
 ### Code Locations
-- **Improved Model**: `/Users/dro/rice/nfl-analytics/py/models/train_bnn_rushing_improved.py`
+- **Improved Model**: `py/models/train_bnn_rushing_improved.py`
 - **Training Logs**:
   - `models/bayesian/bnn_rushing_improved_training.log`
   - `models/bayesian/bnn_rushing_improved_v2_training.log`

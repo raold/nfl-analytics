@@ -11,7 +11,7 @@
 ## Execution (20-30 minutes)
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Run with output capture for later review
 python scripts/xgb_v3_2_l1_regularization.py 2>&1 | tee xgb_v3_2_l1_results.log
@@ -206,4 +206,4 @@ If anything fails:
 
 **Created:** November 14, 2025
 **Purpose:** Quick checklist for BFS Experiment 5 execution
-**Script:** `/Users/dro/rice/nfl-analytics/scripts/xgb_v3_2_l1_regularization.py`
+**Script:** `scripts/xgb_v3_2_l1_regularization.py`

@@ -22,7 +22,7 @@ All deliverables are production-ready and suitable for dissertation submission.
 ## Task 3.4: Statistical Significance Tests ✅
 
 ### File Created
-**Location**: `/Users/dro/rice/nfl-analytics/py/analysis/statistical_tests.py`
+**Location**: `py/analysis/statistical_tests.py`
 **Lines**: 248
 **Status**: Production-ready
 
@@ -113,7 +113,7 @@ Expected output (6 comparisons):
 ## Task 3.5: Update Dissertation Chapter 8 ✅
 
 ### File Created
-**Location**: `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_8_results_discussion/section_5way_ensemble_production.tex`
+**Location**: `analysis/dissertation/chapter_8_results_discussion/section_5way_ensemble_production.tex`
 **Lines**: 306
 **Status**: Dissertation-ready
 
@@ -184,7 +184,7 @@ Expected output (6 comparisons):
 ## Task 3.6: Create Appendix C - Ablation Studies ✅
 
 ### File Created
-**Location**: `/Users/dro/rice/nfl-analytics/analysis/dissertation/appendix/appendix_c_ensemble_ablation.tex`
+**Location**: `analysis/dissertation/appendix/appendix_c_ensemble_ablation.tex`
 **Lines**: 515
 **Status**: Dissertation-ready
 
@@ -255,7 +255,7 @@ Expected output (6 comparisons):
 
 **Command**: `pdflatex -interaction=nonstopmode main.tex` (2 passes)
 **Status**: ✅ SUCCESS
-**Output**: `/Users/dro/rice/nfl-analytics/analysis/dissertation/main/main.pdf`
+**Output**: `analysis/dissertation/main/main.pdf`
 
 ### Compilation Metrics
 
@@ -429,23 +429,23 @@ Once all 5 models are retrained with canonical window, statistical tests will co
 
 ### Python Module
 ```
-/Users/dro/rice/nfl-analytics/py/analysis/statistical_tests.py
+py/analysis/statistical_tests.py
 ```
 
 ### Dissertation LaTeX
 ```
-/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_8_results_discussion/section_5way_ensemble_production.tex
-/Users/dro/rice/nfl-analytics/analysis/dissertation/appendix/appendix_c_ensemble_ablation.tex
+analysis/dissertation/chapter_8_results_discussion/section_5way_ensemble_production.tex
+analysis/dissertation/appendix/appendix_c_ensemble_ablation.tex
 ```
 
 ### Compiled PDF
 ```
-/Users/dro/rice/nfl-analytics/analysis/dissertation/main/main.pdf
+analysis/dissertation/main/main.pdf
 ```
 
 ### Results Output (Pending Full Ensemble)
 ```
-/Users/dro/rice/nfl-analytics/analysis/results/statistical_tests_results.csv
+analysis/results/statistical_tests_results.csv
 ```
 
 ---

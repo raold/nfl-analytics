@@ -140,7 +140,7 @@ class PropsModelManager:
     """
 
     def __init__(self):
-        self.models_dir = Path("/Users/dro/rice/nfl-analytics/models")
+        self.models_dir = _PROJECT_ROOT / "models"
 
         # Lazy-loaded models
         self._ensemble = None
@@ -428,6 +428,9 @@ class PropsModelManager:
 
         try:
             import psycopg2
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
             # Get player features from database
             if self._db_conn is None or self._db_conn.closed:

@@ -663,7 +663,7 @@ with open("analysis/results/backtest_validation_report.json", "w") as f:
 **Task 5.1: Deploy Grafana + Prometheus Monitoring** ⭐ **2 hours**
 ```bash
 # Start Docker Compose stack
-cd /Users/dro/rice/nfl-analytics
+cd \
 docker compose up -d
 
 # Verify services

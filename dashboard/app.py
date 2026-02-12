@@ -1870,10 +1870,13 @@ def render_model_status_page():
         import glob
         import os
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
         # Try multiple possible model directory locations
         possible_dirs = [
             "/app/models",  # Docker mount
-            "/Users/dro/rice/nfl-analytics/models",  # Local development
+            str(_PROJECT_ROOT / "models"),  # Local development
             "../models",  # Relative path
         ]
 
@@ -1888,7 +1891,7 @@ def render_model_status_page():
                 "Models directory not found. Make sure models directory is mounted in Docker."
             )
             st.info(
-                "Expected paths: /app/models (Docker) or /Users/dro/rice/nfl-analytics/models (local)"
+                "Expected paths: /app/models (Docker) or models (local)"
             )
         else:
             model_files = []

@@ -955,8 +955,8 @@ Before publishing any diagram:
 
 ### Datasets
 - Database: `postgresql://dro:sicillionbillions@localhost:5544/devdb01`
-- Models: `/Users/dro/rice/nfl-analytics/models/`
-- Docker Compose: `/Users/dro/rice/nfl-analytics/docker-compose.yml`
+- Models: `models/`
+- Docker Compose: `docker-compose.yml`
 
 ---
 

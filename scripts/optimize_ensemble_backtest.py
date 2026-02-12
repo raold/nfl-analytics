@@ -507,7 +507,7 @@ def main():
 
         logger.info("\n✓ Complete analysis available in:")
         logger.info(
-            "  /Users/dro/rice/nfl-analytics/docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md"
+            "  docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md"
         )
 
     if args.test:

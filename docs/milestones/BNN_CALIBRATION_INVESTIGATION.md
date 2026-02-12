@@ -167,7 +167,7 @@ If NUTS also shows poor calibration:
 
 ### Files Modified
 
-**`/Users/dro/rice/nfl-analytics/py/models/bayesian_neural_network.py`**:
+**`py/models/bayesian_neural_network.py`**:
 - Lines 110-128: Changed to heteroscedastic architecture
 - Lines 285-301: Updated load() method to match new architecture
 
@@ -179,7 +179,7 @@ If NUTS also shows poor calibration:
 
 ### Grid Search Results
 
-**Full results**: `/Users/dro/rice/nfl-analytics/analysis/results/bnn_grid_search_results.csv`
+**Full results**: `analysis/results/bnn_grid_search_results.csv`
 
 **Best configuration** (composite scoring):
 - Config #7: σ=0.5, (24,12)

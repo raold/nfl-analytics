@@ -21,7 +21,7 @@ Error: Levels '00-0033077_2025' of grouping factor 'player_season' cannot be fou
 ```
 
 ### Root Cause
-In `/Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R` line 103:
+In `R/generate_2025_predictions_all_v2.R` line 103:
 
 ```r
 player_season = paste0(player_id, "_", 2024),  # WRONG - hardcoded 2024
@@ -76,7 +76,7 @@ pred_priors_draws <- posterior_predict(
 
 ## Files Modified
 
-1. **`/Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R`**
+1. **`R/generate_2025_predictions_all_v2.R`**
    - Fixed player_season feature engineering (line 107)
    - Enhanced prediction calls with explicit `sample_new_levels = "gaussian"` (lines 128-133, 166-171)
    - Added comprehensive documentation comments
@@ -85,17 +85,17 @@ pred_priors_draws <- posterior_predict(
 
 ## Files Created
 
-1. **`/Users/dro/rice/nfl-analytics/R/test_hierarchical_v2_new_levels.R`**
+1. **`R/test_hierarchical_v2_new_levels.R`**
    - Test script to verify fix works correctly
    - Tests predictions on small sample of 2025 data
    - Usage: `Rscript R/test_hierarchical_v2_new_levels.R`
 
-2. **`/Users/dro/rice/nfl-analytics/docs/fixes/HIERARCHICAL_V2_NEW_LEVELS_FIX.md`**
+2. **`docs/fixes/HIERARCHICAL_V2_NEW_LEVELS_FIX.md`**
    - Comprehensive technical documentation
    - Explains why fix works and best practices
    - Includes verification steps and impact assessment
 
-3. **`/Users/dro/rice/nfl-analytics/docs/fixes/FIX_SUMMARY_2025-11-10.md`**
+3. **`docs/fixes/FIX_SUMMARY_2025-11-10.md`**
    - This quick reference document
 
 ---
@@ -104,7 +104,7 @@ pred_priors_draws <- posterior_predict(
 
 ### 1. Quick Test (3 samples, ~30 seconds)
 ```bash
-Rscript /Users/dro/rice/nfl-analytics/R/test_hierarchical_v2_new_levels.R
+Rscript R/test_hierarchical_v2_new_levels.R
 ```
 
 **Expected Output:**
@@ -115,7 +115,7 @@ Rscript /Users/dro/rice/nfl-analytics/R/test_hierarchical_v2_new_levels.R
 
 ### 2. Full Validation (148 games, ~5 minutes)
 ```bash
-Rscript /Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R
+Rscript R/generate_2025_predictions_all_v2.R
 ```
 
 **Expected Output:**
@@ -198,13 +198,13 @@ This gives us valid uncertainty quantification for true out-of-sample prediction
 ## References
 
 ### Documentation
-- Full technical write-up: `/Users/dro/rice/nfl-analytics/docs/fixes/HIERARCHICAL_V2_NEW_LEVELS_FIX.md`
-- Test script: `/Users/dro/rice/nfl-analytics/R/test_hierarchical_v2_new_levels.R`
+- Full technical write-up: `docs/fixes/HIERARCHICAL_V2_NEW_LEVELS_FIX.md`
+- Test script: `R/test_hierarchical_v2_new_levels.R`
 
 ### Related Code
-- Fixed script: `/Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R`
-- Training script: `/Users/dro/rice/nfl-analytics/R/train_hierarchical_v2_canonical.R` (no changes needed)
-- Model artifact: `/Users/dro/rice/nfl-analytics/models/bayesian/passing_yards_hierarchical_v2.rds` (no retraining needed)
+- Fixed script: `R/generate_2025_predictions_all_v2.R`
+- Training script: `R/train_hierarchical_v2_canonical.R` (no changes needed)
+- Model artifact: `models/bayesian/passing_yards_hierarchical_v2.rds` (no retraining needed)
 
 ### brms Documentation
 - `?brms::posterior_predict` - See `allow_new_levels` and `sample_new_levels` parameters

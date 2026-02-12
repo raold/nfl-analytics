@@ -40,7 +40,7 @@ The NFL Analytics codebase has **multiple BNN implementations** across two major
 ### Production/Near-Production Models
 
 #### A. PyMC-Based (Scikit-Learn Style API)
-**File:** `/Users/dro/rice/nfl-analytics/py/models/bayesian_neural_network.py` (415 lines)
+**File:** `py/models/bayesian_neural_network.py` (415 lines)
 
 **Architecture:**
 ```
@@ -77,7 +77,7 @@ Input (n_features)
 
 #### B. PyTorch Multi-Output Models (Current Production Rushing)
 
-**Primary File:** `/Users/dro/rice/nfl-analytics/py/models/bnn_multioutput_pytorch.py` (280+ lines)
+**Primary File:** `py/models/bnn_multioutput_pytorch.py` (280+ lines)
 
 **Architecture:**
 ```
@@ -141,7 +141,7 @@ temperature: 0.75  # Post-hoc calibration
 
 ### Calibration & Temperature Scaling
 
-**File:** `/Users/dro/rice/nfl-analytics/py/models/bnn_temperature_scaling.py` (200+ lines)
+**File:** `py/models/bnn_temperature_scaling.py` (200+ lines)
 
 **Method:** Post-hoc temperature scaling (Guo et al. 2017)
 
@@ -157,11 +157,11 @@ temperature: 0.75  # Post-hoc calibration
 
 ### Data/Feature Engineering for BNN
 
-**Rushers:** `/Users/dro/rice/nfl-analytics/py/models/train_bnn_rushing.py` (200+ lines)
+**Rushers:** `py/models/train_bnn_rushing.py` (200+ lines)
 
-**Receivers:** `/Users/dro/rice/nfl-analytics/py/models/train_bnn_receiving.py`
+**Receivers:** `py/models/train_bnn_receiving.py`
 
-**Vegas-aware:** `/Users/dro/rice/nfl-analytics/py/models/train_bnn_rushing_vegas.py`
+**Vegas-aware:** `py/models/train_bnn_rushing_vegas.py`
 
 **Common Pattern:**
 - Load from PostgreSQL (5544)
@@ -243,7 +243,7 @@ ensemble_std = sqrt(ensemble_var)
 
 ### What Exists
 
-**File:** `/Users/dro/rice/nfl-analytics/py/models/conformal_prediction_baseline.py` (410 lines)
+**File:** `py/models/conformal_prediction_baseline.py` (410 lines)
 
 **Implementation:**
 - MAPIE SplitConformalRegressor

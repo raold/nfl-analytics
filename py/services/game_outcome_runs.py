@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 settings = get_settings()
 DB_CONFIG = settings.database.psycopg_kwargs()
 TABLE_NAME = settings.game_outcome_table
-DEFAULT_MODEL_DIR = "models/game_outcome_v1"
+DEFAULT_MODEL_DIR = "models/production/game_outcome_v2"
 
 
 def _safe_float(value):
@@ -61,7 +61,7 @@ def _fetch_games(target_season: int) -> pd.DataFrame:
         g.total_close as vegas_total
     FROM public.games g
     WHERE g.season = %s
-        AND g.week <= 18
+        AND g.week <= 22
     ORDER BY g.week, g.kickoff
     """
     with psycopg2.connect(**DB_CONFIG) as conn:

@@ -22,6 +22,9 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -88,7 +91,7 @@ class DataLayerAnalyzer:
     - Dependency graph visualization
     """
 
-    def __init__(self, project_root: str = "/Users/dro/rice/nfl-analytics"):
+    def __init__(self, project_root: str = str(_PROJECT_ROOT)):
         self.project_root = Path(project_root)
         self.logger = logging.getLogger(self.__class__.__name__)
 

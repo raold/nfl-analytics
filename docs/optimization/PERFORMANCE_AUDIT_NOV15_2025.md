@@ -812,13 +812,13 @@ cycle_metrics = {
 ## 13. Files Created
 
 **This Audit:**
-- `/Users/dro/rice/nfl-analytics/docs/optimization/PERFORMANCE_AUDIT_NOV15_2025.md` (this file)
+- `docs/optimization/PERFORMANCE_AUDIT_NOV15_2025.md` (this file)
 
 **Referenced Documentation:**
-- `/Users/dro/rice/nfl-analytics/docs/optimization/PHASE6_PERFORMANCE_CHECKLIST.md` (Nov 14)
-- `/Users/dro/rice/nfl-analytics/docs/DATABASE_OPTIMIZATION_COMPLETE.md` (Nov 13)
-- `/Users/dro/rice/nfl-analytics/CLAUDE.md` (comprehensive project guide)
-- `/Users/dro/rice/nfl-analytics/PROJECT_STATUS.md` (current production status)
+- `docs/optimization/PHASE6_PERFORMANCE_CHECKLIST.md` (Nov 14)
+- `docs/DATABASE_OPTIMIZATION_COMPLETE.md` (Nov 13)
+- `CLAUDE.md` (comprehensive project guide)
+- `PROJECT_STATUS.md` (current production status)
 
 ---
 

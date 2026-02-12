@@ -368,7 +368,7 @@ with psycopg.connect('postgresql://dro:...@localhost:5544/devdb01') as conn:
 
 Make sure you're in project root directory:
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 python -c "from dashboard.queries.predictions import PredictionQueries"
 ```
 

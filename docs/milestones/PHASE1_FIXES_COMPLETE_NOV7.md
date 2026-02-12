@@ -189,7 +189,7 @@ def calculate_edge(self, prediction, line: float, odds: float = -110):
 
 ## Files Modified
 
-### 1. `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
+### 1. `py/models/player_props_ensemble.py`
 
 **Total Changes**: 5 sections modified, 1 new method added
 
@@ -226,7 +226,7 @@ def _apply_temperature_scaling(self, mean, std, model_name):
 
 ## Files Created
 
-### 1. `/Users/dro/rice/nfl-analytics/docs/milestones/BACKTEST_FAILURE_ANALYSIS_NOV7.md`
+### 1. `docs/milestones/BACKTEST_FAILURE_ANALYSIS_NOV7.md`
 
 **Purpose**: Comprehensive root cause analysis of Nov 7 backtest catastrophic failure
 **Size**: 415 lines
@@ -247,7 +247,7 @@ def _apply_temperature_scaling(self, mean, std, model_name):
 
 ---
 
-### 2. `/Users/dro/rice/nfl-analytics/py/backtest/test_ensemble_fixes.py`
+### 2. `py/backtest/test_ensemble_fixes.py`
 
 **Purpose**: Automated validation tests for Phase 1 fixes
 **Size**: 167 lines
@@ -276,7 +276,7 @@ def _apply_temperature_scaling(self, mean, std, model_name):
 
 ---
 
-### 3. `/Users/dro/rice/nfl-analytics/docs/milestones/PHASE1_FIXES_COMPLETE_NOV7.md`
+### 3. `docs/milestones/PHASE1_FIXES_COMPLETE_NOV7.md`
 
 **Purpose**: Phase 1 completion summary (this document)
 **Size**: 300+ lines

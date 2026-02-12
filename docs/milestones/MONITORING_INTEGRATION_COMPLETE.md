@@ -43,7 +43,7 @@ Container 4: alertmanager (optional profile)
 
 ## 🛠️ Files Modified
 
-### 1. `/Users/dro/rice/nfl-analytics/dashboard/Dockerfile` (UPDATED)
+### 1. `dashboard/Dockerfile` (UPDATED)
 **Changes**:
 - Added Prometheus installation (v2.48.0)
 - Added Grafana installation (v10.2.2)
@@ -78,7 +78,7 @@ CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
 
 ---
 
-### 2. `/Users/dro/rice/nfl-analytics/dashboard/supervisor.conf` (CREATED)
+### 2. `dashboard/supervisor.conf` (CREATED)
 **Purpose**: Manages all three services within the container
 
 **Services Configured**:
@@ -123,7 +123,7 @@ user=grafana
 
 ---
 
-### 3. `/Users/dro/rice/nfl-analytics/docker-compose.yml` (UPDATED)
+### 3. `docker-compose.yml` (UPDATED)
 
 #### **Dashboard Service Updated**
 ```yaml

@@ -246,15 +246,15 @@ weights = comparison["weight"]
 ## Files Created (3)
 
 1. **BAYESIAN_STACKING_LITERATURE_REVIEW.md** (8 papers, 35 pages)
-   - `/Users/dro/rice/nfl-analytics/docs/research/BAYESIAN_STACKING_LITERATURE_REVIEW.md`
+   - `docs/research/BAYESIAN_STACKING_LITERATURE_REVIEW.md`
    - Full citations, summaries, relevance, implementation notes
 
 2. **bayesian_stacking_references.bib** (18 BibTeX entries)
-   - `/Users/dro/rice/nfl-analytics/docs/research/bayesian_stacking_references.bib`
+   - `docs/research/bayesian_stacking_references.bib`
    - Ready to merge into dissertation references.bib
 
 3. **STACKING_IMPLEMENTATION_GUIDE.md** (Step-by-step, 25 pages)
-   - `/Users/dro/rice/nfl-analytics/docs/research/STACKING_IMPLEMENTATION_GUIDE.md`
+   - `docs/research/STACKING_IMPLEMENTATION_GUIDE.md`
    - R/Python code examples, troubleshooting, timeline
 
 ---

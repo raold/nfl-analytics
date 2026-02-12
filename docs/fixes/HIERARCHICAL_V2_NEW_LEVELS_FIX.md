@@ -3,7 +3,7 @@
 **Date:** November 10, 2025
 **Issue:** `Levels '00-0033077_2025' of grouping factor 'player_season' cannot be found in the fitted model`
 **Status:** ✅ FIXED
-**Files Modified:** `/Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R`
+**Files Modified:** `R/generate_2025_predictions_all_v2.R`
 
 ---
 
@@ -114,10 +114,10 @@ This is exactly what we want for **true out-of-sample validation**:
 
 ### Test Script
 
-Created `/Users/dro/rice/nfl-analytics/R/test_hierarchical_v2_new_levels.R` to verify the fix:
+Created `R/test_hierarchical_v2_new_levels.R` to verify the fix:
 
 ```bash
-Rscript /Users/dro/rice/nfl-analytics/R/test_hierarchical_v2_new_levels.R
+Rscript R/test_hierarchical_v2_new_levels.R
 ```
 
 **Expected Output:**
@@ -138,7 +138,7 @@ Prediction results:
 To run the complete 2025 holdout validation:
 
 ```bash
-Rscript /Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R
+Rscript R/generate_2025_predictions_all_v2.R
 ```
 
 This will generate predictions for all 148 games across weeks 1-6 of 2025 season.
@@ -148,19 +148,19 @@ This will generate predictions for all 148 games across weeks 1-6 of 2025 season
 ## Related Files
 
 ### Modified
-- `/Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R` - Main prediction script (FIXED)
+- `R/generate_2025_predictions_all_v2.R` - Main prediction script (FIXED)
 
 ### Created
-- `/Users/dro/rice/nfl-analytics/R/test_hierarchical_v2_new_levels.R` - Verification test script
-- `/Users/dro/rice/nfl-analytics/docs/fixes/HIERARCHICAL_V2_NEW_LEVELS_FIX.md` - This document
+- `R/test_hierarchical_v2_new_levels.R` - Verification test script
+- `docs/fixes/HIERARCHICAL_V2_NEW_LEVELS_FIX.md` - This document
 
 ### Training Scripts (Reference, No Changes)
-- `/Users/dro/rice/nfl-analytics/R/train_hierarchical_v2_canonical.R` - Model training (2015-2024)
-- `/Users/dro/rice/nfl-analytics/R/train_informative_priors_v2_canonical.R` - Informative priors training
+- `R/train_hierarchical_v2_canonical.R` - Model training (2015-2024)
+- `R/train_informative_priors_v2_canonical.R` - Informative priors training
 
 ### Models (No Retraining Required)
-- `/Users/dro/rice/nfl-analytics/models/bayesian/passing_yards_hierarchical_v2.rds` - Trained model
-- `/Users/dro/rice/nfl-analytics/models/bayesian/passing_informative_priors_v2.rds` - Informative priors model
+- `models/bayesian/passing_yards_hierarchical_v2.rds` - Trained model
+- `models/bayesian/passing_informative_priors_v2.rds` - Informative priors model
 
 ---
 

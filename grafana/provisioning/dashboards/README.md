@@ -199,7 +199,7 @@ redis_exporter:
 docker compose logs grafana | grep provisioning
 
 # Verify files exist
-ls -l /Users/dro/rice/nfl-analytics/grafana/provisioning/dashboards/
+ls -l grafana/provisioning/dashboards/
 
 # Restart Grafana
 docker compose restart grafana

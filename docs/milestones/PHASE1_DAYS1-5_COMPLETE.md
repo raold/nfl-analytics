@@ -23,7 +23,7 @@ Successfully completed ALL Day 1-5 tasks for Phase 1 (Conformal Prediction) of t
 
 ### Test Suite Created
 
-**File**: `/Users/dro/rice/nfl-analytics/tests/unit/test_bnn_conformal.py`
+**File**: `tests/unit/test_bnn_conformal.py`
 - **Lines**: 920 lines
 - **Tests**: 48 comprehensive tests
 - **Coverage Target**: 80%+
@@ -39,7 +39,7 @@ Successfully completed ALL Day 1-5 tasks for Phase 1 (Conformal Prediction) of t
 
 ### Validation Script Created
 
-**File**: `/Users/dro/rice/nfl-analytics/scripts/validate_conformal_bnn.py`
+**File**: `scripts/validate_conformal_bnn.py`
 - **Lines**: 1,000+ lines
 - **Features**:
   - NFL data loading (2018-2024) with database fallback
@@ -75,7 +75,7 @@ Successfully completed ALL Day 1-5 tasks for Phase 1 (Conformal Prediction) of t
 
 ### Current Status
 
-**Script Ready**: `/Users/dro/rice/nfl-analytics/scripts/validate_conformal_bnn.py`
+**Script Ready**: `scripts/validate_conformal_bnn.py`
 
 **Command to Run**:
 ```bash
@@ -229,7 +229,7 @@ All figures use placeholder data clearly marked with:
 ### Action 1: Run Full Validation (5 minutes)
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 source .venv/bin/activate
 python scripts/validate_conformal_bnn.py --use-rf-fallback
 ```

@@ -16,6 +16,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 # Set publication-quality style
 plt.style.use("seaborn-v0_8-paper")
 sns.set_palette("colorblind")
@@ -30,7 +33,7 @@ plt.rcParams["legend.fontsize"] = 10
 plt.rcParams["figure.dpi"] = 300
 
 # Output directory
-OUT_DIR = Path("/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out")
+OUT_DIR = _PROJECT_ROOT / "analysis/dissertation/figures/out"
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 

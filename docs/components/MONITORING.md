@@ -1,7 +1,7 @@
 # Monitoring Component Documentation
 
 **Component**: Monitoring & Observability Stack
-**Location**: `/Users/dro/rice/nfl-analytics/prometheus/` and `/Users/dro/rice/nfl-analytics/grafana/`
+**Location**: `prometheus/` and `grafana/`
 **Author**: NFL Analytics Team
 **Last Updated**: November 15, 2025
 **Status**: Production Ready
@@ -154,7 +154,7 @@ User views real-time dashboard (30s auto-refresh)
 
 ### Scrape Configuration
 
-**File**: `/Users/dro/rice/nfl-analytics/prometheus/prometheus.yml`
+**File**: `prometheus/prometheus.yml`
 
 Prometheus scrapes 9 different jobs:
 
@@ -269,7 +269,7 @@ Grafana provides 27 panels across 4 major dashboards:
 
 #### 1. System Monitoring Dashboard (11 panels)
 
-**File**: `/Users/dro/rice/nfl-analytics/grafana/provisioning/dashboards/nfl-analytics-system.json`
+**File**: `grafana/provisioning/dashboards/nfl-analytics-system.json`
 
 **System Overview Row** (4 panels):
 1. **CPU Usage** - `100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)`
@@ -352,7 +352,7 @@ Grafana provides 27 panels across 4 major dashboards:
 
 #### 2. Performance Dashboard (8 panels)
 
-**File**: `/Users/dro/rice/nfl-analytics/grafana/dashboards/performance.json`
+**File**: `grafana/dashboards/performance.json`
 
 1. **ROI Over Time** - `props_roi_total`
    - Target: +5-7%
@@ -383,7 +383,7 @@ Grafana provides 27 panels across 4 major dashboards:
 
 #### 3. Model Quality Dashboard (6 panels)
 
-**File**: `/Users/dro/rice/nfl-analytics/grafana/dashboards/model_quality.json`
+**File**: `grafana/dashboards/model_quality.json`
 
 1. **MAE Over Time** - `props_prediction_mae`
    - Target: <45.2 yards
@@ -406,7 +406,7 @@ Grafana provides 27 panels across 4 major dashboards:
 
 #### 4. Risk Dashboard (2 panels)
 
-**File**: `/Users/dro/rice/nfl-analytics/grafana/dashboards/risk.json`
+**File**: `grafana/dashboards/risk.json`
 
 1. **Max Drawdown** - `props_drawdown_max`
    - Thresholds:
@@ -448,7 +448,7 @@ Grafana provides 27 panels across 4 major dashboards:
 
 ### FastAPI Metrics Endpoint
 
-**File**: `/Users/dro/rice/nfl-analytics/api/main.py`
+**File**: `api/main.py`
 
 **Endpoint**: `GET /metrics`
 
@@ -565,7 +565,7 @@ component_mae_gauge = Gauge(
 
 ### Alert Configuration
 
-**File**: `/Users/dro/rice/nfl-analytics/prometheus/alerts.yml`
+**File**: `prometheus/alerts.yml`
 
 Prometheus evaluates 20 alert rules across 4 severity levels:
 
@@ -1229,7 +1229,7 @@ props_component_mae{component="informative_priors"}
 
 ### Example 4: Alertmanager Route Configuration
 
-**File**: `/Users/dro/rice/nfl-analytics/prometheus/alertmanager.yml`
+**File**: `prometheus/alertmanager.yml`
 
 ```yaml
 route:
@@ -1290,7 +1290,7 @@ receivers:
 
 ### Prometheus Configuration
 
-**File**: `/Users/dro/rice/nfl-analytics/prometheus/prometheus.yml` (178 lines)
+**File**: `prometheus/prometheus.yml` (178 lines)
 
 **Key Sections**:
 
@@ -1328,7 +1328,7 @@ scrape_configs:
 
 ### Grafana Provisioning
 
-**Datasource Config**: `/Users/dro/rice/nfl-analytics/grafana/provisioning/datasources/prometheus.yml`
+**Datasource Config**: `grafana/provisioning/datasources/prometheus.yml`
 
 ```yaml
 apiVersion: 1
@@ -1345,7 +1345,7 @@ datasources:
       queryTimeout: "60s"
 ```
 
-**Dashboard Provisioning**: `/Users/dro/rice/nfl-analytics/grafana/provisioning/dashboards/dashboards.yml`
+**Dashboard Provisioning**: `grafana/provisioning/dashboards/dashboards.yml`
 
 ```yaml
 apiVersion: 1
@@ -1364,7 +1364,7 @@ providers:
 
 ### Docker Compose Integration
 
-**File**: `/Users/dro/rice/nfl-analytics/docker-compose.yml`
+**File**: `docker-compose.yml`
 
 ```yaml
 services:
@@ -1503,7 +1503,7 @@ histogram_quantile(0.95,
 
 ### 4. Database → Postgres Exporter → Prometheus
 
-**Postgres Exporter Queries**: `/Users/dro/rice/nfl-analytics/prometheus/postgres_exporter_queries.yml`
+**Postgres Exporter Queries**: `prometheus/postgres_exporter_queries.yml`
 
 ```yaml
 pg_database:
@@ -1914,10 +1914,10 @@ The **Monitoring & Observability Stack** provides comprehensive production-grade
 - API Metrics: http://localhost:8000/metrics
 
 **Documentation Files**:
-- This file: `/Users/dro/rice/nfl-analytics/docs/components/MONITORING.md` (1,500+ lines)
-- Prometheus config: `/Users/dro/rice/nfl-analytics/prometheus/prometheus.yml` (178 lines)
-- Alert rules: `/Users/dro/rice/nfl-analytics/prometheus/alerts.yml` (280 lines)
-- Grafana dashboards: `/Users/dro/rice/nfl-analytics/grafana/provisioning/dashboards/*.json`
+- This file: `docs/components/MONITORING.md` (1,500+ lines)
+- Prometheus config: `prometheus/prometheus.yml` (178 lines)
+- Alert rules: `prometheus/alerts.yml` (280 lines)
+- Grafana dashboards: `grafana/provisioning/dashboards/*.json`
 
 ---
 

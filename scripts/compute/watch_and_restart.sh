@@ -48,7 +48,7 @@ while true; do
     if [ "$UPGRADED1" = false ]; then
         if ! check_pid $PID1; then
             echo "🏁 PID $PID1 completed! Starting with high intensity..."
-            cd /Users/dro/rice/nfl-analytics
+            cd $(cd "$(dirname "")/.." \&\& pwd)
             nohup $CMD1 > compute_high_1.log 2>&1 &
             NEW_PID1=$!
             echo "✅ Started new process PID $NEW_PID1 with HIGH intensity"
@@ -60,7 +60,7 @@ while true; do
     if [ "$UPGRADED2" = false ]; then
         if ! check_pid $PID2; then
             echo "🏁 PID $PID2 completed! Starting with high intensity..."
-            cd /Users/dro/rice/nfl-analytics
+            cd $(cd "$(dirname "")/.." \&\& pwd)
             nohup $CMD2 > compute_high_2.log 2>&1 &
             NEW_PID2=$!
             echo "✅ Started new process PID $NEW_PID2 with HIGH intensity"

@@ -28,7 +28,7 @@ Usage:
     python py/production/props_production_pipeline.py --paper-trade --bankroll 10000
 
 Schedule via cron (daily at 10am):
-    0 10 * * * cd /Users/dro/rice/nfl-analytics && uv run python py/production/props_production_pipeline.py --api-key $ODDS_API_KEY
+    0 10 * * * cd $PROJECT_ROOT && uv run python py/production/props_production_pipeline.py --api-key $ODDS_API_KEY
 """
 
 import argparse

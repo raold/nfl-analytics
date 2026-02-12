@@ -4,7 +4,7 @@
 **Date:** November 21, 2025
 **Duration:** ~2 hours
 **Games Processed:** 680 (2023-2025 regular season)
-**Backtest Script:** `/Users/dro/rice/nfl-analytics/scripts/backtest_game_predictions.py`
+**Backtest Script:** `scripts/backtest_game_predictions.py`
 
 ---
 

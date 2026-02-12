@@ -32,4 +32,4 @@ echo ""
 echo "Installing dissertation dependencies..."
 echo ""
 
-python3 /Users/dro/rice/nfl-analytics/scripts/install_dissertation_deps.py
+python3 $(cd "$(dirname "")/.." \&\& pwd)/scripts/install_dissertation_deps.py

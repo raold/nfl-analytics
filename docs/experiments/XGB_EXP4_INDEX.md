@@ -179,7 +179,7 @@ weight = clip(weight, 0.5, 2.0)
 
 **Command:**
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 python scripts/xgb_exp4_weighting_fixed.py
 ```
 
@@ -260,7 +260,7 @@ A: Only if successful. If MAE < 40.20, integrate into ensemble at 20% weight (no
 ## File Structure
 
 ```
-/Users/dro/rice/nfl-analytics/
+
 ├── scripts/
 │   └── xgb_exp4_weighting_fixed.py          ← Main script
 ├── docs/

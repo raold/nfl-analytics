@@ -10,9 +10,9 @@
 
 **Incident Inventory:** See `INCIDENT_INVENTORY_2025.md` for complete incident catalog (13 total)
 
-**Template:** See `/Users/dro/rice/nfl-analytics/docs/audits/2025_11_comprehensive_audit/03_missing_postmortems.md` (Section: Postmortem Template)
+**Template:** See `docs/audits/2025_11_comprehensive_audit/03_missing_postmortems.md` (Section: Postmortem Template)
 
-**Audit:** See `/Users/dro/rice/nfl-analytics/docs/audits/2025_11_comprehensive_audit/03_missing_postmortems.md` for complete missing postmortems analysis
+**Audit:** See `docs/audits/2025_11_comprehensive_audit/03_missing_postmortems.md` for complete missing postmortems analysis
 
 **Main Collection:** `docs/POSTMORTEMS.md` (consolidated document)
 

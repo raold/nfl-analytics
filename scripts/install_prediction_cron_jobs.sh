@@ -11,7 +11,7 @@
 
 set -e
 
-PROJECT_DIR="/Users/dro/rice/nfl-analytics"
+PROJECT_DIR="$(cd "$(dirname "")/.." \&\& pwd)"
 
 echo "=============================================================================="
 echo "NFL Prediction Generation Cron Job Installation"

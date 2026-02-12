@@ -82,11 +82,11 @@ post_processing:
 | v6 | enhanced_ensemble_v6.py | ❌ DEPRECATED | WRONG (BNN rushing in passing ensemble) |
 
 **FILES ANALYZED:**
-- `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v3.py` (268 lines, stale)
-- `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py` (100 lines, superseded)
-- `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5_canonical.py` (100 lines, 5-way incorrect)
-- `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5_1.py` (749 lines, **PRODUCTION**)
-- `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6.py` (748 lines, **DEPRECATED**)
+- `py/ensemble/enhanced_ensemble_v3.py` (268 lines, stale)
+- `py/ensemble/enhanced_ensemble_v5.py` (100 lines, superseded)
+- `py/ensemble/enhanced_ensemble_v5_canonical.py` (100 lines, 5-way incorrect)
+- `py/ensemble/enhanced_ensemble_v5_1.py` (749 lines, **PRODUCTION**)
+- `py/ensemble/enhanced_ensemble_v6.py` (748 lines, **DEPRECATED**)
 
 **DEPRECATION STATUS:**
 - v6 raises `DeprecationWarning` on import (lines 41-45)
@@ -99,7 +99,7 @@ post_processing:
 
 ### 1.3 Single Source of Truth Established
 
-**Official Registry:** `/Users/dro/rice/nfl-analytics/models/MODEL_REGISTRY.yaml`
+**Official Registry:** `models/MODEL_REGISTRY.yaml`
 
 **Lines 358-403:** Definitive ensemble configuration (v5.1)
 
@@ -211,7 +211,7 @@ yards_mean = exp(log_yards_mean + 0.5 * sigma^2)  # Lognormal correction
 
 **Status:** ✅ PROPERLY INTEGRATED
 
-**Scaler File:** `/Users/dro/rice/nfl-analytics/models/calibration/temperature_scaler_4way.pkl`
+**Scaler File:** `models/calibration/temperature_scaler_4way.pkl`
 **Temperature:** T = 0.5534
 **Target Coverage:** 90%
 **Method:** Brent's method (root-finding)
@@ -296,7 +296,7 @@ ensemble_var = within_var + between_var
 4. ❌ Model version mismatch detection
 5. ❌ Convergence metric validation (Rhat, ESS from model metadata)
 
-**RECOMMENDATION:** Add `EnsembleHealthMonitor` integration (file exists at `/Users/dro/rice/nfl-analytics/py/utils/ensemble_health_monitor.py`, 850 lines)
+**RECOMMENDATION:** Add `EnsembleHealthMonitor` integration (file exists at `py/utils/ensemble_health_monitor.py`, 850 lines)
 
 ### 4.2 Monitoring and Alerting
 

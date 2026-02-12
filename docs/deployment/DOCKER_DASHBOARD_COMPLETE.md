@@ -288,7 +288,7 @@ tail -f /tmp/state_space_correctly_fixed_backtest_2022_2025.log
 
 ### Start All Services
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 docker compose up -d
 ```
 

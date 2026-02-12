@@ -180,22 +180,13 @@ safe_db_operation(
 
         total_predictions_deleted <- 0
         for (table in predictions_tables) {
-          deleted <- tryCatch(
-            {
-              dbExecute(conn, sprintf("DELETE FROM %s WHERE game_id LIKE '%d_%%'", table, CURRENT_SEASON))
-            },
-            error = function(e) {
-              log_message(sprintf("%s table not found, skipping", table), level = "INFO")
-              0
-            }
-          )
-          if (deleted > 0) {
-            log_message(sprintf(
-              "Deleted %d rows from %s for season %d",
-              deleted, table, CURRENT_SEASON
-            ), level = "INFO")
-            total_predictions_deleted <- total_predictions_deleted + deleted
-          }
+          # Use server-side exception handling to avoid poisoning the transaction
+          # when a table doesn't exist (R tryCatch doesn't fix PG transaction state)
+          result <- dbGetQuery(conn, sprintf(
+            "DO $$ BEGIN EXECUTE format('DELETE FROM %s WHERE game_id LIKE ''%d_%%%%'''); EXCEPTION WHEN undefined_table THEN NULL; END $$;",
+            table, CURRENT_SEASON
+          ))
+          log_message(sprintf("Cleaned %s for season %d (if exists)", table, CURRENT_SEASON), level = "INFO")
         }
 
         # Delete plays
@@ -622,9 +613,22 @@ safe_db_operation(
           batch_size <- 10000
           total_rows <- nrow(plays_data)
 
+          # Get DB column names to filter dataframe columns
+          db_cols <- dbGetQuery(conn,
+            "SELECT column_name FROM information_schema.columns WHERE table_name = 'plays' AND table_schema = 'public'"
+          )$column_name
+          insert_cols <- intersect(names(plays_data), db_cols)
+          skipped_cols <- setdiff(names(plays_data), db_cols)
+          if (length(skipped_cols) > 0) {
+            log_message(sprintf(
+              "Skipping %d columns not in DB schema: %s",
+              length(skipped_cols), paste(head(skipped_cols, 10), collapse = ", ")
+            ), level = "WARNING")
+          }
+
           for (i in seq(1, total_rows, by = batch_size)) {
             end_idx <- min(i + batch_size - 1, total_rows)
-            batch <- plays_data[i:end_idx, ]
+            batch <- plays_data[i:end_idx, insert_cols]
 
             dbWriteTable(conn, "plays", batch, append = TRUE, row.names = FALSE)
             log_message(

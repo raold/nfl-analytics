@@ -1,6 +1,6 @@
 # Model Registry CLI - Quick Reference Card
 
-**Location:** `/Users/dro/rice/nfl-analytics/py/utils/query_model_registry.py`
+**Location:** `py/utils/query_model_registry.py`
 
 ## Installation
 
@@ -111,4 +111,4 @@ Modify in script if needed (lines 40-46).
 
 ## Full Documentation
 
-See: `/Users/dro/rice/nfl-analytics/py/utils/README_MODEL_REGISTRY_CLI.md`
+See: `py/utils/README_MODEL_REGISTRY_CLI.md`

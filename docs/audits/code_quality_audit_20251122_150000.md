@@ -943,14 +943,14 @@ logger.error(f"Failed: {e}", exc_info=True)
 
 **Top 10 Files Needing Attention:**
 
-1. `/Users/dro/rice/nfl-analytics/dashboard/app.py` (2,216 lines, complexity 28)
-2. `/Users/dro/rice/nfl-analytics/py/api/main.py` (1,184 lines, hardcoded credentials)
-3. `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_production.py` (844 lines, production critical)
-4. `/Users/dro/rice/nfl-analytics/py/ensemble/r_prediction_lookup.py` (645 lines, hardcoded config)
-5. `/Users/dro/rice/nfl-analytics/py/models/train_bnn_receiving.py` (426 lines, magic numbers)
-6. `/Users/dro/rice/nfl-analytics/dashboard/constants.py` (needs adoption across codebase)
-7. `/Users/dro/rice/nfl-analytics/py/utils/database_pool.py` (needs adoption across codebase)
-8. `/Users/dro/rice/nfl-analytics/tests/` (3,200 TODO stubs)
+1. `dashboard/app.py` (2,216 lines, complexity 28)
+2. `py/api/main.py` (1,184 lines, hardcoded credentials)
+3. `py/ensemble/enhanced_ensemble_v6_production.py` (844 lines, production critical)
+4. `py/ensemble/r_prediction_lookup.py` (645 lines, hardcoded config)
+5. `py/models/train_bnn_receiving.py` (426 lines, magic numbers)
+6. `dashboard/constants.py` (needs adoption across codebase)
+7. `py/utils/database_pool.py` (needs adoption across codebase)
+8. `tests/` (3,200 TODO stubs)
 
 ---
 

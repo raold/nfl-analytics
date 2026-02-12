@@ -336,27 +336,27 @@ tail -f /tmp/ensemble_v6_backtest.log  # Monitor
 ### Key Documents
 
 #### Project Overview
-- [README.md](/Users/dro/rice/nfl-analytics/README.md) - Quick start guide
-- [CLAUDE.md](/Users/dro/rice/nfl-analytics/CLAUDE.md) - Comprehensive project guide
-- [FILE_ORGANIZATION.md](/Users/dro/rice/nfl-analytics/FILE_ORGANIZATION.md) - File placement rules
+- [README.md](README.md) - Quick start guide
+- [CLAUDE.md](CLAUDE.md) - Comprehensive project guide
+- [FILE_ORGANIZATION.md](FILE_ORGANIZATION.md) - File placement rules
 
 #### Session Documentation
-- [SESSION_NOV15_PRODUCTION_DEPLOYMENT_COMPLETE.md](/Users/dro/rice/nfl-analytics/docs/archive/2025_nov/SESSION_NOV15_PRODUCTION_DEPLOYMENT_COMPLETE.md) - Latest 6-hour session (Nov 15)
-- [SESSION_NOV14_GOOGLE_DRIVE_REMOVAL.md](/Users/dro/rice/nfl-analytics/docs/archive/2025_nov/SESSION_NOV14_GOOGLE_DRIVE_REMOVAL.md) - Infrastructure cleanup (Nov 14)
+- [SESSION_NOV15_PRODUCTION_DEPLOYMENT_COMPLETE.md](docs/archive/2025_nov/SESSION_NOV15_PRODUCTION_DEPLOYMENT_COMPLETE.md) - Latest 6-hour session (Nov 15)
+- [SESSION_NOV14_GOOGLE_DRIVE_REMOVAL.md](docs/archive/2025_nov/SESSION_NOV14_GOOGLE_DRIVE_REMOVAL.md) - Infrastructure cleanup (Nov 14)
 
 #### Technical Guides
-- [DATABASE_QUICK_REFERENCE.md](/Users/dro/rice/nfl-analytics/docs/database/DATABASE_QUICK_REFERENCE.md) - Schema guide (257 columns)
-- [SQL_PATTERNS.md](/Users/dro/rice/nfl-analytics/docs/database/SQL_PATTERNS.md) - Query patterns + examples
-- [GIT_LFS_WORKFLOW.md](/Users/dro/rice/nfl-analytics/docs/guides/GIT_LFS_WORKFLOW.md) - Model sync across machines
+- [DATABASE_QUICK_REFERENCE.md](docs/database/DATABASE_QUICK_REFERENCE.md) - Schema guide (257 columns)
+- [SQL_PATTERNS.md](docs/database/SQL_PATTERNS.md) - Query patterns + examples
+- [GIT_LFS_WORKFLOW.md](docs/guides/GIT_LFS_WORKFLOW.md) - Model sync across machines
 
 #### Model Documentation
-- [XGBOOST_V4_PRODUCTION_APPROVAL_NOV15.md](/Users/dro/rice/nfl-analytics/docs/milestones/XGBOOST_V4_PRODUCTION_APPROVAL_NOV15.md) - XGBoost v4 validation
-- [R_MODEL_INTEGRATION_COMPLETE.md](/Users/dro/rice/nfl-analytics/docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md) - R integration guide
-- [ENSEMBLE_V6_BACKTEST_GUIDE.md](/Users/dro/rice/nfl-analytics/docs/ENSEMBLE_V6_BACKTEST_GUIDE.md) - Backtest validation protocol
+- [XGBOOST_V4_PRODUCTION_APPROVAL_NOV15.md](docs/milestones/XGBOOST_V4_PRODUCTION_APPROVAL_NOV15.md) - XGBoost v4 validation
+- [R_MODEL_INTEGRATION_COMPLETE.md](docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md) - R integration guide
+- [ENSEMBLE_V6_BACKTEST_GUIDE.md](docs/ENSEMBLE_V6_BACKTEST_GUIDE.md) - Backtest validation protocol
 
 #### Deployment Documentation
-- [DEPLOYMENT_LOG_NOV15.md](/Users/dro/rice/nfl-analytics/docs/deployment/DEPLOYMENT_LOG_NOV15.md) - Infrastructure deployment log
-- [ENSEMBLE_V6_BACKTEST_QUICK_START.txt](/Users/dro/rice/nfl-analytics/ENSEMBLE_V6_BACKTEST_QUICK_START.txt) - 2-minute quick start
+- [DEPLOYMENT_LOG_NOV15.md](docs/deployment/DEPLOYMENT_LOG_NOV15.md) - Infrastructure deployment log
+- [ENSEMBLE_V6_BACKTEST_QUICK_START.txt](ENSEMBLE_V6_BACKTEST_QUICK_START.txt) - 2-minute quick start
 
 **Total Documentation Files:** 397+ (organized in `docs/` subdirectories)
 
@@ -463,10 +463,10 @@ psql postgresql://dro:sicillionbillions@localhost:5544/devdb01
   - NFL Predictions Monitoring (11 panels)
 
 ### Critical Files
-- Ensemble: `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_production.py`
-- Backtest: `/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_v6.py`
-- Config: `/Users/dro/rice/nfl-analytics/models/MODEL_REGISTRY.yaml`
-- Database: `/Users/dro/rice/nfl-analytics/docs/database/DATABASE_QUICK_REFERENCE.md`
+- Ensemble: `py/ensemble/enhanced_ensemble_v6_production.py`
+- Backtest: `py/backtest/historical_validation_v6.py`
+- Config: `models/MODEL_REGISTRY.yaml`
+- Database: `docs/database/DATABASE_QUICK_REFERENCE.md`
 
 ---
 

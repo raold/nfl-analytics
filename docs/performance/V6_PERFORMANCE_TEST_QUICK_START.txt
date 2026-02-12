@@ -16,7 +16,7 @@ Speedup:         2.6x
 
 RUN TEST:
 ---------
-cd /Users/dro/rice/nfl-analytics
+cd \
 python scripts/test_v6_performance_improvements.py
 
 PREREQUISITES:

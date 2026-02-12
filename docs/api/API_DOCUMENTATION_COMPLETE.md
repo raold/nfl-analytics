@@ -422,7 +422,7 @@ To update documentation:
 - **OpenAPI Spec:** `http://localhost:8000/openapi.json`
 - **Swagger UI:** `http://localhost:8000/docs`
 - **ReDoc:** `http://localhost:8000/redoc`
-- **Project CLAUDE.md:** `/Users/dro/rice/nfl-analytics/CLAUDE.md`
+- **Project CLAUDE.md:** `CLAUDE.md`
 
 ---
 

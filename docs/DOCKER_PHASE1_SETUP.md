@@ -307,7 +307,7 @@ docker network ls | grep nfl-analytics
 
 **Option A: Start all services (except optional profiles)**
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 docker compose up -d
 ```
 

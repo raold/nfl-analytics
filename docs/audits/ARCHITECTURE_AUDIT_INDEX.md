@@ -11,7 +11,7 @@
 ## Document Summary
 
 ### 1. Executive Summary (START HERE)
-**File:** `/Users/dro/rice/nfl-analytics/ARCHITECTURE_AUDIT_SUMMARY.md`
+**File:** `ARCHITECTURE_AUDIT_SUMMARY.md`
 **Length:** 1,500 lines
 **Read Time:** 15-20 minutes
 **Purpose:** High-level overview, quick reference
@@ -33,7 +33,7 @@
 ---
 
 ### 2. Comprehensive Audit Report (DETAILED ANALYSIS)
-**File:** `/Users/dro/rice/nfl-analytics/docs/C4_MODEL_ARCHITECTURE_AUDIT_NOV15.md`
+**File:** `docs/C4_MODEL_ARCHITECTURE_AUDIT_NOV15.md`
 **Length:** 6,200+ lines
 **Read Time:** 2-3 hours (or skip to sections)
 **Purpose:** Complete architecture analysis with findings
@@ -90,7 +90,7 @@
 ---
 
 ### 3. Implementation Guide (HOW-TO)
-**File:** `/Users/dro/rice/nfl-analytics/docs/C4_DIAGRAMS_IMPLEMENTATION_GUIDE.md`
+**File:** `docs/C4_DIAGRAMS_IMPLEMENTATION_GUIDE.md`
 **Length:** 3,500+ lines
 **Read Time:** 1-2 hours (reference while implementing)
 **Purpose:** Step-by-step instructions with code templates
@@ -151,7 +151,7 @@
 ---
 
 ### 4. Complete Deliverables Document (OVERVIEW)
-**File:** `/Users/dro/rice/nfl-analytics/ARCHITECTURE_AUDIT_DELIVERABLES.md`
+**File:** `ARCHITECTURE_AUDIT_DELIVERABLES.md`
 **Length:** 2,500+ lines
 **Read Time:** 30-40 minutes
 **Purpose:** Consolidated view of all deliverables

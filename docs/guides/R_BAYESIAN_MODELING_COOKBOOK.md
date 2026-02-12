@@ -1980,23 +1980,23 @@ See `docs/guides/R_MODEL_INTERFACE_GUIDE.md` for complete Python ↔ R integrati
 ### Project-Specific Documentation
 
 **Architecture:**
-- [CLAUDE.md](/Users/dro/rice/nfl-analytics/CLAUDE.md) - Complete project documentation
-- [docs/ARCHITECTURE_REFERENCE.md](/Users/dro/rice/nfl-analytics/docs/ARCHITECTURE_REFERENCE.md) - Architecture deep dive
-- [docs/COMPONENT_DEEP_DIVES.md](/Users/dro/rice/nfl-analytics/docs/COMPONENT_DEEP_DIVES.md) - Component details
+- [CLAUDE.md](CLAUDE.md) - Complete project documentation
+- [docs/ARCHITECTURE_REFERENCE.md](docs/ARCHITECTURE_REFERENCE.md) - Architecture deep dive
+- [docs/COMPONENT_DEEP_DIVES.md](docs/COMPONENT_DEEP_DIVES.md) - Component details
 
 **Database:**
-- [docs/database/DATABASE_QUICK_REFERENCE.md](/Users/dro/rice/nfl-analytics/docs/database/DATABASE_QUICK_REFERENCE.md) - Schema reference
-- [docs/database/SQL_PATTERNS.md](/Users/dro/rice/nfl-analytics/docs/database/SQL_PATTERNS.md) - Common query patterns
+- [docs/database/DATABASE_QUICK_REFERENCE.md](docs/database/DATABASE_QUICK_REFERENCE.md) - Schema reference
+- [docs/database/SQL_PATTERNS.md](docs/database/SQL_PATTERNS.md) - Common query patterns
 
 **Guides:**
-- [docs/guides/R_MODEL_INTERFACE_GUIDE.md](/Users/dro/rice/nfl-analytics/docs/guides/R_MODEL_INTERFACE_GUIDE.md) - Python ↔ R integration
-- [docs/guides/GIT_LFS_WORKFLOW.md](/Users/dro/rice/nfl-analytics/docs/guides/GIT_LFS_WORKFLOW.md) - Large model file management
-- [docs/guides/PRODUCTION_DEPLOYMENT.md](/Users/dro/rice/nfl-analytics/docs/guides/PRODUCTION_DEPLOYMENT.md) - Deployment checklist
+- [docs/guides/R_MODEL_INTERFACE_GUIDE.md](docs/guides/R_MODEL_INTERFACE_GUIDE.md) - Python ↔ R integration
+- [docs/guides/GIT_LFS_WORKFLOW.md](docs/guides/GIT_LFS_WORKFLOW.md) - Large model file management
+- [docs/guides/PRODUCTION_DEPLOYMENT.md](docs/guides/PRODUCTION_DEPLOYMENT.md) - Deployment checklist
 
 **Milestones:**
-- [docs/archive/2025_nov/STATE_SPACE_VALIDATION_REPORT.md](/Users/dro/rice/nfl-analytics/docs/archive/2025_nov/STATE_SPACE_VALIDATION_REPORT.md) - State-Space v2 validation
-- [docs/milestones/HIERARCHICAL_V2_VERIFICATION_COMPLETE.md](/Users/dro/rice/nfl-analytics/docs/milestones/HIERARCHICAL_V2_VERIFICATION_COMPLETE.md) - Hierarchical v2 verification
-- [docs/ADVANCED_BAYESIAN_V3.md](/Users/dro/rice/nfl-analytics/docs/ADVANCED_BAYESIAN_V3.md) - Advanced Bayesian enhancements
+- [docs/archive/2025_nov/STATE_SPACE_VALIDATION_REPORT.md](docs/archive/2025_nov/STATE_SPACE_VALIDATION_REPORT.md) - State-Space v2 validation
+- [docs/milestones/HIERARCHICAL_V2_VERIFICATION_COMPLETE.md](docs/milestones/HIERARCHICAL_V2_VERIFICATION_COMPLETE.md) - Hierarchical v2 verification
+- [docs/ADVANCED_BAYESIAN_V3.md](docs/ADVANCED_BAYESIAN_V3.md) - Advanced Bayesian enhancements
 
 ### Community Resources
 
@@ -2075,4 +2075,4 @@ See `R/train_hierarchical_v2_production.R` for complete production script (241 l
 **Version:** 1.0
 **Last Updated:** November 16, 2025
 **Maintainer:** Claude Code (Sonnet 4.5)
-**Questions?** See [docs/guides/TROUBLESHOOTING_MASTER.md](/Users/dro/rice/nfl-analytics/docs/guides/TROUBLESHOOTING_MASTER.md)
+**Questions?** See [docs/guides/TROUBLESHOOTING_MASTER.md](docs/guides/TROUBLESHOOTING_MASTER.md)

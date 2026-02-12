@@ -74,7 +74,7 @@ The data layer demonstrates **strong fundamentals** with excellent temporal safe
   - `026_paper_trading_schema.sql`
   - `026_pinnacle_exchange_fields.sql`
 - **Impact:** Unclear execution order, potential conflicts
-- **Files:** `/Users/dro/rice/nfl-analytics/db/migrations/026_*.sql`
+- **Files:** `db/migrations/026_*.sql`
 - **Risk:** Low (all use `IF NOT EXISTS`, no conflicts detected)
 - **Fix:** Rename to 026a, 026b, 026c, 026d or use semantic versioning
 
@@ -94,7 +94,7 @@ The data layer demonstrates **strong fundamentals** with excellent temporal safe
 ✅ **EXCELLENT ADHERENCE:**
 - **Naming:** Uses `kickoff` (not `game_date`), `spread_close` (not `spread_line`)
 - **Team Codes:** Properly uses LAR/LAC (not LA)
-- **Documented:** `/Users/dro/rice/nfl-analytics/docs/database/DATABASE_QUICK_REFERENCE.md:76-83`
+- **Documented:** `docs/database/DATABASE_QUICK_REFERENCE.md:76-83`
 - **Automated Validation:** SQL validator catches naming errors (see SQL_ERROR_PREVENTION_SUMMARY.md)
 
 **Validation Test:**
@@ -227,7 +227,7 @@ WHERE pgs.season BETWEEN 2015 AND 2024
 
 ✅ **PROPERLY IMPLEMENTED (Nov 8, 2025):**
 
-**Migration:** `/Users/dro/rice/nfl-analytics/db/migrations/026_canonical_training_window.sql`
+**Migration:** `db/migrations/026_canonical_training_window.sql`
 
 **Canonical Window v1:**
 - **Core Years:** 2018-2024 (full weight)
@@ -298,7 +298,7 @@ def merge_predictions_features(predictions, features):
 
 **P1: No Error Handling in Repository Pattern**
 
-**File:** `/Users/dro/rice/nfl-analytics/py/data/repository/feature_repository.py:82-98`
+**File:** `py/data/repository/feature_repository.py:82-98`
 ```python
 def refresh_materialized_views(self) -> None:
     """Refresh all feature materialized views."""
@@ -410,7 +410,7 @@ LIMIT 20;
 
 ✅ **EXCELLENT: Phase 6 Performance Indexes**
 
-**File:** `/Users/dro/rice/nfl-analytics/db/performance_indexes_phase6.sql`
+**File:** `db/performance_indexes_phase6.sql`
 
 **Indexes Created (Nov 14, 2025):**
 1. `idx_player_game_stats_passing_filter` - 3-5x speedup on QB data loading
@@ -593,7 +593,7 @@ POSTGRES_CONNECTION_STRING=postgresql://dro:${DB_PASSWORD}@localhost:5544/devdb0
 ✅ **GOOD: Automated Data Quality Checks**
 
 **SQL Validator (Created Nov 14, 2025):**
-- **File:** `/Users/dro/rice/nfl-analytics/py/utils/sql_validator.py` (430 lines)
+- **File:** `py/utils/sql_validator.py` (430 lines)
 - **Purpose:** Catch schema errors before runtime
 - **Test Results:** 5/5 passing (100%)
 - **Detection Rate:** 100% (game_id, game_date, spread_line errors)

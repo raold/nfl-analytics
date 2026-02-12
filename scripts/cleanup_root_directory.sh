@@ -14,7 +14,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Project root
-PROJECT_ROOT="/Users/dro/rice/nfl-analytics"
+PROJECT_ROOT="$(cd "$(dirname "")/.." \&\& pwd)"
 cd "$PROJECT_ROOT"
 
 # Dry run by default (set to false to actually move files)

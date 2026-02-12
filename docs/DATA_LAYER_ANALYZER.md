@@ -354,7 +354,7 @@ Clear cached lineage data. Forces re-scan on next command.
 from py.utils.data_layer_analyzer import DataLayerAnalyzer
 
 # Initialize analyzer
-analyzer = DataLayerAnalyzer(project_root="/Users/dro/rice/nfl-analytics")
+analyzer = DataLayerAnalyzer(project_root="\")
 
 # Scan codebase
 analyzer.scan_codebase()
@@ -686,7 +686,7 @@ git commit -m "Remove spread_close column"
 
 ```bash
 # Add to cron or daily workflow
-0 2 * * * cd /Users/dro/rice/nfl-analytics && ./scripts/analyze_data_layer.sh scan
+0 2 * * * cd \ && ./scripts/analyze_data_layer.sh scan
 ```
 
 Cache stays fresh, lineage always up-to-date.

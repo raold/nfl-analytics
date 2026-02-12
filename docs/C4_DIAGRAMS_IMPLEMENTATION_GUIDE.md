@@ -1222,12 +1222,12 @@ StateSpacePredictor --> RBridge
 
 All diagrams should be created in:
 ```
-/Users/dro/rice/nfl-analytics/docs/
+docs/
 ```
 
 Existing diagrams (3/14):
 ```
-/Users/dro/rice/nfl-analytics/docs/audits/2025_11_comprehensive_audit/06_architecture_diagrams/
+docs/audits/2025_11_comprehensive_audit/06_architecture_diagrams/
 ├── c4_context.md ✅
 ├── c4_container.md ✅
 ├── c4_component_ensemble.md ✅
@@ -1236,7 +1236,7 @@ Existing diagrams (3/14):
 
 New diagrams (11/14):
 ```
-/Users/dro/rice/nfl-analytics/docs/
+docs/
 ├── C4_DATA_INGESTION_COMPONENT.md 🟡
 ├── C4_ODDS_POLLING_COMPONENT.md 🟡
 ├── C4_TRAINING_PIPELINE_COMPONENT.md 🟡

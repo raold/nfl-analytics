@@ -9,7 +9,7 @@
 
 Replace equal weighting with Sharpe ratio weighting in 1 file, 10 lines of code.
 
-**File**: `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
+**File**: `py/models/player_props_ensemble.py`
 **Location**: Lines 926-935 (ensemble combination logic)
 
 ---

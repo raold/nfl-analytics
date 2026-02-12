@@ -55,7 +55,7 @@ This document tracks significant errors, their root causes, and lessons learned.
 
 ### Full Postmortem
 
-See: `/Users/dro/rice/nfl-analytics/docs/postmortems/ENSEMBLE_V7_VALIDATION_FAILURE_NOV18.md` (14,000+ lines)
+See: `docs/postmortems/ENSEMBLE_V7_VALIDATION_FAILURE_NOV18.md` (14,000+ lines)
 
 **Status**: ✅ CLOSED - v7.0 terminated, v6.0 approved for production
 
@@ -416,7 +416,7 @@ mu_league <- mean(fit_ss[, "mu_league"])  # ❌ Dimension error
 
 ### Root Cause
 
-**File:** `/Users/dro/rice/nfl-analytics/R/generate_2025_predictions_all_v2.R`
+**File:** `R/generate_2025_predictions_all_v2.R`
 **Lines:** 200-206 (broken), replaced with 200-216 (fixed)
 
 ```r

@@ -68,24 +68,9 @@ repos:
   #     - id: sqlfluff-fix
   #       files: ^db/.*\.sql$
 
-  # Data Layer Analyzer - Column lineage and impact analysis
+  # Local hooks for project-specific validation
   - repo: local
     hooks:
-      - id: validate-schema-changes
-        name: Data Layer Impact Analysis
-        entry: ./scripts/analyze_data_layer.sh validate
-        language: system
-        files: ^db/migrations/.*\.sql$
-        pass_filenames: true
-        description: Validate database migrations for breaking changes
-
-      - id: check-file-organization
-        name: File Organization Check
-        entry: python3 scripts/check_file_organization.py
-        language: system
-        files: ^\./[^/]+\.(md|txt)$
-        description: Prevent documentation files in root directory
-
       - id: check-hardcoded-dates
         name: Detect hardcoded temporal values
         entry: bash -c 'grep -Hn -E "(season|year)\s*[=<-]\s*20[0-9]{2}" "$@" || exit 0' --
@@ -93,14 +78,6 @@ repos:
         files: \.(py|R)$
         exclude: ^(tests/|examples/|docs/)
         description: Detect hardcoded season/year values
-
-      - id: check-brms-predictions
-        name: Validate brms posterior_predict calls
-        entry: python scripts/check_brms_predictions.py
-        language: system
-        files: \.R$
-        exclude: ^(tests/|examples/)
-        description: Ensure posterior_predict has sample_new_levels parameter
 
       - id: check-convergence-template
         name: Check MCMC convergence checks present

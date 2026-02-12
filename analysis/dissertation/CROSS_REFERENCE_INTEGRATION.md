@@ -518,7 +518,7 @@ The model specifications documented here reflect lessons from 13-month architect
 ### Compilation Commands:
 
 ```bash
-cd /Users/dro/rice/nfl-analytics/analysis/dissertation/main
+cd analysis/dissertation/main
 
 # First pass (generates .aux files with labels)
 pdflatex main.tex

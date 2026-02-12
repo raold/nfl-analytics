@@ -276,7 +276,7 @@ Documentation Health Score: 95/100
 ## Related Documentation
 
 ### FILE_ORGANIZATION.md
-**Location:** `/Users/dro/rice/nfl-analytics/FILE_ORGANIZATION.md`
+**Location:** `FILE_ORGANIZATION.md`
 **Purpose:** Canonical rules for file placement
 **Last Updated:** November 15, 2025
 
@@ -289,7 +289,7 @@ Documentation Health Score: 95/100
 ---
 
 ### DOCUMENTATION_INDEX.md
-**Location:** `/Users/dro/rice/nfl-analytics/DOCUMENTATION_INDEX.md`
+**Location:** `DOCUMENTATION_INDEX.md`
 **Purpose:** Canonical navigation index
 **Last Updated:** November 15, 2025
 **Status:** 🟡 NEEDS UPDATE (40+ orphaned files)
@@ -303,7 +303,7 @@ Documentation Health Score: 95/100
 ---
 
 ### CLAUDE.md
-**Location:** `/Users/dro/rice/nfl-analytics/CLAUDE.md`
+**Location:** `CLAUDE.md`
 **Purpose:** AI assistant project instructions
 **Last Updated:** November 9, 2025
 **Status:** 🟡 NEEDS UPDATE (references need validation)

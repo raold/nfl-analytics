@@ -16,7 +16,7 @@ Workflow:
 
 Expected Runtime: 2-3 minutes
 Schedule: Cron job every Monday 6:00 AM ET
-Cron Entry: 0 6 * * 1 cd /Users/dro/rice/nfl-analytics && python scripts/weekly_wls_reoptimization.py
+Cron Entry: 0 6 * * 1 cd $PROJECT_ROOT && python scripts/weekly_wls_reoptimization.py
 
 Author: Enhanced Ensemble v7.0
 Date: November 16, 2025

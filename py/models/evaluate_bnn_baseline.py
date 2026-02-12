@@ -7,12 +7,12 @@ calibration metrics. This establishes the baseline for Phase 1 experiments.
 """
 
 import sys
-
-sys.path.append("/Users/dro/rice/nfl-analytics")
-
-import pickle
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+sys.path.insert(0, str(_PROJECT_ROOT))
+
+import pickle
 import numpy as np
 
 from py.models.calibration_test_harness import CalibrationEvaluator, ExperimentLogger

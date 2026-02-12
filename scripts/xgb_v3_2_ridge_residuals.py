@@ -23,6 +23,10 @@ import pandas as pd
 import xgboost as xgb
 from sklearn.linear_model import RidgeCV
 from sqlalchemy import create_engine
+from pathlib import Path
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
 # Database connection
 DB_URI = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
@@ -283,10 +287,10 @@ def main():
     # Save model if successful
     if mae < 40.20:
         model.save_model(
-            "/Users/dro/rice/nfl-analytics/models/xgboost/xgb_v3_2_ridge_residuals.json"
+            str(_PROJECT_ROOT / "models/xgboost/xgb_v3_2_ridge_residuals.json")
         )
         importance_df.to_csv(
-            "/Users/dro/rice/nfl-analytics/models/xgboost/xgb_v3_2_ridge_residuals_importance.csv",
+            str(_PROJECT_ROOT / "models/xgboost/xgb_v3_2_ridge_residuals_importance.csv"),
             index=False,
         )
         print("✓ Model saved to models/xgboost/xgb_v3_2_ridge_residuals.json\n")

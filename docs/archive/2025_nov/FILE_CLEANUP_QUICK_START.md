@@ -31,7 +31,7 @@ Automated cleanup script that moves files to proper locations:
 ### Option 1: Preview Changes (Dry Run)
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 chmod +x scripts/cleanup_root_directory.sh
 ./scripts/cleanup_root_directory.sh
 ```
@@ -41,7 +41,7 @@ chmod +x scripts/cleanup_root_directory.sh
 ### Option 2: Execute Cleanup
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 ./scripts/cleanup_root_directory.sh --execute
 ```
 

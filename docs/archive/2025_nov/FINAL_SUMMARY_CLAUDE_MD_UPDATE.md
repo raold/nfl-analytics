@@ -28,7 +28,7 @@ The 5-way ensemble historical validation backtest (2022-2025 Week 10, 2,120 bets
 
 ### 1. **CLAUDE_MD_UPDATE_EXECUTIVE_SUMMARY.md**
 
-Location: `/Users/dro/rice/nfl-analytics/CLAUDE_MD_UPDATE_EXECUTIVE_SUMMARY.md`
+Location: `CLAUDE_MD_UPDATE_EXECUTIVE_SUMMARY.md`
 
 **Purpose:** High-level overview for decision makers
 - What happened
@@ -45,7 +45,7 @@ Location: `/Users/dro/rice/nfl-analytics/CLAUDE_MD_UPDATE_EXECUTIVE_SUMMARY.md`
 
 ### 2. **CLAUDE_MD_EXACT_TEXT_CHANGES.md**
 
-Location: `/Users/dro/rice/nfl-analytics/CLAUDE_MD_EXACT_TEXT_CHANGES.md`
+Location: `CLAUDE_MD_EXACT_TEXT_CHANGES.md`
 
 **Purpose:** Line-by-line implementation guide
 - Current text to replace (verbatim)
@@ -63,7 +63,7 @@ Location: `/Users/dro/rice/nfl-analytics/CLAUDE_MD_EXACT_TEXT_CHANGES.md`
 
 ### 3. **CLAUDE_MD_UPDATE_PLAN_NOV7.md**
 
-Location: `/Users/dro/rice/nfl-analytics/CLAUDE_MD_UPDATE_PLAN_NOV7.md`
+Location: `CLAUDE_MD_UPDATE_PLAN_NOV7.md`
 
 **Purpose:** Detailed specification of required changes
 - Each section needing updates
@@ -80,7 +80,7 @@ Location: `/Users/dro/rice/nfl-analytics/CLAUDE_MD_UPDATE_PLAN_NOV7.md`
 
 ### 4. **CLAUDE_MD_ANALYSIS_NOV7.md**
 
-Location: `/Users/dro/rice/nfl-analytics/CLAUDE_MD_ANALYSIS_NOV7.md`
+Location: `CLAUDE_MD_ANALYSIS_NOV7.md`
 
 **Purpose:** Comprehensive technical analysis
 - Why updates are critical
@@ -100,7 +100,7 @@ Location: `/Users/dro/rice/nfl-analytics/CLAUDE_MD_ANALYSIS_NOV7.md`
 
 ### 5. **CLAUDE_MD_UPDATE_INDEX.md**
 
-Location: `/Users/dro/rice/nfl-analytics/CLAUDE_MD_UPDATE_INDEX.md`
+Location: `CLAUDE_MD_UPDATE_INDEX.md`
 
 **Purpose:** Navigation and coordination guide
 - Quick start guides for different users
@@ -199,7 +199,7 @@ Location: `/Users/dro/rice/nfl-analytics/CLAUDE_MD_UPDATE_INDEX.md`
 
 ## Key Metrics (All Verified)
 
-From: `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_2022_2025_metrics.json`
+From: `analysis/results/historical_validation_5way_2022_2025_metrics.json`
 
 ```json
 {
@@ -280,7 +280,7 @@ From: `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way
 
 ### For Implementers (20 minutes)
 1. Read: `CLAUDE_MD_EXACT_TEXT_CHANGES.md`
-2. Open: `/Users/dro/rice/nfl-analytics/CLAUDE.md`
+2. Open: `CLAUDE.md`
 3. Apply: 4 changes in order (all line numbers provided)
 4. Verify: Checklist at bottom of changes document
 5. Commit: Use provided git message
@@ -319,7 +319,7 @@ After implementation:
 
 ## Files Created as Part of This Analysis
 
-All files are in the project root directory (`/Users/dro/rice/nfl-analytics/`):
+All files are in the project root directory (``):
 
 1. **CLAUDE_MD_UPDATE_EXECUTIVE_SUMMARY.md** - Start here
 2. **CLAUDE_MD_EXACT_TEXT_CHANGES.md** - For implementation
@@ -328,7 +328,7 @@ All files are in the project root directory (`/Users/dro/rice/nfl-analytics/`):
 5. **CLAUDE_MD_UPDATE_INDEX.md** - Navigation guide
 6. **FINAL_SUMMARY_CLAUDE_MD_UPDATE.md** - This document
 
-All other files are unchanged. Only `/Users/dro/rice/nfl-analytics/CLAUDE.md` needs updating.
+All other files are unchanged. Only `CLAUDE.md` needs updating.
 
 ---
 
@@ -399,20 +399,20 @@ A: Version 4.4 is current update. Future changes go in v4.5 after investigation.
 ## Files to Reference
 
 **Main Documentation (Read these):**
-1. `/Users/dro/rice/nfl-analytics/CLAUDE_MD_UPDATE_EXECUTIVE_SUMMARY.md`
-2. `/Users/dro/rice/nfl-analytics/CLAUDE_MD_EXACT_TEXT_CHANGES.md`
-3. `/Users/dro/rice/nfl-analytics/CLAUDE_MD_UPDATE_INDEX.md`
+1. `CLAUDE_MD_UPDATE_EXECUTIVE_SUMMARY.md`
+2. `CLAUDE_MD_EXACT_TEXT_CHANGES.md`
+3. `CLAUDE_MD_UPDATE_INDEX.md`
 
 **Supporting Documentation (Reference as needed):**
-4. `/Users/dro/rice/nfl-analytics/CLAUDE_MD_UPDATE_PLAN_NOV7.md`
-5. `/Users/dro/rice/nfl-analytics/CLAUDE_MD_ANALYSIS_NOV7.md`
+4. `CLAUDE_MD_UPDATE_PLAN_NOV7.md`
+5. `CLAUDE_MD_ANALYSIS_NOV7.md`
 
 **Source Data:**
-- `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_2022_2025_metrics.json`
-- `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_5way_2022_2025.csv`
+- `analysis/results/historical_validation_5way_2022_2025_metrics.json`
+- `analysis/results/historical_validation_5way_2022_2025.csv`
 
 **Target File to Update:**
-- `/Users/dro/rice/nfl-analytics/CLAUDE.md` (currently v4.3)
+- `CLAUDE.md` (currently v4.3)
 
 ---
 

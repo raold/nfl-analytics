@@ -477,13 +477,13 @@ result = ensemble.predict(player_id="00-0033873", season=2024, week=9)
 ## Files Summary
 
 ### Created
-1. `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5_1.py` (744 lines)
-2. `/Users/dro/rice/nfl-analytics/scripts/validate_ensemble_v5_1.py` (150 lines)
-3. `/Users/dro/rice/nfl-analytics/docs/ENSEMBLE_V5_1_COMPLETE.md` (this file)
+1. `py/ensemble/enhanced_ensemble_v5_1.py` (744 lines)
+2. `scripts/validate_ensemble_v5_1.py` (150 lines)
+3. `docs/ENSEMBLE_V5_1_COMPLETE.md` (this file)
 
 ### Modified
-1. `/Users/dro/rice/nfl-analytics/models/MODEL_REGISTRY.yaml` (ensemble config, weights, changelog)
-2. `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6.py` (added deprecation notice)
+1. `models/MODEL_REGISTRY.yaml` (ensemble config, weights, changelog)
+2. `py/ensemble/enhanced_ensemble_v6.py` (added deprecation notice)
 
 ### Total Lines Changed
 - **Created:** 894 lines

@@ -202,9 +202,9 @@ Add to `~/.config/mcp/config.json`:
       "args": [
         "-y",
         "@modelcontextprotocol/server-filesystem",
-        "/Users/dro/rice/nfl-analytics/models",
-        "/Users/dro/rice/nfl-analytics/logs",
-        "/Users/dro/rice/nfl-analytics/analysis/results"
+        "models",
+        "logs",
+        "analysis/results"
       ]
     }
   }
@@ -860,8 +860,8 @@ async def test_postgres():
 async def test_filesystem():
     print("\n=== Testing Filesystem MCP ===")
     async with Client("npx", ["-y", "@modelcontextprotocol/server-filesystem",
-                               "/Users/dro/rice/nfl-analytics/models"]) as client:
-        result = await client.call_tool("list_directory", {"path": "/Users/dro/rice/nfl-analytics/models"})
+                               "models"]) as client:
+        result = await client.call_tool("list_directory", {"path": "models"})
         print(f"✅ Filesystem: Found {len(result)} items")
 
 async def test_github():
@@ -1025,4 +1025,4 @@ mcptools::mcp_session()
 **Expected ROI:** 20+ hours/month saved in manual operations
 **Payback Period:** 1 month
 
-**Questions?** See `/Users/dro/rice/nfl-analytics/docs/MCP_INTEGRATION_AUDIT.md` for comprehensive details.
+**Questions?** See `docs/MCP_INTEGRATION_AUDIT.md` for comprehensive details.

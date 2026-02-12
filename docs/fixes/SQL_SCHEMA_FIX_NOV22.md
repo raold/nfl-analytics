@@ -15,7 +15,7 @@ Fixed SQL schema error in production code where `mart.player_game_stats.game_id`
 
 ## Files Modified
 
-### 1. `/Users/dro/rice/nfl-analytics/py/production/bayesian_online_updater.py` (line 450)
+### 1. `py/production/bayesian_online_updater.py` (line 450)
 
 **Issue:** Incorrect join using non-existent `game_id` column
 **Severity:** HIGH (production code, would fail at runtime)
@@ -52,7 +52,7 @@ JOIN games g
 
 ## False Positives
 
-### `/Users/dro/rice/nfl-analytics/py/models/train_xgboost_touchdowns.py` (lines 180, 205)
+### `py/models/train_xgboost_touchdowns.py` (lines 180, 205)
 
 **Status:** ✅ No fix needed - false positive
 

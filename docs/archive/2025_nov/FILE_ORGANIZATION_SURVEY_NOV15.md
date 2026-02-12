@@ -209,7 +209,7 @@ mv QUICK_RECOVERY_COMMANDS.txt docs/guides/DATABASE_RECOVERY_QUICK_REFERENCE.txt
 ## Proposed Directory Structure After Cleanup
 
 ```
-/Users/dro/rice/nfl-analytics/
+
 ├── README.md                      ✅ Permitted
 ├── CLAUDE.md                      ✅ Permitted
 ├── SETUP.md                       ✅ Permitted

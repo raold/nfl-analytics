@@ -274,7 +274,7 @@ Recommendation: Review lines 156-342 for incomplete/placeholder code
 ## Files Modified
 
 ### Production Code (1 file)
-**File:** `/Users/dro/rice/nfl-analytics/py/utils/enforcement_router.py`
+**File:** `py/utils/enforcement_router.py`
 
 **Changes:**
 - Line 14: Added placeholder prevention to module docstring
@@ -407,14 +407,14 @@ All rules work together to prevent production issues at commit time.
 ## Files to Reference
 
 ### Implementation
-- `/Users/dro/rice/nfl-analytics/py/utils/enforcement_router.py` (lines 337-348, 1086-1232, 1312-1314)
+- `py/utils/enforcement_router.py` (lines 337-348, 1086-1232, 1312-1314)
 
 ### Documentation
-- `/Users/dro/rice/nfl-analytics/docs/enforcement/RULE_19_PLACEHOLDER_DETECTION.md` - Full guide
-- `/Users/dro/rice/nfl-analytics/docs/enforcement/RULE_19_EXAMPLE_FILES.md` - Code examples
-- `/Users/dro/rice/nfl-analytics/docs/enforcement/RULE_19_TEST_VALIDATION.md` - Test design
-- `/Users/dro/rice/nfl-analytics/docs/enforcement/RULE_19_SUMMARY.md` - Executive summary
-- `/Users/dro/rice/nfl-analytics/docs/enforcement/RULE_19_QUICK_REFERENCE.md` - Quick ref
+- `docs/enforcement/RULE_19_PLACEHOLDER_DETECTION.md` - Full guide
+- `docs/enforcement/RULE_19_EXAMPLE_FILES.md` - Code examples
+- `docs/enforcement/RULE_19_TEST_VALIDATION.md` - Test design
+- `docs/enforcement/RULE_19_SUMMARY.md` - Executive summary
+- `docs/enforcement/RULE_19_QUICK_REFERENCE.md` - Quick ref
 
 ---
 

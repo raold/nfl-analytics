@@ -144,11 +144,11 @@ FILE STRUCTURE
 ================================================================================
 
 Script:
-  /Users/dro/rice/nfl-analytics/scripts/xgb_exp2_clustering_fixed.py (580 lines)
+  scripts/xgb_exp2_clustering_fixed.py (580 lines)
 
 Documentation:
-  /Users/dro/rice/nfl-analytics/docs/XGB_EXP2_CLUSTERING_GUIDE.md (comprehensive)
-  /Users/dro/rice/nfl-analytics/scripts/XGB_EXP2_QUICK_START.txt (this file)
+  docs/XGB_EXP2_CLUSTERING_GUIDE.md (comprehensive)
+  scripts/XGB_EXP2_QUICK_START.txt (this file)
 
 Outputs:
   models/xgboost/xgb_exp2_clustering_summary.json

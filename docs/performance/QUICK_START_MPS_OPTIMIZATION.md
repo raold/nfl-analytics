@@ -31,7 +31,7 @@ Expected output: `MPS available: True`
 **Scan for device patterns in codebase:**
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 python scripts/enable_mps_acceleration.py --scan-only
 ```
 
@@ -132,7 +132,7 @@ pytest tests/performance/test_mps_acceleration.py -v
 ### 4.2: Validate BNN Training
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Train BNN on MPS (should auto-detect)
 python py/models/bnn_multioutput_pytorch.py \

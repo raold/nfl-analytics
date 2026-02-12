@@ -24,7 +24,7 @@ The Prediction API provides a RESTful interface for generating ensemble predicti
 
 ```bash
 # Install dependencies
-cd /Users/dro/rice/nfl-analytics
+cd \
 pip install -r api/requirements.txt
 
 # Start API server

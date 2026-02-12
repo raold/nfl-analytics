@@ -211,7 +211,7 @@ WHERE g.season BETWEEN %s AND %s
 
 **Solution**: Use explicit venv Python interpreter:
 ```bash
-/Users/dro/rice/nfl-analytics/.venv/bin/python py/models/train_bnn_receiving.py
+.venv/bin/python py/models/train_bnn_receiving.py
 ```
 
 **Status**: Resolved
@@ -254,10 +254,10 @@ WHERE g.season BETWEEN %s AND %s
 2. **Re-run Training** (10-15 minutes)
    ```bash
    # BNN Receiving (5-8 minutes)
-   /Users/dro/rice/nfl-analytics/.venv/bin/python py/models/train_bnn_receiving.py
+   .venv/bin/python py/models/train_bnn_receiving.py
 
    # XGBoost TD (3-4 minutes)
-   /Users/dro/rice/nfl-analytics/.venv/bin/python py/models/train_xgboost_touchdowns.py
+   .venv/bin/python py/models/train_xgboost_touchdowns.py
    ```
 
 3. **Validate Models** (5 minutes)

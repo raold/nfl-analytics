@@ -396,7 +396,7 @@ Complete profiling data exported as JSON:
 ```json
 {
   "generated_at": "2025-11-22T10:30:00",
-  "project_root": "/Users/dro/rice/nfl-analytics",
+  "project_root": "\",
   "bottlenecks": [
     {
       "severity": "HIGH",

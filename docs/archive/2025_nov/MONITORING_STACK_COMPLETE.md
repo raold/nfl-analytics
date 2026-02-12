@@ -23,7 +23,7 @@ Complete Prometheus + Grafana monitoring stack deployed for NFL Analytics produc
 
 ### 1. Prometheus Configuration ✅
 
-**Location:** `/Users/dro/rice/nfl-analytics/prometheus/`
+**Location:** `prometheus/`
 
 **Files Created:**
 - `prometheus.yml` (148 lines) - Scrape configuration, retention, targets
@@ -44,7 +44,7 @@ Complete Prometheus + Grafana monitoring stack deployed for NFL Analytics produc
 
 ### 2. Grafana Dashboards ✅
 
-**Location:** `/Users/dro/rice/nfl-analytics/grafana/dashboards/`
+**Location:** `grafana/dashboards/`
 
 **4 Production Dashboards:**
 
@@ -87,7 +87,7 @@ Complete Prometheus + Grafana monitoring stack deployed for NFL Analytics produc
 
 ### 3. Metrics Collection Module ✅
 
-**Location:** `/Users/dro/rice/nfl-analytics/py/production/metrics.py`
+**Location:** `py/production/metrics.py`
 
 **Size:** 600+ lines of production-grade Python code
 
@@ -194,7 +194,7 @@ metrics_registry.update_risk_metrics(
 ### Step 1: Start Services (30 min)
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Ensure network exists
 docker network create nfl-analytics 2>/dev/null || true
@@ -226,7 +226,7 @@ pip install flask prometheus_client
 # Create test server
 python3 << 'EOF'
 import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
+sys.path.append('\')
 
 from flask import Flask
 from prometheus_client import make_wsgi_app
@@ -255,7 +255,7 @@ EOF
 # In another terminal, simulate bets
 python3 << 'EOF'
 import sys, time, random
-sys.path.append('/Users/dro/rice/nfl-analytics')
+sys.path.append('\')
 from py.production.metrics import metrics_registry
 
 metrics_registry.initialize_bankroll(10000.0)

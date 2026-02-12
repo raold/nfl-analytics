@@ -40,6 +40,9 @@ except ImportError:
 try:
     import docker
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
     DOCKER_AVAILABLE = True
 except ImportError:
     DOCKER_AVAILABLE = False
@@ -954,8 +957,8 @@ Examples:
 
     parser.add_argument(
         "--claude-md-path",
-        default="/Users/dro/rice/nfl-analytics/CLAUDE.md",
-        help="Path to CLAUDE.md file (default: /Users/dro/rice/nfl-analytics/CLAUDE.md)",
+        default=str(_PROJECT_ROOT / "CLAUDE.md"),
+        help="Path to CLAUDE.md file (default: CLAUDE.md)",
     )
     parser.add_argument(
         "--report-file",

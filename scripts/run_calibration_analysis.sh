@@ -3,7 +3,7 @@
 # Run calibration diagnostic analysis
 #
 
-cd /Users/dro/rice/nfl-analytics
+cd $(cd "$(dirname "")/.." \&\& pwd)
 
 echo "Running calibration diagnostic analysis..."
 echo

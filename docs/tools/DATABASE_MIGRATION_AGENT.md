@@ -311,7 +311,7 @@ agent = DatabaseMigrationAgent(
         'password': 'sicillionbillions'
     },
     migrations_dir='db/migrations',
-    project_root='/Users/dro/rice/nfl-analytics'
+    project_root='\'
 )
 
 # Generate migration

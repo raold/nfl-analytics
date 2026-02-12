@@ -10,6 +10,9 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 
 def get_benchmark_data() -> pd.DataFrame:
     """
@@ -224,7 +227,7 @@ def main():
     """Generate benchmark comparison tables."""
 
     # Setup paths
-    base_dir = Path("/Users/dro/rice/nfl-analytics")
+    base_dir = _PROJECT_ROOT
     figures_dir = base_dir / "analysis/dissertation/figures/out"
 
     # Get benchmark data

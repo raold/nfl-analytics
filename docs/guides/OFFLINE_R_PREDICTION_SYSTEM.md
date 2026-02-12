@@ -172,7 +172,7 @@ print(f"90% CI: [{state_space_pred['q05']:.1f}, {state_space_pred['q95']:.1f}]")
 **Installation**:
 ```bash
 crontab -e
-# Add: 0 3 * * 2 /Users/dro/rice/nfl-analytics/scripts/regenerate_r_predictions_weekly.sh
+# Add: 0 3 * * 2 scripts/regenerate_r_predictions_weekly.sh
 ```
 
 See `docs/guides/CRON_SETUP_GUIDE.md` for complete installation guide.

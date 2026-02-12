@@ -134,7 +134,7 @@ docker network create nfl-analytics
 
 ```bash
 # Navigate to project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Verify files exist
 ls -la prometheus/prometheus.yml
@@ -153,7 +153,7 @@ ls -la py/production/metrics.py
 
 ```bash
 # Navigate to project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Start monitoring services
 docker compose up -d prometheus grafana postgres_exporter node_exporter
@@ -225,7 +225,7 @@ open http://localhost:3000
 docker logs nfl-analytics-grafana | grep provisioning
 
 # Verify dashboard files exist
-ls -la /Users/dro/rice/nfl-analytics/grafana/dashboards/
+ls -la grafana/dashboards/
 
 # Restart Grafana
 docker compose restart grafana
@@ -243,7 +243,7 @@ cat > /tmp/test_metrics_server.py << 'EOF'
 Test metrics server for NFL Analytics monitoring stack validation.
 """
 import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
+sys.path.append('\')
 
 from flask import Flask
 from prometheus_client import make_wsgi_app
@@ -297,7 +297,7 @@ While test server is running, simulate some bets:
 # In Python REPL or script
 python3 << 'EOF'
 import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
+sys.path.append('\')
 from py.production.metrics import metrics_registry
 import time
 
@@ -503,7 +503,7 @@ curl 'http://localhost:9090/api/v1/query?query=props_roi_total' | jq
 # Simulate multiple losing bets in Python:
 python3 << 'EOF'
 import sys
-sys.path.append('/Users/dro/rice/nfl-analytics')
+sys.path.append('\')
 from py.production.metrics import metrics_registry
 
 # Record 10 losing bets
@@ -547,7 +547,7 @@ python /tmp/test_metrics_server.py &
 python3 << 'EOF'
 import sys
 import time
-sys.path.append('/Users/dro/rice/nfl-analytics')
+sys.path.append('\')
 from py.production.metrics import metrics_registry
 
 # Initialize

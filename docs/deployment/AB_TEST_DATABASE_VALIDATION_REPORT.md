@@ -368,12 +368,12 @@ db_pool = SimpleConnectionPool(
 ## Appendix A: Validation Scripts
 
 ### Connection Pool Test
-**File:** `/Users/dro/rice/nfl-analytics/scripts/validate_db_connection_pool.py`
+**File:** `scripts/validate_db_connection_pool.py`
 **Tests:** 6 (all passed)
 **Runtime:** ~1 second
 
 ### SQL Validation Queries
-**File:** `/Users/dro/rice/nfl-analytics/grafana/provisioning/dashboards/ab_test_monitoring.sql`
+**File:** `grafana/provisioning/dashboards/ab_test_monitoring.sql`
 **Panels:** 8 (Panel 1 and Panel 4 tested)
 
 ---

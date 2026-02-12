@@ -11,7 +11,7 @@ CREATED FILES (IN ORDER OF USE)
 ================================================================================
 
 1. MAIN EXECUTABLE SCRIPT
-   File: /Users/dro/rice/nfl-analytics/scripts/xgb_exp2_clustering_fixed.py
+   File: scripts/xgb_exp2_clustering_fixed.py
    Size: 505 lines
    Purpose: Complete experiment pipeline
    Status: READY TO EXECUTE
@@ -28,7 +28,7 @@ CREATED FILES (IN ORDER OF USE)
    $ python scripts/xgb_exp2_clustering_fixed.py
 
 2. COMPREHENSIVE GUIDE (THEORY & APPROACH)
-   File: /Users/dro/rice/nfl-analytics/docs/XGB_EXP2_CLUSTERING_GUIDE.md
+   File: docs/XGB_EXP2_CLUSTERING_GUIDE.md
    Size: ~400 lines
    Purpose: Deep dive documentation
    Status: COMPLETE
@@ -48,7 +48,7 @@ CREATED FILES (IN ORDER OF USE)
    - For future reference
 
 3. QUICK START GUIDE
-   File: /Users/dro/rice/nfl-analytics/scripts/XGB_EXP2_QUICK_START.txt
+   File: scripts/XGB_EXP2_QUICK_START.txt
    Size: ~200 lines
    Purpose: Quick reference
    Status: COMPLETE
@@ -68,7 +68,7 @@ CREATED FILES (IN ORDER OF USE)
    - For troubleshooting
 
 4. EXPERIMENTS FRAMEWORK (FUTURE ROADMAP)
-   File: /Users/dro/rice/nfl-analytics/docs/XGB_EXPERIMENTS_README.md
+   File: docs/XGB_EXPERIMENTS_README.md
    Size: ~500 lines
    Purpose: Framework for multiple experiments
    Status: COMPLETE
@@ -87,7 +87,7 @@ CREATED FILES (IN ORDER OF USE)
    - Production integration checklist
 
 5. DELIVERY SUMMARY
-   File: /Users/dro/rice/nfl-analytics/EXPERIMENT_2_DELIVERY.md
+   File: EXPERIMENT_2_DELIVERY.md
    Size: ~400 lines
    Purpose: Executive summary & checklist
    Status: COMPLETE
@@ -108,7 +108,7 @@ CREATED FILES (IN ORDER OF USE)
    - For project planning
 
 6. FILES INDEX (THIS FILE)
-   File: /Users/dro/rice/nfl-analytics/EXPERIMENT_2_FILES_INDEX.txt
+   File: EXPERIMENT_2_FILES_INDEX.txt
    Purpose: Navigation guide
    Status: COMPLETE
 
@@ -174,21 +174,21 @@ QUICK FILE LOCATIONS
 ================================================================================
 
 SCRIPT:
-  /Users/dro/rice/nfl-analytics/scripts/xgb_exp2_clustering_fixed.py
+  scripts/xgb_exp2_clustering_fixed.py
 
 DOCUMENTATION:
-  /Users/dro/rice/nfl-analytics/docs/XGB_EXP2_CLUSTERING_GUIDE.md
-  /Users/dro/rice/nfl-analytics/docs/XGB_EXPERIMENTS_README.md
-  /Users/dro/rice/nfl-analytics/scripts/XGB_EXP2_QUICK_START.txt
+  docs/XGB_EXP2_CLUSTERING_GUIDE.md
+  docs/XGB_EXPERIMENTS_README.md
+  scripts/XGB_EXP2_QUICK_START.txt
 
 DELIVERY DOCS:
-  /Users/dro/rice/nfl-analytics/EXPERIMENT_2_DELIVERY.md
-  /Users/dro/rice/nfl-analytics/EXPERIMENT_2_FILES_INDEX.txt (this file)
+  EXPERIMENT_2_DELIVERY.md
+  EXPERIMENT_2_FILES_INDEX.txt (this file)
 
 OUTPUT (AFTER EXECUTION):
-  /Users/dro/rice/nfl-analytics/models/xgboost/xgb_exp2_clustering_summary.json
-  /Users/dro/rice/nfl-analytics/models/xgboost/xgb_exp2_clustering_importance.csv
-  /Users/dro/rice/nfl-analytics/models/xgboost/xgb_exp2_clustering.json
+  models/xgboost/xgb_exp2_clustering_summary.json
+  models/xgboost/xgb_exp2_clustering_importance.csv
+  models/xgboost/xgb_exp2_clustering.json
 
 ================================================================================
 HOW TO USE EACH FILE
@@ -230,7 +230,7 @@ USAGE SCENARIOS
 ================================================================================
 
 Scenario 1: "I want to run the experiment"
-  1. cd /Users/dro/rice/nfl-analytics
+  1. cd \
   2. python scripts/xgb_exp2_clustering_fixed.py
   3. Check models/xgboost/xgb_exp2_clustering_summary.json
   Files: xgb_exp2_clustering_fixed.py, XGB_EXP2_QUICK_START.txt

@@ -60,7 +60,7 @@ Both **performance-optimizer** and **performance-analyzer** agents completed com
 
 ### 1. Database Optimization Analysis
 
-**File:** `/Users/dro/rice/nfl-analytics/docs/performance/BATCH_PREDICTION_DATABASE_OPTIMIZATION.md` (17,800+ lines)
+**File:** `docs/performance/BATCH_PREDICTION_DATABASE_OPTIMIZATION.md` (17,800+ lines)
 
 **Contents:**
 - Comprehensive query overlap analysis
@@ -74,7 +74,7 @@ Both **performance-optimizer** and **performance-analyzer** agents completed com
 
 ### 2. Implementation Checklist
 
-**File:** `/Users/dro/rice/nfl-analytics/docs/performance/PHASE3_IMPLEMENTATION_CHECKLIST.md` (600+ lines)
+**File:** `docs/performance/PHASE3_IMPLEMENTATION_CHECKLIST.md` (600+ lines)
 
 **Contents:**
 - Step-by-step implementation guide
@@ -85,7 +85,7 @@ Both **performance-optimizer** and **performance-analyzer** agents completed com
 
 ### 3. Compute Analysis
 
-**File:** `/Users/dro/rice/nfl-analytics/docs/performance/BATCH_PREDICTION_COMPUTE_ANALYSIS.md` (600+ lines)
+**File:** `docs/performance/BATCH_PREDICTION_COMPUTE_ANALYSIS.md` (600+ lines)
 
 **Contents:**
 - Assembly loop profiling
@@ -98,7 +98,7 @@ Both **performance-optimizer** and **performance-analyzer** agents completed com
 
 ### 4. Executive Summary
 
-**File:** `/Users/dro/rice/nfl-analytics/docs/performance/PERFORMANCE_OPTIMIZATION_EXECUTIVE_SUMMARY.md` (400+ lines)
+**File:** `docs/performance/PERFORMANCE_OPTIMIZATION_EXECUTIVE_SUMMARY.md` (400+ lines)
 
 **Contents:**
 - Top 3 optimizations ranked by impact
@@ -110,7 +110,7 @@ Both **performance-optimizer** and **performance-analyzer** agents completed com
 
 ### 5. Profiling Tool
 
-**File:** `/Users/dro/rice/nfl-analytics/scripts/profile_batch_prediction_compute.py` (400+ lines)
+**File:** `scripts/profile_batch_prediction_compute.py` (400+ lines)
 
 **Purpose:** Detailed profiling of assembly loop, memory allocation, vectorization feasibility
 

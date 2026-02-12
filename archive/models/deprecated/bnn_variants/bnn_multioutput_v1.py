@@ -19,15 +19,15 @@ Date: October 2025
 """
 
 import sys
+from pathlib import Path
 
-sys.path.append("/Users/dro/rice/nfl-analytics")
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 import json
 import logging
 import pickle
 from datetime import datetime
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
 import psycopg2
@@ -500,10 +500,10 @@ def main():
     metrics = model.evaluate_calibration(X_test, y_test_yards, y_test_td)
 
     # Save
-    output_dir = Path("/Users/dro/rice/nfl-analytics/models/bayesian")
+    output_dir = _PROJECT_ROOT / "models/bayesian"
     model.save(output_dir / "bnn_multioutput_v1.pkl")
 
-    metrics_path = Path("/Users/dro/rice/nfl-analytics/experiments/phase3")
+    metrics_path = _PROJECT_ROOT / "experiments/phase3"
     metrics_path.mkdir(parents=True, exist_ok=True)
 
     with open(metrics_path / "multioutput_v1_results.json", "w") as f:

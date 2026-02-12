@@ -33,7 +33,7 @@
 - Backward compatible (v5.1 unaffected)
 - Ready for A/B test launch
 
-**Documentation:** `/Users/dro/rice/nfl-analytics/docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md` (470 lines)
+**Documentation:** `docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md` (470 lines)
 
 ---
 
@@ -205,9 +205,9 @@
 ## Reference Documents
 
 **Complete Details:**
-- Full audit & investigation: `/Users/dro/rice/nfl-analytics/docs/archive/2025_NOV/COMPREHENSIVE_INFRASTRUCTURE_AUDIT_NOV15.md` (5,200 lines)
-- R integration implementation: `/Users/dro/rice/nfl-analytics/docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md` (470 lines)
-- Complete execution plan: `/Users/dro/rice/nfl-analytics/docs/archive/2025_NOV/INFRASTRUCTURE_FIXES_EXECUTION_NOV15.md` (2,800 lines)
+- Full audit & investigation: `docs/archive/2025_NOV/COMPREHENSIVE_INFRASTRUCTURE_AUDIT_NOV15.md` (5,200 lines)
+- R integration implementation: `docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md` (470 lines)
+- Complete execution plan: `docs/archive/2025_NOV/INFRASTRUCTURE_FIXES_EXECUTION_NOV15.md` (2,800 lines)
 
 **Related Context:**
 - Infrastructure rebuild (Nov 15): `docs/archive/2025_NOV/SESSION_NOV15_INFRASTRUCTURE_REBUILD.md`

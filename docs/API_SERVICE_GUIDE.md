@@ -936,8 +936,8 @@ redis-cli --latency
 - **Pydantic Documentation**: https://docs.pydantic.dev
 - **Prometheus Client**: https://github.com/prometheus/client_python
 - **Redis Documentation**: https://redis.io/documentation
-- **Project CLAUDE.md**: See `/Users/dro/rice/nfl-analytics/CLAUDE.md`
-- **Project Status**: See `/Users/dro/rice/nfl-analytics/PROJECT_STATUS.md`
+- **Project CLAUDE.md**: See `CLAUDE.md`
+- **Project Status**: See `PROJECT_STATUS.md`
 
 ---
 

@@ -30,12 +30,12 @@ This directory contains a systematic framework for XGBoost experiments to improv
 
 **Expected Outcome:** MAE < 40.20 yards (beat v2 baseline)
 
-**File:** `/Users/dro/rice/nfl-analytics/scripts/xgb_exp2_clustering_fixed.py`
+**File:** `scripts/xgb_exp2_clustering_fixed.py`
 
 ### Running the Experiment
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Syntax check
 python -m py_compile scripts/xgb_exp2_clustering_fixed.py

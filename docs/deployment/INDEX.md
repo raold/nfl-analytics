@@ -384,10 +384,10 @@ docs/deployment/
 ## Quick Links
 
 ### A/B Test Resources
-- **Analysis Script:** `/Users/dro/rice/nfl-analytics/scripts/analyze_ab_test.py`
-- **A/B Router:** `/Users/dro/rice/nfl-analytics/py/production/ab_test_router.py`
-- **Ensemble v5:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
-- **Ensemble v6:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6.py`
+- **Analysis Script:** `scripts/analyze_ab_test.py`
+- **A/B Router:** `py/production/ab_test_router.py`
+- **Ensemble v5:** `py/ensemble/enhanced_ensemble_v5.py`
+- **Ensemble v6:** `py/ensemble/enhanced_ensemble_v6.py`
 
 ### Infrastructure URLs
 - **API:** http://localhost:8000

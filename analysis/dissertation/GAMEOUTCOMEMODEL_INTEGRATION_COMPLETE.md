@@ -7,7 +7,7 @@ Successfully integrated GameOutcomeModel v1.0 results into the NFL analytics dis
 ## Files Created/Modified
 
 ### 1. New Section: `section_game_outcome_model.tex` (522 lines)
-**Location:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_04_baseline_modeling/section_game_outcome_model.tex`
+**Location:** `analysis/dissertation/chapter_04_baseline_modeling/section_game_outcome_model.tex`
 
 **Content Structure:**
 - **Section 1**: Motivation - Learning from ensemble failures
@@ -134,7 +134,7 @@ The dissertation now includes GameOutcomeModel in:
 ## Next Steps (User Action Required)
 
 ### 1. Update Baseline Model Comparison Table
-**File:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/baseline_model_comparison_table.tex`
+**File:** `analysis/dissertation/figures/out/baseline_model_comparison_table.tex`
 
 **Add row:**
 ```latex
@@ -142,7 +142,7 @@ GameOutcomeModel v1.0 & Multi-Output XGBoost & 0.2438 & 0.669 & 0.648 & 0.2438 &
 ```
 
 ### 2. Update Appendix O (Model Specifications)
-**File:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/appendix/appendix_o_model_specifications.tex`
+**File:** `analysis/dissertation/appendix/appendix_o_model_specifications.tex`
 
 **Add section:**
 ```latex
@@ -153,7 +153,7 @@ GameOutcomeModel v1.0 & Multi-Output XGBoost & 0.2438 & 0.669 & 0.648 & 0.2438 &
 ```
 
 ### 3. Reference in Chapter 9 (Results)
-**File:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_09_results_discussion/chapter_09_results_discussion.tex`
+**File:** `analysis/dissertation/chapter_09_results_discussion/chapter_09_results_discussion.tex`
 
 **Add reference:**
 ```latex
@@ -161,7 +161,7 @@ The GameOutcomeModel (\Cref{sec:game-outcome-model}) provides an additional vali
 ```
 
 ### 4. Reference in Chapter 11 (Lessons Learned)
-**File:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_11_lessons_learned/chapter_11_lessons_learned.tex`
+**File:** `analysis/dissertation/chapter_11_lessons_learned/chapter_11_lessons_learned.tex`
 
 **Add to Section 2 (Multi-Layer Validation):**
 ```latex
@@ -170,7 +170,7 @@ The GameOutcomeModel initially showed impressive performance (Spread MAE 8.42) b
 ```
 
 ### 5. Update Appendix E (Technical Debt)
-**File:** `/Users/dro/rice/nfl-analytics/analysis/dissertation/appendix/appendix_technical_debt.tex`
+**File:** `analysis/dissertation/appendix/appendix_technical_debt.tex`
 
 **Add to Section 2.1 (Temporal Leakage Risks):**
 ```latex
@@ -209,7 +209,7 @@ Remediation: Enforced explicit temporal sorting via \texttt{df.sort\_values(['se
 
 **Verify with:**
 ```bash
-cd /Users/dro/rice/nfl-analytics/analysis/dissertation/main
+cd analysis/dissertation/main
 pdflatex main.tex
 ```
 
@@ -217,9 +217,9 @@ pdflatex main.tex
 
 | File | Path | Status |
 |------|------|--------|
-| New section | `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_04_baseline_modeling/section_game_outcome_model.tex` | ✅ Created (522 lines) |
-| Chapter 4 | `/Users/dro/rice/nfl-analytics/analysis/dissertation/chapter_04_baseline_modeling/chapter_04_baseline_modeling.tex` | ✅ Updated (line 194, 200-210) |
-| This summary | `/Users/dro/rice/nfl-analytics/analysis/dissertation/GAMEOUTCOMEMODEL_INTEGRATION_COMPLETE.md` | ✅ Created |
+| New section | `analysis/dissertation/chapter_04_baseline_modeling/section_game_outcome_model.tex` | ✅ Created (522 lines) |
+| Chapter 4 | `analysis/dissertation/chapter_04_baseline_modeling/chapter_04_baseline_modeling.tex` | ✅ Updated (line 194, 200-210) |
+| This summary | `analysis/dissertation/GAMEOUTCOMEMODEL_INTEGRATION_COMPLETE.md` | ✅ Created |
 
 ---
 

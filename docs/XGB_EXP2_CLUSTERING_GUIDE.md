@@ -114,7 +114,7 @@ early_stopping_rounds: 50
 
 ### Execute
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Quick syntax check
 python -m py_compile scripts/xgb_exp2_clustering_fixed.py

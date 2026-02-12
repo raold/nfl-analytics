@@ -284,7 +284,7 @@ team_pred = baseline_pred + team_net_strength * 0.5
 ```
 
 **Documentation:**
-See [docs/TEAM_STRENGTH_RATINGS_COMPLETE.md](/Users/dro/rice/nfl-analytics/docs/TEAM_STRENGTH_RATINGS_COMPLETE.md) for full technical details.
+See [docs/TEAM_STRENGTH_RATINGS_COMPLETE.md](docs/TEAM_STRENGTH_RATINGS_COMPLETE.md) for full technical details.
 
 ---
 

@@ -1,7 +1,7 @@
 # Data Pipeline Component Documentation
 
 **Component**: Data Pipeline
-**Location**: `/Users/dro/rice/nfl-analytics/py/pipeline/` and `/Users/dro/rice/nfl-analytics/py/data/`
+**Location**: `py/pipeline/` and `py/data/`
 **Author**: NFL Analytics Team
 **Last Updated**: November 15, 2025
 **Status**: Production Ready
@@ -206,7 +206,7 @@ SNF/MNF Games Complete
 
 ### 1. Auto-Retrain Pipeline
 
-**File**: `/Users/dro/rice/nfl-analytics/py/pipeline/auto_retrain.py`
+**File**: `py/pipeline/auto_retrain.py`
 **Lines**: 486
 **Purpose**: Orchestrate model retraining when seasons complete
 
@@ -260,7 +260,7 @@ python py/pipeline/auto_retrain.py --auto --verbose
 
 ### 2. Prediction Refresh Pipeline
 
-**File**: `/Users/dro/rice/nfl-analytics/py/pipeline/refresh_predictions.py`
+**File**: `py/pipeline/refresh_predictions.py`
 **Lines**: 413
 **Purpose**: Refresh predictions after weekly games complete
 
@@ -315,7 +315,7 @@ python py/pipeline/refresh_predictions.py --auto --dry-run
 
 ### 3. Repository Pattern (Data Access Layer)
 
-**Location**: `/Users/dro/rice/nfl-analytics/py/data/repository/`
+**Location**: `py/data/repository/`
 
 #### Purpose
 
@@ -328,7 +328,7 @@ Provide type-safe, high-level database access with:
 
 #### Base Repository
 
-**File**: `/Users/dro/rice/nfl-analytics/py/data/repository/base.py`
+**File**: `py/data/repository/base.py`
 **Lines**: 710
 
 ##### Key Classes
@@ -405,7 +405,7 @@ result = repo.query(
 
 #### Game Repository
 
-**File**: `/Users/dro/rice/nfl-analytics/py/data/repository/game_repository.py`
+**File**: `py/data/repository/game_repository.py`
 
 ```python
 class GameRepository(BaseRepository):
@@ -420,7 +420,7 @@ class GameRepository(BaseRepository):
 
 #### Player Repository
 
-**File**: `/Users/dro/rice/nfl-analytics/py/data/repository/player_repository.py`
+**File**: `py/data/repository/player_repository.py`
 
 ```python
 class PlayerRepository(BaseRepository):
@@ -435,7 +435,7 @@ class PlayerRepository(BaseRepository):
 
 #### Feature Repository
 
-**File**: `/Users/dro/rice/nfl-analytics/py/data/repository/feature_repository.py`
+**File**: `py/data/repository/feature_repository.py`
 
 ```python
 class FeatureRepository(BaseRepository):
@@ -450,7 +450,7 @@ class FeatureRepository(BaseRepository):
 
 #### Prediction Repository
 
-**File**: `/Users/dro/rice/nfl-analytics/py/data/repository/prediction_repository.py`
+**File**: `py/data/repository/prediction_repository.py`
 
 ```python
 class PredictionRepository(BaseRepository):
@@ -467,7 +467,7 @@ class PredictionRepository(BaseRepository):
 
 ### 4. Odds Fetching
 
-**File**: `/Users/dro/rice/nfl-analytics/py/data/fetch_prop_odds.py`
+**File**: `py/data/fetch_prop_odds.py`
 **Lines**: ~400+
 **Purpose**: Fetch player prop odds from The Odds API
 
@@ -530,7 +530,7 @@ python py/data/fetch_prop_odds.py --api-key YOUR_KEY --dry-run
 
 ### 5. Live Score Updates
 
-**File**: `/Users/dro/rice/nfl-analytics/py/data/update_live_scores.py`
+**File**: `py/data/update_live_scores.py`
 **Lines**: ~400+
 **Purpose**: Update game scores from live APIs
 
@@ -562,7 +562,7 @@ python py/data/update_live_scores.py --dry-run
 
 ### 6. Game Trajectory Extraction (cVAE Pipeline)
 
-**File**: `/Users/dro/rice/nfl-analytics/py/data/cvae_data_pipeline.py`
+**File**: `py/data/cvae_data_pipeline.py`
 **Lines**: 500+
 **Purpose**: Extract quarter-by-quarter game trajectories for deep learning
 
@@ -628,7 +628,7 @@ pipeline.disconnect()
 
 ### 7. Real-Time Odds Service
 
-**File**: `/Users/dro/rice/nfl-analytics/py/data/odds_update_service.py`
+**File**: `py/data/odds_update_service.py`
 **Lines**: 600+
 **Purpose**: Continuous monitoring of betting odds with production-grade reliability
 

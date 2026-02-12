@@ -26,12 +26,8 @@ class BaselineCalibrationComparator:
     """Generate calibration comparison figure for baseline models"""
 
     def __init__(self):
-        self.predictions_path = Path(
-            "/Users/dro/rice/nfl-analytics/models/ensemble/game_outcome/predictions_all_games_2019_2025.csv"
-        )
-        self.player_to_game_path = Path(
-            "/Users/dro/rice/nfl-analytics/models/player_to_game/test_predictions_2025.csv"
-        )
+        self.predictions_path = _PROJECT_ROOT / "models/ensemble/game_outcome/predictions_all_games_2019_2025.csv"
+        self.player_to_game_path = _PROJECT_ROOT / "models/player_to_game/test_predictions_2025.csv"
         self.data = None
         self.load_predictions()
 
@@ -241,15 +237,11 @@ def main():
         comparator.print_summary()
 
         # Generate calibration figure
-        figure_path = Path(
-            "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/baseline_calibration_comparison.png"
-        )
+        figure_path = _PROJECT_ROOT / "analysis/dissertation/figures/out/baseline_calibration_comparison.png"
         comparator.generate_calibration_figure(figure_path)
 
         # Generate LaTeX wrapper
-        latex_path = Path(
-            "/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out/baseline_calibration_comparison.tex"
-        )
+        latex_path = _PROJECT_ROOT / "analysis/dissertation/figures/out/baseline_calibration_comparison.tex"
         comparator.generate_latex_figure(latex_path)
 
         print("\n✓ Baseline calibration comparison generated successfully")
@@ -262,6 +254,9 @@ def main():
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
         traceback.print_exc()
         return 1

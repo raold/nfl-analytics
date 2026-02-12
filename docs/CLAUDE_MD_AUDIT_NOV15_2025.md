@@ -568,14 +568,14 @@ CLAUDE.md is the project's critical reference documentation for AI assistants bu
 
 These documentation files contain information that should be integrated into CLAUDE.md:
 
-- `/Users/dro/rice/nfl-analytics/docs/archive/2025_nov/SESSION_NOV15_PRODUCTION_DEPLOYMENT_COMPLETE.md` - 6,000+ lines
-- `/Users/dro/rice/nfl-analytics/docs/archive/2025_nov/COMPREHENSIVE_INFRASTRUCTURE_AUDIT_NOV15.md` - Infrastructure fixes status
-- `/Users/dro/rice/nfl-analytics/docs/EXECUTION_STATUS_NOV15.md` - Execution status tracking
-- `/Users/dro/rice/nfl-analytics/docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md` - R integration completion
-- `/Users/dro/rice/nfl-analytics/docs/ENSEMBLE_V6_BACKTEST_GUIDE.md` - v6.0 backtest details
-- `/Users/dro/rice/nfl-analytics/ENSEMBLE_V6_BACKTEST_QUICK_START.txt` - v6.0 quick reference
-- `/Users/dro/rice/nfl-analytics/docs/guides/TEMPERATURE_SCALER_V6_USAGE.md` - Temperature scaling integration
-- `/Users/dro/rice/nfl-analytics/docs/guides/R_MODEL_INTERFACE_GUIDE.md` - R interface documentation
+- `docs/archive/2025_nov/SESSION_NOV15_PRODUCTION_DEPLOYMENT_COMPLETE.md` - 6,000+ lines
+- `docs/archive/2025_nov/COMPREHENSIVE_INFRASTRUCTURE_AUDIT_NOV15.md` - Infrastructure fixes status
+- `docs/EXECUTION_STATUS_NOV15.md` - Execution status tracking
+- `docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md` - R integration completion
+- `docs/ENSEMBLE_V6_BACKTEST_GUIDE.md` - v6.0 backtest details
+- `ENSEMBLE_V6_BACKTEST_QUICK_START.txt` - v6.0 quick reference
+- `docs/guides/TEMPERATURE_SCALER_V6_USAGE.md` - Temperature scaling integration
+- `docs/guides/R_MODEL_INTERFACE_GUIDE.md` - R interface documentation
 
 ---
 

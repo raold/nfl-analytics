@@ -368,12 +368,12 @@ Future enhancements could include:
 ## Files
 
 **Created:**
-- `/Users/dro/rice/nfl-analytics/dashboard/constants.py` (380 lines)
+- `dashboard/constants.py` (380 lines)
 
 **Modified:**
-- `/Users/dro/rice/nfl-analytics/dashboard/app.py` (52 replacements)
-- `/Users/dro/rice/nfl-analytics/dashboard/game_predictions_patch.py` (11 replacements)
-- `/Users/dro/rice/nfl-analytics/dashboard/pages/paper_trading.py` (9 replacements)
+- `dashboard/app.py` (52 replacements)
+- `dashboard/game_predictions_patch.py` (11 replacements)
+- `dashboard/pages/paper_trading.py` (9 replacements)
 
 ---
 

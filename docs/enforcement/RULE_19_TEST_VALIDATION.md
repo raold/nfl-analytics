@@ -619,6 +619,6 @@ Rule 19 has been thoroughly tested and validated:
 ---
 
 **Related Files:**
-- Implementation: `/Users/dro/rice/nfl-analytics/py/utils/enforcement_router.py`
+- Implementation: `py/utils/enforcement_router.py`
 - Test Suite: `tests/integration/test_rule_19_placeholder_detection.py`
-- Documentation: `/Users/dro/rice/nfl-analytics/docs/enforcement/RULE_19_PLACEHOLDER_DETECTION.md`
+- Documentation: `docs/enforcement/RULE_19_PLACEHOLDER_DETECTION.md`

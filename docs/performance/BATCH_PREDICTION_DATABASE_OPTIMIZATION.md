@@ -648,7 +648,7 @@ class EnhancedEnsemble4Way:
 
 #### Step 1: Create master query method (30 min)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
+**File:** `py/ensemble/enhanced_ensemble_v5.py`
 
 **Location:** After line 315 (before `_get_state_space_predictions_batch`)
 
@@ -667,7 +667,7 @@ assert 'player_season' in master_df.columns
 
 #### Step 2: Refactor State-Space batch method (15 min)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
+**File:** `py/ensemble/enhanced_ensemble_v5.py`
 
 **Location:** Lines 316-430 (`_get_state_space_predictions_batch`)
 
@@ -687,7 +687,7 @@ with mock.patch.object(ensemble, '_get_db_connection') as mock_conn:
 
 #### Step 3: Refactor XGBoost batch method (15 min)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
+**File:** `py/ensemble/enhanced_ensemble_v5.py`
 
 **Location:** Lines 522-656 (`_get_xgboost_predictions_batch`)
 
@@ -699,7 +699,7 @@ with mock.patch.object(ensemble, '_get_db_connection') as mock_conn:
 
 #### Step 4: Refactor R models batch method (20 min)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
+**File:** `py/ensemble/enhanced_ensemble_v5.py`
 
 **Location:** Lines 914-1043 (`_get_r_predictions_batch`)
 
@@ -711,7 +711,7 @@ with mock.patch.object(ensemble, '_get_db_connection') as mock_conn:
 
 #### Step 5: Update predict_batch() (30 min)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py`
+**File:** `py/ensemble/enhanced_ensemble_v5.py`
 
 **Location:** Lines 1045-1197 (`predict_batch`)
 
@@ -749,7 +749,7 @@ informative_preds = self._get_r_predictions_batch(
 
 #### Step 6: Testing & Validation (30 min)
 
-**Test Script:** `/Users/dro/rice/nfl-analytics/scripts/test_batch_prediction_phase3.py`
+**Test Script:** `scripts/test_batch_prediction_phase3.py`
 
 ```python
 #!/usr/bin/env python3
@@ -1104,9 +1104,9 @@ The 646ms database overhead is caused by **4 sequential queries fetching 90%+ ov
 ---
 
 **Files Referenced:**
-- `/Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py` (lines 316-1197)
-- `/Users/dro/rice/nfl-analytics/docs/performance/BATCH_PREDICTION_PHASE2_COMPLETE.md`
-- `/Users/dro/rice/nfl-analytics/docs/database/SQL_PATTERNS.md`
+- `py/ensemble/enhanced_ensemble_v5.py` (lines 316-1197)
+- `docs/performance/BATCH_PREDICTION_PHASE2_COMPLETE.md`
+- `docs/database/SQL_PATTERNS.md`
 
 **Next Steps:**
 1. Review this analysis with stakeholders

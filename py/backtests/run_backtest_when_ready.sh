@@ -10,7 +10,7 @@ while true; do
         echo "✓ Found $count passing yards ratings in database"
         echo "Starting multi-year backtest..."
 
-        cd /Users/dro/rice/nfl-analytics
+        cd $(cd "$(dirname "")/.." \&\& pwd)
         uv run python py/backtests/bayesian_props_multiyear_backtest.py 2>&1 | tee reports/multiyear_backtest_with_bayesian.log
 
         echo ""

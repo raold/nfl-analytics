@@ -591,7 +591,7 @@ Chapter~\ref{chap:lessons-learned}.
 
 2. **Initial Compilation:**
    ```bash
-   cd /Users/dro/rice/nfl-analytics/analysis/dissertation/main
+   cd analysis/dissertation/main
    pdflatex main.tex
    ```
    - [ ] No compilation errors
@@ -955,7 +955,7 @@ analysis/dissertation/chapter_10_lessons_learned/chapter_10_lessons_learned.tex
 
 3. **Full dissertation compilation**
    ```bash
-   cd /Users/dro/rice/nfl-analytics/analysis/dissertation/main
+   cd analysis/dissertation/main
    pdflatex main.tex
    bibtex main
    pdflatex main.tex

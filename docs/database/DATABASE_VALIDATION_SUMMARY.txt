@@ -88,7 +88,7 @@ Query 5: Recent Games (2024 Playoffs)
 INGESTION SCRIPTS (NOT RUN)
 ================================================================================
 
-Location: /Users/dro/rice/nfl-analytics/R/ingestion/
+Location: R/ingestion/
 
 Script 1: ingest_schedules.R
   Purpose:  Populate games table from nflreadr

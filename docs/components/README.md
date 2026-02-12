@@ -1,6 +1,6 @@
 # System Components Documentation Index
 
-**Location:** `/Users/dro/rice/nfl-analytics/docs/components/`
+**Location:** `docs/components/`
 **Last Updated:** November 15, 2025
 **Status:** Complete (4/4 components documented)
 

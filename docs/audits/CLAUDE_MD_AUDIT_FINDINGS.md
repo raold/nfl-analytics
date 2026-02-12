@@ -277,19 +277,19 @@ Gap: 1 full day of major production work completely missing
 The following files contain information that should be integrated into CLAUDE.md updates:
 
 **CRITICAL (use in immediate update):**
-- `/Users/dro/rice/nfl-analytics/docs/archive/2025_nov/SESSION_NOV15_PRODUCTION_DEPLOYMENT_COMPLETE.md` (6,000+ lines - main source)
-- `/Users/dro/rice/nfl-analytics/docs/EXECUTION_STATUS_NOV15.md` (execution status)
-- `/Users/dro/rice/nfl-analytics/docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md` (R integration)
+- `docs/archive/2025_nov/SESSION_NOV15_PRODUCTION_DEPLOYMENT_COMPLETE.md` (6,000+ lines - main source)
+- `docs/EXECUTION_STATUS_NOV15.md` (execution status)
+- `docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md` (R integration)
 
 **HIGH (use in soon update):**
-- `/Users/dro/rice/nfl-analytics/docs/archive/2025_nov/COMPREHENSIVE_INFRASTRUCTURE_AUDIT_NOV15.md`
-- `/Users/dro/rice/nfl-analytics/docs/ENSEMBLE_V6_BACKTEST_GUIDE.md`
-- `/Users/dro/rice/nfl-analytics/docs/guides/TEMPERATURE_SCALER_V6_USAGE.md`
+- `docs/archive/2025_nov/COMPREHENSIVE_INFRASTRUCTURE_AUDIT_NOV15.md`
+- `docs/ENSEMBLE_V6_BACKTEST_GUIDE.md`
+- `docs/guides/TEMPERATURE_SCALER_V6_USAGE.md`
 
 **MEDIUM (reference as needed):**
-- `/Users/dro/rice/nfl-analytics/ENSEMBLE_V6_BACKTEST_QUICK_START.txt`
-- `/Users/dro/rice/nfl-analytics/docs/guides/R_MODEL_INTERFACE_GUIDE.md`
-- `/Users/dro/rice/nfl-analytics/config/ab_test_config.yaml`
+- `ENSEMBLE_V6_BACKTEST_QUICK_START.txt`
+- `docs/guides/R_MODEL_INTERFACE_GUIDE.md`
+- `config/ab_test_config.yaml`
 
 ---
 

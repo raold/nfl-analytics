@@ -8,12 +8,12 @@ Date: October 2025
 """
 
 import sys
-
-sys.path.append("/Users/dro/rice/nfl-analytics")
-
-import logging
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+sys.path.insert(0, str(_PROJECT_ROOT))
+
+import logging
 import numpy as np
 import pandas as pd
 
@@ -34,7 +34,7 @@ def test_pipeline_with_historical_data():
     logger.info("=" * 80)
 
     # Initialize pipeline with conservative settings
-    model_path = "/Users/dro/rice/nfl-analytics/models/bayesian/bnn_mixture_experts_v2.pkl"
+    model_path = str(_PROJECT_ROOT / "models/bayesian/bnn_mixture_experts_v2.pkl")
 
     pipeline = BNNMoEProductionPipeline(
         model_path=model_path,
@@ -132,7 +132,7 @@ def test_pipeline_with_historical_data():
         logger.info(f"Expected ROI: {100*total_ev/total_bet:.2f}%")
 
         # Output file location
-        output_dir = Path("/Users/dro/rice/nfl-analytics/data/betting_recommendations")
+        output_dir = _PROJECT_ROOT / "data/betting_recommendations"
         output_file = output_dir / f"recommendations_{test_season}_week{test_week}.csv"
 
         logger.info("\n✓ Recommendations saved to:")

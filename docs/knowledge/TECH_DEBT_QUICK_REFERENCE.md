@@ -171,13 +171,13 @@ mypy api/ py/ensemble/ --strict
 ## Files to Read
 
 1. **Executive Summary** (this is it!)
-   - `/Users/dro/rice/nfl-analytics/TECH_DEBT_EXECUTIVE_SUMMARY.md`
+   - `TECH_DEBT_EXECUTIVE_SUMMARY.md`
 
 2. **Detailed Inventory** (5,500 words, comprehensive)
-   - `/Users/dro/rice/nfl-analytics/TECH_DEBT_INVENTORY_NOV15.md`
+   - `TECH_DEBT_INVENTORY_NOV15.md`
 
 3. **Action Plan** (4,200 words, actionable)
-   - `/Users/dro/rice/nfl-analytics/TECH_DEBT_ACTION_PLAN.md`
+   - `TECH_DEBT_ACTION_PLAN.md`
 
 ---
 

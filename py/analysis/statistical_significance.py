@@ -10,6 +10,9 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 
 def diebold_mariano_test(
     losses1: np.ndarray, losses2: np.ndarray, h: int = 1, alternative: str = "two-sided"
@@ -420,7 +423,7 @@ def generate_significance_tables(output_dir: Path) -> None:
 def main():
     """Generate all statistical significance analyses."""
 
-    output_dir = Path("/Users/dro/rice/nfl-analytics/analysis/dissertation/figures/out")
+    output_dir = _PROJECT_ROOT / "analysis/dissertation/figures/out"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     generate_significance_tables(output_dir)

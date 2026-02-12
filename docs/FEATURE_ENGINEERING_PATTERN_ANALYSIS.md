@@ -10,7 +10,7 @@ Analysis of existing feature engineering patterns in the NFL Analytics codebase 
 
 ### 1.1 How XGBoost v3.1 Loads Features
 
-**File:** `/Users/dro/rice/nfl-analytics/py/models/train_xgboost_v3_1_aligned_window.py`
+**File:** `py/models/train_xgboost_v3_1_aligned_window.py`
 
 The XGBoost v3.1 training script demonstrates the **canonical feature loading pattern** for this project:
 
@@ -262,7 +262,7 @@ for each game:
 
 ### 6.1 Existing `ml.*` Schema (Created Nov 9, 2025)
 
-**File:** `/Users/dro/rice/nfl-analytics/db/migrations/025_model_registry.sql`
+**File:** `db/migrations/025_model_registry.sql`
 
 Currently implements:
 - `ml.model_registry` - Model metadata and deployment status

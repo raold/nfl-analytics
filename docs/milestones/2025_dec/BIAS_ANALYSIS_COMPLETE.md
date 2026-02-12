@@ -149,15 +149,15 @@ The ensemble is **production-ready as-is** without modification.
 
 ### 1. BIAS_ANALYSIS_SUMMARY.txt (8.7 KB)
 Quick reference with all key metrics, results, and deployment status.
-Location: `/Users/dro/rice/nfl-analytics/BIAS_ANALYSIS_SUMMARY.txt`
+Location: `BIAS_ANALYSIS_SUMMARY.txt`
 
 ### 2. docs/ENSEMBLE_BIAS_ANALYSIS_CORRECTED.md (9.4 KB)
 Comprehensive technical analysis with detailed diagnostics, individual model results, and production recommendations.
-Location: `/Users/dro/rice/nfl-analytics/docs/ENSEMBLE_BIAS_ANALYSIS_CORRECTED.md`
+Location: `docs/ENSEMBLE_BIAS_ANALYSIS_CORRECTED.md`
 
 ### 3. docs/BIAS_COMPARISON_PHASE1_VS_CORRECTED.md (9.0 KB)
 Detailed comparison of Phase 1 error and corrected analysis, with timeline, root cause analysis, and lessons learned.
-Location: `/Users/dro/rice/nfl-analytics/docs/BIAS_COMPARISON_PHASE1_VS_CORRECTED.md`
+Location: `docs/BIAS_COMPARISON_PHASE1_VS_CORRECTED.md`
 
 ---
 

@@ -565,7 +565,7 @@ def create_markdown_report(
                 f.write("**Implementation:**\n")
                 if "temperature" in cause["recommendation"].lower():
                     f.write(
-                        "1. Edit `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`\n"
+                        "1. Edit `py/models/player_props_ensemble.py`\n"
                     )
                     f.write("2. Locate `_apply_temperature_scaling()` method (lines 398-451)\n")
                     f.write("3. Update temperature_map values:\n")
@@ -582,7 +582,7 @@ def create_markdown_report(
                     )
                 elif "weighting" in cause["recommendation"].lower():
                     f.write(
-                        "1. Edit `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`\n"
+                        "1. Edit `py/models/player_props_ensemble.py`\n"
                     )
                     f.write("2. Locate ensemble aggregation (lines 924-936)\n")
                     f.write("3. Replace inverse variance weighting with equal weighting:\n")
@@ -602,13 +602,13 @@ def create_markdown_report(
         # Files
         f.write("## Files Analyzed\n\n")
         f.write(
-            "- **Backtest Results:** `/Users/dro/rice/nfl-analytics/analysis/results/historical_validation_4way_EMERGENCY_FIX.csv`\n"
+            "- **Backtest Results:** `analysis/results/historical_validation_4way_EMERGENCY_FIX.csv`\n"
         )
         f.write(
-            "- **Ensemble Implementation:** `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`\n"
+            "- **Ensemble Implementation:** `py/models/player_props_ensemble.py`\n"
         )
         f.write(
-            "- **Backtest Script:** `/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_5way.py`\n\n"
+            "- **Backtest Script:** `py/backtest/historical_validation_5way.py`\n\n"
         )
 
         # Next Steps

@@ -22,7 +22,7 @@ The current 5-way ensemble uses **equal weighting** (20% each model) after recen
 ## 1. Current Ensemble Implementation
 
 ### Location
-- **File**: `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py`
+- **File**: `py/models/player_props_ensemble.py`
 - **Lines**: 926-950 (ensemble combination logic)
 
 ### Current Logic (Equal Weighting)

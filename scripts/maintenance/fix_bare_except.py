@@ -4,6 +4,9 @@ import json
 import subprocess
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
+
 
 def main():
     # Get files with bare except
@@ -15,7 +18,7 @@ def main():
         ],
         capture_output=True,
         text=True,
-        cwd="/Users/dro/rice/nfl-analytics",
+        cwd=str(_PROJECT_ROOT),
     )
 
     errors = json.loads(result.stdout)

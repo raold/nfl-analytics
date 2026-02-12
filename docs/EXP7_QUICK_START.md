@@ -16,7 +16,7 @@ Ridge Residuals Experiment uses **opponent strength isolation** to predict NFL Q
 ## Quick Run
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 python scripts/xgb_exp7_ridge_fixed.py
 ```
 

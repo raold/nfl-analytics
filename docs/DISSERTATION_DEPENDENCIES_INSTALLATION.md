@@ -26,7 +26,7 @@ Four specialized Python libraries have been added to support the 7-phase dissert
 ### Method 1: Automated Bash Script (Recommended)
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Run automated installation
 bash scripts/install_dissertation_deps.sh
@@ -41,7 +41,7 @@ bash scripts/install_dissertation_deps.sh
 ### Method 2: Python Script
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Run Python installation script
 python3 check_and_install_deps.py
@@ -574,7 +574,7 @@ Phase 5 (Week 7-8): torchuncertainty evidential nets
 
 ## Requirements Files
 
-### Updated `/Users/dro/rice/nfl-analytics/requirements.txt`
+### Updated `requirements.txt`
 
 Added to line 34-45:
 ```txt
@@ -650,9 +650,9 @@ EOF
 - Chapter 12: Online Learning & Monitoring
 
 ### Installation Scripts
-- `/Users/dro/rice/nfl-analytics/scripts/install_dissertation_deps.sh`
-- `/Users/dro/rice/nfl-analytics/check_and_install_deps.py`
-- `/Users/dro/rice/nfl-analytics/test_deps.py`
+- `scripts/install_dissertation_deps.sh`
+- `check_and_install_deps.py`
+- `test_deps.py`
 
 ---
 

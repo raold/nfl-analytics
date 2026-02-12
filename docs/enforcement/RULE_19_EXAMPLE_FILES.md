@@ -496,6 +496,6 @@ python py/utils/enforcement_router.py \
 ---
 
 **Related Documentation:**
-- [Rule 19 Full Documentation](/Users/dro/rice/nfl-analytics/docs/enforcement/RULE_19_PLACEHOLDER_DETECTION.md)
-- [Enforcement Framework](/Users/dro/rice/nfl-analytics/docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md)
-- [Implementation](/Users/dro/rice/nfl-analytics/py/utils/enforcement_router.py)
+- [Rule 19 Full Documentation](docs/enforcement/RULE_19_PLACEHOLDER_DETECTION.md)
+- [Enforcement Framework](docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md)
+- [Implementation](py/utils/enforcement_router.py)

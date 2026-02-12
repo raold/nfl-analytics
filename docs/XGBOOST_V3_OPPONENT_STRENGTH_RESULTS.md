@@ -192,14 +192,14 @@ Mean weight: 0.934
 ## Files Generated
 
 ### Model Artifacts
-- **Model:** `/Users/dro/rice/nfl-analytics/models/xgboost/passing_xgboost_v3_with_opponent_strength.pkl` (3.4 MB)
-- **Metadata:** `/Users/dro/rice/nfl-analytics/models/xgboost/passing_xgboost_v3_with_opponent_strength_metadata.json` (2.3 KB)
+- **Model:** `models/xgboost/passing_xgboost_v3_with_opponent_strength.pkl` (3.4 MB)
+- **Metadata:** `models/xgboost/passing_xgboost_v3_with_opponent_strength_metadata.json` (2.3 KB)
 
 ### Training Script
-- **Script:** `/Users/dro/rice/nfl-analytics/py/models/train_xgboost_v3_with_opponent_strength.py` (733 lines)
+- **Script:** `py/models/train_xgboost_v3_with_opponent_strength.py` (733 lines)
 
 ### Input Data
-- **Opponent Features:** `/Users/dro/rice/nfl-analytics/data/processed/features/opponent_strength_features.csv` (3,710 records)
+- **Opponent Features:** `data/processed/features/opponent_strength_features.csv` (3,710 records)
 
 ---
 

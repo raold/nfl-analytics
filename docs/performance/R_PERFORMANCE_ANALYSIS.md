@@ -22,7 +22,7 @@
 ## Top 10 Performance Bottlenecks (Ranked by Impact)
 
 ### 1. Loop-Based Prediction Generation (CRITICAL)
-**File**: `/Users/dro/rice/nfl-analytics/R/batch_generate_r_predictions.R:169-210`
+**File**: `R/batch_generate_r_predictions.R:169-210`
 **Impact**: HIGH (21 minutes → 4 minutes estimated)
 **Current Code**:
 ```r
@@ -100,7 +100,7 @@ generate_predictions_vectorized <- function(model, model_name, player_games, n_d
 ---
 
 ### 2. rpy2 Python/R Bridge Overhead (CRITICAL)
-**File**: `/Users/dro/rice/nfl-analytics/py/ensemble/r_model_interface.py:200-277`
+**File**: `py/ensemble/r_model_interface.py:200-277`
 **Impact**: VERY HIGH (4.0s per prediction → 0.05s with lookup)
 **Current Approach**:
 ```python
@@ -161,7 +161,7 @@ def predict_hierarchical_cached(self, player_id, season, week):
 ---
 
 ### 3. Row-by-Row Database Inserts (HIGH IMPACT)
-**File**: `/Users/dro/rice/nfl-analytics/R/state_space_player_skills_v2.R:288-318`
+**File**: `R/state_space_player_skills_v2.R:288-318`
 **Impact**: MEDIUM-HIGH (283ms per insert × 100 players = 28 seconds)
 **Current Code**:
 ```r
@@ -217,7 +217,7 @@ bulk_insert_ratings <- function(conn, ratings_df) {
 ---
 
 ### 4. Suboptimal MCMC Parallelization (MEDIUM IMPACT)
-**File**: `/Users/dro/rice/nfl-analytics/R/state_space/train_state_space_v2_canonical.R:229-230`
+**File**: `R/state_space/train_state_space_v2_canonical.R:229-230`
 **Impact**: MEDIUM (20% speedup on M4 Max)
 **Current Configuration**:
 ```r
@@ -262,7 +262,7 @@ STAN_CONFIG <- list(
 ---
 
 ### 5. Non-Vectorized Kalman Filtering (MEDIUM IMPACT)
-**File**: `/Users/dro/rice/nfl-analytics/R/state_space_player_skills_v2.R:102-135, 139-143`
+**File**: `R/state_space_player_skills_v2.R:102-135, 139-143`
 **Impact**: MEDIUM (~50% slower than vectorized)
 **Current Code**:
 ```r
@@ -295,7 +295,7 @@ data <- data %>%
 ---
 
 ### 6. Unnecessary Progress Bar Overhead (LOW-MEDIUM IMPACT)
-**File**: `/Users/dro/rice/nfl-analytics/R/batch_generate_r_predictions.R:167-209`
+**File**: `R/batch_generate_r_predictions.R:167-209`
 **Impact**: LOW-MEDIUM (~5% overhead on 1,800 iterations)
 **Current Code**:
 ```r
@@ -332,7 +332,7 @@ close(pb)
 ---
 
 ### 7. Inefficient List Growth in Loop (MEDIUM IMPACT)
-**File**: `/Users/dro/rice/nfl-analytics/R/elo_win_loss_only.R:140-181`
+**File**: `R/elo_win_loss_only.R:140-181`
 **Impact**: MEDIUM (O(n²) reallocation)
 **Current Code**:
 ```r
@@ -381,7 +381,7 @@ elo_history <- bind_rows(elo_history)
 ---
 
 ### 8. Database Query Latency (rpy2 Feature Fetching) (MEDIUM IMPACT)
-**File**: `/Users/dro/rice/nfl-analytics/py/ensemble/r_model_interface.py:128-198`
+**File**: `py/ensemble/r_model_interface.py:128-198`
 **Impact**: MEDIUM (~50-100ms per query × 3 models = 150-300ms overhead)
 **Current Code**:
 ```python
@@ -446,7 +446,7 @@ LIMIT 1
 ---
 
 ### 9. Repeated Expensive `dbGetQuery()` Calls (LOW-MEDIUM IMPACT)
-**File**: `/Users/dro/rice/nfl-analytics/R/backfill_advanced_metrics.R:98-101, 197-200, 292-295, 372-375`
+**File**: `R/backfill_advanced_metrics.R:98-101, 197-200, 292-295, 372-375`
 **Impact**: LOW-MEDIUM (creates/drops temp tables 4× per season)
 **Current Code**:
 ```r
@@ -510,7 +510,7 @@ upsert_with_staging(conn, "espn_qbr", qbr_clean, c("player_id", "season", "game_
 ---
 
 ### 10. Inefficient `bind_rows()` in Feature Engineering Loop (LOW IMPACT)
-**File**: `/Users/dro/rice/nfl-analytics/R/features_injury_load.R:32-49`
+**File**: `R/features_injury_load.R:32-49`
 **Impact**: LOW (small dataset, 5 seasons)
 **Current Code**:
 ```r
@@ -571,8 +571,8 @@ injuries_df <- bind_rows(all_injuries)
 
 ### Current Architecture
 **Files**:
-- `/Users/dro/rice/nfl-analytics/py/ensemble/r_model_interface.py` (484 lines)
-- `/Users/dro/rice/nfl-analytics/R/batch_generate_r_predictions.R` (331 lines)
+- `py/ensemble/r_model_interface.py` (484 lines)
+- `R/batch_generate_r_predictions.R` (331 lines)
 
 ### Bottleneck Breakdown
 
@@ -615,7 +615,7 @@ mean, std = lookup.get_prediction(
 # Result: 50ms (vs 4,000ms with rpy2)
 ```
 
-**See**: `/Users/dro/rice/nfl-analytics/docs/guides/OFFLINE_R_PREDICTION_SYSTEM.md`
+**See**: `docs/guides/OFFLINE_R_PREDICTION_SYSTEM.md`
 
 ---
 
@@ -888,16 +888,16 @@ The R codebase has **significant optimization opportunities** with **40-60% tota
 ---
 
 **Files Referenced**:
-- `/Users/dro/rice/nfl-analytics/R/batch_generate_r_predictions.R`
-- `/Users/dro/rice/nfl-analytics/R/state_space/train_state_space_v2_canonical.R`
-- `/Users/dro/rice/nfl-analytics/R/state_space_player_skills_v2.R`
-- `/Users/dro/rice/nfl-analytics/R/elo_win_loss_only.R`
-- `/Users/dro/rice/nfl-analytics/py/ensemble/r_model_interface.py`
-- `/Users/dro/rice/nfl-analytics/R/backfill_advanced_metrics.R`
-- `/Users/dro/rice/nfl-analytics/R/features_injury_load.R`
-- `/Users/dro/rice/nfl-analytics/R/ingestion/reingest_historical_all_phases.R`
+- `R/batch_generate_r_predictions.R`
+- `R/state_space/train_state_space_v2_canonical.R`
+- `R/state_space_player_skills_v2.R`
+- `R/elo_win_loss_only.R`
+- `py/ensemble/r_model_interface.py`
+- `R/backfill_advanced_metrics.R`
+- `R/features_injury_load.R`
+- `R/ingestion/reingest_historical_all_phases.R`
 
 **Related Documentation**:
-- `/Users/dro/rice/nfl-analytics/docs/guides/OFFLINE_R_PREDICTION_SYSTEM.md`
-- `/Users/dro/rice/nfl-analytics/docs/database/DATABASE_QUICK_REFERENCE.md`
-- `/Users/dro/rice/nfl-analytics/CLAUDE.md` (Lesson 7: MCMC 4→6 cores pending)
+- `docs/guides/OFFLINE_R_PREDICTION_SYSTEM.md`
+- `docs/database/DATABASE_QUICK_REFERENCE.md`
+- `CLAUDE.md` (Lesson 7: MCMC 4→6 cores pending)

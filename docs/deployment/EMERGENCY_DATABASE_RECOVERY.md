@@ -34,7 +34,7 @@ postgresql://dro:sicillionbillions@localhost:5544/devdb01
 ### OPTION 1: Native PostgreSQL Installation (FASTEST - 10-15 minutes)
 
 **Why This Works:**
-- PostgreSQL data exists in `/Users/dro/rice/nfl-analytics/pgdata/` directory
+- PostgreSQL data exists in `pgdata/` directory
 - Can mount existing pgdata directly with native PostgreSQL 16
 - No Docker dependency
 - Fastest path to production
@@ -49,8 +49,8 @@ brew services stop postgresql@16
 
 # 3. Start PostgreSQL pointing to existing pgdata
 /opt/homebrew/opt/postgresql@16/bin/pg_ctl \
-  -D /Users/dro/rice/nfl-analytics/pgdata \
-  -l /Users/dro/rice/nfl-analytics/logs/postgres.log \
+  -D pgdata \
+  -l logs/postgres.log \
   -o "-p 5544" \
   start
 
@@ -95,8 +95,8 @@ psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 -c "\dx"
 # File: scripts/start_native_postgres.sh
 set -euo pipefail
 
-PGDATA="/Users/dro/rice/nfl-analytics/pgdata"
-PGLOG="/Users/dro/rice/nfl-analytics/logs/postgres.log"
+PGDATA="pgdata"
+PGLOG="logs/postgres.log"
 PGPORT="5544"
 
 if pg_ctl -D "$PGDATA" status &>/dev/null; then
@@ -156,7 +156,7 @@ colima start --cpu 4 --memory 8 --disk 100
 docker ps  # Should show clean slate
 
 # 4. Start NFL Analytics stack
-cd /Users/dro/rice/nfl-analytics
+cd \
 docker compose up -d pg-1
 
 # 5. Wait for PostgreSQL to be ready (2-3 min)
@@ -201,7 +201,7 @@ open /Applications/OrbStack.app
 docker ps
 
 # 4. Start NFL Analytics stack
-cd /Users/dro/rice/nfl-analytics
+cd \
 docker compose up -d
 
 # 5. Verify all services healthy
@@ -303,8 +303,8 @@ brew install postgresql@16
 
 # Start with existing pgdata
 /opt/homebrew/opt/postgresql@16/bin/pg_ctl \
-  -D /Users/dro/rice/nfl-analytics/pgdata \
-  -l /Users/dro/rice/nfl-analytics/logs/postgres.log \
+  -D pgdata \
+  -l logs/postgres.log \
   -o "-p 5544" \
   start
 
@@ -348,7 +348,7 @@ Last resort only. Try in order:
 
 ```bash
 # Check pgdata directory
-ls -lh /Users/dro/rice/nfl-analytics/pgdata/
+ls -lh pgdata/
 
 # Expected output (TimescaleDB data):
 # drwx------  pg_wal/
@@ -358,7 +358,7 @@ ls -lh /Users/dro/rice/nfl-analytics/pgdata/
 # etc.
 
 # Check size (should be substantial)
-du -sh /Users/dro/rice/nfl-analytics/pgdata/
+du -sh pgdata/
 # Expected: 1-10 GB depending on data volume
 ```
 
@@ -485,7 +485,7 @@ After database recovery:
 **If all options fail:**
 
 1. **Check Recent Backups**
-   - `/Users/dro/rice/nfl-analytics/backups/backup_before_backfill_20251010.sql`
+   - `backups/backup_before_backfill_20251010.sql`
    - Restore: `psql ... -f backup.sql`
 
 2. **Discord/Slack**: Post in #infrastructure channel

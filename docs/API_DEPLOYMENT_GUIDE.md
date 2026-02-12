@@ -140,7 +140,7 @@ pip install -r api/requirements.txt
 # Set environment variables
 export DATABASE_URL=postgresql://dro:sicillionbillions@localhost:5544/devdb01
 export REDIS_URL=redis://localhost:6379
-export MODELS_DIR=/Users/dro/rice/nfl-analytics/models
+export MODELS_DIR=models
 
 # Start API server
 cd api
@@ -666,9 +666,9 @@ time curl -X POST http://localhost:8000/predict \
 ## Support
 
 For issues or questions:
-- API README: `/Users/dro/rice/nfl-analytics/api/README.md`
+- API README: `api/README.md`
 - GitHub Issues: https://github.com/raold/nfl-analytics/issues
-- Documentation: `/Users/dro/rice/nfl-analytics/docs/`
+- Documentation: `docs/`
 - Contact: dro@rice.edu
 
 ---

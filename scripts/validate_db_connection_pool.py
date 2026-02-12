@@ -9,10 +9,13 @@ Created: November 14, 2025
 """
 
 import sys
+from pathlib import Path
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
 import time
 from contextlib import contextmanager
 
-sys.path.append("/Users/dro/rice/nfl-analytics")
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 import psycopg2
 from psycopg2.pool import SimpleConnectionPool

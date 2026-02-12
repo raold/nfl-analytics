@@ -18,7 +18,7 @@ This guide covers installation of four specialized Python libraries required for
 
 ```bash
 # From project root
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Make script executable
 chmod +x scripts/install_dissertation_deps.sh
@@ -289,7 +289,7 @@ pip install torchuncertainty
 
 ## Updating requirements.txt
 
-After successful installation, add to `/Users/dro/rice/nfl-analytics/requirements.txt`:
+After successful installation, add to `requirements.txt`:
 
 ```txt
 # Dissertation Enhancement Plan Dependencies

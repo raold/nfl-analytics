@@ -9,12 +9,12 @@ Date: October 2025
 """
 
 import sys
-
-sys.path.append("/Users/dro/rice/nfl-analytics")
-
-import pickle
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+sys.path.insert(0, str(_PROJECT_ROOT))
+
+import pickle
 import pandas as pd
 import psycopg2
 from sklearn.preprocessing import StandardScaler
@@ -92,7 +92,7 @@ print(f"  Feature means: {scaler.mean_}")
 print(f"  Feature stds: {scaler.scale_}")
 
 # Load the saved model
-model_path = Path("/Users/dro/rice/nfl-analytics/models/bayesian/bnn_mixture_experts_v2.pkl")
+model_path = _PROJECT_ROOT / "models/bayesian/bnn_mixture_experts_v2.pkl"
 print(f"\nLoading model from {model_path}...")
 
 with open(model_path, "rb") as f:

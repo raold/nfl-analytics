@@ -342,7 +342,7 @@ jobs:
 ```
 ================================ test session starts =================================
 platform darwin -- Python 3.11.5, pytest-7.4.3, pluggy-1.3.0
-rootdir: /Users/dro/rice/nfl-analytics
+rootdir: \
 plugins: cov-4.1.0, asyncio-0.21.1
 collected 60 items
 

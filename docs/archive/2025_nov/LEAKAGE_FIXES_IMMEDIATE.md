@@ -267,16 +267,16 @@ After Phase 1 fixes, verify:
 
 ## Quick Reference
 
-**Audit Document**: `/Users/dro/rice/nfl-analytics/docs/audits/data_leakage_audit_nov7.md`
+**Audit Document**: `docs/audits/data_leakage_audit_nov7.md`
 
 **Key Files to Fix**:
-1. `/Users/dro/rice/nfl-analytics/py/features/vegas_line_bias_features.py` (CRITICAL)
-2. `/Users/dro/rice/nfl-analytics/py/models/player_props_ensemble.py` (CRITICAL)
-3. `/Users/dro/rice/nfl-analytics/py/features/defensive_game_script_indicators.py` (HIGH)
+1. `py/features/vegas_line_bias_features.py` (CRITICAL)
+2. `py/models/player_props_ensemble.py` (CRITICAL)
+3. `py/features/defensive_game_script_indicators.py` (HIGH)
 
 **Validation Scripts**:
-- `/Users/dro/rice/nfl-analytics/py/models/validate_bnn_calibration.py`
-- `/Users/dro/rice/nfl-analytics/tests/integration/test_temporal_leakage.py`
+- `py/models/validate_bnn_calibration.py`
+- `tests/integration/test_temporal_leakage.py`
 
 ---
 

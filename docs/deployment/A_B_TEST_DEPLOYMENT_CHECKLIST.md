@@ -1474,17 +1474,17 @@ GROUP BY m.model_name;
 
 ### B. Python Scripts Reference
 
-**analyze_ab_test.py:** `/Users/dro/rice/nfl-analytics/scripts/analyze_ab_test.py`
-**ab_test_router.py:** `/Users/dro/rice/nfl-analytics/py/production/ab_test_router.py`
-**real_time_api.py:** `/Users/dro/rice/nfl-analytics/py/production/real_time_api.py`
+**analyze_ab_test.py:** `scripts/analyze_ab_test.py`
+**ab_test_router.py:** `py/production/ab_test_router.py`
+**real_time_api.py:** `py/production/real_time_api.py`
 
 ### C. Documentation References
 
-- **Ensemble v5 Spec:** `/Users/dro/rice/nfl-analytics/docs/ENSEMBLE_V5_1_COMPLETE.md`
-- **Ensemble v6 Spec:** `/Users/dro/rice/nfl-analytics/docs/ENSEMBLE_V6_COMPLETE.md`
-- **Sagarin Integration:** `/Users/dro/rice/nfl-analytics/docs/SAGARIN_INTEGRATION_COMPLETE_FINAL.md`
-- **Team Strength Ratings:** `/Users/dro/rice/nfl-analytics/docs/TEAM_STRENGTH_RATINGS_COMPLETE.md`
-- **A/B Test Guide:** `/Users/dro/rice/nfl-analytics/docs/AB_TEST_INTEGRATION_GUIDE.md`
+- **Ensemble v5 Spec:** `docs/ENSEMBLE_V5_1_COMPLETE.md`
+- **Ensemble v6 Spec:** `docs/ENSEMBLE_V6_COMPLETE.md`
+- **Sagarin Integration:** `docs/SAGARIN_INTEGRATION_COMPLETE_FINAL.md`
+- **Team Strength Ratings:** `docs/TEAM_STRENGTH_RATINGS_COMPLETE.md`
+- **A/B Test Guide:** `docs/AB_TEST_INTEGRATION_GUIDE.md`
 
 ---
 

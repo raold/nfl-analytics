@@ -77,10 +77,10 @@ chmod +x scripts/install_prediction_cron_jobs.sh
 **Cron Entries Created**:
 ```cron
 # NFL Analytics: R Model Regeneration (Tuesday 3:00 AM)
-0 3 * * 2 cd /Users/dro/rice/nfl-analytics && ./scripts/regenerate_r_predictions_weekly.sh >> logs/r_models/weekly_regeneration.log 2>&1
+0 3 * * 2 cd \ && ./scripts/regenerate_r_predictions_weekly.sh >> logs/r_models/weekly_regeneration.log 2>&1
 
 # NFL Analytics: Ensemble Prediction Generation (Tuesday 12:00 PM)
-0 12 * * 2 cd /Users/dro/rice/nfl-analytics && ./scripts/generate_weekly_predictions_automated.sh >> logs/predictions/weekly_automated.log 2>&1
+0 12 * * 2 cd \ && ./scripts/generate_weekly_predictions_automated.sh >> logs/predictions/weekly_automated.log 2>&1
 ```
 
 ### 3. Dashboard Prediction Freshness Widget

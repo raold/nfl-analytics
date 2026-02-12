@@ -18,8 +18,8 @@ chmod +x scripts/emergency_start_native_postgres.sh
 
 # Or manual startup:
 /opt/homebrew/opt/postgresql@16/bin/pg_ctl \
-  -D /Users/dro/rice/nfl-analytics/pgdata \
-  -l /Users/dro/rice/nfl-analytics/logs/postgres.log \
+  -D pgdata \
+  -l logs/postgres.log \
   -o '-p 5544' \
   start
 
@@ -39,7 +39,7 @@ brew install colima
 colima start --cpu 4 --memory 8 --disk 100
 
 # Step 3: Start NFL Analytics stack
-cd /Users/dro/rice/nfl-analytics
+cd \
 docker compose up -d pg-1
 
 # Step 4: Wait for ready (2-3 min)
@@ -63,7 +63,7 @@ open /Applications/OrbStack.app
 docker ps
 
 # Step 4: Start NFL Analytics stack
-cd /Users/dro/rice/nfl-analytics
+cd \
 docker compose up -d
 
 # Step 5: Test connection
@@ -80,7 +80,7 @@ chmod +x scripts/emergency_db_diagnostic.sh
 # Quick checks
 lsof -i :5544                                    # Is port 5544 listening?
 docker ps                                         # Is Docker working?
-ls -lh /Users/dro/rice/nfl-analytics/pgdata/    # Does pgdata exist?
+ls -lh pgdata/    # Does pgdata exist?
 brew list postgresql@16                           # Is PostgreSQL installed?
 
 ================================================================================
@@ -114,16 +114,16 @@ POSTGRESQL MANAGEMENT (Native Option)
 ================================================================================
 
 # Status
-/opt/homebrew/opt/postgresql@16/bin/pg_ctl -D /Users/dro/rice/nfl-analytics/pgdata status
+/opt/homebrew/opt/postgresql@16/bin/pg_ctl -D pgdata status
 
 # Stop
-/opt/homebrew/opt/postgresql@16/bin/pg_ctl -D /Users/dro/rice/nfl-analytics/pgdata stop
+/opt/homebrew/opt/postgresql@16/bin/pg_ctl -D pgdata stop
 
 # Restart
-/opt/homebrew/opt/postgresql@16/bin/pg_ctl -D /Users/dro/rice/nfl-analytics/pgdata restart
+/opt/homebrew/opt/postgresql@16/bin/pg_ctl -D pgdata restart
 
 # View logs
-tail -f /Users/dro/rice/nfl-analytics/logs/postgres.log
+tail -f logs/postgres.log
 
 ================================================================================
 DOCKER DESKTOP TROUBLESHOOTING (Last resort)
@@ -174,8 +174,8 @@ Then resume:
 EMERGENCY CONTACTS
 ================================================================================
 
-Full documentation: /Users/dro/rice/nfl-analytics/EMERGENCY_DATABASE_RECOVERY.md
-Diagnostic script:  /Users/dro/rice/nfl-analytics/scripts/emergency_db_diagnostic.sh
-Startup script:     /Users/dro/rice/nfl-analytics/scripts/emergency_start_native_postgres.sh
+Full documentation: EMERGENCY_DATABASE_RECOVERY.md
+Diagnostic script:  scripts/emergency_db_diagnostic.sh
+Startup script:     scripts/emergency_start_native_postgres.sh
 
 ================================================================================

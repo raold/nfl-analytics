@@ -16,8 +16,8 @@ echo "=========================================="
 echo ""
 
 # Configuration
-PGDATA="/Users/dro/rice/nfl-analytics/pgdata"
-PGLOG="/Users/dro/rice/nfl-analytics/logs/postgres.log"
+PGDATA="$(cd "$(dirname "")/.." \&\& pwd)/pgdata"
+PGLOG="$(cd "$(dirname "")/.." \&\& pwd)/logs/postgres.log"
 PGPORT="5544"
 PG_VERSION="16"
 

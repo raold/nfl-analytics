@@ -441,7 +441,7 @@ streamlit run dashboard/app_refactored.py --server.port 8502
 
 **Week 3: Production Swap**
 ```bash
-cd /Users/dro/rice/nfl-analytics/dashboard
+cd dashboard
 mv app.py app_legacy.py
 mv app_refactored.py app.py
 # Restart Streamlit (automatically picks up new app.py)
@@ -450,7 +450,7 @@ mv app_refactored.py app.py
 ### Option 2: Immediate Migration (HIGHER RISK)
 
 ```bash
-cd /Users/dro/rice/nfl-analytics/dashboard
+cd dashboard
 cp app.py app_backup_$(date +%Y%m%d).py  # Additional safety
 mv app_refactored.py app.py
 # Restart Streamlit
@@ -466,7 +466,7 @@ mv app_refactored.py app.py
 If critical bugs discovered:
 
 ```bash
-cd /Users/dro/rice/nfl-analytics/dashboard
+cd dashboard
 
 # Option A: Revert to backup
 mv app.py app_refactored_broken.py

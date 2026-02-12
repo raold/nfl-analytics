@@ -386,7 +386,7 @@ df = pd.read_sql_query(query, conn)  # Faster than SELECT *
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `ModuleNotFoundError: No module named 'dashboard'` | Python path incorrect | Run from project root: `cd /Users/dro/rice/nfl-analytics` |
+| `ModuleNotFoundError: No module named 'dashboard'` | Python path incorrect | Run from project root: `cd \` |
 | `OperationalError: could not connect to server` | Database not running | Start Docker: `docker-compose up -d postgres` |
 | `KeyError: 'win_rate'` | DataFrame missing column | Check query returned expected columns |
 | `AttributeError: module has no attribute 'plot_win_rate_over_time'` | Import error | Check `__init__.py` exports function |

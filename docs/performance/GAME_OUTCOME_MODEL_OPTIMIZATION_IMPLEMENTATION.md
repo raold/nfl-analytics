@@ -1,7 +1,7 @@
 # Game Outcome Model - Optimization Implementation Guide
 
 **Date:** November 29, 2025
-**Target File:** `/Users/dro/rice/nfl-analytics/py/models/game_outcome_model.py`
+**Target File:** `py/models/game_outcome_model.py`
 **Expected Gain:** 60-75% performance improvement (training + inference)
 **Implementation Time:** 1-2 hours (Phase 1), 4-6 hours (Phase 2)
 
@@ -33,7 +33,7 @@ python py/models/game_outcome_model.py  # Run main() function
 
 ### Change 1: Add Connection Pooling (40-60% gain)
 
-**File:** `/Users/dro/rice/nfl-analytics/py/models/game_outcome_model.py`
+**File:** `py/models/game_outcome_model.py`
 
 **Lines 1-82 (imports and class definition):**
 ```python
@@ -569,7 +569,7 @@ def load_models(self, suffix: Optional[str] = None):
 
 ### Change 5: Update GameFeatureExtractor to accept db_pool
 
-**File:** `/Users/dro/rice/nfl-analytics/py/features/game_feature_extractor.py`
+**File:** `py/features/game_feature_extractor.py`
 
 **Lines 221-313 (`__init__` method):**
 ```python
@@ -676,7 +676,7 @@ if get_team_playcalling_features:
 
 ### 1. Unit Tests
 
-Create `/Users/dro/rice/nfl-analytics/tests/models/test_game_outcome_model.py`:
+Create `tests/models/test_game_outcome_model.py`:
 
 ```python
 #!/usr/bin/env python3
@@ -807,7 +807,7 @@ pytest tests/models/test_game_outcome_model.py -v -s
 
 ### 2. Benchmark Script
 
-Create `/Users/dro/rice/nfl-analytics/scripts/benchmark_game_outcome_model.py`:
+Create `scripts/benchmark_game_outcome_model.py`:
 
 ```python
 #!/usr/bin/env python3
@@ -996,7 +996,7 @@ Inference:
 3. **Phase 2 (Optional):**
    - Implement parallel feature extraction (15-25% additional gain)
    - Implement batch queries (25-35% additional gain)
-   - See `/Users/dro/rice/nfl-analytics/docs/performance/GAME_OUTCOME_MODEL_OPTIMIZATION_ANALYSIS.md`
+   - See `docs/performance/GAME_OUTCOME_MODEL_OPTIMIZATION_ANALYSIS.md`
 
 4. **Documentation:**
    - Update CLAUDE.md with new performance numbers

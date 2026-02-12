@@ -333,7 +333,7 @@ LEFT JOIN games g ON
 - One player plays in one game per week, but multiple players play in each game
 - Composite key `(player_id, season, week)` is sufficient for unique constraint
 
-**Reference:** [SQL_PATTERNS.md](/Users/dro/rice/nfl-analytics/docs/database/SQL_PATTERNS.md)
+**Reference:** [SQL_PATTERNS.md](docs/database/SQL_PATTERNS.md)
 
 ---
 
@@ -610,9 +610,9 @@ ORDER BY oh.time;
 ## Related Documentation
 
 **Database Documentation:**
-- [DATABASE_QUICK_REFERENCE.md](/Users/dro/rice/nfl-analytics/docs/database/DATABASE_QUICK_REFERENCE.md) - Quick lookup guide
-- [DATABASE_SCHEMA_AUDIT.md](/Users/dro/rice/nfl-analytics/docs/database/DATABASE_SCHEMA_AUDIT.md) - Complete audit
-- [SQL_PATTERNS.md](/Users/dro/rice/nfl-analytics/docs/database/SQL_PATTERNS.md) - Query patterns library
+- [DATABASE_QUICK_REFERENCE.md](docs/database/DATABASE_QUICK_REFERENCE.md) - Quick lookup guide
+- [DATABASE_SCHEMA_AUDIT.md](docs/database/DATABASE_SCHEMA_AUDIT.md) - Complete audit
+- [SQL_PATTERNS.md](docs/database/SQL_PATTERNS.md) - Query patterns library
 
 **Architecture Diagrams:**
 - [c4_component_data_ingestion.md](c4_component_data_ingestion.md) - Data ingestion pipeline
@@ -620,7 +620,7 @@ ORDER BY oh.time;
 - [data_flow_diagram.md](data_flow_diagram.md) - End-to-end data flow
 
 **Performance Optimization:**
-- [BATCH_PREDICTION_OPTIMIZATION.md](/Users/dro/rice/nfl-analytics/docs/performance/BATCH_PREDICTION_OPTIMIZATION.md)
+- [BATCH_PREDICTION_OPTIMIZATION.md](docs/performance/BATCH_PREDICTION_OPTIMIZATION.md)
 
 ---
 
@@ -643,4 +643,4 @@ ORDER BY oh.time;
 
 **Diagram Created:** November 15, 2025
 **Maintained By:** Data Engineering Team
-**Contact:** See [CLAUDE.md](/Users/dro/rice/nfl-analytics/CLAUDE.md) for questions
+**Contact:** See [CLAUDE.md](CLAUDE.md) for questions

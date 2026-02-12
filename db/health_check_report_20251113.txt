@@ -5,7 +5,7 @@ NFL ANALYTICS DATABASE HEALTH CHECK
 
 1. TABLE BLOAT (Top 10 bloated tables)
 ------------------------------------------------------------
-psql:/Users/dro/rice/nfl-analytics/db/health_check.sql:46: ERROR:  function round(double precision, integer) does not exist
+psql:db/health_check.sql:46: ERROR:  function round(double precision, integer) does not exist
 LINE 7:     ROUND(100.0 * (1 - (n_live_tup::float / NULLIF(n_live_tu...
             ^
 HINT:  No function matches the given name and argument types. You might need to add explicit type casts.

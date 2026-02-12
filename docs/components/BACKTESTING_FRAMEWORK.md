@@ -224,7 +224,7 @@ gates = validator.validate_risk_gates(metrics)
 - 90% CI Calibration: 85-95% ✅
 - Inference Speed < 500ms ✅
 
-**File Location:** `/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_4way.py`
+**File Location:** `py/backtest/historical_validation_4way.py`
 
 ---
 
@@ -264,7 +264,7 @@ python py/backtest/historical_validation_4way_optimized.py \
     --output results/optimized_backtest.csv
 ```
 
-**File Location:** `/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_4way_optimized.py`
+**File Location:** `py/backtest/historical_validation_4way_optimized.py`
 
 ---
 
@@ -306,7 +306,7 @@ dm_statistic, p_value = compute_diebold_mariano(
 )
 ```
 
-**File Location:** `/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_v6.py`
+**File Location:** `py/backtest/historical_validation_v6.py`
 
 ---
 
@@ -321,7 +321,7 @@ dm_statistic, p_value = compute_diebold_mariano(
 
 **Use Case:** Quick validation of feature quality without complex ensemble
 
-**File Location:** `/Users/dro/rice/nfl-analytics/py/backtest/baseline_glm.py`
+**File Location:** `py/backtest/baseline_glm.py`
 
 ---
 
@@ -345,7 +345,7 @@ python py/backtest/harness.py \
     --tex analysis/dissertation/figures/out/glm_table.tex
 ```
 
-**File Location:** `/Users/dro/rice/nfl-analytics/py/backtest/harness.py`
+**File Location:** `py/backtest/harness.py`
 
 ---
 
@@ -374,7 +374,7 @@ python py/backtest/harness_multimodel.py \
     --per-season-csv analysis/results/multimodel_per_season.csv
 ```
 
-**File Location:** `/Users/dro/rice/nfl-analytics/py/backtest/harness_multimodel.py`
+**File Location:** `py/backtest/harness_multimodel.py`
 
 ---
 
@@ -398,7 +398,7 @@ python py/backtest/harness_multimodel.py \
 - Baseline (spread only): ~52%
 - With features: ~53-55%
 
-**File Location:** `/Users/dro/rice/nfl-analytics/py/backtest/comprehensive_safe_backtest.py`
+**File Location:** `py/backtest/comprehensive_safe_backtest.py`
 
 ---
 
@@ -413,7 +413,7 @@ python py/backtest/harness_multimodel.py \
 - Bankroll management
 - Position tracking (open, closed, P&L)
 
-**File Location:** `/Users/dro/rice/nfl-analytics/py/backtest/pinnacle_historical_simulation.py`
+**File Location:** `py/backtest/pinnacle_historical_simulation.py`
 
 ---
 
@@ -427,7 +427,7 @@ python py/backtest/harness_multimodel.py \
 - Market depth
 - Partial position management
 
-**File Location:** `/Users/dro/rice/nfl-analytics/py/backtest/exchange_simulation_v2.py`
+**File Location:** `py/backtest/exchange_simulation_v2.py`
 
 ---
 
@@ -1385,7 +1385,7 @@ ORDER BY g.kickoff
 
 ### 3. Risk Management Integration
 
-**Risk Gates Component:** See `/Users/dro/rice/nfl-analytics/py/utils/`
+**Risk Gates Component:** See `py/utils/`
 - `ensemble_health_monitor.py` (P0 critical pre-backtest checks)
 - `sports_analytics_validator.py` (NFL domain rule enforcement)
 - `enforcement_router.py` (Automated validation routing)

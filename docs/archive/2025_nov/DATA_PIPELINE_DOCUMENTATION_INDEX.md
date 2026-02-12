@@ -319,10 +319,10 @@ Detailed metrics: [Component Docs - Performance](docs/components/DATA_PIPELINE.m
 
 ## Files Created
 
-1. `/Users/dro/rice/nfl-analytics/docs/components/DATA_PIPELINE.md` (1,274 lines, 44 KB)
-2. `/Users/dro/rice/nfl-analytics/docs/guides/DATA_PIPELINE_QUICK_START.md` (397 lines, 12 KB)
-3. `/Users/dro/rice/nfl-analytics/docs/DOCUMENTATION_SUMMARY.md` (233 lines, 8 KB)
-4. `/Users/dro/rice/nfl-analytics/DATA_PIPELINE_DOCUMENTATION_INDEX.md` (this file)
+1. `docs/components/DATA_PIPELINE.md` (1,274 lines, 44 KB)
+2. `docs/guides/DATA_PIPELINE_QUICK_START.md` (397 lines, 12 KB)
+3. `docs/DOCUMENTATION_SUMMARY.md` (233 lines, 8 KB)
+4. `DATA_PIPELINE_DOCUMENTATION_INDEX.md` (this file)
 
 ---
 

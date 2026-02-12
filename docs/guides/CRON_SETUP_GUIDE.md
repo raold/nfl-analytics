@@ -22,7 +22,7 @@ The weekly cron job runs every Tuesday at 3:00 AM (after Monday Night Football) 
 Test the script manually before scheduling:
 
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 
 # Test run (dry run with --test flag)
 Rscript R/batch_generate_r_predictions.R --test
@@ -47,7 +47,7 @@ Add the following line:
 
 ```cron
 # Weekly R predictions regeneration (Tuesday 3:00 AM after MNF)
-0 3 * * 2 /Users/dro/rice/nfl-analytics/scripts/regenerate_r_predictions_weekly.sh >> /Users/dro/rice/nfl-analytics/logs/r_predictions/cron.log 2>&1
+0 3 * * 2 scripts/regenerate_r_predictions_weekly.sh >> logs/r_predictions/cron.log 2>&1
 ```
 
 **Explanation**:

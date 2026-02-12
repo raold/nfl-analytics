@@ -23,7 +23,7 @@ Your documentation has **300+ files** with **47 violations** in the root directo
 
 ### Step 1: Run Dry-Run Cleanup (5 minutes)
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 bash scripts/cleanup_documentation_nov15.sh --dry-run
 ```
 

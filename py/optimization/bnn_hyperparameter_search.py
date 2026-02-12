@@ -19,9 +19,10 @@ Target: Find configuration achieving >50% coverage (2x current best)
 import json
 import logging
 import sys
-from datetime import datetime
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+from datetime import datetime
 import numpy as np
 import optuna
 import pandas as pd
@@ -31,7 +32,7 @@ from optuna.storages import RDBStorage
 from sklearn.preprocessing import StandardScaler
 
 # Add project root to path
-sys.path.append("/Users/dro/rice/nfl-analytics")
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 # Setup logging
 logging.basicConfig(
@@ -40,7 +41,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Paths
-STUDY_DIR = Path("/Users/dro/rice/nfl-analytics/experiments/optimization")
+STUDY_DIR = _PROJECT_ROOT / "experiments/optimization"
 STUDY_DIR.mkdir(parents=True, exist_ok=True)
 DB_PATH = STUDY_DIR / "optuna_study.db"
 

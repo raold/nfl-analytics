@@ -48,7 +48,7 @@ Run full 4-way ensemble backtest on 2022-2024 seasons to validate production per
 
 ### 1. Infrastructure Successfully Created ✅
 
-#### File: `/Users/dro/rice/nfl-analytics/py/backtest/historical_validation_4way.py`
+#### File: `py/backtest/historical_validation_4way.py`
 
 **Lines of Code:** 662
 **Features:**

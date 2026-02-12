@@ -256,7 +256,7 @@ This directory contains comprehensive documentation for deploying the **4-way NF
 
 ### Models
 ```
-/Users/dro/rice/nfl-analytics/models/bayesian/
+models/bayesian/
 ├── simplified_random_walk_v2.rds          (State-Space v2, ~250 MB)
 ├── passing_yards_hierarchical_v2.rds      (Hierarchical v2, ~200 MB)
 ├── passing_informative_priors_v2.rds      (Informative Priors v2, ~200 MB)
@@ -265,7 +265,7 @@ This directory contains comprehensive documentation for deploying the **4-way NF
 
 ### Infrastructure
 ```
-/Users/dro/rice/nfl-analytics/
+
 ├── docker-compose.yml                     (Service definitions)
 ├── prometheus.yml                         (Metrics config)
 └── grafana/provisioning/dashboards/       (Dashboard configs)
@@ -273,7 +273,7 @@ This directory contains comprehensive documentation for deploying the **4-way NF
 
 ### Scripts
 ```
-/Users/dro/rice/nfl-analytics/
+
 ├── py/ensemble/enhanced_ensemble_v5_canonical.py     (Predictions)
 ├── py/backtests/comprehensive_ensemble_backtest.py   (Backtesting)
 ├── py/production/risk_gates.py                       (Safety system)
@@ -521,7 +521,7 @@ Issue Detected
 - Main Checklist: PRODUCTION_DEPLOYMENT_CHECKLIST.md
 - Quick Reference: DEPLOYMENT_QUICK_REFERENCE.md
 - Health Checks: HEALTH_CHECK_PROCEDURES.md
-- Project Context: /Users/dro/rice/nfl-analytics/CLAUDE.md
+- Project Context: CLAUDE.md
 
 ### Decision Records (ADRs)
 - ADR-001: Canonical Training Window (approved)

@@ -170,7 +170,7 @@ EOF
 
 **Step 2.1: Run Registration Script**
 ```bash
-cd /Users/dro/rice/nfl-analytics
+cd \
 python py/database/register_ensemble_models.py
 ```
 

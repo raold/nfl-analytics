@@ -852,8 +852,8 @@ docs/ENSEMBLE_V5_1_COMPLETE.md                  # Latest ensemble docs
 **Reviewers:** Claude Code (AI Assistant)
 
 **Related Documentation:**
-- [CLAUDE.md](/Users/dro/rice/nfl-analytics/CLAUDE.md) - Project master documentation
-- [AGENT_COORDINATOR_GUIDE.md](/Users/dro/rice/nfl-analytics/docs/AGENT_COORDINATOR_GUIDE.md) - Agent system
-- [R/README.md](/Users/dro/rice/nfl-analytics/R/README.md) - R analytics infrastructure
-- [py/models/README.md](/Users/dro/rice/nfl-analytics/py/models/README.md) - ML models guide
-- [GIT_LFS_WORKFLOW.md](/Users/dro/rice/nfl-analytics/docs/guides/GIT_LFS_WORKFLOW.md) - Model management
+- [CLAUDE.md](CLAUDE.md) - Project master documentation
+- [AGENT_COORDINATOR_GUIDE.md](docs/AGENT_COORDINATOR_GUIDE.md) - Agent system
+- [R/README.md](R/README.md) - R analytics infrastructure
+- [py/models/README.md](py/models/README.md) - ML models guide
+- [GIT_LFS_WORKFLOW.md](docs/guides/GIT_LFS_WORKFLOW.md) - Model management

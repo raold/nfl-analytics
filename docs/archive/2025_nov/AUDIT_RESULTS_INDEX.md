@@ -245,7 +245,7 @@ Run these commands to verify fixes:
 
 ```bash
 # 1. Test R ingestion scripts
-cd /Users/dro/rice/nfl-analytics
+cd \
 Rscript --vanilla R/ingestion/ingest_schedules.R --dry-run 2>&1 | head -5
 
 # 2. Test environment variable loading

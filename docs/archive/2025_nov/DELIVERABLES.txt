@@ -254,24 +254,24 @@ FILES AND LOCATIONS
 ================================================================================
 
 ROOT LEVEL DOCUMENTATION:
-✅ /Users/dro/rice/nfl-analytics/TEMPERATURE_SCALING_README.md
-✅ /Users/dro/rice/nfl-analytics/IMPLEMENTATION_PLAN_SUMMARY.txt
-✅ /Users/dro/rice/nfl-analytics/DELIVERABLES.txt (this file)
+✅ TEMPERATURE_SCALING_README.md
+✅ IMPLEMENTATION_PLAN_SUMMARY.txt
+✅ DELIVERABLES.txt (this file)
 
 DETAILED DOCUMENTATION IN docs/:
-✅ /Users/dro/rice/nfl-analytics/docs/TEMPERATURE_SCALING_EXECUTIVE_SUMMARY.md
-✅ /Users/dro/rice/nfl-analytics/docs/TEMPERATURE_SCALING_IMPLEMENTATION_PLAN.md
-✅ /Users/dro/rice/nfl-analytics/docs/TEMPERATURE_SCALING_TECHNICAL_SPEC.md
-✅ /Users/dro/rice/nfl-analytics/docs/TEMPERATURE_SCALING_QUICK_REFERENCE.md
+✅ docs/TEMPERATURE_SCALING_EXECUTIVE_SUMMARY.md
+✅ docs/TEMPERATURE_SCALING_IMPLEMENTATION_PLAN.md
+✅ docs/TEMPERATURE_SCALING_TECHNICAL_SPEC.md
+✅ docs/TEMPERATURE_SCALING_QUICK_REFERENCE.md
 
 TARGET FILE FOR MODIFICATION:
-✅ /Users/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v5.py
+✅ py/ensemble/enhanced_ensemble_v5.py
 
 REFERENCE IMPLEMENTATIONS:
-✅ /Users/dro/rice/nfl-analytics/py/models/bnn_temperature_scaling.py
+✅ py/models/bnn_temperature_scaling.py
 
 RELATED DOCUMENTATION:
-✅ /Users/dro/rice/nfl-analytics/docs/decisions/ADR-003-ensemble-calibration-production.md
+✅ docs/decisions/ADR-003-ensemble-calibration-production.md
 
 ================================================================================
 QUICK START GUIDE

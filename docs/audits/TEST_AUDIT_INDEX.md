@@ -313,14 +313,14 @@ TARGET STATE (After, Week 6)
 
 ### Root Directory
 ```
-/Users/dro/rice/nfl-analytics/
+
 ├── TEST_AUDIT_SUMMARY_NOV15_2025.md          ← EXECUTIVE SUMMARY
 └── TEST_AUDIT_INDEX.md                        ← THIS FILE
 ```
 
 ### Documentation Directory
 ```
-/Users/dro/rice/nfl-analytics/docs/
+docs/
 ├── TEST_COVERAGE_AUDIT_NOV15_2025.md          ← MAIN AUDIT (75+ pages)
 ├── TEST_IMPLEMENTATION_PLAN_NOV15_2025.md     ← IMPLEMENTATION GUIDE (60+ pages)
 ├── TEST_QUICK_START_GUIDE.md                  ← DEVELOPER REFERENCE (30+ pages)

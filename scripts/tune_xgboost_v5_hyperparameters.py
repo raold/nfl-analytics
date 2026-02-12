@@ -32,16 +32,17 @@ import logging
 
 # Import XGBoost v5 training class
 import sys
-from datetime import datetime
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+from datetime import datetime
 import numpy as np
 import pandas as pd
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import KFold
 
-sys.path.append("/Users/dro/rice/nfl-analytics")
+sys.path.insert(0, str(_PROJECT_ROOT))
 from scripts.train_xgboost_v5_integrated import XGBoostV5Integrated
 
 logging.basicConfig(

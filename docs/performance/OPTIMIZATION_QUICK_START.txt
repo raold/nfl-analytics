@@ -172,27 +172,27 @@ FILES & DOCUMENTATION
 ================================================================================
 
 Main Analysis:
-  /Users/dro/rice/nfl-analytics/docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md
+  docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md
   → 4,200 lines, complete technical analysis, all bottlenecks explained
 
 Implementation Guide:
-  /Users/dro/rice/nfl-analytics/docs/OPTIMIZATION_IMPLEMENTATION_CHECKLIST.md
+  docs/OPTIMIZATION_IMPLEMENTATION_CHECKLIST.md
   → 600 lines, step-by-step for each optimization
 
 Code Examples:
-  /Users/dro/rice/nfl-analytics/scripts/optimize_ensemble_backtest.py
+  scripts/optimize_ensemble_backtest.py
   → 350 lines, production-ready classes (DatabasePoolManager, RModelCache)
 
 Executive Summary:
-  /Users/dro/rice/nfl-analytics/docs/ENSEMBLE_PERFORMANCE_SUMMARY.md
+  docs/ENSEMBLE_PERFORMANCE_SUMMARY.md
   → 400 lines, key findings and risk assessment
 
 This Quick Start:
-  /Users/dro/rice/nfl-analytics/OPTIMIZATION_QUICK_START.txt
+  OPTIMIZATION_QUICK_START.txt
   → You are here!
 
 Index:
-  /Users/dro/rice/nfl-analytics/PERFORMANCE_ANALYSIS_DELIVERABLES.md
+  PERFORMANCE_ANALYSIS_DELIVERABLES.md
   → Overview of all analysis and implementation materials
 
 ================================================================================

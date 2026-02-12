@@ -11,7 +11,7 @@ import os
 import sys
 
 # Add project root to path
-project_root = "/Users/dro/rice/nfl-analytics"
+project_root = str(_PROJECT_ROOT)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
@@ -28,6 +28,9 @@ os.chdir(project_root)
 
 # Import cVAE model using absolute import from project root
 import importlib.util
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
 spec = importlib.util.spec_from_file_location(
     "game_trajectory_cvae", os.path.join(project_root, "py/models/game_trajectory_cvae.py")

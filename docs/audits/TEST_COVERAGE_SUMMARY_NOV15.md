@@ -385,16 +385,16 @@ pytest -n auto
 ## Documentation
 
 **Complete Reports:**
-- `/Users/dro/rice/nfl-analytics/TEST_COVERAGE_FRESH_AUDIT_NOV15.md` - Full audit
-- `/Users/dro/rice/nfl-analytics/TEST_GENERATION_PLAN_80PCT.md` - Detailed plan
-- `/Users/dro/rice/nfl-analytics/tests/P0_COMPLETION_GUIDE.md` - P0 guide
-- `/Users/dro/rice/nfl-analytics/tests/README.md` - Test infrastructure
+- `TEST_COVERAGE_FRESH_AUDIT_NOV15.md` - Full audit
+- `TEST_GENERATION_PLAN_80PCT.md` - Detailed plan
+- `tests/P0_COMPLETION_GUIDE.md` - P0 guide
+- `tests/README.md` - Test infrastructure
 
 **Quick Start:**
-- `/Users/dro/rice/nfl-analytics/tests/P0_QUICK_START.md` - Run P0 tests
+- `tests/P0_QUICK_START.md` - Run P0 tests
 
 **Previous Audit:**
-- `/Users/dro/rice/nfl-analytics/docs/TEST_COVERAGE_AUDIT_NOV15_2025.md` - Nov 8 baseline
+- `docs/TEST_COVERAGE_AUDIT_NOV15_2025.md` - Nov 8 baseline
 
 ---
 
