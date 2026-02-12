@@ -1,0 +1,68 @@
+# Feature Weights Configuration
+# ==============================
+# Set weight=0.0 to disable feature groups without removing code.
+# This allows easy re-enabling for future experiments.
+#
+# Updated: 2025-12-31
+# Rationale: ADR-015 - Kalman/GP features provide negative signal
+#
+# Evidence (A/B Test Results):
+#   - v2 Baseline: 69.1% ML accuracy, 10.45 spread MAE
+#   - v2.1 (with Kalman/GP): 58.9% ML accuracy, 10.70 spread MAE
+#   - Impact: -10.2pp accuracy, +0.25 MAE (WORSE)
+
+feature_groups:
+  # =====================================================
+  # DISABLED FEATURE GROUPS
+  # =====================================================
+
+  kalman_epa:
+    weight: 0.0
+    reason: "DISABLED: -10.2pp accuracy drop in A/B test (ADR-014)"
+    disabled_date: "2025-12-31"
+    features:
+      - "kal_home_*"      # 8 home team Kalman features
+      - "kal_away_*"      # 8 away team Kalman features
+      - "kal_*_diff"      # 2 differential features
+    notes: |
+      Kalman filter for EPA regime detection with CUSUM.
+      EPA already captured by existing features (redundant).
+      CUSUM regime changes don't correlate with game outcomes.
+      2-season lookback may be insufficient for stable estimates.
+
+  gp_injury:
+    weight: 0.0
+    reason: "DISABLED: GP never trains, uses fake estimated data (ADR-015)"
+    disabled_date: "2025-12-31"
+    features:
+      - "gp_*"            # 8 GP recovery features
+      - "injury_*"        # 9 injury type flags
+    notes: |
+      GP injury recovery curves never actually train (self._trained=False).
+      Uses exponential_decay_baseline() with arbitrary parameters.
+      days_since_return is ESTIMATED from severity index (14 - severity * 2), NOT real data.
+      Uncertainty bounds are heuristic (15.0 magic number), not calibrated.
+
+  # =====================================================
+  # ENABLED FEATURE GROUPS (weight=1.0)
+  # =====================================================
+
+  semantic:
+    weight: 1.0
+    reason: "A/B test ongoing - currently enabled for continued evaluation"
+    features:
+      - "sem_*"           # 38 semantic LLM-derived features
+
+  rest_differential:
+    weight: 1.0
+    reason: "Strong signal: +25pp ATS swing for 3+ day advantage (validated)"
+    features:
+      - "rest_*"
+      - "is_*_short_week"
+      - "is_*_long_week"
+
+  base_features:
+    weight: 1.0
+    reason: "Core v2 production features - proven performance"
+    features:
+      - "*"               # All other features enabled by default
