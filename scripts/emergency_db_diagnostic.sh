@@ -53,10 +53,12 @@ echo ""
 echo "=========================================="
 echo "2. DOCKER SOCKET"
 echo "=========================================="
-if [ -S "/Users/dro/.docker/run/docker.sock" ]; then
-  test_pass "Docker socket exists: /Users/dro/.docker/run/docker.sock"
+DOCKER_SOCKET="${DOCKER_HOST:-/var/run/docker.sock}"
+DOCKER_SOCKET="${DOCKER_SOCKET#unix://}"  # Strip unix:// prefix if present
+if [ -S "$DOCKER_SOCKET" ]; then
+  test_pass "Docker socket exists: $DOCKER_SOCKET"
 else
-  test_fail "Docker socket missing: /Users/dro/.docker/run/docker.sock"
+  test_fail "Docker socket missing: $DOCKER_SOCKET"
 fi
 echo ""
 
@@ -78,7 +80,7 @@ echo ""
 echo "=========================================="
 echo "4. PGDATA DIRECTORY"
 echo "=========================================="
-PGDATA_DIR="/Users/dro/rice/nfl-analytics/pgdata"
+PGDATA_DIR="$(cd "$(dirname "")/.." \&\& pwd)/pgdata"
 if [ -d "$PGDATA_DIR" ]; then
   test_pass "pgdata directory exists"
   echo "Size: $(du -sh $PGDATA_DIR 2>/dev/null || echo 'Unknown')"
@@ -200,7 +202,7 @@ echo ""
 echo "=========================================="
 echo "9. DOCKER COMPOSE CONFIGURATION"
 echo "=========================================="
-COMPOSE_FILE="/Users/dro/rice/nfl-analytics/docker-compose.yml"
+COMPOSE_FILE="$(cd "$(dirname "")/.." \&\& pwd)/docker-compose.yml"
 if [ -f "$COMPOSE_FILE" ]; then
   test_pass "docker-compose.yml exists"
 
@@ -216,7 +218,7 @@ echo ""
 echo "=========================================="
 echo "10. ENVIRONMENT VARIABLES"
 echo "=========================================="
-ENV_FILE="/Users/dro/rice/nfl-analytics/.env"
+ENV_FILE="$(cd "$(dirname "")/.." \&\& pwd)/.env"
 if [ -f "$ENV_FILE" ]; then
   test_pass ".env file exists"
   echo "Database variables:"
@@ -234,7 +236,7 @@ echo "macOS Version: $(sw_vers -productVersion)"
 echo "Chip: $(sysctl -n machdep.cpu.brand_string)"
 echo "Memory: $(sysctl -n hw.memsize | awk '{print $1/1024/1024/1024 " GB"}')"
 echo "Disk space (NFL analytics dir):"
-df -h /Users/dro/rice/nfl-analytics | tail -1 | awk '{print "  Available: "$4" / "$2" ("$5" used)"}'
+df -h $(cd "$(dirname "")/.." \&\& pwd) | tail -1 | awk '{print "  Available: "$4" / "$2" ("$5" used)"}'
 echo ""
 
 # 12. Check recent Docker logs (if Docker is running)
@@ -282,8 +284,8 @@ else
   echo "FASTEST (10-15 min): Option 1 - Native PostgreSQL"
   echo "  brew install postgresql@16"
   echo "  /opt/homebrew/opt/postgresql@16/bin/pg_ctl \\"
-  echo "    -D /Users/dro/rice/nfl-analytics/pgdata \\"
-  echo "    -l /Users/dro/rice/nfl-analytics/logs/postgres.log \\"
+  echo "    -D $(cd "$(dirname "")/.." \&\& pwd)/pgdata \\"
+  echo "    -l $(cd "$(dirname "")/.." \&\& pwd)/logs/postgres.log \\"
   echo "    -o '-p 5544' \\"
   echo "    start"
   echo ""

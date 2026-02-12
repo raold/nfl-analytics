@@ -6,14 +6,14 @@
 # to refresh predictions for upcoming weeks.
 #
 # Cron schedule (Tuesdays at 3 AM):
-# 0 3 * * 2 cd /Users/dro/rice/nfl-analytics && ./scripts/weekly_refresh.sh >> logs/weekly_refresh.log 2>&1
+# 0 3 * * 2 cd $(cd "$(dirname "$0")/.." \&\& pwd) && ./scripts/weekly_refresh.sh >> logs/weekly_refresh.log 2>&1
 #
 # Or use launchd on macOS - see scripts/com.nfl-analytics.weekly-refresh.plist
 
-set -e  # Exit on error
+set -euo pipefail  # Exit on error, undefined variable, or pipe failure
 
 # Configuration
-PROJECT_ROOT="/Users/dro/rice/nfl-analytics"
+PROJECT_ROOT="$(cd "$(dirname "$0")/.." \&\& pwd)"
 LOG_DIR="$PROJECT_ROOT/logs"
 LOG_FILE="$LOG_DIR/weekly_refresh_$(date +%Y%m%d_%H%M%S).log"
 

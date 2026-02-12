@@ -4,6 +4,7 @@ Monitor running compute tasks and upgrade their intensity when round completes.
 """
 
 import os
+import shlex
 import subprocess
 import sys
 import time
@@ -63,8 +64,8 @@ def restart_with_high_intensity(original_cmd, pid):
     print("🚀 Starting new process with high intensity:")
     print(f"   Command: {new_cmd}")
 
-    # Start the new process in background
-    subprocess.Popen(new_cmd, shell=True)
+    # Start the new process in background (shell=False to avoid injection)
+    subprocess.Popen(shlex.split(new_cmd))
     print("✅ Process upgraded to high intensity")
 
 
