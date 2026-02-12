@@ -585,20 +585,22 @@ class GameFeatureExtractor:
                 f"(spread_adj={injury_features.get('injury_spread_adjustment', 0):.1f})"
             )
         except Exception as e:
-            logger.warning(f"Failed to extract injury features: {e}. Using default values.")
-            # Add default injury features (all zeros)
+            logger.warning(f"Failed to extract injury features: {e}. Using league averages.")
+            # Use league average injury load instead of zeros.
+            # Zero means "no injuries at all" which is false information.
+            # League averages: ~3.2 injuries/week, severity ~1.8, rarely QB out.
             features.update(
                 {
-                    "home_injury_total": 0,
-                    "home_injury_severity_index": 0.0,
+                    "home_injury_total": 3,
+                    "home_injury_severity_index": 1.8,
                     "home_qb_out": 0,
                     "home_key_position_out": 0,
-                    "home_oline_injuries": 0,
-                    "away_injury_total": 0,
-                    "away_injury_severity_index": 0.0,
+                    "home_oline_injuries": 1,
+                    "away_injury_total": 3,
+                    "away_injury_severity_index": 1.8,
                     "away_qb_out": 0,
                     "away_key_position_out": 0,
-                    "away_oline_injuries": 0,
+                    "away_oline_injuries": 1,
                     "injury_severity_diff": 0.0,
                     "injury_spread_adjustment": 0.0,
                 }
@@ -1270,27 +1272,19 @@ class GameFeatureExtractor:
                 "oline_injuries": row[5] or 0,
             }
 
-        # Extract home and away data (default to zeros if missing)
-        home_data = injury_data.get(
-            home_team,
-            {
-                "total_injuries": 0,
-                "injury_severity_index": 0.0,
-                "qb_out": 0,
-                "key_position_out": 0,
-                "oline_injuries": 0,
-            },
-        )
-        away_data = injury_data.get(
-            away_team,
-            {
-                "total_injuries": 0,
-                "injury_severity_index": 0.0,
-                "qb_out": 0,
-                "key_position_out": 0,
-                "oline_injuries": 0,
-            },
-        )
+        # Extract home and away data (default to league averages if missing).
+        # Using league averages instead of zeros prevents feature collapse —
+        # zero means "perfectly healthy" which is misinformation when data is
+        # simply unavailable.
+        _default_injury = {
+            "total_injuries": 3,
+            "injury_severity_index": 1.8,
+            "qb_out": 0,
+            "key_position_out": 0,
+            "oline_injuries": 1,
+        }
+        home_data = injury_data.get(home_team, _default_injury.copy())
+        away_data = injury_data.get(away_team, _default_injury.copy())
 
         # Compute derived features
         injury_severity_diff = (
