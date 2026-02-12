@@ -16,8 +16,11 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import logging
 import math
 import os
+
+logger = logging.getLogger(__name__)
 
 try:
     import cvxpy as cp
@@ -102,12 +105,14 @@ def solve_cvar_lp(
     problem = cp.Problem(objective, constraints)
     try:
         problem.solve(solver=solver, verbose=False)
-    except Exception:
+    except (cp.error.SolverError, ValueError) as e:
         # Fallback to ECOS if specified solver fails
+        logger.warning("Solver %s failed (%s), falling back to ECOS", solver, e)
         try:
             problem.solve(solver="ECOS", verbose=False)
-        except Exception:
+        except (cp.error.SolverError, ValueError) as e2:
             # Last resort: SCS
+            logger.warning("ECOS failed (%s), falling back to SCS", e2)
             problem.solve(solver="SCS", verbose=False)
 
     if problem.status not in ["optimal", "optimal_inaccurate"]:

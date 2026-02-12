@@ -89,7 +89,7 @@ def _fit_outcome(df: pd.DataFrame) -> dict[str, np.ndarray]:
     Xty = Xd.T @ y
     try:
         beta = np.linalg.solve(XtX, Xty)
-    except Exception:
+    except np.linalg.LinAlgError:
         return {"coef": np.zeros(1), "intercept": np.array([0.0])}
     return {"coef": beta[1:], "intercept": np.array([beta[0]])}
 

@@ -46,12 +46,10 @@ MODEL_DISPLAY_NAMES = {
 
 def load_predictions(csv_path: Path) -> pd.DataFrame:
     """Load predictions from 4-way backtest CSV."""
+    if csv_path.suffix != ".csv":
+        raise ValueError(f"Expected a .csv file, got: {csv_path.suffix}")
     logger.info(f"Loading predictions from: {csv_path}")
-    df = (
-        pd.read_sql_query(f"SELECT * FROM {csv_path}", conn=None)
-        if csv_path.suffix == ".db"
-        else pd.read_csv(csv_path)
-    )
+    df = pd.read_csv(csv_path)
 
     logger.info(f"  Loaded {len(df)} predictions")
     logger.info(f"  Seasons: {df['season'].min()} - {df['season'].max()}")

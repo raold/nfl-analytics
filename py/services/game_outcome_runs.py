@@ -127,7 +127,7 @@ def _store_predictions(predictions_df: pd.DataFrame, prediction_run_id: uuid4) -
                 execute_batch(cur, insert_query, records, page_size=100)
                 conn.commit()
                 return len(records)
-            except Exception:
+            except psycopg2.Error:
                 conn.rollback()
                 logger.exception("Failed to store predictions")
                 raise

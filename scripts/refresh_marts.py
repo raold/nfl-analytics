@@ -20,6 +20,7 @@ import logging
 from datetime import datetime
 
 import psycopg2
+from psycopg2 import sql
 from psycopg2.extras import DictCursor
 
 # Configure logging
@@ -85,9 +86,12 @@ def get_table_counts(conn, tables: list[tuple[str, str]]) -> dict[str, int]:
     for schema, table in tables:
         try:
             with conn.cursor() as cur:
-                cur.execute(f"SELECT COUNT(*) FROM {schema}.{table}")
+                query = sql.SQL("SELECT COUNT(*) FROM {}.{}").format(
+                    sql.Identifier(schema), sql.Identifier(table)
+                )
+                cur.execute(query)
                 counts[f"{schema}.{table}"] = cur.fetchone()[0]
-        except Exception as e:
+        except psycopg2.Error as e:
             logger.warning(f"Could not count {schema}.{table}: {e}")
             counts[f"{schema}.{table}"] = -1
     return counts
@@ -96,7 +100,7 @@ def get_table_counts(conn, tables: list[tuple[str, str]]) -> dict[str, int]:
 def refresh_materialized_view(conn, schema: str, name: str, concurrent: bool = False):
     """Refresh a single materialized view."""
     full_name = f"{schema}.{name}"
-    concurrent_str = "CONCURRENTLY " if concurrent else ""
+    qualified = sql.SQL("{}.{}").format(sql.Identifier(schema), sql.Identifier(name))
 
     logger.info(f"Refreshing {full_name}...")
     start = datetime.now()
@@ -105,12 +109,15 @@ def refresh_materialized_view(conn, schema: str, name: str, concurrent: bool = F
         with conn.cursor() as cur:
             # CONCURRENTLY requires a unique index; fall back to regular if fails
             try:
-                cur.execute(f"REFRESH MATERIALIZED VIEW {concurrent_str}{full_name}")
+                if concurrent:
+                    cur.execute(sql.SQL("REFRESH MATERIALIZED VIEW CONCURRENTLY {}").format(qualified))
+                else:
+                    cur.execute(sql.SQL("REFRESH MATERIALIZED VIEW {}").format(qualified))
             except psycopg2.errors.ObjectNotInPrerequisiteState:
                 if concurrent:
                     logger.warning(f"CONCURRENTLY failed for {full_name}, using regular refresh")
                     conn.rollback()
-                    cur.execute(f"REFRESH MATERIALIZED VIEW {full_name}")
+                    cur.execute(sql.SQL("REFRESH MATERIALIZED VIEW {}").format(qualified))
                 else:
                     raise
 
@@ -119,7 +126,7 @@ def refresh_materialized_view(conn, schema: str, name: str, concurrent: bool = F
         logger.info(f"  Refreshed {full_name} in {elapsed:.2f}s")
         return True
 
-    except Exception as e:
+    except psycopg2.Error as e:
         conn.rollback()
         logger.error(f"  Failed to refresh {full_name}: {e}")
         return False
