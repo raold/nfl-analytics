@@ -1,0 +1,138 @@
+# Data Source Configurations
+# Defines all external data sources, connection details, and extraction parameters
+
+nflverse:
+  type: r_package
+  package: nflreadr
+  description: "NFL data from nflverse (schedules, play-by-play, rosters, etc.)"
+  
+  endpoints:
+    schedules:
+      function: load_schedules
+      description: "Game schedules with scores and betting lines"
+      params:
+        seasons: null  # Will be provided at runtime
+      cache_ttl: 3600  # 1 hour
+      
+    pbp:
+      function: load_pbp
+      description: "Play-by-play data with EPA and advanced metrics"
+      params:
+        seasons: null
+      cache_ttl: 86400  # 24 hours (historical data doesn't change)
+      
+    rosters:
+      function: load_rosters
+      description: "Weekly team rosters"
+      params:
+        seasons: null
+      cache_ttl: 3600  # 1 hour
+      
+    depth_charts:
+      function: load_depth_charts
+      description: "Team depth charts by week"
+      params:
+        seasons: null
+      cache_ttl: 3600
+      
+    injuries:
+      function: load_injuries
+      description: "Injury reports"
+      params:
+        seasons: null
+      cache_ttl: 1800  # 30 minutes (updates frequently)
+  
+  rate_limit: null  # No rate limit for local R package
+  retry_config:
+    max_attempts: 3
+    backoff_type: exponential
+    initial_delay: 1
+    max_delay: 30
+
+odds_api:
+  type: rest_api
+  base_url: https://api.the-odds-api.com/v4
+  description: "Real-time betting odds from The Odds API"
+  
+  endpoints:
+    odds:
+      path: /sports/americanfootball_nfl/odds
+      method: GET
+      description: "Current odds for NFL games"
+      params:
+        apiKey: ${ODDS_API_KEY}
+        regions: us
+        markets: h2h,spreads,totals
+        oddsFormat: american
+        dateFormat: iso
+      cache_ttl: 300  # 5 minutes
+      
+    historical:
+      path: /sports/americanfootball_nfl/odds-history
+      method: GET
+      description: "Historical odds snapshots"
+      params:
+        apiKey: ${ODDS_API_KEY}
+        regions: us
+        markets: h2h,spreads,totals
+        oddsFormat: american
+        dateFormat: iso
+        date: null  # Provided at runtime
+      cache_ttl: 86400  # 24 hours
+  
+  rate_limit:
+    requests_per_minute: 500
+    requests_per_month: 500000  # Track monthly usage
+  
+  retry_config:
+    max_attempts: 3
+    backoff_type: exponential
+    initial_delay: 2
+    max_delay: 60
+    retry_on_status: [429, 500, 502, 503, 504]
+
+weather:
+  type: python_library
+  library: meteostat
+  description: "Historical weather data from Meteostat"
+  
+  endpoints:
+    hourly:
+      function: Hourly
+      description: "Hourly weather observations"
+      params:
+        start: null  # datetime
+        end: null    # datetime
+        station: null  # Station ID
+      cache_ttl: 86400  # 24 hours (historical data)
+      
+    stations:
+      function: Stations
+      description: "Weather station lookup"
+      params:
+        lat: null
+        lon: null
+        radius: 50000  # 50km search radius
+      cache_ttl: 604800  # 1 week (stations don't change often)
+  
+  rate_limit: null  # No official rate limit
+  retry_config:
+    max_attempts: 3
+    backoff_type: exponential
+    initial_delay: 1
+    max_delay: 30
+
+# Stadium coordinates for weather lookups
+stadiums:
+  type: static_data
+  description: "NFL stadium locations and metadata"
+  file: db/seeds/stadiums.csv
+  columns:
+    - stadium
+    - stadium_id
+    - latitude
+    - longitude
+    - city
+    - state
+    - roof_type
+    - surface_type

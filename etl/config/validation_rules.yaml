@@ -1,0 +1,225 @@
+# Data Quality Rules
+# Validation rules applied during ETL pipeline execution
+
+# Data Freshness Rules
+freshness:
+  schedules:
+    max_age_hours: 24
+    description: "Schedules should be updated daily"
+    severity: warning
+  
+  pbp:
+    max_age_hours: 48
+    description: "Play-by-play should be updated within 48 hours of game completion"
+    severity: error
+  
+  rosters:
+    max_age_hours: 168  # 1 week
+    description: "Rosters should be updated weekly"
+    severity: warning
+  
+  odds:
+    max_age_hours: 1
+    description: "Odds should be updated hourly"
+    severity: warning
+  
+  weather:
+    max_age_hours: 24
+    description: "Weather should be fetched within 24 hours of game"
+    severity: warning
+
+# Completeness Rules
+completeness:
+  schedules:
+    expected_games_per_season:
+      regular_season: 272
+      playoffs_min: 11
+      playoffs_max: 13
+    description: "Each season should have complete game schedule"
+    severity: error
+  
+  pbp:
+    min_plays_per_game: 100
+    max_plays_per_game: 200
+    description: "Each game should have reasonable number of plays"
+    severity: warning
+  
+  rosters:
+    min_players_per_team: 45
+    max_players_per_team: 60
+    description: "Each team should have full roster"
+    severity: warning
+
+# Consistency Rules
+consistency:
+  scores_match_plays:
+    description: "Final scores should match play-by-play"
+    check: |
+      SELECT g.game_id, g.home_score, g.away_score,
+             MAX(p.posteam_score) as pbp_home, 
+             MAX(p.defteam_score) as pbp_away
+      FROM games g
+      JOIN plays p ON g.game_id = p.game_id
+      WHERE g.home_score IS NOT NULL
+      GROUP BY g.game_id
+      HAVING g.home_score != MAX(p.posteam_score) 
+         OR g.away_score != MAX(p.defteam_score)
+    severity: error
+  
+  turnovers_match_plays:
+    description: "Turnover counts should match plays"
+    check: |
+      SELECT g.game_id, g.home_turnovers, g.away_turnovers,
+             COUNT(*) FILTER (WHERE p.interception=1 OR p.fumble_lost=1) as pbp_turnovers
+      FROM games g
+      JOIN plays p ON g.game_id = p.game_id
+      WHERE g.home_turnovers IS NOT NULL
+      GROUP BY g.game_id
+      HAVING g.home_turnovers + g.away_turnovers != COUNT(*)
+    severity: warning
+  
+  roster_player_exists:
+    description: "Roster players should exist in players table"
+    check: |
+      SELECT r.season, r.week, r.team, r.player_id
+      FROM rosters r
+      LEFT JOIN players p ON r.player_id = p.player_id
+      WHERE p.player_id IS NULL
+    severity: error
+
+# Accuracy Rules
+accuracy:
+  no_duplicate_games:
+    description: "No duplicate game records"
+    check: |
+      SELECT game_id, COUNT(*) 
+      FROM games 
+      GROUP BY game_id 
+      HAVING COUNT(*) > 1
+    severity: error
+  
+  no_duplicate_plays:
+    description: "No duplicate play records"
+    check: |
+      SELECT game_id, play_id, COUNT(*) 
+      FROM plays 
+      GROUP BY game_id, play_id 
+      HAVING COUNT(*) > 1
+    severity: error
+  
+  no_orphan_plays:
+    description: "All plays must have a game"
+    check: |
+      SELECT p.game_id, COUNT(*) 
+      FROM plays p
+      LEFT JOIN games g ON p.game_id = g.game_id
+      WHERE g.game_id IS NULL
+      GROUP BY p.game_id
+    severity: error
+  
+  no_orphan_rosters:
+    description: "All roster entries must have a game"
+    check: |
+      SELECT r.season, r.week, r.team 
+      FROM rosters r
+      WHERE NOT EXISTS (
+        SELECT 1 FROM games g 
+        WHERE g.season = r.season 
+        AND g.week = r.week 
+        AND (g.home_team = r.team OR g.away_team = r.team)
+      )
+    severity: warning
+
+# Timeliness Rules  
+timeliness:
+  scores_after_completion:
+    description: "Scores should only exist for completed games"
+    check: |
+      SELECT game_id, kickoff, home_score, away_score
+      FROM games
+      WHERE kickoff > NOW()
+      AND (home_score IS NOT NULL OR away_score IS NOT NULL)
+    severity: error
+  
+  plays_after_completion:
+    description: "Plays should only exist for games that have started"
+    check: |
+      SELECT g.game_id, g.kickoff, COUNT(p.*) as play_count
+      FROM games g
+      JOIN plays p ON g.game_id = p.game_id
+      WHERE g.kickoff > NOW()
+      GROUP BY g.game_id, g.kickoff
+    severity: error
+
+# Referential Integrity Rules
+referential_integrity:
+  plays_reference_valid_game:
+    description: "All plays must reference valid game_id"
+    foreign_key:
+      table: plays
+      column: game_id
+      references: games(game_id)
+    severity: error
+  
+  rosters_reference_valid_player:
+    description: "All roster entries must reference valid player_id"
+    foreign_key:
+      table: rosters
+      column: player_id
+      references: players(player_id)
+    severity: error
+  
+  odds_reference_valid_game:
+    description: "All odds must reference valid game_id"
+    foreign_key:
+      table: odds_history
+      column: game_id
+      references: games(game_id)
+    severity: error
+
+# Anomaly Detection Rules
+anomalies:
+  unusual_score:
+    description: "Flag unusually high or low scores"
+    check: |
+      SELECT game_id, home_score, away_score
+      FROM games
+      WHERE (home_score > 70 OR away_score > 70)
+         OR (home_score = 0 AND away_score = 0)
+    severity: warning
+  
+  unusual_play_count:
+    description: "Flag games with unusual play counts"
+    check: |
+      SELECT game_id, COUNT(*) as play_count
+      FROM plays
+      GROUP BY game_id
+      HAVING COUNT(*) < 80 OR COUNT(*) > 220
+    severity: warning
+  
+  missing_starting_qb:
+    description: "Flag games without starting QB identified"
+    check: |
+      SELECT game_id, home_team, away_team, home_qb_name, away_qb_name
+      FROM games
+      WHERE home_score IS NOT NULL
+      AND (home_qb_name IS NULL OR away_qb_name IS NULL)
+    severity: warning
+
+# Data Quality Scoring
+scoring:
+  weights:
+    freshness: 0.15
+    completeness: 0.25
+    consistency: 0.25
+    accuracy: 0.25
+    timeliness: 0.10
+  
+  thresholds:
+    excellent: 0.95
+    good: 0.90
+    acceptable: 0.85
+    poor: 0.70
+    critical: 0.50
+  
+  alert_on_score_below: 0.85

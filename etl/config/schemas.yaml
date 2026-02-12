@@ -1,0 +1,356 @@
+# Schema Definitions
+# Expected schemas for each data entity with validation rules
+
+schedules:
+  description: "Game schedule with betting lines and scores"
+  source: nflverse.schedules
+  
+  required_columns:
+    - game_id
+    - season
+    - week
+    - home_team
+    - away_team
+    - kickoff
+  
+  optional_columns:
+    - spread_close
+    - total_close
+    - home_score
+    - away_score
+    - home_moneyline
+    - away_moneyline
+    - home_spread_odds
+    - away_spread_odds
+    - over_odds
+    - under_odds
+    - stadium
+    - roof
+    - surface
+    - home_rest
+    - away_rest
+    - home_qb_id
+    - home_qb_name
+    - away_qb_id
+    - away_qb_name
+    - home_coach
+    - away_coach
+    - referee
+    - game_type
+    - overtime
+  
+  data_types:
+    game_id: str
+    season: int
+    week: int
+    home_team: str
+    away_team: str
+    kickoff: datetime
+    spread_close: Optional[float]
+    total_close: Optional[float]
+    home_score: Optional[int]
+    away_score: Optional[int]
+    home_moneyline: Optional[float]
+    away_moneyline: Optional[float]
+  
+  constraints:
+    season:
+      min: 1999
+      max: 2030
+    week:
+      min: 1
+      max: 22
+    home_score:
+      min: 0
+      max: 100
+      allow_null: true
+    away_score:
+      min: 0
+      max: 100
+      allow_null: true
+    spread_close:
+      min: -50
+      max: 50
+      allow_null: true
+    total_close:
+      min: 20
+      max: 100
+      allow_null: true
+  
+  business_rules:
+    - name: no_future_scores
+      description: "Games in the future cannot have scores"
+      check: "IF kickoff > now() THEN home_score IS NULL AND away_score IS NULL"
+    
+    - name: valid_teams
+      description: "Teams must exist in NFL team list"
+      check: "home_team IN teams AND away_team IN teams"
+    
+    - name: no_self_play
+      description: "Team cannot play itself"
+      check: "home_team != away_team"
+    
+    - name: unique_game_id
+      description: "Game ID must be unique"
+      check: "UNIQUE(game_id)"
+
+plays:
+  description: "Play-by-play data with EPA and advanced metrics"
+  source: nflverse.pbp
+  
+  required_columns:
+    - play_id
+    - game_id
+    - posteam
+    - defteam
+    - quarter  # Note: May be 'qtr' in 2025+ data
+    - down
+    - ydstogo
+    - epa
+  
+  column_aliases:
+    # Handle column name variations across seasons
+    quarter: [qtr, quarter]
+    time_seconds: [game_seconds_remaining, time_seconds]
+  
+  optional_columns:
+    - pass
+    - rush
+    - wp
+    - wpa
+    - vegas_wp
+    - vegas_wpa
+    - success
+    - yards_gained
+    - first_down
+    - air_yards
+    - yards_after_catch
+    - cpoe
+    - complete_pass
+    - incomplete_pass
+    - interception
+    - pass_length
+    - pass_location
+    - qb_hit
+    - qb_scramble
+    - run_location
+    - run_gap
+    - passer_player_id
+    - passer_player_name
+    - rusher_player_id
+    - rusher_player_name
+    - receiver_player_id
+    - receiver_player_name
+    - touchdown
+    - fumble
+    - fumble_lost
+    - penalty
+    - penalty_yards
+    - sack
+  
+  data_types:
+    play_id: int
+    game_id: str
+    posteam: str
+    defteam: str
+    quarter: int
+    down: Optional[int]
+    ydstogo: Optional[int]
+    epa: Optional[float]
+    pass: Optional[int]
+    rush: Optional[int]
+  
+  constraints:
+    quarter:
+      min: 1
+      max: 5  # Includes OT
+    down:
+      min: 1
+      max: 4
+      allow_null: true
+    ydstogo:
+      min: 0
+      max: 99
+      allow_null: true
+    epa:
+      min: -10
+      max: 10
+      allow_null: true
+  
+  business_rules:
+    - name: valid_game_reference
+      description: "Play must reference existing game"
+      check: "game_id IN (SELECT game_id FROM games)"
+    
+    - name: valid_teams
+      description: "Teams must exist"
+      check: "posteam IN teams AND defteam IN teams"
+    
+    - name: unique_play
+      description: "Play ID must be unique per game"
+      check: "UNIQUE(game_id, play_id)"
+
+rosters:
+  description: "Weekly team rosters"
+  source: nflverse.rosters
+  
+  required_columns:
+    - season
+    - week
+    - team
+    - gsis_id
+    - full_name
+    - position
+  
+  optional_columns:
+    - depth_chart_position
+    - jersey_number
+    - status
+    - first_name
+    - last_name
+    - birth_date
+    - height
+    - weight
+    - college
+    - rookie_year
+    - draft_club
+    - draft_number
+    - years_exp
+  
+  data_types:
+    season: int
+    week: int
+    team: str
+    gsis_id: str
+    full_name: str
+    position: str
+    jersey_number: Optional[int]
+    height: Optional[str]
+    weight: Optional[int]
+  
+  constraints:
+    season:
+      min: 1999
+      max: 2030
+    week:
+      min: 1
+      max: 22
+    jersey_number:
+      min: 0
+      max: 99
+      allow_null: true
+    weight:
+      min: 150
+      max: 400
+      allow_null: true
+  
+  business_rules:
+    - name: valid_team
+      description: "Team must exist"
+      check: "team IN teams"
+    
+    - name: unique_roster_entry
+      description: "Player can only appear once per team per week"
+      check: "UNIQUE(season, week, team, gsis_id)"
+
+odds:
+  description: "Betting odds from sportsbooks"
+  source: odds_api.odds
+  
+  required_columns:
+    - game_id
+    - bookmaker
+    - timestamp
+    - market_type
+  
+  optional_columns:
+    - home_price
+    - away_price
+    - home_point
+    - away_point
+    - over_price
+    - under_price
+    - total_point
+  
+  data_types:
+    game_id: str
+    bookmaker: str
+    timestamp: datetime
+    market_type: str
+    home_price: Optional[int]
+    away_price: Optional[int]
+    home_point: Optional[float]
+  
+  constraints:
+    market_type:
+      allowed_values: [h2h, spreads, totals]
+    home_price:
+      min: -2000
+      max: 2000
+      allow_null: true
+    home_point:
+      min: -50
+      max: 50
+      allow_null: true
+  
+  business_rules:
+    - name: valid_game
+      description: "Must reference existing game"
+      check: "game_id IN (SELECT game_id FROM games)"
+    
+    - name: timestamp_before_game
+      description: "Odds must be timestamped before game starts"
+      check: "timestamp <= (SELECT kickoff FROM games WHERE game_id = odds.game_id)"
+
+weather:
+  description: "Weather conditions at game time"
+  source: weather.hourly
+  
+  required_columns:
+    - game_id
+    - timestamp
+    - temperature
+  
+  optional_columns:
+    - temp_feel
+    - precipitation
+    - humidity
+    - wind_speed
+    - wind_direction
+    - pressure
+    - cloud_cover
+    - visibility
+  
+  data_types:
+    game_id: str
+    timestamp: datetime
+    temperature: float
+    humidity: Optional[float]
+    wind_speed: Optional[float]
+    precipitation: Optional[float]
+  
+  constraints:
+    temperature:
+      min: -40
+      max: 120
+    humidity:
+      min: 0
+      max: 100
+      allow_null: true
+    wind_speed:
+      min: 0
+      max: 100
+      allow_null: true
+    precipitation:
+      min: 0
+      max: 100
+      allow_null: true
+  
+  business_rules:
+    - name: valid_game
+      description: "Must reference existing game"
+      check: "game_id IN (SELECT game_id FROM games)"
+    
+    - name: timestamp_near_kickoff
+      description: "Weather timestamp should be within 3 hours of kickoff"
+      check: "ABS(timestamp - kickoff) <= INTERVAL '3 hours'"
