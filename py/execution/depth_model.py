@@ -93,7 +93,7 @@ def fit_depth(rows: Iterable[dict[str, str]]) -> dict[tuple[str, str, str], Dept
             dp = executed - quoted
             Xrow = [1.0, q, q * q, sign_v * q]
             buckets[(book, market, tau)].append((Xrow, dp))
-        except Exception:
+        except (KeyError, ValueError, TypeError):
             continue
     out: dict[tuple[str, str, str], DepthParams] = {}
     for key, pairs in buckets.items():

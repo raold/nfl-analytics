@@ -7,14 +7,17 @@ Supports v2.5 and v3.0 models with sub-100ms latency.
 """
 
 import sys
+from pathlib import Path
 
-sys.path.append("/Users/dro/rice/nfl-analytics")
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 import asyncio
 import json
 import logging
 from datetime import datetime
 
+import psycopg2
 import redis
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from psycopg2.pool import SimpleConnectionPool
@@ -320,7 +323,7 @@ async def health_check():
         cur.close()
         db_pool.putconn(conn)
         db_healthy = True
-    except Exception:
+    except (psycopg2.Error, AttributeError):
         pass
 
     # Check Redis
@@ -329,7 +332,7 @@ async def health_check():
         try:
             redis_client.ping()
             redis_healthy = True
-        except Exception:
+        except redis.RedisError:
             pass
 
     # Check models

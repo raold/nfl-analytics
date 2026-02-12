@@ -92,7 +92,7 @@ def fit_fill(rows: Iterable[dict[str, str]]) -> dict[tuple[str, str, str], FillP
             X, Y = groups[(book, market, tau)]
             X.append(x)
             Y.append(y)
-        except Exception:
+        except (KeyError, ValueError, TypeError):
             continue
     out: dict[tuple[str, str, str], FillParams] = {}
     for key, (X, Y) in groups.items():

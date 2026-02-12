@@ -25,7 +25,7 @@ class LatencyParams:
 def _to_seconds(v: str) -> float:
     try:
         return float(v)
-    except Exception:
+    except (ValueError, TypeError):
         return 0.0
 
 
@@ -40,7 +40,7 @@ def fit_latency(rows: Iterable[dict[str, str]]) -> dict[tuple[str, str, str], La
             exe = _to_seconds(r.get("exec_ts", r.get("executed_ts", "0")))
             ell = max(1e-6, exe - sig)
             groups[(book, market, tau)].append(ell)
-        except Exception:
+        except (KeyError, ValueError, TypeError):
             continue
     out: dict[tuple[str, str, str], LatencyParams] = {}
     for key, vals in groups.items():

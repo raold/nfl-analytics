@@ -4,7 +4,7 @@ Deduplication tool for NFL Analytics database.
 Safely removes duplicates while preserving data integrity.
 """
 
-import os
+import subprocess
 
 import click
 import psycopg
@@ -313,7 +313,7 @@ def main(live, backup_first):
 
     if live and backup_first:
         console.print("[yellow]Creating backup before deduplication...[/yellow]")
-        os.system("bash scripts/maintenance/backup.sh")
+        subprocess.run(["bash", "scripts/maintenance/backup.sh"], check=False)
 
     deduplicator = DataDeduplicator(DB_URL, dry_run=not live)
     deduplicator.find_and_remove_duplicates()
@@ -321,7 +321,7 @@ def main(live, backup_first):
     if live:
         # Run validation after deduplication
         console.print("\n[cyan]Running validation check...[/cyan]")
-        os.system("python scripts/maintenance/validate_data.py")
+        subprocess.run(["python", "scripts/maintenance/validate_data.py"], check=False)
 
 
 if __name__ == "__main__":

@@ -193,8 +193,8 @@ def main():
 
         # Write backup
         backup_path = app_py.with_suffix(".py.backup")
-        with open(backup_path, "w") as f:
-            f.write(open(app_py).read())
+        with open(app_py) as src, open(backup_path, "w") as dst:
+            dst.write(src.read())
         print(f"  - Created backup: {backup_path}")
 
         # Write modified content
@@ -216,8 +216,8 @@ def main():
 
         # Write backup
         backup_path = patch_py.with_suffix(".py.backup")
-        with open(backup_path, "w") as f:
-            f.write(open(patch_py).read())
+        with open(patch_py) as src, open(backup_path, "w") as dst:
+            dst.write(src.read())
         print(f"  - Created backup: {backup_path}")
 
         # Write modified content

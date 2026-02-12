@@ -12,6 +12,7 @@ Usage:
     python py/models/spread_coverage_model.py --sweep --output-dir models/spread_coverage/sweep
 """
 import argparse
+import ast
 import json
 import logging
 from datetime import datetime
@@ -456,7 +457,7 @@ def main():
         logger.info(f"Config: {best['config']}")
 
         # Train final model with best config
-        best_config = eval(best["config"])
+        best_config = ast.literal_eval(best["config"])
         model, metrics = model_trainer.train(df, params=best_config)
         model_trainer.save_model(model, metrics, args.output_dir + "/best")
 
