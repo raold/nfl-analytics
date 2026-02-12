@@ -16,6 +16,7 @@ from datetime import datetime
 
 import pandas as pd
 import psycopg
+from psycopg import sql
 
 from etl.extract.base import ExtractionResult
 from etl.extract.nflverse import NFLVerseExtractor
@@ -285,7 +286,9 @@ class WeeklyPipeline(BasePipeline):
 
                 for schema, view_name in views:
                     self.logger.info(f"Refreshing {schema}.{view_name}...")
-                    cur.execute(f"REFRESH MATERIALIZED VIEW {schema}.{view_name}")
+                    cur.execute(sql.SQL("REFRESH MATERIALIZED VIEW {}.{}").format(
+                        sql.Identifier(schema), sql.Identifier(view_name)
+                    ))
 
                 self.db_conn.commit()
                 self.logger.info(f"Refreshed {len(views)} materialized views")

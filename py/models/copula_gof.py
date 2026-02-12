@@ -191,7 +191,8 @@ def tail_gof_stat(
     if model == "gaussian":
         uu, vv = sim_gaussian(nsim, rho, rng)
     else:
-        assert nu is not None
+        if nu is None:
+            raise ValueError("nu (degrees of freedom) is required for t-copula model")
         uu, vv = sim_t_copula(nsim, rho, int(nu), rng)
     mod = np.array([float(np.mean((uu > t0) & (vv > t0))) for t0 in ths])
     sse = float(np.sum((emp - mod) ** 2))

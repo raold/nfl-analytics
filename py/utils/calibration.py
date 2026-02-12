@@ -31,7 +31,8 @@ def reliability_curve(
     y_true: list[int], p_hat: list[float], bins: int = 10
 ) -> list[tuple[float, float, int]]:
     """Return list of (bin_center, observed_rate, count)."""
-    assert len(y_true) == len(p_hat)
+    if len(y_true) != len(p_hat):
+        raise ValueError(f"y_true and p_hat must have same length, got {len(y_true)} and {len(p_hat)}")
     n = len(y_true)
     if n == 0:
         return []

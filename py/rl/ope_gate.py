@@ -31,7 +31,8 @@ except Exception:  # allow running as a script without packages
     OPE_PATH = Path(__file__).resolve().parent / "ope.py"
     spec = importlib.util.spec_from_file_location("ope", str(OPE_PATH))
     _mod = importlib.util.module_from_spec(spec)
-    assert spec and spec.loader
+    if not spec or not spec.loader:
+        raise ImportError(f"Cannot load ope module from {OPE_PATH}")
     spec.loader.exec_module(_mod)
     snis, dr = _mod.snis, _mod.dr
 

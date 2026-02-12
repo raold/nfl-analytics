@@ -115,8 +115,18 @@ def check_table(conn, table: str, min_rows: int, criticality: str) -> CheckResul
                     expected_min=min_rows,
                 )
 
-            # Get row count
-            cur.execute(f"SELECT COUNT(*) FROM {table}")
+            # Get row count — use SQL composition for identifier safety
+            from psycopg2 import sql as sql_mod
+            parts = table.split(".")
+            if len(parts) == 2:
+                query = sql_mod.SQL("SELECT COUNT(*) FROM {}.{}").format(
+                    sql_mod.Identifier(parts[0]), sql_mod.Identifier(parts[1])
+                )
+            else:
+                query = sql_mod.SQL("SELECT COUNT(*) FROM {}").format(
+                    sql_mod.Identifier(table)
+                )
+            cur.execute(query)
             count = cur.fetchone()[0]
 
             if count >= min_rows:

@@ -23,6 +23,7 @@ from datetime import datetime
 from pathlib import Path
 
 import psycopg2
+from psycopg2 import sql
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -128,7 +129,9 @@ class PredictionRefreshPipeline:
             for view in views:
                 logger.info(f"  Refreshing {view}...")
                 start = datetime.now()
-                cur.execute(f"REFRESH MATERIALIZED VIEW CONCURRENTLY {view};")
+                cur.execute(sql.SQL("REFRESH MATERIALIZED VIEW CONCURRENTLY {}").format(
+                    sql.Identifier(*view.split(".")) if "." in view else sql.Identifier(view)
+                ))
                 conn.commit()
                 duration = (datetime.now() - start).total_seconds()
                 logger.info(f"  ✓ {view} refreshed in {duration:.1f}s")

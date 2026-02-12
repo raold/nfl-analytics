@@ -187,13 +187,15 @@ class VegasLineBiasSafeEngine:
         return team_df
 
     def compute_rolling_line_features(
-        self, team_df: pd.DataFrame, windows: list = [3, 5]
+        self, team_df: pd.DataFrame, windows: list | None = None
     ) -> pd.DataFrame:
         """
         Compute rolling statistics on betting line features.
 
         SAFE: All rolling stats use .shift(1) to exclude current game.
         """
+        if windows is None:
+            windows = [3, 5]
         team_df = team_df.sort_values(["team", "game_date"]).copy()
 
         for window in windows:

@@ -172,8 +172,8 @@ class TemporalSafetyValidator(DataFrameValidator):
         split_col = "split" if "split" in df.columns else "is_train"
 
         if split_col == "is_train":
-            train_df = df[df["is_train"] == True]
-            val_df = df[df["is_train"] == False]
+            train_df = df[df["is_train"]]
+            val_df = df[~df["is_train"]]
         else:
             train_df = df[df["split"] == "train"]
             val_df = df[df["split"].isin(["val", "validation", "test"])]

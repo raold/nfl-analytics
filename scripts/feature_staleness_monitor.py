@@ -30,6 +30,7 @@ from datetime import datetime
 from enum import Enum
 
 import psycopg2
+from psycopg2 import sql
 from psycopg2.extras import DictCursor
 
 # Configure logging
@@ -496,7 +497,9 @@ def check_materialized_view_freshness(conn, view_name: str, context: dict) -> Fe
                 )
 
             # Get row count
-            cur.execute(f"SELECT COUNT(*) FROM {view_name}")
+            cur.execute(sql.SQL("SELECT COUNT(*) FROM {}.{}").format(
+                sql.Identifier(schema), sql.Identifier(mv)
+            ))
             row_count = cur.fetchone()[0]
 
             # Get last refresh time (pg_stat_user_tables has stats for MVs too)
