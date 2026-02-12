@@ -107,8 +107,6 @@ where $y_{it}(1), y_{it}(0)$ are potential outcomes under treatment/control. Agg
 \citet{sun2021event} extend group-time ATT to event-study plots, tracing effects $\tau$ periods before/after treatment. Parallel trends---the identifying assumption that treated and control units would follow the same trajectory absent treatment---is assessed by testing pre-treatment coefficients for zero effect. \citet{rambachan2023honest} introduce sensitivity analysis for violations: bounds on ATT under bounded deviations from parallel trends, formalizing robustness checks.
 
 \paragraph{Application to NFL Injuries.}
-% TODO: No causal chapter - using section instead
-% Chapter~\ref{chap:causal}
 Chapter~8 applies DiD to star quarterback injuries (e.g., Patrick Mahomes injury, Week 9, 2023). Treatment group: Chiefs games post-injury. Control group: Chiefs games pre-injury and comparable teams with no QB change. We estimate ATT on offensive EPA/play and win probability, using \texttt{did} for group-time estimates. Results show a -0.15 EPA/play decline (95\% CI: $[-0.24, -0.06]$, $p<0.01$), validating market adjustment in spread lines. This causal estimate informs our injury feature engineering, replacing naive binary indicators with ATT-calibrated expected-value shifts.
 
 %=============================================================================
