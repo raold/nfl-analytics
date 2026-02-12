@@ -39,7 +39,7 @@ v6.0 (Dec 2025)    & +2.96\%  & 44.25 & 53.89\% & +0.48 & -9.1\%  \\
 \end{tabular}
 \end{table}
 
-The cumulative improvement of \SI{6.7}{\percent} ROI represents the difference between systematic losses and profitable operations, achieved through disciplined architecture refinement and honest assessment of failed approaches. The v6.0 production system additionally achieves 74.9\% spread prediction accuracy on true out-of-sample 2025 holdout data (p < 0.001).
+\textbf{Critical caveat (December 2025):} The ROI figures in Table~\ref{tab:performance-trajectory} were computed \textbf{before} the comprehensive data leakage investigation (see ADR-016). The cleaned baseline shows \textbf{51.0\% win rate and $-7.5$\% ROI} for spread betting---confirming market efficiency. The +2.96\% ROI for v6.0 is \textbf{invalidated} for spread betting. The table is preserved for methodological transparency to document the architecture evolution journey, not as validated profitability claims. The 74.9\% figure refers to straight-up winner prediction accuracy, not ATS performance (actual ATS: 51.8\% multi-year, $-1.1$\% ROI for the power ratings model).
 
 ---
 

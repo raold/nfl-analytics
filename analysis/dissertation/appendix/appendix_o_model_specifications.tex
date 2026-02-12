@@ -787,33 +787,40 @@ Hybrid XGBoost v1 & 40.69 & 37.07 & 36.33 & 38.03 & 0.18 \\
 
 A comprehensive out-of-sample validation was conducted using the 2025 NFL season as a true holdout set. All models were trained on 2015-2024 data and tested on 195 completed games through Week 14 of the 2025 season. This represents the most rigorous prospective validation of the ensemble architecture, as no 2025 data was used during model development or hyperparameter tuning.
 
-\subsection{Game Spread Predictions}
+\subsection{Game Spread Predictions (Against the Spread)}
 
-A simple power ratings model using 2024 point differentials and 2.5-point home field advantage was tested as a baseline for spread prediction performance. This model represents a minimally viable approach to NFL game prediction, leveraging only prior season performance metrics.
+A simple power ratings model using prior-season point differentials and 2.5-point home field advantage was tested for spread prediction performance. This model represents a minimally viable approach to NFL game prediction, leveraging only prior season performance metrics. \textbf{Critical distinction:} straight-up winner prediction accuracy (74.9\%) must not be conflated with against-the-spread (ATS) performance, which determines betting profitability.
 
 \begin{table}[htbp]
 \centering
-\caption{Historical Spread Prediction Performance (2020-2025)}
+\caption{Power Ratings ATS Performance (2020--2025)}
 \label{tab:spread-holdout-2025}
 \begin{tabular}{lrrrr}
 \toprule
-\textbf{Season} & \textbf{Bets} & \textbf{Wins} & \textbf{Win Rate} & \textbf{ROI} \\
+\textbf{Season} & \textbf{Games} & \textbf{ATS Wins} & \textbf{ATS Rate} & \textbf{ROI} \\
 \midrule
-2020 & 235 & 179 & 76.2\% & +45.5\% \\
-2021 & 241 & 179 & 74.3\% & +41.9\% \\
-2022 & 244 & 179 & 73.4\% & +40.1\% \\
-2023 & 234 & 182 & 77.8\% & +48.6\% \\
-2024 & 240 & 181 & 75.4\% & +44.0\% \\
-2025 & 179 & 134 & 74.9\% & +43.0\% \\
+2020 & 218 & 112 & 51.4\% & $-2.1$\% \\
+2021 & 224 & 113 & 50.4\% & $-3.7$\% \\
+2022 & 221 & 114 & 51.6\% & $-1.7$\% \\
+2023 & 218 & 115 & 52.8\% & $+1.0$\% \\
+2024 & 208 & 105 & 50.5\% & $-3.5$\% \\
+2025 & 221 & 127 & 57.7\% & $+10.2$\% \\
 \midrule
-\textbf{Overall} & 1,373 & 1,034 & \textbf{75.3\%} & \textbf{+43.8\%} \\
+\textbf{Overall} & \textbf{1,310} & \textbf{686} & \textbf{51.8\%} & $\mathbf{-1.1}$\textbf{\%} \\
 \bottomrule
 \end{tabular}
+
+\vspace{4pt}
+{\footnotesize \textbf{Note:} ATS = against the spread. The 52.4\% breakeven threshold accounts for standard $-110$ vigorish. Straight-up winner prediction accuracy is 74.9\% (2025), but this does not translate to ATS profitability because the spread already prices in team strength differentials.}
 \end{table}
 
-\textbf{Statistical Significance}: The observed win rate (75.3\%) exceeds the breakeven threshold (52.4\% accounting for -110 vig) with overwhelming statistical significance (p < $10^{-68}$ via binomial test). The consistency across all six seasons (73.4\%-77.8\% range) demonstrates robustness to regime changes, rule modifications, and coaching turnover.
+\textbf{Multi-Year Assessment:} The overall 51.8\% ATS rate falls below the 52.4\% breakeven threshold, yielding $-1.1$\% ROI across 1,310 games (2020--2025). This confirms that the simple power ratings approach is \textbf{not reliably profitable} against the spread over multiple seasons.
 
-\textbf{2025 Holdout Performance}: The 2025 season maintained performance (74.9\% win rate, +43.0\% ROI) nearly identical to the 2020-2024 average (75.4\%), indicating no degradation in true out-of-sample conditions. This validates the model's ability to generalize beyond its training window.
+\textbf{2025 Single-Season Result:} The 2025 season showed 57.7\% ATS and +10.2\% ROI ($N\!=\!221$), but this is a single-season result ($N\!=\!1$ season) and should be interpreted with caution. The 5 prior seasons averaged 51.3\% ATS---near coin-flip performance. Single-season variance in ATS rates is substantial in NFL betting.
+
+\textbf{Non-Monotonic Edge Discovery:} Further analysis revealed that the edge is concentrated in a narrow 3--4 point spread window, where the model achieved 67.6\% ATS. Outside this sweet spot, performance degrades to near-random. This non-monotonic relationship between predicted edge size and ATS success merits further investigation (see Chapter~\ref{chap:conclusion}).
+
+\textbf{Key Lesson:} The 74.9\% straight-up prediction accuracy is meaningful for picking game winners but irrelevant for betting profitability. The spread market already incorporates team quality differentials, so the relevant metric is ATS performance, which at 51.8\% multi-year confirms semi-strong market efficiency.
 
 \subsection{Player Props Predictions (Passing Yards)}
 

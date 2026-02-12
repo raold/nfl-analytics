@@ -1118,7 +1118,7 @@ After remediation, the corrected Ridge Residuals architecture was re-validated o
 
 \subsection{Production Deployment Status}
 
-The corrected Ridge Residuals architecture is deployed in \textbf{XGBoost v4}, which is integrated into the production \textbf{v6.0 ensemble} with 23\% weight allocation. The ensemble-level metrics reported in Chapter~\ref{chap:intro} (+2.96\% ROI, 74.9\% 2025 holdout accuracy) reflect the corrected, leak-free implementation.
+The corrected Ridge Residuals architecture was deployed in \textbf{XGBoost v4}, integrated into the production \textbf{v6.0 ensemble} with 23\% weight allocation. However, subsequent 2025 holdout validation revealed catastrophic failure (Section~\ref{sec:dec-2025-failure}), and XGBoost v4 is now \textbf{permanently DISABLED} (0\% weight). \textbf{Note:} The +2.96\% ROI figure applies to the player props pipeline (limited test window, pipeline currently non-functional), while 74.9\% refers to straight-up winner prediction accuracy---neither reflects validated ATS profitability for the spread-betting ensemble.
 
 \paragraph{Ensemble Integration.}
 XGBoost v4 with corrected Ridge Residuals contributes to the v6.0 ensemble alongside:

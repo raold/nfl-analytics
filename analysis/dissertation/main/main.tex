@@ -355,7 +355,7 @@
 \textbf{Can machine learning beat NFL betting markets?} This dissertation answers that question with a surprising and rigorously documented \textbf{``No'' for spread betting with publicly available data}—but with significant methodological contributions. After a 13-month research journey, we confirm \textbf{semi-strong market efficiency}: publicly available NFL data is insufficient to overcome the 4.5\% vigorish barrier.
 
 \paragraph{The Journey from Failure to Honest Assessment.}
-Our initial approach, using a sophisticated but isolated Bayesian model, failed catastrophically (maximum drawdown $-83.5\%$). Subsequent iterations appeared to show improvement, but the \textbf{comprehensive data leakage investigation (December 2025)} revealed that earlier positive results (+2.96\% ROI, 53.89\% win rate) were artifacts of target leakage. The cleaned baseline shows \textbf{51.0\% win rate and $-7.5$\% ROI}—below the 52.4\% breakeven threshold.
+Our initial approach, using a sophisticated but isolated Bayesian model, failed catastrophically (maximum drawdown $-83.5\%$). Subsequent iterations appeared to show improvement, but the \textbf{comprehensive data leakage investigation (December 2025)} revealed that earlier positive results were inflated by target leakage in the Ridge Residuals pipeline and CQL bet sizing. The cleaned spread betting baseline shows \textbf{51.0\% win rate and $-7.5$\% ROI}---below the 52.4\% breakeven threshold. Player props showed $+2.96$\% ROI in a limited test window, but the props pipeline is currently non-functional (model files missing, data tables empty).
 
 \paragraph{What We Built.}
 A complete end-to-end sports betting system integrating: (1)~automated data pipelines processing 300,000+ NFL plays; (2)~a diversified 5-way ensemble of machine learning models (State-Space, Hierarchical Bayesian, XGBoost) built on a principle of feature orthogonalization; (3)~a hybrid static-adaptive architecture to balance stability and responsiveness; and (4)~a risk management layer using offline reinforcement learning and portfolio-level constraints.
@@ -369,10 +369,10 @@ A complete end-to-end sports betting system integrating: (1)~automated data pipe
 \midrule
 \multicolumn{4}{l}{\textit{Game-Level Markets}} \\
 \quad Spread Betting (ATS) & $-7.5$\% & 51.0\% & Market efficient for public data \\
-\quad Simple Power Ratings & $+43.0$\% & 74.9\% & 2025 holdout (remarkably simple) \\
+\quad Simple Power Ratings (ATS) & $-1.1$\% & 51.8\% & 6-yr avg unprofitable; 2025 alone: 57.7\% ATS, +10.2\% ROI ($N\!=\!221$) \\
 \midrule
 \multicolumn{4}{l}{\textit{Player Props (2022--2024)}} \\
-\quad Props Ensemble & $+2.96$\% & 53.89\% & Profitable but high volatility \\
+\quad Props Ensemble & $+2.96$\% & 53.89\% & Limited test window; pipeline non-functional$^{\dagger}$ \\
 \quad Props MAE & \multicolumn{2}{c}{44.25 yards} & Equal-weight beats Dirichlet \\
 \midrule
 \multicolumn{4}{l}{\textit{Props by Position (Year-over-Year Stability)}} \\
@@ -381,11 +381,14 @@ A complete end-to-end sports betting system integrating: (1)~automated data pipe
 \quad RB Rushing Yards & \multicolumn{2}{c}{0.50 stability} & Unpredictable, likely negative \\
 \bottomrule
 \end{tabular}
+
+\vspace{2pt}
+{\footnotesize $^{\dagger}$Props pipeline is currently non-functional: model files missing, data tables empty. The +2.96\% ROI figure is from a limited test window and has not been validated for production deployment.}
 \end{center}
 
-\noindent\textbf{Critical insight:} The aggregate $-7.5$\% ROI applies \textbf{only to spread betting}. Player props show $+2.96$\% ROI (above the 52.4\% breakeven threshold), and a remarkably simple power ratings model achieved $+43$\% ROI on 2025 holdout data. Performance varies dramatically by bet type and position---RB props are essentially noise (0.26--0.50 year-over-year correlation) while QB/WR props are highly predictable (0.85 stability).
+\noindent\textbf{Critical insight:} The aggregate $-7.5$\% ROI applies \textbf{only to spread betting}. Player props showed $+2.96$\% ROI in a limited test window (above the 52.4\% breakeven threshold), but the props pipeline is currently non-functional and these results have not been reproduced. The simple power ratings model achieved 57.7\% ATS and +10.2\% ROI on 2025 data ($N\!=\!221$), but multi-year performance (2020--2025, 1,310 games) shows 51.8\% ATS and $-1.1$\% ROI---unprofitable. A 3--4 point edge sweet spot showed 67.6\% ATS, suggesting non-monotonic value that requires further investigation. Performance varies dramatically by bet type and position---RB props are essentially noise (0.26--0.50 year-over-year correlation) while QB/WR props are highly predictable (0.85 stability).
 
-\noindent\textbf{The bottom line}: NFL \textbf{spread betting markets} are efficient for publicly available information---the 4.5\% vigorish represents a barrier that sophisticated methods cannot overcome. However, \textbf{player props markets show profitability} ($+2.96$\% ROI), particularly for high-stability positions (QB, WR). The surprising finding is that complexity does not guarantee improvement: a simple power ratings model outperformed the sophisticated ensemble on 2025 holdout data. The contribution is both \textbf{methodological} (rigorous validation, leakage detection) and \textbf{practical} (bet type matters more than model complexity).
+\noindent\textbf{The bottom line}: NFL \textbf{spread betting markets} are efficient for publicly available information---the 4.5\% vigorish represents a barrier that sophisticated methods cannot overcome. Player props showed $+2.96$\% ROI in a limited test window, particularly for high-stability positions (QB, WR), but \textbf{the props pipeline is currently non-functional} and these results have not been reproduced. The simple power ratings model showed a promising 57.7\% ATS in 2025, but multi-year data (51.8\% ATS, $-1.1$\% ROI) confirms it is not reliably profitable. The contribution is both \textbf{methodological} (rigorous validation, leakage detection) and \textbf{practical} (bet type selection and honest assessment matter more than model complexity).
 
 \paragraph{Why This Matters.}
 The primary contribution is not profitability, but a \textbf{playbook for rigorous ML validation in adversarial environments}. We discovered that honest assessment hinges on three principles:
@@ -401,7 +404,7 @@ The primary contribution is not profitability, but a \textbf{playbook for rigoro
 \chapter*{Abstract}
 This dissertation presents a system-of-systems for prediction and decision-making in National Football League (NFL) betting markets, revealing \textbf{differential market efficiency across bet types}. The work documents a 13-month research journey, beginning with the catastrophic failure of monolithic predictive models (maximum drawdown $-83.5\%$) and culminating in a comprehensive data leakage investigation and nuanced performance assessment.
 
-\textbf{Critical findings (December 2025):} Performance varies dramatically by market type. \textbf{Spread betting} shows $-7.5$\% ROI (51.0\% win rate)---confirming market efficiency for publicly available data. However, \textbf{player props} show $+2.96$\% ROI (53.89\% win rate), with high-stability positions (QB passing yards, WR receptions) likely more profitable than volatile RB metrics. Most surprisingly, a \textbf{simple power ratings model} achieved $+43$\% ROI on 2025 holdout data, significantly outperforming the sophisticated 5-way ensemble. The conclusion is nuanced: spread markets are efficient, but props markets and simple models may offer exploitable edges.
+\textbf{Critical findings (December 2025):} Performance varies dramatically by market type. \textbf{Spread betting} shows $-7.5$\% ROI (51.0\% win rate)---confirming market efficiency for publicly available data. \textbf{Player props} showed $+2.96$\% ROI (53.89\% win rate) in a limited test window, though the props pipeline is currently non-functional (model files missing, data tables empty). A \textbf{simple power ratings model} achieved 57.7\% ATS and +10.2\% ROI on 2025 data ($N\!=\!221$), but multi-year evaluation (2020--2025, 1,310 games) shows 51.8\% ATS and $-1.1$\% ROI---unprofitable overall. The conclusion is nuanced: single-season results can be misleading, and honest multi-year evaluation is essential for credible claims.
 
 The system architecture embodies three core principles discovered through rigorous experimentation. First, a \textbf{diversified ensemble architecture} combines Bayesian (State-Space, Hierarchical), frequentist (ELO), and machine learning (XGBoost) models. Ensemble variance reduction is driven by minimizing inter-model correlation ($\bar{\rho}=0.32$) rather than maximizing individual accuracy. Second, a \textbf{hybrid static-incremental structure} (70\% static, 30\% incremental) resolves the stability-adaptation trade-off. Third, a \textbf{multi-layer validation framework} proved critical in identifying target leakage in the Ridge Residuals method (88\% ``improvement'' $\to$ 47\% degradation) and CQL bet sizing (100\% win rate $\to$ target contamination), reinforcing the importance of validation rigor over apparent performance.
 

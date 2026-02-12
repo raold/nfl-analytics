@@ -30,7 +30,7 @@ We pursue four questions:
 % (Contributions merged into Research Questions; no separate section)
 
 \section{Scope and Boundaries}
-We target pre-game markets across two domains: (1)~\textbf{game-level} (spread/total/moneyline) from 1999 onward, and (2)~\textbf{player props} (passing yards, rushing yards, receptions) from 2020 onward. Live in-game betting is out of scope. Only public data are used. All evaluation is out-of-sample with rolling-origin splits and clear decision-time information. Critically, we find that \textbf{performance varies dramatically by market type}: spreads show $-7.5$\% ROI (market efficient) while props show $+2.96$\% ROI (profitable).
+We target pre-game markets across two domains: (1)~\textbf{game-level} (spread/total/moneyline) from 1999 onward, and (2)~\textbf{player props} (passing yards, rushing yards, receptions) from 2020 onward. Live in-game betting is out of scope. Only public data are used. All evaluation is out-of-sample with rolling-origin splits and clear decision-time information. Critically, we find that \textbf{performance varies dramatically by market type}: spreads show $-7.5$\% ROI (market efficient) while props showed $+2.96$\% ROI in a limited test window (pipeline currently non-functional).
 
 \section{Thesis Statement and Hypotheses}
 
@@ -43,11 +43,11 @@ We develop a complete betting system pipeline—from data ingestion to model tra
 \textbf{Critical findings (December 2025):} Performance varies dramatically by market type:
 \begin{itemize}[itemsep=2pt,parsep=0pt]
     \item \textbf{Spread betting:} $-7.5$\% ROI, 51.0\% win rate---market efficient, vigorish barrier cannot be overcome
-    \item \textbf{Player props:} $+2.96$\% ROI, 53.89\% win rate---above breakeven, profitable (especially QB/WR)
-    \item \textbf{Simple power ratings:} $+43.0$\% ROI, 74.9\% accuracy on 2025 holdout---outperformed sophisticated ensemble
+    \item \textbf{Player props:} $+2.96$\% ROI, 53.89\% win rate in limited test window---pipeline currently non-functional (model files missing, data tables empty)
+    \item \textbf{Simple power ratings:} 57.7\% ATS, +10.2\% ROI on 2025 ($N\!=\!221$); multi-year 2020--2025: 51.8\% ATS, $-1.1$\% ROI (1,310 games)---single-season results misleading
     \item \textbf{Position stability matters:} QB passing (0.85 YoY correlation) vs RB rushing (0.50)---not all props are equal
 \end{itemize}
-The conclusion is nuanced: spread markets are efficient, but props markets and simple models may offer exploitable edges. Prediction accuracy does not imply betting profitability, but bet type selection matters more than model sophistication.
+The conclusion is nuanced: spread markets are efficient, single-season results can be misleading (power ratings multi-year ATS is 51.8\%), and props pipeline requires restoration before claims can be validated. Prediction accuracy does not imply betting profitability, and honest multi-year evaluation matters more than model sophistication.
 
 \textbf{Supporting Evidence:}
 \begin{enumerate}[itemsep=2pt,parsep=0pt]
@@ -139,7 +139,7 @@ Here are some terms you’ll see frequently:
 % (Removed Writing and Style Notes)
 
 \chaptersummary{
-This chapter established the motivation, scope, and core contributions of the dissertation. We test whether NFL betting markets can be beaten with publicly available data. The comprehensive data leakage investigation (December 2025) reveals \textbf{differential market efficiency}: spread betting shows $-7.5$\% ROI (market efficient), but player props show $+2.96$\% ROI (profitable). Most surprisingly, a simple power ratings model achieved $+43$\% ROI on 2025 holdout data, outperforming the sophisticated ensemble. The contributions are both methodological (rigorous validation, leakage detection, honest reporting) and practical (bet type selection matters more than model complexity).
+This chapter established the motivation, scope, and core contributions of the dissertation. We test whether NFL betting markets can be beaten with publicly available data. The comprehensive data leakage investigation (December 2025) reveals \textbf{market efficiency for spreads}: $-7.5$\% ROI. Player props showed $+2.96$\% ROI in limited testing but the pipeline is non-functional. A simple power ratings model showed 57.7\% ATS in 2025 but $-1.1$\% ROI over 6 years. The contributions are methodological (rigorous validation, leakage detection, honest reporting) and cautionary (single-season results can be misleading; multi-year evaluation is essential).
 }{
 We now survey the foundational literature—canonical models (Harville, Stern, Glickman), score distributions (Poisson, Skellam, bivariate), evaluation frameworks (proper scoring, calibration), and market microstructure—in \Cref{chap:litreview}.
 }
