@@ -10,8 +10,6 @@ from __future__ import annotations
 
 import asyncio
 from functools import partial
-import asyncio
-from functools import partial
 from typing import List, Optional
 from uuid import UUID
 
@@ -60,8 +58,6 @@ class PredictionRun(BaseModel):
     season_start: Optional[int]
     season_end: Optional[int]
     model_version: Optional[str]
-    season_start: Optional[int]
-    season_end: Optional[int]
 
 
 class GameOutcomePrediction(BaseModel):

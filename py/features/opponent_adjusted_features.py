@@ -498,10 +498,15 @@ class OpponentAdjustedFeatures:
         n_results = len(df)
         weights = self._compute_exponential_weights(n_results)
 
-        # Apply weighted averages
-        opp_def_epa = np.average(
-            df["avg_epa_allowed"].fillna(self.DEFAULT_OPP_DEF_EPA).astype(float), weights=weights
-        )
+        # Apply weighted averages (guard against zero-sum weights)
+        weight_sum = np.sum(weights)
+        if weight_sum == 0:
+            logger.warning("All weights sum to zero, using simple average")
+            opp_def_epa = np.mean(df["avg_epa_allowed"].fillna(self.DEFAULT_OPP_DEF_EPA).astype(float))
+        else:
+            opp_def_epa = np.average(
+                df["avg_epa_allowed"].fillna(self.DEFAULT_OPP_DEF_EPA).astype(float), weights=weights
+            )
         opp_def_pass_epa = np.average(
             df["avg_pass_epa_allowed"].fillna(self.DEFAULT_OPP_DEF_PASS_EPA).astype(float),
             weights=weights,

@@ -22,12 +22,12 @@ Expected Impact: +0.3-0.8% ROI from:
 """
 
 import sys
-
-sys.path.append("/Users/dro/rice/nfl-analytics")
-
-import logging
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+sys.path.insert(0, str(_PROJECT_ROOT))
+
+import logging
 import arviz as az
 import joblib
 import numpy as np
@@ -242,6 +242,8 @@ class BayesianNeuralNetwork:
 
         pred_mean = pred_samples.mean(axis=0)
         pred_std = pred_samples.std(axis=0) if return_std else None
+        if pred_std is not None:
+            pred_std = np.maximum(pred_std, 1e-6)
 
         logger.info(
             f"✓ Generated predictions: mean={pred_mean.mean():.1f}, " f"std={pred_std.mean():.1f}"

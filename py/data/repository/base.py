@@ -155,7 +155,7 @@ class QueryCache:
                 else:
                     logger.warning("Redis connection failed - using in-memory fallback")
                     self._redis_cache = None
-            except Exception as e:
+            except (ConnectionError, TimeoutError, OSError) as e:
                 logger.warning(f"Redis initialization failed: {e} - using in-memory fallback")
                 self._redis_cache = None
 

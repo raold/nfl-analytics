@@ -164,14 +164,15 @@ class DailyPipeline(BasePipeline):
         Returns:
             DataFrame with games from last N days
         """
-        query = f"""
+        lookback = int(self.lookback_days)
+        query = """
             SELECT *
             FROM games
-            WHERE kickoff >= NOW() - INTERVAL '{self.lookback_days} days'
+            WHERE kickoff >= NOW() - MAKE_INTERVAL(days => %s)
             ORDER BY kickoff DESC
         """
 
-        return pd.read_sql(query, self.db_conn)
+        return pd.read_sql(query, self.db_conn, params=(lookback,))
 
     def transform(self, data: pd.DataFrame) -> pd.DataFrame:
         """

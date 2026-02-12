@@ -195,9 +195,16 @@ class TemporalCausalityTracker:
         """
 
         # Extract season/week from game_id (format: 2025_16_KC_PIT)
+        if not game_id or not isinstance(game_id, str):
+            raise ValueError(f"Invalid game_id: {game_id}")
         parts = game_id.split("_")
-        season = int(parts[0]) if len(parts) >= 2 else 2025
-        week = int(parts[1]) if len(parts) >= 2 else 1
+        if len(parts) < 4:
+            raise ValueError(f"Invalid game_id format: {game_id}. Expected: YYYY_WW_XXX_YYY")
+        try:
+            season = int(parts[0])
+            week = int(parts[1])
+        except ValueError as e:
+            raise ValueError(f"Game_id season/week not numeric: {game_id}") from e
 
         news_data = {
             "texts": [news_text],
@@ -490,9 +497,15 @@ class TemporalCausalityTracker:
             probs["random"] += 0.1
             probs["prediction"] -= 0.05
 
+        # Clamp probabilities to [0, 1] before normalization
+        probs = {k: max(0.0, min(1.0, v)) for k, v in probs.items()}
+
         # Normalize probabilities
         total = sum(probs.values())
-        probs = {k: v / total for k, v in probs.items()}
+        if total > 0:
+            probs = {k: v / total for k, v in probs.items()}
+        else:
+            probs = {k: 1.0 / len(probs) for k in probs}
 
         diagnosis.stage_probabilities = {k: round(v, 3) for k, v in probs.items()}
 

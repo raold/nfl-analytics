@@ -6,16 +6,15 @@
 # Purpose: Generate ensemble predictions for upcoming NFL week using fresh R model predictions
 #
 # Cron entry:
-# 0 12 * * 2 cd /Users/dro/rice/nfl-analytics && ./scripts/generate_weekly_predictions_automated.sh >> /tmp/weekly_predictions.log 2>&1
+# 0 12 * * 2 cd $(cd "$(dirname "$0")/.." \&\& pwd) && ./scripts/generate_weekly_predictions_automated.sh >> /tmp/weekly_predictions.log 2>&1
 #
 # Created: November 22, 2025
 # Author: Claude Code (Sonnet 4.5)
 
-set -e  # Exit on error
-set -u  # Exit on undefined variable
+set -euo pipefail  # Exit on error, undefined variable, or pipe failure
 
 # Configuration
-PROJECT_DIR="/Users/dro/rice/nfl-analytics"
+PROJECT_DIR="$(cd "$(dirname "$0")/.." \&\& pwd)"
 LOG_DIR="$PROJECT_DIR/logs/predictions"
 PYTHON_VENV="$PROJECT_DIR/.venv/bin/python"
 
@@ -40,6 +39,12 @@ if [ "$CURRENT_MONTH" -lt 3 ]; then
 else
     # Mar-Dec: Current year's season
     SEASON=$CURRENT_YEAR
+fi
+
+# Validate SEASON is a 4-digit year
+if ! [[ "$SEASON" =~ ^[0-9]{4}$ ]]; then
+    echo "ERROR: Invalid season value: $SEASON (expected YYYY format)"
+    exit 1
 fi
 
 # Determine week (simplified - assumes Week 1 starts first week of September)
