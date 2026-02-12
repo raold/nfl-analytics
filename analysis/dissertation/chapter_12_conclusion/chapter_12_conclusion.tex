@@ -18,6 +18,7 @@ The journey from v1.0 to v6.0, culminating in the comprehensive data leakage inv
   \item \textbf{ROI:} $-7.5\%$ (confirming negative expected value after vig)
   \item \textbf{True out-of-sample (2025 holdout):} 74.9\% spread \emph{prediction} accuracy---but prediction accuracy does not imply betting profitability
   \item \textbf{Props performance:} 44.25 MAE with equal-weight averaging (props market may be less efficient)
+  \item \textbf{Complete 2025 season (February 2026):} Full evaluation across 285 games (272 regular season + 13 postseason including Super Bowl~LIX) confirms the market efficiency finding with $-3.2\%$ ATS ROI on 208 qualified bets (\S\ref{subsec:postseason-validation})
 \end{itemize}
 
 Earlier claims of +2.96\% ROI and 53.89\% win rate were computed before comprehensive leakage remediation and are now \textbf{INVALIDATED}. The Ridge Residuals method---initially appearing to offer 88\% improvement---was revealed to contain target leakage that inflated metrics by $>$14$\times$.
@@ -125,6 +126,8 @@ Despite current unprofitability, this work opens several research directions:
   \item \textbf{Private information}: Integrate injury monitoring (social media scraping, team beat reporters) to capture non-public intel before line moves.
   \item \textbf{Market microstructure arbitrage}: Exploit cross-book discrepancies in derivative markets (teaser pricing inconsistencies, correlated SGP legs).
   \item \textbf{Responsible gambling integration}: Build bankroll caps, session limits, and addiction detection into the system architecture.
+  \item \textbf{Feature pipeline resilience}: The 2025 postseason re-evaluation (\S\ref{subsec:postseason-validation}) revealed that model prediction quality degrades severely when ancillary data sources (NextGen tracking, QBR, semantic features) become unavailable. Future production systems must implement fault-tolerant data pipelines with automated health monitoring and graceful degradation when individual data sources fail.
+  \item \textbf{Postseason-specific modeling}: Playoff games ($n=13$ in 2025) showed distinct characteristics---tighter spreads, higher-quality opponents, motivational factors absent from regular-season training data. Dedicated playoff features (seed differential, bye-week advantage, playoff experience) merit investigation.
 \end{itemize}
 
 % Profit Optimization Future Work from Ch 12

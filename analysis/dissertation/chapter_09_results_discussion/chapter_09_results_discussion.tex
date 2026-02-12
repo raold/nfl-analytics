@@ -113,7 +113,7 @@ The final v6.0 system, a 5-way ensemble built on the principles of diversificati
 \bottomrule
 \end{tabular}
 \begin{tablenotes}
-\item \textbf{Note:} Betting economics from fully cleaned GLM baseline (\S\ref{sec:data-leakage-investigation}). Higher-level ensemble metrics (74.9\% holdout accuracy) use prediction accuracy, not betting simulation with vig.
+\item \textbf{Note:} Betting economics from fully cleaned GLM baseline (\S\ref{sec:data-leakage-investigation}). Higher-level ensemble metrics (74.9\% holdout accuracy) use prediction accuracy, not betting simulation with vig. Full 2025 season (Weeks 1--22, $n=285$ games including postseason) is now available; see \S\ref{subsec:postseason-validation} for playoff and Super Bowl~LIX results.
 \end{tablenotes}
 \end{table}
 
@@ -401,6 +401,9 @@ The narrow profitability margin ($<+3\%$ ROI) under full integration highlights 
 We report out-of-sample performance by season. Stability across 2015--2024 demonstrates generalization despite regime changes.
 % Prefer auto-generated table under figures/out if present, else fallback to results/
 \IfFileExists{../figures/out/oos_record_table.tex}{\input{../figures/out/oos_record_table.tex}}{\input{../results/oos_record_table.tex}}
+
+% 2025 Postseason Validation - Complete Season Analysis (Feb 2026)
+\input{../chapter_09_results_discussion/section_postseason_validation.tex}
 
 % BNN Calibration Study for Player Props (Rushing Yards) - ELEVATED SECTION
 \input{../chapter_09_results_discussion/section_bnn_calibration_study.tex}

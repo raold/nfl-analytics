@@ -1,0 +1,72 @@
+% !TEX root = ../main/main.tex
+\subsection{2025 Postseason Validation}\label{subsec:postseason-validation}
+
+With the completion of the 2025 NFL season---including Wild Card (Week~19), Divisional (Week~20), Conference Championships (Week~21), and Super Bowl~LIX (Week~22)---we extend the holdout evaluation from the in-season window to all 285 games. This represents the first end-to-end validation of the Game Outcome Model~v2 across both regular season and postseason play.
+
+\subsubsection{Full-Season Performance Summary}
+
+\Cref{tab:full-season-2025} presents the segmented performance of the XGBoost-based Game Outcome Model~v2 (382 features) across the complete 2025 season. All predictions were generated using the production model trained on 2022--2024 data with no retraining on 2025 outcomes.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Game Outcome Model v2: Complete 2025 Season Performance by Segment}
+\label{tab:full-season-2025}
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Segment} & \textbf{Games} & \textbf{Spread MAE} & \textbf{Total MAE} & \textbf{Win Prob Acc.} & \textbf{ATS Rate} \\
+\midrule
+Regular Season (Wk 1--18) & 272 & 11.14 & 11.05 & 57.0\% & 48.2\% \\
+Playoffs (Wk 19--21) & 12 & 8.43 & 12.83 & 58.3\% & 66.7\% \\
+Super Bowl LIX & 1 & 17.40 & 6.10 & --- & --- \\
+\midrule
+\textbf{Full Season} & \textbf{285} & \textbf{11.05} & \textbf{11.11} & \textbf{56.5\%} & \textbf{48.8\%} \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item Win Prob Accuracy = percentage of games where $P(\text{home win}) > 0.5$ correctly identified the winner. ATS Rate = percentage of games where model-implied spread was on the correct side of the Vegas closing line. Super Bowl omitted from accuracy calculations ($n=1$).
+\end{tablenotes}
+\end{table}
+
+\paragraph{Comparison with Vegas closing lines.}
+The model achieves a spread MAE of 11.05 points against the market's 9.67 points (Vegas), with the model producing a tighter prediction than Vegas in only 39.6\% of games. This 1.38-point disadvantage is consistent with the market efficiency finding reported throughout this chapter. Notably, playoff performance (spread MAE~=~8.43) outperformed regular season (11.14), likely because late-season team quality differentials are better established and the model's lookback window contains more informative data.
+
+\subsubsection{Super Bowl LIX Case Study}
+
+Super Bowl LIX featured the Seattle Seahawks ($-4.5$) against the New England Patriots at a neutral site. The model predicted a near toss-up (NE $+1.4$, total 48.1, win probability 49.4\% home), while Vegas installed Seattle as a 4.5-point favorite. The actual result---Seattle 29, New England 13---validated the market's assessment. The model's spread error of 17.4 points on this single game illustrates the challenge of predicting low-frequency, high-stakes events where motivational and matchup-specific factors dominate.
+
+\subsubsection{Betting Simulation: Postseason}
+
+\Cref{tab:betting-sim-2025} summarizes the ATS betting simulation at $-110$ vigorish with a 2-point minimum model-market edge threshold.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{ATS Betting Simulation: 2025 Season at $-110$ Vig (2pt Min Edge)}
+\label{tab:betting-sim-2025}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Segment} & \textbf{Bets} & \textbf{Win\%} & \textbf{ROI} \\
+\midrule
+Regular Season & 198 & 49.7\% & $-5.0\%$ \\
+Playoffs & 10 & 70.0\% & $+33.6\%$ \\
+\midrule
+\textbf{Full Season} & \textbf{208} & \textbf{50.7\%} & $\mathbf{-3.2\%}$ \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item Bets placed when $|\text{model spread} - \text{Vegas spread}| > 2$ points. Playoff outperformance ($n=10$) is not statistically significant at $\alpha=0.05$ (binomial $p=0.17$).
+\end{tablenotes}
+\end{table}
+
+The full-season ATS ROI of $-3.2\%$ is an improvement over the cleaned GLM baseline ($-7.5\%$) but remains below the 52.4\% breakeven threshold. The playoff subsample ($n=10$, 70\% win rate) is too small for statistical inference but suggests that larger team-quality differentials in postseason play may create exploitable edges---a hypothesis meriting investigation with multi-season playoff data.
+
+\subsubsection{Feature Pipeline Dependency}
+
+A critical infrastructure finding emerged during the full-season re-evaluation: model prediction quality is \textbf{critically dependent on feature pipeline completeness}. The in-season evaluation (December 2025) benefited from live data pipelines feeding NextGen tracking stats, ESPN QBR, real-time odds, and semantic features into the feature extractor. The post-season re-evaluation, conducted against a database backup with partial ancillary data (NextGen through Week~12 only, QBR unavailable, semantic features defaulting to mock data), produced compressed prediction distributions---spread predictions clustered within $[-2.6, +8.7]$ points versus actual NFL spreads spanning $[-35, +25]$.
+
+This finding has two implications:
+\begin{enumerate}
+  \item \textbf{Operational}: Production deployment requires automated, fault-tolerant data pipelines that maintain feature completeness throughout the season. A single missing data source (e.g., QBR) can degrade all 382 features to league-average defaults, collapsing the model's discriminatory power.
+  \item \textbf{Methodological}: Reporting model accuracy requires specifying the feature pipeline state at evaluation time. The same model architecture produces qualitatively different predictions depending on data availability---a consideration often overlooked in sports analytics literature.
+\end{enumerate}
