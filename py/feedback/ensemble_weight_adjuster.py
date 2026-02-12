@@ -151,7 +151,7 @@ class EnsembleWeightAdjuster:
             return self.DEFAULT_WEIGHTS.copy()
 
         # Compute inverse-MAE weights
-        inverse_maes = {k: 1.0 / v["mae"] for k, v in valid_models.items()}
+        inverse_maes = {k: 1.0 / (v["mae"] + 1e-6) for k, v in valid_models.items()}
         total = sum(inverse_maes.values())
 
         raw_weights = {k: v / total for k, v in inverse_maes.items()}
@@ -217,8 +217,10 @@ class EnsembleWeightAdjuster:
 
         # Normalize
         total = sum(limited.values())
-        if total > 0:
+        if total > 1e-6:
             limited = {k: v / total for k, v in limited.items()}
+        else:
+            return current_weights.copy()
 
         return limited
 
@@ -324,8 +326,12 @@ class EnsembleWeightAdjuster:
                 weighted_mae += weight * perf["mae"]
                 total_weight += weight
 
-        if total_weight == 0:
+        if total_weight < 1e-6:
             return float("inf")
+
+        # Only normalize if weights don't already sum to ~1.0
+        if abs(total_weight - 1.0) < 1e-6:
+            return weighted_mae
 
         return weighted_mae / total_weight
 

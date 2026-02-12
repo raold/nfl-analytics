@@ -114,8 +114,10 @@ class TemporalSafetyValidator(DataFrameValidator):
         result: ValidationResult,
     ) -> None:
         """Check that no data comes from after the target week."""
+        # Use > (not >=) for target_week: pre-game data from the target week
+        # (injury reports, weather, etc.) is available before kickoff
         future_mask = (df["season"] > target_season) | (
-            (df["season"] == target_season) & (df["week"] >= target_week)
+            (df["season"] == target_season) & (df["week"] > target_week)
         )
 
         future_count = future_mask.sum()

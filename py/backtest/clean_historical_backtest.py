@@ -83,12 +83,18 @@ def kelly_criterion(p_win, odds=1.91, fraction=0.25):
     if p_win <= 0 or p_win >= 1:
         return 0
 
-    edge = p_win * odds - 1
+    # Kelly criterion for decimal odds: f* = (p*b - q) / b
+    # where b = odds - 1 (net payout per unit), q = 1 - p (loss probability)
+    b = odds - 1
+    if b <= 0:
+        return 0
+
+    edge = p_win * b - (1 - p_win)
 
     if edge <= 0:
         return 0
 
-    kelly = (p_win * odds - 1) / odds
+    kelly = edge / b
     return min(kelly * fraction, 0.1)  # Cap at 10% of bankroll
 
 

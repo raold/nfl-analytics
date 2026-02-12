@@ -510,6 +510,9 @@ class PerStatTypeStackingStrategy(EnsembleStrategy):
         self, predictions: list[ModelPrediction], stat_type: str
     ) -> EnsemblePrediction:
         """Combine using Dirichlet weights as fallback."""
+        if not predictions:
+            raise ValueError("Cannot combine empty predictions list")
+
         dirichlet = self._get_dirichlet_stacker()
         weights = dirichlet.get_weights(stat_type)
 
