@@ -1,5 +1,5 @@
 % Profit Optimization Results
-% Extracted from Chapter 12 for integration into Chapter 6
+% Extracted from Chapter 12 for integration into Chapter 7
 
 \section{Profit Optimization Results}\label{sec:profit-optimization-results}
 
@@ -83,7 +83,7 @@ We quantify each component's contribution through ablation:
 
 \begin{table}[!ht]
 \centering
-\caption{ROI Impact by Component}
+\caption{ROI Impact by Component \textbf{[INVALIDATED---Pre-Leakage Remediation. These ablation estimates derive from the same pre-leakage backtest as \Cref{tab:profit-optimization-performance} and are similarly superseded.]}}
 \label{tab:profit-optimization-ablation}
 \begin{tabular}{lr}
 \toprule
@@ -157,16 +157,16 @@ Strategy adjustment: Required 5\% minimum edge, limited to 10\% Kelly. Found no 
 
 \subsection{Key Insights}
 
-The transformation from negative to positive ROI reveals several critical insights:
+While the ROI figures in this section were \textbf{invalidated} by the data leakage investigation (\S\ref{sec:data-leakage-investigation}), the \emph{methodological principles} remain sound and are validated by the framework's risk management improvements:
 
 \begin{enumerate}
-  \item \textbf{Edge Quality > Quantity}: Betting fewer games with higher edge produces superior returns to broad coverage with marginal edges.
+  \item \textbf{Edge Quality > Quantity}: Betting fewer games with higher estimated edge reduces variance and avoids marginal bets---even when the absolute edge is smaller than expected.
 
-  \item \textbf{Market Structure Matters}: Understanding and exploiting market microstructure (timing, book selection, alternative lines) contributes as much to profitability as prediction accuracy.
+  \item \textbf{Market Structure Matters}: Understanding market microstructure (timing, book selection, alternative lines) is essential for any bettor, regardless of model accuracy.
 
-  \item \textbf{Risk Management is Paramount}: CVaR constraints and uncertainty-based sizing prevent catastrophic drawdowns that eliminate long-term players.
+  \item \textbf{Risk Management is Paramount}: CVaR constraints and uncertainty-based sizing prevent catastrophic drawdowns. The 42\% drawdown reduction and 44\% CVaR improvement represent genuine risk management value independent of ROI.
 
-  \item \textbf{Friction is Significant}: Real-world costs (fees, heat, bonuses) consume 7\% of gross EV on average, making optimization essential.
+  \item \textbf{Friction is Significant}: Real-world costs (fees, heat, bonuses) consume approximately 7\% of gross EV, making optimization essential even for profitable strategies.
 
-  \item \textbf{Adaptation Required}: Static strategies fail; successful systems adapt to confidence levels, market regimes, and evolving conditions.
+  \item \textbf{Market Efficiency Dominates}: The cleaned baseline ($-7.5$\% ROI, 51.0\% win rate) confirms that publicly available data is insufficient to overcome the 4.5\% vigorish barrier for spread betting. Superior methodology cannot overcome negative expected value in efficient markets.
 \end{enumerate}

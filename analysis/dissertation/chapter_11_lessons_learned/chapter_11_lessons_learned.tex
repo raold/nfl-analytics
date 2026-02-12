@@ -20,7 +20,7 @@ The successful v6.0 ensemble was built upon three core technical principles that
 \begin{enumerate}
     \item \textbf{Validation Rigor and the Perils of Target Leakage.} The most important lesson of this research was not a specific modeling technique, but the process of discovering a critical flaw in one. An experimental two-stage model for feature orthogonalization (the "Ridge Residuals" method) initially appeared to be a breakthrough, promising an 88\% reduction in error. However, a final pre-deployment audit revealed this to be the result of a subtle but catastrophic target leakage flaw in the validation pipeline. When corrected, the method actually performed 55\% \textit{worse} than the baseline. This experience, detailed in the case study in Appendix~N, proved that a robust, multi-layered validation process is the most critical component of the system, as it is the only defense against chasing phantom improvements and deploying invalid models.
 
-    \item \textbf{Ensemble Diversification > Individual Sophistication.} The v1.0 system failed because it relied on a single model. The profitable v6.0 system succeeded by combining five weakly correlated models. As shown by the variance decomposition analysis in \Cref{sec:unified-baseline-comparison}, adding a simple, uncorrelated model (like ELO) was more effective at reducing overall error than further refining a single, sophisticated one.
+    \item \textbf{Ensemble Diversification > Individual Sophistication.} The v1.0 system failed because it relied on a single model. The v6.0 system achieved its best prediction accuracy by combining five weakly correlated models. As shown by the variance decomposition analysis in \Cref{sec:unified-baseline-comparison}, adding a simple, uncorrelated model (like ELO) was more effective at reducing overall error than further refining a single, sophisticated one.
 
     \item \textbf{Hybrid Architectures Resolve the Stability-Adaptation Dilemma.}\label{itm:hybrid-architecture} NFL markets are non-stationary. We found that neither pure static models (which suffer from concept drift) nor pure incremental models (which overfit to noise) were optimal. The solution, detailed in Chapter~\ref{chap:methods}, was a hybrid 70/30 blend of a static and an incremental model, which achieved a +4.2\% performance improvement over either pure approach.
 \end{enumerate}
@@ -124,7 +124,7 @@ The v6.0 system provides a strong foundation, but several promising research ave
 
 \paragraph{Problem.} The current system uses only structured statistical data, ignoring rich unstructured information: injury report narratives (``questionable with ankle'' vs.\ ``questionable but expected to play''), press conference sentiment, beat reporter insights, and social media signals. This information is often predictive but difficult to quantify systematically.
 
-\paragraph{Approach.} Extend the Semantic Stack (\Cref{chap:lessons-learned}) with deeper LLM integration \citep{xia2024sportsllm,lewis2020rag}:
+\paragraph{Approach.} Extend the Semantic Stack (\Cref{sec:semantic-stack}) with deeper LLM integration \citep{xia2024sportsllm,lewis2020rag}:
 
 \begin{itemize}
   \item \textbf{Enhanced Injury Severity Assessment:} Current injury features treat ``questionable'' uniformly. Fine-tuned LLMs can parse injury report language to predict actual availability probability (``questionable with hamstring'' $\to$ 35\% play probability vs.\ ``questionable rest'' $\to$ 85\%).
@@ -195,7 +195,7 @@ Combining the above directions, a v7.0 ensemble would integrate:
   \item Full MLOps infrastructure for continuous monitoring and improvement
 \end{enumerate}
 
-Conservative projections suggest 20--30\% relative improvement in ROI through reduced variance ($\bar{\rho}$ reduction) and improved signal extraction (causal + LLM features), validated through the A/B testing infrastructure before full deployment.
+Conservative projections suggest 20--30\% relative improvement in prediction accuracy through reduced variance ($\bar{\rho}$ reduction) and improved signal extraction (causal + LLM features), validated through the A/B testing infrastructure before full deployment. \textbf{Note:} Given the cleaned baseline of $-7.5$\% ROI, even a 30\% relative improvement would not achieve profitability for spread betting. These improvements are most likely to benefit less efficient markets (player props, live betting) or alternative applications (coaching analytics, draft evaluation).
 
 \section{Final Reflection: The Market as Teacher}
 

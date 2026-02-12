@@ -6,7 +6,7 @@
 \section*{Overview and Motivation}
 Building on the classical baseline models in \Cref{chap:methods}, this chapter develops advanced Bayesian hierarchical frameworks and ensemble methods that address the limitations of point-estimate models. While gradient boosting and GLMs excel at prediction, they lack principled uncertainty quantification critical for risk-aware betting. Bayesian methods provide full posterior distributions that inform Kelly sizing, ensemble voting, and production risk gates.
 
-This chapter presents: (1) Bayesian hierarchical team ratings with partial pooling and time-varying effects, (2) GPU training infrastructure enabling large-scale Bayesian neural networks, (3) graph neural networks for matchup dynamics with 660× GPU speedup, (4) advanced feature engineering including regime detection and dynamic copulas, and (5) the v3.0 player props ensemble integrating informative priors, QB-WR chemistry, and meta-learner stacking for 86.4\% MAE improvement.
+This chapter presents: (1) Bayesian hierarchical team ratings with partial pooling and time-varying effects, (2) GPU training infrastructure enabling large-scale Bayesian neural networks, (3) graph neural networks for matchup dynamics with 660× GPU speedup, (4) advanced feature engineering including regime detection and dynamic copulas, and (5) the v3.0 player props ensemble integrating informative priors, QB-WR chemistry, and meta-learner stacking for 87.7\% MAE improvement.
 
 The Bayesian foundations established here enable the reinforcement learning system (\Cref{chap:rl}) to convert predictive edge into sequential betting decisions with quantified uncertainty, portfolio diversification, and governance oversight.
 
@@ -395,7 +395,7 @@ The following section extends the Bayesian hierarchical methodology to player pr
   \item Correlation-adjusted Kelly criterion for portfolio optimization
 \end{itemize}
 
-This v3.0 ensemble achieves breakthrough 86.4\% MAE improvement over baseline (42.3 $\to$ 5.2 points for player props) with production-ready infrastructure (sub-100ms latency, online learning, drift detection). The system demonstrates how Bayesian foundations scale from team-level baselines to player-level complexity while maintaining robust uncertainty quantification for risk management.
+This v3.0 ensemble achieves breakthrough 87.7\% MAE improvement over baseline (42.3 $\to$ 5.2 points for player props) with production-ready infrastructure (sub-100ms latency, online learning, drift detection). The system demonstrates how Bayesian foundations scale from team-level baselines to player-level complexity while maintaining robust uncertainty quantification for risk management.
 
 % Include the v3.0 Ensemble Section
 \input{../chapter_04_baseline_modeling/v3_ensemble_section.tex}
@@ -458,7 +458,7 @@ This chapter developed advanced Bayesian hierarchical frameworks and ensemble me
 
 The state-space vs Bayesian analysis clarified when to prefer speed (Kalman, 2 sec) vs full uncertainty (MCMC, 18 sec), informing production deployment decisions. Advanced feature engineering evaluation revealed that GNN GPU optimization (660× speedup) made graph neural networks practical, while changepoint detection and dynamic copulas offered insufficient benefit relative to complexity.
 
-The v3.0 player prop ensemble extended Bayesian foundations to granular player-level prediction, achieving 86.4\% MAE improvement (42.3 $\to$ 5.2 points) through informative priors, meta-learner stacking, QB-WR chemistry modeling, and correlation-adjusted Kelly sizing. This demonstrates scalability from team baselines to player complexity while maintaining robust risk management.
+The v3.0 player prop ensemble extended Bayesian foundations to granular player-level prediction, achieving 87.7\% MAE improvement (42.3 $\to$ 5.2 points) through informative priors, meta-learner stacking, QB-WR chemistry modeling, and correlation-adjusted Kelly sizing. This demonstrates scalability from team baselines to player complexity while maintaining robust risk management.
 
 These advanced Bayesian methods provide the principled uncertainty quantification needed for the reinforcement learning system (\Cref{chap:rl}) to convert predictive edge into sequential betting decisions with quantified risk, portfolio diversification, and governance oversight.
 }{

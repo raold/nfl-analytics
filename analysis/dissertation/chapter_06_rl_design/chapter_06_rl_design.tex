@@ -74,8 +74,8 @@ Using advantage $A^{\pi_\theta}=Q^{\pi_\theta}-V^{\pi_\theta}$ reduces variance.
 \subsection{Value-Based Methods and Offline RL}\label{subsec:cql}
 Deep Q-learning with target networks and replay learns $Q_\theta$ from TD errors; Double Q-learning mitigates overestimation bias, dueling networks separate value and advantage streams, and prioritized replay focuses on informative transitions \citep{vanhasselt2016,wang2016dueling,schaul2016per}. For continuous actions we use TD3/SAC-style actors with entropy regularization \citep{fujimoto2018td3,haarnoja2018sac}. Distributional critics (IQN) can improve stability and calibration of value targets \citep{bellemare2017distributional,dabney2018quantile}.
 
-In the offline setting with dataset $\mathcal D$, distributional shift leads to extrapolation error. Behavior regularization and batch constraints restrict actions to the data support (BCQ/BRAC/IQL), while pessimistic objectives downweight unsupported actions; CQL optimizes
-Let $\mathcal{D}$ be an offline dataset, $\hat Q_\theta$ a Q-network. CQL optimizes
+In the offline setting with dataset $\mathcal D$, distributional shift leads to extrapolation error. Behavior regularization and batch constraints restrict actions to the data support (BCQ/BRAC/IQL), while pessimistic objectives downweight unsupported actions.
+Let $\mathcal{D}$ be an offline dataset and $\hat Q_\theta$ a Q-network. CQL optimizes
 \begin{equation*}
 \resizebox{0.96\linewidth}{!}{$
 \min_\theta\ \alpha\,\E_s\!\left[\log\!\sum_a \exp\hat Q_\theta(s,a) - \E_{a\sim\mathcal{D}} \hat Q_\theta(s,a)\right]
@@ -94,7 +94,7 @@ Raw profit-and-loss is sparse and noisy. We augment with shaped rewards that cre
 Historical seasons provide logged trajectories. We apply conservative batch RL algorithms (CQL, BCQ) to mitigate distributional shift and use importance-sampling diagnostics to ensure coverage. Hyperparameter sweeps run on GPU-backed instances with reproducible seeds.
 
 \subsection{DQN and PPO Implementation}\label{subsec:dqn-ppo-impl}
-I implement two baseline agents for NFL betting: a Deep Q-Network (DQN) with discrete actions and a Proximal Policy Optimization (PPO) actor-critic with continuous action space. Both agents are trained offline on 1,408 games (2020--2025) using logged rewards and bet probabilities.
+We implement two baseline agents for NFL betting: a Deep Q-Network (DQN) with discrete actions and a Proximal Policy Optimization (PPO) actor-critic with continuous action space. Both agents are trained offline on 1,408 games (2020--2025) using logged rewards and bet probabilities.
 
 \paragraph{DQN architecture.} The DQN uses a three-layer feed-forward network (128–64–32 units, ReLU activations) mapping state features (spread, total, EPA, market prices) to Q-values for four discrete actions: skip bet, small stake (0.5\% bankroll), medium stake (1.0\%), and large stake (2.0\%). Training employs experience replay with 10,000 samples, target network updates every 10 episodes, $\varepsilon$-greedy exploration ($\varepsilon\in[0.9,0.1]$ over 200 episodes), discount $\gamma=0.99$, and Adam optimizer (lr=0.001). After 400 epochs on MPS (Apple Silicon GPU), the final Q-value converged to 0.1539 with peak performance at epoch 149 (Q=0.2323).
 
@@ -104,9 +104,9 @@ I implement two baseline agents for NFL betting: a Deep Q-Network (DQN) with dis
 
 \paragraph{Action space analysis.} DQN's discrete action space (4 buckets) enforces interpretable stake levels but lacks granularity. PPO's continuous Beta distribution allows finer-grained sizing, with final average action 0.5773 (medium stake). DQN shows 100\% bet rate (never skips), while PPO is more conservative (57.7\% average action). This suggests PPO's continuous parameterization provides more flexible risk control, though at the cost of 16.2\% lower final reward.
 
-\paragraph{Device compatibility.} DQN successfully uses MPS acceleration (5-minute training for 400 epochs), while PPO requires CPU due to \texttt{torch.distributions.Beta} not supporting MPS sampling (12-minute training). This hardware limitation favors DQN for rapid iteration on Apple Silicon but does not affect final performance.
+\paragraph{Device compatibility.} DQN successfully uses GPU acceleration (5-minute training for 400 epochs), while PPO requires CPU due to \texttt{torch.distributions.Beta} sampling limitations on certain GPU backends (12-minute training). This hardware consideration favors DQN for rapid iteration but does not affect final performance.
 
-\paragraph{Recommendation.} For deployment, I prefer PPO due to its superior stability (3.8$\times$ lower variance) and continuous action space, despite the 16.2\% reward trade-off. In risk-sensitive betting, consistent performance is more valuable than occasional peaks, and PPO's lower variance reduces the risk of catastrophic drawdowns. The comparison is documented in \texttt{py/analysis/rl\_agent\_comparison.py} and \texttt{models/\{dqn,ppo\}\_training\_log.json}.
+\paragraph{Recommendation.} For deployment, we prefer PPO due to its superior stability (3.8$\times$ lower variance) and continuous action space, despite the 16.2\% reward trade-off. In risk-sensitive betting, consistent performance is more valuable than occasional peaks, and PPO's lower variance reduces the risk of catastrophic drawdowns. The comparison is documented in \texttt{py/analysis/rl\_agent\_comparison.py} and \texttt{models/\{dqn,ppo\}\_training\_log.json}.
 
 % Include the comparison table if it exists
 \IfFileExists{../figures/out/rl_agent_comparison_table.tex}{\input{../figures/out/rl_agent_comparison_table.tex}}{}
@@ -352,7 +352,7 @@ We compare the RL policy to a stateless baseline: place a bet when comparative b
   \end{threeparttable}
 \end{table}
 
-\paragraph{Pessimism sensitivity.} Equation~8.1.2 uses a lower quantile for $p$ to discount Kelly. We sweep $\alpha\in\{0.05,0.10\}$ and report growth/drawdown trade‑offs.
+\paragraph{Pessimism sensitivity.} The Kelly-LCB baseline uses a lower quantile for $p$ to discount Kelly. We sweep $\alpha\in\{0.05,0.10\}$ and report growth/drawdown trade‑offs.
 
 \subsection{Parsimony: when to prefer stateless rules}\label{sec:parsimonious-choice}
 Pre‑game NFL betting has limited sequential structure relative to genuinely sequential control problems: weekly decisions are nearly independent, and exposure resets quickly. Consequently, a parsimonious decision rule can be competitive with offline RL.
@@ -378,9 +378,9 @@ This rule aligns claims with evidence: RL is used only when it provides reliable
 
 \paragraph{Utilization‑adjusted Sharpe.} If a system is deployed 52 weeks but bets only $W$ weeks, we report
 \[\mathrm{Sharpe}_{\mathrm{util}} = \mathrm{Sharpe}_{\mathrm{active}}\times\sqrt{\frac{W}{52}},\]
-to reflect annualized performance accounting for idle periods (cf. Table~10.2 zero‑bet weeks). We include this in the core ablation table.
+to reflect annualized performance accounting for idle periods (cf.\ the zero-bet weeks documented in \Cref{chap:production}). We include this in the core ablation table.
 
-\paragraph{CVaR sizing complexity.} For portfolio sizing with CVaR constraints (\S\ref{chap:risk}), typical instances solve in sub‑second wall‑clock time on a laptop. As a concrete benchmark: $n=\,$100 bets, $B=\,$10{,}000 scenarios, solver=OSQP, time$\approx\,$0.4 s.\footnote{Typical benchmark on an M2 laptop: $n=100$, $B=10{,}000$, OSQP 0.6, warm‑started. Replace with your local run; a table \texttt{cvar\_benchmark\_table.tex} is included if present.}
+\paragraph{CVaR sizing complexity.} For portfolio sizing with CVaR constraints (\S\ref{chap:risk}), typical instances solve in sub‑second wall‑clock time on a laptop. As a concrete benchmark: $n=\,$100 bets, $B=\,$10{,}000 scenarios, solver=OSQP, time$\approx\,$0.4 s.\footnote{Benchmark: $n=100$, $B=10{,}000$, OSQP 0.6, warm-started. A table \texttt{cvar\_benchmark\_table.tex} is included if present.}
 
 \IfFileExists{../figures/out/utilization_adjusted_sharpe_table.tex}{\input{../figures/out/utilization_adjusted_sharpe_table.tex}}{}
 \IfFileExists{../figures/out/cvar_benchmark_table.tex}{%
@@ -460,7 +460,7 @@ Full coverage statistics and temporal distribution details are documented in the
 \input{../chapter_06_rl_design/section_experiment_augmented_rl.tex}
 
 \chaptersummary{
-We designed an offline RL layer that converts calibrated edge into actions while enforcing safety via conservative objectives and OPE gates. We mapped NFL challenges to RL design choices, summarized robust offline RL algorithms, and formalized OPE tools and risk gates used for promotion decisions. The design emphasizes conservative learning from logged data, dependence‑aware action spaces, and safety constraints aligned with governance. We extended the baseline RL framework by integrating 29 experiment-derived features from the 25 successful cVAE and causal experiments (\Cref{sec:experiments}), expanding the state space from 15 to 44 dimensions and enabling experiment-aware bet sizing with projected ROI improvements of +3--10\%. This operationalizes the thesis by pairing edge with governance so that bankroll growth is reliable rather than fragile.
+We designed an offline RL layer that converts calibrated edge into actions while enforcing safety via conservative objectives and OPE gates. We mapped NFL challenges to RL design choices, summarized robust offline RL algorithms, and formalized OPE tools and risk gates used for promotion decisions. The design emphasizes conservative learning from logged data, dependence-aware action spaces, and safety constraints aligned with governance. We extended the baseline RL framework by integrating 29 experiment-derived features from the 25 successful cVAE and causal experiments (\Cref{sec:experiments}), expanding the state space from 15 to 44 dimensions. \textbf{Note:} Original ROI improvement projections of +3--10\% are now understood against the cleaned baseline of $-7.5$\% ROI (\S\ref{sec:data-leakage-investigation}); even optimistic scenarios would only marginally reach breakeven for spread betting. CQL models remain disabled pending retraining (ADR-016). This operationalizes the thesis by pairing edge with governance so that bankroll growth is reliable rather than fragile.
 }{
 \Cref{chap:risk} quantifies uncertainty and translates it into stake sizing and tail‑risk controls (fractional Kelly, CVaR), making policies deployable in practice.
 }

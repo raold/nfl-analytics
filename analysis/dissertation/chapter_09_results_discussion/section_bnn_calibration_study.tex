@@ -38,7 +38,7 @@ This investigation was designed to systematically test each hypothesis through f
     \item[RQ4: Hyperparameter Optimization] Can systematic search identify single-output BNN configurations that achieve acceptable calibration? (\S\ref{subsec:phase4_optimization})
 \end{description}
 
-\textbf{Note:} This chapter documents the \textit{successful} investigation that led to the Multi-Output v3.1 BNN. For a complete account of the six failed BNN approaches that preceded this success (NUTS timeout, MC Dropout gradient explosion, Temperature Scaling undercalibration, Laplace Approximation dimension errors, and two Multi-Output variants with data leakage and contamination), see Appendix~\ref{app:bnn-failures}.
+\textbf{Note:} This chapter documents the \textit{successful} investigation that led to the Multi-Output v3.1 BNN. For a complete account of the six failed BNN approaches that preceded this success (NUTS timeout, MC Dropout gradient explosion, Temperature Scaling undercalibration, Laplace Approximation dimension errors, and two Multi-Output variants with data leakage and contamination), see Appendix~\ref{app:bnn-investigation}.
 
 Critically, we also implemented \textbf{non-Bayesian baselines} (quantile regression, conformal prediction) to determine whether the calibration problem was inherent to the task or specific to our Bayesian methodology—a comparison often omitted in Bayesian deep learning research but essential for assessing whether the additional computational cost of Bayesian methods is justified.
 

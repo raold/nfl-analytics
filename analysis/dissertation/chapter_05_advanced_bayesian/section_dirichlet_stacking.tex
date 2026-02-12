@@ -186,7 +186,7 @@ Hybrid Static-Incremental & 0.100 (10\%) & 0.101 (10.1\%) & +1\% \\
 \end{tabular}
 \begin{tablenotes}
 \footnotesize
-\item[a] Sum of Hierarchical v2 + Informative Priors v2 + State-Space v2.
+\item[a] Sum of Hierarchical v2 + Informative Priors v2 (partial-pooling models). State-Space v2 excluded as it uses Kalman filtering rather than hierarchical shrinkage.
 \item[b] Sum of XGBoost v4 Ridge + Hybrid Static-Incremental.
 \end{tablenotes}
 \end{threeparttable}
@@ -339,7 +339,7 @@ v8.0 DIRICHLET & Game Spreads & \textit{Not Tested}\tnote{c} & Expected Worse \\
 \end{tabular}
 \begin{tablenotes}
 \footnotesize
-\item[a] v6.0 achieves 54.5\% ATS cover rate and +4.0\% ROI on game predictions (validated 2022--2024).
+\item[a] v6.0 achieves 54.5\% ATS cover rate on the 2022--2024 backtest. \textbf{Note:} Cleaned baseline from leakage investigation shows 51.0\% win rate and $-7.5$\% ROI (\S\ref{sec:data-leakage-investigation}); the +4.0\% ROI originally reported is superseded.
 \item[b] 31.5\% MAE improvement over v6.0 baseline: $(89.42 - 61.26) / 89.42 = 0.315$.
 \item[c] Using v8.0 for game spreads would collapse XGBoost to 2.6\%, likely degrading spread prediction accuracy.
 \end{tablenotes}

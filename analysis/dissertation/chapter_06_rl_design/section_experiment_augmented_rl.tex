@@ -25,7 +25,7 @@ The baseline RL state space (\Cref{subsec:dqn-ppo-impl}) contains 15 features en
 \begin{itemize}
   \item Market signals: home/away win probability, spread line, total line
   \item Game context: season, week number (raw and normalized)
-  \item Scoring: home/away scores, actual total, margin (absolute and signed)
+  \item Scoring context: \textbf{[Note: The original implementation included post-game outcomes (scores, margin) in the state vector, constituting target leakage---the same class of error identified in the CQL pipeline (ADR-016, \S\ref{sec:data-leakage-investigation}). A corrected implementation would replace these with pre-game predictive features (e.g., projected scores from ensemble models, historical scoring averages).]}
   \item Market microstructure: market edge (deviation from 50/50), absolute spread
 \end{itemize}
 
