@@ -217,90 +217,90 @@
 \contentsline {table}{\numberline {K.9}{\ignorespaces Ensemble v7.0 Validation: Multi-Season Performance Comparison}}{540}{table.caption.3502}%
 \contentsline {table}{\numberline {K.10}{\ignorespaces Component Performance Stability (2022--2024)}}{540}{table.caption.3507}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {L.1}{\ignorespaces Incremental XGBoost Investigation Timeline}}{547}{table.caption.3553}%
-\contentsline {table}{\numberline {L.2}{\ignorespaces Initial 2024 Season Results (INCORRECT - Baseline Error)}}{548}{table.caption.3559}%
-\contentsline {table}{\numberline {L.3}{\ignorespaces 2022 Week 1 Results (Discovery of Error)}}{549}{table.caption.3577}%
-\contentsline {table}{\numberline {L.4}{\ignorespaces Corrected Multi-Season Results (Pure Incremental vs Static XGBoost)}}{551}{table.caption.3607}%
-\contentsline {table}{\numberline {L.5}{\ignorespaces Cold-Start Penalty (2024 Season)}}{551}{table.caption.3610}%
-\contentsline {table}{\numberline {L.6}{\ignorespaces Window Size Tuning Results (2024 Season)}}{552}{table.caption.3616}%
-\contentsline {table}{\numberline {L.7}{\ignorespaces Learning Rate Tuning Results (2024 Season)}}{553}{table.caption.3621}%
-\contentsline {table}{\numberline {L.8}{\ignorespaces Update Frequency Results (2024 Season)}}{553}{table.caption.3626}%
-\contentsline {table}{\numberline {L.9}{\ignorespaces Feature Selection Results (2024 Season)}}{554}{table.caption.3631}%
-\contentsline {table}{\numberline {L.10}{\ignorespaces Incremental Ensemble Results (2024 Season)}}{555}{table.caption.3636}%
-\contentsline {table}{\numberline {L.11}{\ignorespaces Adaptive Learning Rate Results (2024 Season)}}{555}{table.caption.3641}%
-\contentsline {table}{\numberline {L.12}{\ignorespaces Warm-Start Results (2024 Season)}}{556}{table.caption.3646}%
-\contentsline {table}{\numberline {L.13}{\ignorespaces Hybrid Blending Results (2024 Season) - BREAKTHROUGH}}{556}{table.caption.3651}%
-\contentsline {table}{\numberline {L.14}{\ignorespaces Hybrid 70/30 Model: Full Multi-Season Validation}}{557}{table.caption.3655}%
-\contentsline {table}{\numberline {L.15}{\ignorespaces Statistical Significance Tests (Paired t-test)}}{557}{table.caption.3659}%
+\contentsline {table}{\numberline {L.1}{\ignorespaces Incremental XGBoost Investigation Timeline}}{546}{table.caption.3553}%
+\contentsline {table}{\numberline {L.2}{\ignorespaces Initial 2024 Season Results (INCORRECT - Baseline Error)}}{547}{table.caption.3559}%
+\contentsline {table}{\numberline {L.3}{\ignorespaces 2022 Week 1 Results (Discovery of Error)}}{548}{table.caption.3577}%
+\contentsline {table}{\numberline {L.4}{\ignorespaces Corrected Multi-Season Results (Pure Incremental vs Static XGBoost)}}{550}{table.caption.3607}%
+\contentsline {table}{\numberline {L.5}{\ignorespaces Cold-Start Penalty (2024 Season)}}{550}{table.caption.3610}%
+\contentsline {table}{\numberline {L.6}{\ignorespaces Window Size Tuning Results (2024 Season)}}{551}{table.caption.3616}%
+\contentsline {table}{\numberline {L.7}{\ignorespaces Learning Rate Tuning Results (2024 Season)}}{552}{table.caption.3621}%
+\contentsline {table}{\numberline {L.8}{\ignorespaces Update Frequency Results (2024 Season)}}{552}{table.caption.3626}%
+\contentsline {table}{\numberline {L.9}{\ignorespaces Feature Selection Results (2024 Season)}}{553}{table.caption.3631}%
+\contentsline {table}{\numberline {L.10}{\ignorespaces Incremental Ensemble Results (2024 Season)}}{554}{table.caption.3636}%
+\contentsline {table}{\numberline {L.11}{\ignorespaces Adaptive Learning Rate Results (2024 Season)}}{554}{table.caption.3641}%
+\contentsline {table}{\numberline {L.12}{\ignorespaces Warm-Start Results (2024 Season)}}{555}{table.caption.3646}%
+\contentsline {table}{\numberline {L.13}{\ignorespaces Hybrid Blending Results (2024 Season) - BREAKTHROUGH}}{555}{table.caption.3651}%
+\contentsline {table}{\numberline {L.14}{\ignorespaces Hybrid 70/30 Model: Full Multi-Season Validation}}{556}{table.caption.3655}%
+\contentsline {table}{\numberline {L.15}{\ignorespaces Statistical Significance Tests (Paired t-test)}}{556}{table.caption.3659}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {M.1}{\ignorespaces Hardcoded Credential Inventory}}{561}{table.caption.3709}%
-\contentsline {table}{\numberline {M.2}{\ignorespaces Test Coverage Gaps}}{562}{table.caption.3714}%
-\contentsline {table}{\numberline {M.3}{\ignorespaces Integration Test Gaps}}{563}{table.caption.3720}%
-\contentsline {table}{\numberline {M.4}{\ignorespaces ETL Pipeline Complexity}}{563}{table.caption.3723}%
-\contentsline {table}{\numberline {M.5}{\ignorespaces Data Validation Gaps}}{565}{table.caption.3734}%
-\contentsline {table}{\numberline {M.6}{\ignorespaces Technical Debt Remediation Timeline}}{566}{table.caption.3743}%
+\contentsline {table}{\numberline {M.1}{\ignorespaces Hardcoded Credential Inventory}}{560}{table.caption.3709}%
+\contentsline {table}{\numberline {M.2}{\ignorespaces Test Coverage Gaps}}{561}{table.caption.3714}%
+\contentsline {table}{\numberline {M.3}{\ignorespaces Integration Test Gaps}}{562}{table.caption.3720}%
+\contentsline {table}{\numberline {M.4}{\ignorespaces ETL Pipeline Complexity}}{562}{table.caption.3723}%
+\contentsline {table}{\numberline {M.5}{\ignorespaces Data Validation Gaps}}{564}{table.caption.3734}%
+\contentsline {table}{\numberline {M.6}{\ignorespaces Technical Debt Remediation Timeline}}{565}{table.caption.3743}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {N.1}{\ignorespaces BNN Passing Model Investigation Timeline (Oct 14 - Nov 9, 2025)}}{570}{table.caption.3774}%
-\contentsline {table}{\numberline {N.2}{\ignorespaces BNN Architecture Comparison (6 Approaches)}}{571}{table.caption.3778}%
-\contentsline {table}{\numberline {N.3}{\ignorespaces Conformal BNN vs Standard BNN Uncertainty Quantification}}{575}{table.caption.3813}%
-\contentsline {table}{\numberline {N.4}{\ignorespaces BNN MCMC Convergence Diagnostics (3 Converged Approaches)}}{577}{table.caption.3827}%
-\contentsline {table}{\numberline {N.5}{\ignorespaces BNN Performance Comparison Across All Approaches}}{578}{table.caption.3830}%
-\contentsline {table}{\numberline {N.6}{\ignorespaces BNN Failure Mode Taxonomy}}{578}{table.caption.3832}%
-\contentsline {table}{\numberline {N.7}{\ignorespaces Production Gate Analysis (3 Statistically Valid Approaches)}}{581}{table.caption.3852}%
+\contentsline {table}{\numberline {N.1}{\ignorespaces BNN Passing Model Investigation Timeline (Oct 14 - Nov 9, 2025)}}{569}{table.caption.3774}%
+\contentsline {table}{\numberline {N.2}{\ignorespaces BNN Architecture Comparison (6 Approaches)}}{570}{table.caption.3778}%
+\contentsline {table}{\numberline {N.3}{\ignorespaces Conformal BNN vs Standard BNN Uncertainty Quantification}}{574}{table.caption.3813}%
+\contentsline {table}{\numberline {N.4}{\ignorespaces BNN MCMC Convergence Diagnostics (3 Converged Approaches)}}{576}{table.caption.3827}%
+\contentsline {table}{\numberline {N.5}{\ignorespaces BNN Performance Comparison Across All Approaches}}{577}{table.caption.3830}%
+\contentsline {table}{\numberline {N.6}{\ignorespaces BNN Failure Mode Taxonomy}}{577}{table.caption.3832}%
+\contentsline {table}{\numberline {N.7}{\ignorespaces Production Gate Analysis (3 Statistically Valid Approaches)}}{580}{table.caption.3852}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {O.1}{\ignorespaces Empirical Feature Correlations (2022--2024 Training Data, $n=3,330$ QB-games)}}{589}{table.caption.3896}%
-\contentsline {table}{\numberline {O.2}{\ignorespaces Ridge Regularization Tuning via 5-Fold Cross-Validation}}{591}{table.caption.3911}%
-\contentsline {table}{\numberline {O.3}{\ignorespaces Bias-Variance Decomposition by Ridge Penalty $\alpha $}}{595}{table.caption.3952}%
-\contentsline {table}{\numberline {O.4}{\ignorespaces Ablation Study: Residual Centering Methods (2023 Season, 148 games)}}{596}{table.caption.3960}%
-\contentsline {table}{\numberline {O.5}{\ignorespaces Impact of Residual Clipping (2023 Season, 148 games)}}{598}{table.caption.4008}%
-\contentsline {table}{\numberline {O.6}{\ignorespaces Comprehensive Ablation Results (2023 Season, 148 games)}}{599}{table.caption.4011}%
-\contentsline {table}{\numberline {O.7}{\ignorespaces Decision Tree Analysis: XGBoost v2 (Baseline) vs v4 (Ridge Residuals)}}{601}{table.caption.4024}%
-\contentsline {table}{\numberline {O.8}{\ignorespaces Incremental Learning vs Orthogonalization Methods (2023 Season)}}{602}{table.caption.4029}%
-\contentsline {table}{\numberline {O.9}{\ignorespaces Sample Complexity Comparison Across Model Classes}}{603}{table.caption.4037}%
-\contentsline {table}{\numberline {O.10}{\ignorespaces \textbf {(Erroneous)} Multi-Season Results from Flawed Model}}{603}{table.caption.4040}%
-\contentsline {table}{\numberline {O.11}{\ignorespaces Estimated Impact of Future Enhancements}}{606}{table.caption.4068}%
-\contentsline {table}{\numberline {O.12}{\ignorespaces Ridge Residuals Development Timeline}}{608}{table.caption.4078}%
-\contentsline {table}{\numberline {O.13}{\ignorespaces Multi-Season Validation: \textbf {Corrected} Ridge Residuals}}{609}{table.caption.4109}%
-\contentsline {table}{\numberline {O.14}{\ignorespaces 2025 Holdout Validation: Ridge Residuals Failure}}{611}{table.caption.4123}%
+\contentsline {table}{\numberline {O.1}{\ignorespaces Empirical Feature Correlations (2022--2024 Training Data, $n=3,330$ QB-games)}}{588}{table.caption.3896}%
+\contentsline {table}{\numberline {O.2}{\ignorespaces Ridge Regularization Tuning via 5-Fold Cross-Validation}}{590}{table.caption.3911}%
+\contentsline {table}{\numberline {O.3}{\ignorespaces Bias-Variance Decomposition by Ridge Penalty $\alpha $}}{594}{table.caption.3952}%
+\contentsline {table}{\numberline {O.4}{\ignorespaces Ablation Study: Residual Centering Methods (2023 Season, 148 games)}}{595}{table.caption.3960}%
+\contentsline {table}{\numberline {O.5}{\ignorespaces Impact of Residual Clipping (2023 Season, 148 games)}}{597}{table.caption.4008}%
+\contentsline {table}{\numberline {O.6}{\ignorespaces Comprehensive Ablation Results (2023 Season, 148 games)}}{598}{table.caption.4011}%
+\contentsline {table}{\numberline {O.7}{\ignorespaces Decision Tree Analysis: XGBoost v2 (Baseline) vs v4 (Ridge Residuals)}}{600}{table.caption.4024}%
+\contentsline {table}{\numberline {O.8}{\ignorespaces Incremental Learning vs Orthogonalization Methods (2023 Season)}}{601}{table.caption.4029}%
+\contentsline {table}{\numberline {O.9}{\ignorespaces Sample Complexity Comparison Across Model Classes}}{602}{table.caption.4037}%
+\contentsline {table}{\numberline {O.10}{\ignorespaces \textbf {(Erroneous)} Multi-Season Results from Flawed Model}}{602}{table.caption.4040}%
+\contentsline {table}{\numberline {O.11}{\ignorespaces Estimated Impact of Future Enhancements}}{605}{table.caption.4068}%
+\contentsline {table}{\numberline {O.12}{\ignorespaces Ridge Residuals Development Timeline}}{607}{table.caption.4078}%
+\contentsline {table}{\numberline {O.13}{\ignorespaces Multi-Season Validation: \textbf {Corrected} Ridge Residuals}}{608}{table.caption.4109}%
+\contentsline {table}{\numberline {O.14}{\ignorespaces 2025 Holdout Validation: Ridge Residuals Failure}}{610}{table.caption.4123}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {P.1}{\ignorespaces Ensemble Architecture Performance Trajectory (v1.0 → v6.0)}}{614}{table.caption.4143}%
-\contentsline {table}{\numberline {P.2}{\ignorespaces 13-Month Ensemble Evolution Timeline (Oct 2024 -- Nov 2025)}}{614}{table.caption.4145}%
-\contentsline {table}{\numberline {P.3}{\ignorespaces Person-Hours Invested by Component (Total: 787 hours)}}{615}{table.caption.4147}%
-\contentsline {table}{\numberline {P.4}{\ignorespaces v1.0 Hierarchical Model Performance (2024 Season)}}{616}{table.caption.4153}%
-\contentsline {table}{\numberline {P.5}{\ignorespaces v2.5 vs v1.0 Performance Comparison (2024 Holdout)}}{617}{table.caption.4163}%
-\contentsline {table}{\numberline {P.6}{\ignorespaces v2.5 Model Error Patterns (Absolute Residual > 50 yards)}}{617}{table.caption.4165}%
-\contentsline {table}{\numberline {P.7}{\ignorespaces v3.0 Leave-One-Out Ablation Study (2024 Holdout)}}{619}{table.caption.4176}%
-\contentsline {table}{\numberline {P.8}{\ignorespaces v3.0 CVX-Optimized vs Equal Weights (2024 Holdout)}}{619}{table.caption.4178}%
-\contentsline {table}{\numberline {P.9}{\ignorespaces Canonical Training Window Ablation Study (2024 Holdout, State-Space v2)}}{621}{table.caption.4195}%
-\contentsline {table}{\numberline {P.10}{\ignorespaces Hybrid XGBoost vs Baseline Architectures (2022--2024 Multi-Season)}}{622}{table.caption.4203}%
-\contentsline {table}{\numberline {P.11}{\ignorespaces v6.0 Adaptive Weight Drift (Weeks 1--13, 2024 Season)}}{624}{table.caption.4222}%
-\contentsline {table}{\numberline {P.12}{\ignorespaces v6.0 Marginal Component Contributions (Shapley Values)}}{625}{table.caption.4225}%
-\contentsline {table}{\numberline {P.13}{\ignorespaces v6.0 Pairwise Model Correlations (Prediction Errors)}}{625}{table.caption.4227}%
-\contentsline {table}{\numberline {P.14}{\ignorespaces Diebold-Mariano Test: Canonical vs Historical Windows (State-Space v2)}}{626}{table.caption.4230}%
-\contentsline {table}{\numberline {P.15}{\ignorespaces Weight Optimization Method Performance (v2.5 → v6.0)}}{626}{table.caption.4233}%
-\contentsline {table}{\numberline {P.16}{\ignorespaces v6.0 Adaptive WLS Halflife Sensitivity (2024 Season)}}{626}{table.caption.4235}%
+\contentsline {table}{\numberline {P.1}{\ignorespaces Ensemble Architecture Performance Trajectory (v1.0 → v6.0)}}{613}{table.caption.4143}%
+\contentsline {table}{\numberline {P.2}{\ignorespaces 13-Month Ensemble Evolution Timeline}}{613}{table.caption.4145}%
+\contentsline {table}{\numberline {P.3}{\ignorespaces Person-Hours Invested by Component (Total: 787 hours)}}{614}{table.caption.4147}%
+\contentsline {table}{\numberline {P.4}{\ignorespaces v1.0 Hierarchical Model Performance (2024 Season)}}{615}{table.caption.4153}%
+\contentsline {table}{\numberline {P.5}{\ignorespaces v2.5 vs v1.0 Performance Comparison (2024 Holdout)}}{616}{table.caption.4163}%
+\contentsline {table}{\numberline {P.6}{\ignorespaces v2.5 Model Error Patterns (Absolute Residual > 50 yards)}}{616}{table.caption.4165}%
+\contentsline {table}{\numberline {P.7}{\ignorespaces v3.0 Leave-One-Out Ablation Study (2024 Holdout)}}{618}{table.caption.4176}%
+\contentsline {table}{\numberline {P.8}{\ignorespaces v3.0 CVX-Optimized vs Equal Weights (2024 Holdout)}}{618}{table.caption.4178}%
+\contentsline {table}{\numberline {P.9}{\ignorespaces Canonical Training Window Ablation Study (2024 Holdout, State-Space v2)}}{620}{table.caption.4195}%
+\contentsline {table}{\numberline {P.10}{\ignorespaces Hybrid XGBoost vs Baseline Architectures (2022--2024 Multi-Season)}}{621}{table.caption.4203}%
+\contentsline {table}{\numberline {P.11}{\ignorespaces v6.0 Adaptive Weight Drift}}{623}{table.caption.4222}%
+\contentsline {table}{\numberline {P.12}{\ignorespaces v6.0 Marginal Component Contributions (Shapley Values)}}{624}{table.caption.4225}%
+\contentsline {table}{\numberline {P.13}{\ignorespaces v6.0 Pairwise Model Correlations (Prediction Errors)}}{624}{table.caption.4227}%
+\contentsline {table}{\numberline {P.14}{\ignorespaces Diebold-Mariano Test: Canonical vs Historical Windows (State-Space v2)}}{625}{table.caption.4230}%
+\contentsline {table}{\numberline {P.15}{\ignorespaces Weight Optimization Method Performance}}{625}{table.caption.4233}%
+\contentsline {table}{\numberline {P.16}{\ignorespaces v6.0 Adaptive WLS Halflife Sensitivity}}{625}{table.caption.4235}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {Q.1}{\ignorespaces State-Space v2 MCMC Training Configuration}}{632}{table.caption.4284}%
-\contentsline {table}{\numberline {Q.2}{\ignorespaces State-Space v2 Convergence Diagnostics (Nov 8, 2025)}}{633}{table.caption.4286}%
-\contentsline {table}{\numberline {Q.3}{\ignorespaces State-Space v2 Predictive Performance (2024 Holdout, 148 games)}}{633}{table.caption.4288}%
-\contentsline {table}{\numberline {Q.4}{\ignorespaces Hierarchical v2 Convergence: 2000 vs 6000 Iterations}}{635}{table.caption.4308}%
-\contentsline {table}{\numberline {Q.5}{\ignorespaces Hierarchical v2 Final Convergence Diagnostics (Nov 13, 2025)}}{635}{table.caption.4310}%
-\contentsline {table}{\numberline {Q.6}{\ignorespaces Hierarchical v2 Predictive Performance (2024 Holdout, 562 games)}}{635}{table.caption.4312}%
-\contentsline {table}{\numberline {Q.7}{\ignorespaces XGBoost v4 Hyperparameters}}{637}{table.caption.4324}%
-\contentsline {table}{\numberline {Q.8}{\ignorespaces XGBoost v4 Multi-Season Performance}}{637}{table.caption.4326}%
-\contentsline {table}{\numberline {Q.9}{\ignorespaces XGBoost v4 Feature Importance (Gain Metric)}}{638}{table.caption.4332}%
-\contentsline {table}{\numberline {Q.10}{\ignorespaces Informative Priors v2 Convergence: 2000 vs 6000 Iterations}}{639}{table.caption.4345}%
-\contentsline {table}{\numberline {Q.11}{\ignorespaces Informative Priors v2 Final Convergence Diagnostics (Nov 13, 2025)}}{640}{table.caption.4347}%
-\contentsline {table}{\numberline {Q.12}{\ignorespaces Informative Priors v2 Predictive Performance (2024 Holdout, 562 games)}}{640}{table.caption.4349}%
-\contentsline {table}{\numberline {Q.13}{\ignorespaces Hybrid XGBoost v1 Static Component Hyperparameters}}{641}{table.caption.4355}%
-\contentsline {table}{\numberline {Q.14}{\ignorespaces Hybrid XGBoost v1 Incremental Component Configuration}}{641}{table.caption.4357}%
-\contentsline {table}{\numberline {Q.15}{\ignorespaces Hybrid XGBoost v1 Multi-Season Performance}}{642}{table.caption.4363}%
-\contentsline {table}{\numberline {Q.16}{\ignorespaces Production Model Comparison (2024 Holdout)}}{644}{table.caption.4381}%
-\contentsline {table}{\numberline {Q.17}{\ignorespaces Bayesian Model Convergence Summary}}{645}{table.caption.4383}%
-\contentsline {table}{\numberline {Q.18}{\ignorespaces Multi-Season MAE Consistency (2022-2024)}}{645}{table.caption.4385}%
-\contentsline {table}{\numberline {Q.19}{\ignorespaces Power Ratings ATS Performance (2020--2025)}}{646}{table.caption.4388}%
-\contentsline {table}{\numberline {Q.20}{\ignorespaces Player Props (Passing Yards) 2025 Holdout Validation}}{646}{table.caption.4390}%
-\contentsline {table}{\numberline {Q.21}{\ignorespaces Production Model Training Times (M4 Mac, 10 cores)}}{648}{table.caption.4397}%
-\contentsline {table}{\numberline {Q.22}{\ignorespaces Ensemble v6.0 Inference Time Breakdown (Single Prediction)}}{648}{table.caption.4399}%
-\contentsline {table}{\numberline {Q.23}{\ignorespaces Software Version Registry (Pinned to Patch Level)}}{649}{table.caption.4402}%
-\contentsline {table}{\numberline {Q.24}{\ignorespaces Random Seed Registry}}{650}{table.caption.4405}%
+\contentsline {table}{\numberline {Q.1}{\ignorespaces State-Space v2 MCMC Training Configuration}}{631}{table.caption.4284}%
+\contentsline {table}{\numberline {Q.2}{\ignorespaces State-Space v2 Convergence Diagnostics (Nov 8, 2025)}}{632}{table.caption.4286}%
+\contentsline {table}{\numberline {Q.3}{\ignorespaces State-Space v2 Predictive Performance (2024 Holdout, 148 games)}}{632}{table.caption.4288}%
+\contentsline {table}{\numberline {Q.4}{\ignorespaces Hierarchical v2 Convergence: 2000 vs 6000 Iterations}}{634}{table.caption.4308}%
+\contentsline {table}{\numberline {Q.5}{\ignorespaces Hierarchical v2 Final Convergence Diagnostics (Nov 13, 2025)}}{634}{table.caption.4310}%
+\contentsline {table}{\numberline {Q.6}{\ignorespaces Hierarchical v2 Predictive Performance (2024 Holdout, 562 games)}}{634}{table.caption.4312}%
+\contentsline {table}{\numberline {Q.7}{\ignorespaces XGBoost v4 Hyperparameters}}{636}{table.caption.4324}%
+\contentsline {table}{\numberline {Q.8}{\ignorespaces XGBoost v4 Multi-Season Performance}}{636}{table.caption.4326}%
+\contentsline {table}{\numberline {Q.9}{\ignorespaces XGBoost v4 Feature Importance (Gain Metric)}}{637}{table.caption.4332}%
+\contentsline {table}{\numberline {Q.10}{\ignorespaces Informative Priors v2 Convergence: 2000 vs 6000 Iterations}}{638}{table.caption.4345}%
+\contentsline {table}{\numberline {Q.11}{\ignorespaces Informative Priors v2 Final Convergence Diagnostics (Nov 13, 2025)}}{639}{table.caption.4347}%
+\contentsline {table}{\numberline {Q.12}{\ignorespaces Informative Priors v2 Predictive Performance (2024 Holdout, 562 games)}}{639}{table.caption.4349}%
+\contentsline {table}{\numberline {Q.13}{\ignorespaces Hybrid XGBoost v1 Static Component Hyperparameters}}{640}{table.caption.4355}%
+\contentsline {table}{\numberline {Q.14}{\ignorespaces Hybrid XGBoost v1 Incremental Component Configuration}}{640}{table.caption.4357}%
+\contentsline {table}{\numberline {Q.15}{\ignorespaces Hybrid XGBoost v1 Multi-Season Performance}}{641}{table.caption.4363}%
+\contentsline {table}{\numberline {Q.16}{\ignorespaces Production Model Comparison (2024 Holdout)}}{643}{table.caption.4381}%
+\contentsline {table}{\numberline {Q.17}{\ignorespaces Bayesian Model Convergence Summary}}{644}{table.caption.4383}%
+\contentsline {table}{\numberline {Q.18}{\ignorespaces Multi-Season MAE Consistency (2022-2024)}}{644}{table.caption.4385}%
+\contentsline {table}{\numberline {Q.19}{\ignorespaces Power Ratings ATS Performance (2020--2025)}}{645}{table.caption.4388}%
+\contentsline {table}{\numberline {Q.20}{\ignorespaces Player Props (Passing Yards) 2025 Holdout Validation}}{645}{table.caption.4390}%
+\contentsline {table}{\numberline {Q.21}{\ignorespaces Production Model Training Times (M4 Mac, 10 cores)}}{647}{table.caption.4397}%
+\contentsline {table}{\numberline {Q.22}{\ignorespaces Ensemble v6.0 Inference Time Breakdown (Single Prediction)}}{647}{table.caption.4399}%
+\contentsline {table}{\numberline {Q.23}{\ignorespaces Software Version Registry (Pinned to Patch Level)}}{648}{table.caption.4402}%
+\contentsline {table}{\numberline {Q.24}{\ignorespaces Random Seed Registry}}{649}{table.caption.4405}%

@@ -1071,7 +1071,7 @@ We introduced Claude AI integration for semantic research exploration (Section~\
 
 Key infrastructure components documented: ensemble deployment (Section~\ref{sec:system_architecture}) with CQL \textbf{DISABLED} pending retraining; Kelly sizing (Section~\ref{sec:kelly_sizing}) with critical caveat that optimal sizing cannot overcome negative expected value; line shopping infrastructure (Section~\ref{sec:line_shopping}) providing +0.5\% EV (insufficient to overcome $-7.5$\% baseline); early‑week betting strategy (Section~\ref{sec:early_week}); and monitoring infrastructure (Section~\ref{sec:monitoring}).
 
-The Semantic Stack (Section~\ref{sec:semantic-stack}) extends the system with LLM-powered feature engineering: 26 semantic features extracted via local inference (Ollama, MLX). \textbf{However, A/B testing showed semantic features underperformed the baseline} (58.5\% → 51.8\%), illustrating the importance of rigorous validation before deployment.
+The Semantic Stack (Section~\ref{sec:semantic-stack}) extends the system with LLM-powered feature engineering: 38 semantic features extracted via local inference (Ollama, MLX). \textbf{However, A/B testing showed semantic features underperformed the baseline} (58.5\% → 51.8\%), illustrating the importance of rigorous validation before deployment.
 
 \textbf{Revised expectation}: Year 1 returns with spread betting are projected at \textbf{$-$\$455 to $-$\$525 loss} (4.5--5.3\% of \$10K bankroll). The critical insight: \textbf{market efficiency dominates}. No amount of operational optimization can overcome a negative-EV baseline. Future work should focus on less efficient markets (props, live betting) or alternative approaches (arbitrage, market making).
 }{

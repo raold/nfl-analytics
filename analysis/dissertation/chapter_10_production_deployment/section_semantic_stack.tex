@@ -82,7 +82,7 @@ The Semantic Stack implements a four-layer architecture, from data ingestion thr
 \draw[->, thick, accentblue] (layer3) -- (layer4);
 
 \end{tikzpicture}
-\caption{Semantic Stack Architecture. Four-layer design from data ingestion (L1) through decision support (L4). Layer 2 implements fallback chain for inference reliability: local models (Ollama, MLX) preferred, API fallback (Gemini, Claude) for complex queries or availability issues. Layer 3 generates 26 semantic features integrated into existing GameFeatureExtractor pipeline. Layer 4 provides human-readable explanations for value bet recommendations.}
+\caption{Semantic Stack Architecture. Four-layer design from data ingestion (L1) through decision support (L4). Layer 2 implements fallback chain for inference reliability: local models (Ollama, MLX) preferred, API fallback (Gemini, Claude) for complex queries or availability issues. Layer 3 generates 38 semantic features (17 per team $\times$ 2 + 4 matchup-level) integrated into existing GameFeatureExtractor pipeline. Layer 4 provides human-readable explanations for value bet recommendations.}
 \label{fig:semantic-stack-architecture}
 \end{figure}
 
@@ -360,7 +360,7 @@ The Semantic Stack represents a systematic approach to integrating LLM capabilit
 
 \begin{enumerate}[itemsep=2pt,parsep=0pt]
     \item \textbf{Local-first architecture:} Self-hosted models (Ollama, MLX) minimize costs while API fallback ensures reliability
-    \item \textbf{26 semantic features:} Sentiment, injury severity, media signals integrated into existing pipeline
+    \item \textbf{38 semantic features:} Sentiment, injury severity/decay, media signals, and derived dynamics (velocity, acceleration) integrated into existing pipeline
     \item \textbf{Human-in-the-loop:} LLM explanations support, rather than replace, human decision-making
     \item \textbf{Training pipeline:} 7,000+ annotated samples from historical NFL data
 \end{enumerate}

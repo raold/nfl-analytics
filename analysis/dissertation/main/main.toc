@@ -537,13 +537,13 @@
 \contentsline {paragraph}{Deployment Timeline.}{156}{section*.1127}%
 \contentsline {paragraph}{Risk Management.}{156}{section*.1133}%
 \contentsline {subsection}{\numberline {5.4.8}Performance Progression Across Versions}{156}{subsection.1134}%
-\contentsline {subsection}{\numberline {5.4.9}Lessons Learned Across 4 Versions}{157}{subsection.1136}%
-\contentsline {paragraph}{1. Production Constraints Dominate Academic Metrics.}{157}{section*.1137}%
+\contentsline {subsection}{\numberline {5.4.9}Lessons Learned Across 4 Versions}{156}{subsection.1136}%
+\contentsline {paragraph}{1. Production Constraints Dominate Academic Metrics.}{156}{section*.1137}%
 \contentsline {paragraph}{2. Incremental Improvements > Revolutionary Changes.}{157}{section*.1138}%
 \contentsline {paragraph}{3. Multi-Season Validation Prevents Overfitting.}{157}{section*.1139}%
 \contentsline {paragraph}{4. Honest Failure Documentation Prevents Repeating Mistakes.}{157}{section*.1140}%
-\contentsline {subsection}{\numberline {5.4.10}Future Directions}{158}{subsection.1141}%
-\contentsline {paragraph}{1. Automated Ensemble Optimization.}{158}{section*.1142}%
+\contentsline {subsection}{\numberline {5.4.10}Future Directions}{157}{subsection.1141}%
+\contentsline {paragraph}{1. Automated Ensemble Optimization.}{157}{section*.1142}%
 \contentsline {paragraph}{2. Multi-Task Ensemble (Spread + Total + Props).}{158}{section*.1143}%
 \contentsline {paragraph}{3. Online Ensemble Adaptation.}{158}{section*.1144}%
 \contentsline {subsection}{\numberline {5.4.11}Domain-Specific Weight Optimization via Dirichlet Bayesian Stacking}{158}{subsection.1145}%
@@ -551,17 +551,17 @@
 \contentsline {paragraph}{Methodology: Bayesian Stacking via Dirichlet Optimization.}{158}{section*.1147}%
 \contentsline {paragraph}{Hyperparameter Grid Search.}{159}{section*.1151}%
 \contentsline {paragraph}{Results: Dramatic Performance Improvement.}{159}{section*.1153}%
-\contentsline {paragraph}{Weight Comparison: Games vs Props.}{160}{section*.1155}%
+\contentsline {paragraph}{Weight Comparison: Games vs Props.}{159}{section*.1155}%
 \contentsline {paragraph}{Interpretation: Why Bayesian Models Dominate for Props.}{160}{section*.1157}%
 \contentsline {paragraph}{Validation: Stability Across Warmup Period.}{160}{section*.1162}%
-\contentsline {paragraph}{Production Decision: Domain-Specific Ensembles.}{161}{section*.1164}%
+\contentsline {paragraph}{Production Decision: Domain-Specific Ensembles.}{160}{section*.1164}%
 \contentsline {paragraph}{Contrast with ADR-009 Dynamic Weighting Investigation.}{161}{section*.1165}%
 \contentsline {subsection}{\numberline {5.4.12}Chapter Summary}{162}{subsection.1168}%
 \contentsline {section}{\numberline {5.5}Dirichlet Bayesian Stacking and Domain-Specific Weight Optimization}{162}{section.1174}%
 \contentsline {subsection}{\numberline {5.5.1}Theoretical Foundation: Dirichlet-Categorical Conjugacy}{163}{subsection.1175}%
 \contentsline {paragraph}{Generative Model.}{163}{section*.1176}%
 \contentsline {paragraph}{Posterior Update (Closed-Form).}{163}{section*.1181}%
-\contentsline {paragraph}{Hyperparameter Interpretation.}{164}{section*.1184}%
+\contentsline {paragraph}{Hyperparameter Interpretation.}{163}{section*.1184}%
 \contentsline {subsection}{\numberline {5.5.2}Prequential Evaluation Protocol}{164}{subsection.1189}%
 \contentsline {paragraph}{Challenge: Temporal Validation.}{164}{section*.1190}%
 \contentsline {paragraph}{Solution: Prequential ``Predict-Then-Observe'' Evaluation.}{164}{section*.1191}%
@@ -572,15 +572,15 @@
 \contentsline {paragraph}{Baseline Performance.}{166}{section*.1209}%
 \contentsline {paragraph}{Optimal Dirichlet Configuration.}{166}{section*.1211}%
 \contentsline {paragraph}{Learned Weight Vector.}{166}{section*.1213}%
-\contentsline {paragraph}{Key Observations.}{167}{section*.1216}%
+\contentsline {paragraph}{Key Observations.}{166}{section*.1216}%
 \contentsline {subsection}{\numberline {5.5.5}Mechanistic Interpretation: Why Bayesian Models Dominate Player Props}{167}{subsection.1221}%
-\contentsline {paragraph}{Game-Level Predictions (Spreads, Totals).}{168}{section*.1222}%
+\contentsline {paragraph}{Game-Level Predictions (Spreads, Totals).}{167}{section*.1222}%
 \contentsline {paragraph}{Player-Level Predictions (Passing Yards, TDs).}{168}{section*.1224}%
 \contentsline {paragraph}{Empirical Support.}{168}{section*.1227}%
 \contentsline {subsection}{\numberline {5.5.6}The Dual-Weight Paradigm: Domain-Specific Ensemble Configurations}{169}{subsection.1230}%
 \contentsline {paragraph}{Implementation Architecture.}{169}{section*.1231}%
 \contentsline {paragraph}{Decision Rule.}{169}{table.caption.1233}%
-\contentsline {paragraph}{Validation on 2024 Holdout.}{171}{table.caption.1236}%
+\contentsline {paragraph}{Validation on 2024 Holdout.}{169}{table.caption.1236}%
 \contentsline {subsection}{\numberline {5.5.7}Reconciliation with ADR-009: Static Learning vs Online Meta-Learning}{171}{subsection.1237}%
 \contentsline {paragraph}{Critical Distinctions.}{171}{table.caption.1239}%
 \contentsline {paragraph}{Fundamental Difference: Static Deployment.}{171}{section*.1240}%
@@ -719,10 +719,10 @@
 \contentsline {section}{\numberline {7.4}Drawdown Analytics}{213}{section.1490}%
 \contentsline {section}{\numberline {7.5}Governance and Reporting}{213}{section.1492}%
 \contentsline {section}{\numberline {7.6}Multi-Model Reliability Analysis}{214}{section.1501}%
-\contentsline {subsection}{\numberline {7.6.1}Multi-Model Comparison}{215}{subsection.1502}%
-\contentsline {paragraph}{Evaluation Protocol.}{215}{section*.1503}%
+\contentsline {subsection}{\numberline {7.6.1}Multi-Model Comparison}{214}{subsection.1502}%
+\contentsline {paragraph}{Evaluation Protocol.}{214}{section*.1503}%
 \contentsline {paragraph}{Reliability Calibration.}{215}{section*.1504}%
-\contentsline {paragraph}{Model Class Results.}{216}{table.caption.1506}%
+\contentsline {paragraph}{Model Class Results.}{215}{table.caption.1506}%
 \contentsline {paragraph}{Reliability Panels and Diagnostic Plots.}{216}{section*.1507}%
 \contentsline {section}{\numberline {7.7}Conformal Prediction for Distribution-Free Calibration}{216}{section.1508}%
 \contentsline {subsection}{\numberline {7.7.1}Motivation: Beyond Parametric Calibration}{216}{subsection.1509}%
@@ -730,44 +730,44 @@
 \contentsline {subsubsection}{Split Conformal Prediction}{217}{section*.1511}%
 \contentsline {subsubsection}{Conformalized Quantile Regression (CQR)}{218}{section*.1521}%
 \contentsline {subsection}{\numberline {7.7.3}Integration with Bayesian Hierarchical Models}{218}{subsection.1528}%
-\contentsline {paragraph}{1. Post-hoc calibration of BNN intervals.}{219}{section*.1529}%
+\contentsline {paragraph}{1. Post-hoc calibration of BNN intervals.}{218}{section*.1529}%
 \contentsline {paragraph}{2. Ensemble with temperature scaling.}{219}{section*.1533}%
 \contentsline {paragraph}{3. Robustness to distributional shifts.}{219}{section*.1535}%
-\contentsline {subsection}{\numberline {7.7.4}Implementation Details}{220}{subsection.1536}%
+\contentsline {subsection}{\numberline {7.7.4}Implementation Details}{219}{subsection.1536}%
 \contentsline {subsection}{\numberline {7.7.5}Why Conformal Prediction Complements Temperature Scaling}{220}{subsection.1542}%
 \contentsline {paragraph}{When Temperature Scaling Excels.}{220}{section*.1544}%
 \contentsline {paragraph}{When Conformal Prediction Excels.}{220}{section*.1545}%
-\contentsline {paragraph}{Ensemble Strategy.}{221}{section*.1546}%
+\contentsline {paragraph}{Ensemble Strategy.}{220}{section*.1546}%
 \contentsline {subsection}{\numberline {7.7.6}Limitations and Extensions}{221}{subsection.1547}%
 \contentsline {paragraph}{Exchangeability Violations.}{221}{section*.1548}%
-\contentsline {paragraph}{Interval Sharpness.}{222}{section*.1552}%
-\contentsline {paragraph}{Computational Scalability.}{222}{section*.1553}%
+\contentsline {paragraph}{Interval Sharpness.}{221}{section*.1552}%
+\contentsline {paragraph}{Computational Scalability.}{221}{section*.1553}%
 \contentsline {subsection}{\numberline {7.7.7}Conclusion}{222}{subsection.1554}%
 \contentsline {section}{\numberline {7.8}Evidential Deep Learning for Uncertainty Quantification}{222}{section.1555}%
 \contentsline {subsection}{\numberline {7.8.1}Motivation and Theory}{222}{subsection.1556}%
-\contentsline {subsubsection}{Normal Inverse-Gamma Distribution}{223}{section*.1557}%
+\contentsline {subsubsection}{Normal Inverse-Gamma Distribution}{222}{section*.1557}%
 \contentsline {subsubsection}{Uncertainty Decomposition}{223}{section*.1561}%
 \contentsline {subsubsection}{Loss Function}{223}{section*.1565}%
 \contentsline {subsection}{\numberline {7.8.2}Comparison to Bayesian Neural Networks}{224}{subsection.1569}%
 \contentsline {subsection}{\numberline {7.8.3}Architecture}{224}{subsection.1571}%
 \contentsline {subsection}{\numberline {7.8.4}Advantages for NFL Props Betting}{224}{subsection.1581}%
-\contentsline {paragraph}{1. Real-time inference}{225}{section*.1582}%
-\contentsline {paragraph}{2. Explicit epistemic uncertainty}{225}{section*.1583}%
-\contentsline {paragraph}{3. Computational efficiency}{225}{section*.1584}%
-\contentsline {subsection}{\numberline {7.8.5}Limitations}{225}{subsection.1585}%
-\contentsline {paragraph}{1. Slightly worse calibration}{225}{section*.1586}%
+\contentsline {paragraph}{1. Real-time inference}{224}{section*.1582}%
+\contentsline {paragraph}{2. Explicit epistemic uncertainty}{224}{section*.1583}%
+\contentsline {paragraph}{3. Computational efficiency}{224}{section*.1584}%
+\contentsline {subsection}{\numberline {7.8.5}Limitations}{224}{subsection.1585}%
+\contentsline {paragraph}{1. Slightly worse calibration}{224}{section*.1586}%
 \contentsline {paragraph}{2. Single epistemic source}{225}{section*.1587}%
 \contentsline {paragraph}{3. Hyperparameter sensitivity}{225}{section*.1588}%
 \contentsline {subsection}{\numberline {7.8.6}Implementation Details}{225}{subsection.1589}%
 \contentsline {subsection}{\numberline {7.8.7}Related Work}{225}{subsection.1590}%
 \contentsline {section}{\numberline {7.9}Profit Optimization Results}{226}{section.1591}%
 \contentsline {subsection}{\numberline {7.9.1}System Architecture}{226}{subsection.1592}%
-\contentsline {subsection}{\numberline {7.9.2}Backtesting Results}{227}{subsection.1594}%
-\contentsline {paragraph}{Historical backtest (pre-leakage remediation).}{227}{section*.1595}%
+\contentsline {subsection}{\numberline {7.9.2}Backtesting Results}{226}{subsection.1594}%
+\contentsline {paragraph}{Historical backtest (pre-leakage remediation).}{226}{section*.1595}%
 \contentsline {subsection}{\numberline {7.9.3}Component Attribution}{227}{subsection.1597}%
 \contentsline {subsection}{\numberline {7.9.4}Case Studies}{227}{subsection.1599}%
 \contentsline {subsubsection}{Case 1: Alternative Line Value Capture}{227}{section*.1600}%
-\contentsline {subsubsection}{Case 2: Sharp Money Alignment}{228}{section*.1601}%
+\contentsline {subsubsection}{Case 2: Sharp Money Alignment}{227}{section*.1601}%
 \contentsline {subsubsection}{Case 3: Uncertainty Segmentation in Action}{228}{section*.1602}%
 \contentsline {subsection}{\numberline {7.9.5}Key Insights}{228}{subsection.1603}%
 \contentsline {section}{Chapter Summary}{229}{section*.1609}%
@@ -1034,7 +1034,7 @@
 \contentsline {paragraph}{Expected Ensemble Performance.}{323}{section*.2209}%
 \contentsline {subsection}{\numberline {9.12.8}Lessons Learned}{323}{subsection.2210}%
 \contentsline {section}{\numberline {9.13}5-Way Ensemble Integration and Production Results}{324}{section.2214}%
-\contentsline {subsection}{\numberline {9.13.1}Model Retraining with Canonical Training Window}{324}{subsection.2220}%
+\contentsline {subsection}{\numberline {9.13.1}Model Retraining with Canonical Training Window}{325}{subsection.2220}%
 \contentsline {paragraph}{Decay Function.}{325}{section*.2221}%
 \contentsline {paragraph}{Training Protocol.}{325}{section*.2223}%
 \contentsline {paragraph}{Training Results.}{325}{section*.2224}%
@@ -1864,411 +1864,411 @@
 \contentsline {paragraph}{Consistency Across Seasons.}{539}{section*.3504}%
 \contentsline {subsection}{\numberline {K.6.4}Root Cause Analysis}{540}{subsection.3505}%
 \contentsline {paragraph}{1. Component Stability.}{540}{section*.3506}%
-\contentsline {paragraph}{2. No Regime Changes.}{541}{section*.3508}%
+\contentsline {paragraph}{2. No Regime Changes.}{540}{section*.3508}%
 \contentsline {paragraph}{3. Meta-Features Lack Predictive Power.}{541}{section*.3509}%
 \contentsline {paragraph}{4. Functional Redundancy.}{541}{section*.3510}%
 \contentsline {paragraph}{5. Insufficient Sample Size.}{541}{section*.3511}%
 \contentsline {subsection}{\numberline {K.6.5}Decision and Rationale}{541}{subsection.3512}%
 \contentsline {paragraph}{Rationale.}{541}{section*.3513}%
 \contentsline {subsection}{\numberline {K.6.6}Re-Evaluation Criteria}{542}{subsection.3519}%
-\contentsline {subsection}{\numberline {K.6.7}Lesson: Occam's Razor for Machine Learning}{543}{subsection.3526}%
+\contentsline {subsection}{\numberline {K.6.7}Lesson: Occam's Razor for Machine Learning}{542}{subsection.3526}%
 \contentsline {paragraph}{Intellectual Appeal vs Empirical Utility.}{543}{section*.3527}%
 \contentsline {paragraph}{The Cost of Complexity.}{543}{section*.3528}%
 \contentsline {paragraph}{Negative Results Have Scientific Value.}{543}{section*.3529}%
-\contentsline {subsection}{\numberline {K.6.8}Related Failures}{544}{subsection.3533}%
-\contentsline {paragraph}{BNN Passing Investigation (84 hours).}{544}{section*.3534}%
+\contentsline {subsection}{\numberline {K.6.8}Related Failures}{543}{subsection.3533}%
+\contentsline {paragraph}{BNN Passing Investigation (84 hours).}{543}{section*.3534}%
 \contentsline {paragraph}{Incremental XGBoost Baseline Error (November 10--12).}{544}{section*.3535}%
 \contentsline {paragraph}{SQL Schema Errors (Recurring).}{544}{section*.3536}%
 \contentsline {paragraph}{Common Thread.}{544}{section*.3537}%
 \contentsline {subsection}{\numberline {K.6.9}Implementation and Archival}{544}{subsection.3538}%
 \contentsline {paragraph}{Code Preservation.}{544}{section*.3539}%
 \contentsline {paragraph}{Documentation.}{544}{section*.3540}%
-\contentsline {paragraph}{Prevention Infrastructure.}{545}{section*.3544}%
-\contentsline {subsection}{\numberline {K.6.10}Implications for Future Work}{545}{subsection.3545}%
-\contentsline {paragraph}{Ensemble v8.0 Criteria.}{545}{section*.3546}%
+\contentsline {paragraph}{Prevention Infrastructure.}{544}{section*.3544}%
+\contentsline {subsection}{\numberline {K.6.10}Implications for Future Work}{544}{subsection.3545}%
+\contentsline {paragraph}{Ensemble v8.0 Criteria.}{544}{section*.3546}%
 \contentsline {paragraph}{Research Pipeline Discipline.}{545}{section*.3547}%
 \contentsline {paragraph}{Component Monitoring.}{545}{section*.3548}%
 \contentsline {subsection}{\numberline {K.6.11}Conclusion}{545}{subsection.3549}%
-\contentsline {chapter}{\numberline {L}Incremental XGBoost Investigation: A Research Postmortem}{547}{appendix.3550}%
-\contentsline {section}{\numberline {L.1}Overview}{547}{section.3551}%
-\contentsline {subsection}{\numberline {L.1.1}Timeline Summary}{547}{subsection.3552}%
-\contentsline {section}{\numberline {L.2}Initial Claim (November 10, 2025)}{547}{section.3554}%
-\contentsline {subsection}{\numberline {L.2.1}Experimental Setup}{548}{subsection.3555}%
-\contentsline {paragraph}{Data.}{548}{section*.3556}%
-\contentsline {paragraph}{Model Configuration.}{548}{section*.3557}%
-\contentsline {subsection}{\numberline {L.2.2}Initial Results (INCORRECT)}{548}{subsection.3558}%
-\contentsline {paragraph}{Interpretation (at the time).}{548}{section*.3560}%
-\contentsline {paragraph}{What We Missed.}{549}{section*.3561}%
-\contentsline {subsection}{\numberline {L.2.3}Code Inspection: The Bug}{549}{subsection.3562}%
-\contentsline {section}{\numberline {L.3}Baseline Error Discovery (November 12, 2025)}{549}{section.3575}%
-\contentsline {subsection}{\numberline {L.3.1}Week 1 Backtest Extension}{549}{subsection.3576}%
-\contentsline {paragraph}{Red Flag: Constant Predictions.}{549}{section*.3578}%
-\contentsline {subsection}{\numberline {L.3.2}Debugging Process}{550}{subsection.3579}%
-\contentsline {paragraph}{Hypothesis 1: Feature Scaling Issue.}{550}{section*.3580}%
-\contentsline {paragraph}{Hypothesis 2: Model Serialization Corruption.}{550}{section*.3581}%
-\contentsline {paragraph}{Hypothesis 3: XGBoost Configuration Error.}{550}{section*.3582}%
-\contentsline {subsection}{\numberline {L.3.3}Corrected Baseline Implementation}{550}{subsection.3583}%
-\contentsline {section}{\numberline {L.4}Corrected Validation Results (November 12, 2025)}{551}{section.3605}%
-\contentsline {subsection}{\numberline {L.4.1}Multi-Season Comparison}{551}{subsection.3606}%
-\contentsline {paragraph}{Reality Check.}{551}{section*.3608}%
-\contentsline {subsection}{\numberline {L.4.2}Cold-Start Penalty Analysis}{551}{subsection.3609}%
-\contentsline {paragraph}{Key Insight.}{552}{section*.3611}%
-\contentsline {section}{\numberline {L.5}Exhaustive Optimization: 8 Approaches}{552}{section.3612}%
-\contentsline {subsection}{\numberline {L.5.1}Approach 1: Window Size Tuning}{552}{subsection.3613}%
-\contentsline {paragraph}{Hypothesis.}{552}{section*.3614}%
-\contentsline {paragraph}{Tested Configurations.}{552}{section*.3615}%
-\contentsline {paragraph}{Result.}{552}{section*.3617}%
-\contentsline {subsection}{\numberline {L.5.2}Approach 2: Learning Rate Tuning}{552}{subsection.3618}%
-\contentsline {paragraph}{Hypothesis.}{552}{section*.3619}%
-\contentsline {paragraph}{Tested Configurations.}{553}{section*.3620}%
-\contentsline {paragraph}{Result.}{553}{section*.3622}%
-\contentsline {subsection}{\numberline {L.5.3}Approach 3: Update Frequency Optimization}{553}{subsection.3623}%
-\contentsline {paragraph}{Hypothesis.}{553}{section*.3624}%
-\contentsline {paragraph}{Tested Configurations.}{553}{section*.3625}%
-\contentsline {paragraph}{Result.}{554}{section*.3627}%
-\contentsline {subsection}{\numberline {L.5.4}Approach 4: Feature Selection for Online Learning}{554}{subsection.3628}%
-\contentsline {paragraph}{Hypothesis.}{554}{section*.3629}%
-\contentsline {paragraph}{Tested Configurations.}{554}{section*.3630}%
-\contentsline {paragraph}{Result.}{554}{section*.3632}%
-\contentsline {subsection}{\numberline {L.5.5}Approach 5: Ensemble of Incremental Models}{554}{subsection.3633}%
-\contentsline {paragraph}{Hypothesis.}{554}{section*.3634}%
-\contentsline {paragraph}{Tested Configurations.}{554}{section*.3635}%
-\contentsline {paragraph}{Result.}{554}{section*.3637}%
-\contentsline {subsection}{\numberline {L.5.6}Approach 6: Adaptive Learning Rate Schedule}{555}{subsection.3638}%
-\contentsline {paragraph}{Hypothesis.}{555}{section*.3639}%
-\contentsline {paragraph}{Tested Configurations.}{555}{section*.3640}%
-\contentsline {paragraph}{Result.}{555}{section*.3642}%
-\contentsline {subsection}{\numberline {L.5.7}Approach 7: Warm-Start from Static Baseline}{555}{subsection.3643}%
-\contentsline {paragraph}{Hypothesis.}{555}{section*.3644}%
-\contentsline {paragraph}{Tested Configurations.}{555}{section*.3645}%
-\contentsline {paragraph}{Result.}{555}{section*.3647}%
-\contentsline {subsection}{\numberline {L.5.8}Approach 8: Hybrid Blending (BREAKTHROUGH)}{556}{subsection.3648}%
-\contentsline {paragraph}{Hypothesis.}{556}{section*.3649}%
-\contentsline {paragraph}{Tested Configurations.}{556}{section*.3650}%
-\contentsline {paragraph}{Result.}{556}{section*.3652}%
-\contentsline {section}{\numberline {L.6}Multi-Season Validation of Hybrid Solution}{556}{section.3653}%
-\contentsline {subsection}{\numberline {L.6.1}Full 3-Season Results}{556}{subsection.3654}%
-\contentsline {paragraph}{Consistency.}{556}{section*.3656}%
-\contentsline {paragraph}{Robustness.}{557}{section*.3657}%
-\contentsline {subsection}{\numberline {L.6.2}Statistical Significance Testing}{557}{subsection.3658}%
-\contentsline {paragraph}{Conclusion.}{557}{section*.3660}%
-\contentsline {section}{\numberline {L.7}Lessons for Production ML Systems}{557}{section.3661}%
-\contentsline {subsection}{\numberline {L.7.1}Lesson 1: Baseline Validation is Non-Negotiable}{557}{subsection.3662}%
-\contentsline {paragraph}{What Went Wrong.}{557}{section*.3663}%
-\contentsline {paragraph}{Best Practice.}{557}{section*.3664}%
-\contentsline {subsection}{\numberline {L.7.2}Lesson 2: Multi-Season Testing Catches Spurious Results}{558}{subsection.3679}%
-\contentsline {paragraph}{What Went Wrong.}{558}{section*.3680}%
-\contentsline {paragraph}{Best Practice.}{558}{section*.3681}%
-\contentsline {subsection}{\numberline {L.7.3}Lesson 3: Exhaustive Optimization Rescues Failing Research}{558}{subsection.3693}%
-\contentsline {paragraph}{What Went Wrong.}{558}{section*.3694}%
-\contentsline {paragraph}{Best Practice.}{558}{section*.3695}%
-\contentsline {subsection}{\numberline {L.7.4}Lesson 4: Transparent Error Reporting Builds Trust}{559}{subsection.3696}%
-\contentsline {paragraph}{What Went Wrong.}{559}{section*.3697}%
-\contentsline {paragraph}{Best Practice.}{559}{section*.3698}%
-\contentsline {subsection}{\numberline {L.7.5}Lesson 5: Negative Results Have Scientific Value}{559}{subsection.3699}%
-\contentsline {paragraph}{What We Learned.}{559}{section*.3700}%
-\contentsline {paragraph}{Best Practice.}{559}{section*.3701}%
-\contentsline {section}{\numberline {L.8}Conclusion}{559}{section.3702}%
-\contentsline {paragraph}{Key Takeaways.}{559}{section*.3703}%
-\contentsline {paragraph}{Production Recommendation.}{560}{section*.3704}%
-\contentsline {paragraph}{Broader Impact.}{560}{section*.3705}%
-\contentsline {chapter}{\numberline {M}Technical Debt Inventory and Remediation}{561}{appendix.3706}%
-\contentsline {section}{\numberline {M.1}Security Vulnerabilities}{561}{section.3707}%
-\contentsline {subsection}{\numberline {M.1.1}Hardcoded Credentials}{561}{subsection.3708}%
-\contentsline {subsection}{\numberline {M.1.2}Docker Security Issues}{562}{subsection.3710}%
-\contentsline {subsection}{\numberline {M.1.3}Temporal Leakage Risks}{562}{subsection.3711}%
-\contentsline {section}{\numberline {M.2}Testing Debt}{562}{section.3712}%
-\contentsline {subsection}{\numberline {M.2.1}Test Stub Analysis}{562}{subsection.3713}%
-\contentsline {subsection}{\numberline {M.2.2}Missing Integration Tests}{563}{subsection.3719}%
-\contentsline {section}{\numberline {M.3}Architectural Debt}{563}{section.3721}%
-\contentsline {subsection}{\numberline {M.3.1}Multi-Language ETL Complexity}{563}{subsection.3722}%
-\contentsline {paragraph}{Considered Alternatives:}{564}{section*.3724}%
-\contentsline {subsection}{\numberline {M.3.2}Scattered SQL Queries (160 Files)}{564}{subsection.3728}%
-\contentsline {section}{\numberline {M.4}Data Quality Gaps}{565}{section.3732}%
-\contentsline {subsection}{\numberline {M.4.1}Missing Validation Rules}{565}{subsection.3733}%
-\contentsline {section}{\numberline {M.5}Remediation Roadmap}{566}{section.3742}%
-\contentsline {paragraph}{Critical Path:}{566}{section*.3744}%
-\contentsline {paragraph}{Parallel Work Opportunities:}{566}{section*.3749}%
-\contentsline {section}{\numberline {M.6}Lessons Learned}{567}{section.3750}%
-\contentsline {subsection}{\numberline {M.6.1}What Worked Well}{567}{subsection.3751}%
-\contentsline {subsection}{\numberline {M.6.2}What Could Improve}{567}{subsection.3755}%
-\contentsline {subsection}{\numberline {M.6.3}Best Practices Established}{567}{subsection.3759}%
-\contentsline {paragraph}{Recommendation for Future Work:}{568}{section*.3764}%
-\contentsline {chapter}{\numberline {N}Bayesian Neural Network Investigation: A 26-Day Journey}{569}{appendix.3765}%
-\contentsline {section}{\numberline {N.1}Introduction: The Promise of Uncertainty Quantification}{569}{section.3766}%
-\contentsline {paragraph}{Research Question.}{569}{section*.3767}%
-\contentsline {paragraph}{The Narrative Arc.}{569}{section*.3768}%
-\contentsline {section}{\numberline {N.2}Investigation Timeline and Resource Allocation}{570}{section.3773}%
-\contentsline {paragraph}{Resource Distribution.}{570}{section*.3775}%
-\contentsline {paragraph}{Opportunity Cost.}{570}{section*.3776}%
-\contentsline {section}{\numberline {N.3}Architecture Evolution: Six Distinct Approaches}{571}{section.3777}%
-\contentsline {subsection}{\numberline {N.3.1}Multi-Output v1 (Oct 14-18): Data Leakage Discovery}{571}{subsection.3779}%
-\contentsline {paragraph}{Architecture.}{571}{section*.3780}%
-\contentsline {paragraph}{Training Protocol.}{571}{section*.3781}%
-\contentsline {paragraph}{Failure Mode: Data Leakage.}{571}{section*.3782}%
-\contentsline {subsection}{\numberline {N.3.2}Multi-Output v2 (Oct 19-23): Training Instability}{572}{subsection.3786}%
-\contentsline {paragraph}{Architectural Enhancements.}{572}{section*.3787}%
-\contentsline {paragraph}{Training Progression.}{572}{section*.3788}%
-\contentsline {paragraph}{Root Cause Analysis.}{572}{section*.3789}%
-\contentsline {subsection}{\numberline {N.3.3}Ensemble BNN (Oct 24-27): Computational Tractability}{573}{subsection.3793}%
-\contentsline {paragraph}{Motivation.}{573}{section*.3794}%
-\contentsline {paragraph}{Architecture.}{573}{section*.3795}%
-\contentsline {paragraph}{Results.}{573}{section*.3796}%
-\contentsline {paragraph}{Failure Mode: Computational Cost.}{573}{section*.3797}%
-\contentsline {subsection}{\numberline {N.3.4}Informative Priors (Oct 28-30): Overconstrained Models}{574}{subsection.3798}%
-\contentsline {paragraph}{Hypothesis.}{574}{section*.3799}%
-\contentsline {paragraph}{Hierarchical Prior Specification.}{574}{section*.3800}%
-\contentsline {paragraph}{Training Results.}{574}{section*.3804}%
-\contentsline {paragraph}{Root Cause: Regression to Mean.}{574}{section*.3805}%
-\contentsline {subsection}{\numberline {N.3.5}Conformal BNN (Oct 31-Nov 3): Interval Width Trade-off}{575}{subsection.3806}%
-\contentsline {paragraph}{Motivation.}{575}{section*.3807}%
-\contentsline {paragraph}{Method.}{575}{section*.3808}%
-\contentsline {paragraph}{Results.}{575}{section*.3812}%
-\contentsline {paragraph}{Failure Mode: Betting Utility.}{575}{section*.3814}%
-\contentsline {subsection}{\numberline {N.3.6}Evidential Deep Learning (Nov 4-8): Implementation Complexity}{576}{subsection.3815}%
-\contentsline {paragraph}{Motivation.}{576}{section*.3816}%
-\contentsline {paragraph}{Architecture.}{576}{section*.3817}%
-\contentsline {paragraph}{Implementation Challenges.}{576}{section*.3821}%
-\contentsline {paragraph}{Strategic Decision: Diminishing Returns.}{576}{section*.3825}%
-\contentsline {section}{\numberline {N.4}Convergence Diagnostics and MCMC Analysis}{577}{section.3826}%
-\contentsline {paragraph}{Interpretation.}{577}{section*.3828}%
-\contentsline {section}{\numberline {N.5}Performance Analysis: Why BNN Failed Where Simpler Models Succeeded}{578}{section.3829}%
-\contentsline {subsection}{\numberline {N.5.1}Failure Mode Taxonomy}{578}{subsection.3831}%
-\contentsline {paragraph}{Training Instability (33\% of failures).}{578}{section*.3833}%
-\contentsline {paragraph}{Poor Generalization (33\% of failures).}{579}{section*.3834}%
-\contentsline {paragraph}{Calibration Issues (17\% of failures).}{579}{section*.3835}%
-\contentsline {paragraph}{Computational Constraints (17\% of failures).}{579}{section*.3836}%
-\contentsline {subsection}{\numberline {N.5.2}Why XGBoost v4 Succeeded Where BNN Failed}{579}{subsection.3837}%
-\contentsline {section}{\numberline {N.6}Lessons Learned: When to Abandon Research Lines}{579}{section.3841}%
-\contentsline {subsection}{\numberline {N.6.1}Lesson 1: Convergence $\neq $ Validity}{580}{subsection.3842}%
-\contentsline {paragraph}{Practical Implication:}{580}{section*.3843}%
-\contentsline {subsection}{\numberline {N.6.2}Lesson 2: Diminishing Returns Signal Research Pivots}{580}{subsection.3848}%
-\contentsline {paragraph}{Decision Heuristic:}{580}{section*.3850}%
-\contentsline {subsection}{\numberline {N.6.3}Lesson 3: Production Constraints are Hard Gates}{581}{subsection.3851}%
-\contentsline {paragraph}{Practical Implication:}{581}{section*.3853}%
-\contentsline {subsection}{\numberline {N.6.4}Lesson 4: Negative Results Have Scientific Value}{581}{subsection.3854}%
-\contentsline {subsection}{\numberline {N.6.5}Lesson 5: Opportunity Cost is Real Cost}{582}{subsection.3855}%
-\contentsline {subsection}{\numberline {N.6.6}Lesson 6: Simplicity Scales Better Than Sophistication}{582}{subsection.3856}%
-\contentsline {subsection}{\numberline {N.6.7}Lesson 7: Know When to Quit}{582}{subsection.3861}%
-\contentsline {section}{\numberline {N.7}Conclusion: Failure as Foundation}{583}{section.3862}%
-\contentsline {paragraph}{Final Reflection.}{583}{section*.3868}%
-\contentsline {chapter}{\numberline {O}Case Study: Target Leakage in Two-Stage Models}{585}{appendix.3870}%
-\contentsline {section}{\numberline {O.1}Introduction: A Case Study on the Perils of Target Leakage}{585}{section.3871}%
-\contentsline {paragraph}{Roadmap.}{585}{section*.3872}%
-\contentsline {section}{\numberline {O.2}Mathematical Foundations of Orthogonalization}{586}{section.3873}%
-\contentsline {subsection}{\numberline {O.2.1}Feature Orthogonality and Statistical Independence}{586}{subsection.3874}%
-\contentsline {paragraph}{Why Orthogonal Features Prevent Spurious Correlations.}{586}{section*.3878}%
-\contentsline {subsection}{\numberline {O.2.2}Gram-Schmidt Orthogonalization Process}{586}{subsection.3881}%
-\contentsline {paragraph}{Ridge Residuals as Gram-Schmidt Analog.}{587}{section*.3883}%
-\contentsline {subsection}{\numberline {O.2.3}Variance Decomposition via Orthogonal Components}{587}{subsection.3885}%
-\contentsline {section}{\numberline {O.3}The Multicollinearity Problem in NFL Player Prediction}{587}{section.3890}%
-\contentsline {subsection}{\numberline {O.3.1}Spurious Correlations: Formal Definition}{587}{subsection.3891}%
-\contentsline {paragraph}{Partial Correlation Removes Confound.}{588}{section*.3894}%
-\contentsline {subsection}{\numberline {O.3.2}Example: QB Skill Confounded with Opponent Strength}{589}{subsection.3897}%
-\contentsline {paragraph}{Omitted Variable Bias.}{589}{section*.3899}%
-\contentsline {paragraph}{Numerical Example.}{589}{section*.3901}%
-\contentsline {section}{\numberline {O.4}Ridge Residuals Methodology: Detailed Derivation}{590}{section.3903}%
-\contentsline {subsection}{\numberline {O.4.1}Stage 1: Ridge Opponent Baseline}{590}{subsection.3904}%
-\contentsline {paragraph}{Why Ridge over OLS?}{590}{section*.3907}%
-\contentsline {paragraph}{Bias-Variance Tradeoff.}{590}{section*.3908}%
-\contentsline {paragraph}{Implementation Details.}{590}{section*.3912}%
-\contentsline {subsection}{\numberline {O.4.2}Stage 2: Residual Extraction and QB-Specific Centering}{591}{subsection.3913}%
-\contentsline {paragraph}{Critical Design Choice: Why QB-Specific Centering?}{591}{section*.3915}%
-\contentsline {paragraph}{Solution: QB-Specific Expected Residual.}{592}{section*.3917}%
-\contentsline {paragraph}{Mathematical Proof of Orthogonality.}{592}{section*.3919}%
-\contentsline {paragraph}{Outlier Protection via Clipping.}{592}{section*.3921}%
-\contentsline {subsection}{\numberline {O.4.3}Stage 3: XGBoost with Uncorrelated Features}{592}{subsection.3923}%
-\contentsline {paragraph}{XGBoost Objective Function.}{593}{section*.3926}%
-\contentsline {paragraph}{Hyperparameters (Cross-Validated).}{593}{section*.3928}%
-\contentsline {paragraph}{Input Features to XGBoost (8 Total).}{593}{section*.3929}%
-\contentsline {section}{\numberline {O.5}Statistical Theory: Why Ridge Residuals Work}{593}{section.3938}%
-\contentsline {subsection}{\numberline {O.5.1}Orthogonal Decomposition Theorem}{593}{subsection.3939}%
-\contentsline {paragraph}{Ridge Residuals Implements This Decomposition.}{594}{section*.3944}%
-\contentsline {subsection}{\numberline {O.5.2}Variance Decomposition and Information Theory}{594}{subsection.3945}%
-\contentsline {paragraph}{Information-Theoretic Perspective.}{594}{section*.3947}%
-\contentsline {subsection}{\numberline {O.5.3}Bias-Variance Tradeoff with Strong Regularization}{595}{subsection.3949}%
-\contentsline {paragraph}{Why Strong Regularization Helps.}{595}{section*.3953}%
-\contentsline {section}{\numberline {O.6}Implementation Nuances and Production Lessons}{595}{section.3954}%
-\contentsline {subsection}{\numberline {O.6.1}The Critical Failure: Generic vs QB-Specific Residuals}{596}{subsection.3955}%
-\contentsline {paragraph}{Initial Implementation (FAILED).}{596}{section*.3956}%
-\contentsline {paragraph}{Corrected Implementation (SUCCESS).}{596}{section*.3958}%
-\contentsline {paragraph}{Code Implementation.}{596}{lstlisting.3962}%
-\contentsline {subsection}{\numberline {O.6.2}Fail-Fast Validation on Missing Opponent Data}{597}{subsection.3981}%
-\contentsline {paragraph}{Three-Tier Fallback Strategy.}{597}{section*.3982}%
-\contentsline {paragraph}{Implementation.}{597}{lstlisting.3988}%
-\contentsline {paragraph}{Impact of Fallback.}{597}{section*.4005}%
-\contentsline {subsection}{\numberline {O.6.3}Outlier Protection via Residual Clipping}{598}{subsection.4006}%
-\contentsline {paragraph}{Clipping as Robust Regression.}{598}{section*.4009}%
-\contentsline {section}{\numberline {O.7}Ablation Studies: Quantifying Component Contributions}{598}{section.4010}%
-\contentsline {paragraph}{Key Findings.}{598}{section*.4012}%
-\contentsline {section}{\numberline {O.8}Comparison to Alternative Approaches}{600}{section.4019}%
-\contentsline {subsection}{\numberline {O.8.1}Pure XGBoost with Opponent Features (XGBoost v2 Baseline)}{600}{subsection.4020}%
-\contentsline {paragraph}{Approach.}{600}{section*.4021}%
-\contentsline {paragraph}{Results.}{600}{section*.4022}%
-\contentsline {paragraph}{Why It Fails.}{600}{section*.4023}%
-\contentsline {subsection}{\numberline {O.8.2}Incremental XGBoost with Online Learning}{601}{subsection.4025}%
-\contentsline {paragraph}{Approach.}{601}{section*.4026}%
-\contentsline {paragraph}{Results.}{601}{section*.4027}%
-\contentsline {paragraph}{Why It's Weaker.}{601}{section*.4028}%
-\contentsline {subsection}{\numberline {O.8.3}ELO + Weighted Least Squares (Principled Baseline)}{601}{subsection.4030}%
-\contentsline {paragraph}{Approach.}{601}{section*.4031}%
-\contentsline {paragraph}{Pros.}{601}{section*.4032}%
-\contentsline {paragraph}{Cons.}{602}{section*.4033}%
-\contentsline {paragraph}{Status.}{602}{section*.4034}%
-\contentsline {subsection}{\numberline {O.8.4}Deep Learning (Insufficient Data)}{602}{subsection.4035}%
-\contentsline {paragraph}{Why Not Used.}{602}{section*.4036}%
-\contentsline {paragraph}{Revisit Criteria.}{602}{section*.4038}%
-\contentsline {section}{\numberline {O.9}Erroneous Multi-Season Validation Results}{602}{section.4039}%
-\contentsline {paragraph}{Consistency Gates (All PASSED $\text {$\mathsurround \z@ \mathchar "458$}$).}{604}{section*.4041}%
-\contentsline {paragraph}{Key Findings.}{604}{section*.4046}%
-\contentsline {section}{\numberline {O.10}Production Deployment Lessons}{604}{section.4047}%
-\contentsline {subsection}{\numberline {O.10.1}Feature Engineering > Model Complexity}{604}{subsection.4048}%
-\contentsline {paragraph}{Quantitative Evidence.}{604}{section*.4049}%
-\contentsline {subsection}{\numberline {O.10.2}Multi-Season Validation Prevents Overfitting}{605}{subsection.4050}%
-\contentsline {paragraph}{Lesson.}{605}{section*.4051}%
-\contentsline {subsection}{\numberline {O.10.3}Fail-Fast Validation on Critical Dependencies}{605}{subsection.4052}%
-\contentsline {section}{\numberline {O.11}Limitations and Future Directions}{605}{section.4057}%
-\contentsline {subsection}{\numberline {O.11.1}Known Limitations}{605}{subsection.4058}%
-\contentsline {subsection}{\numberline {O.11.2}Future Research Directions}{606}{subsection.4063}%
-\contentsline {section}{\numberline {O.12}Conclusion: Practical Orthogonalization for Sports Prediction}{606}{section.4069}%
-\contentsline {paragraph}{Theoretical.}{607}{section*.4070}%
-\contentsline {paragraph}{Methodological.}{607}{section*.4071}%
-\contentsline {paragraph}{Empirical.}{607}{section*.4072}%
-\contentsline {paragraph}{Practical.}{607}{section*.4073}%
-\contentsline {paragraph}{Broader Impact.}{607}{section*.4074}%
-\contentsline {paragraph}{Final Message.}{607}{section*.4075}%
-\contentsline {section}{\numberline {O.13}Resolution: Corrected Ridge Residuals in Production}{607}{section.4076}%
-\contentsline {subsection}{\numberline {O.13.1}Timeline of Discovery and Remediation}{607}{subsection.4077}%
-\contentsline {subsection}{\numberline {O.13.2}The Leakage Bug and Its Fix}{608}{subsection.4079}%
-\contentsline {paragraph}{Original Bug (Documented Above).}{608}{section*.4080}%
-\contentsline {paragraph}{Corrected Implementation.}{608}{section*.4085}%
-\contentsline {paragraph}{Additional Safeguards.}{609}{section*.4104}%
-\contentsline {subsection}{\numberline {O.13.3}Validated Performance: Corrected Ridge Residuals}{609}{subsection.4108}%
-\contentsline {paragraph}{Key Differences from Flawed Results.}{609}{section*.4110}%
-\contentsline {subsection}{\numberline {O.13.4}Production Deployment Status}{610}{subsection.4115}%
-\contentsline {paragraph}{Ensemble Integration.}{610}{section*.4116}%
-\contentsline {subsection}{\numberline {O.13.5}Lessons for Practitioners}{610}{subsection.4117}%
-\contentsline {subsection}{\numberline {O.13.6}December 2025 Holdout Validation: Complete Failure}{611}{subsection.4122}%
-\contentsline {paragraph}{Why 2022--2024 Results Don't Generalize.}{611}{section*.4124}%
-\contentsline {paragraph}{Production Status Update.}{611}{section*.4129}%
-\contentsline {paragraph}{Revised Lessons.}{612}{section*.4130}%
-\contentsline {paragraph}{Final Note.}{612}{section*.4135}%
-\contentsline {chapter}{\numberline {P}Appendix M: Ensemble Architecture Evolution}{613}{appendix.4136}%
-\contentsline {section}{\numberline {P.1}Introduction: From Failure to Success}{613}{section.4137}%
-\contentsline {subsection}{\numberline {P.1.1}Strategic Context}{613}{subsection.4138}%
-\contentsline {subsection}{\numberline {P.1.2}Key Performance Progression}{613}{subsection.4142}%
-\contentsline {section}{\numberline {P.2}Complete Development Timeline}{614}{section.4144}%
-\contentsline {subsection}{\numberline {P.2.1}Resource Allocation Analysis}{615}{subsection.4146}%
-\contentsline {section}{\numberline {P.3}v1.0 Baseline: Single Hierarchical Model (October 2024)}{615}{section.4148}%
-\contentsline {subsection}{\numberline {P.3.1}Architecture Specification}{615}{subsection.4149}%
-\contentsline {subsection}{\numberline {P.3.2}Training Configuration}{616}{subsection.4151}%
-\contentsline {subsection}{\numberline {P.3.3}Backtest Results: Catastrophic Failure}{616}{subsection.4152}%
-\contentsline {subsection}{\numberline {P.3.4}Mathematical Failure Mode}{616}{subsection.4154}%
-\contentsline {section}{\numberline {P.4}v2.5 Enhanced: Breakthrough to Profitability (November 2024)}{617}{section.4158}%
-\contentsline {subsection}{\numberline {P.4.1}Key Innovation: 2-Way Ensemble}{617}{subsection.4159}%
-\contentsline {subsection}{\numberline {P.4.2}Performance Breakthrough}{617}{subsection.4162}%
-\contentsline {subsection}{\numberline {P.4.3}Error Pattern Complementarity}{617}{subsection.4164}%
-\contentsline {section}{\numberline {P.5}v3.0 4-Way Ensemble: CVX Weight Optimization (November 2024)}{618}{section.4166}%
-\contentsline {subsection}{\numberline {P.5.1}Architecture Expansion}{618}{subsection.4167}%
-\contentsline {subsection}{\numberline {P.5.2}CVX Weight Optimization}{618}{subsection.4173}%
-\contentsline {subsection}{\numberline {P.5.3}Ablation Study: Component Contributions}{618}{subsection.4175}%
-\contentsline {subsection}{\numberline {P.5.4}CVX vs Equal Weighting}{619}{subsection.4177}%
-\contentsline {section}{\numberline {P.6}v4.0 R Integration Failure \& BNN Abandonment (November 2024--2025)}{619}{section.4179}%
-\contentsline {subsection}{\numberline {P.6.1}v4.0: R Model Integration Attempt}{619}{subsection.4180}%
-\contentsline {subsection}{\numberline {P.6.2}BNN Passing Investigation: 84 Hours of Failed Experiments}{620}{subsection.4181}%
-\contentsline {section}{\numberline {P.7}v5.0 Canonical: Training Window Standardization (November 2025)}{620}{section.4188}%
-\contentsline {subsection}{\numberline {P.7.1}Motivation: Historical Window Inconsistency}{620}{subsection.4189}%
-\contentsline {subsection}{\numberline {P.7.2}Canonical Window Specification}{621}{subsection.4190}%
-\contentsline {subsection}{\numberline {P.7.3}Ablation Validation: Canonical vs Alternative Windows}{621}{subsection.4194}%
-\contentsline {section}{\numberline {P.8}v5.1: Hybrid XGBoost Integration (November 2025)}{622}{section.4196}%
-\contentsline {subsection}{\numberline {P.8.1}Motivation: Static vs Incremental Trade-off}{622}{subsection.4197}%
-\contentsline {subsection}{\numberline {P.8.2}Hybrid Architecture: 70\% Static + 30\% Incremental}{622}{subsection.4198}%
-\contentsline {subsection}{\numberline {P.8.3}Hybrid Performance Validation}{622}{subsection.4202}%
-\contentsline {subsection}{\numberline {P.8.4}Incremental Update Protocol}{623}{subsection.4204}%
-\contentsline {section}{\numberline {P.9}v6.0: 5-Way Adaptive Ensemble (November 2025)}{623}{section.4209}%
-\contentsline {subsection}{\numberline {P.9.1}Dual Innovation: ELO Integration + Adaptive Weights}{623}{subsection.4210}%
-\contentsline {subsubsection}{5th Component: ELO Win/Loss Predictor}{623}{section*.4211}%
-\contentsline {subsubsection}{Adaptive WLS Weight Reoptimization}{624}{section*.4218}%
-\contentsline {subsection}{\numberline {P.9.2}Weight Evolution Across 2024 Season}{624}{subsection.4221}%
-\contentsline {section}{\numberline {P.10}Ablation Studies: Component-Level Analysis}{624}{section.4223}%
-\contentsline {subsection}{\numberline {P.10.1}Marginal Contribution by Model}{625}{subsection.4224}%
-\contentsline {subsection}{\numberline {P.10.2}Interaction Effects}{625}{subsection.4226}%
-\contentsline {section}{\numberline {P.11}Training Window Evolution Analysis}{625}{section.4228}%
-\contentsline {subsection}{\numberline {P.11.1}Historical vs Canonical Comparison}{625}{subsection.4229}%
-\contentsline {section}{\numberline {P.12}Weight Optimization Methods Comparison}{626}{section.4231}%
-\contentsline {subsection}{\numberline {P.12.1}Evolution: Manual → CVX → Adaptive WLS}{626}{subsection.4232}%
-\contentsline {subsection}{\numberline {P.12.2}Adaptive WLS Sensitivity Analysis}{626}{subsection.4234}%
-\contentsline {section}{\numberline {P.13}Lessons Learned \& Future Directions}{627}{section.4236}%
-\contentsline {subsection}{\numberline {P.13.1}Transferable Insights}{627}{subsection.4237}%
-\contentsline {subsubsection}{1. Ensemble Diversification is Non-Negotiable}{627}{section*.4238}%
-\contentsline {subsubsection}{2. Abandon Sunk Costs Ruthlessly}{627}{section*.4240}%
-\contentsline {subsubsection}{3. Canonical Standards Prevent Confounding}{627}{section*.4242}%
+\contentsline {chapter}{\numberline {L}Incremental XGBoost Investigation: A Research Postmortem}{546}{appendix.3550}%
+\contentsline {section}{\numberline {L.1}Overview}{546}{section.3551}%
+\contentsline {subsection}{\numberline {L.1.1}Timeline Summary}{546}{subsection.3552}%
+\contentsline {section}{\numberline {L.2}Initial Claim (November 10, 2025)}{546}{section.3554}%
+\contentsline {subsection}{\numberline {L.2.1}Experimental Setup}{547}{subsection.3555}%
+\contentsline {paragraph}{Data.}{547}{section*.3556}%
+\contentsline {paragraph}{Model Configuration.}{547}{section*.3557}%
+\contentsline {subsection}{\numberline {L.2.2}Initial Results (INCORRECT)}{547}{subsection.3558}%
+\contentsline {paragraph}{Interpretation (at the time).}{547}{section*.3560}%
+\contentsline {paragraph}{What We Missed.}{548}{section*.3561}%
+\contentsline {subsection}{\numberline {L.2.3}Code Inspection: The Bug}{548}{subsection.3562}%
+\contentsline {section}{\numberline {L.3}Baseline Error Discovery (November 12, 2025)}{548}{section.3575}%
+\contentsline {subsection}{\numberline {L.3.1}Week 1 Backtest Extension}{548}{subsection.3576}%
+\contentsline {paragraph}{Red Flag: Constant Predictions.}{548}{section*.3578}%
+\contentsline {subsection}{\numberline {L.3.2}Debugging Process}{549}{subsection.3579}%
+\contentsline {paragraph}{Hypothesis 1: Feature Scaling Issue.}{549}{section*.3580}%
+\contentsline {paragraph}{Hypothesis 2: Model Serialization Corruption.}{549}{section*.3581}%
+\contentsline {paragraph}{Hypothesis 3: XGBoost Configuration Error.}{549}{section*.3582}%
+\contentsline {subsection}{\numberline {L.3.3}Corrected Baseline Implementation}{549}{subsection.3583}%
+\contentsline {section}{\numberline {L.4}Corrected Validation Results (November 12, 2025)}{550}{section.3605}%
+\contentsline {subsection}{\numberline {L.4.1}Multi-Season Comparison}{550}{subsection.3606}%
+\contentsline {paragraph}{Reality Check.}{550}{section*.3608}%
+\contentsline {subsection}{\numberline {L.4.2}Cold-Start Penalty Analysis}{550}{subsection.3609}%
+\contentsline {paragraph}{Key Insight.}{551}{section*.3611}%
+\contentsline {section}{\numberline {L.5}Exhaustive Optimization: 8 Approaches}{551}{section.3612}%
+\contentsline {subsection}{\numberline {L.5.1}Approach 1: Window Size Tuning}{551}{subsection.3613}%
+\contentsline {paragraph}{Hypothesis.}{551}{section*.3614}%
+\contentsline {paragraph}{Tested Configurations.}{551}{section*.3615}%
+\contentsline {paragraph}{Result.}{551}{section*.3617}%
+\contentsline {subsection}{\numberline {L.5.2}Approach 2: Learning Rate Tuning}{551}{subsection.3618}%
+\contentsline {paragraph}{Hypothesis.}{551}{section*.3619}%
+\contentsline {paragraph}{Tested Configurations.}{552}{section*.3620}%
+\contentsline {paragraph}{Result.}{552}{section*.3622}%
+\contentsline {subsection}{\numberline {L.5.3}Approach 3: Update Frequency Optimization}{552}{subsection.3623}%
+\contentsline {paragraph}{Hypothesis.}{552}{section*.3624}%
+\contentsline {paragraph}{Tested Configurations.}{552}{section*.3625}%
+\contentsline {paragraph}{Result.}{553}{section*.3627}%
+\contentsline {subsection}{\numberline {L.5.4}Approach 4: Feature Selection for Online Learning}{553}{subsection.3628}%
+\contentsline {paragraph}{Hypothesis.}{553}{section*.3629}%
+\contentsline {paragraph}{Tested Configurations.}{553}{section*.3630}%
+\contentsline {paragraph}{Result.}{553}{section*.3632}%
+\contentsline {subsection}{\numberline {L.5.5}Approach 5: Ensemble of Incremental Models}{553}{subsection.3633}%
+\contentsline {paragraph}{Hypothesis.}{553}{section*.3634}%
+\contentsline {paragraph}{Tested Configurations.}{553}{section*.3635}%
+\contentsline {paragraph}{Result.}{553}{section*.3637}%
+\contentsline {subsection}{\numberline {L.5.6}Approach 6: Adaptive Learning Rate Schedule}{554}{subsection.3638}%
+\contentsline {paragraph}{Hypothesis.}{554}{section*.3639}%
+\contentsline {paragraph}{Tested Configurations.}{554}{section*.3640}%
+\contentsline {paragraph}{Result.}{554}{section*.3642}%
+\contentsline {subsection}{\numberline {L.5.7}Approach 7: Warm-Start from Static Baseline}{554}{subsection.3643}%
+\contentsline {paragraph}{Hypothesis.}{554}{section*.3644}%
+\contentsline {paragraph}{Tested Configurations.}{554}{section*.3645}%
+\contentsline {paragraph}{Result.}{554}{section*.3647}%
+\contentsline {subsection}{\numberline {L.5.8}Approach 8: Hybrid Blending (BREAKTHROUGH)}{555}{subsection.3648}%
+\contentsline {paragraph}{Hypothesis.}{555}{section*.3649}%
+\contentsline {paragraph}{Tested Configurations.}{555}{section*.3650}%
+\contentsline {paragraph}{Result.}{555}{section*.3652}%
+\contentsline {section}{\numberline {L.6}Multi-Season Validation of Hybrid Solution}{555}{section.3653}%
+\contentsline {subsection}{\numberline {L.6.1}Full 3-Season Results}{555}{subsection.3654}%
+\contentsline {paragraph}{Consistency.}{555}{section*.3656}%
+\contentsline {paragraph}{Robustness.}{556}{section*.3657}%
+\contentsline {subsection}{\numberline {L.6.2}Statistical Significance Testing}{556}{subsection.3658}%
+\contentsline {paragraph}{Conclusion.}{556}{section*.3660}%
+\contentsline {section}{\numberline {L.7}Lessons for Production ML Systems}{556}{section.3661}%
+\contentsline {subsection}{\numberline {L.7.1}Lesson 1: Baseline Validation is Non-Negotiable}{556}{subsection.3662}%
+\contentsline {paragraph}{What Went Wrong.}{556}{section*.3663}%
+\contentsline {paragraph}{Best Practice.}{556}{section*.3664}%
+\contentsline {subsection}{\numberline {L.7.2}Lesson 2: Multi-Season Testing Catches Spurious Results}{557}{subsection.3679}%
+\contentsline {paragraph}{What Went Wrong.}{557}{section*.3680}%
+\contentsline {paragraph}{Best Practice.}{557}{section*.3681}%
+\contentsline {subsection}{\numberline {L.7.3}Lesson 3: Exhaustive Optimization Rescues Failing Research}{557}{subsection.3693}%
+\contentsline {paragraph}{What Went Wrong.}{557}{section*.3694}%
+\contentsline {paragraph}{Best Practice.}{557}{section*.3695}%
+\contentsline {subsection}{\numberline {L.7.4}Lesson 4: Transparent Error Reporting Builds Trust}{558}{subsection.3696}%
+\contentsline {paragraph}{What Went Wrong.}{558}{section*.3697}%
+\contentsline {paragraph}{Best Practice.}{558}{section*.3698}%
+\contentsline {subsection}{\numberline {L.7.5}Lesson 5: Negative Results Have Scientific Value}{558}{subsection.3699}%
+\contentsline {paragraph}{What We Learned.}{558}{section*.3700}%
+\contentsline {paragraph}{Best Practice.}{558}{section*.3701}%
+\contentsline {section}{\numberline {L.8}Conclusion}{558}{section.3702}%
+\contentsline {paragraph}{Key Takeaways.}{558}{section*.3703}%
+\contentsline {paragraph}{Production Recommendation.}{559}{section*.3704}%
+\contentsline {paragraph}{Broader Impact.}{559}{section*.3705}%
+\contentsline {chapter}{\numberline {M}Technical Debt Inventory and Remediation}{560}{appendix.3706}%
+\contentsline {section}{\numberline {M.1}Security Vulnerabilities}{560}{section.3707}%
+\contentsline {subsection}{\numberline {M.1.1}Hardcoded Credentials}{560}{subsection.3708}%
+\contentsline {subsection}{\numberline {M.1.2}Docker Security Issues}{561}{subsection.3710}%
+\contentsline {subsection}{\numberline {M.1.3}Temporal Leakage Risks}{561}{subsection.3711}%
+\contentsline {section}{\numberline {M.2}Testing Debt}{561}{section.3712}%
+\contentsline {subsection}{\numberline {M.2.1}Test Stub Analysis}{561}{subsection.3713}%
+\contentsline {subsection}{\numberline {M.2.2}Missing Integration Tests}{562}{subsection.3719}%
+\contentsline {section}{\numberline {M.3}Architectural Debt}{562}{section.3721}%
+\contentsline {subsection}{\numberline {M.3.1}Multi-Language ETL Complexity}{562}{subsection.3722}%
+\contentsline {paragraph}{Considered Alternatives:}{563}{section*.3724}%
+\contentsline {subsection}{\numberline {M.3.2}Scattered SQL Queries (160 Files)}{563}{subsection.3728}%
+\contentsline {section}{\numberline {M.4}Data Quality Gaps}{564}{section.3732}%
+\contentsline {subsection}{\numberline {M.4.1}Missing Validation Rules}{564}{subsection.3733}%
+\contentsline {section}{\numberline {M.5}Remediation Roadmap}{565}{section.3742}%
+\contentsline {paragraph}{Critical Path:}{565}{section*.3744}%
+\contentsline {paragraph}{Parallel Work Opportunities:}{565}{section*.3749}%
+\contentsline {section}{\numberline {M.6}Lessons Learned}{566}{section.3750}%
+\contentsline {subsection}{\numberline {M.6.1}What Worked Well}{566}{subsection.3751}%
+\contentsline {subsection}{\numberline {M.6.2}What Could Improve}{566}{subsection.3755}%
+\contentsline {subsection}{\numberline {M.6.3}Best Practices Established}{566}{subsection.3759}%
+\contentsline {paragraph}{Recommendation for Future Work:}{567}{section*.3764}%
+\contentsline {chapter}{\numberline {N}Bayesian Neural Network Investigation: A 26-Day Journey}{568}{appendix.3765}%
+\contentsline {section}{\numberline {N.1}Introduction: The Promise of Uncertainty Quantification}{568}{section.3766}%
+\contentsline {paragraph}{Research Question.}{568}{section*.3767}%
+\contentsline {paragraph}{The Narrative Arc.}{568}{section*.3768}%
+\contentsline {section}{\numberline {N.2}Investigation Timeline and Resource Allocation}{569}{section.3773}%
+\contentsline {paragraph}{Resource Distribution.}{569}{section*.3775}%
+\contentsline {paragraph}{Opportunity Cost.}{569}{section*.3776}%
+\contentsline {section}{\numberline {N.3}Architecture Evolution: Six Distinct Approaches}{570}{section.3777}%
+\contentsline {subsection}{\numberline {N.3.1}Multi-Output v1 (Oct 14-18): Data Leakage Discovery}{570}{subsection.3779}%
+\contentsline {paragraph}{Architecture.}{570}{section*.3780}%
+\contentsline {paragraph}{Training Protocol.}{570}{section*.3781}%
+\contentsline {paragraph}{Failure Mode: Data Leakage.}{570}{section*.3782}%
+\contentsline {subsection}{\numberline {N.3.2}Multi-Output v2 (Oct 19-23): Training Instability}{571}{subsection.3786}%
+\contentsline {paragraph}{Architectural Enhancements.}{571}{section*.3787}%
+\contentsline {paragraph}{Training Progression.}{571}{section*.3788}%
+\contentsline {paragraph}{Root Cause Analysis.}{571}{section*.3789}%
+\contentsline {subsection}{\numberline {N.3.3}Ensemble BNN (Oct 24-27): Computational Tractability}{572}{subsection.3793}%
+\contentsline {paragraph}{Motivation.}{572}{section*.3794}%
+\contentsline {paragraph}{Architecture.}{572}{section*.3795}%
+\contentsline {paragraph}{Results.}{572}{section*.3796}%
+\contentsline {paragraph}{Failure Mode: Computational Cost.}{572}{section*.3797}%
+\contentsline {subsection}{\numberline {N.3.4}Informative Priors (Oct 28-30): Overconstrained Models}{573}{subsection.3798}%
+\contentsline {paragraph}{Hypothesis.}{573}{section*.3799}%
+\contentsline {paragraph}{Hierarchical Prior Specification.}{573}{section*.3800}%
+\contentsline {paragraph}{Training Results.}{573}{section*.3804}%
+\contentsline {paragraph}{Root Cause: Regression to Mean.}{573}{section*.3805}%
+\contentsline {subsection}{\numberline {N.3.5}Conformal BNN (Oct 31-Nov 3): Interval Width Trade-off}{574}{subsection.3806}%
+\contentsline {paragraph}{Motivation.}{574}{section*.3807}%
+\contentsline {paragraph}{Method.}{574}{section*.3808}%
+\contentsline {paragraph}{Results.}{574}{section*.3812}%
+\contentsline {paragraph}{Failure Mode: Betting Utility.}{574}{section*.3814}%
+\contentsline {subsection}{\numberline {N.3.6}Evidential Deep Learning (Nov 4-8): Implementation Complexity}{575}{subsection.3815}%
+\contentsline {paragraph}{Motivation.}{575}{section*.3816}%
+\contentsline {paragraph}{Architecture.}{575}{section*.3817}%
+\contentsline {paragraph}{Implementation Challenges.}{575}{section*.3821}%
+\contentsline {paragraph}{Strategic Decision: Diminishing Returns.}{575}{section*.3825}%
+\contentsline {section}{\numberline {N.4}Convergence Diagnostics and MCMC Analysis}{576}{section.3826}%
+\contentsline {paragraph}{Interpretation.}{576}{section*.3828}%
+\contentsline {section}{\numberline {N.5}Performance Analysis: Why BNN Failed Where Simpler Models Succeeded}{577}{section.3829}%
+\contentsline {subsection}{\numberline {N.5.1}Failure Mode Taxonomy}{577}{subsection.3831}%
+\contentsline {paragraph}{Training Instability (33\% of failures).}{577}{section*.3833}%
+\contentsline {paragraph}{Poor Generalization (33\% of failures).}{578}{section*.3834}%
+\contentsline {paragraph}{Calibration Issues (17\% of failures).}{578}{section*.3835}%
+\contentsline {paragraph}{Computational Constraints (17\% of failures).}{578}{section*.3836}%
+\contentsline {subsection}{\numberline {N.5.2}Why XGBoost v4 Succeeded Where BNN Failed}{578}{subsection.3837}%
+\contentsline {section}{\numberline {N.6}Lessons Learned: When to Abandon Research Lines}{578}{section.3841}%
+\contentsline {subsection}{\numberline {N.6.1}Lesson 1: Convergence $\neq $ Validity}{579}{subsection.3842}%
+\contentsline {paragraph}{Practical Implication:}{579}{section*.3843}%
+\contentsline {subsection}{\numberline {N.6.2}Lesson 2: Diminishing Returns Signal Research Pivots}{579}{subsection.3848}%
+\contentsline {paragraph}{Decision Heuristic:}{579}{section*.3850}%
+\contentsline {subsection}{\numberline {N.6.3}Lesson 3: Production Constraints are Hard Gates}{580}{subsection.3851}%
+\contentsline {paragraph}{Practical Implication:}{580}{section*.3853}%
+\contentsline {subsection}{\numberline {N.6.4}Lesson 4: Negative Results Have Scientific Value}{580}{subsection.3854}%
+\contentsline {subsection}{\numberline {N.6.5}Lesson 5: Opportunity Cost is Real Cost}{581}{subsection.3855}%
+\contentsline {subsection}{\numberline {N.6.6}Lesson 6: Simplicity Scales Better Than Sophistication}{581}{subsection.3856}%
+\contentsline {subsection}{\numberline {N.6.7}Lesson 7: Know When to Quit}{581}{subsection.3861}%
+\contentsline {section}{\numberline {N.7}Conclusion: Failure as Foundation}{582}{section.3862}%
+\contentsline {paragraph}{Final Reflection.}{582}{section*.3868}%
+\contentsline {chapter}{\numberline {O}Case Study: Target Leakage in Two-Stage Models}{584}{appendix.3870}%
+\contentsline {section}{\numberline {O.1}Introduction: A Case Study on the Perils of Target Leakage}{584}{section.3871}%
+\contentsline {paragraph}{Roadmap.}{584}{section*.3872}%
+\contentsline {section}{\numberline {O.2}Mathematical Foundations of Orthogonalization}{585}{section.3873}%
+\contentsline {subsection}{\numberline {O.2.1}Feature Orthogonality and Statistical Independence}{585}{subsection.3874}%
+\contentsline {paragraph}{Why Orthogonal Features Prevent Spurious Correlations.}{585}{section*.3878}%
+\contentsline {subsection}{\numberline {O.2.2}Gram-Schmidt Orthogonalization Process}{585}{subsection.3881}%
+\contentsline {paragraph}{Ridge Residuals as Gram-Schmidt Analog.}{586}{section*.3883}%
+\contentsline {subsection}{\numberline {O.2.3}Variance Decomposition via Orthogonal Components}{586}{subsection.3885}%
+\contentsline {section}{\numberline {O.3}The Multicollinearity Problem in NFL Player Prediction}{586}{section.3890}%
+\contentsline {subsection}{\numberline {O.3.1}Spurious Correlations: Formal Definition}{586}{subsection.3891}%
+\contentsline {paragraph}{Partial Correlation Removes Confound.}{587}{section*.3894}%
+\contentsline {subsection}{\numberline {O.3.2}Example: QB Skill Confounded with Opponent Strength}{588}{subsection.3897}%
+\contentsline {paragraph}{Omitted Variable Bias.}{588}{section*.3899}%
+\contentsline {paragraph}{Numerical Example.}{588}{section*.3901}%
+\contentsline {section}{\numberline {O.4}Ridge Residuals Methodology: Detailed Derivation}{589}{section.3903}%
+\contentsline {subsection}{\numberline {O.4.1}Stage 1: Ridge Opponent Baseline}{589}{subsection.3904}%
+\contentsline {paragraph}{Why Ridge over OLS?}{589}{section*.3907}%
+\contentsline {paragraph}{Bias-Variance Tradeoff.}{589}{section*.3908}%
+\contentsline {paragraph}{Implementation Details.}{589}{section*.3912}%
+\contentsline {subsection}{\numberline {O.4.2}Stage 2: Residual Extraction and QB-Specific Centering}{590}{subsection.3913}%
+\contentsline {paragraph}{Critical Design Choice: Why QB-Specific Centering?}{590}{section*.3915}%
+\contentsline {paragraph}{Solution: QB-Specific Expected Residual.}{591}{section*.3917}%
+\contentsline {paragraph}{Mathematical Proof of Orthogonality.}{591}{section*.3919}%
+\contentsline {paragraph}{Outlier Protection via Clipping.}{591}{section*.3921}%
+\contentsline {subsection}{\numberline {O.4.3}Stage 3: XGBoost with Uncorrelated Features}{591}{subsection.3923}%
+\contentsline {paragraph}{XGBoost Objective Function.}{592}{section*.3926}%
+\contentsline {paragraph}{Hyperparameters (Cross-Validated).}{592}{section*.3928}%
+\contentsline {paragraph}{Input Features to XGBoost (8 Total).}{592}{section*.3929}%
+\contentsline {section}{\numberline {O.5}Statistical Theory: Why Ridge Residuals Work}{592}{section.3938}%
+\contentsline {subsection}{\numberline {O.5.1}Orthogonal Decomposition Theorem}{592}{subsection.3939}%
+\contentsline {paragraph}{Ridge Residuals Implements This Decomposition.}{593}{section*.3944}%
+\contentsline {subsection}{\numberline {O.5.2}Variance Decomposition and Information Theory}{593}{subsection.3945}%
+\contentsline {paragraph}{Information-Theoretic Perspective.}{593}{section*.3947}%
+\contentsline {subsection}{\numberline {O.5.3}Bias-Variance Tradeoff with Strong Regularization}{594}{subsection.3949}%
+\contentsline {paragraph}{Why Strong Regularization Helps.}{594}{section*.3953}%
+\contentsline {section}{\numberline {O.6}Implementation Nuances and Production Lessons}{594}{section.3954}%
+\contentsline {subsection}{\numberline {O.6.1}The Critical Failure: Generic vs QB-Specific Residuals}{595}{subsection.3955}%
+\contentsline {paragraph}{Initial Implementation (FAILED).}{595}{section*.3956}%
+\contentsline {paragraph}{Corrected Implementation (SUCCESS).}{595}{section*.3958}%
+\contentsline {paragraph}{Code Implementation.}{595}{lstlisting.3962}%
+\contentsline {subsection}{\numberline {O.6.2}Fail-Fast Validation on Missing Opponent Data}{596}{subsection.3981}%
+\contentsline {paragraph}{Three-Tier Fallback Strategy.}{596}{section*.3982}%
+\contentsline {paragraph}{Implementation.}{596}{lstlisting.3988}%
+\contentsline {paragraph}{Impact of Fallback.}{596}{section*.4005}%
+\contentsline {subsection}{\numberline {O.6.3}Outlier Protection via Residual Clipping}{597}{subsection.4006}%
+\contentsline {paragraph}{Clipping as Robust Regression.}{597}{section*.4009}%
+\contentsline {section}{\numberline {O.7}Ablation Studies: Quantifying Component Contributions}{597}{section.4010}%
+\contentsline {paragraph}{Key Findings.}{597}{section*.4012}%
+\contentsline {section}{\numberline {O.8}Comparison to Alternative Approaches}{599}{section.4019}%
+\contentsline {subsection}{\numberline {O.8.1}Pure XGBoost with Opponent Features (XGBoost v2 Baseline)}{599}{subsection.4020}%
+\contentsline {paragraph}{Approach.}{599}{section*.4021}%
+\contentsline {paragraph}{Results.}{599}{section*.4022}%
+\contentsline {paragraph}{Why It Fails.}{599}{section*.4023}%
+\contentsline {subsection}{\numberline {O.8.2}Incremental XGBoost with Online Learning}{600}{subsection.4025}%
+\contentsline {paragraph}{Approach.}{600}{section*.4026}%
+\contentsline {paragraph}{Results.}{600}{section*.4027}%
+\contentsline {paragraph}{Why It's Weaker.}{600}{section*.4028}%
+\contentsline {subsection}{\numberline {O.8.3}ELO + Weighted Least Squares (Principled Baseline)}{600}{subsection.4030}%
+\contentsline {paragraph}{Approach.}{600}{section*.4031}%
+\contentsline {paragraph}{Pros.}{600}{section*.4032}%
+\contentsline {paragraph}{Cons.}{601}{section*.4033}%
+\contentsline {paragraph}{Status.}{601}{section*.4034}%
+\contentsline {subsection}{\numberline {O.8.4}Deep Learning (Insufficient Data)}{601}{subsection.4035}%
+\contentsline {paragraph}{Why Not Used.}{601}{section*.4036}%
+\contentsline {paragraph}{Revisit Criteria.}{601}{section*.4038}%
+\contentsline {section}{\numberline {O.9}Erroneous Multi-Season Validation Results}{601}{section.4039}%
+\contentsline {paragraph}{Consistency Gates (All PASSED $\text {$\mathsurround \z@ \mathchar "458$}$).}{603}{section*.4041}%
+\contentsline {paragraph}{Key Findings.}{603}{section*.4046}%
+\contentsline {section}{\numberline {O.10}Production Deployment Lessons}{603}{section.4047}%
+\contentsline {subsection}{\numberline {O.10.1}Feature Engineering > Model Complexity}{603}{subsection.4048}%
+\contentsline {paragraph}{Quantitative Evidence.}{603}{section*.4049}%
+\contentsline {subsection}{\numberline {O.10.2}Multi-Season Validation Prevents Overfitting}{604}{subsection.4050}%
+\contentsline {paragraph}{Lesson.}{604}{section*.4051}%
+\contentsline {subsection}{\numberline {O.10.3}Fail-Fast Validation on Critical Dependencies}{604}{subsection.4052}%
+\contentsline {section}{\numberline {O.11}Limitations and Future Directions}{604}{section.4057}%
+\contentsline {subsection}{\numberline {O.11.1}Known Limitations}{604}{subsection.4058}%
+\contentsline {subsection}{\numberline {O.11.2}Future Research Directions}{605}{subsection.4063}%
+\contentsline {section}{\numberline {O.12}Conclusion: Practical Orthogonalization for Sports Prediction}{605}{section.4069}%
+\contentsline {paragraph}{Theoretical.}{606}{section*.4070}%
+\contentsline {paragraph}{Methodological.}{606}{section*.4071}%
+\contentsline {paragraph}{Empirical.}{606}{section*.4072}%
+\contentsline {paragraph}{Practical.}{606}{section*.4073}%
+\contentsline {paragraph}{Broader Impact.}{606}{section*.4074}%
+\contentsline {paragraph}{Final Message.}{606}{section*.4075}%
+\contentsline {section}{\numberline {O.13}Resolution: Corrected Ridge Residuals in Production}{606}{section.4076}%
+\contentsline {subsection}{\numberline {O.13.1}Timeline of Discovery and Remediation}{606}{subsection.4077}%
+\contentsline {subsection}{\numberline {O.13.2}The Leakage Bug and Its Fix}{607}{subsection.4079}%
+\contentsline {paragraph}{Original Bug (Documented Above).}{607}{section*.4080}%
+\contentsline {paragraph}{Corrected Implementation.}{607}{section*.4085}%
+\contentsline {paragraph}{Additional Safeguards.}{608}{section*.4104}%
+\contentsline {subsection}{\numberline {O.13.3}Validated Performance: Corrected Ridge Residuals}{608}{subsection.4108}%
+\contentsline {paragraph}{Key Differences from Flawed Results.}{608}{section*.4110}%
+\contentsline {subsection}{\numberline {O.13.4}Production Deployment Status}{609}{subsection.4115}%
+\contentsline {paragraph}{Ensemble Integration.}{609}{section*.4116}%
+\contentsline {subsection}{\numberline {O.13.5}Lessons for Practitioners}{609}{subsection.4117}%
+\contentsline {subsection}{\numberline {O.13.6}December 2025 Holdout Validation: Complete Failure}{610}{subsection.4122}%
+\contentsline {paragraph}{Why 2022--2024 Results Don't Generalize.}{610}{section*.4124}%
+\contentsline {paragraph}{Production Status Update.}{610}{section*.4129}%
+\contentsline {paragraph}{Revised Lessons.}{611}{section*.4130}%
+\contentsline {paragraph}{Final Note.}{611}{section*.4135}%
+\contentsline {chapter}{\numberline {P}Appendix M: Ensemble Architecture Evolution}{612}{appendix.4136}%
+\contentsline {section}{\numberline {P.1}Introduction: From Failure to Success}{612}{section.4137}%
+\contentsline {subsection}{\numberline {P.1.1}Strategic Context}{612}{subsection.4138}%
+\contentsline {subsection}{\numberline {P.1.2}Key Performance Progression}{612}{subsection.4142}%
+\contentsline {section}{\numberline {P.2}Complete Development Timeline}{613}{section.4144}%
+\contentsline {subsection}{\numberline {P.2.1}Resource Allocation Analysis}{614}{subsection.4146}%
+\contentsline {section}{\numberline {P.3}v1.0 Baseline: Single Hierarchical Model (October 2024)}{614}{section.4148}%
+\contentsline {subsection}{\numberline {P.3.1}Architecture Specification}{614}{subsection.4149}%
+\contentsline {subsection}{\numberline {P.3.2}Training Configuration}{615}{subsection.4151}%
+\contentsline {subsection}{\numberline {P.3.3}Backtest Results: Catastrophic Failure}{615}{subsection.4152}%
+\contentsline {subsection}{\numberline {P.3.4}Mathematical Failure Mode}{615}{subsection.4154}%
+\contentsline {section}{\numberline {P.4}v2.5 Enhanced: Breakthrough to Profitability (November 2024)}{616}{section.4158}%
+\contentsline {subsection}{\numberline {P.4.1}Key Innovation: 2-Way Ensemble}{616}{subsection.4159}%
+\contentsline {subsection}{\numberline {P.4.2}Performance Breakthrough}{616}{subsection.4162}%
+\contentsline {subsection}{\numberline {P.4.3}Error Pattern Complementarity}{616}{subsection.4164}%
+\contentsline {section}{\numberline {P.5}v3.0 4-Way Ensemble: CVX Weight Optimization (November 2024)}{617}{section.4166}%
+\contentsline {subsection}{\numberline {P.5.1}Architecture Expansion}{617}{subsection.4167}%
+\contentsline {subsection}{\numberline {P.5.2}CVX Weight Optimization}{617}{subsection.4173}%
+\contentsline {subsection}{\numberline {P.5.3}Ablation Study: Component Contributions}{617}{subsection.4175}%
+\contentsline {subsection}{\numberline {P.5.4}CVX vs Equal Weighting}{618}{subsection.4177}%
+\contentsline {section}{\numberline {P.6}v4.0 R Integration Failure \& BNN Abandonment (November 2024--2025)}{618}{section.4179}%
+\contentsline {subsection}{\numberline {P.6.1}v4.0: R Model Integration Attempt}{618}{subsection.4180}%
+\contentsline {subsection}{\numberline {P.6.2}BNN Passing Investigation: 84 Hours of Failed Experiments}{619}{subsection.4181}%
+\contentsline {section}{\numberline {P.7}v5.0 Canonical: Training Window Standardization (November 2025)}{619}{section.4188}%
+\contentsline {subsection}{\numberline {P.7.1}Motivation: Historical Window Inconsistency}{619}{subsection.4189}%
+\contentsline {subsection}{\numberline {P.7.2}Canonical Window Specification}{620}{subsection.4190}%
+\contentsline {subsection}{\numberline {P.7.3}Ablation Validation: Canonical vs Alternative Windows}{620}{subsection.4194}%
+\contentsline {section}{\numberline {P.8}v5.1: Hybrid XGBoost Integration (November 2025)}{621}{section.4196}%
+\contentsline {subsection}{\numberline {P.8.1}Motivation: Static vs Incremental Trade-off}{621}{subsection.4197}%
+\contentsline {subsection}{\numberline {P.8.2}Hybrid Architecture: 70\% Static + 30\% Incremental}{621}{subsection.4198}%
+\contentsline {subsection}{\numberline {P.8.3}Hybrid Performance Validation}{621}{subsection.4202}%
+\contentsline {subsection}{\numberline {P.8.4}Incremental Update Protocol}{622}{subsection.4204}%
+\contentsline {section}{\numberline {P.9}v6.0: 5-Way Adaptive Ensemble (November 2025)}{622}{section.4209}%
+\contentsline {subsection}{\numberline {P.9.1}Dual Innovation: ELO Integration + Adaptive Weights}{622}{subsection.4210}%
+\contentsline {subsubsection}{5th Component: ELO Win/Loss Predictor}{622}{section*.4211}%
+\contentsline {subsubsection}{Adaptive WLS Weight Reoptimization}{623}{section*.4218}%
+\contentsline {subsection}{\numberline {P.9.2}Weight Evolution Across 2024 Season}{623}{subsection.4221}%
+\contentsline {section}{\numberline {P.10}Ablation Studies: Component-Level Analysis}{623}{section.4223}%
+\contentsline {subsection}{\numberline {P.10.1}Marginal Contribution by Model}{624}{subsection.4224}%
+\contentsline {subsection}{\numberline {P.10.2}Interaction Effects}{624}{subsection.4226}%
+\contentsline {section}{\numberline {P.11}Training Window Evolution Analysis}{624}{section.4228}%
+\contentsline {subsection}{\numberline {P.11.1}Historical vs Canonical Comparison}{624}{subsection.4229}%
+\contentsline {section}{\numberline {P.12}Weight Optimization Methods Comparison}{625}{section.4231}%
+\contentsline {subsection}{\numberline {P.12.1}Evolution: Manual → CVX → Adaptive WLS}{625}{subsection.4232}%
+\contentsline {subsection}{\numberline {P.12.2}Adaptive WLS Sensitivity Analysis}{625}{subsection.4234}%
+\contentsline {section}{\numberline {P.13}Lessons Learned \& Future Directions}{626}{section.4236}%
+\contentsline {subsection}{\numberline {P.13.1}Transferable Insights}{626}{subsection.4237}%
+\contentsline {subsubsection}{1. Ensemble Diversification is Non-Negotiable}{626}{section*.4238}%
+\contentsline {subsubsection}{2. Abandon Sunk Costs Ruthlessly}{626}{section*.4240}%
+\contentsline {subsubsection}{3. Canonical Standards Prevent Confounding}{626}{section*.4242}%
 \contentsline {subsubsection}{4. Adaptive Weighting Requires Sufficient Observations}{627}{section*.4243}%
-\contentsline {subsubsection}{5. Hybrid Architectures Resolve Static-Adaptive Dilemma}{628}{section*.4244}%
-\contentsline {subsection}{\numberline {P.13.2}v7.0+ Roadmap: Speculative Enhancements}{628}{subsection.4245}%
-\contentsline {subsubsection}{Causal Feature Engineering}{628}{section*.4246}%
-\contentsline {subsubsection}{Transformer-Based Sequence Modeling}{628}{section*.4248}%
-\contentsline {subsubsection}{Real-Time Adaptive Weighting}{628}{section*.4250}%
-\contentsline {section}{\numberline {P.14}Conclusion}{629}{section.4252}%
-\contentsline {chapter}{\numberline {Q}Appendix O: Production Model Specifications}{630}{appendix.4258}%
-\contentsline {section}{\numberline {Q.1}Introduction: Technical Reference for Reproducibility}{630}{section.4259}%
-\contentsline {subsection}{\numberline {Q.1.1}Purpose and Scope}{630}{subsection.4260}%
-\contentsline {subsection}{\numberline {Q.1.2}Canonical Training Window (Established November 8, 2025)}{630}{subsection.4261}%
-\contentsline {section}{\numberline {Q.2}State-Space Random Walk v2}{631}{section.4267}%
-\contentsline {subsection}{\numberline {Q.2.1}Model Specification}{631}{subsection.4268}%
-\contentsline {subsection}{\numberline {Q.2.2}Prior Specifications}{632}{subsection.4278}%
-\contentsline {subsection}{\numberline {Q.2.3}MCMC Configuration}{632}{subsection.4283}%
-\contentsline {subsection}{\numberline {Q.2.4}Convergence Diagnostics}{632}{subsection.4285}%
-\contentsline {subsection}{\numberline {Q.2.5}Performance Metrics}{633}{subsection.4287}%
-\contentsline {subsection}{\numberline {Q.2.6}Computational Requirements}{633}{subsection.4289}%
-\contentsline {section}{\numberline {Q.3}Hierarchical Bayesian v2}{633}{section.4290}%
-\contentsline {subsection}{\numberline {Q.3.1}Model Specification}{634}{subsection.4291}%
-\contentsline {subsection}{\numberline {Q.3.2}Prior Specifications}{634}{subsection.4301}%
-\contentsline {subsection}{\numberline {Q.3.3}Convergence Improvement: 2000 → 6000 Iterations}{634}{subsection.4307}%
-\contentsline {subsection}{\numberline {Q.3.4}Final Convergence Diagnostics (6000 Iterations)}{634}{subsection.4309}%
-\contentsline {subsection}{\numberline {Q.3.5}Performance Metrics}{635}{subsection.4311}%
-\contentsline {subsection}{\numberline {Q.3.6}Computational Requirements}{635}{subsection.4313}%
-\contentsline {section}{\numberline {Q.4}XGBoost v4 Ridge Residuals (Two-Stage Orthogonalization)}{636}{section.4314}%
-\contentsline {subsection}{\numberline {Q.4.1}Architecture Overview}{636}{subsection.4315}%
-\contentsline {subsection}{\numberline {Q.4.2}Stage 1: Ridge Regression Specification}{636}{subsection.4319}%
-\contentsline {subsection}{\numberline {Q.4.3}Stage 2: XGBoost Specification}{637}{subsection.4323}%
-\contentsline {subsection}{\numberline {Q.4.4}Multi-Season Validation (2022-2024)}{637}{subsection.4325}%
-\contentsline {subsection}{\numberline {Q.4.5}Feature Importance Analysis}{638}{subsection.4331}%
-\contentsline {subsection}{\numberline {Q.4.6}Computational Requirements}{638}{subsection.4333}%
-\contentsline {section}{\numberline {Q.5}Informative Priors v2}{638}{section.4334}%
-\contentsline {subsection}{\numberline {Q.5.1}Model Specification}{638}{subsection.4335}%
-\contentsline {subsection}{\numberline {Q.5.2}Convergence Improvement: 2000 → 6000 Iterations}{639}{subsection.4344}%
-\contentsline {subsection}{\numberline {Q.5.3}Final Convergence Diagnostics (6000 Iterations)}{640}{subsection.4346}%
-\contentsline {subsection}{\numberline {Q.5.4}Performance Metrics}{640}{subsection.4348}%
-\contentsline {subsection}{\numberline {Q.5.5}Computational Requirements}{640}{subsection.4350}%
-\contentsline {section}{\numberline {Q.6}Hybrid Static-Incremental XGBoost v1}{640}{section.4351}%
-\contentsline {subsection}{\numberline {Q.6.1}Architecture: 70\% Static + 30\% Incremental}{640}{subsection.4352}%
-\contentsline {subsection}{\numberline {Q.6.2}Static Component Specification}{641}{subsection.4354}%
-\contentsline {subsection}{\numberline {Q.6.3}Incremental Component Specification}{641}{subsection.4356}%
-\contentsline {subsection}{\numberline {Q.6.4}Performance Validation (2022-2024)}{642}{subsection.4362}%
-\contentsline {subsection}{\numberline {Q.6.5}Baseline Error Correction (November 12, 2025)}{642}{subsection.4364}%
-\contentsline {subsection}{\numberline {Q.6.6}Computational Requirements}{642}{subsection.4365}%
-\contentsline {section}{\numberline {Q.7}Supporting Models}{643}{section.4366}%
-\contentsline {subsection}{\numberline {Q.7.1}CQL Reinforcement Learning Bet Sizer}{643}{subsection.4367}%
-\contentsline {subsection}{\numberline {Q.7.2}Temperature Scaler (Isotonic Regression)}{643}{subsection.4375}%
-\contentsline {section}{\numberline {Q.8}Comparative Performance Analysis}{644}{section.4379}%
-\contentsline {subsection}{\numberline {Q.8.1}Production Model Performance Matrix}{644}{subsection.4380}%
-\contentsline {subsection}{\numberline {Q.8.2}Convergence Summary}{644}{subsection.4382}%
-\contentsline {subsection}{\numberline {Q.8.3}Multi-Season Consistency}{644}{subsection.4384}%
-\contentsline {section}{\numberline {Q.9}2025 Holdout Validation}{645}{section.4386}%
-\contentsline {subsection}{\numberline {Q.9.1}Game Spread Predictions (Against the Spread)}{645}{subsection.4387}%
-\contentsline {subsection}{\numberline {Q.9.2}Player Props Predictions (Passing Yards)}{646}{subsection.4389}%
-\contentsline {subsection}{\numberline {Q.9.3}Validation Protocol}{647}{subsection.4391}%
-\contentsline {subsection}{\numberline {Q.9.4}Implications for Ensemble Architecture}{647}{subsection.4392}%
-\contentsline {section}{\numberline {Q.10}Computational Requirements \& Training Benchmarks}{648}{section.4395}%
-\contentsline {subsection}{\numberline {Q.10.1}Training Time Summary}{648}{subsection.4396}%
-\contentsline {subsection}{\numberline {Q.10.2}Inference Time Breakdown}{648}{subsection.4398}%
-\contentsline {section}{\numberline {Q.11}Reproducibility Checklist}{649}{section.4400}%
-\contentsline {subsection}{\numberline {Q.11.1}Software Environment}{649}{subsection.4401}%
-\contentsline {subsection}{\numberline {Q.11.2}Hardware Specifications}{649}{subsection.4403}%
-\contentsline {subsection}{\numberline {Q.11.3}Random Seeds}{649}{subsection.4404}%
-\contentsline {subsection}{\numberline {Q.11.4}Data Snapshots}{649}{subsection.4406}%
-\contentsline {subsection}{\numberline {Q.11.5}Reproduction Steps}{650}{subsection.4407}%
-\contentsline {subsection}{\numberline {Q.11.6}Production Deployment Checklist}{650}{subsection.4412}%
-\contentsline {section}{\numberline {Q.12}Conclusion}{651}{section.4413}%
-\contentsline {chapter}{References}{652}{section*.4414}%
+\contentsline {subsubsection}{5. Hybrid Architectures Resolve Static-Adaptive Dilemma}{627}{section*.4244}%
+\contentsline {subsection}{\numberline {P.13.2}v7.0+ Roadmap: Speculative Enhancements}{627}{subsection.4245}%
+\contentsline {subsubsection}{Causal Feature Engineering}{627}{section*.4246}%
+\contentsline {subsubsection}{Transformer-Based Sequence Modeling}{627}{section*.4248}%
+\contentsline {subsubsection}{Real-Time Adaptive Weighting}{627}{section*.4250}%
+\contentsline {section}{\numberline {P.14}Conclusion}{628}{section.4252}%
+\contentsline {chapter}{\numberline {Q}Appendix O: Production Model Specifications}{629}{appendix.4258}%
+\contentsline {section}{\numberline {Q.1}Introduction: Technical Reference for Reproducibility}{629}{section.4259}%
+\contentsline {subsection}{\numberline {Q.1.1}Purpose and Scope}{629}{subsection.4260}%
+\contentsline {subsection}{\numberline {Q.1.2}Canonical Training Window (Established November 8, 2025)}{629}{subsection.4261}%
+\contentsline {section}{\numberline {Q.2}State-Space Random Walk v2}{630}{section.4267}%
+\contentsline {subsection}{\numberline {Q.2.1}Model Specification}{630}{subsection.4268}%
+\contentsline {subsection}{\numberline {Q.2.2}Prior Specifications}{631}{subsection.4278}%
+\contentsline {subsection}{\numberline {Q.2.3}MCMC Configuration}{631}{subsection.4283}%
+\contentsline {subsection}{\numberline {Q.2.4}Convergence Diagnostics}{631}{subsection.4285}%
+\contentsline {subsection}{\numberline {Q.2.5}Performance Metrics}{632}{subsection.4287}%
+\contentsline {subsection}{\numberline {Q.2.6}Computational Requirements}{632}{subsection.4289}%
+\contentsline {section}{\numberline {Q.3}Hierarchical Bayesian v2}{632}{section.4290}%
+\contentsline {subsection}{\numberline {Q.3.1}Model Specification}{633}{subsection.4291}%
+\contentsline {subsection}{\numberline {Q.3.2}Prior Specifications}{633}{subsection.4301}%
+\contentsline {subsection}{\numberline {Q.3.3}Convergence Improvement: 2000 → 6000 Iterations}{633}{subsection.4307}%
+\contentsline {subsection}{\numberline {Q.3.4}Final Convergence Diagnostics (6000 Iterations)}{633}{subsection.4309}%
+\contentsline {subsection}{\numberline {Q.3.5}Performance Metrics}{634}{subsection.4311}%
+\contentsline {subsection}{\numberline {Q.3.6}Computational Requirements}{634}{subsection.4313}%
+\contentsline {section}{\numberline {Q.4}XGBoost v4 Ridge Residuals (Two-Stage Orthogonalization)}{635}{section.4314}%
+\contentsline {subsection}{\numberline {Q.4.1}Architecture Overview}{635}{subsection.4315}%
+\contentsline {subsection}{\numberline {Q.4.2}Stage 1: Ridge Regression Specification}{635}{subsection.4319}%
+\contentsline {subsection}{\numberline {Q.4.3}Stage 2: XGBoost Specification}{636}{subsection.4323}%
+\contentsline {subsection}{\numberline {Q.4.4}Multi-Season Validation (2022-2024)}{636}{subsection.4325}%
+\contentsline {subsection}{\numberline {Q.4.5}Feature Importance Analysis}{637}{subsection.4331}%
+\contentsline {subsection}{\numberline {Q.4.6}Computational Requirements}{637}{subsection.4333}%
+\contentsline {section}{\numberline {Q.5}Informative Priors v2}{637}{section.4334}%
+\contentsline {subsection}{\numberline {Q.5.1}Model Specification}{637}{subsection.4335}%
+\contentsline {subsection}{\numberline {Q.5.2}Convergence Improvement: 2000 → 6000 Iterations}{638}{subsection.4344}%
+\contentsline {subsection}{\numberline {Q.5.3}Final Convergence Diagnostics (6000 Iterations)}{639}{subsection.4346}%
+\contentsline {subsection}{\numberline {Q.5.4}Performance Metrics}{639}{subsection.4348}%
+\contentsline {subsection}{\numberline {Q.5.5}Computational Requirements}{639}{subsection.4350}%
+\contentsline {section}{\numberline {Q.6}Hybrid Static-Incremental XGBoost v1}{639}{section.4351}%
+\contentsline {subsection}{\numberline {Q.6.1}Architecture: 70\% Static + 30\% Incremental}{639}{subsection.4352}%
+\contentsline {subsection}{\numberline {Q.6.2}Static Component Specification}{640}{subsection.4354}%
+\contentsline {subsection}{\numberline {Q.6.3}Incremental Component Specification}{640}{subsection.4356}%
+\contentsline {subsection}{\numberline {Q.6.4}Performance Validation (2022-2024)}{641}{subsection.4362}%
+\contentsline {subsection}{\numberline {Q.6.5}Baseline Error Correction (November 12, 2025)}{641}{subsection.4364}%
+\contentsline {subsection}{\numberline {Q.6.6}Computational Requirements}{641}{subsection.4365}%
+\contentsline {section}{\numberline {Q.7}Supporting Models}{642}{section.4366}%
+\contentsline {subsection}{\numberline {Q.7.1}CQL Reinforcement Learning Bet Sizer}{642}{subsection.4367}%
+\contentsline {subsection}{\numberline {Q.7.2}Temperature Scaler (Isotonic Regression)}{642}{subsection.4375}%
+\contentsline {section}{\numberline {Q.8}Comparative Performance Analysis}{643}{section.4379}%
+\contentsline {subsection}{\numberline {Q.8.1}Production Model Performance Matrix}{643}{subsection.4380}%
+\contentsline {subsection}{\numberline {Q.8.2}Convergence Summary}{643}{subsection.4382}%
+\contentsline {subsection}{\numberline {Q.8.3}Multi-Season Consistency}{643}{subsection.4384}%
+\contentsline {section}{\numberline {Q.9}2025 Holdout Validation}{644}{section.4386}%
+\contentsline {subsection}{\numberline {Q.9.1}Game Spread Predictions (Against the Spread)}{644}{subsection.4387}%
+\contentsline {subsection}{\numberline {Q.9.2}Player Props Predictions (Passing Yards)}{645}{subsection.4389}%
+\contentsline {subsection}{\numberline {Q.9.3}Validation Protocol}{646}{subsection.4391}%
+\contentsline {subsection}{\numberline {Q.9.4}Implications for Ensemble Architecture}{646}{subsection.4392}%
+\contentsline {section}{\numberline {Q.10}Computational Requirements \& Training Benchmarks}{647}{section.4395}%
+\contentsline {subsection}{\numberline {Q.10.1}Training Time Summary}{647}{subsection.4396}%
+\contentsline {subsection}{\numberline {Q.10.2}Inference Time Breakdown}{647}{subsection.4398}%
+\contentsline {section}{\numberline {Q.11}Reproducibility Checklist}{648}{section.4400}%
+\contentsline {subsection}{\numberline {Q.11.1}Software Environment}{648}{subsection.4401}%
+\contentsline {subsection}{\numberline {Q.11.2}Hardware Specifications}{648}{subsection.4403}%
+\contentsline {subsection}{\numberline {Q.11.3}Random Seeds}{648}{subsection.4404}%
+\contentsline {subsection}{\numberline {Q.11.4}Data Snapshots}{648}{subsection.4406}%
+\contentsline {subsection}{\numberline {Q.11.5}Reproduction Steps}{649}{subsection.4407}%
+\contentsline {subsection}{\numberline {Q.11.6}Production Deployment Checklist}{649}{subsection.4412}%
+\contentsline {section}{\numberline {Q.12}Conclusion}{650}{section.4413}%
+\contentsline {chapter}{References}{651}{section*.4414}%

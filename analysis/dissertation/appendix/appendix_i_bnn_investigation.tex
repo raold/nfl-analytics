@@ -636,6 +636,7 @@ Figure~\ref{fig:research-journey} synthesizes the investigation's narrative arc:
 
 \begin{figure}[htbp]
 \centering
+\sbox0{%
 \begin{tikzpicture}[
     node distance=1.5cm,
     act/.style={rectangle, rounded corners, draw=accentblue, fill=accentblue!10, thick, minimum width=3.5cm, minimum height=1cm, align=center},
@@ -689,7 +690,13 @@ Figure~\ref{fig:research-journey} synthesizes the investigation's narrative arc:
 
 \draw[arrow, color=green!50!black] (act4) -- node[above, font=\scriptsize] {Pivot} (outcome);
 
-\end{tikzpicture}
+\end{tikzpicture}%
+}%
+\ifdim\wd0>\textwidth
+  \resizebox{\textwidth}{!}{\usebox0}%
+\else
+  \usebox0%
+\fi
 \caption{BNN Investigation Research Journey: Four-Act Narrative Structure. The investigation progressed from initial optimism (Multi-Output v1 strong training metrics) through repeated setbacks (5 consecutive failures) to strategic realization (diminishing returns) and ultimate abandonment. This freed resources for XGBoost v4, which achieved breakthrough results in 57\% less time. The arc illustrates that research progress is non-monotonic: sometimes the path forward requires stepping back.}
 \label{fig:research-journey}
 \end{figure}

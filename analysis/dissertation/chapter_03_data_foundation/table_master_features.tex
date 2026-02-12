@@ -1,12 +1,12 @@
 % Master Feature Definition Table
 % Comprehensive reference for all feature families used across models
 % Cross-referenced from Chapters 4, 6, 8, and 12
-% Updated: December 2025 - reflects 386 production features
+% Updated: February 2026 - 382 predictor features (Game Outcome v2); catalog total 386 incl. identifiers
 
 \begin{table}[!ht]
 \centering
 \small
-\caption[Master Feature Catalog]{Master Feature Catalog: All 386 production features organized by category. Features marked \texttt{asof\_safe} use only pre-game information. See \texttt{py/features/} for implementation details.}
+\caption[Master Feature Catalog]{Master Feature Catalog: 386 catalog entries (382 used as model predictors; 4 game-identifier columns excluded from model input). Features marked \texttt{asof\_safe} use only pre-game information. See \texttt{py/features/} for implementation details.}
 \label{tab:master-features}
 \begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{@{}llccl@{}}
@@ -52,14 +52,14 @@ Game Outcomes & Final score, margin, win, cover, over/under & 7 & \ding{55} & \t
 \textbf{Semantic} & & \textbf{38} & \textbf{38 safe} & \\
 \textbf{Rest/Schedule} & & \textbf{6} & \textbf{6 safe} & \\
 \midrule
-\textbf{Grand Total} & \textbf{All production features} & \textbf{386} & \textbf{386 safe} & \textbf{Dec 2025} \\
+\textbf{Grand Total} & \textbf{All catalog entries (382 predictors)} & \textbf{386} & \textbf{386 safe} & \textbf{Dec 2025} \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
 \end{table}
 
 \paragraph{Feature Temporal Safety.}
-Features marked \texttt{asof\_safe} (\checkmark) are guaranteed to use only information available before game kickoff. All 386 production features are validated by 15 unit tests and 2 runtime validators (see \Cref{app:leakage_audit}). The 7 target variables (\ding{55}) are post-game outcomes used only as training targets or evaluation metrics, never as predictors.
+Features marked \texttt{asof\_safe} (\checkmark) are guaranteed to use only information available before game kickoff. All 382 predictor features are validated by 15 unit tests and 2 runtime validators (see \Cref{app:leakage_audit}). The 7 target variables (\ding{55}) are post-game outcomes used only as training targets or evaluation metrics, never as predictors. Four game-identifier columns (game ID, season, week, team) are included in the catalog (386 total) but excluded from model input.
 
 \paragraph{Disabled Features (Not in Production).}
 Two experimental feature groups were disabled after A/B testing revealed negative signal (ADR-015):
@@ -67,7 +67,7 @@ Two experimental feature groups were disabled after A/B testing revealed negativ
     \item \textbf{Kalman EPA Filter (18 features):} Team EPA regime detection with CUSUM---disabled due to $-10.2$ percentage point accuracy drop in holdout testing.
     \item \textbf{GP Injury Recovery (17 features):} Gaussian process recovery curves---disabled because underlying GP models never successfully trained on available data.
 \end{itemize}
-These features remain in the codebase with \texttt{weight=0.0} in \texttt{py/config/feature\_weights.yaml} for potential future iteration.
+These features remain in the codebase with \texttt{weight=0.0} in \texttt{py/config/\allowbreak feature\_weights.yaml} for potential future iteration.
 
 \paragraph{Cross-References.}
 \begin{itemize}
@@ -85,4 +85,4 @@ The feature catalog balances three principles:
     \item \textbf{Empirical validation}: Features are retained only if they demonstrate positive signal in A/B testing
 \end{enumerate}
 
-For detailed definitions of all 386 features, see the feature modules in \texttt{py/features/} and the unified extraction interface via \texttt{GameFeatureExtractor}.
+For detailed definitions of all 382 predictor features, see the feature modules in \texttt{py/features/} and the unified extraction interface via \texttt{GameFeatureExtractor}.

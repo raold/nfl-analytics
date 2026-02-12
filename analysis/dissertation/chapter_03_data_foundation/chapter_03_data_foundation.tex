@@ -2,7 +2,7 @@
 \chapter{Data Foundations and Feature Engineering}
 \label{chap:data}
 
-Building on the calibration requirements and market efficiency findings from \Cref{chap:litreview}, this chapter establishes the data foundation that enables reliable probability estimation and uncertainty quantification. We implement a defense-in-depth approach spanning five integrated layers: (i) idempotent ingestion pipelines for play-by-play, odds history, and weather data; (ii) a governed PostgreSQL schema with hypertables, compression, and indexing optimized for time-series analytics; (iii) a feature engineering catalog comprising 386 production features across base metrics (305), synthetic interactions (37), semantic/LLM-derived signals (38), and rest differentials (6), with strict temporal leakage controls; (iv) data quality gates with drift detection and coverage monitoring; and (v) temporal weighting schemes that address NFL rule changes and market evolution while preserving statistical power.
+Building on the calibration requirements and market efficiency findings from \Cref{chap:litreview}, this chapter establishes the data foundation that enables reliable probability estimation and uncertainty quantification. We implement a defense-in-depth approach spanning five integrated layers: (i) idempotent ingestion pipelines for play-by-play, odds history, and weather data; (ii) a governed PostgreSQL schema with hypertables, compression, and indexing optimized for time-series analytics; (iii) a feature engineering catalog comprising 382 predictor features across base metrics (305), synthetic interactions (37), semantic/LLM-derived signals (38), and rest differentials (6), minus four game-identifier columns, with strict temporal leakage controls; (iv) data quality gates with drift detection and coverage monitoring; and (v) temporal weighting schemes that address NFL rule changes and market evolution while preserving statistical power.
 
 The central technical contribution is a multi-layered leakage prevention architecture that enforces as-of semantics through SQL constraints, pandas validation, runtime guards, and unit tests---ensuring that no feature incorporates information unavailable at decision time. This rigor is essential to the thesis: uncertainty quantification is only credible when data integrity is provable and reproducible.
 
@@ -137,7 +137,7 @@ With the governed schema in place, we systematically engineer features that bala
 \section{Feature Engineering}
 \label{sec:feature-engineering}
 
-We construct a comprehensive feature catalog comprising 386 production features organized into four taxonomic categories. The feature breakdown is: base metrics (305 features including team offensive/defensive statistics, Next Gen tracking data, QBR metrics, opponent-adjusted ratings, and situational analytics), synthetic interactions (37 features capturing QB-OL synergy, momentum indicators, and research-driven signals), semantic/LLM-derived signals (38 features from news sentiment, injury severity assessment, and media analysis), and rest differentials (6 features). Each feature has documented lineage, update cadence, and leakage controls. The catalog enables modular experimentation while enforcing strict as-of semantics across all features.
+We construct a comprehensive feature catalog comprising 382 predictor features organized into four taxonomic categories. The catalog breakdown is: base metrics (305 features including team offensive/defensive statistics, Next Gen tracking data, QBR metrics, opponent-adjusted ratings, and situational analytics), synthetic interactions (37 features capturing QB-OL synergy, momentum indicators, and research-driven signals), semantic/LLM-derived signals (38 features from news sentiment, injury severity assessment, and media analysis), and rest differentials (6 features); four game-identifier columns bring the catalog total to 386 but are excluded from model input. Each feature has documented lineage, update cadence, and leakage controls. The catalog enables modular experimentation while enforcing strict as-of semantics across all features.
 
 \subsection{Feature Catalog and Taxonomy}
 \label{subsec:feature-catalog}
@@ -162,7 +162,7 @@ features:
     description: "Opponent-adjusted offensive EPA/play..."
 \end{lstlisting}
 
-The comprehensive master feature catalog consolidating all 386 features across baseline, ensemble, and RL models is presented in \Cref{tab:master-features}. Each feature family is documented with temporal safety indicators, source files, and cross-references to chapters that utilize them.
+The comprehensive master feature catalog consolidating all 382 predictor features across baseline, ensemble, and RL models is presented in \Cref{tab:master-features}. Each feature family is documented with temporal safety indicators, source files, and cross-references to chapters that utilize them.
 
 \input{../chapter_03_data_foundation/table_master_features.tex}
 
@@ -253,7 +253,7 @@ Conservative estimate based on literature review and ablation studies:
 \toprule
 \textbf{Scenario} & \textbf{Features Added} & \textbf{ROI Delta} & \textbf{Cumulative ROI} \\
 \midrule
-Baseline (cleaned, Dec 2025) & 386 & -- & $-7.5\%$ \\
+Baseline (cleaned, Dec 2025) & 382 & -- & $-7.5\%$ \\
 + NGS (Phase 1) & +18 & +2.5\%? & $-5.0\%$? \\
 + Market (Phase 2) & +14 & +3.0\%? & $-2.0\%$? \\
 + Injury (Phase 3) & +12 & +1.5\%? & $-0.5\%$? \\
@@ -373,7 +373,7 @@ WITH odds_ranked AS (
 This deduplication ensures we use the most recent pre-cutoff odds snapshot without leaking future updates.
 
 \paragraph{5. Unit tests for leakage detection.}
-The test suite (\texttt{tests/unit/test\_asof\_features.py}) includes 15 tests for temporal integrity:
+The test suite (\texttt{tests/unit/\allowbreak test\_asof\_features.py}) includes 15 tests for temporal integrity:
 \begin{itemize}
   \item \texttt{test\_no\_future\_leakage}: Verifies as-of snapshots exclude future games.
   \item \texttt{test\_cumulative\_feature\_growth}: Parametrized test checking that prior game counts match chronological ordering.
@@ -403,7 +403,7 @@ Manual code review of 6 core feature modules (\texttt{asof\_snapshot.py}, \textt
   \item All rolling windows specify \texttt{min\_periods=1} to gracefully handle early-season data.
 \end{itemize}
 
-This multi-layered approach provides defense-in-depth: SQL constraints prevent leakage at ingestion, pandas operations enforce it during aggregation, validation functions catch it at runtime, and unit tests guard against regressions. The result is a feature pipeline with provable temporal integrity. A comprehensive audit of all 386 features, automated validation tools, and the complete feature catalog are documented in \Cref{app:leakage_audit}.
+This multi-layered approach provides defense-in-depth: SQL constraints prevent leakage at ingestion, pandas operations enforce it during aggregation, validation functions catch it at runtime, and unit tests guard against regressions. The result is a feature pipeline with provable temporal integrity. A comprehensive audit of all 382 predictor features, automated validation tools, and the complete feature catalog are documented in \Cref{app:leakage_audit}.
 
 \subsubsection{Temporal Leakage Detection and Mitigation}
 
@@ -413,13 +413,15 @@ Comprehensive code audit (November 2025) identified three critical temporal leak
 \centering
 \caption{Temporal Leakage Inventory and Remediation}
 \label{tab:temporal_leakage}
-\begin{tabular}{@{}lp{5cm}p{4cm}@{}}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lp{4.5cm}p{3.5cm}@{}}
 \toprule
 \textbf{Location} & \textbf{Leakage Type} & \textbf{Mitigation} \\
 \midrule
-\texttt{py/data/feature\_engineering.py:L142} & Missing \texttt{asof} join (weather data) & Add \texttt{<=} constraint \\
-\texttt{R/generate\_predictions.R:L89} & Future injury status in lag window & Filter \texttt{kickoff < prediction\_date} \\
-\texttt{db/queries/player\_stats.sql:L34} & Season aggregates include current game & Exclude \texttt{game\_id} from window \\
+\texttt{py/data/feature\_engineering.py:\allowbreak L142} & Missing \texttt{asof} join (weather data) & Add \texttt{<=} constraint \\
+\texttt{R/generate\_predictions.R:\allowbreak L89} & Future injury status in lag window & Filter \texttt{kickoff < prediction\_date} \\
+\texttt{db/queries/player\_stats.sql:\allowbreak L34} & Season aggregates include current game & Exclude \texttt{game\_id} from window \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -472,7 +474,7 @@ All three identified leakage risks (Table~\ref{tab:temporal_leakage}) have been 
     \item \textbf{Season aggregates (SQL:L34):} Added \texttt{WHERE games.game\_id != \%(current\_game\_id)s} to prevent self-contamination. Validated with Test 3.
 \end{enumerate}
 
-Post-remediation validation: 10/10 automated tests pass on full feature suite (386 features). Zero temporal leakage violations detected in production deployment pipeline (December 2025).
+Post-remediation validation: 10/10 automated tests pass on full feature suite (382 predictor features). Zero temporal leakage violations detected in production deployment pipeline (December 2025).
 
 Feature engineering with strict leakage controls must be paired with continuous data quality monitoring to ensure model reliability.
 
@@ -671,9 +673,9 @@ The integration of temporal weighting with dataset cohorts ensures robust evalua
 \input{../chapter_03_data_foundation/subsection_phase5_exhaustive_features.tex}
 
 \chaptersummary{
-This chapter established a reproducible data foundation with five integrated layers: (i) idempotent ingestion pipelines for play-by-play, odds history, and weather data with 92.7\% coverage; (ii) a governed PostgreSQL architecture with staging/core/mart layers, hypertables, and optimized indexing across 64 tables and 1.25M plays; (iii) a feature catalog comprising 386 production features across base metrics (305 features including Next Gen Stats tracking, ESPN QBR, opponent-adjusted ratings), synthetic interactions (37 features for QB-OL synergy and momentum), semantic/LLM-derived signals (38 features from news sentiment and injury analysis), and rest differentials (6 features); (iv) a multi-layered leakage prevention architecture combining SQL constraints, pandas validation, runtime guards, and 15 unit tests achieving 100\% validation success rate; (v) data quality gates with drift detection and coverage monitoring; and (vi) temporal weighting schemes with exponential decay (half-life $H \in \{3,4,5\}$) addressing NFL rule changes and market evolution.
+This chapter established a reproducible data foundation with five integrated layers: (i) idempotent ingestion pipelines for play-by-play, odds history, and weather data with 92.7\% coverage; (ii) a governed PostgreSQL architecture with staging/core/mart layers, hypertables, and optimized indexing across 64 tables and 1.25M plays; (iii) a feature catalog comprising 382 predictor features across base metrics (305 features including Next Gen Stats tracking, ESPN QBR, opponent-adjusted ratings), synthetic interactions (37 features for QB-OL synergy and momentum), semantic/LLM-derived signals (38 features from news sentiment and injury analysis), and rest differentials (6 features), with four game-identifier columns excluded from model input; (iv) a multi-layered leakage prevention architecture combining SQL constraints, pandas validation, runtime guards, and 15 unit tests achieving 100\% validation success rate; (v) data quality gates with drift detection and coverage monitoring; and (vi) temporal weighting schemes with exponential decay (half-life $H \in \{3,4,5\}$) addressing NFL rule changes and market evolution.
 
-The weather hypothesis testing (wind impact on scoring) demonstrated scientific rigor by rejecting conventional wisdom unsupported by empirical evidence ($r=0.0038$, $p=0.90$), guarding against overfitting spurious effects. The feature engineering targets three classes of market inefficiency: situational context (clutch vs.\ garbage time), opponent adjustment (skill vs.\ schedule strength), and tracking data precision (player skill isolated from scheme effects). The central contribution---defense-in-depth leakage prevention across all 386 features---is essential to the thesis: uncertainty quantification is only credible when data integrity is provable and reproducible.
+The weather hypothesis testing (wind impact on scoring) demonstrated scientific rigor by rejecting conventional wisdom unsupported by empirical evidence ($r=0.0038$, $p=0.90$), guarding against overfitting spurious effects. The feature engineering targets three classes of market inefficiency: situational context (clutch vs.\ garbage time), opponent adjustment (skill vs.\ schedule strength), and tracking data precision (player skill isolated from scheme effects). The central contribution---defense-in-depth leakage prevention across all 382 predictor features---is essential to the thesis: uncertainty quantification is only credible when data integrity is provable and reproducible.
 }{
-With a governed data foundation of 386 validated features ensuring temporal integrity, the next chapter (\Cref{chap:methods}) develops calibrated baseline models (GLM, state-space, Bayesian hierarchical, Dixon-Coles) that leverage this expanded feature set to produce reliable probability estimates for spreads, totals, and moneylines.
+With a governed data foundation of 382 validated predictor features ensuring temporal integrity, the next chapter (\Cref{chap:methods}) develops calibrated baseline models (GLM, state-space, Bayesian hierarchical, Dixon-Coles) that leverage this expanded feature set to produce reliable probability estimates for spreads, totals, and moneylines.
 }

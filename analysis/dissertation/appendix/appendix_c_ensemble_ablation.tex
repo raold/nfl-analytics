@@ -670,13 +670,15 @@ Deployment threshold: $\ge$2 yards MAE improvement ($\ge$5.9\% reduction) with s
   \centering
   \caption{Ensemble v7.0 Validation: Multi-Season Performance Comparison}
   \label{tab:ensemble-v7-validation-results}
-  \begin{tabular}{lrrrr}
+  \small
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{@{}lrrrr@{}}
     \toprule
     \textbf{Configuration} & \textbf{MAE (yards)} & \textbf{vs v6.0} & \textbf{Improvement} & \textbf{DM $p$-value} \\
     \midrule
     \multicolumn{5}{l}{\textit{2022--2024 Average ($n=1{,}632$ QB-games)}} \\
     \rowcolor{lightgray}
-    \textbf{v6\_baseline (PRODUCTION)} & \textbf{34.00} & \textbf{---} & \textbf{---} & \textbf{---} \\
+    \textbf{v6\_baseline (PROD.)} & \textbf{34.00} & \textbf{---} & \textbf{---} & \textbf{---} \\
     v7\_wls\_only & 34.01 & +0.01 & +0.03\% & NaN \\
     v7\_meta\_only & 34.02 & +0.02 & +0.06\% & NaN \\
     v7\_full & 34.01 & +0.01 & +0.03\% & NaN \\
@@ -685,7 +687,7 @@ Deployment threshold: $\ge$2 yards MAE improvement ($\ge$5.9\% reduction) with s
     \textbf{Target} & \textbf{$\le$32.00} & \textbf{$\ge-2.00$} & \textbf{$\ge$5.9\%} & \textbf{$<$0.05} \\
     \midrule
     \multicolumn{5}{l}{\textit{Decision}} \\
-    \multicolumn{5}{l}{❌ \textbf{REJECT v7.0}: Zero measurable improvement, deployment criteria not met} \\
+    \multicolumn{5}{l}{❌ \textbf{REJECT v7.0}: Zero measurable improvement, criteria not met} \\
     \bottomrule
   \end{tabular}
   \vspace{0.5em}
@@ -826,7 +828,7 @@ All failures share a pattern: \textit{theoretical plausibility without empirical
 \subsection{Implementation and Archival}
 
 \paragraph{Code Preservation.}
-All v7.0 code archived (not deleted) in git branch \texttt{archive/ensemble-v7.0-meta-learning-investigation} with tag \texttt{v7.0-validation-failure}. Preserves 8.5 hours of development work for future reference if component dynamics change.
+All v7.0 code archived (not deleted) in git branch \texttt{archive/\allowbreak ensemble-v7.0-\allowbreak meta-learning-\allowbreak investigation} with tag \texttt{v7.0-\allowbreak validation-failure}. Preserves 8.5 hours of development work for future reference if component dynamics change.
 
 \paragraph{Documentation.}
 Three documents created:

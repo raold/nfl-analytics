@@ -1,12 +1,12 @@
 % !TEX root = ../main/main.tex
 % Section 3.5: Phase 2 Advanced Stats Integration
 % Created: November 27, 2025
-% Updated: December 2025 - reflects current 386 feature production state
+% Updated: February 2026 - reflects 382 predictor features (Game Outcome v2)
 
 \section{Advanced Analytics Integration}
 \label{sec:phase2-advanced-stats}
 
-The feature engineering system evolved through multiple phases to reach the current production state of 386 features. This section documents the advanced analytics integration that forms the core of the base metrics (305 features), complemented by synthetic interactions (37), semantic/LLM features (38), and rest differentials (6) documented in \Cref{tab:master-features}. Systematic literature review~\cite{lopez2020big, yurko2020going, deshpande2016estimating} and industry practice analysis revealed substantial signal residing in modern tracking data, advanced efficiency metrics, and opponent-adjusted performance measures that now constitute the production feature set.
+The feature engineering system evolved through multiple phases to reach the current production state of 382 predictor features. This section documents the advanced analytics integration that forms the core of the base metrics (305 features), complemented by synthetic interactions (37), semantic/LLM features (38), and rest differentials (6) documented in \Cref{tab:master-features}; four game-identifier columns are excluded from model input, yielding 382 predictors from 386 catalog entries. Systematic literature review~\cite{lopez2020big, yurko2020going, deshpande2016estimating} and industry practice analysis revealed substantial signal residing in modern tracking data, advanced efficiency metrics, and opponent-adjusted performance measures that now constitute the production feature set.
 
 The central contribution is a modular feature architecture that integrates five advanced analytics domains while maintaining strict temporal safety, database integration, and unified API access. All features leverage existing database infrastructure (no external API dependencies), enforce as-of semantics through multi-layered leakage prevention (\Cref{subsec:leakage-arch}), and expose a single-call extraction interface via \texttt{GameFeatureExtractor} with sub-500ms latency.
 
@@ -310,7 +310,7 @@ Conservative impact projections based on NFL analytics literature~\cite{lopez202
 \label{subsec:phase2-risks}
 
 \paragraph{Risk 1: Overfitting from Feature Expansion}
-Managing 386 features with limited sample size (815 games per season) elevates overfitting risk. Mitigation: (i) SHAP-based feature selection identifying top contributors, (ii) L1/L2 regularization in XGBoost ($\alpha = 1.0$, $\lambda = 2.0$), (iii) season-based temporal splits (train on seasons $< N$, validate on season $N$), (iv) strict 2025 holdout validation, (v) config-based feature group disabling (\texttt{py/config/\allowbreak feature\_weights.yaml}).
+Managing 382 predictor features with limited sample size (815 games per season) elevates overfitting risk. Mitigation: (i) SHAP-based feature selection identifying top contributors, (ii) L1/L2 regularization in XGBoost ($\alpha = 1.0$, $\lambda = 2.0$), (iii) season-based temporal splits (train on seasons $< N$, validate on season $N$), (iv) strict 2025 holdout validation, (v) config-based feature group disabling (\texttt{py/config/\allowbreak feature\_weights.yaml}).
 
 \paragraph{Risk 2: Multicollinearity Among Advanced Features}
 Many advanced metrics correlate (EPA vs.\ success rate: $\rho = 0.85$; explosive play rate vs.\ EPA: $\rho = 0.72$). Mitigation: Variance Inflation Factor (VIF) analysis pre-training, pruning features with VIF $> 10$. Alternative: XGBoost's tree-based splits naturally handle multicollinearity better than linear models.
@@ -319,13 +319,13 @@ Many advanced metrics correlate (EPA vs.\ success rate: $\rho = 0.85$; explosive
 Next Gen tables may contain missing data for certain games/players. Mitigation: (i) null handling via team/position averages, (ii) coverage validation (target: $\ge$90\% games 2022--2025), (iii) graceful degradation to base features if Next Gen unavailable. Validation results: 94\% coverage for analysis period.
 
 \paragraph{Risk 4: Computational Latency}
-Extracting 386 features could exceed latency requirements. Mitigation: (i) strategic database indexing (\Cref{subsec:leakage-arch}), (ii) Redis caching (5-minute TTL), (iii) parallel extraction of independent modules. Current performance: $<500$ms for full feature set via \texttt{GameFeatureExtractor}.
+Extracting 382 features could exceed latency requirements. Mitigation: (i) strategic database indexing (\Cref{subsec:leakage-arch}), (ii) Redis caching (5-minute TTL), (iii) parallel extraction of independent modules. Current performance: $<500$ms for full feature set via \texttt{GameFeatureExtractor}.
 
 \subsection{Implementation Status}
 \label{subsec:phase2-status}
 
 \paragraph{Production Deployment (December 2025)}
-The 386-feature production system is fully operational:
+The 382-feature production system is fully operational:
 \begin{itemize}
   \item \texttt{py/features/\allowbreak game\_feature\_extractor.py}: Unified extraction interface ($<500$ms)
   \item \texttt{py/features/nextgen\_features.py}: Next Gen Stats tracking integration
@@ -383,7 +383,7 @@ All Phase 2 features use existing database infrastructure with no external API d
 \subsection{Summary and Contributions}
 \label{subsec:phase2-summary}
 
-The advanced analytics integration establishes a production feature pipeline with 386 validated features across base metrics (305), synthetic interactions (37), semantic/LLM signals (38), and rest differentials (6). The central contributions are:
+The advanced analytics integration establishes a production feature pipeline with 382 predictor features across base metrics (305), synthetic interactions (37), semantic/LLM signals (38), and rest differentials (6), minus four game-identifier columns excluded from model input. The central contributions are:
 
 \begin{enumerate}
   \item \textbf{Modular Architecture}: Standardized feature module interfaces enabling selective integration, A/B testing, and config-based feature group disabling (\texttt{py/config/\allowbreak feature\_weights.yaml}).
@@ -394,11 +394,11 @@ The advanced analytics integration establishes a production feature pipeline wit
 
   \item \textbf{Opponent Adjustment}: DVOA-approximation features differentiating team skill from schedule strength, with opponent-adjusted EPA correlating more strongly with Vegas win totals ($\rho = 0.82$) than raw EPA ($\rho = 0.71$).
 
-  \item \textbf{Temporal Safety}: Multi-layer leakage prevention (SQL constraints, pandas shifts, runtime validation, automated tests) achieving 100\% validation success rate across all 386 features.
+  \item \textbf{Temporal Safety}: Multi-layer leakage prevention (SQL constraints, pandas shifts, runtime validation, automated tests) achieving 100\% validation success rate across all 382 predictor features.
 
   \item \textbf{Unified API}: Single-call extraction interface (\texttt{GameFeatureExtractor}) with $<500$ms latency, graceful degradation, and seamless ensemble integration.
 
   \item \textbf{Empirical Validation}: Config-based feature disabling after A/B testing (Kalman EPA and GP Injury features disabled per ADR-015 after negative holdout signal).
 \end{enumerate}
 
-The 386-feature production system provides the expanded signal foundation for advanced Bayesian models detailed in \Cref{chap:advanced_bayesian} and ensemble integration documented in \Cref{chap:results}.
+The 382-feature production system provides the expanded signal foundation for advanced Bayesian models detailed in \Cref{chap:advanced_bayesian} and ensemble integration documented in \Cref{chap:results}.

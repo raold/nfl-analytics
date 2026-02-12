@@ -638,7 +638,8 @@ r_{\text{clip}} = \text{sign}(r) \cdot \min(|r|, 170)
 
 \begin{table}[htbp]
 \centering
-\small
+\footnotesize
+\setlength{\tabcolsep}{4pt}
 \caption{Impact of Residual Clipping (2023 Season, 148 games)}
 \label{tab:clipping-ablation}
 \begin{tabular}{@{}lS[table-format=2.1]S[table-format=1.1]S[table-format=1.1]l@{}}
@@ -651,7 +652,7 @@ $\pm$170 yards ($\pm 2\sigma$) & {4.7} & {4.76} & {1.2} & \textbf{Optimal} $\che
 $\pm$85 yards ($\pm 1\sigma$) & 18.3 & 5.34 & 0.8 & Over-clipped (underfit) \\
 \bottomrule
 \end{tabular}
-\begin{tablenotes}
+\begin{tablenotes}\footnotesize
 \item \textbf{Notes:} Clipping threshold in yards. Train-test gap measures overfitting (train MAE $-$ test MAE). $\pm 2\sigma$ clipping (170 yards) reduces overfitting (gap 2.8 $\to$ 1.2) while preserving signal (MAE 5.21 $\to$ 4.76). Tighter clipping ($\pm 1\sigma$) degrades performance (MAE $\to$ 5.34) by removing too much signal.
 \end{tablenotes}
 \end{table}

@@ -367,13 +367,15 @@ Two-stage model addressing spurious correlation between player skill and opponen
 \centering
 \caption{XGBoost v4 Multi-Season Performance}
 \label{tab:xgboost-v4-multisea son}
-\begin{tabular}{lrrrrl}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrl@{}}
 \toprule
-\textbf{Season} & \textbf{MAE} & \textbf{RMSE} & \textbf{Improvement} & \textbf{p-value} & \textbf{Significance} \\
+\textbf{Season} & \textbf{MAE} & \textbf{RMSE} & \textbf{Improvement} & \textbf{p-value} & \textbf{Signif.} \\
 \midrule
-2022 & 5.06 & 6.74 & +87.40\% & <0.000001 & $\checkmark$ \\
-2023 & 4.76 & 6.21 & +88.15\% & <0.000001 & $\checkmark$ \\
-2024 & 4.27 & 5.93 & +89.38\% & <0.000001 & $\checkmark$ \\
+2022 & 5.06 & 6.74 & +87.40\% & $<$0.000001 & $\checkmark$ \\
+2023 & 4.76 & 6.21 & +88.15\% & $<$0.000001 & $\checkmark$ \\
+2024 & 4.27 & 5.93 & +89.38\% & $<$0.000001 & $\checkmark$ \\
 \midrule
 \textbf{Mean $\pm$ SD} & \textbf{4.70 $\pm$ 0.40} & \textbf{6.29 $\pm$ 0.42} & \textbf{88.31\%} & -- & -- \\
 \bottomrule
@@ -747,13 +749,15 @@ Hybrid XGBoost v1 & 38.03 & 50.12 & N/A & 11 & 25\% \\
 \centering
 \caption{Bayesian Model Convergence Summary}
 \label{tab:convergence-summary}
-\begin{tabular}{lrrrrr}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrr@{}}
 \toprule
-\textbf{Model} & \textbf{$\hat{R}$} & \textbf{ESS (min)} & \textbf{Divergences} & \textbf{Iterations} & \textbf{Status} \\
+\textbf{Model} & \textbf{$\hat{R}$} & \textbf{ESS (min)} & \textbf{Diverg.} & \textbf{Iterations} & \textbf{Status} \\
 \midrule
 State-Space v2 & 1.0013 & 2,218 & 0 & 2,000 & EXCELLENT \\
 Hierarchical v2 & 1.0092 & 8,394 & 42 & 6,000 & EXCELLENT \\
-Informative Priors v2 & 1.0177 & 8,490 & 177 & 6,000 & EXCELLENT \\
+Inform.\ Priors v2 & 1.0177 & 8,490 & 177 & 6,000 & EXCELLENT \\
 \bottomrule
 \end{tabular}
 \end{table}

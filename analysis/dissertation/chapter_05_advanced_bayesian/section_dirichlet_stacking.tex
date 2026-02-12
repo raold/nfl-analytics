@@ -104,6 +104,8 @@ To identify optimal Dirichlet hyperparameters, we conducted exhaustive grid sear
 \caption[Dirichlet hyperparameter search space]{Hyperparameter grid search design. 108 total configurations tested via prequential evaluation on 2,543 player passing games (2022--2024).}
 \label{tab:grid-search-space}
 \begin{threeparttable}
+\small
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}lll@{}}
 \toprule
 \textbf{Hyperparameter} & \textbf{Values Tested} & \textbf{Rationale} \\
@@ -149,6 +151,8 @@ Grid search identified the following best configuration (ranked by 2024 validati
 \centering
 \caption[Optimal Dirichlet hyperparameters]{Best Dirichlet configuration discovered via grid search. Achieved 31.5\% MAE improvement over v6.0 static weights for player passing predictions.}
 \label{tab:optimal-dirichlet-config}
+\small
+\setlength{\tabcolsep}{4pt}
 \begin{tabular}{@{}llr@{}}
 \toprule
 \textbf{Hyperparameter} & \textbf{Optimal Value} & \textbf{Interpretation} \\
@@ -305,7 +309,9 @@ yards_pred = ensemble.predict_player(player_id="00-0019596", week=12)
 \centering
 \caption[Dual-weight decision matrix]{Decision matrix for selecting v6.0 vs v8.0 weights based on prediction task.}
 \label{tab:dual-weight-decision}
-\begin{tabular}{@{}lll@{}}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\textwidth}{@{}llX@{}}
 \toprule
 \textbf{Prediction Task} & \textbf{Weights} & \textbf{Rationale} \\
 \midrule
@@ -318,7 +324,7 @@ Player Rushing Yards & v8.0 & Position-specific distributions (RB vs QB) \\
 Player Touchdowns & v8.0 & Low-count outcomes need strong priors \\
 Player Receptions & v8.0 & Player-specific role (target share) \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 \paragraph{Validation on 2024 Holdout.}

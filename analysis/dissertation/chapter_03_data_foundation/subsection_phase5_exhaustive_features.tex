@@ -2,7 +2,7 @@
 \subsection{Schema Evolution and Database Infrastructure}
 \label{subsec:phase5-features}
 
-This section documents the database schema evolution that supports the 386-feature production system, including migration strategy, validation procedures, and situational feature modules.
+This section documents the database schema evolution that supports the 382-feature production system, including migration strategy, validation procedures, and situational feature modules.
 
 \subsubsection{Schema Evolution Overview}
 
@@ -20,7 +20,7 @@ The database infrastructure evolved through multiple phases to reach the current
     \midrule
     Baseline (2020) & 112 & 12 & 0.85 & Core EPA, rolling windows, market signals \\
     Advanced Stats (2024) & 232 & 28 & 1.8 & Next Gen, QBR, opponent-adjusted \\
-    Semantic + Synthetic (2025) & 386 & 64 & 2.5 & LLM features, interactions, rest differentials \\
+    Semantic + Synthetic (2025) & 382$^*$ & 64 & 2.5 & LLM features, interactions, rest differentials \\
     \bottomrule
   \end{tabular}
   \end{adjustbox}
@@ -136,7 +136,7 @@ where $w$ is the week number (0-indexed, so week 1 uses $w=0$) and $H=4.0$ is th
   \item \textbf{Buffalo Bills (2024):} New DC Bobby Babich (\texttt{dc\_continuity=0}, \texttt{dc\_tenure\_seasons=1}, Week 1: \texttt{new\_dc\_adjustment=0.8}, Week 5: \texttt{new\_dc\_adjustment=0.294}). Elevated defensive uncertainty in early weeks.
 \end{itemize}
 
-\noindent\textbf{Implementation:} Computed via \texttt{py/features/oc\_features.py} and \texttt{py/features/dc\_features.py}, querying the \texttt{coaching\_staff} table with temporal joins. Integrated into XGBoost v5 training pipeline (\texttt{scripts/train\_xgboost\_player\_agg\_v5.py:merge\_coaching\_features()}) generating 16 total features (8 home + 8 away).
+\noindent\textbf{Implementation:} Computed via \texttt{py/features/\allowbreak oc\_features.py} and \texttt{py/features/\allowbreak dc\_features.py}, querying the \texttt{coaching\_staff} table with temporal joins. Integrated into XGBoost v5 training pipeline (\texttt{scripts/\allowbreak train\_xgboost\_player\_agg\_v5.py:\allowbreak merge\_coaching\_features()}) generating 16 total features (8 home + 8 away).
 
 \subsubsection{Coverage Rates and Data Quality}
 
@@ -232,7 +232,7 @@ Despite the 3.4× schema expansion, query performance remained acceptable throug
 
 \subsubsection{Impact on Model Performance}
 
-The feature expansion to 386 production features yielded measurable improvements on the 2025 holdout (Weeks 1--16, 195 games):
+The feature expansion to 382 predictor features yielded measurable improvements on the 2025 holdout (Weeks 1--16, 195 games):
 
 \begin{itemize}
   \item \textbf{Spread accuracy}: 74.9\% (vs.\ 52.4\% breakeven threshold)
