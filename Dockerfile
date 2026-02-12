@@ -27,7 +27,6 @@ def check_and_install_packages():
     # Check each package before installing
     packages_to_check = [
         ('redis', 'redis>=4.5.0'),
-        ('aioredis', 'aioredis>=2.0.0'),
         ('psutil', 'psutil>=5.9.0'),
         ('numpy', 'numpy'),
         ('pandas', 'pandas'),

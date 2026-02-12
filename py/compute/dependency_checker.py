@@ -227,7 +227,7 @@ class DependencyChecker:
             ("scikit-learn", "sklearn"),
             ("scipy", "scipy"),
             ("torch", "torch"),
-            ("aioredis", "aioredis"),
+
         ]
 
         for package_name, import_name in optional_packages:

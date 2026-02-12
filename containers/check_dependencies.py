@@ -14,7 +14,6 @@ import sys
 PACKAGE_MAPPINGS = {
     # Core dependencies
     "redis": "redis>=4.5.0",
-    "aioredis": "aioredis>=2.0.0",
     "psutil": "psutil>=5.9.0",
     # Data science packages
     "numpy": "numpy",
