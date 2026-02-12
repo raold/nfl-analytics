@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  nfl-analytics:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: worker
+    container_name: nfl-analytics-worker
+    volumes:
+      # Mount Google Drive synced data directory
+      - ../data:/data
+      # Mount configuration
+      - ./config:/app/config
+      # Mount source code for development
+      - ../py:/app/py
+      - ../run_compute.py:/app/run_compute.py
+    environment:
+      - REDIS_HOST=localhost
+      - REDIS_PORT=6379
+      - MACHINE_ID=${MACHINE_ID:-auto}
+      - HARDWARE_PROFILE=${HARDWARE_PROFILE:-auto}
+      - PYTHONPATH=/app:/app/py:/app/py/compute
+      - NFL_ANALYTICS_ENV=${NFL_ANALYTICS_ENV:-development}
+    restart: unless-stopped
+    network_mode: host
+    # Enable GPU access if available
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    # Ensure data directory exists
+    depends_on:
+      - data-init
+
+  dashboard:
+    build:
+      context: ../dashboard
+      dockerfile: Dockerfile
+    container_name: nfl-analytics-dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      - DB_HOST=host.docker.internal
+      - DB_PORT=5544
+      - DB_NAME=devdb01
+      - DB_USER=dro
+      - DB_PASSWORD=sicillionbillions
+    restart: unless-stopped
+    networks:
+      - default
+    extra_hosts:
+      # Allow container to access host database
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8501/_stcore/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  data-init:
+    image: alpine:latest
+    container_name: nfl-analytics-data-init
+    volumes:
+      - ../data:/data
+    command: >
+      sh -c "
+        mkdir -p /data/redis /data/results /data/checkpoints /data/logs /data/config &&
+        chown -R 1000:1000 /data &&
+        echo 'Data directories initialized'
+      "
+
+networks:
+  default:
+    name: nfl-analytics
