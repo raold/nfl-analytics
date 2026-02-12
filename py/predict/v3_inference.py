@@ -12,6 +12,7 @@ Usage:
 import argparse
 import json
 import logging
+import os
 from datetime import datetime
 from pathlib import Path
 
@@ -51,7 +52,11 @@ class V3Predictor:
     def connect_db(self) -> psycopg2.extensions.connection:
         """Create database connection."""
         return psycopg2.connect(
-            dbname="devdb01", user="dro", password="sicillionbillions", host="localhost", port=5544
+            dbname=os.environ.get("POSTGRES_DB", "devdb01"),
+            user=os.environ.get("POSTGRES_USER", "dro"),
+            password=os.environ.get("POSTGRES_PASSWORD", "sicillionbillions"),
+            host=os.environ.get("POSTGRES_HOST", "localhost"),
+            port=int(os.environ.get("POSTGRES_PORT", "5544")),
         )
 
     def fetch_game_features(
