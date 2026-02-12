@@ -244,12 +244,10 @@ def test_max_drawdown_gate_pass(good_backtest_results):
     max_drawdown = drawdown.min()
 
     # As percentage (assuming $100 bet size)
-    (max_drawdown / len(df)) * 100
+    max_drawdown_pct = (max_drawdown / len(df)) * 100
 
-    # Gate: Max DD < -8%
-
-    # Good strategy may not always pass this gate in short backtests
-    # (depends on variance)
+    # Gate: Max DD should not be catastrophically severe
+    assert max_drawdown_pct > -20, f"Max DD {max_drawdown_pct:.1f}% too severe"
 
 
 def test_max_drawdown_severe():
