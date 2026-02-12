@@ -12,6 +12,7 @@ Usage:
 
 import logging
 import os
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any
@@ -86,9 +87,14 @@ class SemanticRepository:
         }
         logger.info("SemanticRepository initialized")
 
+    @contextmanager
     def _get_connection(self):
-        """Get database connection."""
-        return psycopg2.connect(**self.conn_params)
+        """Get database connection (auto-closed on exit)."""
+        conn = psycopg2.connect(**self.conn_params)
+        try:
+            yield conn
+        finally:
+            conn.close()
 
     # =========================================================================
     # NEWS OPERATIONS

@@ -582,6 +582,7 @@ async def predict_game_full(request: GamePredictionRequest) -> GamePredictionRes
     """
     processing_start = time.time()
 
+    conn = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -609,8 +610,6 @@ async def predict_game_full(request: GamePredictionRequest) -> GamePredictionRes
         game_data = cursor.fetchone()
 
         if not game_data:
-            cursor.close()
-            conn.close()
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail=f"Game not found: {request.game_id} (season={request.season}, week={request.week})",
@@ -646,7 +645,6 @@ async def predict_game_full(request: GamePredictionRequest) -> GamePredictionRes
         store_game_prediction(conn, prediction_data, ensemble_version="v6.1")
 
         cursor.close()
-        conn.close()
 
         processing_ms = (time.time() - processing_start) * 1000
 
@@ -697,6 +695,9 @@ async def predict_game_full(request: GamePredictionRequest) -> GamePredictionRes
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to generate game prediction: {str(e)}",
         )
+    finally:
+        if conn:
+            conn.close()
 
 
 @router.post(

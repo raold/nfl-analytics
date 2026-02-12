@@ -39,41 +39,43 @@ def load_passing_data_from_db():
         host="localhost", port=5544, user="dro", password="sicillionbillions", database="devdb01"
     )
 
-    query = """
-    SELECT
-        pgs.player_id,
-        pgs.season,
-        pgs.week,
-        pgs.stat_yards as yards,
-        pgs.stat_touchdowns as touchdowns,
-        pgs.stat_attempts as attempts,
-        pgs.current_team as team,
-        g.home_score,
-        g.away_score,
-        g.spread_close as spread_line,
-        g.total_close as total_line,
-        g.temp,
-        g.wind,
-        CASE WHEN pgs.current_team = g.home_team THEN 1 ELSE 0 END as is_home
-    FROM mart.player_game_stats pgs
-    JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
-    LEFT JOIN games g ON
-      g.season = pgs.season
-      AND g.week = pgs.week
-      AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
-    WHERE pgs.stat_category = 'passing'
-      AND pgs.stat_yards IS NOT NULL
-      AND pgs.stat_yards > 0
-      AND pgs.stat_attempts >= 10
-      AND pgs.season >= 2015
-      AND pgs.season <= 2024
-      AND ph.position_group = 'QB'
-    ORDER BY pgs.season, pgs.week, pgs.player_id
-    """
+    try:
+        query = """
+        SELECT
+            pgs.player_id,
+            pgs.season,
+            pgs.week,
+            pgs.stat_yards as yards,
+            pgs.stat_touchdowns as touchdowns,
+            pgs.stat_attempts as attempts,
+            pgs.current_team as team,
+            g.home_score,
+            g.away_score,
+            g.spread_close as spread_line,
+            g.total_close as total_line,
+            g.temp,
+            g.wind,
+            CASE WHEN pgs.current_team = g.home_team THEN 1 ELSE 0 END as is_home
+        FROM mart.player_game_stats pgs
+        JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
+        LEFT JOIN games g ON
+          g.season = pgs.season
+          AND g.week = pgs.week
+          AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
+        WHERE pgs.stat_category = 'passing'
+          AND pgs.stat_yards IS NOT NULL
+          AND pgs.stat_yards > 0
+          AND pgs.stat_attempts >= 10
+          AND pgs.season >= 2015
+          AND pgs.season <= 2024
+          AND ph.position_group = 'QB'
+        ORDER BY pgs.season, pgs.week, pgs.player_id
+        """
 
-    logger.info("Loading passing data from database...")
-    df = pd.read_sql_query(query, conn)
-    conn.close()
+        logger.info("Loading passing data from database...")
+        df = pd.read_sql_query(query, conn)
+    finally:
+        conn.close()
 
     logger.info(f"Loaded {len(df)} QB games from {df.season.min()}-{df.season.max()}")
 
@@ -183,7 +185,7 @@ def train_and_evaluate():
     y_train_std = y_train.std()
 
     y_train_norm = (y_train - y_train_mean) / y_train_std
-    (y_test - y_train_mean) / y_train_std
+    y_test_norm = (y_test - y_train_mean) / y_train_std
 
     logger.info(f"\nTarget normalization: mean={y_train_mean:.1f}, std={y_train_std:.1f}\n")
 
