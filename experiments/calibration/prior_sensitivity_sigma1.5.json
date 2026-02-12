@@ -1,0 +1,16 @@
+{
+  "experiment": "phase2_prior_sensitivity",
+  "noise_sigma": 1.5,
+  "prior_std": 0.5,
+  "hidden_dim": 16,
+  "features": "baseline_4",
+  "calibration": {
+    "90%_coverage": 0.2620320855614973,
+    "68%_coverage": 0.1925133689839572
+  },
+  "accuracy": {
+    "mae": 18.692247468075575,
+    "rmse": 26.01197687546749
+  },
+  "timestamp": "2025-10-16T15:43:48.617161"
+}

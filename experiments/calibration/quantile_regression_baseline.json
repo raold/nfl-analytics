@@ -1,0 +1,38 @@
+{
+  "experiment_name": "quantile_regression_baseline",
+  "config": {
+    "model": "Quantile Regression (L1 regularized)",
+    "features": [
+      "carries",
+      "avg_rushing_l3",
+      "season_avg",
+      "week",
+      "spread_close",
+      "total_close"
+    ],
+    "n_features": 6,
+    "quantiles": [
+      0.05,
+      0.5,
+      0.95
+    ],
+    "solver": "highs",
+    "alpha": 0.1
+  },
+  "metrics": {
+    "coverage": {
+      "90pct": 0.8937329700272479,
+      "68pct": 0.8201634877384196
+    },
+    "sharpness": {
+      "width_90": 106.0
+    },
+    "point_accuracy": {
+      "mae": 20.33943168548073,
+      "rmse": 28.32643502068212,
+      "mape": 30.85959224052478
+    },
+    "n_samples": 367
+  },
+  "notes": "Non-Bayesian UQ baseline using quantile regression. Trains separate models for 5%, 50%, 95% quantiles. Serves as comparison to BNN approach."
+}

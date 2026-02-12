@@ -1,0 +1,107 @@
+---
+title: "02 – Play-by-Play Features"
+format:
+  html:
+    code-fold: true
+execute:
+  echo: true
+  warning: false
+  message: false
+params:
+  season_start: 2023
+  season_end: 2024
+  seasons_override: null
+  write_raw_pbp: false
+  write_team_mart: true
+  mart_schema: "mart"
+  truncate_team_mart: false
+  persist_parquet: true
+  parquet_path: "data/raw/team_epa_{season_start}_{season_end}.parquet"
+---
+
+## Purpose
+Build play-level features and EPA aggregates to support modeling and matchup reports.
+
+## Prerequisites
+- Postgres container running with `plays` schema applied (`db/001_init.sql`).
+- R packages: `nflreadr`, `dplyr`, `purrr`, `dbplyr`, `DBI`, `RPostgres`, `glue`, `arrow`.
+
+## 1. Load Raw PBP Data
+```{r}
+library(nflreadr)
+library(dplyr)
+library(purrr)
+
+pbp_years <- if (!is.null(params$seasons_override)) params$seasons_override else params$season_start:params$season_end
+
+pbp_raw <- purrr::map_dfr(pbp_years, load_pbp)
+
+pbp_raw |> select(game_id, play_id, posteam, defteam, epa) |> head()
+```
+
+## 2. Derive Aggregations
+```{r}
+team_epa <- pbp_raw |>
+  filter(!is.na(epa)) |>
+  group_by(game_id, posteam) |>
+  summarise(
+    plays = n(),
+    epa_sum = sum(epa),
+    epa_mean = mean(epa),
+    explosive_pass = mean(air_yards >= 15, na.rm = TRUE),
+    explosive_rush = mean(rush == 1 & yards_gained >= 10, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+tail(team_epa)
+```
+
+## 3. Write Aggregates to Warehouse
+```{r}
+library(DBI)
+library(RPostgres)
+
+con <- dbConnect(
+  Postgres(),
+  dbname   = Sys.getenv("POSTGRES_DB", "devdb01"),
+  host     = Sys.getenv("POSTGRES_HOST", "localhost"),
+  port     = as.integer(Sys.getenv("POSTGRES_PORT", 5544)),
+  user     = Sys.getenv("POSTGRES_USER", "dro"),
+  password = Sys.getenv("POSTGRES_PASSWORD", "sicillionbillions")
+)
+
+if (isTRUE(params$write_raw_pbp)) {
+  dbWriteTable(
+    con,
+    "plays",
+    pbp_raw |> select(game_id, play_id, posteam, defteam, quarter, game_seconds_remaining, down, ydstogo, epa, pass, rush),
+    append = TRUE,
+    row.names = FALSE
+  )
+}
+
+if (isTRUE(params$write_team_mart)) {
+  schema_name <- params$mart_schema
+  quoted_schema <- as.character(DBI::dbQuoteIdentifier(con, schema_name))
+  dbExecute(con, sprintf("CREATE SCHEMA IF NOT EXISTS %s;", quoted_schema))
+  if (isTRUE(params$truncate_team_mart)) {
+    dbExecute(con, sprintf("TRUNCATE TABLE %s.team_epa;", quoted_schema))
+  }
+  dbWriteTable(con, Id(schema = schema_name, table = "team_epa"), team_epa, append = TRUE, row.names = FALSE)
+}
+
+dbDisconnect(con)
+```
+
+## 4. Persist Feature Table Locally
+```{r}
+if (isTRUE(params$persist_parquet)) {
+  output_path <- glue::glue(params$parquet_path, season_start = params$season_start, season_end = params$season_end)
+  arrow::write_parquet(team_epa, output_path)
+}
+```
+
+## TODO
+- Add incremental load logic or upserts for raw play storage and mart tables.
+- Join to `games` and roster data for opponent context prior to modeling.
+- Emit basic QA metrics (coverage, mean EPA stability) after each refresh.

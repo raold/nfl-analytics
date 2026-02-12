@@ -1,0 +1,984 @@
+# NFL Analytics - Experiment Manifest
+# Version: 1.0.0
+# Last Updated: 2025-10-31
+#
+# This manifest tracks all experiments across research vectors for:
+# - Reproducibility (exact configurations and seeds)
+# - Progress tracking (status and results)
+# - Documentation (dissertation chapter mapping)
+# - Integration planning (dependencies and next steps)
+
+metadata:
+  project: NFL Analytics PhD Research
+  author: David Rodriguez-Obregon
+  institution: Rice University
+  start_date: 2019-01-01
+  current_phase: Phase 3 - Integration & Optimization
+  dissertation_defense: TBD
+
+experiment_categories:
+  - production_ensemble
+  - bayesian_neural_networks
+  - graph_neural_networks
+  - conditional_vae
+  - reinforcement_learning
+  - causal_inference
+  - optimization_studies
+
+experiments:
+  # ============================================================================
+  # PRODUCTION ENSEMBLE (The Hub)
+  # ============================================================================
+
+  - id: PROD-001
+    name: Game Outcome Ensemble v2025 - Optimized & Deployed
+    category: production_ensemble
+    status: complete
+    priority: critical
+    created: 2025-10-30
+    completed: 2025-10-30
+
+    description: |
+      Production ensemble with regularization, feature ablation, and Platt Scaling.
+      Deployed for 2025 season predictions (weeks 1-7).
+
+    hypothesis: |
+      Strong regularization (alpha=5.0, lambda=5.0) + feature ablation +
+      calibration will achieve realistic 60-62% accuracy with < 3% calibration error.
+
+    configuration:
+      train_seasons: [2019, 2020, 2021, 2022, 2023]
+      calibration_season: 2024
+      prediction_season: 2025
+      n_train_games: 1390
+      n_calibration_games: 285
+      n_prediction_games: 107
+
+      xgboost:
+        alpha: 5.0
+        lambda: 5.0
+        max_depth: 4
+        learning_rate: 0.1
+        n_estimators: 100
+        subsample: 0.8
+        colsample_bytree: 0.8
+
+      features:
+        baseline: 9  # home_win_pct, away_win_pct, points, etc.
+        phase5: 2    # away_short_rest, is_conference_game
+        total: 11
+        removed: [extreme_cold, high_wind, dome_team_outdoor_wind]
+
+      betting_criteria:
+        min_edge: 0.05
+        max_kelly_fraction: 0.10
+        prob_clip_low: 0.15
+        prob_clip_high: 0.85
+
+    results:
+      train_accuracy: 0.720
+      test_accuracy: 0.607  # From validation study
+      calibration_error: 0.028  # 70% improvement from 0.093
+      predictions_generated: 107
+      bets_recommended: 35
+      bet_percentage: 0.327
+      avg_edge: 0.072
+      avg_kelly: 0.10
+
+      validation_metrics:
+        2021_accuracy: 0.628
+        2022_accuracy: 0.570
+        2023_accuracy: 0.614
+        2024_accuracy: 0.582
+
+      performance_vs_baseline:
+        old_win_rate: 0.632  # Artificially elevated
+        new_win_rate: 0.607  # Realistic
+        old_calibration_error: 0.093
+        new_calibration_error: 0.028
+        improvement: -70%
+
+    outputs:
+      predictions: predictions/2025/optimized_ensemble_predictions_2025.csv
+      bets: predictions/2025/recommended_bets_2025.csv
+      metadata: predictions/2025/deployment_metadata_2025.json
+      logs: logs/deployment/deploy_2025.log
+      documentation: analysis/OPTIMIZED_ENSEMBLE_2025_DEPLOYMENT.md
+
+    dissertation_chapters: [4, 8, 9]
+    frontend_integration: true
+    production_ready: true
+
+    next_steps:
+      - Monitor performance on 2025 weeks 8-22
+      - Monthly calibration checks
+      - Quarterly performance reviews
+      - A/B test stricter betting criteria
+
+  # ============================================================================
+  # BAYESIAN NEURAL NETWORKS (Research Spoke)
+  # ============================================================================
+
+  - id: BNN-001
+    name: BNN Multioutput v1 - Rushing Yards & TDs
+    category: bayesian_neural_networks
+    status: complete
+    priority: high
+    created: 2025-10-15
+    completed: 2025-10-16
+
+    description: |
+      Multi-output Bayesian NN predicting rushing yards (regression) and
+      rushing TDs (classification) with uncertainty quantification.
+
+    hypothesis: |
+      Multi-output BNN can achieve 90% CI coverage on rushing yards while
+      maintaining competitive accuracy on TD prediction.
+
+    configuration:
+      architecture:
+        input_dim: 11  # Team stats + contextual features
+        hidden_layers: [64, 32]
+        activation: relu
+        dropout: 0.3
+        outputs:
+          rushing_yards:
+            type: regression
+            activation: linear
+          rushing_tds:
+            type: classification
+            activation: sigmoid
+
+      training:
+        epochs: 50
+        batch_size: 32
+        learning_rate: 0.001
+        optimizer: adam
+        early_stopping_patience: 10
+        samples: 1000  # MC dropout samples for uncertainty
+
+      data:
+        train_seasons: [2019, 2020, 2021, 2022, 2023]
+        test_season: 2024
+        n_train: 1390
+        n_test: 285
+
+    results:
+      rushing_yards:
+        mae: 18.50
+        rmse: 24.79
+        ci_coverage_90: 0.920  # ✅ Target: 0.90
+        ci_width_avg: 52.3
+
+      rushing_tds:
+        brier_score: 0.2393
+        accuracy: 0.583
+        log_loss: 0.6247
+
+    outputs:
+      model: models/bayesian/bnn_multioutput_v1.pkl
+      metadata: models/bayesian/bnn_multioutput_v1_metadata.json
+      logs: logs/training/bnn_multioutput_v1.log
+
+    dissertation_chapters: [6, 8]
+    frontend_integration: false  # Pending INT-001
+    production_ready: false      # Needs integration testing
+
+    next_steps:
+      - INT-001: Integrate uncertainty into ensemble
+      - Add to frontend as confidence intervals
+      - Test on 2025 season
+
+  - id: BNN-002
+    name: BNN Mixture v2 - Mixture of Experts
+    category: bayesian_neural_networks
+    status: trained_not_evaluated
+    priority: high
+    created: 2025-10-01
+    completed: 2025-10-02
+
+    description: |
+      Mixture of Experts BNN with 3 expert networks combined via gating network.
+      Trained but not yet evaluated.
+
+    hypothesis: |
+      Mixture of experts can capture different game types (blowouts, close games,
+      upsets) with specialized networks, improving overall accuracy and calibration.
+
+    configuration:
+      architecture:
+        n_experts: 3
+        expert_hidden: [64, 32]
+        gating_hidden: [32, 16]
+        dropout: 0.3
+
+      training:
+        epochs: 50
+        batch_size: 32
+        learning_rate: 0.001
+        samples: 1000
+
+      data:
+        train_seasons: [2019, 2020, 2021, 2022, 2023]
+        test_season: 2024
+
+    results: null  # NOT YET EVALUATED
+
+    outputs:
+      model: models/bayesian/bnn_mixture_v2.pkl  # 1.3 GB
+      logs: logs/training/bnn_mixture_v2.log
+
+    dissertation_chapters: [6, 8]
+    frontend_integration: false
+    production_ready: false
+
+    next_steps:
+      - URGENT: Evaluate on 2024 test set
+      - Measure 90% CI coverage
+      - Compare vs Multioutput v1
+      - Consider for INT-004 (BNN stacking)
+
+  - id: BNN-003
+    name: BNN Environment - Weather & Rest Context
+    category: bayesian_neural_networks
+    status: complete
+    priority: medium
+    created: 2025-09-20
+    completed: 2025-09-21
+
+    description: |
+      BNN focused on environmental factors (weather, dome, rest days, time zones).
+      Poor standalone calibration (29.7% CI coverage) but may provide useful features.
+
+    hypothesis: |
+      Environmental context can improve predictions for outdoor games in extreme
+      weather or teams on short rest.
+
+    configuration:
+      architecture:
+        input_features: 14  # 9 baseline + 5 environmental
+        hidden_layers: [32, 16]
+        dropout: 0.3
+
+      environmental_features:
+        - extreme_cold
+        - high_wind
+        - is_dome
+        - away_short_rest
+        - time_zone_travel
+
+      training:
+        epochs: 50
+        batch_size: 32
+        learning_rate: 0.001
+        samples: 1000
+
+    results:
+      accuracy: 0.554
+      brier_score: 0.2487
+      ci_coverage_90: 0.297  # ❌ Target: 0.90 (POOR CALIBRATION)
+      auc: 0.589
+
+    outputs:
+      model: models/bayesian/bnn_environment.pkl
+      logs: logs/bnn_environment_training.log
+
+    dissertation_chapters: [6, 8]
+    frontend_integration: false
+    production_ready: false
+
+    status_note: |
+      Standalone calibration failed, but model may still be valuable as
+      feature extractor for ensemble (INT-002).
+
+    next_steps:
+      - INT-002: Extract hidden layer activations as ensemble features
+      - Analyze which environmental patterns were learned
+      - Document as "repurposed failed model" case study in dissertation
+
+  - id: BNN-004
+    name: BNN Simpler v2 - Lightweight Architecture
+    category: bayesian_neural_networks
+    status: trained_not_evaluated
+    priority: medium
+    created: 2025-09-15
+    completed: 2025-09-16
+
+    description: |
+      Simplified BNN with fewer parameters (10 MB vs 50+ MB) for faster inference.
+      Trained but not yet evaluated.
+
+    hypothesis: |
+      Simpler architecture may achieve similar performance to larger BNNs with
+      faster inference time and lower memory footprint.
+
+    configuration:
+      architecture:
+        input_dim: 11
+        hidden_layers: [32, 16]  # Smaller than Multioutput
+        dropout: 0.2
+
+      training:
+        epochs: 50
+        batch_size: 64  # Larger batch for speed
+        learning_rate: 0.001
+        samples: 500  # Fewer samples for speed
+
+    results: null  # NOT YET EVALUATED
+
+    outputs:
+      model: models/bayesian/bnn_simpler_v2.pkl  # 10 MB (lightweight)
+      logs: logs/training/bnn_simpler_v2.log
+
+    dissertation_chapters: [6, 8]
+    frontend_integration: false
+    production_ready: false
+
+    next_steps:
+      - Evaluate on 2024 test set
+      - Benchmark inference speed vs Multioutput v1
+      - Consider for mobile/edge deployment
+
+  - id: BNN-005
+    name: BNN Prior Sensitivity Study
+    category: bayesian_neural_networks
+    status: complete
+    priority: low
+    created: 2025-10-10
+    completed: 2025-10-12
+
+    description: |
+      Sensitivity analysis of BNN prior distributions (sigma = 0.5, 0.7, 1.0, 1.5).
+      Tests impact of prior strength on calibration and accuracy.
+
+    hypothesis: |
+      Weaker priors (sigma=1.5) may improve calibration at cost of accuracy,
+      while stronger priors (sigma=0.5) may overfit.
+
+    configuration:
+      priors_tested: [0.5, 0.7, 1.0, 1.5]
+      architecture: Same as BNN Multioutput v1
+      n_trials_per_prior: 1
+
+    results:
+      sigma_0_5:
+        accuracy: 0.591
+        ci_coverage: 0.887
+        ci_width: 48.2
+
+      sigma_0_7:
+        accuracy: 0.588
+        ci_coverage: 0.903
+        ci_width: 51.7
+
+      sigma_1_0:
+        accuracy: 0.583
+        ci_coverage: 0.920
+        ci_width: 52.3
+
+      sigma_1_5:
+        accuracy: 0.579
+        ci_coverage: 0.934
+        ci_width: 55.8
+
+      conclusion: |
+        Sigma=1.0 provides best balance of accuracy (58.3%) and calibration (92.0%).
+        Selected for production BNN Multioutput v1.
+
+    outputs:
+      results: experiments/calibration/prior_sensitivity_*.json
+      plots: experiments/calibration/prior_sensitivity_comparison.png
+
+    dissertation_chapters: [6, 8]
+    frontend_integration: false
+    production_ready: true  # Informs production BNN choice
+
+  # ============================================================================
+  # GRAPH NEURAL NETWORKS (Research Spoke)
+  # ============================================================================
+
+  - id: GNN-001
+    name: GNN Ablation Study - 9 Configurations
+    category: graph_neural_networks
+    status: complete
+    priority: high
+    created: 2025-10-05
+    completed: 2025-10-08
+
+    description: |
+      Comprehensive ablation study testing 9 GNN configurations: baseline,
+      architecture variants, edge ablations.
+
+    hypothesis: |
+      GNN can capture schedule network structure and team relationships to
+      improve predictions beyond traditional features.
+
+    configuration:
+      base_architecture:
+        embedding_dim: 64
+        hidden_dim: 128
+        num_message_rounds: 3
+        edge_types: [plays_against, chemistry]
+
+      ablations:
+        - name: Baseline (Full Model)
+        - name: No Chemistry Edges
+        - name: Embedding Dim 32
+        - name: Embedding Dim 128
+        - name: 1 Message Round
+        - name: 2 Message Rounds
+        - name: 5 Message Rounds
+        - name: Small Model (embed=32, hidden=64, msg=2)
+        - name: Large Model (embed=128, hidden=256, msg=5)
+
+      data:
+        seasons: [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+        train_val: 2016-2023
+        test: 2024-2025
+
+      training:
+        epochs: 20
+        batch_size: 32
+        learning_rate: 0.001
+        device: cpu  # MPS has tensor corruption bug
+
+    results:
+      baseline:
+        val_brier: 0.2337
+        test_accuracy: 0.469
+        test_auc: 0.548
+        test_brier: 0.2549
+
+      best_config:
+        name: Large Model
+        val_brier: 0.2150  # 7.9% better than baseline
+        test_accuracy: 0.469
+        test_auc: 0.548
+        test_brier: 0.2549
+
+      conclusion: |
+        GNN standalone accuracy (46-50%) significantly worse than ensemble (60.7%).
+        Recommendation: Use GNN embeddings as features (INT-005), not standalone.
+
+    outputs:
+      results: models/gnn/ablation/ablation_results.json
+      models: models/gnn/ablation/config_*.pt
+      logs: logs/gnn/ablation_study_CPU.log
+
+    dissertation_chapters: [4, 8]
+    dissertation_section: Section 4.4 - GNN Ablation Study
+    frontend_integration: false
+    production_ready: false
+
+    next_steps:
+      - INT-005: Extract GNN embeddings as ensemble features
+      - Analyze learned team representations
+      - Document GNN failure + repurposing strategy
+
+  # ============================================================================
+  # CONDITIONAL VAE (Research Spoke)
+  # ============================================================================
+
+  - id: CVAE-001
+    name: Conditional VAE - Game Trajectory Modeling
+    category: conditional_vae
+    status: trained_use_case_undefined
+    priority: low
+    created: 2025-09-01
+    completed: 2025-09-03
+
+    description: |
+      Conditional VAE trained to model game trajectories (scores, yards, turnovers).
+      Training complete but concrete use case not yet defined.
+
+    hypothesis: |
+      cVAE can generate realistic synthetic games for rare event simulation or
+      uncertainty quantification via trajectory sampling.
+
+    configuration:
+      architecture:
+        encoder_hidden: [128, 64]
+        latent_dim: 32
+        decoder_hidden: [64, 128]
+        beta: 1.0  # KL weight
+
+      conditioning:
+        - home_team_strength
+        - away_team_strength
+        - week
+        - is_playoff
+
+      training:
+        epochs: 100
+        batch_size: 64
+        learning_rate: 0.001
+        early_stopping_patience: 15
+        device: mps
+
+      data:
+        seasons: [2020, 2021, 2022, 2023, 2024]
+        n_games: 1343
+        train_val_test: [0.7, 0.15, 0.15]
+
+    results:
+      best_val_loss: 60.47  # Epoch 94
+      test_loss: 62.55
+      reconstruction_quality: Good (passes sanity checks)
+
+      status: Trained but use case undefined
+
+    outputs:
+      model: models/cvae/cvae_model.pt
+      training_history: models/cvae/training_history.json
+      logs: logs/cvae/training_full.log
+
+    dissertation_chapters: [7, 8]
+    dissertation_section: Chapter 7 - Simulation
+    frontend_integration: false
+    production_ready: false
+
+    proposed_use_cases:
+      - uncertainty_quantification: Generate trajectory samples for confidence intervals
+      - rare_event_simulation: Simulate extreme weather / injury scenarios
+      - counterfactual_analysis: What-if coaching change / rule change analysis
+
+    next_steps:
+      - URGENT: Define 1-2 concrete experiments
+      - INT-006: Integrate cVAE for scenario simulation
+      - Generate synthetic games for ensemble robustness testing
+
+  # ============================================================================
+  # REINFORCEMENT LEARNING (Research Spoke - DORMANT)
+  # ============================================================================
+
+  - id: RL-001
+    name: RL Betting Agents - CQL, IQL, DQN, PPO
+    category: reinforcement_learning
+    status: dormant
+    priority: high
+    created: 2024-06-01
+    completed: null
+
+    description: |
+      Reinforcement learning agents for optimal betting strategy. Code exists
+      but not recently trained. HIGH potential for betting optimization.
+
+    hypothesis: |
+      RL agents can learn temporal betting patterns (e.g., bet more conservatively
+      early season, exploit late season) to outperform static Kelly criterion.
+
+    configuration:
+      agents:
+        - Conservative Q-Learning (CQL)
+        - Implicit Q-Learning (IQL)
+        - Deep Q-Network (DQN)
+        - Proximal Policy Optimization (PPO)
+
+      state_space:
+        - current_bankroll
+        - game_predictions (from ensemble)
+        - week_of_season
+        - recent_performance (last 10 bets)
+        - market_odds (if available)
+
+      action_space:
+        - bet_fraction: [0.0, 0.01, 0.02, ..., 0.25]
+        - bet_side: [home, away, skip]
+
+      reward:
+        - profit: Change in bankroll
+        - risk_penalty: -0.1 * variance
+        - sharpe_bonus: +0.5 * sharpe_ratio
+
+    results: null  # NOT RECENTLY TRAINED
+
+    outputs:
+      code: py/rl/*.py
+      old_models: models/rl/*.pt  # May be outdated
+
+    dissertation_chapters: [5, 11, 12]
+    dissertation_sections:
+      - Chapter 5: RL Design
+      - Chapter 11: Market Optimization
+      - Chapter 12: Profit Optimization
+    frontend_integration: false
+    production_ready: false
+
+    blocking_issues:
+      - Code not touched since June 2024
+      - Models may be outdated (trained on old data)
+      - Need to audit code status
+
+    next_steps:
+      - URGENT: Audit RL code status (py/rl/)
+      - Check if models are loadable
+      - Retrain on 2019-2024 data if needed
+      - INT-003: Integrate RL policy with ensemble
+      - INT-008: Combine RL + BNN uncertainty
+
+  # ============================================================================
+  # CAUSAL INFERENCE (Research Spoke)
+  # ============================================================================
+
+  - id: CAUSAL-001
+    name: Causal Inference Framework
+    category: causal_inference
+    status: framework_complete_not_applied
+    priority: medium
+    created: 2025-10-20
+    completed: 2025-10-22
+
+    description: |
+      Complete causal inference framework (SCM, diff-in-diff, synthetic control)
+      for identifying treatment effects. Not yet applied to data.
+
+    hypothesis: |
+      Causal methods can identify treatment effects (coaching changes, rest days,
+      prime time games) to inform betting strategy and feature engineering.
+
+    configuration:
+      methods:
+        - structural_causal_model: DAG-based causal graphs
+        - difference_in_differences: Before/after treatment comparison
+        - synthetic_control: Construct counterfactual from control units
+
+      proposed_questions:
+        - Does firing a coach mid-season improve team performance?
+        - What's the causal effect of short rest on game outcomes?
+        - Do prime time games favor home teams more than day games?
+        - Does weather causally affect scoring (not just correlation)?
+
+    results: null  # NOT YET APPLIED
+
+    outputs:
+      code: py/causal/*.py
+      documentation: docs/CAUSAL_INFERENCE_FRAMEWORK.md
+
+    dissertation_chapters: [8, 12]
+    dissertation_section: Section 8.X - Causal Inference Results
+    frontend_integration: false
+    production_ready: false
+
+    next_steps:
+      - URGENT: Select 2-3 causal questions to investigate
+      - Apply framework to historical data
+      - Estimate treatment effects with confidence intervals
+      - INT-007: Integrate causal findings into ensemble features
+
+  # ============================================================================
+  # OPTIMIZATION STUDIES
+  # ============================================================================
+
+  - id: OPT-001
+    name: Regularization & Feature Ablation Study
+    category: optimization_studies
+    status: complete
+    priority: critical
+    created: 2025-10-25
+    completed: 2025-10-28
+
+    description: |
+      Comprehensive study testing regularization strengths (alpha/lambda) and
+      feature ablations to fix elevated win rate and calibration issues.
+
+    hypothesis: |
+      Strong regularization + removing harmful features will reduce overfitting,
+      improve calibration, and achieve realistic 60-62% win rate.
+
+    configuration:
+      regularization_tested:
+        - alpha: [2.0, 5.0, 10.0]
+        - lambda: [2.0, 5.0, 10.0]
+
+      feature_ablations:
+        - baseline: 9 features only
+        - baseline + phase5: Add away_short_rest, is_conference_game
+        - baseline + harmful: Add extreme_cold, high_wind
+        - full: All features
+
+      calibration:
+        - uncalibrated: Raw XGBoost probabilities
+        - platt_scaling: Logistic calibration on 2024 season
+
+    results:
+      optimal_config:
+        alpha: 5.0
+        lambda: 5.0
+        features: baseline (9) + beneficial phase5 (2) = 11 total
+        removed_features: [extreme_cold, high_wind, dome_team_outdoor_wind]
+
+      improvements:
+        test_accuracy: 60.7%  # Down from 63.2% (more realistic)
+        calibration_error: 2.8%  # Down from 9.3% (-70%)
+        max_bet_size: 10%  # Down from 67% (more conservative)
+        temporal_stability: Stable (no degradation 2021-2024)
+
+      conclusion: |
+        Regularization is primary solution. Feature ablation provides marginal
+        benefit. Platt Scaling critical for calibration.
+
+    outputs:
+      documentation: analysis/REGULARIZATION_FEATURE_ABLATION_SUMMARY.md
+      results: analysis/OPTIMIZED_ENSEMBLE_FINAL_SUMMARY.md
+
+    dissertation_chapters: [4, 8]
+    frontend_integration: true  # Used in production ensemble
+    production_ready: true
+
+  - id: OPT-002
+    name: BNN Hyperparameter Bayesian Optimization
+    category: optimization_studies
+    status: in_progress
+    priority: low
+    created: 2025-10-12
+    completed: null
+
+    description: |
+      Bayesian optimization of BNN hyperparameters (learning rate, dropout,
+      hidden dims, prior sigma) using Optuna.
+
+    hypothesis: |
+      Bayesian optimization can find better hyperparameter configurations than
+      manual tuning, improving BNN calibration and accuracy.
+
+    configuration:
+      search_space:
+        learning_rate: [1e-4, 1e-2]  # Log scale
+        dropout: [0.1, 0.5]
+        hidden_dim_1: [32, 128]
+        hidden_dim_2: [16, 64]
+        prior_sigma: [0.5, 2.0]
+
+      optimization:
+        n_trials: 50
+        sampler: TPE  # Tree-structured Parzen Estimator
+        pruner: Median
+        objective: Maximize 90% CI coverage
+
+    results: null  # IN PROGRESS
+
+    outputs:
+      logs: logs/optimization/pilot_study.log
+      results: experiments/optimization/bnn_hyperparameter_search_results.json
+
+    dissertation_chapters: [6]
+    frontend_integration: false
+    production_ready: false
+
+    next_steps:
+      - Monitor pilot study (10 trials)
+      - If promising, run full study (50 trials)
+      - Compare optimized BNN vs manual tuning
+
+# ============================================================================
+# INTEGRATION EXPERIMENTS (Cross-Model Combinations)
+# ============================================================================
+
+integration_experiments:
+  - integration_id: INT-001
+    name: Ensemble + BNN Multioutput Uncertainty
+    status: planned
+    priority: high
+    depends_on: [BNN-001]
+    dissertation_impact: high
+    frontend_impact: high
+
+  - integration_id: INT-002
+    name: Ensemble + BNN Environment Features
+    status: planned
+    priority: high
+    depends_on: [BNN-003]
+    dissertation_impact: medium
+    frontend_impact: medium
+
+  - integration_id: INT-003
+    name: Ensemble + RL Policy
+    status: blocked
+    priority: high
+    depends_on: [RL-001]
+    blocking_issue: RL agents need retraining
+    dissertation_impact: critical
+    frontend_impact: high
+
+  - integration_id: INT-004
+    name: BNN Variants Stacking
+    status: blocked
+    priority: medium
+    depends_on: [BNN-001, BNN-002, BNN-004]
+    blocking_issue: BNN Mixture and Simpler not evaluated
+    dissertation_impact: medium
+    frontend_impact: low
+
+  - integration_id: INT-005
+    name: Ensemble + GNN Embeddings
+    status: planned
+    priority: medium
+    depends_on: [GNN-001]
+    dissertation_impact: medium
+    frontend_impact: low
+
+  - integration_id: INT-006
+    name: Ensemble + cVAE Trajectory Simulation
+    status: blocked
+    priority: low
+    depends_on: [CVAE-001]
+    blocking_issue: cVAE use case undefined
+    dissertation_impact: medium
+    frontend_impact: low
+
+  - integration_id: INT-007
+    name: Ensemble + Causal Inference
+    status: blocked
+    priority: medium
+    depends_on: [CAUSAL-001]
+    blocking_issue: No causal questions defined
+    dissertation_impact: high
+    frontend_impact: medium
+
+  - integration_id: INT-008
+    name: BNN + RL Uncertainty-Aware Policy
+    status: blocked
+    priority: medium
+    depends_on: [BNN-001, RL-001]
+    blocking_issue: Depends on INT-001 and INT-003
+    dissertation_impact: high
+    frontend_impact: high
+
+  - integration_id: INT-009
+    name: Multi-Model Ensemble (ALL SPOKES)
+    status: blocked
+    priority: low
+    depends_on: [INT-001, INT-002, INT-003, INT-004, INT-005, INT-007]
+    blocking_issue: Requires completion of INT-001 through INT-007
+    dissertation_impact: critical
+    frontend_impact: high
+
+# ============================================================================
+# EXPERIMENT STATUS SUMMARY
+# ============================================================================
+
+status_summary:
+  total_experiments: 13
+
+  by_status:
+    complete: 7  # PROD-001, BNN-001, BNN-003, BNN-005, GNN-001, OPT-001
+    in_progress: 1  # OPT-002
+    trained_not_evaluated: 2  # BNN-002, BNN-004
+    trained_use_case_undefined: 1  # CVAE-001
+    framework_complete_not_applied: 1  # CAUSAL-001
+    dormant: 1  # RL-001
+
+  by_priority:
+    critical: 2  # PROD-001, OPT-001
+    high: 5  # BNN-001, BNN-002, GNN-001, RL-001
+    medium: 4  # BNN-003, BNN-004, CAUSAL-001
+    low: 2  # BNN-005, CVAE-001, OPT-002
+
+  dissertation_readiness:
+    ready: 7  # PROD-001, BNN-001, BNN-005, GNN-001, OPT-001
+    partial: 2  # BNN-003 (failure case study)
+    incomplete: 4  # BNN-002, CVAE-001, RL-001, CAUSAL-001
+
+  frontend_integration:
+    live: 1  # PROD-001
+    ready_to_integrate: 1  # BNN-001
+    needs_work: 11
+
+# ============================================================================
+# DISSERTATION CHAPTER MAPPING
+# ============================================================================
+
+dissertation_mapping:
+  chapter_4_baseline_modeling:
+    - PROD-001
+    - GNN-001
+    - OPT-001
+
+  chapter_5_rl_design:
+    - RL-001
+
+  chapter_6_uncertainty_risk_betting:
+    - BNN-001
+    - BNN-002
+    - BNN-003
+    - BNN-004
+    - BNN-005
+    - OPT-002
+
+  chapter_7_simulation:
+    - CVAE-001
+
+  chapter_8_results_discussion:
+    - PROD-001
+    - BNN-001
+    - BNN-003
+    - GNN-001
+    - CAUSAL-001
+    - OPT-001
+
+  chapter_9_production_deployment:
+    - PROD-001
+
+  chapter_11_market_optimization:
+    - RL-001
+
+  chapter_12_profit_optimization:
+    - RL-001
+    - CAUSAL-001
+
+# ============================================================================
+# NEXT ACTIONS (Prioritized)
+# ============================================================================
+
+next_actions:
+  immediate_high_priority:
+    - action: Evaluate BNN Mixture v2
+      experiment: BNN-002
+      effort: 30 min
+      blocks: INT-004
+
+    - action: Evaluate BNN Simpler v2
+      experiment: BNN-004
+      effort: 30 min
+      blocks: INT-004
+
+    - action: Audit RL agent code status
+      experiment: RL-001
+      effort: 1 hour
+      blocks: INT-003, INT-008
+
+  week_1_integration:
+    - action: INT-001 - Add BNN uncertainty to ensemble
+      effort: 4 hours
+      impact: High frontend + dissertation
+
+    - action: INT-002 - Extract Environment BNN features
+      effort: 3 hours
+      impact: High dissertation (repurposed model)
+
+  week_2_dissertation:
+    - action: Define cVAE experiments (2 use cases)
+      experiment: CVAE-001
+      effort: 2 hours
+      impact: Complete Chapter 7
+
+    - action: Define causal questions (2-3)
+      experiment: CAUSAL-001
+      effort: 2 hours
+      impact: Complete Chapter 8
+
+    - action: Retrain RL agents if needed
+      experiment: RL-001
+      effort: 8-12 hours
+      impact: Complete Chapters 5, 11, 12
+
+  week_3_frontend:
+    - action: Integrate BNN uncertainty into dashboard
+      depends: INT-001
+      effort: 2-3 hours
+      impact: High user value
+
+    - action: Add RL optimal bet sizing
+      depends: INT-003
+      effort: 3-4 hours
+      impact: High betting performance

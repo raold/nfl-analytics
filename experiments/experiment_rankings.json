@@ -1,0 +1,1220 @@
+{
+  "metadata": {
+    "total_experiments": 40,
+    "top_cvae_count": 10,
+    "top_causal_count": 10,
+    "scoring_weights": {
+      "predictive_lift": 0.35,
+      "market_inefficiency": 0.3,
+      "feasibility": 0.2,
+      "sharpe_potential": 0.15
+    },
+    "created_date": "2025-11-01T06:14:58.002893"
+  },
+  "all_experiments": [
+    {
+      "experiment_id": "CVAE-014",
+      "rank": 1,
+      "composite_score": 82.92,
+      "predictive_lift": 22,
+      "market_inefficiency": 0.95,
+      "implementation_feasibility": 0.8,
+      "sharpe_potential": 0.85,
+      "confidence": 0.94,
+      "components": {
+        "predictive_lift_raw": 22,
+        "predictive_lift_norm": 73.33,
+        "market_inefficiency_raw": 0.95,
+        "market_inefficiency_norm": 95.0,
+        "feasibility_raw": 0.8,
+        "feasibility_norm": 80.0,
+        "sharpe_potential_raw": 0.85,
+        "sharpe_potential_norm": 85.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-014",
+      "rank": 2,
+      "composite_score": 81.92,
+      "predictive_lift": 25,
+      "market_inefficiency": 0.95,
+      "implementation_feasibility": 0.5,
+      "sharpe_potential": 0.95,
+      "confidence": 0.85,
+      "components": {
+        "predictive_lift_raw": 25,
+        "predictive_lift_norm": 83.33,
+        "market_inefficiency_raw": 0.95,
+        "market_inefficiency_norm": 95.0,
+        "feasibility_raw": 0.5,
+        "feasibility_norm": 50.0,
+        "sharpe_potential_raw": 0.95,
+        "sharpe_potential_norm": 95.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-009",
+      "rank": 3,
+      "composite_score": 80.0,
+      "predictive_lift": 24,
+      "market_inefficiency": 0.95,
+      "implementation_feasibility": 0.5,
+      "sharpe_potential": 0.9,
+      "confidence": 0.85,
+      "components": {
+        "predictive_lift_raw": 24,
+        "predictive_lift_norm": 80.0,
+        "market_inefficiency_raw": 0.95,
+        "market_inefficiency_norm": 95.0,
+        "feasibility_raw": 0.5,
+        "feasibility_norm": 50.0,
+        "sharpe_potential_raw": 0.9,
+        "sharpe_potential_norm": 90.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-010",
+      "rank": 4,
+      "composite_score": 79.67,
+      "predictive_lift": 25,
+      "market_inefficiency": 0.9,
+      "implementation_feasibility": 0.5,
+      "sharpe_potential": 0.9,
+      "confidence": 0.85,
+      "components": {
+        "predictive_lift_raw": 25,
+        "predictive_lift_norm": 83.33,
+        "market_inefficiency_raw": 0.9,
+        "market_inefficiency_norm": 90.0,
+        "feasibility_raw": 0.5,
+        "feasibility_norm": 50.0,
+        "sharpe_potential_raw": 0.9,
+        "sharpe_potential_norm": 90.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-008",
+      "rank": 5,
+      "composite_score": 79.42,
+      "predictive_lift": 22,
+      "market_inefficiency": 0.9,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.85,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 22,
+        "predictive_lift_norm": 73.33,
+        "market_inefficiency_raw": 0.9,
+        "market_inefficiency_norm": 90.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.85,
+        "sharpe_potential_norm": 85.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-020",
+      "rank": 6,
+      "composite_score": 77.5,
+      "predictive_lift": 21,
+      "market_inefficiency": 0.9,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.8,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 21,
+        "predictive_lift_norm": 70.0,
+        "market_inefficiency_raw": 0.9,
+        "market_inefficiency_norm": 90.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.8,
+        "sharpe_potential_norm": 80.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-008",
+      "rank": 7,
+      "composite_score": 76.33,
+      "predictive_lift": 20,
+      "market_inefficiency": 0.9,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.8,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 20,
+        "predictive_lift_norm": 66.67,
+        "market_inefficiency_raw": 0.9,
+        "market_inefficiency_norm": 90.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.8,
+        "sharpe_potential_norm": 80.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-005",
+      "rank": 8,
+      "composite_score": 76.33,
+      "predictive_lift": 20,
+      "market_inefficiency": 0.9,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.8,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 20,
+        "predictive_lift_norm": 66.67,
+        "market_inefficiency_raw": 0.9,
+        "market_inefficiency_norm": 90.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.8,
+        "sharpe_potential_norm": 80.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-007",
+      "rank": 9,
+      "composite_score": 75.0,
+      "predictive_lift": 18,
+      "market_inefficiency": 0.85,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.7,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 18,
+        "predictive_lift_norm": 60.0,
+        "market_inefficiency_raw": 0.85,
+        "market_inefficiency_norm": 85.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.7,
+        "sharpe_potential_norm": 70.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-018",
+      "rank": 10,
+      "composite_score": 71.75,
+      "predictive_lift": 18,
+      "market_inefficiency": 0.85,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.75,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 18,
+        "predictive_lift_norm": 60.0,
+        "market_inefficiency_raw": 0.85,
+        "market_inefficiency_norm": 85.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.75,
+        "sharpe_potential_norm": 75.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-002",
+      "rank": 11,
+      "composite_score": 71.0,
+      "predictive_lift": 18,
+      "market_inefficiency": 0.85,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.7,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 18,
+        "predictive_lift_norm": 60.0,
+        "market_inefficiency_raw": 0.85,
+        "market_inefficiency_norm": 85.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.7,
+        "sharpe_potential_norm": 70.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-002",
+      "rank": 12,
+      "composite_score": 68.5,
+      "predictive_lift": 15,
+      "market_inefficiency": 0.8,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.6,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 15,
+        "predictive_lift_norm": 50.0,
+        "market_inefficiency_raw": 0.8,
+        "market_inefficiency_norm": 80.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.6,
+        "sharpe_potential_norm": 60.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-003",
+      "rank": 13,
+      "composite_score": 68.5,
+      "predictive_lift": 15,
+      "market_inefficiency": 0.8,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.6,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 15,
+        "predictive_lift_norm": 50.0,
+        "market_inefficiency_raw": 0.8,
+        "market_inefficiency_norm": 80.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.6,
+        "sharpe_potential_norm": 60.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-020",
+      "rank": 14,
+      "composite_score": 67.42,
+      "predictive_lift": 19,
+      "market_inefficiency": 0.8,
+      "implementation_feasibility": 0.5,
+      "sharpe_potential": 0.75,
+      "confidence": 0.85,
+      "components": {
+        "predictive_lift_raw": 19,
+        "predictive_lift_norm": 63.33,
+        "market_inefficiency_raw": 0.8,
+        "market_inefficiency_norm": 80.0,
+        "feasibility_raw": 0.5,
+        "feasibility_norm": 50.0,
+        "sharpe_potential_raw": 0.75,
+        "sharpe_potential_norm": 75.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-019",
+      "rank": 15,
+      "composite_score": 66.83,
+      "predictive_lift": 17,
+      "market_inefficiency": 0.75,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.7,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 17,
+        "predictive_lift_norm": 56.67,
+        "market_inefficiency_raw": 0.75,
+        "market_inefficiency_norm": 75.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.7,
+        "sharpe_potential_norm": 70.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-018",
+      "rank": 16,
+      "composite_score": 65.25,
+      "predictive_lift": 15,
+      "market_inefficiency": 0.8,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.65,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 15,
+        "predictive_lift_norm": 50.0,
+        "market_inefficiency_raw": 0.8,
+        "market_inefficiency_norm": 80.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.65,
+        "sharpe_potential_norm": 65.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-009",
+      "rank": 17,
+      "composite_score": 65.0,
+      "predictive_lift": 12,
+      "market_inefficiency": 0.85,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.5,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 12,
+        "predictive_lift_norm": 40.0,
+        "market_inefficiency_raw": 0.85,
+        "market_inefficiency_norm": 85.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.5,
+        "sharpe_potential_norm": 50.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-017",
+      "rank": 18,
+      "composite_score": 62.42,
+      "predictive_lift": 16,
+      "market_inefficiency": 0.8,
+      "implementation_feasibility": 0.5,
+      "sharpe_potential": 0.65,
+      "confidence": 0.85,
+      "components": {
+        "predictive_lift_raw": 16,
+        "predictive_lift_norm": 53.33,
+        "market_inefficiency_raw": 0.8,
+        "market_inefficiency_norm": 80.0,
+        "feasibility_raw": 0.5,
+        "feasibility_norm": 50.0,
+        "sharpe_potential_raw": 0.65,
+        "sharpe_potential_norm": 65.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-015",
+      "rank": 19,
+      "composite_score": 61.83,
+      "predictive_lift": 14,
+      "market_inefficiency": 0.75,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.6,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 14,
+        "predictive_lift_norm": 46.67,
+        "market_inefficiency_raw": 0.75,
+        "market_inefficiency_norm": 75.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.6,
+        "sharpe_potential_norm": 60.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-017",
+      "rank": 20,
+      "composite_score": 61.67,
+      "predictive_lift": 16,
+      "market_inefficiency": 0.75,
+      "implementation_feasibility": 0.5,
+      "sharpe_potential": 0.7,
+      "confidence": 0.85,
+      "components": {
+        "predictive_lift_raw": 16,
+        "predictive_lift_norm": 53.33,
+        "market_inefficiency_raw": 0.75,
+        "market_inefficiency_norm": 75.0,
+        "feasibility_raw": 0.5,
+        "feasibility_norm": 50.0,
+        "sharpe_potential_raw": 0.7,
+        "sharpe_potential_norm": 70.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-012",
+      "rank": 21,
+      "composite_score": 60.83,
+      "predictive_lift": 11,
+      "market_inefficiency": 0.75,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.5,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 11,
+        "predictive_lift_norm": 36.67,
+        "market_inefficiency_raw": 0.75,
+        "market_inefficiency_norm": 75.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.5,
+        "sharpe_potential_norm": 50.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-013",
+      "rank": 22,
+      "composite_score": 59.17,
+      "predictive_lift": 13,
+      "market_inefficiency": 0.7,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.6,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 13,
+        "predictive_lift_norm": 43.33,
+        "market_inefficiency_raw": 0.7,
+        "market_inefficiency_norm": 70.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.6,
+        "sharpe_potential_norm": 60.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-006",
+      "rank": 23,
+      "composite_score": 58.5,
+      "predictive_lift": 12,
+      "market_inefficiency": 0.7,
+      "implementation_feasibility": 0.8,
+      "sharpe_potential": 0.5,
+      "confidence": 0.94,
+      "components": {
+        "predictive_lift_raw": 12,
+        "predictive_lift_norm": 40.0,
+        "market_inefficiency_raw": 0.7,
+        "market_inefficiency_norm": 70.0,
+        "feasibility_raw": 0.8,
+        "feasibility_norm": 80.0,
+        "sharpe_potential_raw": 0.5,
+        "sharpe_potential_norm": 50.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-001",
+      "rank": 24,
+      "composite_score": 58.17,
+      "predictive_lift": 10,
+      "market_inefficiency": 0.7,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.5,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 10,
+        "predictive_lift_norm": 33.33,
+        "market_inefficiency_raw": 0.7,
+        "market_inefficiency_norm": 70.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.5,
+        "sharpe_potential_norm": 50.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-010",
+      "rank": 25,
+      "composite_score": 56.33,
+      "predictive_lift": 14,
+      "market_inefficiency": 0.7,
+      "implementation_feasibility": 0.5,
+      "sharpe_potential": 0.6,
+      "confidence": 0.85,
+      "components": {
+        "predictive_lift_raw": 14,
+        "predictive_lift_norm": 46.67,
+        "market_inefficiency_raw": 0.7,
+        "market_inefficiency_norm": 70.0,
+        "feasibility_raw": 0.5,
+        "feasibility_norm": 50.0,
+        "sharpe_potential_raw": 0.6,
+        "sharpe_potential_norm": 60.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-004",
+      "rank": 26,
+      "composite_score": 55.75,
+      "predictive_lift": 12,
+      "market_inefficiency": 0.65,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.55,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 12,
+        "predictive_lift_norm": 40.0,
+        "market_inefficiency_raw": 0.65,
+        "market_inefficiency_norm": 65.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.55,
+        "sharpe_potential_norm": 55.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-015",
+      "rank": 27,
+      "composite_score": 55.75,
+      "predictive_lift": 12,
+      "market_inefficiency": 0.65,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.55,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 12,
+        "predictive_lift_norm": 40.0,
+        "market_inefficiency_raw": 0.65,
+        "market_inefficiency_norm": 65.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.55,
+        "sharpe_potential_norm": 55.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-004",
+      "rank": 28,
+      "composite_score": 53.67,
+      "predictive_lift": 10,
+      "market_inefficiency": 0.6,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.4,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 10,
+        "predictive_lift_norm": 33.33,
+        "market_inefficiency_raw": 0.6,
+        "market_inefficiency_norm": 60.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.4,
+        "sharpe_potential_norm": 40.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-016",
+      "rank": 29,
+      "composite_score": 51.92,
+      "predictive_lift": 10,
+      "market_inefficiency": 0.65,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.45,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 10,
+        "predictive_lift_norm": 33.33,
+        "market_inefficiency_raw": 0.65,
+        "market_inefficiency_norm": 65.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.45,
+        "sharpe_potential_norm": 45.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-011",
+      "rank": 30,
+      "composite_score": 51.33,
+      "predictive_lift": 8,
+      "market_inefficiency": 0.6,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.4,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 8,
+        "predictive_lift_norm": 26.67,
+        "market_inefficiency_raw": 0.6,
+        "market_inefficiency_norm": 60.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.4,
+        "sharpe_potential_norm": 40.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-003",
+      "rank": 31,
+      "composite_score": 48.33,
+      "predictive_lift": 8,
+      "market_inefficiency": 0.5,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.4,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 8,
+        "predictive_lift_norm": 26.67,
+        "market_inefficiency_raw": 0.5,
+        "market_inefficiency_norm": 50.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.4,
+        "sharpe_potential_norm": 40.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-006",
+      "rank": 32,
+      "composite_score": 46.42,
+      "predictive_lift": 7,
+      "market_inefficiency": 0.5,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.35,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 7,
+        "predictive_lift_norm": 23.33,
+        "market_inefficiency_raw": 0.5,
+        "market_inefficiency_norm": 50.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.35,
+        "sharpe_potential_norm": 35.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-019",
+      "rank": 33,
+      "composite_score": 45.83,
+      "predictive_lift": 8,
+      "market_inefficiency": 0.55,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.4,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 8,
+        "predictive_lift_norm": 26.67,
+        "market_inefficiency_raw": 0.55,
+        "market_inefficiency_norm": 55.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.4,
+        "sharpe_potential_norm": 40.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-012",
+      "rank": 34,
+      "composite_score": 44.5,
+      "predictive_lift": 6,
+      "market_inefficiency": 0.5,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.3,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 6,
+        "predictive_lift_norm": 20.0,
+        "market_inefficiency_raw": 0.5,
+        "market_inefficiency_norm": 50.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.3,
+        "sharpe_potential_norm": 30.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-001",
+      "rank": 35,
+      "composite_score": 43.33,
+      "predictive_lift": 5,
+      "market_inefficiency": 0.5,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.3,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 5,
+        "predictive_lift_norm": 16.67,
+        "market_inefficiency_raw": 0.5,
+        "market_inefficiency_norm": 50.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.3,
+        "sharpe_potential_norm": 30.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-011",
+      "rank": 36,
+      "composite_score": 42.58,
+      "predictive_lift": 5,
+      "market_inefficiency": 0.5,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.25,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 5,
+        "predictive_lift_norm": 16.67,
+        "market_inefficiency_raw": 0.5,
+        "market_inefficiency_norm": 50.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.25,
+        "sharpe_potential_norm": 25.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-013",
+      "rank": 37,
+      "composite_score": 38.83,
+      "predictive_lift": 5,
+      "market_inefficiency": 0.4,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.2,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 5,
+        "predictive_lift_norm": 16.67,
+        "market_inefficiency_raw": 0.4,
+        "market_inefficiency_norm": 40.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.2,
+        "sharpe_potential_norm": 20.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-007",
+      "rank": 38,
+      "composite_score": 37.5,
+      "predictive_lift": 6,
+      "market_inefficiency": 0.4,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.3,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 6,
+        "predictive_lift_norm": 20.0,
+        "market_inefficiency_raw": 0.4,
+        "market_inefficiency_norm": 40.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.3,
+        "sharpe_potential_norm": 30.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-016",
+      "rank": 39,
+      "composite_score": 36.17,
+      "predictive_lift": 4,
+      "market_inefficiency": 0.35,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.2,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 4,
+        "predictive_lift_norm": 13.33,
+        "market_inefficiency_raw": 0.35,
+        "market_inefficiency_norm": 35.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.2,
+        "sharpe_potential_norm": 20.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-005",
+      "rank": 40,
+      "composite_score": 34.83,
+      "predictive_lift": 5,
+      "market_inefficiency": 0.4,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.2,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 5,
+        "predictive_lift_norm": 16.67,
+        "market_inefficiency_raw": 0.4,
+        "market_inefficiency_norm": 40.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.2,
+        "sharpe_potential_norm": 20.0
+      }
+    }
+  ],
+  "top_10_cvae": [
+    {
+      "experiment_id": "CVAE-014",
+      "rank": 1,
+      "composite_score": 82.92,
+      "predictive_lift": 22,
+      "market_inefficiency": 0.95,
+      "implementation_feasibility": 0.8,
+      "sharpe_potential": 0.85,
+      "confidence": 0.94,
+      "components": {
+        "predictive_lift_raw": 22,
+        "predictive_lift_norm": 73.33,
+        "market_inefficiency_raw": 0.95,
+        "market_inefficiency_norm": 95.0,
+        "feasibility_raw": 0.8,
+        "feasibility_norm": 80.0,
+        "sharpe_potential_raw": 0.85,
+        "sharpe_potential_norm": 85.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-010",
+      "rank": 4,
+      "composite_score": 79.67,
+      "predictive_lift": 25,
+      "market_inefficiency": 0.9,
+      "implementation_feasibility": 0.5,
+      "sharpe_potential": 0.9,
+      "confidence": 0.85,
+      "components": {
+        "predictive_lift_raw": 25,
+        "predictive_lift_norm": 83.33,
+        "market_inefficiency_raw": 0.9,
+        "market_inefficiency_norm": 90.0,
+        "feasibility_raw": 0.5,
+        "feasibility_norm": 50.0,
+        "sharpe_potential_raw": 0.9,
+        "sharpe_potential_norm": 90.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-008",
+      "rank": 7,
+      "composite_score": 76.33,
+      "predictive_lift": 20,
+      "market_inefficiency": 0.9,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.8,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 20,
+        "predictive_lift_norm": 66.67,
+        "market_inefficiency_raw": 0.9,
+        "market_inefficiency_norm": 90.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.8,
+        "sharpe_potential_norm": 80.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-007",
+      "rank": 9,
+      "composite_score": 75.0,
+      "predictive_lift": 18,
+      "market_inefficiency": 0.85,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.7,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 18,
+        "predictive_lift_norm": 60.0,
+        "market_inefficiency_raw": 0.85,
+        "market_inefficiency_norm": 85.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.7,
+        "sharpe_potential_norm": 70.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-018",
+      "rank": 10,
+      "composite_score": 71.75,
+      "predictive_lift": 18,
+      "market_inefficiency": 0.85,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.75,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 18,
+        "predictive_lift_norm": 60.0,
+        "market_inefficiency_raw": 0.85,
+        "market_inefficiency_norm": 85.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.75,
+        "sharpe_potential_norm": 75.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-002",
+      "rank": 12,
+      "composite_score": 68.5,
+      "predictive_lift": 15,
+      "market_inefficiency": 0.8,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.6,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 15,
+        "predictive_lift_norm": 50.0,
+        "market_inefficiency_raw": 0.8,
+        "market_inefficiency_norm": 80.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.6,
+        "sharpe_potential_norm": 60.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-003",
+      "rank": 13,
+      "composite_score": 68.5,
+      "predictive_lift": 15,
+      "market_inefficiency": 0.8,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.6,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 15,
+        "predictive_lift_norm": 50.0,
+        "market_inefficiency_raw": 0.8,
+        "market_inefficiency_norm": 80.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.6,
+        "sharpe_potential_norm": 60.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-020",
+      "rank": 14,
+      "composite_score": 67.42,
+      "predictive_lift": 19,
+      "market_inefficiency": 0.8,
+      "implementation_feasibility": 0.5,
+      "sharpe_potential": 0.75,
+      "confidence": 0.85,
+      "components": {
+        "predictive_lift_raw": 19,
+        "predictive_lift_norm": 63.33,
+        "market_inefficiency_raw": 0.8,
+        "market_inefficiency_norm": 80.0,
+        "feasibility_raw": 0.5,
+        "feasibility_norm": 50.0,
+        "sharpe_potential_raw": 0.75,
+        "sharpe_potential_norm": 75.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-019",
+      "rank": 15,
+      "composite_score": 66.83,
+      "predictive_lift": 17,
+      "market_inefficiency": 0.75,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.7,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 17,
+        "predictive_lift_norm": 56.67,
+        "market_inefficiency_raw": 0.75,
+        "market_inefficiency_norm": 75.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.7,
+        "sharpe_potential_norm": 70.0
+      }
+    },
+    {
+      "experiment_id": "CVAE-009",
+      "rank": 17,
+      "composite_score": 65.0,
+      "predictive_lift": 12,
+      "market_inefficiency": 0.85,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.5,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 12,
+        "predictive_lift_norm": 40.0,
+        "market_inefficiency_raw": 0.85,
+        "market_inefficiency_norm": 85.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.5,
+        "sharpe_potential_norm": 50.0
+      }
+    }
+  ],
+  "top_10_causal": [
+    {
+      "experiment_id": "CAUSAL-014",
+      "rank": 2,
+      "composite_score": 81.92,
+      "predictive_lift": 25,
+      "market_inefficiency": 0.95,
+      "implementation_feasibility": 0.5,
+      "sharpe_potential": 0.95,
+      "confidence": 0.85,
+      "components": {
+        "predictive_lift_raw": 25,
+        "predictive_lift_norm": 83.33,
+        "market_inefficiency_raw": 0.95,
+        "market_inefficiency_norm": 95.0,
+        "feasibility_raw": 0.5,
+        "feasibility_norm": 50.0,
+        "sharpe_potential_raw": 0.95,
+        "sharpe_potential_norm": 95.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-009",
+      "rank": 3,
+      "composite_score": 80.0,
+      "predictive_lift": 24,
+      "market_inefficiency": 0.95,
+      "implementation_feasibility": 0.5,
+      "sharpe_potential": 0.9,
+      "confidence": 0.85,
+      "components": {
+        "predictive_lift_raw": 24,
+        "predictive_lift_norm": 80.0,
+        "market_inefficiency_raw": 0.95,
+        "market_inefficiency_norm": 95.0,
+        "feasibility_raw": 0.5,
+        "feasibility_norm": 50.0,
+        "sharpe_potential_raw": 0.9,
+        "sharpe_potential_norm": 90.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-008",
+      "rank": 5,
+      "composite_score": 79.42,
+      "predictive_lift": 22,
+      "market_inefficiency": 0.9,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.85,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 22,
+        "predictive_lift_norm": 73.33,
+        "market_inefficiency_raw": 0.9,
+        "market_inefficiency_norm": 90.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.85,
+        "sharpe_potential_norm": 85.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-020",
+      "rank": 6,
+      "composite_score": 77.5,
+      "predictive_lift": 21,
+      "market_inefficiency": 0.9,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.8,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 21,
+        "predictive_lift_norm": 70.0,
+        "market_inefficiency_raw": 0.9,
+        "market_inefficiency_norm": 90.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.8,
+        "sharpe_potential_norm": 80.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-005",
+      "rank": 8,
+      "composite_score": 76.33,
+      "predictive_lift": 20,
+      "market_inefficiency": 0.9,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.8,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 20,
+        "predictive_lift_norm": 66.67,
+        "market_inefficiency_raw": 0.9,
+        "market_inefficiency_norm": 90.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.8,
+        "sharpe_potential_norm": 80.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-002",
+      "rank": 11,
+      "composite_score": 71.0,
+      "predictive_lift": 18,
+      "market_inefficiency": 0.85,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.7,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 18,
+        "predictive_lift_norm": 60.0,
+        "market_inefficiency_raw": 0.85,
+        "market_inefficiency_norm": 85.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.7,
+        "sharpe_potential_norm": 70.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-018",
+      "rank": 16,
+      "composite_score": 65.25,
+      "predictive_lift": 15,
+      "market_inefficiency": 0.8,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.65,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 15,
+        "predictive_lift_norm": 50.0,
+        "market_inefficiency_raw": 0.8,
+        "market_inefficiency_norm": 80.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.65,
+        "sharpe_potential_norm": 65.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-017",
+      "rank": 20,
+      "composite_score": 61.67,
+      "predictive_lift": 16,
+      "market_inefficiency": 0.75,
+      "implementation_feasibility": 0.5,
+      "sharpe_potential": 0.7,
+      "confidence": 0.85,
+      "components": {
+        "predictive_lift_raw": 16,
+        "predictive_lift_norm": 53.33,
+        "market_inefficiency_raw": 0.75,
+        "market_inefficiency_norm": 75.0,
+        "feasibility_raw": 0.5,
+        "feasibility_norm": 50.0,
+        "sharpe_potential_raw": 0.7,
+        "sharpe_potential_norm": 70.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-012",
+      "rank": 21,
+      "composite_score": 60.83,
+      "predictive_lift": 11,
+      "market_inefficiency": 0.75,
+      "implementation_feasibility": 0.9,
+      "sharpe_potential": 0.5,
+      "confidence": 0.97,
+      "components": {
+        "predictive_lift_raw": 11,
+        "predictive_lift_norm": 36.67,
+        "market_inefficiency_raw": 0.75,
+        "market_inefficiency_norm": 75.0,
+        "feasibility_raw": 0.9,
+        "feasibility_norm": 90.0,
+        "sharpe_potential_raw": 0.5,
+        "sharpe_potential_norm": 50.0
+      }
+    },
+    {
+      "experiment_id": "CAUSAL-013",
+      "rank": 22,
+      "composite_score": 59.17,
+      "predictive_lift": 13,
+      "market_inefficiency": 0.7,
+      "implementation_feasibility": 0.7,
+      "sharpe_potential": 0.6,
+      "confidence": 0.91,
+      "components": {
+        "predictive_lift_raw": 13,
+        "predictive_lift_norm": 43.33,
+        "market_inefficiency_raw": 0.7,
+        "market_inefficiency_norm": 70.0,
+        "feasibility_raw": 0.7,
+        "feasibility_norm": 70.0,
+        "sharpe_potential_raw": 0.6,
+        "sharpe_potential_norm": 60.0
+      }
+    }
+  ]
+}
