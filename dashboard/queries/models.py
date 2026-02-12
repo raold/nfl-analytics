@@ -136,7 +136,9 @@ class ModelQueries:
             query += " WHERE model_id = %s"
             params.append(model_id)
 
-        query += f" ORDER BY started_at DESC LIMIT {limit}"
+        limit = int(limit)
+        query += " ORDER BY started_at DESC LIMIT %s"
+        params.append(limit)
 
         return pd.read_sql_query(query, conn, params=params if params else None)
 
@@ -250,7 +252,9 @@ class ModelQueries:
         Returns:
             DataFrame with run history and performance metrics
         """
-        query = f"""
+        limit = int(limit)
+
+        query = """
         SELECT
             run_id,
             model_id,
@@ -263,10 +267,10 @@ class ModelQueries:
         FROM ml.training_runs
         WHERE model_id = %s
         ORDER BY started_at DESC
-        LIMIT {limit}
+        LIMIT %s
         """
 
-        return pd.read_sql_query(query, conn, params=(model_id,))
+        return pd.read_sql_query(query, conn, params=(model_id, limit))
 
     @staticmethod
     def model_update_timeline(conn, days_back: int = 30) -> pd.DataFrame:
@@ -282,7 +286,9 @@ class ModelQueries:
                 - model_id, model_name, version, status
                 - updated_at, days_since_update
         """
-        query = f"""
+        days_back = int(days_back)
+
+        query = """
         SELECT
             model_id,
             model_name,
@@ -291,8 +297,8 @@ class ModelQueries:
             updated_at,
             CAST(EXTRACT(DAY FROM NOW() - updated_at) AS INTEGER) as days_since_update
         FROM ml.model_registry
-        WHERE updated_at >= NOW() - INTERVAL '{days_back} days'
+        WHERE updated_at >= NOW() - MAKE_INTERVAL(days => %s)
         ORDER BY updated_at DESC
         """
 
-        return pd.read_sql_query(query, conn)
+        return pd.read_sql_query(query, conn, params=(days_back,))

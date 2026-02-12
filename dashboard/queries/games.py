@@ -194,7 +194,9 @@ class GameQueries:
         if completed_only:
             where_clause = " AND home_score IS NOT NULL"
 
-        query = f"""
+        limit = int(limit)
+
+        query = """
         SELECT
             game_id,
             season,
@@ -209,10 +211,10 @@ class GameQueries:
         FROM games
         WHERE kickoff IS NOT NULL {where_clause}
         ORDER BY kickoff DESC
-        LIMIT {limit}
-        """
+        LIMIT %s
+        """.format(where_clause=where_clause)
 
-        return pd.read_sql_query(query, conn)
+        return pd.read_sql_query(query, conn, params=(limit,))
 
     @staticmethod
     def data_coverage_by_season_week(conn) -> pd.DataFrame:

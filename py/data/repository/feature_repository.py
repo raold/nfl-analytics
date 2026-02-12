@@ -29,14 +29,17 @@ class FeatureRepository(BaseRepository):
         Returns:
             Feature dict or None if not found
         """
-        # Map feature set to materialized view
+        # Map feature set to materialized view (whitelist validation)
         view_map = {
             "baseline": "mart.game_features_baseline",
             "enhanced": "mart.game_features_enhanced",
             "advanced": "mart.game_features_advanced",
         }
 
-        view = view_map.get(feature_set, "mart.game_features_baseline")
+        if feature_set not in view_map:
+            raise ValueError(f"Unknown feature_set '{feature_set}'. Must be one of: {list(view_map.keys())}")
+
+        view = view_map[feature_set]
 
         sql = f"SELECT * FROM {view} WHERE game_id = %s"
         result = self.query(

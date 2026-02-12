@@ -207,10 +207,13 @@ class FeaturePerformanceMemory:
             marginal_contribution
         FROM ml.feature_performance
         WHERE feature_name = %s
-          AND created_at >= NOW() - INTERVAL '%s weeks'
+          AND created_at >= NOW() - MAKE_INTERVAL(weeks => %s)
         """
 
-        params = [feature_name, weeks]
+        weeks_int = int(weeks)
+        if weeks_int <= 0 or weeks_int > 52:
+            raise ValueError(f"weeks must be between 1 and 52, got {weeks_int}")
+        params = [feature_name, weeks_int]
 
         if season:
             query += " AND season = %s"
@@ -244,8 +247,12 @@ class FeaturePerformanceMemory:
         contrib_incorrect = np.mean(contribs[~correct]) if (~correct).sum() > 0 else 0.0
 
         # Correlation with error (negative = feature helps reduce error)
-        corr = np.corrcoef(values, errors)[0, 1] if len(values) > 1 else 0.0
-        corr = 0.0 if np.isnan(corr) else corr
+        # Check variance before computing correlation to avoid NaN
+        if len(values) > 1 and np.var(values) > 0 and np.var(errors) > 0:
+            corr = np.corrcoef(values, errors)[0, 1]
+            corr = 0.0 if np.isnan(corr) else corr
+        else:
+            corr = 0.0
 
         # Stability (1 - normalized std of contributions)
         std_contrib = np.std(contribs)
@@ -461,8 +468,8 @@ class FeaturePerformanceMemory:
             params.append(season)
 
         if weeks:
-            query += " AND created_at >= NOW() - INTERVAL '%s weeks'"
-            params.append(weeks)
+            query += " AND created_at >= NOW() - MAKE_INTERVAL(weeks => %s)"
+            params.append(int(weeks))
 
         query += " ORDER BY created_at DESC"
 

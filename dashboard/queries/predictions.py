@@ -89,7 +89,9 @@ class PredictionQueries:
             query += " AND p.season = %s"
             params.append(season)
 
-        query += f" ORDER BY g.kickoff DESC LIMIT {limit}"
+        limit = int(limit)
+        query += " ORDER BY g.kickoff DESC LIMIT %s"
+        params.append(limit)
 
         try:
             df = pd.read_sql_query(query, conn, params=params if params else None)
@@ -120,7 +122,9 @@ class PredictionQueries:
                 - win_rate, calibration_rate
                 - weekly_pnl (profit/loss sum)
         """
-        query = f"""
+        min_season = int(min_season)
+
+        query = """
         WITH weekly_metrics AS (
             SELECT
                 p.season,
@@ -133,14 +137,14 @@ class PredictionQueries:
             FROM ml.predictions p
             WHERE p.stat_type = 'passing_yards'
               AND p.actual_value IS NOT NULL
-              AND p.season >= {min_season}
+              AND p.season >= %s
             GROUP BY p.season, p.week
             ORDER BY p.season, p.week
         )
         SELECT * FROM weekly_metrics
         """
 
-        return pd.read_sql_query(query, conn)
+        return pd.read_sql_query(query, conn, params=(min_season,))
 
     @staticmethod
     def bnn_uncertainty_metrics(conn, min_season: int = 2023, limit: int = 500) -> pd.DataFrame:
@@ -160,7 +164,10 @@ class PredictionQueries:
                 - ci_lower_5pct (q05), ci_upper_95pct (q95)
                 - actual_value, mae, within_90pct_ci
         """
-        query = f"""
+        min_season = int(min_season)
+        limit = int(limit)
+
+        query = """
         SELECT
             p.game_id,
             p.player_name,
@@ -186,12 +193,12 @@ class PredictionQueries:
         WHERE p.stat_type = 'passing_yards'
           AND p.bnn_mean IS NOT NULL
           AND p.actual_value IS NOT NULL
-          AND p.season >= {min_season}
+          AND p.season >= %s
         ORDER BY p.predicted_at DESC
-        LIMIT {limit}
+        LIMIT %s
         """
 
-        return pd.read_sql_query(query, conn)
+        return pd.read_sql_query(query, conn, params=(min_season, limit))
 
     @staticmethod
     def predictions_with_odds(conn, season: int, week: int) -> pd.DataFrame:
@@ -294,7 +301,9 @@ class PredictionQueries:
             DataFrame with columns:
                 - snapshot_at, line_value, over_odds, under_odds, bookmaker_title
         """
-        query = f"""
+        days_back = int(days_back)
+
+        query = """
         SELECT
             snapshot_at,
             line_value,
@@ -304,11 +313,11 @@ class PredictionQueries:
         FROM prop_lines_history
         WHERE player_name = %s
           AND prop_type = 'passing_yards'
-          AND snapshot_at >= NOW() - INTERVAL '{days_back} days'
+          AND snapshot_at >= NOW() - MAKE_INTERVAL(days => %s)
         ORDER BY snapshot_at ASC
         """
 
-        return pd.read_sql_query(query, conn, params=(player_name,))
+        return pd.read_sql_query(query, conn, params=(player_name, days_back))
 
     @staticmethod
     def model_comparison(conn) -> pd.DataFrame:

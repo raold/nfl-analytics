@@ -29,7 +29,9 @@ class PaperTradingQueries:
                 - win_rate, roi, sharpe_ratio, max_drawdown
                 - strategy
         """
-        query = f"""
+        days_back = int(days_back)
+
+        query = """
         SELECT
             session_id,
             started_at,
@@ -43,11 +45,11 @@ class PaperTradingQueries:
             max_drawdown,
             strategy
         FROM paper_trading_sessions
-        WHERE ended_at IS NULL OR ended_at >= NOW() - INTERVAL '{days_back} days'
+        WHERE ended_at IS NULL OR ended_at >= NOW() - MAKE_INTERVAL(days => %s)
         ORDER BY started_at DESC
         """
 
-        return pd.read_sql_query(query, conn)
+        return pd.read_sql_query(query, conn, params=(days_back,))
 
     @staticmethod
     def session_trades(conn, session_id: str, limit: int = 1000) -> pd.DataFrame:
@@ -67,7 +69,9 @@ class PaperTradingQueries:
                 - outcome ('win', 'loss', 'push', 'pending'), profit_loss
                 - bookmaker_key
         """
-        query = f"""
+        limit = int(limit)
+
+        query = """
         SELECT
             paper_trade_id,
             trade_timestamp,
@@ -87,10 +91,10 @@ class PaperTradingQueries:
         FROM paper_trades
         WHERE session_id = %s
         ORDER BY trade_timestamp DESC
-        LIMIT {limit}
+        LIMIT %s
         """
 
-        return pd.read_sql_query(query, conn, params=(session_id,))
+        return pd.read_sql_query(query, conn, params=(session_id, limit))
 
     @staticmethod
     def pending_trades(conn, limit: int = 20) -> pd.DataFrame:
@@ -107,7 +111,9 @@ class PaperTradingQueries:
                 - line_value, bet_side, bet_amount, bookmaker_key
                 - session_id
         """
-        query = f"""
+        limit = int(limit)
+
+        query = """
         SELECT
             paper_trade_id,
             trade_timestamp,
@@ -121,10 +127,10 @@ class PaperTradingQueries:
         FROM paper_trades
         WHERE outcome = 'pending'
         ORDER BY trade_timestamp DESC
-        LIMIT {limit}
+        LIMIT %s
         """
 
-        return pd.read_sql_query(query, conn)
+        return pd.read_sql_query(query, conn, params=(limit,))
 
     @staticmethod
     def performance_by_prop_type(conn, session_id: str | None = None) -> pd.DataFrame:
@@ -343,7 +349,9 @@ class PaperTradingQueries:
                 - initial_bankroll, final_bankroll, roi, win_rate
                 - total_trades, sharpe_ratio, max_drawdown
         """
-        query = f"""
+        limit = int(limit)
+
+        query = """
         SELECT
             session_id,
             strategy,
@@ -358,7 +366,7 @@ class PaperTradingQueries:
             ROUND(max_drawdown::numeric, 4) as max_drawdown
         FROM paper_trading_sessions
         ORDER BY started_at DESC
-        LIMIT {limit}
+        LIMIT %s
         """
 
-        return pd.read_sql_query(query, conn)
+        return pd.read_sql_query(query, conn, params=(limit,))

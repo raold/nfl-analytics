@@ -94,7 +94,9 @@ class SystemQueries:
                 - season, week, game_type, games (count)
                 - latest_kickoff (most recent game in that group)
         """
-        query = f"""
+        min_season = int(min_season)
+
+        query = """
         SELECT
             season,
             week,
@@ -102,13 +104,13 @@ class SystemQueries:
             COUNT(*) as games,
             MAX(kickoff) as latest_kickoff
         FROM games
-        WHERE season >= {min_season}
+        WHERE season >= %s
         GROUP BY season, week, game_type
         ORDER BY season DESC, week DESC
         LIMIT 10
         """
 
-        return pd.read_sql_query(query, conn)
+        return pd.read_sql_query(query, conn, params=(min_season,))
 
     @staticmethod
     def table_row_counts(conn) -> pd.DataFrame:
@@ -224,20 +226,22 @@ class SystemQueries:
             DataFrame with columns:
                 - query, calls, mean_time_ms, total_time_ms
         """
-        query = f"""
+        min_duration_ms = int(min_duration_ms)
+
+        query = """
         SELECT
             LEFT(query, 100) as query,
             calls,
             ROUND(mean_exec_time::numeric, 2) as mean_time_ms,
             ROUND(total_exec_time::numeric, 2) as total_time_ms
         FROM pg_stat_statements
-        WHERE mean_exec_time > {min_duration_ms}
+        WHERE mean_exec_time > %s
         ORDER BY total_exec_time DESC
         LIMIT 20
         """
 
         try:
-            return pd.read_sql_query(query, conn)
+            return pd.read_sql_query(query, conn, params=(min_duration_ms,))
         except Exception:
             # pg_stat_statements might not be enabled
             return pd.DataFrame()
