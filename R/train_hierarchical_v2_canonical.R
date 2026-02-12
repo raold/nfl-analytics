@@ -185,19 +185,29 @@ priors <- c(
 # Train model
 start_time <- Sys.time()
 
-model <- brm(
-  formula = formula,
-  data = data,
-  family = gaussian(),
-  prior = priors,
-  chains = 10,
-  iter = 4000,
-  warmup = 2000,
-  cores = 10,
-  threads = threading(2),
-  backend = "cmdstanr",
-  control = list(adapt_delta = 0.95, max_treedepth = 12),
-  seed = 42
+model <- tryCatch(
+  brm(
+    formula = formula,
+    data = data,
+    family = gaussian(),
+    prior = priors,
+    chains = 10,
+    iter = 4000,
+    warmup = 2000,
+    cores = 10,
+    threads = threading(2),
+    backend = "cmdstanr",
+    control = list(adapt_delta = 0.95, max_treedepth = 12),
+    seed = 42
+  ),
+  error = function(e) {
+    cat(sprintf("\n❌ Model training FAILED: %s\n", e$message))
+    # Clean up partial artifacts
+    partial_rds <- "models/bayesian/passing_hierarchical_v2.rds"
+    if (file.exists(partial_rds)) file.remove(partial_rds)
+    if (exists("conn") && inherits(conn, "PqConnection")) dbDisconnect(conn)
+    stop(e)
+  }
 )
 
 end_time <- Sys.time()

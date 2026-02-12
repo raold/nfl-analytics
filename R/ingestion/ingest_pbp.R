@@ -19,7 +19,10 @@ if (!table_exists) {
   stop("plays table does not exist! Run db/migrations/000_complete_schema.sql first")
 }
 
-# Idempotent load: truncate and refill
+# Idempotent load: truncate and refill (requires explicit confirmation)
+if (Sys.getenv("CONFIRM_TRUNCATE") != "yes") {
+  stop("TRUNCATE requires explicit confirmation. Set CONFIRM_TRUNCATE=yes to proceed.")
+}
 dbExecute(con, "TRUNCATE TABLE plays CASCADE;")
 
 cat("Loading ALL play-by-play data from 1999-2024...\n")

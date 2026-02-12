@@ -129,6 +129,10 @@ fit_brms_model_basic <- function(games_df, chains = 10, iter = 4000, cores = 10)
     refresh = 0
   )
 
+  # Convergence check
+  max_rhat <- max(rhat(fit), na.rm = TRUE)
+  if (max_rhat > 1.01) warning(sprintf("Model 1 convergence issue: max Rhat = %.4f", max_rhat))
+
   fit
 }
 
@@ -166,6 +170,10 @@ fit_brms_model_timevarying <- function(games_df, chains = 10, iter = 4000, cores
     backend = "cmdstanr",
     refresh = 0
   )
+
+  # Convergence check
+  max_rhat <- max(rhat(fit), na.rm = TRUE)
+  if (max_rhat > 1.01) warning(sprintf("Model 2 convergence issue: max Rhat = %.4f", max_rhat))
 
   fit
 }
@@ -216,6 +224,10 @@ fit_brms_model_full <- function(games_df, chains = 10, iter = 4000, cores = 10) 
     backend = "cmdstanr",
     refresh = 0
   )
+
+  # Convergence check
+  max_rhat <- max(rhat(fit), na.rm = TRUE)
+  if (max_rhat > 1.01) warning(sprintf("Model 3 convergence issue: max Rhat = %.4f", max_rhat))
 
   fit
 }
