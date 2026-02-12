@@ -48,7 +48,8 @@ class BayesianXGBoostEnsemble:
             edge_threshold: Minimum edge to place bet after vig (default: 0.02 = 2%)
             vig_rate: Vigorish rate for betting (default: 0.024 for -110 odds)
         """
-        assert abs(bayesian_weight + xgb_weight - 1.0) < 1e-6, "Weights must sum to 1.0"
+        if abs(bayesian_weight + xgb_weight - 1.0) >= 1e-6:
+            raise ValueError(f"Weights must sum to 1.0, got {bayesian_weight + xgb_weight}")
 
         self.bayesian_weight = bayesian_weight
         self.xgb_weight = xgb_weight

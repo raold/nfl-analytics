@@ -338,7 +338,7 @@ class GPUMonitor:
     def run_simple_monitor(self):
         """Simple monitoring without rich library."""
         while True:
-            os.system("clear" if os.name == "posix" else "cls")
+            subprocess.run(["clear" if os.name == "posix" else "cls"], check=False)
 
             gpu_stats = self.get_gpu_stats()
             training_status = self.get_training_status()

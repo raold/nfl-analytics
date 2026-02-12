@@ -374,13 +374,13 @@ def main() -> None:
                         csv_path = os.path.join(args.cal_out_dir, base + "_overall.csv")
                         try:
                             rel.to_csv(csv_path, index=False)
-                        except Exception:
+                        except OSError:
                             pass
                         try:
                             glm.write_reliability_plot(
                                 rel, os.path.join(args.cal_out_dir, base + "_overall.png")
                             )
-                        except Exception:
+                        except OSError:
                             pass
                         # Per-season reliability outputs
                         for s, g in preds_df.groupby("season"):
@@ -388,13 +388,13 @@ def main() -> None:
                             csv_s = os.path.join(args.cal_out_dir, f"{base}_s{s}.csv")
                             try:
                                 rel_s.to_csv(csv_s, index=False)
-                            except Exception:
+                            except OSError:
                                 pass
                             try:
                                 glm.write_reliability_plot(
                                     rel_s, os.path.join(args.cal_out_dir, f"{base}_s{s}.png")
                                 )
-                            except Exception:
+                            except OSError:
                                 pass
                         # Panel TeX (single) for selected config/cal/threshold
                         if (

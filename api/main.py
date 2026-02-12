@@ -183,7 +183,7 @@ async def shutdown_event():
         authenticator = get_authenticator()
         authenticator.close()
         logger.info("✓ Authenticator closed")
-    except Exception:
+    except (ConnectionError, RuntimeError, OSError):
         pass
 
 

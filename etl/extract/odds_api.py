@@ -289,7 +289,7 @@ class OddsAPIExtractor(BaseExtractor):
             return None
         try:
             return datetime.fromisoformat(value.replace("Z", "+00:00"))
-        except Exception:
+        except (ValueError, AttributeError):
             return None
 
     def _daterange(self, start: date, end: date) -> Iterable[date]:

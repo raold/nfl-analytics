@@ -439,7 +439,7 @@ class BaseRepository:
             try:
                 yield cursor
                 conn.commit()
-            except Exception:
+            except psycopg2.Error:
                 conn.rollback()
                 raise
             finally:

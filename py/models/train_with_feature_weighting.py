@@ -41,11 +41,13 @@ XGB_PARAMS = {
 }
 
 
-def load_data_from_db(training_seasons=[2022, 2023, 2024]):
+def load_data_from_db(training_seasons=None):
     """Load game data with features from database.
 
     Uses temporal_cv: season-based split prevents data leakage.
     """
+    if training_seasons is None:
+        training_seasons = [2022, 2023, 2024]
     # Initialize model (creates its own DB connection internally)
     model = GameOutcomeModel(model_dir="models/feature_weighting_test")
 

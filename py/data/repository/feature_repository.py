@@ -6,6 +6,8 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
+from psycopg2 import sql
+
 from .base import BaseRepository
 
 
@@ -40,10 +42,13 @@ class FeatureRepository(BaseRepository):
             raise ValueError(f"Unknown feature_set '{feature_set}'. Must be one of: {list(view_map.keys())}")
 
         view = view_map[feature_set]
+        schema, table = view.split(".")
 
-        sql = f"SELECT * FROM {view} WHERE game_id = %s"
+        query = sql.SQL("SELECT * FROM {}.{} WHERE game_id = %s").format(
+            sql.Identifier(schema), sql.Identifier(table)
+        )
         result = self.query(
-            sql,
+            query,
             (game_id,),
             cache_key=f"features_{feature_set}_{game_id}",
             cache_ttl=cache_ttl,
@@ -94,7 +99,10 @@ class FeatureRepository(BaseRepository):
         ]
 
         for view in views:
-            self.execute(f"REFRESH MATERIALIZED VIEW CONCURRENTLY {view}")
+            schema, table = view.split(".")
+            self.execute(sql.SQL("REFRESH MATERIALIZED VIEW CONCURRENTLY {}.{}").format(
+                sql.Identifier(schema), sql.Identifier(table)
+            ))
 
         # Clear all feature caches
         self.clear_cache()
