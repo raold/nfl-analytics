@@ -1,6 +1,6 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** January 10, 2026 | **Version:** 6.9 | **Status:** Production Ready (Grade A+)
+**Last Updated:** February 12, 2026 | **Version:** 7.0 | **Status:** Production Ready (2025 Season Complete)
 
 ## Quick Status
 
@@ -8,11 +8,12 @@
 |-----------|-------|------------|
 | Ensemble | v6.2 + equal-weight props | 54.5% spread (games), 44.25 MAE (props) |
 | Features | 386 active (Kalman/GP disabled) | Base 305 + 37 synthetic + 38 semantic + 6 rest |
-| Semantic Stack | Complete (Dec 21) | Ollama/MLX inference, 26 LLM features |
-| **Game Outcome Model** | **v2 PRODUCTION (Dec 23)** | **382 features, +4.6% win accuracy, 10.45 spread MAE** |
+| Semantic Stack | Complete (Dec 21) | Ollama/MLX inference, 38 LLM features (17/team + 4 matchup) |
+| **Game Outcome Model** | **v2 PRODUCTION (Dec 23)** | **382 features, 11.05 spread MAE (full 2025), 56.5% win prob** |
 | **Feedback Loop** | **NEW (Dec 22)** | **Weekly learning system, 10 modules** |
-| Database | 64 tables, 1.25M plays | PostgreSQL + Redis |
-| **Dissertation** | **Publication-ready (Jan 10)** | **693 pages, 19 overfull (<10pt), all chapters pass visual** |
+| Database | 50 tables, 1.25M plays | PostgreSQL + Redis (custom AVG/SUM boolean aggregates) |
+| **Dissertation** | **Updated (Feb 12)** | **753 pages, postseason validation added, 0 undefined refs** |
+| **2025 Season** | **COMPLETE (Feb 2026)** | **285 games evaluated, -3.2% ATS ROI, market efficiency confirmed** |
 | Infrastructure | 8/9 Docker services | ~105ms inference |
 
 **Critical Files:** `py/ensemble/enhanced_ensemble_v6_production.py`, `py/ensemble/strategy/base.py`, `py/features/game_feature_extractor.py`, `py/feedback/`
@@ -76,7 +77,7 @@ uv pip list               # List installed packages (79+ packages)
 - `models/` - Trained artifacts (~60 files)
 - `docs/` - 400+ documentation files
 
-**Features (384 total):**
+**Features (386 active, Kalman/GP disabled):**
 
 | Category | Count | Module |
 |----------|-------|--------|
@@ -93,13 +94,13 @@ uv pip list               # List installed packages (79+ packages)
 | **Synthetic Interaction** | 11 | `synthetic_interaction_features.py` |
 | **Synthetic Momentum** | 11 | `synthetic_momentum_features.py` |
 | **Research-Driven** | 15 | `research_driven_features.py` |
-| **Semantic (LLM)** | 26 | `py/semantic/features/semantic_features.py` (NEW) |
+| **Semantic (LLM)** | 38 | `py/semantic/features/semantic_features.py` (17/team × 2 + 4 matchup) |
 | ~~Kalman EPA~~ | ~~18~~ | `py/features/kalman_epa_filter.py` (**DISABLED** ADR-015) |
 | ~~GP Injury Recovery~~ | ~~17~~ | `py/features/gp_injury_recovery.py` (**DISABLED** ADR-015) |
 | Props Stability | N/A | `py/ensemble/props_stability_weights.py` |
 
 **Entry Points:**
-- `GameFeatureExtractor` - Base 305 + 26 semantic features (unified API, <500ms)
+- `GameFeatureExtractor` - Base 305 + 37 synthetic + 6 rest + 38 semantic = 386 features (unified API, <500ms)
 - `SyntheticInteractionEngine` - QB-OL synergy, defensive balance, explosive mismatch
 - `SyntheticMomentumEngine` - Form intensity, pressure consistency, RZ efficiency
 - `ResearchDrivenEngine` - nfelo EPA weighting (1.6:1.0), coaching rationality
@@ -261,20 +262,28 @@ py/semantic/
     └── fine_tune.py           # Ollama/MLX fine-tuning
 ```
 
-### Semantic Features (26 total, prefix: `sem_`)
+### Semantic Features (38 total, prefix: `sem_`)
 
-**Per-Team (11 each):**
+**Per-Team (17 each = 34 total):**
 | Feature | Type | Description |
 |---------|------|-------------|
 | `sentiment_24h` | float | News/social sentiment (-1 to 1) |
 | `sentiment_7d_trend` | float | Week-over-week sentiment change |
+| `sentiment_confidence` | float | LLM confidence in sentiment assessment |
+| `injury_mentions` | float | Count of injury mentions in sources |
 | `injury_severity_llm` | int | LLM-assessed injury impact (1-5) |
 | `key_player_risk` | float | Star player injury probability |
 | `media_buzz_volume` | float | Media attention (0-1 normalized) |
+| `media_buzz_trend` | float | Media attention trend |
 | `coaching_change` | bool | Recent coaching staff changes |
-| `roster_churn` | float | Player turnover indicator |
+| `scheme_mentions` | float | Scheme/play-calling discussion count |
 | `public_overreaction` | float | Market sentiment extremity |
-| `contrarian_signal` | float | Inverse public sentiment |
+| `injury_impact_decay` | float | ODE-inspired exponential injury decay |
+| `injury_velocity` | float | Rate of change in injury severity |
+| `recovery_momentum` | float | Injury recovery trajectory |
+| `sentiment_velocity` | float | Rate of change in sentiment |
+| `sentiment_acceleration` | float | Second derivative of sentiment |
+| `media_half_life` | float | Decay rate of media attention |
 
 **Matchup (4):**
 | Feature | Description |
@@ -282,7 +291,7 @@ py/semantic/
 | `sentiment_differential` | Home - away sentiment gap |
 | `injury_advantage` | Relative injury situation |
 | `media_attention_ratio` | Coverage imbalance |
-| `combined_semantic_edge` | Composite semantic signal |
+| `narrative_momentum` | Sentiment trend differential |
 
 ### Inference Configuration
 
@@ -495,7 +504,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ## LaTeX Tooling & Workflow
 
-**Location:** `analysis/dissertation/main/main.tex` (693 pages)
+**Location:** `analysis/dissertation/main/main.tex` (753 pages)
 
 ### Workflow Scripts (`~/.local/bin/diss-*`)
 
@@ -580,7 +589,7 @@ pdfpg                           # pdfinfo (shows page count)
 
 ## Dissertation Structure & File Map
 
-**Root:** `analysis/dissertation/` (693 pages, 62 figures, 313 tables)
+**Root:** `analysis/dissertation/` (753 pages, 62 figures, 313 tables)
 **Main Entry:** `analysis/dissertation/main/main.tex`
 
 ### Directory Structure
@@ -604,7 +613,8 @@ analysis/dissertation/
 ├── chapter_09_results_discussion/  # Ch9: Results (163 pages, 14 figures, 57 tables) ← HEAVIEST
 ├── chapter_10_production_deployment/  # Ch10: Production (40 pages, 2 figures, 5 tables)
 ├── chapter_11_lessons_learned/     # Ch11: Lessons (12 pages, 0 figures, 3 tables)
-├── chapter_12_profit_optimization/ # Ch12: Profit Optimization (12 pages, 1 figure, 5 tables)
+├── chapter_12_conclusion/          # Ch12: Conclusion and Future Work (updated Feb 2026 with full-season results)
+├── chapter_12_profit_optimization/ # Ch12b: Profit Optimization (included via \input in Ch12)
 ├── appendix_*/                     # Appendices A-R (9 figures, 136 tables)
 ├── figures/                        # Shared figures directory
 │   ├── out/                        # Generated figures (PDF, PNG, TEX)
@@ -692,9 +702,27 @@ evince /tmp/section.pdf
 
 ---
 
-## Current Status (Dec 31, 2025)
+## Current Status (February 12, 2026)
 
 **Completed:**
+- **2025 FULL SEASON ANALYSIS COMPLETE (Feb 12, 2026):** All 285 games (272 REG + 13 playoff) evaluated
+  - Spread MAE: 11.05 (vs Vegas 9.67) — model underperforms market by 1.38 points
+  - ATS ROI: -3.2% on 208 qualified bets — below 52.4% breakeven (market efficiency confirmed)
+  - Win Prob Accuracy: 56.5% — better than coin flip but not exploitable
+  - Playoffs: 8.43 spread MAE (better than regular season), 70% ATS on 10 bets
+  - Super Bowl LIX: SEA 29, NE 13 — model predicted NE +1.4 (17.4pt error)
+  - Critical finding: Feature pipeline incompleteness (missing QBR, partial NextGen, no semantic data)
+  - Dissertation updated: new postseason validation section, Ch 9 + Ch 12 updated (753 pages)
+  - ADR-017 created: 2026 Season Improvement Roadmap (3 tiers)
+  - Database: Created `ml.game_outcome_predictions` table, custom `AVG(boolean)` / `SUM(boolean)` aggregates
+  - Code: Fixed DEFAULT_MODEL_DIR to v2, extended inference to Week 22 (playoffs)
+- **Code Review Remediation (Feb 12, 2026):** 8-chunk systematic review of entire Python codebase
+  - Fixed hardcoded credentials → env var fallbacks
+  - Tightened exception handling across API/ETL/production
+  - SQL identifier quoting, mutable default fixes
+  - Eliminated shell=True, os.system/eval usage
+  - Added MCMC convergence checks and TRUNCATE safeguards
+- **Path Normalization (Feb 12, 2026):** Replaced /Users/dro → /home/dro across 300+ files (macOS → Linux migration)
 - **Kalman/GP Features DISABLED (Dec 31):** ADR-015 documents decision to disable negative-signal features
   - Created `py/config/feature_weights.yaml` for feature group enable/disable via config
   - Kalman EPA (18 features): -10.2pp accuracy drop in A/B test
@@ -792,10 +820,14 @@ evince /tmp/section.pdf
 - **Error decomposition formula** (Dec 28): C_i = w_i × (Y - Ŷ_i) enables per-model attribution
 - **SHAP interactions** (Dec 28): O(M² × N × T) complexity - subsample to ~2000 for tractability
 
-**In Progress:**
-- Extended semantic A/B testing through Week 18 for larger sample size
-- Feature ablation to identify which semantic features provide positive signal
-- Integration testing of S1 (Kalman/GP) and S2 (WHY System) with production pipeline
+**In Progress (2026 Season Preparation — ADR-017):**
+- Tier 1: Fix feature pipeline health checks (QBR, NextGen, semantic data staleness alerts)
+- Tier 1: Register Game Outcome v2 in model registry + populate ml.model_metrics
+- Tier 1: Unified weekly pipeline (`make weekly-pipeline SEASON=2026 WEEK=N`)
+- Tier 1: Restore 4 missing production model files (state-space v2, GNN, temp scaler, v1 staging)
+- Tier 2: Add playoff-specific features (game_type, seed_differential, bye_week_advantage)
+- Tier 2: Retrain on 2022-2025 window (25% more training data)
+- Tier 2: Boolean/integer schema cleanup (proper migration, remove custom aggregates)
 
 **Strategic Decisions:**
 - BNN research abandoned (Nov 9) - 84 hours, 6 approaches, only BNN v3.1 Rushing remains
@@ -818,7 +850,7 @@ evince /tmp/section.pdf
 | Architecture | [ARCHITECTURE_REFERENCE](docs/ARCHITECTURE_REFERENCE.md), [COMPONENT_DEEP_DIVES](docs/COMPONENT_DEEP_DIVES.md) |
 | Milestones | [RECENT_WORK_HISTORY](docs/milestones/RECENT_WORK_HISTORY.md), [docs/milestones/](docs/milestones/) |
 | Synthesis | [DIRICHLET_OPTIMIZATION](docs/synthesis/DIRICHLET_WEIGHT_OPTIMIZATION_SYNTHESIS_NOV27.md) |
-| ADRs | [docs/adr/](docs/adr/) (009: Dynamic weights, 011: Feature optimization, 012: Feedback loop, 015: Kalman/GP disabled) |
+| ADRs | [docs/adr/](docs/adr/) (009: Dynamic weights, 011: Feature optimization, 012: Feedback loop, 015: Kalman/GP disabled, 016: CQL target leakage, 017: 2026 season roadmap) |
 
 ---
 
@@ -865,6 +897,15 @@ evince /tmp/section.pdf
 19. **Check schema before writing SQL** - `fixed_drive` column didn't exist, causing silent failures
 20. **Fake data is worse than no data** - GP injury recovery using estimated days provided negative signal
 
+### Full 2025 Season Lessons (Feb 2026)
+
+21. **Feature pipeline health > model sophistication** - Missing QBR/NextGen/semantic data compressed predictions to [-2.6, +8.7] vs actual [-35, +25]. A single missing data source degrades ALL 382 features.
+22. **Full season reveals truth** - Week 16 showed 10.45 spread MAE; full season showed 11.05 (5.7% worse). Always evaluate on complete holdout.
+23. **Playoffs behave differently** - 8.43 playoff MAE vs 11.14 regular season. Late-season team quality differentials are more informative. Dedicated playoff features merit investigation.
+24. **Custom PostgreSQL aggregates are fragile** - `AVG(boolean)` doesn't exist natively; creating custom aggregates works but adds schema complexity across machines. Prefer explicit `::int` casts.
+25. **Model registry hygiene matters** - Production v2 not registered in ml.model_registry caused deployment confusion and audit gaps (ADR-017 Tier 1.2).
+26. **Market efficiency is real** - -3.2% ATS ROI on 208 bets confirms semi-strong EMH for NFL spreads with public data. The 4.5% vig is insurmountable.
+
 ### LaTeX/Dissertation Lessons (Jan 2026)
 
 21. **texlogsieve for debugging** - Parse main.log to find exact line numbers of overfull boxes, much faster than visual scanning
@@ -880,7 +921,7 @@ evince /tmp/section.pdf
 
 ---
 
-**Version:** 6.9 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
+**Version:** 7.0 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
 
 **Project Rules:**
 - Never take shortcuts, never use synthetic data

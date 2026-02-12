@@ -1,6 +1,6 @@
 # Database Quick Reference
 
-**Last Updated:** December 20, 2025
+**Last Updated:** February 12, 2026
 **Purpose:** Quick lookup reference for database schema, connections, and critical conventions
 **Full Documentation:** See [DATABASE_SCHEMA_AUDIT.md](DATABASE_SCHEMA_AUDIT.md)
 **Health Check:** `python scripts/db_health_check.py`
@@ -89,11 +89,13 @@ postgresql://dro:sicillionbillions@localhost:5544/devdb01
 
 ## Schema Overview
 
-**56 tables across 4 user schemas** (+ TimescaleDB internal schemas):
-- `public` - Raw data (games, plays, weather, injuries, odds_history, nextgen_*, players, rosters_weekly)
-- `mart` - Derived tables and materialized views (player_hierarchy, player_game_stats, team_epa, team_injury_load)
-- `ml` - Model registry and training metadata (model_registry, predictions, ensemble_versions)
-- `metadata` - Column lineage tracking
+**50 tables across 4 user schemas** (+ TimescaleDB internal schemas):
+- `public` (31) - Raw data (games, plays, weather, injuries, odds_history, nextgen_*, players, rosters_weekly)
+- `mart` (6) - Derived tables and materialized views (player_hierarchy, player_game_stats, team_epa, team_injury_load)
+- `ml` (12) - Model registry, predictions, feedback loop (model_registry, game_outcome_predictions, feedback_runs, etc.)
+- `metadata` (1) - Column lineage tracking
+
+**Note:** `plays` table has 26 boolean columns (converted from INTEGER Feb 2026). Custom `AVG(boolean)` and `SUM(boolean)` aggregates exist to support legacy SQL. See [CROSS_PLATFORM_SETUP.md](../CROSS_PLATFORM_SETUP.md) for details.
 
 **Note:** TimescaleDB adds 8 internal schemas (_timescaledb_*) for hypertable management.
 
@@ -125,6 +127,21 @@ postgresql://dro:sicillionbillions@localhost:5544/devdb01
 - `mart.team_injury_load` - 2,798 injury load metrics
 - `mart.position_groups` - 29 position→position_group mappings
 - `mart.bayesian_player_ratings` - Bayesian model output (populated by models)
+
+### ml schema (Machine Learning)
+
+| Table | Rows | Purpose |
+|-------|------|---------|
+| `ml.game_outcome_predictions` | 285 | Game-level predictions from v2 model (spread, total, win prob) |
+| `ml.model_registry` | 16 | Registered models (9 production, 7 staging) |
+| `ml.model_metrics` | 0 | Model performance metrics (TODO: populate — ADR-017 Tier 1.2) |
+| `ml.production_deployments` | 0 | Active deployment records (TODO: populate — ADR-017 Tier 1.2) |
+| `ml.feedback_runs` | varies | Weekly feedback orchestration summaries |
+| `ml.semantic_attribution` | varies | Per-game feature SHAP attribution scores |
+| `ml.feature_performance` | varies | Rolling feature contribution tracking |
+| `ml.feature_selection_state` | varies | Feature status (active/disabled/probation) |
+
+**Note:** Game Outcome v2 is the production model but is NOT yet registered in `ml.model_registry` (ADR-017 Tier 1.2).
 
 ---
 
