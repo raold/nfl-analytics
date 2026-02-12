@@ -529,7 +529,7 @@ class SemanticMetaLearner:
 
         # Compute contributions
         contributions = {}
-        magnitudes = [abs(v) for v in features.values() if v != 0]
+        magnitudes = [abs(v) for v in features.values() if v != 0 and not np.isnan(v)]
         avg_mag = np.mean(magnitudes) if magnitudes else 1.0
 
         for name, value in features.items():

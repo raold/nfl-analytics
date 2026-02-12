@@ -114,18 +114,15 @@ cat(glue("Unique QBs: {n_distinct(data$player_id)}\n\n"))
 # ============================================================================
 cat("Step 3: Estimating empirical Bayes priors...\n")
 
-# Use first half of data (2015-2019) for prior estimation
-prior_data <- data %>% filter(season <= 2019)
+# Domain-knowledge priors (avoids empirical Bayes circular reasoning)
+# Using pre-2015 data or well-established league averages prevents leakage
+# from training data (2015-2024) into prior specification.
+log_yards_mean <- log(235)     # ~235 yards is league average for qualifying QBs
+log_yards_sd <- 0.3            # Modest uncertainty around log-scale mean
+log_attempts_coef <- 0.75      # Strong positive relationship with attempts
+home_effect <- 0.02            # Small home advantage in passing yards (~2%)
 
-cat(glue("  Prior estimation dataset: {nrow(prior_data)} games\n"))
-
-# Estimate key parameters
-log_yards_mean <- mean(log(prior_data$yards))
-log_yards_sd <- sd(log(prior_data$yards))
-log_attempts_coef <- coef(lm(log(yards) ~ log(attempts), data = prior_data))[2]
-home_effect <- mean(log(prior_data$yards[prior_data$is_home == 1])) -
-  mean(log(prior_data$yards[prior_data$is_home == 0]))
-
+cat("  Using domain-knowledge priors (no empirical Bayes leakage)\n")
 cat(sprintf("  Intercept prior: N(%.2f, %.2f)\n", log_yards_mean, log_yards_sd / 2))
 cat(sprintf("  log_attempts prior: N(%.3f, 0.1)\n", log_attempts_coef))
 cat(sprintf("  home effect prior: N(%.3f, 0.01)\n", home_effect))

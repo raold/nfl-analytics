@@ -318,7 +318,9 @@ class DataQualityValidator:
         """Check if data is up-to-date"""
         if "season" in df.columns:
             max_season = df["season"].max()
-            current_season = 2024  # TODO: Get dynamically
+            from datetime import datetime
+            now = datetime.now()
+            current_season = now.year if now.month >= 9 else now.year - 1
 
             if max_season < current_season - 1:
                 self.results.append(
