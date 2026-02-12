@@ -4,6 +4,7 @@ Scaled-Up Training for Phases 2-4
 RTX 4090 is barely being used - let's CRUSH these models with massive scale.
 """
 
+import shlex
 import subprocess
 import time
 
@@ -22,7 +23,7 @@ def run_and_log(command, log_file, job_name):
     start = time.time()
 
     with open(log_file, "w") as f:
-        result = subprocess.run(command, shell=True, stdout=f, stderr=subprocess.STDOUT, text=True)
+        result = subprocess.run(shlex.split(command), stdout=f, stderr=subprocess.STDOUT, text=True)
 
     duration = time.time() - start
 

@@ -7,15 +7,15 @@ Date: October 2024
 """
 
 import sys
+from pathlib import Path
 
-sys.path.append("/Users/dro/rice/nfl-analytics")
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+sys.path.insert(0, str(_PROJECT_ROOT))
 
 import json
 import logging
 import subprocess
 import time
-from pathlib import Path
-
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class AutonomousPhase2Runner:
     """Autonomously runs Phases 2.1 and 2.2, compares results"""
 
     def __init__(self):
-        self.base_dir = Path("/Users/dro/rice/nfl-analytics")
+        self.base_dir = _PROJECT_ROOT
         self.models_dir = self.base_dir / "models" / "bayesian"
         self.results_dir = self.base_dir / "experiments" / "calibration"
 
@@ -102,14 +102,16 @@ class AutonomousPhase2Runner:
         logger.info("=" * 80)
 
         # Load results
-        results_21 = json.load(open(self.results_dir / "simpler_bnn_v2_results.json"))
+        with open(self.results_dir / "simpler_bnn_v2_results.json") as f:
+            results_21 = json.load(f)
         results_22_file = self.results_dir / "mixture_experts_v2_results.json"
 
         if not results_22_file.exists():
             logger.warning("Phase 2.2 results not found, skipping comparison")
             return
 
-        results_22 = json.load(open(results_22_file))
+        with open(results_22_file) as f:
+            results_22 = json.load(f)
 
         # Compare
         print("\n" + "=" * 80)

@@ -91,9 +91,8 @@ def create_baseline_comparison_table() -> str:
     )
 
     # GNN Baseline (3 Message Rounds)
-    gnn_baseline = next(
-        x for x in json.load(open(GNN_RESULTS_PATH)) if x["config_name"] == "baseline"
-    )
+    with open(GNN_RESULTS_PATH) as f:
+        gnn_baseline = next(x for x in json.load(f) if x["config_name"] == "baseline")
     models_data.append(
         {
             "Model": "GNN (Baseline)",
@@ -111,7 +110,8 @@ def create_baseline_comparison_table() -> str:
     )
 
     # GNN Small Model (efficiency pick)
-    gnn_small = next(x for x in json.load(open(GNN_RESULTS_PATH)) if x["config_name"] == "small")
+    with open(GNN_RESULTS_PATH) as f:
+        gnn_small = next(x for x in json.load(f) if x["config_name"] == "small")
     models_data.append(
         {
             "Model": "GNN (Small)",
