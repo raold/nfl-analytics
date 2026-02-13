@@ -16,8 +16,9 @@ library(dplyr)
 library(tidyr)
 library(scales)
 
-# Set theme for consistent styling
-theme_set(theme_minimal(base_size = 10))
+# Load dissertation theme (Palatino + Tableau 10)
+source(file.path(dirname(normalizePath(sub("--file=", "", grep("^--file=", commandArgs(), value = TRUE)), mustWork = FALSE)), "theme_dissertation.R"))
+theme_set(theme_dissertation())
 
 # Output directory (use absolute path)
 script_dir <- dirname(normalizePath(sub("--file=", "", grep("^--file=", commandArgs(), value = TRUE)), mustWork = FALSE))
@@ -52,7 +53,7 @@ p1 <- ggplot(speedup_data, aes(x = phase, y = speedup_factor)) +
             vjust = -0.5, size = 3) +
   geom_text(aes(label = sprintf("%.1f min", time_minutes)),
             vjust = 1.5, size = 2.5, color = "white", fontface = "bold") +
-  scale_fill_viridis_d(option = "D", direction = -1) +
+  scale_fill_tableau() +
   scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
   labs(
     title = "GNN GPU Optimization: Speedup Contributions",
@@ -61,15 +62,12 @@ p1 <- ggplot(speedup_data, aes(x = phase, y = speedup_factor)) +
     y = "Speedup Factor"
   ) +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
-    panel.grid.major.x = element_blank(),
-    plot.title = element_text(face = "bold", size = 11),
-    plot.subtitle = element_text(size = 9, color = "gray40")
+    axis.text.x = element_text(angle = 45, hjust = 1)
   )
 
 ggsave(
   file.path(out_dir, "gnn_speedup_waterfall.pdf"),
-  p1, width = 6, height = 4, device = "pdf"
+  p1, width = 6, height = 4, device = cairo_pdf
 )
 
 # =============================================================================
@@ -77,8 +75,8 @@ ggsave(
 # =============================================================================
 
 p2 <- ggplot(speedup_data, aes(x = phase, y = cumulative, group = 1)) +
-  geom_line(color = "#1f77b4", linewidth = 1.2) +
-  geom_point(color = "#1f77b4", size = 3) +
+  geom_line(color = ACCENT_BLUE, linewidth = 1.2) +
+  geom_point(color = ACCENT_BLUE, size = 3) +
   geom_text(aes(label = sprintf("%.1fx\n(%.1f min)", cumulative, time_minutes)),
             vjust = -0.8, size = 2.8, lineheight = 0.9) +
   scale_y_log10(breaks = c(1, 3, 10, 30, 100), labels = function(x) sprintf("%.0fx", x)) +
@@ -90,15 +88,13 @@ p2 <- ggplot(speedup_data, aes(x = phase, y = cumulative, group = 1)) +
     y = "Cumulative Speedup (log scale)"
   ) +
   theme(
-    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),
-    panel.grid.major.x = element_blank(),
-    plot.title = element_text(face = "bold", size = 11),
-    plot.subtitle = element_text(size = 9, color = "gray40")
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    panel.grid.major.y = element_line(linewidth = 0.3, linetype = "dashed", color = "gray80")
   )
 
 ggsave(
   file.path(out_dir, "gnn_cumulative_speedup.pdf"),
-  p2, width = 6, height = 4, device = "pdf"
+  p2, width = 6, height = 4, device = cairo_pdf
 )
 
 # =============================================================================
@@ -123,7 +119,7 @@ p3 <- gpu_comparison %>%
   geom_text(aes(label = sprintf("%.0f%%", value)), vjust = -0.5, size = 4) +
   annotate("text", x = 1.5, y = 100, label = "100% (Available)",
            vjust = -0.5, color = "red", size = 3) +
-  scale_fill_manual(values = c("baseline" = "#d62728", "optimized" = "#2ca02c")) +
+  scale_fill_manual(values = c("baseline" = unname(COLORS_TABLEAU["red"]), "optimized" = unname(COLORS_TABLEAU["green"]))) +
   scale_y_continuous(limits = c(0, 110), expand = c(0, 0)) +
   labs(
     title = "GPU Utilization: Baseline vs Optimized",
@@ -132,16 +128,11 @@ p3 <- gpu_comparison %>%
     y = "GPU Utilization (%)"
   ) +
   scale_x_discrete(labels = c("baseline" = "Baseline\n(1 season, CPU)",
-                               "optimized" = "Optimized\n(9 seasons, GPU)")) +
-  theme(
-    panel.grid.major.x = element_blank(),
-    plot.title = element_text(face = "bold", size = 11),
-    plot.subtitle = element_text(size = 9, color = "gray40")
-  )
+                               "optimized" = "Optimized\n(9 seasons, GPU)"))
 
 ggsave(
   file.path(out_dir, "gnn_gpu_utilization_comparison.pdf"),
-  p3, width = 5, height = 4, device = "pdf"
+  p3, width = 5, height = 4, device = cairo_pdf
 )
 
 # =============================================================================
@@ -154,10 +145,10 @@ data_dir <- file.path(dirname(script_dir), "data")
 training_data <- read.csv(file.path(data_dir, "gnn_training_history.csv"))
 
 p4 <- ggplot(training_data, aes(x = epoch, y = val_brier)) +
-  geom_line(color = "#1f77b4", linewidth = 0.8, alpha = 0.6) +
+  geom_line(color = ACCENT_BLUE, linewidth = 0.8, alpha = 0.6) +
   geom_point(aes(x = epoch, y = val_brier),
-             color = "#1f77b4", size = 2) +
-  geom_smooth(se = TRUE, color = "#d62728", linewidth = 1, method = "loess", span = 0.4) +
+             color = ACCENT_BLUE, size = 2) +
+  geom_smooth(se = TRUE, color = COLORS_TABLEAU["red"], linewidth = 1, method = "loess", span = 0.4) +
   geom_hline(yintercept = 0.250, linetype = "dashed", color = "gray50", alpha = 0.5) +
   annotate("text", x = 35, y = 0.250, label = "Theoretical minimum (0.250)",
            vjust = -0.5, size = 3, color = "gray40") +
@@ -169,16 +160,11 @@ p4 <- ggplot(training_data, aes(x = epoch, y = val_brier)) +
     x = "Epoch",
     y = "Validation Brier Score",
     caption = "Actual training data from 10 checkpoints (epochs 4, 9, 14, 19, 24, 29, 34, 39, 44, 49)."
-  ) +
-  theme(
-    plot.title = element_text(face = "bold", size = 11),
-    plot.subtitle = element_text(size = 9, color = "gray40"),
-    plot.caption = element_text(size = 7, color = "gray50", hjust = 0)
   )
 
 ggsave(
   file.path(out_dir, "gnn_training_convergence.pdf"),
-  p4, width = 6, height = 4, device = "pdf"
+  p4, width = 6, height = 4, device = cairo_pdf
 )
 
 # =============================================================================

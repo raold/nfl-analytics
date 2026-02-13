@@ -86,9 +86,9 @@ def setup_plot_style():
 
     plt.rcParams.update(
         {
-            # Fonts
-            "font.family": "sans-serif",
-            "font.sans-serif": ["Arial", "DejaVu Sans"],
+            # Fonts — match LaTeX document (newpxtext = Palatino/TeX Gyre Pagella)
+            "font.family": "serif",
+            "font.serif": ["TeX Gyre Pagella", "Palatino", "Palatino Linotype", "DejaVu Serif"],
             "font.size": FONT_SIZES["label"],
             "axes.titlesize": FONT_SIZES["title"],
             "axes.labelsize": FONT_SIZES["label"],

@@ -7,8 +7,16 @@ Heatmap PDF: analysis/dissertation/figures/out/teaser_ev_heatmap.pdf
 import argparse
 import os
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+
+plt.rcParams.update({
+    "font.family": "serif",
+    "font.serif": ["TeX Gyre Pagella", "Palatino", "DejaVu Serif"],
+    "savefig.dpi": 300,
+})
 
 CURVE_OUT_DEFAULT = "analysis/dissertation/figures/out/teaser_ev_curve.pdf"
 HEAT_OUT_DEFAULT = "analysis/dissertation/figures/out/teaser_ev_heatmap.pdf"

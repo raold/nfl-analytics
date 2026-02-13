@@ -9,9 +9,17 @@ Outputs:
 import argparse
 import os
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+
+plt.rcParams.update({
+    "font.family": "serif",
+    "font.serif": ["TeX Gyre Pagella", "Palatino", "DejaVu Serif"],
+    "savefig.dpi": 300,
+})
 
 OUT_DEFAULT = "analysis/dissertation/figures/out/bankroll_ensemble.pdf"
 

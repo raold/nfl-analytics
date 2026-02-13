@@ -26,8 +26,16 @@ CLI
 import argparse
 import os
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+
+plt.rcParams.update({
+    "font.family": "serif",
+    "font.serif": ["TeX Gyre Pagella", "Palatino", "DejaVu Serif"],
+    "savefig.dpi": 300,
+})
 import pandas as pd
 
 OUT_DEFAULT = "analysis/figures/out/clv_sparkline_2025.pdf"
