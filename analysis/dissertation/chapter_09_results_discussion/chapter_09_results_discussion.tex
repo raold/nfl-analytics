@@ -2,6 +2,20 @@
 \chapter{Results and Discussion}
 \label{chap:results}
 
+\epigraph{In God we trust. All others must bring data.}{W.\ Edwards Deming}
+
+\chaptercard{This chapter evaluates the complete v6.0 system across 285~games,
+5~seasons, and 3~market types. The central question: does model sophistication
+translate to betting profitability?}
+
+\begin{herometricrow}
+\herometric{5,529}{Games Analyzed}{21 seasons, 2004--2024}%
+\hfill
+\herometric{10.25}{Spread MAE}{points, near-market accuracy}%
+\hfill
+\herometric{53.89\%}{Win Rate}{above 52.4\% breakeven}
+\end{herometricrow}
+
 We synthesize empirical findings from baseline models, ML ensembles, and RL policies. This chapter presents the final, profitable results of the v6.0 system, but more importantly, it details the rigorous validation process that provides confidence in those results. We demonstrate that profitability was achieved not by a single model, but by a system and a process that could distinguish true signal from statistical noise and methodological error.
 
 \section{The Critical Role of Multi-Layer Validation}
@@ -16,6 +30,7 @@ Hyperparameter tuning or model selection based on a single season's backtest is 
 Therefore, a core principle of our methodology is that **no model is considered for production without passing validation on at least three distinct seasons.** We target low inter-season variance in performance as a primary indicator of robustness. The final Ridge Residuals model, for example, showed extremely stable performance across three seasons, giving us confidence in its generalizability.
 
 \begin{table}[h]
+\begin{keytable}
 \centering
 \caption{XGBoost v4 Ridge Residuals: Multi-Season Consistency (2022--2024)}
 \label{tab:ridge-multi-season-consistency-condensed}
@@ -34,6 +49,7 @@ Therefore, a core principle of our methodology is that **no model is considered 
 \begin{tablenotes}
 \item \textbf{Notes:} The low cross-season standard deviation ($\sigma=0.40$) demonstrates the model's robustness.
 \end{tablenotes}
+\end{keytable}
 \end{table}
 
 \subsection{Case Study: The Baseline Error That Proved the Principle}
@@ -54,6 +70,7 @@ This incident was a powerful lesson:
 This experience led to the formalization of our 6-layer "Defense-in-Depth" validation architecture, which is applied to every model component before it can touch a production betting decision.
 
 \begin{table}[h]
+\begin{keytable}
 \centering
 \caption{Multi-Layer Validation Architecture}
 \label{tab:defense-in-depth-condensed}
@@ -69,6 +86,7 @@ This experience led to the formalization of our 6-layer "Defense-in-Depth" valid
 \textbf{6: Production Monitoring} & Real-time MAE \& calibration tracking & Model drift, data quality degradation \\
 \bottomrule
 \end{tabular}
+\end{keytable}
 \end{table}
 
 The "Baseline Error" was caught at Layer 3, preventing a production disaster. This framework gives us high confidence in the final results presented in this chapter. They have survived a process designed to kill them.
@@ -80,11 +98,16 @@ This dissertation began with a fundamental question: can machine learning extrac
 
 However, that failure was not the conclusion, but the beginning of a 13-month research journey. The central finding of this dissertation is therefore not that markets are efficient, but that \textbf{profitability is achievable through a disciplined process of discovery}. By systematically identifying the failure modes of early models and developing specific architectural principles to overcome them, we constructed the v6.0 system—a profitable, robust, and reproducible decision engine.
 
-The dramatic improvement in model accuracy and profitability can be substantially attributed to the feature orthogonalization process described in Chapter 4. The "Ridge Residuals" method provided an 88\% improvement in component accuracy by giving the ensemble models a less noisy, more robust signal of intrinsic team and player strength. This confirms our core hypothesis: in efficient markets, superior feature engineering is a more potent source of alpha than marginal improvements in model architecture.
+The dramatic improvement in model accuracy and profitability can be substantially attributed to the feature orthogonalization process described in Chapter 4. The ``Ridge Residuals'' method provided an 88\% improvement in component accuracy by giving the ensemble models a less noisy, more robust signal of intrinsic team and player strength. This confirms our core hypothesis: in efficient markets, superior feature engineering is a more potent source of alpha than marginal improvements in model architecture.
+
+\begin{keyfinding}{Feature Engineering Dominates Model Complexity}
+The Ridge Residuals orthogonalization method delivered an 88\% improvement in component accuracy---dwarfing the 84-hour, zero-return BNN investigation. In efficient markets, making features do the work is a more potent source of alpha than increasing model sophistication.
+\end{keyfinding}
 
 The final v6.0 system, a 5-way ensemble built on the principles of feature orthogonalization, diversification, and hybrid modeling, was subjected to the same rigorous, multi-season validation that caused earlier models to fail. It succeeded.
 
 \begin{table}[h]
+\begin{keytable}
 \centering
 \small
 \caption{Final Performance Metrics (v6.0 Ensemble, 2022-2025 Validation)}
@@ -108,6 +131,7 @@ The final v6.0 system, a 5-way ensemble built on the principles of feature ortho
 \quad Sharpe Ratio & 0.48 & Positive risk-adjusted returns \\
 \bottomrule
 \end{tabular}
+\end{keytable}
 \end{table}
 
 This result reframes the initial hypothesis. The answer is "Yes," but with a critical qualification: profitability is not a feature of a single, clever model. It is an emergent property of a \textbf{system} that embraces:
@@ -118,6 +142,10 @@ This result reframes the initial hypothesis. The answer is "Yes," but with a cri
 \end{itemize}
 
 The failure of the initial models was not a failure of the project, but a validation of market efficiency. The success of the final model is a validation of the scientific process.
+
+\begin{keyfinding}{Profitability Is a System Property, Not a Model Property}
+The v6.0 ensemble succeeds where v1.0 failed because profitability emerges from a \emph{system}: feature engineering over complexity, diversification over sophistication, and rigorous multi-season validation over single-season performance. No single component is sufficient alone.
+\end{keyfinding}
 
 % DATA LEAKAGE INVESTIGATION - Critical methodological finding (Nov 2, 2025)
 \input{../chapter_09_results_discussion/section_data_leakage_investigation.tex}
@@ -139,6 +167,10 @@ This experimental framework validated 40 experiments with real NFL data from 202
 
 The top-performing cVAE experiments identified actionable betting edges in playoff-bound team games (9.5\% edge when starters rest), injury-adjusted trajectories (8.5\% live betting ROI), and multi-horizon forecasting (6.2\% ROI across quarters). The causal inference experiments quantified treatment effects for fourth-down aggression (+3.5\% win probability), offensive line quality (-12.5 yards rushing impact), and home field advantage (+2.65 points ATE).
 
+\begin{keyfinding}{Differential Market Efficiency: Where Edges Persist}
+While main-market spreads are efficiently priced, specific segments show exploitable inefficiencies: playoff-bound teams resting starters (9.5\% edge), injury-adjusted trajectories (8.5\% live ROI), and fourth-down aggression effects (+3.5\% win probability). Profitability may require targeting these differential segments rather than the main market.
+\end{keyfinding}
+
 The 15 failed experiments encountered database schema mismatches rather than methodological issues, representing data pipeline gaps in player-game aggregation tables, weather integration, and game context metadata. All failed experiments have complete implementations and will succeed once the data pipeline is extended.
 
 The experimental framework demonstrated efficient execution ($<$1 second for all 40 experiments), robust error handling, and comprehensive result tracking via CSV and JSON exports. The success of 25 experiments validates the core methodology while the systematic documentation of failures provides a roadmap for future data integration work.
@@ -156,7 +188,9 @@ The experimental framework demonstrated efficient execution ($<$1 second for all
 Despite unprofitability, our system demonstrates technical competence in four areas:
 
 \paragraph{Calibration.}
-Brier score of 0.2515 places us in the top tier of published NFL prediction models. \Cref{tab:benchmark-comparison} shows our model outperforms FiveThirtyEight ELO (0.253) and matches Vegas closing line efficiency (0.250). Calibration curves (not shown) confirm predicted probabilities match observed frequencies across deciles.
+Brier score of 0.2515 places us in the top tier of published NFL prediction models. \Cref{fig:model-comparison-chart} plots calibration (Brier) against profitability (ATS\%) for all models; \Cref{tab:benchmark-comparison} shows our model outperforms FiveThirtyEight ELO (0.253) and matches Vegas closing line efficiency (0.250). Calibration curves (not shown) confirm predicted probabilities match observed frequencies across deciles.
+
+\input{../figures/tikz/chart_model_comparison}
 
 \input{../figures/out/benchmark_comparison_table.tex}
 \input{../figures/out/benchmark_significance_table.tex}
@@ -171,6 +205,10 @@ Stacked ensembles improve over individual models by 0.0037 Brier points (1.5\% r
 Market microstructure features (line velocity, cross-book discrepancies, hold percentage) contribute over 40\% of CLV capture in ablation studies (\Cref{sec:ablations}). This confirms that betting markets contain exploitable information beyond team performance metrics.
 
 These successes validate the technical infrastructure. The failure is not in prediction quality but in the economics of the betting market structure.
+
+\begin{keyfinding}{Prediction Accuracy $\neq$ Betting Profitability}
+Top-tier calibration (Brier~=~0.2515), temporal stability across 10 seasons, and positive CLV (+14.9~bps) all validate the technical infrastructure. Yet the system loses money. The failure is not in prediction quality but in the economics of efficient market structure.
+\end{keyfinding}
 
 \subsection{Where Models Fail}
 
@@ -187,7 +225,11 @@ Betting performance metrics (\Cref{tab:betting-performance}) quantify this gap. 
 
 \IfFileExists{../figures/out/betting_performance_table.tex}{\input{../figures/out/betting_performance_table.tex}}{}
 
-\textbf{Interpretation}: NFL betting markets exhibit semi-strong form efficiency. Public information—play-by-play data, injury reports, weather forecasts, historical performance—is already incorporated into closing lines. Our sophisticated feature engineering and ensemble methods extract marginal gains, but these gains are insufficient to overcome frictional costs (the $-110$ vig represents a 4.5\% hurdle).
+\begin{keyfinding}{Market Efficiency Confirmed: $-7.5\%$ ROI}
+NFL betting markets exhibit semi-strong form efficiency. Public information is already incorporated into closing lines. Our ensemble extracts marginal gains (51.0\% win rate, +14.9~bps CLV) but these are insufficient to overcome the 4.5\% vigorish hurdle requiring 52.4\% win rate for breakeven.
+\end{keyfinding}
+
+\textbf{Interpretation}: NFL betting markets exhibit semi-strong form efficiency. Public information---play-by-play data, injury reports, weather forecasts, historical performance---is already incorporated into closing lines. Our sophisticated feature engineering and ensemble methods extract marginal gains, but these gains are insufficient to overcome frictional costs (the $-110$ vig represents a 4.5\% hurdle).
 
 \subsection{Performance Optimization Impact}
 \label{subsec:performance_optimization}
@@ -692,7 +734,9 @@ We evaluate on rolling time splits with season holdouts and publish aggregated m
 \section{Per-Season Narratives}
 Across 1999–2005, classical baselines anchored calibration while ML gains were modest. From 2006 onward, richer features and microstructure produced stronger CLV capture, with the RL policy translating gains under strict risk caps. Pandemic‑era splits required scenario conditioning; despite volatility, conservative gating contained drawdowns.
 
-\Cref{tab:per-season-top3} presents detailed per-season performance for the GLM baseline, stacked ensemble, and XGBoost across 2015--2024, highlighting consistent Brier scores in the 0.25--0.26 range with modest variation in ROI (from $-10\%$ to $+5\%$).
+\Cref{fig:per-season-brier-chart} visualizes 10 years of calibration consistency; \Cref{tab:per-season-top3} provides exact values for the GLM baseline, stacked ensemble, and XGBoost across 2015--2024, highlighting consistent Brier scores in the 0.25--0.26 range with modest variation in ROI (from $-10\%$ to $+5\%$).
+
+\input{../figures/tikz/chart_per_season_brier}
 
 \input{../figures/out/per_season_top3_table.tex}
 \FloatBarrier

@@ -1,0 +1,78 @@
+% v6.0 Adaptive Weight Evolution (2024 Season)
+% Replaces: tab:v6-weight-evolution in appendix_m
+% Stacked bar chart showing weight drift across week ranges
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\definecolor{colSS}{RGB}{31,119,180}
+\definecolor{colHier}{RGB}{255,127,14}
+\definecolor{colXGB}{RGB}{44,160,44}
+\definecolor{colIP}{RGB}{214,39,40}
+\definecolor{colELO}{RGB}{148,103,189}
+
+\begin{axis}[
+  width=0.75\textwidth,
+  height=7cm,
+  ybar stacked,
+  bar width=28pt,
+  ylabel={Weight (\%)},
+  ylabel style={font=\footnotesize},
+  ymin=0, ymax=105,
+  xtick={1,2,3},
+  xticklabels={
+    {\shortstack{Weeks 1--4\\(default)}},
+    {\shortstack{Weeks 5--8\\(1st update)}},
+    {\shortstack{Weeks 9--13\\(2nd update)}}
+  },
+  xticklabel style={font=\scriptsize},
+  ytick={0,20,40,60,80,100},
+  yticklabel style={font=\scriptsize},
+  yticklabel={\pgfmathprintnumber{\tick}\%},
+  legend style={at={(1.02,0.5)}, anchor=west, font=\scriptsize, draw=gray!40, cells={anchor=west}},
+  enlarge x limits={abs=0.8},
+  grid=major,
+  grid style={gray!15},
+  xmajorgrids=false,
+]
+
+% ELO (bottom of stack)
+\addplot[fill=colELO!70, draw=colELO] coordinates {
+  (1, 10) (2, 10) (3, 10)
+};
+\addlegendentry{ELO Win/Loss}
+
+% Informative Priors
+\addplot[fill=colIP!70, draw=colIP] coordinates {
+  (1, 13) (2, 12) (3, 11)
+};
+\addlegendentry{Informative Priors}
+
+% XGBoost
+\addplot[fill=colXGB!70, draw=colXGB] coordinates {
+  (1, 23) (2, 24) (3, 25)
+};
+\addlegendentry{Hybrid XGBoost}
+
+% Hierarchical
+\addplot[fill=colHier!70, draw=colHier] coordinates {
+  (1, 27) (2, 25) (3, 26)
+};
+\addlegendentry{Hierarchical v2}
+
+% State-Space (top of stack)
+\addplot[fill=colSS!70, draw=colSS] coordinates {
+  (1, 27) (2, 29) (3, 28)
+};
+\addlegendentry{State-Space v2}
+
+% ROI annotation below each bar
+\node[font=\tiny, text=black!60] at (axis cs:1,-6) {ROI: +2.65\%};
+\node[font=\tiny, text=black!60] at (axis cs:2,-6) {ROI: +2.80\%};
+\node[font=\tiny\bfseries, text=black!80] at (axis cs:3,-6) {ROI: +2.96\%};
+
+\end{axis}
+\end{tikzpicture}
+\caption[Adaptive weight evolution]{v6.0 adaptive WLS weight drift across the 2024 season. Weights reoptimize every 4 weeks using exponential recency weighting ($H=4$). State-Space and XGBoost weights increase as more 2024 data accumulates, while Informative Priors weight decreases as empirical data overwhelms prior assumptions. ELO remains stable at 10\%. Weight reoptimization contributed $+0.31$ percentage points ROI.}
+\label{fig:weight-evolution-chart}
+\end{figure}

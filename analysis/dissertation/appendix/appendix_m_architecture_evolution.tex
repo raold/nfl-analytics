@@ -19,6 +19,8 @@ The ensemble evolution documented here navigated these constraints through syste
 
 \subsection{Key Performance Progression}
 
+\input{../figures/tikz/chart_ensemble_progression}
+
 \begin{table}[h]
 \centering
 \caption{Ensemble Architecture Performance Trajectory (v1.0 → v6.0)}
@@ -49,6 +51,7 @@ The cumulative improvement of \SI{6.7}{\percent} ROI represents the difference b
 \centering
 \caption{13-Month Ensemble Evolution Timeline (Oct 2024 -- Nov 2025)}
 \label{tab:complete-timeline}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{llp{6cm}r}
 \toprule
 \textbf{Date} & \textbf{Version} & \textbf{Key Innovation} & \textbf{ROI} \\
@@ -63,6 +66,7 @@ Nov 13, 2025  & v5.1   & Hybrid XGBoost (70\% static + 30\% incremental) & +2.80
 Dec 9, 2025   & v6.0   & 5-way + ELO + adaptive WLS weights & +2.96\% \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \subsection{Resource Allocation Analysis}
@@ -71,6 +75,7 @@ Dec 9, 2025   & v6.0   & 5-way + ELO + adaptive WLS weights & +2.96\% \\
 \centering
 \caption{Person-Hours Invested by Component (Total: 787 hours)}
 % \label{tab:resource-allocation} % REMOVED: Duplicate of Chapter 10 line 45 (full data version)
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lrr}
 \toprule
 \textbf{Component} & \textbf{Hours} & \textbf{\% Total} \\
@@ -90,6 +95,7 @@ Backtesting framework & 65 & 8.3\% \\
 Production deployment & 60 & 7.6\% \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \textbf{Key Insight}: 15.8\% of development time (124 hours) invested in failed approaches, highlighting importance of rigorous ablation testing and willingness to abandon sunk costs when statistical evidence contradicts initial hypotheses.
@@ -268,6 +274,7 @@ Solved via \texttt{cvxpy} with quadratic programming (QP) solver.
 \centering
 \caption{v3.0 Leave-One-Out Ablation Study (2024 Holdout)}
 \label{tab:v3-ablation}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lrrrr}
 \toprule
 \textbf{Configuration} & \textbf{MAE} & \textbf{ROI} & \textbf{$\Delta$ MAE} & \textbf{$\Delta$ ROI} \\
@@ -280,6 +287,7 @@ Drop Hierarchical & 50.1 & +4.61\% & +2.3 & -0.60pp \\
 Drop Informative Priors & 48.9 & +4.95\% & +1.1 & -0.26pp \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \textbf{Critical Finding}: XGBoost component contributes disproportionately to ensemble performance (40\% of improvement despite 25\% weight). Removing XGBoost degrades ROI by \SI{2.09}{\percent}, larger than any other component.
@@ -392,6 +400,7 @@ where:
 \centering
 \caption{Canonical Training Window Ablation Study (2024 Holdout, State-Space v2)}
 \label{tab:canonical-window-ablation}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lrrrl}
 \toprule
 \textbf{Window Specification} & \textbf{MAE} & \textbf{$\Delta$ MAE} & \textbf{p-value} & \textbf{Verdict} \\
@@ -404,6 +413,7 @@ where:
 2018--2024 (core only, no historical) & 48.01 & +0.24 & 0.3912 & Accept \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \textbf{Statistical Test}: Diebold-Mariano test for forecast accuracy differences. Canonical window significantly outperforms full-history approach ($p = 0.0421$), validating decay mechanism.
@@ -445,6 +455,7 @@ where:
 \centering
 \caption{Hybrid XGBoost vs Baseline Architectures (2022--2024 Multi-Season)}
 \label{tab:hybrid-xgboost-performance}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lrrrr}
 \toprule
 \textbf{Architecture} & \textbf{MAE (2022)} & \textbf{MAE (2023)} & \textbf{MAE (2024)} & \textbf{Mean $\pm$ SD} \\
@@ -457,6 +468,7 @@ Pure Incremental & 46.12 & 45.01 & 44.53 & 45.22 $\pm$ 0.82 \\
 \textbf{vs Incremental} & \textbf{-17.1\%} & \textbf{-15.5\%} & \textbf{-15.0\%} & \textbf{-15.9\%} \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \textbf{Key Findings}:
@@ -525,10 +537,13 @@ Recent predictions receive 2--5× more weight than 8-week-old predictions, allow
 
 \subsection{Weight Evolution Across 2024 Season}
 
+\input{../figures/tikz/chart_weight_evolution}
+
 \begin{table}[h]
 \centering
 \caption{v6.0 Adaptive Weight Drift (Weeks 1--13, 2024 Season)}
 \label{tab:v6-weight-evolution}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lrrrrrr}
 \toprule
 \textbf{Week Range} & \textbf{SS v2} & \textbf{Hier v2} & \textbf{XGB} & \textbf{IP v2} & \textbf{ELO} & \textbf{ROI} \\
@@ -538,6 +553,7 @@ Weeks 5--8 (1st update) & 0.29 & 0.25 & 0.24 & 0.12 & 0.10 & +2.80\% \\
 Weeks 9--13 (2nd update) & 0.28 & 0.26 & 0.25 & 0.11 & 0.10 & +2.96\% \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \textbf{Observations}:
@@ -555,6 +571,8 @@ Weight reoptimization contributed \SI{+0.63}{\percent} ROI improvement (Weeks 9-
 \section{Ablation Studies: Component-Level Analysis}
 
 \subsection{Marginal Contribution by Model}
+
+\input{../figures/tikz/chart_shapley_contributions}
 
 \begin{table}[h]
 \centering
@@ -608,6 +626,7 @@ Prior architectures (v1.0--v2.5) used ad-hoc training windows. v5.0+ standardize
 \centering
 \caption{Diebold-Mariano Test: Canonical vs Historical Windows (State-Space v2)}
 \label{tab:dm-test-windows}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lrrrl}
 \toprule
 \textbf{Alternative Window} & \textbf{MAE} & \textbf{DM Statistic} & \textbf{p-value} & \textbf{Verdict} \\
@@ -620,6 +639,7 @@ Prior architectures (v1.0--v2.5) used ad-hoc training windows. v5.0+ standardize
 2018--2024 (core only) & 48.01 & +0.87 & 0.3912 & Fail to reject \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \textbf{Interpretation}: Canonical window significantly outperforms full-history (p=0.0421) and recent-only (p=0.0512) approaches at $\alpha = 0.05$ level. No significant difference vs no-decay (p=0.1830), but canonical preferred for theoretical soundness (downweights obsolete data).
@@ -634,6 +654,7 @@ Prior architectures (v1.0--v2.5) used ad-hoc training windows. v5.0+ standardize
 \centering
 \caption{Weight Optimization Method Performance (v2.5 → v6.0)}
 \label{tab:weight-optimization-methods}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{llrrr}
 \toprule
 \textbf{Version} & \textbf{Method} & \textbf{MAE} & \textbf{ROI} & \textbf{Sharpe} \\
@@ -645,6 +666,7 @@ v5.1 & CVX (canonical window) & 44.5 & +2.80\% & +0.46 \\
 \textbf{v6.0} & \textbf{Adaptive WLS (H=4)} & \textbf{44.25} & \textbf{+2.96\%} & \textbf{+0.48} \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \textbf{Incremental Gains}:
@@ -659,6 +681,7 @@ v5.1 & CVX (canonical window) & 44.5 & +2.80\% & +0.46 \\
 \centering
 \caption{v6.0 Adaptive WLS Halflife Sensitivity (2024 Season)}
 \label{tab:wls-halflife-sensitivity}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lrrrr}
 \toprule
 \textbf{Halflife (weeks)} & \textbf{MAE} & \textbf{ROI} & \textbf{Weight Stability} & \textbf{Verdict} \\
@@ -669,6 +692,7 @@ H = 6 (conservative) & 44.5 & +2.85\% & High (0.04 SD) & Too stable \\
 H = 8 (very conservative) & 45.0 & +2.70\% & Very High (0.02 SD) & Underreacts \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \textbf{Recommendation}: H=4 weeks balances adaptation speed (responds to 4-week trends) with weight stability (avoids overfitting to noise).

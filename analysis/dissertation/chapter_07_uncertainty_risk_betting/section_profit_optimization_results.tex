@@ -44,6 +44,7 @@ The profit optimization framework integrates with existing components:
 Comprehensive backtesting on 2022-2024 seasons shows dramatic improvement:
 
 \begin{table}[!ht]
+\begin{keytable}
 \centering
 \caption{Performance Comparison: Before vs After Optimization}
 \label{tab:profit-optimization-performance}
@@ -62,6 +63,7 @@ Max Drawdown & 18.3\% & 10.7\% \\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
+\end{keytable}
 \end{table}
 
 Key improvements:
@@ -74,12 +76,15 @@ Key improvements:
 
 \subsection{Component Attribution}
 
-We quantify each component's contribution through ablation:
+We quantify each component's contribution through ablation. \Cref{fig:profit-attribution-chart} visualizes the cumulative ROI impact as a waterfall chart; \Cref{tab:profit-optimization-ablation} provides exact values.
+
+\input{../figures/tikz/chart_profit_attribution}
 
 \begin{table}[!ht]
 \centering
 \caption{ROI Impact by Component}
 \label{tab:profit-optimization-ablation}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lr}
 \toprule
  \textbf{Component} & \textbf{ROI Impact} \\
@@ -95,6 +100,7 @@ Residual interactions & +0.3\% \\
 \textbf{Total} & \textbf{+7.9\%} \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \subsection{Case Studies}

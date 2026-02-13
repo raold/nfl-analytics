@@ -1,0 +1,106 @@
+% Top 20 Features by SHAP Importance (Horizontal Lollipop Plot)
+% Replaces: tab:xgboost-feature-importance-top20 in appendix_c
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\definecolor{catMarket}{RGB}{31,119,180}
+\definecolor{catHistorical}{RGB}{255,127,14}
+\definecolor{catTeam}{RGB}{44,160,44}
+\definecolor{catMatchup}{RGB}{214,39,40}
+\definecolor{catScript}{RGB}{148,103,189}
+\definecolor{catAdvanced}{RGB}{140,86,75}
+\definecolor{catPlayer}{RGB}{227,119,194}
+
+\begin{axis}[
+  width=0.92\textwidth,
+  height=13cm,
+  xmin=0, xmax=5.5,
+  xlabel={Mean $|$SHAP$|$ (yards)},
+  xlabel style={font=\footnotesize},
+  ytick={1,...,20},
+  yticklabels={
+    Injury status,
+    {Opening--closing move},
+    Explosive play rate,
+    Divisional game flag,
+    Wind speed,
+    Implied total,
+    {TDs/game (4wk)},
+    {Completion pct (4wk)},
+    {Season win pct},
+    Cross-book discrepancy,
+    Home/away,
+    {Yards/game (8wk)},
+    Rest days diff,
+    {EPA/play (4wk)},
+    Sharp vs public split,
+    Closing spread,
+    Opp defensive DVOA,
+    {Off EPA (pass)},
+    {Yards/game (4wk)},
+    {Line move velocity (24h)}
+  },
+  yticklabel style={font=\scriptsize},
+  y dir=reverse,
+  ytick pos=left,
+  grid=major,
+  grid style={gray!15},
+  xmajorgrids=true,
+  ymajorgrids=false,
+  enlarge y limits={abs=0.4},
+  legend style={at={(0.98,0.02)}, anchor=south east, font=\tiny, draw=gray!40, cells={anchor=west}},
+  legend columns=2,
+]
+
+% Market features (blue) — using xcomb for lollipop stems
+\addplot[xcomb, catMarket, thick, mark=*, mark size=3.5pt, mark options={solid, fill=catMarket}] coordinates {
+  (4.82, 1) (2.98, 6) (2.31, 10) (1.42, 19)
+};
+\addlegendentry{Market}
+
+% Historical features (orange)
+\addplot[xcomb, catHistorical, thick, mark=*, mark size=3.5pt, mark options={solid, fill=catHistorical}] coordinates {
+  (3.91, 2) (2.54, 12) (2.08, 13) (1.97, 14)
+};
+\addlegendentry{Historical}
+
+% Team Strength (green)
+\addplot[xcomb, catTeam, thick, mark=*, mark size=3.5pt, mark options={solid, fill=catTeam}] coordinates {
+  (3.67, 3) (2.19, 11)
+};
+\addlegendentry{Team Strength}
+
+% Matchup (red)
+\addplot[xcomb, catMatchup, thick, mark=*, mark size=3.5pt, mark options={solid, fill=catMatchup}] coordinates {
+  (3.45, 4) (2.76, 8) (2.43, 9) (1.75, 16) (1.64, 17)
+};
+\addlegendentry{Matchup}
+
+% Game Script (purple)
+\addplot[xcomb, catScript, thick, mark=*, mark size=3.5pt, mark options={solid, fill=catScript}] coordinates {
+  (3.21, 5) (1.86, 15)
+};
+\addlegendentry{Game Script}
+
+% Advanced (brown)
+\addplot[xcomb, catAdvanced, thick, mark=*, mark size=3.5pt, mark options={solid, fill=catAdvanced}] coordinates {
+  (2.87, 7) (1.53, 18)
+};
+\addlegendentry{Advanced}
+
+% Player Attributes (pink)
+\addplot[xcomb, catPlayer, thick, mark=*, mark size=3.5pt, mark options={solid, fill=catPlayer}] coordinates {
+  (1.31, 20)
+};
+\addlegendentry{Player}
+
+% Annotation: top 20 = 70.3% of total importance
+\node[font=\scriptsize, text=black!60, anchor=north west, align=left] at (axis cs:3.2,18)
+  {Top 20 = 70.3\%\\ of total importance};
+
+\end{axis}
+\end{tikzpicture}
+\caption[Feature importance by SHAP]{Top 20 features by mean $|$SHAP$|$ value (XGBoost, 2023--2024 test set). Market microstructure features (blue) dominate: line movement velocity ranks \#1. Color encodes feature category. These 20 features account for 70.3\% of total model importance.}
+\label{fig:feature-importance-chart}
+\end{figure}

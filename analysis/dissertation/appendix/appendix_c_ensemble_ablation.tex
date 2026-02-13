@@ -205,7 +205,9 @@ where $\mathcal{M}$ is the set of models in the configuration and $\sigma_i^2$ i
 
 \subsection{Results}
 
-\Cref{tab:ensemble-composition-results} presents performance for selected configurations. The full 4-way ensemble (SS+HB+BNN+XGB) achieves the lowest MAE (45.23 yards), outperforming the best single model (SS: 47.77 yards) by 5.3\%.
+\Cref{fig:ablation-composition-chart} visualizes the diminishing returns as models are added; \Cref{tab:ensemble-composition-results} provides exact values. The full 4-way ensemble (SS+HB+BNN+XGB) achieves the lowest MAE (45.23 yards), outperforming the best single model (SS: 47.77 yards) by 5.3\%.
+
+\input{../figures/tikz/chart_ablation_composition}
 
 \begin{table}[htbp]
   \centering
@@ -444,7 +446,9 @@ EPA per play (last 4 weeks), success rate, explosive play rate ($>$20 yards), re
 
 \subsection{Feature Importance Analysis}
 
-\Cref{tab:xgboost-feature-importance-top20} presents the top 20 features by SHAP importance (mean absolute SHAP value across all test predictions). Market microstructure and historical performance dominate.
+\Cref{fig:feature-importance-chart} visualizes the top 20 features by SHAP importance, color-coded by category; \Cref{tab:xgboost-feature-importance-top20} provides exact values. Market microstructure and historical performance dominate.
+
+\input{../figures/tikz/chart_feature_importance}
 
 \begin{table}[htbp]
   \centering

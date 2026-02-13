@@ -146,6 +146,7 @@ The v6.0 static weights (State-Space 27\%, Hierarchical 27\%, XGBoost v4 23\%, I
 \paragraph{Optimal Dirichlet Configuration.}
 Grid search identified the following best configuration (ranked by 2024 validation MAE):
 \begin{table}[h]
+\begin{keytable}
 \centering
 \caption[Optimal Dirichlet hyperparameters]{Best Dirichlet configuration discovered via grid search. Achieved 31.5\% MAE improvement over v6.0 static weights for player passing predictions.}
 \label{tab:optimal-dirichlet-config}
@@ -160,10 +161,13 @@ Scoring Rule & Squared & Gaussian assumption, heavy penalty for large errors \\
 \textbf{Validation MAE} & \textbf{61.26 yards} & \textbf{31.5\% improvement vs v6.0} \\
 \bottomrule
 \end{tabular}
+\end{keytable}
 \end{table}
 
 \paragraph{Learned Weight Vector.}
-After warmup on 2022--2023 data, the Dirichlet posterior converged to the following weights (compared to v6.0 static):
+After warmup on 2022--2023 data, the Dirichlet posterior converged to the weights shown in \Cref{fig:dirichlet-weights-chart}; \Cref{tab:weight-comparison} provides exact values:
+
+\input{../figures/tikz/chart_dirichlet_weights}
 
 \begin{table}[h]
 \centering
@@ -227,7 +231,10 @@ where $\theta_{\text{player}}$ is latent skill (partially pooled across position
 borrowing strength across players within positions (e.g., all QBs share a common mean $\mu_{\text{QB}}$ but have individual deviations). Informative Priors v2 further constrains predictions via position-specific priors elicited from 2015--2023 data (e.g., QBs $\sim$ 240 yards, RBs $\sim$ 60 yards).
 
 \paragraph{Empirical Support.}
-To validate this mechanistic interpretation, we decomposed component errors by variance source:
+To validate this mechanistic interpretation, we decomposed component errors by variance source (\Cref{fig:variance-decomposition-chart}):
+
+\input{../figures/tikz/chart_variance_decomposition}
+
 \begin{table}[h]
 \centering
 \caption[Component error decomposition by variance source]{Variance decomposition of component errors for player passing predictions. Hierarchical models minimize within-player variance; XGBoost minimizes opponent-driven variance (which is small for props).}

@@ -269,12 +269,15 @@ The model is implemented in Python using NumPy for efficient matrix operations:
 
 \subsection{Historical Performance Analysis}
 
-To assess long-term robustness, we generated sequential predictions for all games from 2019--2025 (1,782 games) using the optimal hyperparameters. Table~\ref{tab:state-space-by-season} shows performance by season.
+To assess long-term robustness, we generated sequential predictions for all games from 2019--2025 (1,782 games) using the optimal hyperparameters. \Cref{fig:state-space-seasons-chart} shows stable performance across 7 seasons; Table~\ref{tab:state-space-by-season} provides exact values.
+
+\input{../figures/tikz/chart_state_space_seasons}
 
 \begin{table}[h]
 \centering
 \caption{State-Space Historical Performance (2019--2025)}
 \label{tab:state-space-by-season}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lccc}
 \toprule
 \textbf{Season} & \textbf{Games} & \textbf{Accuracy} & \textbf{Trend} \\
@@ -290,6 +293,7 @@ To assess long-term robustness, we generated sequential predictions for all game
 \textbf{Overall} & \textbf{1,782} & \textbf{63.5\%} & --- \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 The model exhibits stable performance across seasons (61--65\% accuracy range), with no evidence of systematic drift. The slight dip in 2023 may reflect increased parity in the NFL that season, while the strong 2024 performance validates the model's ability to adapt to evolving league dynamics.

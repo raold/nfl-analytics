@@ -1,0 +1,54 @@
+% State-Space Historical Performance by Season (2019-2025)
+% Replaces: tab:state-space-by-season in section_state_space_model.tex
+% Line chart with bar overlay showing 7-year stability
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\definecolor{accent}{RGB}{31,119,180}
+\definecolor{accentGreen}{RGB}{44,160,44}
+
+\begin{axis}[
+  width=0.82\textwidth,
+  height=6.5cm,
+  ybar,
+  bar width=18pt,
+  ylabel={Accuracy (\%)},
+  ylabel style={font=\footnotesize},
+  ymin=58, ymax=68,
+  xtick={1,2,3,4,5,6,7},
+  xticklabels={2019, 2020, 2021, 2022, 2023, 2024, 2025*},
+  xticklabel style={font=\scriptsize},
+  yticklabel style={font=\scriptsize},
+  grid=major,
+  grid style={gray!15},
+  xmajorgrids=false,
+  enlarge x limits={abs=0.6},
+]
+
+% Accuracy bars
+\addplot[fill=accent!50, draw=accent] coordinates {
+  (1, 61.1) (2, 63.2) (3, 63.5) (4, 64.4) (5, 62.8) (6, 65.3) (7, 64.5)
+};
+
+% Mean line
+\draw[accentGreen, thick, dashed] (axis cs:0.3,63.5) -- (axis cs:7.7,63.5);
+\node[font=\tiny, text=accentGreen!80!black, anchor=south west] at (axis cs:0.4,63.5) {Mean: 63.5\%};
+
+% Value labels
+\node[font=\tiny\bfseries, anchor=south] at (axis cs:1,61.1) {61.1};
+\node[font=\tiny\bfseries, anchor=south] at (axis cs:2,63.2) {63.2};
+\node[font=\tiny\bfseries, anchor=south] at (axis cs:3,63.5) {63.5};
+\node[font=\tiny\bfseries, anchor=south] at (axis cs:4,64.4) {64.4};
+\node[font=\tiny\bfseries, anchor=south] at (axis cs:5,62.8) {62.8};
+\node[font=\tiny\bfseries, anchor=south] at (axis cs:6,65.3) {65.3};
+\node[font=\tiny, anchor=south] at (axis cs:7,64.5) {64.5};
+
+% Trend annotations
+\node[font=\tiny, text=black!40, anchor=north] at (axis cs:7,59) {*partial (107 games)};
+
+\end{axis}
+\end{tikzpicture}
+\caption[State-space historical performance]{State-space model accuracy across 7 seasons (2019--2025, $n=1{,}782$ games). Performance remains stable in the 61--65\% range (mean 63.5\%) with no evidence of systematic drift. The 2023 dip ($-1.6$pp) may reflect increased NFL parity; the strong 2024 recovery (+2.5pp) validates model adaptability.}
+\label{fig:state-space-seasons-chart}
+\end{figure}

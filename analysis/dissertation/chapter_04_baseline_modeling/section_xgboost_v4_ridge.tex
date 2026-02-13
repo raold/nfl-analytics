@@ -54,7 +54,9 @@ To ensure generalization beyond training data, we conducted \textbf{rolling orig
 \end{itemize}
 
 \paragraph{Results: Consistent 88\% Improvement.}
-Table~\ref{tab:xgboost-v4-multi-season} shows performance across all 3 seasons:
+\Cref{fig:xgb-v4-multiseason-chart} visualizes the dramatic improvement; Table~\ref{tab:xgboost-v4-multi-season} provides exact values:
+
+\input{../figures/tikz/chart_xgb_v4_multseason}
 
 \begin{table}[htbp]
 \centering
@@ -90,7 +92,9 @@ All 4 validation criteria passed:
 
 \subsection{Ablation Study: Component Contributions}
 
-To isolate the value of each design choice, we trained 5 variants on 2023 holdout (148 games):
+To isolate the value of each design choice, we trained 5 variants on 2023 holdout (148 games). \Cref{fig:xgb-v4-ablation-chart} visualizes the degradation hierarchy:
+
+\input{../figures/tikz/chart_xgb_v4_ablation}
 
 \begin{table}[htbp]
 \centering

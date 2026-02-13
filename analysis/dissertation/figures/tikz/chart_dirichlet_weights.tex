@@ -1,0 +1,78 @@
+% v6.0 vs v8.0 Dirichlet Weight Comparison
+% Replaces: tab:weight-comparison in section_dirichlet_stacking.tex
+% Side-by-side stacked bar showing domain-specific weight reallocation
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}
+\definecolor{colHier}{RGB}{31,119,180}
+\definecolor{colIP}{RGB}{255,127,14}
+\definecolor{colSS}{RGB}{44,160,44}
+\definecolor{colXGB}{RGB}{214,39,40}
+\definecolor{colHybrid}{RGB}{148,103,189}
+
+\begin{axis}[
+  width=0.7\textwidth,
+  height=7.5cm,
+  ybar stacked,
+  bar width=36pt,
+  ylabel={Weight (\%)},
+  ylabel style={font=\footnotesize},
+  ymin=0, ymax=108,
+  xtick={1,2},
+  xticklabels={
+    {\shortstack{v6.0 Static\\(Games)}},
+    {\shortstack{v8.0 Dirichlet\\(Props)}}
+  },
+  xticklabel style={font=\scriptsize},
+  ytick={0,20,40,60,80,100},
+  yticklabel style={font=\scriptsize},
+  yticklabel={\pgfmathprintnumber{\tick}\%},
+  legend style={at={(1.02,0.5)}, anchor=west, font=\scriptsize, draw=gray!40, cells={anchor=west}},
+  enlarge x limits={abs=1.2},
+  grid=major,
+  grid style={gray!15},
+  xmajorgrids=false,
+]
+
+% Hybrid (bottom of stack)
+\addplot[fill=colHybrid!70, draw=colHybrid] coordinates {
+  (1, 10) (2, 10.1)
+};
+\addlegendentry{Hybrid Static-Incr.}
+
+% XGBoost
+\addplot[fill=colXGB!60, draw=colXGB] coordinates {
+  (1, 23) (2, 2.6)
+};
+\addlegendentry{XGBoost v4}
+
+% State-Space
+\addplot[fill=colSS!60, draw=colSS] coordinates {
+  (1, 27) (2, 8.2)
+};
+\addlegendentry{State-Space v2}
+
+% Informative Priors
+\addplot[fill=colIP!70, draw=colIP] coordinates {
+  (1, 13) (2, 39.5)
+};
+\addlegendentry{Informative Priors v2}
+
+% Hierarchical (top)
+\addplot[fill=colHier!70, draw=colHier] coordinates {
+  (1, 27) (2, 39.6)
+};
+\addlegendentry{Hierarchical v2}
+
+% Bayesian total bracket annotations
+\draw[decorate, decoration={brace, amplitude=4pt, mirror}, thick, black!50]
+  (axis cs:0.7,0) -- (axis cs:0.7,40) node[midway, left, font=\tiny, text=black!60, xshift=-5pt] {Bayes 40\%};
+\draw[decorate, decoration={brace, amplitude=4pt}, thick, black!50]
+  (axis cs:2.3,0) -- (axis cs:2.3,79.1) node[midway, right, font=\tiny, text=black!60, xshift=5pt] {Bayes 79\%};
+
+\end{axis}
+\end{tikzpicture}
+\caption[Dirichlet weight comparison]{v6.0 static (game-optimized) vs.\ v8.0 Dirichlet (prop-optimized) ensemble weights. Player props demand fundamentally different model contributions: Bayesian models (Hierarchical + Informative Priors) increase from 40\% to 79.1\% combined weight, while XGBoost collapses from 23\% to 2.6\%. This reflects the dominance of within-player variance (84\%) over opponent matchup effects (16\%) in player-level predictions.}
+\label{fig:dirichlet-weights-chart}
+\end{figure}
