@@ -10,11 +10,15 @@
 % ---------------------------------------------------
 \usepackage[utf8]{inputenc}    % Ensure UTF-8 encoding
 \usepackage[T1]{fontenc}       % Use T1 font encoding for accented characters
-\usepackage{lmodern}           % Latin Modern fonts (scalable, resolves microtype expansion)
+\usepackage{newpxtext}          % Palatino text (wider letterforms, superior at 12pt)
+\usepackage{newpxmath}          % Matching Palatino math (replaces Computer Modern math)
 \usepackage{graphicx}          % For including graphics (figures)
 \usepackage{amsmath}           % AMS math package for advanced mathematics
 \usepackage{mathtools}         % Math extensions (psmallmatrix, etc.)
+% Resolve symbol conflicts: newpxmath defines \openbox (QED) and \Bbbk before amsthm/amssymb
+\let\openbox\relax
 \usepackage{amsthm}            % Theorem environments
+\let\Bbbk\relax
 \usepackage{amssymb}         % Additional math symbols (e.g., mathbb)
 \usepackage{amsfonts}        % Math fonts used in chapter content
 \usepackage{algorithm}        % Algorithm floats
@@ -36,22 +40,22 @@
 \usepackage{caption}           % Custom captions for figures/tables
 \usepackage{subcaption}        % Sub-figures and sub-tables
 \usepackage{enumitem}          % Control layout of itemize/enumerate
+\usepackage{epigraph}          % Chapter-opening quotations
+\setlength{\epigraphwidth}{0.75\textwidth}
+\setlength{\epigraphrule}{0pt}  % No rule between quote and attribution
 \usepackage{natbib}            % Natbib for citations (author-year support)
-\usepackage{xcolor}            % Colors (required by todonotes)
+\usepackage[table]{xcolor}     % Colors + \rowcolors for zebra striping
 % Global accent palette (colorblind-safe blue)
 \definecolor{accentBlue}{RGB}{31,119,180}
 \definecolor{accent_blue}{RGB}{31,119,180}  % Alias for consistency
 \definecolor{accentblue}{RGB}{31,119,180}  % Alias for TikZ diagrams (lowercase)
-\usepackage{tcolorbox}          % Colored boxes for highlights
+\usepackage[skins]{tcolorbox}    % Colored boxes for highlights (skins for borderline)
 \usepackage[disable]{todonotes} % Disable todo notes for clean builds
 \usepackage{fvextra}           % Enhanced verbatim; enables wrapping and customization
 \usepackage{alphalph}          % Multi-letter counters (e.g., AA, AB) for many appendices
 \usepackage{setspace}          % Line spacing control (single/onehalf/double)
 \usepackage[protrusion=true,expansion=true]{microtype} % Better typography
 \emergencystretch=1em          % Allow extra stretching to avoid overfull boxes
-% Computer Modern (LaTeX default) - no font package needed
-% This provides the classic LaTeX appearance with superior math typesetting
-% (mathpazo removed to use default Computer Modern fonts)
 \usepackage{tikz}                % TikZ for diagrams/flowcharts
 \usetikzlibrary{arrows.meta,positioning,calc,shapes.geometric}
 \usepackage{pgfplots}            % Vector plots for inline charts (e.g., feature importance)
@@ -271,6 +275,84 @@
 % Hyphenation & layout tuning
 \Urlmuskip=0mu plus 1mu
 
+% ---------------------------------------------------
+% Visual Redesign Environments
+% ---------------------------------------------------
+
+% Key Finding callout box — accentBlue left sidebar, light fill
+% Usage: \begin{keyfinding}{Title Text} ... \end{keyfinding}
+\newtcolorbox{keyfinding}[1]{%
+  enhanced,
+  colback=accentBlue!5,
+  colframe=accentBlue!5,
+  borderline west={3pt}{0pt}{accentBlue},
+  sharp corners,
+  boxrule=0pt,
+  left=10pt, right=10pt, top=8pt, bottom=8pt,
+  before skip=12pt, after skip=12pt,
+  fonttitle=\bfseries\color{accentBlue},
+  title={#1},
+  attach title to upper={\par\smallskip}
+}
+
+% Hero Metric display — large centered number with supporting text
+% Usage: \herometric{value}{label}{context}
+\newcommand{\herometric}[3]{%
+  \begin{minipage}[t]{0.30\textwidth}%
+    \centering
+    {\fontsize{28}{34}\selectfont\bfseries\color{accentBlue}#1}\\[4pt]
+    {\small\textsc{#2}}\\[2pt]
+    {\footnotesize\color{black!60}#3}
+  \end{minipage}%
+}
+
+% Hero Metric row — wraps 3 herometrics in a centered display
+% Usage: \begin{herometricrow} \herometric{...}{...}{...} \hfill ... \end{herometricrow}
+\newenvironment{herometricrow}{%
+  \begin{center}
+  \vspace{8pt}
+  \begin{minipage}{0.92\textwidth}
+  \centering
+}{%
+  \end{minipage}
+  \vspace{8pt}
+  \end{center}
+}
+
+% Chapter Card — grey-bordered orientation box after chapter heading
+% Usage: \chaptercard{Summary text describing this chapter's purpose and driving question.}
+\newcommand{\chaptercard}[1]{%
+  \begin{tcolorbox}[
+    enhanced,
+    colback=black!2,
+    colframe=black!20,
+    boxrule=0.5pt,
+    sharp corners,
+    left=10pt, right=10pt, top=8pt, bottom=8pt,
+    before skip=6pt, after skip=16pt
+  ]
+  \itshape #1
+  \end{tcolorbox}
+}
+
+% Key Table wrapper — adds accentBlue left border to important tables
+% Usage: \begin{keytable} \begin{table}...\end{table} \end{keytable}
+\newenvironment{keytable}{%
+  \begin{tcolorbox}[
+    enhanced,
+    colback=white,
+    colframe=white,
+    borderline west={3pt}{0pt}{accentBlue},
+    boxrule=0pt,
+    sharp corners,
+    left=2pt, right=0pt, top=0pt, bottom=0pt,
+    before skip=0pt, after skip=0pt,
+    boxsep=0pt
+  ]
+}{%
+  \end{tcolorbox}
+}
+
 % Footnote configuration
 
 % ---------------------------------------------------
@@ -354,6 +436,14 @@ These modeling principles are integrated into a full-stack system featuring: ide
 The contributions are twofold: (1) a complete, reproducible, and profitable NFL betting system, and (2) a set of generalizable principles for applied machine learning in efficient markets, supported by a transparent accounting of both successful and failed research paths (e.g., an 84-hour, 0\%-return investigation into Bayesian Neural Networks). This work provides a playbook for moving beyond simple prediction to building robust, profitable, and deployable decision-making systems.
 \addcontentsline{toc}{chapter}{Abstract}
 
+\begin{herometricrow}
+\herometric{+2.96\%}{Betting ROI}{v6.0 ensemble, 2022--2024}%
+\hfill
+\herometric{342}{Engineered Features}{4 identifiers excluded}%
+\hfill
+\herometric{74.9\%}{Spread Accuracy}{2025 true out-of-sample}
+\end{herometricrow}
+
 % Code and Data Availability
 \chapter*{Code and Data Availability}
 \addcontentsline{toc}{chapter}{Code and Data Availability}
@@ -423,6 +513,9 @@ The code is released under the MIT License for academic and research use. Commer
 % \IfFileExists{../appendix/productionization_guide.tex}{\input{../appendix/productionization_guide.tex}}{}
 % \listoftodos
 
+% Executive Summary Dashboard (2-page visual spread)
+\IfFileExists{../executive_dashboard.tex}{\input{../executive_dashboard.tex}}{}
+
 % ---------------------------------------------------
 % Main Matter
 % ---------------------------------------------------
@@ -434,22 +527,48 @@ The code is released under the MIT License for academic and research use. Commer
 % Chapters
 % ---------------------------------------------------
 
+% Part I: Foundations — research question, literature, and data
+\part{Foundations}
+\noindent This part introduces the research problem—predicting NFL outcomes
+and profiting from betting markets—surveys the relevant literature in sports
+analytics, Bayesian modeling, and market efficiency, and documents the 342-feature
+data foundation upon which all subsequent models are built.
+
 \input{../chapter_01_intro/chapter_01_intro.tex}
 \input{../chapter_02_lit_review/chapter_02_lit_review.tex}
 \input{../chapter_03_data_foundation/chapter_03_data_foundation.tex}
+
+% Part II: Models — baseline through advanced architectures
+\part{Models}
+\noindent This part develops the predictive engine: from baseline models (XGBoost,
+State-Space, Hierarchical Bayesian) through the advanced ensemble architecture
+and the reinforcement-learning-based bet-sizing agent that converts predictions
+into actionable positions.
+
 \input{../chapter_04_baseline_modeling/chapter_04_baseline_modeling.tex}
 \input{../chapter_05_advanced_bayesian/chapter_05_advanced_bayesian.tex}
 \input{../chapter_06_rl_design/chapter_06_rl_design.tex}
+
+% Part III: Evaluation — risk, simulation, and results
+\part{Evaluation}
+\noindent This part evaluates the complete system under realistic conditions:
+uncertainty quantification and risk management, Monte Carlo simulation of betting
+outcomes, and a comprehensive multi-season results analysis across spreads,
+totals, and player props.
+
 \input{../chapter_07_uncertainty_risk_betting/chapter_07_uncertainty_risk_betting.tex}
 \input{../chapter_08_simulation/chapter_08_simulation.tex}
 \input{../chapter_09_results_discussion/chapter_09_results_discussion.tex}
+
+% Part IV: Production & Reflection — deployment, lessons, and conclusions
+\part{Production \& Reflection}
+\noindent This part covers the journey from research to production: deployment
+architecture and engineering decisions, hard-won lessons from 13~months of
+development, and conclusions that distill the dissertation's contributions
+into transferable principles.
+
 \input{../chapter_10_production_deployment/chapter_10_production_deployment.tex}
-
-% Chapter 10: Lessons Learned (NEW - November 15, 2025)
-% Synthesis of 13-month research journey
 \input{../chapter_11_lessons_learned/chapter_11_lessons_learned.tex}
-
-% Chapter 11: Conclusion and Future Work (formerly Chapter 10)
 \input{../chapter_12_conclusion/chapter_12_conclusion.tex}
 
 % ---------------------------------------------------

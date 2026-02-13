@@ -2,6 +2,20 @@
 \chapter{Conclusion and Future Work}
 \label{chap:conclusion}
 
+\epigraph{The only real mistake is the one from which we learn nothing.}{Henry Ford}
+
+\chaptercard{Final synthesis: what 5,529~games and 21~seasons reveal about market
+efficiency, the limits of public-data models, and a roadmap for future work
+in differential market segments and live-game adaptation.}
+
+\begin{herometricrow}
+\herometric{$-7.5\%$}{Spread ROI}{market efficient at standard vig}%
+\hfill
+\herometric{0.2515}{Brier Score}{top-tier calibration}%
+\hfill
+\herometric{+14.9}{CLV (bps)}{positive closing line value}
+\end{herometricrow}
+
 This dissertation began with an ambitious hypothesis: rigorous statistical methods and machine learning could extract sustainable profits from NFL betting markets using publicly available data. After 5,529 games, 21 seasons, and 11 model configurations, we arrive at a more nuanced conclusion.
 
 \section{What We Learned}
@@ -13,6 +27,10 @@ Our models achieve strong calibration (Brier score = 0.2515) and beat closing li
 NFL betting markets efficiently incorporate public information: play-by-play data, injury reports, weather forecasts, historical performance. Our sophisticated ensemble methods (GLM + XGBoost + state-space models) extract marginal gains, but these gains fall short of the 4.5\% hurdle imposed by vigorish at standard $-110$ odds. To profit at these odds requires a 52.4\% win rate; we achieve 51.0\%.
 
 \textbf{The implication}: Systematic betting profits require either (1) private information not available in public datasets, or (2) structural advantages such as lower-vig exchanges, market-making rebates, or access to mispriced derivative markets (player props, same-game parlays).
+
+\begin{keyfinding}{Semi-Strong Market Efficiency: The Central Lesson}
+Strong calibration (Brier 0.2515) + positive CLV (+14.9~bps) still produce $-7.5\%$ ROI. Public information is efficiently priced. Systematic profits require either private data or structural advantages (lower-vig exchanges, derivative market mispricing).
+\end{keyfinding}
 
 \subsection{Methodological Contributions}
 

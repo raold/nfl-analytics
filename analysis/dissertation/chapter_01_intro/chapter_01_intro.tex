@@ -3,6 +3,13 @@
 \chapter{Introduction and Motivation}
 \label{chap:intro}
 
+\epigraph{All models are wrong, but some are useful.}{George E.\ P.\ Box (1976)}
+
+\chaptercard{This chapter motivates the research question---can machine learning
+extract sustainable profits from NFL betting markets?---and previews the
+system-of-systems architecture, the 13-month research journey, and the
+dissertation's structure.}
+
 \section{Why Focus on the NFL}
 
 The \textbf{National Football League (NFL)} is an ideal testbed for quantitative decision systems because it combines: (i) deep liquid betting markets; (ii) abundant, granular data; and (iii) inherently sequential strategic decisions. These properties support rigorous modeling and credible evaluation of edge.
@@ -40,6 +47,10 @@ We develop a complete betting system pipeline—from data ingestion to model tra
 
 \textbf{Thesis.} A disciplined ensemble architecture combining orthogonalized features, diversified model methodologies, and adaptive weight optimization—validated through multi-season testing and honest failure accounting—can extract systematic profit from NFL betting markets using publicly available data. Multi-season backtesting (2022--2024) achieves +2.96\% ROI with 53.89\% win rate, while true out-of-sample testing on 2025 data demonstrates 74.9\% spread prediction accuracy (p < 0.001).
 
+\begin{keyfinding}{Thesis: Profitability Through Disciplined Process}
+Profitability in efficient betting markets is not a feature of a single clever model---it is an emergent property of a \emph{system} built on feature orthogonalization, ensemble diversification, and multi-season validation. The v6.0 system achieves +2.96\% ROI where the v1.0 monolithic model lost money.
+\end{keyfinding}
+
 \textbf{Supporting Evidence:}
 \begin{enumerate}[itemsep=2pt,parsep=0pt]
     \item \textbf{Orthogonalization principle} (Appendix~\ref{app:orthogonalization}): Two-stage Ridge Residuals architecture achieved 88.31\% MAE improvement (mean 4.70 $\pm$ 0.40 MAE across 2022--2024, all p < 0.000001) by decomposing quarterback skill into opponent-orthogonal residuals via Gram-Schmidt orthogonalization.
@@ -70,6 +81,10 @@ This work makes seven primary contributions, independent of profitability outcom
   \item \textbf{Dependence-aware methods}: Copula-based pricing for correlated outcomes (same-game parlays, teasers) and key-number reweighting for integer margins.
   \item \textbf{Transparent governance}: Documentation of model selection, risk constraints, and operational decision logic, including when the system declines to act.
 \end{enumerate}
+
+\begin{keyfinding}{Calibration $\neq$ Profitability}
+Strong calibration (Brier~=~0.2515) and positive closing line value (+14.9~bps) are \emph{necessary but insufficient} for profitability. The 4--5\% vigorish hurdle in semi-strong efficient markets means prediction accuracy alone cannot guarantee positive returns.
+\end{keyfinding}
 
 \noindent The dissertation demonstrates that strong calibration, while necessary, is insufficient for profitability in semi-strong efficient markets where vigorish imposes a 4--5\% hurdle. Full results appear in \Cref{chap:results}.
 

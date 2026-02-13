@@ -5,7 +5,18 @@
 \chapter{Production Deployment and Operational Edges}
 \label{chap:production}
 
+\epigraph{In theory, there is no difference between theory and practice.
+In practice, there is.}{Attributed to Yogi Berra}
+
+\chaptercard{From research to real money: deployment architecture, line-shopping
+infrastructure, Kelly sizing in production, and the discovery that signal quality
+dominates compute in efficient markets.}
+
 This chapter documents the transition from research to production deployment. Having completed comprehensive modeling, ensemble design, and stress testing, we now address the operational infrastructure required for real‑money betting at scale. The analysis reveals a critical insight: \textbf{the limiting factor for expected value is SIGNAL, not COMPUTE}. Throwing additional GPU resources at the problem yields diminishing returns in NFL markets characterized by data scarcity (256 games per season) and efficient closing lines. Instead, value accrues from operational improvements: line shopping across sportsbooks, Kelly criterion bet sizing, early‑week betting strategies, and enhanced data sources.
+
+\begin{keyfinding}{Signal Quality Dominates Compute in Efficient Markets}
+In NFL markets with only 256 games per season, throwing GPUs at the problem yields diminishing returns. Value accrues from operational edges: line shopping across sportsbooks, timing (early-week vs closing), and data source quality. The limiting factor for expected value is signal, not compute.
+\end{keyfinding}
 
 Section~\ref{sec:claude_integration} introduces a novel contribution: the integration of large language models (specifically Claude AI) for semantic research exploration. This represents the first documented use of conversational AI to bridge statistical modeling and domain‑specific betting narratives, enabling rapid hypothesis testing and feature discovery through natural language queries.
 

@@ -2,9 +2,19 @@
 \chapter{Data Foundations and Feature Engineering}
 \label{chap:data}
 
+\epigraph{It is a capital mistake to theorize before one has data.}{Arthur Conan Doyle, \textit{A Scandal in Bohemia} (1891)}
+
+\chaptercard{This chapter builds the 342-feature data foundation: idempotent
+ingestion pipelines, TimescaleDB schema design, multi-layered temporal leakage
+prevention, and the Phase~2 feature expansion that grew the catalog by 107\%.}
+
 Building on the calibration requirements and market efficiency findings from \Cref{chap:litreview}, this chapter establishes the data foundation that enables reliable probability estimation and uncertainty quantification. We implement a defense-in-depth approach spanning five integrated layers: (i) idempotent ingestion pipelines for play-by-play, odds history, and weather data; (ii) a governed TimescaleDB schema with hypertables, compression, and indexing optimized for time-series analytics; (iii) a feature engineering catalog expanded from 112 baseline to 232 total features (+107\% expansion) through Phase 2 Advanced Stats Integration (\Cref{sec:phase2-advanced-stats}) with strict temporal leakage controls; (iv) data quality gates with drift detection and coverage monitoring; and (v) temporal weighting schemes that address NFL rule changes and market evolution while preserving statistical power.
 
 The central technical contribution is a multi-layered leakage prevention architecture that enforces as-of semantics through SQL constraints, pandas validation, runtime guards, and unit tests---ensuring that no feature incorporates information unavailable at decision time. This rigor is essential to the thesis: uncertainty quantification is only credible when data integrity is provable and reproducible.
+
+\begin{keyfinding}{Defense-in-Depth: Temporal Leakage Prevention}
+The most insidious threat to predictive validity is temporal leakage---using information unavailable at decision time. Our four-layer architecture (SQL constraints, pandas validation, runtime guards, unit tests) enforces as-of semantics across all 342 features, making data integrity provable and reproducible.
+\end{keyfinding}
 
 
 
@@ -138,6 +148,10 @@ With the governed schema in place, we systematically engineer features that bala
 \label{sec:feature-engineering}
 
 We construct a comprehensive feature catalog spanning baseline production features (112) and advanced analytics modules (120 additional features via Phase 2 integration, detailed in \Cref{sec:phase2-advanced-stats}), totaling 232 features across four baseline taxonomic categories plus five advanced analytics domains. Each feature has documented lineage, update cadence, and leakage controls. The catalog enables modular experimentation while enforcing strict as-of semantics across all 232 features.
+
+\begin{keyfinding}{342 Engineered Features with Documented Lineage}
+The feature catalog spans 232 baseline features (112 production + 120 Phase~2 advanced stats) plus 110 synthetic and research-driven features, totaling 342. Every feature has documented lineage, update cadence, and temporal leakage controls---enabling modular experimentation while enforcing strict as-of semantics.
+\end{keyfinding}
 
 \subsection{Feature Catalog and Taxonomy}
 \label{subsec:feature-catalog}

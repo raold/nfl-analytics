@@ -1,6 +1,13 @@
 % !TEX root = ../main/main.tex
 \chapter{Uncertainty and Risk Management}
 \label{chap:risk}
+
+\epigraph{Risk comes from not knowing what you are doing.}{Warren Buffett}
+
+\chaptercard{Translating predictive uncertainty into portfolio-level risk controls:
+Kelly criterion sizing, fractional scaling, CVaR constraints, and conformal
+prediction intervals that keep betting strategies resilient under regime change.}
+
 We translate predictive uncertainty into portfolio-level risk controls, ensuring that betting strategies remain resilient under changing market conditions.\mndown{2}{Quantify, propagate, and govern model uncertainty; see Kelly staking~\S\ref{sec:kelly-math}, CVaR program~\S\ref{sec:cvar-math}, and lattice CRPS~\S\ref{subsec:crps-lattice}.}
 
 % --- Mathematical reasoning: uncertainty and risk ---
@@ -14,6 +21,10 @@ f^\star=\argmax_{f\in[0,1]}\; p\log(1+fb)+(1-p)\log(1-f)
 \end{equation}
 Fractional Kelly $\tilde f=\kappa f^\star$ with $\kappa\in(0,1]$ trades growth for lower variance
 and smaller drawdowns; we report sensitivity over $\kappa$.
+
+\begin{keyfinding}{Kelly Criterion: Optimal Growth Under Uncertainty}
+The Kelly fraction $f^\star = p - (1-p)/b$ maximizes long-run bankroll growth, but full Kelly is too aggressive in practice. Fractional Kelly ($\kappa \in [0.25, 0.50]$) with posterior lower-credible-bound probabilities trades growth for resilience---critical when estimated probabilities carry estimation error.
+\end{keyfinding}
 
 \subsection{Parameter uncertainty: posterior–lower–bound Kelly}\label{subsec:bayes-kelly}
 With estimated probabilities, maximizing Bayesian expected log growth reduces to plugging the posterior mean $\bar p=\E[p\mid\mathcal D]$ into \eqref{eq:kelly-opt}. To account for estimation risk conservatively, we stake on a \emph{lower credible bound} for $p$:
@@ -46,6 +57,10 @@ program
 \text{s.t.}\quad & \xi_b \ge -\vect f^\top R^{(b)} - t,\; b=1,\dots,B,\qquad \vect f\in\mathcal{F} \nonumber
 \end{align}
 limits tail risk while allowing Kelly-like growth on the interior. We include exposure/market caps in $\mathcal{F}$.
+
+\begin{keyfinding}{CVaR: Portfolio-Level Tail Risk Control}
+The CVaR-constrained program limits worst-case portfolio losses while preserving Kelly-like growth on the interior. By combining individual bet edges with portfolio-level exposure and market caps in $\mathcal{F}$, we transform independent bet decisions into a coherent risk-managed portfolio.
+\end{keyfinding}
 
 % Auto-included CVaR benchmark table if present
 \IfFileExists{../figures/out/cvar_benchmark_table.tex}{\input{../figures/out/cvar_benchmark_table.tex}}{}

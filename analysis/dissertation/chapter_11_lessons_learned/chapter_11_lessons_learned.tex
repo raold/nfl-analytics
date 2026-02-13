@@ -1,9 +1,12 @@
 \chapter{Lessons Learned and Production Insights}
 \label{chap:lessons-learned}
 
-\begin{chapquote}{Nassim Nicholas Taleb, \textit{Antifragile}}
-``The absence of evidence of failure is not evidence of the absence of failure.''
-\end{chapquote}
+\epigraph{The absence of evidence of failure is not evidence of the absence
+of failure.}{Nassim Nicholas Taleb, \textit{Antifragile}}
+
+\chaptercard{A synthesis of 13~months and 787~hours of development: the meta-lessons
+about research process, validation discipline, and building robust AI systems in
+adversarial markets that transcend any single model or result.}
 
 \section{Introduction: The 13-Month Journey}
 
@@ -16,7 +19,11 @@ This concluding chapter synthesizes the highest-level lessons from that journey.
 The successful v6.0 ensemble was built upon three core technical principles that were discovered through rigorous experimentation. The detailed evolution and validation of these methods are now presented in their respective chapters, but are summarized here.
 
 \begin{enumerate}
-    \item \textbf{Feature Engineering Dominates Model Complexity.} The single most impactful discovery was the "Ridge Residuals" orthogonalization method, which isolates a pure QB skill signal from confounding opponent effects. This simple feature engineering technique improved a key model component's accuracy by 88\% and proved far more valuable than an 84-hour investigation into complex Bayesian Neural Networks. The full methodology is now detailed in \Cref{sec:ridge-residuals}.
+    \item \textbf{Feature Engineering Dominates Model Complexity.} The single most impactful discovery was the ``Ridge Residuals'' orthogonalization method, which isolates a pure QB skill signal from confounding opponent effects. This simple feature engineering technique improved a key model component's accuracy by 88\% and proved far more valuable than an 84-hour investigation into complex Bayesian Neural Networks. The full methodology is now detailed in \Cref{sec:ridge-residuals}.
+
+\begin{keyfinding}{Features > Models: 88\% vs 0\%}
+Simple feature engineering (Ridge Residuals: 88\% accuracy improvement) delivered more value than 84~hours of Bayesian Neural Network research (0 production models). Make features do the work---not model architectures.
+\end{keyfinding}
 
     \item \textbf{Ensemble Diversification > Individual Sophistication.} The v1.0 system failed because it relied on a single model. The profitable v6.0 system succeeded by combining five weakly correlated models. As shown by the variance decomposition analysis in \Cref{sec:unified-baseline-comparison}, adding a simple, uncorrelated model (like ELO) was more effective at reducing overall error than further refining a single, sophisticated one.
 
@@ -29,7 +36,11 @@ Beyond the specific techniques, this research yielded several generalizable prin
 
 \subsection{The Critical Role of Multi-Layer Validation}
 
-As documented in the case study in \Cref{sec:multi-layer-validation}, a near-catastrophic deployment error was prevented only by a rigorous, multi-season validation protocol. A flawed model that looked like a breakthrough success on a single season's data was correctly identified as a failure when tested across three seasons. This experience proves that a "Defense-in-Depth" validation strategy—spanning unit tests, integration tests, historical backtests, and simulated deployment—is not optional overhead; it is the fundamental requirement for building trustworthy models.
+As documented in the case study in \Cref{sec:multi-layer-validation}, a near-catastrophic deployment error was prevented only by a rigorous, multi-season validation protocol. A flawed model that looked like a breakthrough success on a single season's data was correctly identified as a failure when tested across three seasons. This experience proves that a ``Defense-in-Depth'' validation strategy---spanning unit tests, integration tests, historical backtests, and simulated deployment---is not optional overhead; it is the fundamental requirement for building trustworthy models.
+
+\begin{keyfinding}{Validation Rigor: Defense-in-Depth Is Not Optional}
+A model showing +21\% improvement on single-season data was revealed as 13.7\% \emph{worse} under multi-season testing. Single-season validation is dangerously misleading. Only a multi-layer protocol (unit $\to$ integration $\to$ backtest $\to$ staging $\to$ production) builds trustworthy systems.
+\end{keyfinding}
 
 \subsection{The Bayesian Abandonment Criterion: Know When to Fold}
 
@@ -44,6 +55,10 @@ The initial v1.0 hierarchical model was theoretically sound and would likely pas
 
 \subsection{Honest Failure Accounting Builds Credibility}
 This dissertation transparently documents its most significant failures. This is not self-flagellation; it is a core tenet of the scientific method. By detailing what didn't work and why, we (1) prevent future researchers from repeating the same mistakes, (2) provide a more credible foundation for our successful results, and (3) map the true boundaries of what is feasible in this problem domain.
+
+\begin{keyfinding}{Honest Failure Accounting Builds Credibility}
+Documenting failures (BNN: 84 hours, 6 approaches, 0 production models) is not self-flagellation---it prevents future researchers from repeating mistakes, provides credible foundations for successful results, and maps the true boundaries of what is feasible.
+\end{keyfinding}
 
 \section{Transferable Insights Beyond NFL Betting}
 \label{sec:transferable-condensed}

@@ -4,6 +4,7 @@
   \caption[Out-of-sample results by season]{Out-of-sample performance by season: GLM baseline, stacked ensemble, and XGBoost (2015--2024).}
   \label{tab:oos-record}
   \setlength{\tabcolsep}{2.5pt}\renewcommand{\arraystretch}{1.08}
+  \rowcolors{2}{}{accentBlue!3}
   \begin{tabular}{@{} c l r r r r @{} }
     \toprule
     \textbf{Season}  & \textbf{Model}  & \textbf{N}  & \textbf{Brier $\downarrow$}  & \textbf{Accuracy}  & \textbf{ROI \%} \\
@@ -49,4 +50,5 @@
      & Stack(All) & 281 & 0.2511 & 48.0\% & +0.0\% \\
     \bottomrule
   \end{tabular}
+  \rowcolors{1}{}{}
 \end{table}

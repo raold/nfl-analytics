@@ -359,6 +359,7 @@ Two-stage model addressing spurious correlation between player skill and opponen
 \centering
 \caption{XGBoost v4 Multi-Season Performance}
 \label{tab:xgboost-v4-multisea son}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lrrrrl}
 \toprule
 \textbf{Season} & \textbf{MAE} & \textbf{RMSE} & \textbf{Improvement} & \textbf{p-value} & \textbf{Significance} \\
@@ -370,6 +371,7 @@ Two-stage model addressing spurious correlation between player skill and opponen
 \textbf{Mean $\pm$ SD} & \textbf{4.70 $\pm$ 0.40} & \textbf{6.29 $\pm$ 0.42} & \textbf{88.31\%} & -- & -- \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \textbf{Baseline}: Mean predictor (40.20 MAE)
@@ -785,6 +787,7 @@ A simple power ratings model using 2024 point differentials and 2.5-point home f
 \centering
 \caption{Historical Spread Prediction Performance (2020-2025)}
 \label{tab:spread-holdout-2025}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lrrrr}
 \toprule
 \textbf{Season} & \textbf{Bets} & \textbf{Wins} & \textbf{Win Rate} & \textbf{ROI} \\
@@ -799,6 +802,7 @@ A simple power ratings model using 2024 point differentials and 2.5-point home f
 \textbf{Overall} & 1,373 & 1,034 & \textbf{75.3\%} & \textbf{+43.8\%} \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \textbf{Statistical Significance}: The observed win rate (75.3\%) exceeds the breakeven threshold (52.4\% accounting for -110 vig) with overwhelming statistical significance (p < $10^{-68}$ via binomial test). The consistency across all six seasons (73.4\%-77.8\% range) demonstrates robustness to regime changes, rule modifications, and coaching turnover.
@@ -872,6 +876,7 @@ These findings informed the decision to maintain static ensemble weights (ADR-00
 \centering
 \caption{Production Model Training Times (M4 Mac, 10 cores)}
 \label{tab:training-times}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lrrr}
 \toprule
 \textbf{Model} & \textbf{Time (min)} & \textbf{Memory (GB)} & \textbf{Frequency} \\
@@ -887,6 +892,7 @@ Temperature Scaler & 2.4 & 0.5 & Annual \\
 \textbf{Total (annual retraining)} & \textbf{802.6} & \textbf{--} & \textbf{--} \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \textbf{Total annual training cost}: ~13.4 hours (acceptable for yearly retraining cycle)
@@ -897,6 +903,7 @@ Temperature Scaler & 2.4 & 0.5 & Annual \\
 \centering
 \caption{Ensemble v6.0 Inference Time Breakdown (Single Prediction)}
 \label{tab:inference-times}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{lrrr}
 \toprule
 \textbf{Component} & \textbf{Time (ms)} & \textbf{\% Total} & \textbf{Parallel} \\
@@ -912,6 +919,7 @@ Temperature Scaling & 6 & 3.1\% & No \\
 \textbf{Total (sequential)} & \textbf{206} & \textbf{--} & \textbf{--} \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \textbf{Parallel ensemble prediction} (195 ms) achieves <500 ms target for production deployment.
@@ -926,6 +934,7 @@ Temperature Scaling & 6 & 3.1\% & No \\
 \centering
 \caption{Software Version Registry (Pinned to Patch Level)}
 \label{tab:software-versions}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{llr}
 \toprule
 \textbf{Package} & \textbf{Version} & \textbf{Purpose} \\
@@ -949,6 +958,7 @@ Git LFS & 3.4.0 & Model artifact versioning \\
 Docker & 24.0.7 & Containerization \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 \subsection{Hardware Specifications}

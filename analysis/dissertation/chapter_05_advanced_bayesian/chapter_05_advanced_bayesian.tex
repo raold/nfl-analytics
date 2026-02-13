@@ -3,12 +3,23 @@
 \label{chap:advanced_bayesian}
 \label{chap:bayesian-models}  % Alternative label for backward compatibility
 
+\epigraph{The combination of some data and an aching desire for an answer does
+not ensure that a reasonable answer can be extracted from a given body of data.}{John W.\ Tukey (1986)}
+
+\chaptercard{Beyond baselines: Bayesian hierarchical ratings with time-varying effects,
+GPU-accelerated training, graph neural networks, and the v3.0 ensemble architecture
+that combines diverse weak learners into a robust predictor.}
+
 \section*{Overview and Motivation}
 Building on the classical baseline models in \Cref{chap:methods}, this chapter develops advanced Bayesian hierarchical frameworks and ensemble methods that address the limitations of point-estimate models. While gradient boosting and GLMs excel at prediction, they lack principled uncertainty quantification critical for risk-aware betting. Bayesian methods provide full posterior distributions that inform Kelly sizing, ensemble voting, and production risk gates.
 
 This chapter presents: (1) Bayesian hierarchical team ratings with partial pooling and time-varying effects, (2) GPU training infrastructure enabling large-scale Bayesian neural networks, (3) graph neural networks for matchup dynamics with 660× GPU speedup, (4) advanced feature engineering including regime detection and dynamic copulas, and (5) the v3.0 player props ensemble integrating informative priors, QB-WR chemistry, and meta-learner stacking for 86.4\% MAE improvement.
 
 The Bayesian foundations established here enable the reinforcement learning system (\Cref{chap:rl}) to convert predictive edge into sequential betting decisions with quantified uncertainty, portfolio diversification, and governance oversight.
+
+\begin{keyfinding}{Ensemble Diversification Beats Individual Sophistication}
+Combining five weakly correlated models ($\bar{\rho}=0.32$) achieves 56\% variance reduction---more cost-effective than refining any single model. Adding a simple ELO model (68.4 individual MAE) reduced ensemble error more than further tuning the best-performing XGBoost component.
+\end{keyfinding}
 
 \section{Bayesian Hierarchical Team Ratings}\label{sec:bayesian-hierarchical}
 

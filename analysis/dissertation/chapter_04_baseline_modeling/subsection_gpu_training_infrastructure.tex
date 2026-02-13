@@ -27,6 +27,7 @@ Key features:
 \small
 \caption[GPU training job schedule]{GPU training jobs on NVIDIA RTX 4090 (24GB VRAM, 16,384 CUDA cores) with estimated runtimes and phase priorities. Phase 1 jobs (critical models) execute first; Phase 2 (overnight batch) queued sequentially. Total runtime: 27.5 hours.}
 \label{tab:gpu-training-jobs}
+\rowcolors{2}{}{accentBlue!3}
 \begin{tabular}{llccr}
 \toprule
 \textbf{Job}  & \textbf{Model}  & \textbf{Phase}  & \textbf{Priority}  & \textbf{Est. Hours} \\
@@ -45,6 +46,7 @@ Key features:
 \textbf{Total (All)} & & & & \textbf{27.5} \\
 \bottomrule
 \end{tabular}
+\rowcolors{1}{}{}
 \end{table}
 
 The orchestrator enables overnight batch training: queue all Phase 2 jobs before leaving the lab, return to 8 trained models with full logs and version control snapshots.
