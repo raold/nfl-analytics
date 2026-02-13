@@ -71,7 +71,9 @@ Pairwise Diebold-Mariano tests compare predictive accuracy (MAE) between scenari
 
 \subsection{Results}
 
-\Cref{tab:training-window-ablation-results} presents performance metrics for all four scenarios. Scenario D (2018--2024 + H=4 decay) achieves the lowest MAE (47.77 yards) and is selected as the canonical window.
+\Cref{fig:training-window-chart} visualizes the comparison; \Cref{tab:training-window-ablation-results} provides full metrics. Scenario D (2018--2024 + H=4 decay) achieves the lowest MAE (47.77 yards) and is selected as the canonical window.
+
+\input{../figures/tikz/chart_training_window}
 
 \begin{table}[htbp]
   \centering
@@ -528,7 +530,9 @@ We systematically remove features in reverse importance order (least important f
 
 \subsection{Category-Level Ablation}
 
-We test dropping entire feature categories to assess category-level importance.
+We test dropping entire feature categories to assess category-level importance (\Cref{fig:category-ablation-chart}).
+
+\input{../figures/tikz/chart_category_ablation}
 
 \begin{table}[htbp]
   \centering

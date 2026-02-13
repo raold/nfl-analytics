@@ -207,12 +207,15 @@ We conduct 6 pairwise comparisons:
 We apply the Holm-Bonferroni procedure to control the family-wise error rate at $\alpha = 0.05$. For $m=6$ tests, the $k$th smallest p-value must satisfy $p_k < \alpha/(m-k+1)$ to be declared significant.
 
 \paragraph{Results.}
-\Cref{tab:diebold-mariano-tests} presents DM test results. The ensemble significantly outperforms all individual models at the 5\% level after Holm-Bonferroni correction, with particularly strong evidence against the naive baseline ($p < 0.001$).
+\Cref{fig:dm-tests-chart} visualizes the forest plot of DM test results; \Cref{tab:diebold-mariano-tests} provides exact values. The ensemble significantly outperforms all individual models at the 5\% level after Holm-Bonferroni correction, with particularly strong evidence against the naive baseline ($p < 0.001$).
+
+\input{../figures/tikz/chart_dm_tests}
 
 \begin{table}[htbp]
   \centering
   \caption{Diebold-Mariano Tests for Predictive Accuracy (2022--2024)}
   \label{tab:diebold-mariano-tests}
+  \rowcolors{2}{}{accentBlue!3}
   \begin{tabular}{lrrrrr}
     \toprule
     \textbf{Comparison} & \textbf{$\Delta$ MAE} & \textbf{DM Stat} & \textbf{p-value} & \textbf{95\% CI} & \textbf{Sig.} \\
@@ -225,6 +228,7 @@ We apply the Holm-Bonferroni procedure to control the family-wise error rate at 
     State-Space v2 vs v1 & -1.35 & -2.71 & 0.0034 & [-2.33, -0.37] & Yes* \\
     \bottomrule
   \end{tabular}
+  \rowcolors{1}{}{}
   \vspace{0.5em}
   \begin{flushleft}
     \footnotesize\textit{Notes}: One-sided DM tests on 2022--2024 test set ($n=1{,}405$ predictions). Negative $\Delta$ MAE indicates first model is more accurate. DM statistic computed using Newey-West HAC variance ($h=1$). 95\% confidence intervals via bootstrap (5,000 samples). Sig.* indicates rejection at $\alpha=0.05$ after Holm-Bonferroni correction for 6 tests. Naive baseline uses within-player season average.
