@@ -1,11 +1,11 @@
 # Agent Infrastructure - Complete Reference
 
-**Last Updated:** November 15, 2025
-**Status:** ✅ ALL PHASES COMPLETE + 3 NEW AGENTS (November 14, 2025)
+**Last Updated:** February 13, 2026
+**Status:** Phases 1-5 Complete + Phase 6 Trading Agents (February 13, 2026)
 
-**Total:** 11 specialized agents (8 Phase 1-3 + 3 Nov 14 additions)
-**CLI Tools:** 11 shell scripts for immediate use
-**Code:** ~7,996 lines across 11 agent modules (25 files in py/utils/)
+**Total:** 14 specialized agents (11 infrastructure + 3 trading)
+**CLI Tools:** 12 shell scripts for immediate use
+**Code:** ~7,996 lines across 11 infrastructure modules + ~750 lines across 3 trading agents
 
 ---
 
@@ -499,14 +499,115 @@ Phase 1+2+3+4 agents distributed across coordinator:
 
 ---
 
+## Phase 6: Trading System Agents (3 agents - February 13, 2026)
+
+**Context:** The Kalshi Trading System (6 phases, 437 tests, 37 files) introduced a complete prediction-market pipeline. Three agents provide operational monitoring: pre-trade validation, portfolio health, and post-execution reconciliation.
+
+### 12. Trading Signal Validator
+
+**Purpose:** Pre-trade signal validation — catches suspicious signals before they reach the exchange
+
+**Validates:**
+- Edge size reasonableness (signals with >30¢ edge are suspicious)
+- Contract ID prefix matches known sport patterns (e.g. `KXNFL`)
+- Feature staleness via `FeatureHealthChecker` integration
+- Price within valid 1-99¢ range
+- Strategy-specific guardrails (market maker spread bounds, directional confidence)
+
+**Usage:**
+```bash
+./scripts/trading_agents.sh validate
+```
+
+**Python API:**
+```python
+from py.agents.trading_validator import TradingValidator
+
+validator = TradingValidator(risk_manager=rm)
+result = validator.validate_signal(signal, features)
+if not result.approved:
+    print(f"Blocked: {result.reason}")
+```
+
+---
+
+### 13. Portfolio Monitor
+
+**Purpose:** Continuous portfolio health monitoring with configurable alert thresholds
+
+**Monitors:**
+- `PnLTracker.summary()` — realized/unrealized P&L, win rate
+- `DrawdownMonitor.summary()` — current/max drawdown, Sharpe/Sortino ratios
+- Position concentration risk (single contract > 30% of portfolio)
+- Daily/weekly P&L summaries
+
+**Alert Thresholds:**
+- Warning: 5% drawdown
+- Elevated: 10% drawdown
+- Critical: 15% drawdown (triggers AlertManager)
+
+**Usage:**
+```bash
+./scripts/trading_agents.sh monitor
+```
+
+**Python API:**
+```python
+from py.agents.portfolio_monitor import PortfolioMonitor
+
+monitor = PortfolioMonitor(pnl_tracker=pnl, drawdown_monitor=dd, alert_manager=am)
+report = monitor.check_health()
+print(report.summary())
+```
+
+---
+
+### 14. Execution Auditor
+
+**Purpose:** Post-execution reconciliation — ensures local state matches exchange state
+
+**Checks:**
+- Local positions vs exchange positions (phantom/missing detection)
+- Local balance vs exchange balance (tolerance: $1)
+- Fill completeness (all exchange fills recorded locally)
+- Generates audit trail for regulatory compliance
+
+**Usage:**
+```bash
+./scripts/trading_agents.sh audit
+```
+
+**Python API:**
+```python
+from py.agents.execution_auditor import ExecutionAuditor
+
+auditor = ExecutionAuditor(client=kalshi_client, reconciler=reconciler)
+report = await auditor.run_audit()
+if report.has_discrepancies:
+    print(f"Discrepancies: {report.discrepancy_count}")
+```
+
+**ROI:** Prevents position drift, catches exchange/local desync before it causes P&L errors
+
+**Files:**
+- `py/agents/trading_validator.py`
+- `py/agents/portfolio_monitor.py`
+- `py/agents/execution_auditor.py`
+- `scripts/trading_agents.sh`
+- `tests/unit/agents/test_trading_validator.py`
+- `tests/unit/agents/test_portfolio_monitor.py`
+- `tests/unit/agents/test_execution_auditor.py`
+
+---
+
 ## Total Agent Infrastructure Stats
 
-**Total Agents:** 14 agents (11 distributed + 3 standalone)
-**Total Code:** ~10,922 lines core code + 3,300 lines documentation
-**CLI Tools:** 11 shell scripts
+**Total Agents:** 14 agents (11 infrastructure + 3 trading)
+**Total Code:** ~11,700 lines core code + 3,300 lines documentation
+**CLI Tools:** 12 shell scripts
 **ROI:** 100+ hours saved over 6 months
 
 ---
 
-**Last Updated:** November 15, 2025
+**Last Updated:** February 13, 2026
 **Maintainer:** NFL Analytics Infrastructure Team

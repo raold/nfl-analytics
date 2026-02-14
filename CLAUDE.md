@@ -1,6 +1,6 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** February 12, 2026 | **Version:** 7.0 | **Status:** Production Ready (2025 Season Complete)
+**Last Updated:** February 13, 2026 | **Version:** 8.0 | **Status:** Production Ready (2025 Season Complete + Kalshi Trading)
 
 ## Quick Status
 
@@ -14,6 +14,7 @@
 | Database | 50 tables, 1.25M plays | PostgreSQL + Redis (custom AVG/SUM boolean aggregates) |
 | **Dissertation** | **Updated (Feb 12)** | **753 pages, postseason validation added, 0 undefined refs** |
 | **2025 Season** | **COMPLETE (Feb 2026)** | **285 games evaluated, -3.2% ATS ROI, market efficiency confirmed** |
+| **Kalshi Trading System** | **Complete (Feb 13)** | **6 phases, 437 tests, 37 files** |
 | Infrastructure | 8/9 Docker services | ~105ms inference |
 
 **Critical Files:** `py/ensemble/enhanced_ensemble_v6_production.py`, `py/ensemble/strategy/base.py`, `py/features/game_feature_extractor.py`, `py/feedback/`
@@ -236,6 +237,68 @@ git worktree prune
 | 5: Production Infra | Schema migrations, caching | Database Migration, Prediction Cache, A/B Test Monitor |
 
 **ROI:** $90k-165k estimated annual value, 100+ hours saved
+
+---
+
+## Kalshi Trading System (Feb 2026)
+
+**Status:** All 6 phases complete, 437 unit tests passing, ~9,200 LOC across 37 files
+
+### Architecture
+
+```
+Pipeline: MarketData → Strategy → RiskManager → TradeExecutor → Exchange
+                                                      ↓
+                                    PnLTracker ← DrawdownMonitor
+                                         ↓
+                                  TradeLogger + AlertManager
+```
+
+### Module Map
+
+| Module | Files | LOC | Purpose |
+|--------|-------|-----|---------|
+| `py/trading/` | 6 | ~3,400 | Strategies (directional, market maker, hybrid) |
+| `py/markets/` | 8 | ~3,500 | MarketClient ABC, Kalshi API, paper trading, market router |
+| `py/risk/` | 9 | ~4,000 | Kill switch, drawdown, position limits, feature health, CVaR |
+| `py/execution/` | 8 | ~2,800 | Trade executor, live trader, reconciliation, execution models |
+| `py/monitoring/` | 6 | ~3,200 | PnL tracker, trade logger, alert manager, calibration |
+
+### Key Classes & Entry Points
+
+- `TradingStrategy` (ABC) → `DirectionalStrategy`, `MarketMaker`, `HybridStrategy`
+- `MarketClient` (ABC) → `KalshiClient` (live), `PaperClient` (sim)
+- `RiskManager.check_signal()` → gates ALL signals through risk hierarchy
+- `LiveTrader.run()` → main async orchestration loop
+- `MarketRouter.get_strategy()` → multi-sport contract routing
+
+### Risk Layers (priority order)
+
+1. Feature health (`FeatureHealthChecker`) — blocks on stale/missing data
+2. Kill switch (`KillSwitch`) — daily loss 10%, drawdown 20%, API errors 10 consecutive
+3. Position limits (`PositionLimitChecker`) — per-contract, per-side, correlation groups
+
+### Kalshi Auth
+
+Environment variables: `KALSHI_USER_ID`, `KALSHI_API_KEY`, `KALSHI_PRIVATE_KEY_PATH`
+Fallback: `~/.kalshi/private_key.pem` (RSA-PSS)
+
+### Running Tests
+
+```bash
+uv run pytest tests/unit/risk/ tests/unit/trading/ tests/unit/markets/ tests/unit/execution/ tests/unit/monitoring/ -o "addopts=" -q
+```
+
+### Phase History
+
+| Phase | Scope | Tests |
+|-------|-------|-------|
+| 1 | Foundation (base.py, signal, strategy ABC, paper client) | 67 |
+| 2 | NFL Strategy (directional, risk hierarchy, drawdown) | 23 |
+| 3 | Kalshi Live (auth, client, schemas, websocket) | 99 |
+| 4 | Market Making (market_maker, hybrid) | 52 |
+| 5 | Monitoring & Safety (PnL, logger, alerts, live_trader) | 69 |
+| 6 | Multi-Sport (market_router) | 15 |
 
 ---
 
