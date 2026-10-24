@@ -21,7 +21,6 @@ from pathlib import Path
 _PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
 
 
-
 def analyze_prediction_bias(csv_path: str):
     """Comprehensive bias analysis."""
 
@@ -239,7 +238,9 @@ def analyze_prediction_bias(csv_path: str):
 
 
 if __name__ == "__main__":
-    csv_path = str(_PROJECT_ROOT / "analysis/results/historical_validation_5way_FIXED_2022_2024.csv")
+    csv_path = str(
+        _PROJECT_ROOT / "analysis/results/historical_validation_5way_FIXED_2022_2024.csv"
+    )
 
     if len(sys.argv) > 1:
         csv_path = sys.argv[1]

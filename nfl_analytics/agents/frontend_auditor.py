@@ -229,8 +229,7 @@ class DataValidator:
         with psycopg2.connect(**self.db_config) as conn:
             with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 # Check for unrealistic predictions
-                cur.execute(
-                    """
+                cur.execute("""
                     SELECT game_id, ensemble_version,
                            predicted_home_score, predicted_away_score,
                            predicted_total
@@ -239,8 +238,7 @@ class DataValidator:
                       AND ensemble_version = 'v6.1'
                       AND (predicted_total < 35 OR predicted_total > 65)
                     LIMIT 10;
-                """
-                )
+                """)
 
                 unrealistic = cur.fetchall()
 

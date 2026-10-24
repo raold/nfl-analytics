@@ -416,8 +416,7 @@ def main():
     print("\n" + "=" * 60)
     print("KEY ADVANTAGES OF DEEP GENERATIVE MODELS")
     print("=" * 60)
-    print(
-        """
+    print("""
 1. NON-PARAMETRIC FLEXIBILITY
    - Learns actual game distribution from data
    - No assumptions about functional form
@@ -447,8 +446,7 @@ The cVAE approach is particularly valuable for:
 - Live betting model updates
 - Risk aggregation across correlated bets
 - Regulatory scenario analysis
-    """
-    )
+    """)
 
     print("\nDemo completed successfully!")
 

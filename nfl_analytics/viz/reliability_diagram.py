@@ -14,35 +14,37 @@ import numpy as np
 # =============================================================================
 # DISSERTATION COLOR PALETTE (synchronized with main.tex / tikz_diagram_style.tex)
 # =============================================================================
-ACCENT_BLUE = "#1f77b4"     # RGB(31,119,180) - Primary
-ACCENT_ORANGE = "#ff7f0e"   # RGB(255,127,14) - Secondary/contrast
-ACCENT_GREEN = "#2ca02c"    # RGB(44,160,44) - Success
-ACCENT_RED = "#d62728"      # RGB(214,39,40) - Warning
-GREY_DARK = "#4d4d4d"       # grey3 = 0.3 - Axes, labels
-GREY_MED = "#808080"        # grey5 = 0.5 - Secondary text
-GREY_LIGHT = "#b3b3b3"      # grey7 = 0.7 - Gridlines
+ACCENT_BLUE = "#1f77b4"  # RGB(31,119,180) - Primary
+ACCENT_ORANGE = "#ff7f0e"  # RGB(255,127,14) - Secondary/contrast
+ACCENT_GREEN = "#2ca02c"  # RGB(44,160,44) - Success
+ACCENT_RED = "#d62728"  # RGB(214,39,40) - Warning
+GREY_DARK = "#4d4d4d"  # grey3 = 0.3 - Axes, labels
+GREY_MED = "#808080"  # grey5 = 0.5 - Secondary text
+GREY_LIGHT = "#b3b3b3"  # grey7 = 0.7 - Gridlines
 
 # Set publication-quality style (academic/serif)
-plt.rcParams.update({
-    "figure.facecolor": "white",
-    "axes.facecolor": "white",
-    "savefig.facecolor": "white",
-    "font.family": "serif",
-    "font.serif": ["Computer Modern Roman", "Times New Roman", "DejaVu Serif"],
-    "mathtext.fontset": "cm",
-    "axes.labelsize": 11,
-    "axes.titlesize": 12,
-    "xtick.labelsize": 10,
-    "ytick.labelsize": 10,
-    "legend.fontsize": 9,
-    "axes.linewidth": 0.8,
-    "axes.edgecolor": GREY_DARK,
-    "axes.labelcolor": GREY_DARK,
-    "xtick.color": GREY_MED,
-    "ytick.color": GREY_MED,
-    "grid.color": GREY_LIGHT,
-    "grid.linewidth": 0.5,
-})
+plt.rcParams.update(
+    {
+        "figure.facecolor": "white",
+        "axes.facecolor": "white",
+        "savefig.facecolor": "white",
+        "font.family": "serif",
+        "font.serif": ["Computer Modern Roman", "Times New Roman", "DejaVu Serif"],
+        "mathtext.fontset": "cm",
+        "axes.labelsize": 11,
+        "axes.titlesize": 12,
+        "xtick.labelsize": 10,
+        "ytick.labelsize": 10,
+        "legend.fontsize": 9,
+        "axes.linewidth": 0.8,
+        "axes.edgecolor": GREY_DARK,
+        "axes.labelcolor": GREY_DARK,
+        "xtick.color": GREY_MED,
+        "ytick.color": GREY_MED,
+        "grid.color": GREY_LIGHT,
+        "grid.linewidth": 0.5,
+    }
+)
 
 
 def simulate_predictions_and_outcomes(
@@ -159,8 +161,16 @@ def generate_reliability_diagram(
     fig, ax = plt.subplots(figsize=(6, 6), dpi=300)
 
     # Perfect calibration diagonal
-    ax.plot([0, 1], [0, 1], linestyle="--", linewidth=1.5, color=GREY_MED,
-            alpha=0.8, label="Perfect calibration", zorder=1)
+    ax.plot(
+        [0, 1],
+        [0, 1],
+        linestyle="--",
+        linewidth=1.5,
+        color=GREY_MED,
+        alpha=0.8,
+        label="Perfect calibration",
+        zorder=1,
+    )
 
     # Observed calibration with error bars
     valid_mask = ~np.isnan(observed_freqs)
@@ -197,8 +207,12 @@ def generate_reliability_diagram(
     # Add subtle histogram showing distribution of predictions (secondary axis)
     ax2 = ax.twinx()
     ax2.hist(
-        predicted_probs, bins=n_bins, alpha=0.12, color=GREY_MED,
-        edgecolor=GREY_LIGHT, linewidth=0.5
+        predicted_probs,
+        bins=n_bins,
+        alpha=0.12,
+        color=GREY_MED,
+        edgecolor=GREY_LIGHT,
+        linewidth=0.5,
     )
     ax2.set_ylabel("Frequency", fontsize=9, color=GREY_MED)
     ax2.tick_params(axis="y", labelcolor=GREY_MED, labelsize=8)
@@ -214,11 +228,7 @@ def generate_reliability_diagram(
     ) / np.sum(counts[valid_mask])
 
     # Add metrics as clean text (no box, serif font)
-    metrics_text = (
-        f"Brier = {brier_score:.4f}\n"
-        f"ECE = {ece:.4f}\n"
-        f"$n$ = {n_games:,}"
-    )
+    metrics_text = f"Brier = {brier_score:.4f}\n" f"ECE = {ece:.4f}\n" f"$n$ = {n_games:,}"
 
     ax.text(
         0.04,

@@ -104,9 +104,7 @@ def start(mode: str, balance: int, sport: str):
     """Start a trading session."""
     existing_pid = _read_pid()
     if existing_pid:
-        console.print(
-            f"[yellow]Trading session already running (PID {existing_pid})[/yellow]"
-        )
+        console.print(f"[yellow]Trading session already running (PID {existing_pid})[/yellow]")
         console.print("Use [bold]stop[/bold] to terminate the existing session first.")
         raise SystemExit(1)
 

@@ -15,6 +15,7 @@ Usage:
     # Dry run (show what would be done)
     python nfl_analytics/pipeline/refresh_predictions.py --auto --dry-run
 """
+
 import argparse
 import logging
 import subprocess
@@ -129,9 +130,11 @@ class PredictionRefreshPipeline:
             for view in views:
                 logger.info(f"  Refreshing {view}...")
                 start = datetime.now()
-                cur.execute(sql.SQL("REFRESH MATERIALIZED VIEW CONCURRENTLY {}").format(
-                    sql.Identifier(*view.split(".")) if "." in view else sql.Identifier(view)
-                ))
+                cur.execute(
+                    sql.SQL("REFRESH MATERIALIZED VIEW CONCURRENTLY {}").format(
+                        sql.Identifier(*view.split(".")) if "." in view else sql.Identifier(view)
+                    )
+                )
                 conn.commit()
                 duration = (datetime.now() - start).total_seconds()
                 logger.info(f"  ✓ {view} refreshed in {duration:.1f}s")

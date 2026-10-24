@@ -228,15 +228,13 @@ def create_market_dispersion_view(db_config: dict | None = None) -> None:
     cur = conn.cursor()
 
     # Check if odds_history exists
-    cur.execute(
-        """
+    cur.execute("""
         SELECT EXISTS (
             SELECT FROM information_schema.tables
             WHERE table_schema = 'public'
             AND table_name = 'odds_history'
         );
-    """
-    )
+    """)
     table_exists = cur.fetchone()[0]
 
     if not table_exists:
@@ -296,12 +294,10 @@ def create_market_dispersion_view(db_config: dict | None = None) -> None:
     conn.commit()
 
     # Create index for fast lookups
-    cur.execute(
-        """
+    cur.execute("""
         CREATE INDEX idx_market_dispersion_lookup
         ON mart.market_dispersion (season, week, home_team, away_team);
-    """
-    )
+    """)
     conn.commit()
 
     logger.info("✅ Created materialized view: mart.market_dispersion")

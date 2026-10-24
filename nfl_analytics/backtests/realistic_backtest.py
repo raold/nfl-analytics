@@ -119,7 +119,9 @@ class RealisticBacktest(GameOutcomeBacktest):
                 warnings.append(
                     f"⚠️  Annual ROI {annual_roi:.1%} > 10% - May indicate data leakage!"
                 )
-                print(f"⚠️  Annual ROI: {annual_roi:.1%} (UNREALISTIC - professionals achieve 3-5%)")
+                print(
+                    f"⚠️  Annual ROI: {annual_roi:.1%} (UNREALISTIC - professionals achieve 3-5%)"
+                )
             else:
                 print(f"✓ Annual ROI: {annual_roi:.1%} (REALISTIC - professionals achieve 3-5%)")
 

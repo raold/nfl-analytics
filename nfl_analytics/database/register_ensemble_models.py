@@ -233,16 +233,14 @@ def register_archived_models(cursor) -> int:
 
 def verify_registration(cursor):
     """Verify models were registered successfully."""
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT
             status,
             COUNT(*) as count
         FROM ml.model_registry
         GROUP BY status
         ORDER BY status
-    """
-    )
+    """)
 
     print("\n" + "=" * 60)
     print("REGISTRATION SUMMARY")
@@ -252,8 +250,7 @@ def verify_registration(cursor):
         print(f"{row['status']:15s}: {row['count']:2d} models")
 
     # List all registered models
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT
             model_id,
             model_name,
@@ -263,8 +260,7 @@ def verify_registration(cursor):
             status
         FROM ml.model_registry
         ORDER BY status, model_id
-    """
-    )
+    """)
 
     print("\n" + "=" * 60)
     print("REGISTERED MODELS")

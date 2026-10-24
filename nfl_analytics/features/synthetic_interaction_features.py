@@ -378,14 +378,12 @@ class SyntheticInteractionEngine:
             cur = conn.cursor()
 
             # Check if coaching_staff table exists and has data
-            cur.execute(
-                """
+            cur.execute("""
                 SELECT EXISTS (
                     SELECT 1 FROM information_schema.tables
                     WHERE table_name = 'coaching_staff'
                 )
-            """
-            )
+            """)
             has_table = cur.fetchone()[0]
 
             continuity = 0.5  # Default moderate continuity

@@ -42,7 +42,6 @@ from nfl_analytics.production.value_bet_detector import (
     ValueBetDetector,
 )
 
-
 # ============================================================================
 # Kelly Sizing - Odds Conversion
 # ============================================================================
@@ -97,10 +96,12 @@ class TestKellyCriterion:
 
     def test_quarter_kelly_scales_correctly(self):
         """Quarter Kelly (0.25) should be exactly 25% of full Kelly."""
-        full = kelly_criterion(win_prob=0.55, decimal_odds=100 / 110, kelly_fraction=1.0,
-                               max_bet_fraction=1.0)
-        quarter = kelly_criterion(win_prob=0.55, decimal_odds=100 / 110, kelly_fraction=0.25,
-                                  max_bet_fraction=1.0)
+        full = kelly_criterion(
+            win_prob=0.55, decimal_odds=100 / 110, kelly_fraction=1.0, max_bet_fraction=1.0
+        )
+        quarter = kelly_criterion(
+            win_prob=0.55, decimal_odds=100 / 110, kelly_fraction=0.25, max_bet_fraction=1.0
+        )
         assert quarter == pytest.approx(full * 0.25, rel=1e-6)
 
     def test_full_kelly_at_minus_110_55pct(self):
@@ -111,39 +112,48 @@ class TestKellyCriterion:
         """
         b = 10 / 11
         expected_full_kelly = (b * 0.55 - 0.45) / b  # = 0.055
-        actual = kelly_criterion(win_prob=0.55, decimal_odds=b, kelly_fraction=1.0,
-                                 max_bet_fraction=1.0)
+        actual = kelly_criterion(
+            win_prob=0.55, decimal_odds=b, kelly_fraction=1.0, max_bet_fraction=1.0
+        )
         assert actual == pytest.approx(expected_full_kelly, rel=1e-6)
         assert actual == pytest.approx(0.055, rel=1e-3)
 
     def test_negative_kelly_returns_zero(self):
         """When model probability is below breakeven, Kelly should be zero (no bet)."""
         # At -110, breakeven is ~52.38%. Using 48% should yield negative Kelly => 0.
-        result = kelly_criterion(win_prob=0.48, decimal_odds=100 / 110, kelly_fraction=1.0,
-                                 max_bet_fraction=1.0)
+        result = kelly_criterion(
+            win_prob=0.48, decimal_odds=100 / 110, kelly_fraction=1.0, max_bet_fraction=1.0
+        )
         assert result == 0.0
 
     def test_exactly_breakeven_returns_zero(self):
         """At exactly breakeven probability, Kelly fraction should be zero."""
         # Breakeven for -110: p = 110/210 = 0.52381...
         breakeven_prob = 110 / 210
-        result = kelly_criterion(win_prob=breakeven_prob, decimal_odds=100 / 110,
-                                 kelly_fraction=1.0, max_bet_fraction=1.0)
+        result = kelly_criterion(
+            win_prob=breakeven_prob,
+            decimal_odds=100 / 110,
+            kelly_fraction=1.0,
+            max_bet_fraction=1.0,
+        )
         assert result == pytest.approx(0.0, abs=1e-10)
 
     def test_max_bet_cap_enforcement(self):
         """Kelly bet should never exceed max_bet_fraction regardless of edge."""
         # 70% win probability at +200 odds gives very large Kelly
-        result = kelly_criterion(win_prob=0.70, decimal_odds=2.0, kelly_fraction=1.0,
-                                 max_bet_fraction=0.05)
+        result = kelly_criterion(
+            win_prob=0.70, decimal_odds=2.0, kelly_fraction=1.0, max_bet_fraction=0.05
+        )
         assert result <= 0.05
 
     def test_half_kelly_fraction(self):
         """Half Kelly (0.5) should be exactly 50% of full Kelly."""
-        full = kelly_criterion(win_prob=0.60, decimal_odds=1.0, kelly_fraction=1.0,
-                               max_bet_fraction=1.0)
-        half = kelly_criterion(win_prob=0.60, decimal_odds=1.0, kelly_fraction=0.5,
-                               max_bet_fraction=1.0)
+        full = kelly_criterion(
+            win_prob=0.60, decimal_odds=1.0, kelly_fraction=1.0, max_bet_fraction=1.0
+        )
+        half = kelly_criterion(
+            win_prob=0.60, decimal_odds=1.0, kelly_fraction=0.5, max_bet_fraction=1.0
+        )
         assert half == pytest.approx(full * 0.5, rel=1e-6)
 
 
@@ -186,18 +196,22 @@ class TestOptimalBetSize:
     def test_bet_amount_scales_with_bankroll(self):
         """Doubling the bankroll should double the bet amount (same fraction)."""
         result_10k = optimal_bet_size(
-            model_prob=0.58, market_odds=-110, bankroll=10000,
-            kelly_fraction=0.25, min_edge=0.01,
+            model_prob=0.58,
+            market_odds=-110,
+            bankroll=10000,
+            kelly_fraction=0.25,
+            min_edge=0.01,
         )
         result_20k = optimal_bet_size(
-            model_prob=0.58, market_odds=-110, bankroll=20000,
-            kelly_fraction=0.25, min_edge=0.01,
+            model_prob=0.58,
+            market_odds=-110,
+            bankroll=20000,
+            kelly_fraction=0.25,
+            min_edge=0.01,
         )
         assert result_10k["should_bet"] is True
         assert result_20k["should_bet"] is True
-        assert result_20k["bet_amount"] == pytest.approx(
-            result_10k["bet_amount"] * 2, rel=1e-6
-        )
+        assert result_20k["bet_amount"] == pytest.approx(result_10k["bet_amount"] * 2, rel=1e-6)
 
     def test_bet_fraction_capped_at_max(self):
         """Even with enormous edge, bet_fraction should not exceed max_bet_fraction."""
@@ -224,33 +238,57 @@ class TestSimulateKellyGrowth:
     def test_simulation_returns_expected_keys(self):
         """Simulation result should contain all required metric keys."""
         result = simulate_kelly_growth(
-            win_prob=0.55, decimal_odds=100 / 110,
-            initial_bankroll=10000, n_bets=100, kelly_fraction=0.25, seed=42,
+            win_prob=0.55,
+            decimal_odds=100 / 110,
+            initial_bankroll=10000,
+            n_bets=100,
+            kelly_fraction=0.25,
+            seed=42,
         )
         expected_keys = {
-            "final_bankroll", "total_return", "roi", "n_bets",
-            "wins", "losses", "win_rate", "bet_fraction",
-            "max_drawdown_pct", "sharpe_ratio", "bankroll_history",
+            "final_bankroll",
+            "total_return",
+            "roi",
+            "n_bets",
+            "wins",
+            "losses",
+            "win_rate",
+            "bet_fraction",
+            "max_drawdown_pct",
+            "sharpe_ratio",
+            "bankroll_history",
         }
         assert expected_keys.issubset(result.keys())
 
     def test_simulation_deterministic_with_seed(self):
         """Same seed should produce identical simulation results."""
         r1 = simulate_kelly_growth(
-            win_prob=0.55, decimal_odds=1.0, initial_bankroll=10000,
-            n_bets=200, kelly_fraction=0.25, seed=123,
+            win_prob=0.55,
+            decimal_odds=1.0,
+            initial_bankroll=10000,
+            n_bets=200,
+            kelly_fraction=0.25,
+            seed=123,
         )
         r2 = simulate_kelly_growth(
-            win_prob=0.55, decimal_odds=1.0, initial_bankroll=10000,
-            n_bets=200, kelly_fraction=0.25, seed=123,
+            win_prob=0.55,
+            decimal_odds=1.0,
+            initial_bankroll=10000,
+            n_bets=200,
+            kelly_fraction=0.25,
+            seed=123,
         )
         assert r1["final_bankroll"] == pytest.approx(r2["final_bankroll"], rel=1e-10)
 
     def test_simulation_bankroll_history_length(self):
         """Bankroll history should have n_bets + 1 entries (initial + each bet)."""
         result = simulate_kelly_growth(
-            win_prob=0.55, decimal_odds=1.0, initial_bankroll=10000,
-            n_bets=50, kelly_fraction=0.25, seed=42,
+            win_prob=0.55,
+            decimal_odds=1.0,
+            initial_bankroll=10000,
+            n_bets=50,
+            kelly_fraction=0.25,
+            seed=42,
         )
         assert len(result["bankroll_history"]) == 51
 
@@ -307,12 +345,9 @@ class TestValueBetDetector:
 
     def test_max_bets_per_week_limit(self):
         """Detector should cap results at max_bets_per_week."""
-        detector = ValueBetDetector(
-            min_edge=0.02, max_bets_per_week=2, use_llm_explanations=False
-        )
+        detector = ValueBetDetector(min_edge=0.02, max_bets_per_week=2, use_llm_explanations=False)
         predictions = [
-            self._make_prediction(model_prob=0.58, game_id=f"game_{i}")
-            for i in range(5)
+            self._make_prediction(model_prob=0.58, game_id=f"game_{i}") for i in range(5)
         ]
         bets = detector.detect_value_bets(predictions)
         assert len(bets) <= 2
@@ -347,22 +382,40 @@ class TestValueBetDetector:
     def test_value_bet_is_actionable(self):
         """A bet with edge >= 2% and non-LOW confidence should be actionable."""
         bet = ValueBet(
-            game_id="test", home_team="BAL", away_team="KC", game_time=None,
-            bet_type=BetType.SPREAD, bet_side="BAL -3.5", odds=-110,
-            model_prob=0.58, market_implied=0.5238, edge=0.056,
-            expected_value=5.0, confidence=Confidence.MEDIUM,
-            kelly_fraction=0.05, recommended_size=0.0125,
+            game_id="test",
+            home_team="BAL",
+            away_team="KC",
+            game_time=None,
+            bet_type=BetType.SPREAD,
+            bet_side="BAL -3.5",
+            odds=-110,
+            model_prob=0.58,
+            market_implied=0.5238,
+            edge=0.056,
+            expected_value=5.0,
+            confidence=Confidence.MEDIUM,
+            kelly_fraction=0.05,
+            recommended_size=0.0125,
         )
         assert bet.is_actionable is True
 
     def test_value_bet_not_actionable_low_confidence(self):
         """A bet with LOW confidence should NOT be actionable, even with decent edge."""
         bet = ValueBet(
-            game_id="test", home_team="BAL", away_team="KC", game_time=None,
-            bet_type=BetType.SPREAD, bet_side="BAL -3.5", odds=-110,
-            model_prob=0.85, market_implied=0.5238, edge=0.03,
-            expected_value=2.0, confidence=Confidence.LOW,
-            kelly_fraction=0.02, recommended_size=0.005,
+            game_id="test",
+            home_team="BAL",
+            away_team="KC",
+            game_time=None,
+            bet_type=BetType.SPREAD,
+            bet_side="BAL -3.5",
+            odds=-110,
+            model_prob=0.85,
+            market_implied=0.5238,
+            edge=0.03,
+            expected_value=2.0,
+            confidence=Confidence.LOW,
+            kelly_fraction=0.02,
+            recommended_size=0.005,
         )
         assert bet.is_actionable is False
 
@@ -387,11 +440,20 @@ class TestValueBetDetector:
     def test_to_dict_serialization(self):
         """ValueBet.to_dict() should produce a JSON-serializable dictionary."""
         bet = ValueBet(
-            game_id="2025_16_KC_BAL", home_team="BAL", away_team="KC",
-            game_time=None, bet_type=BetType.SPREAD, bet_side="BAL -3.5",
-            odds=-110, model_prob=0.58, market_implied=0.5238, edge=0.056,
-            expected_value=5.0, confidence=Confidence.MEDIUM,
-            kelly_fraction=0.05, recommended_size=0.0125,
+            game_id="2025_16_KC_BAL",
+            home_team="BAL",
+            away_team="KC",
+            game_time=None,
+            bet_type=BetType.SPREAD,
+            bet_side="BAL -3.5",
+            odds=-110,
+            model_prob=0.58,
+            market_implied=0.5238,
+            edge=0.056,
+            expected_value=5.0,
+            confidence=Confidence.MEDIUM,
+            kelly_fraction=0.05,
+            recommended_size=0.0125,
             key_factors=["Solid model edge (3%+)"],
             risks=["Edge near threshold"],
         )
@@ -445,32 +507,51 @@ class TestMetaLabelingMultiplier:
     def test_low_meta_prob_blocks_bet(self):
         """meta_probability < 0.4 should return multiplier of 0 (no bet)."""
         bet = BetOpportunity(
-            game_id="test", side="home", model_prob=0.58, market_odds=-110,
-            edge=0.05, confidence=0.85, meta_probability=0.30,
+            game_id="test",
+            side="home",
+            model_prob=0.58,
+            market_odds=-110,
+            edge=0.05,
+            confidence=0.85,
+            meta_probability=0.30,
         )
         assert bet.meta_kelly_multiplier == 0.0
 
     def test_high_meta_prob_full_kelly(self):
         """meta_probability > 0.6 should return multiplier of 1.0 (full Kelly)."""
         bet = BetOpportunity(
-            game_id="test", side="home", model_prob=0.58, market_odds=-110,
-            edge=0.05, confidence=0.85, meta_probability=0.75,
+            game_id="test",
+            side="home",
+            model_prob=0.58,
+            market_odds=-110,
+            edge=0.05,
+            confidence=0.85,
+            meta_probability=0.75,
         )
         assert bet.meta_kelly_multiplier == 1.0
 
     def test_midrange_meta_prob_interpolates(self):
         """meta_probability at 0.5 (midpoint of 0.4-0.6) should return 0.5."""
         bet = BetOpportunity(
-            game_id="test", side="home", model_prob=0.58, market_odds=-110,
-            edge=0.05, confidence=0.85, meta_probability=0.50,
+            game_id="test",
+            side="home",
+            model_prob=0.58,
+            market_odds=-110,
+            edge=0.05,
+            confidence=0.85,
+            meta_probability=0.50,
         )
         assert bet.meta_kelly_multiplier == pytest.approx(0.5, rel=1e-6)
 
     def test_default_meta_probability_is_one(self):
         """Default meta_probability=1.0 should give multiplier of 1.0."""
         bet = BetOpportunity(
-            game_id="test", side="home", model_prob=0.58, market_odds=-110,
-            edge=0.05, confidence=0.85,
+            game_id="test",
+            side="home",
+            model_prob=0.58,
+            market_odds=-110,
+            edge=0.05,
+            confidence=0.85,
         )
         assert bet.meta_probability == 1.0
         assert bet.meta_kelly_multiplier == 1.0
@@ -484,18 +565,22 @@ class TestMetaLabelingMultiplier:
 class TestEnhancedKellySizer:
     """Tests for the EnhancedKellySizer class."""
 
-    def _make_bet(self, model_prob=0.58, market_odds=-110, edge=0.05,
-                  confidence=0.85, meta_probability=1.0):
+    def _make_bet(
+        self, model_prob=0.58, market_odds=-110, edge=0.05, confidence=0.85, meta_probability=1.0
+    ):
         return BetOpportunity(
-            game_id="KC_vs_BAL", side="KC -3", model_prob=model_prob,
-            market_odds=market_odds, edge=edge, confidence=confidence,
+            game_id="KC_vs_BAL",
+            side="KC -3",
+            model_prob=model_prob,
+            market_odds=market_odds,
+            edge=edge,
+            confidence=confidence,
             meta_probability=meta_probability,
         )
 
     def test_base_kelly_positive_for_positive_ev(self):
         """A +EV bet should produce a positive base Kelly fraction."""
-        sizer = EnhancedKellySizer(kelly_multiplier=0.25, edge_decay=False,
-                                   cvar_constraint=False)
+        sizer = EnhancedKellySizer(kelly_multiplier=0.25, edge_decay=False, cvar_constraint=False)
         bet = self._make_bet(model_prob=0.58)
         kelly = sizer.calculate_base_kelly(bet, use_meta_labeling=False)
         assert kelly > 0
@@ -529,7 +614,8 @@ class TestEnhancedKellySizer:
         sizer = EnhancedKellySizer(kelly_multiplier=0.25)
         base_size = 0.04
         adjusted = sizer.adjust_for_regime(
-            base_size, volatility_regime="normal",
+            base_size,
+            volatility_regime="normal",
             streak_info={"losing_streak": 4},
         )
         assert adjusted == pytest.approx(base_size * 0.8, rel=1e-6)
@@ -540,7 +626,8 @@ class TestEnhancedKellySizer:
         sizer = EnhancedKellySizer(kelly_multiplier=0.25, constraints=constraints)
         # Low volatility + winning streak would try to increase
         adjusted = sizer.adjust_for_regime(
-            0.04, volatility_regime="low",
+            0.04,
+            volatility_regime="low",
             streak_info={"winning_streak": 5},
         )
         assert adjusted <= 0.03
@@ -548,7 +635,9 @@ class TestEnhancedKellySizer:
     def test_portfolio_optimization_without_cvar(self):
         """Portfolio optimization without CVaR should respect exposure limits."""
         sizer = EnhancedKellySizer(
-            kelly_multiplier=0.25, edge_decay=False, cvar_constraint=False,
+            kelly_multiplier=0.25,
+            edge_decay=False,
+            cvar_constraint=False,
         )
         bets = [
             self._make_bet(model_prob=0.58, edge=0.05),
@@ -615,16 +704,23 @@ class TestEdgeCases:
         """When model prob equals implied prob, edge is zero => no bet."""
         implied = american_odds_to_implied_prob(-110)  # ~0.5238
         result = optimal_bet_size(
-            model_prob=implied, market_odds=-110, bankroll=10000,
-            kelly_fraction=0.25, min_edge=0.01,
+            model_prob=implied,
+            market_odds=-110,
+            bankroll=10000,
+            kelly_fraction=0.25,
+            min_edge=0.01,
         )
         assert result["should_bet"] is False
 
     def test_extreme_model_prediction_high(self):
         """Model predicting 95% win probability should still be bounded by max bet."""
         result = optimal_bet_size(
-            model_prob=0.95, market_odds=-110, bankroll=10000,
-            kelly_fraction=0.25, max_bet_fraction=0.05, min_edge=0.01,
+            model_prob=0.95,
+            market_odds=-110,
+            bankroll=10000,
+            kelly_fraction=0.25,
+            max_bet_fraction=0.05,
+            min_edge=0.01,
         )
         assert result["should_bet"] is True
         assert result["bet_fraction"] <= 0.05
@@ -633,8 +729,11 @@ class TestEdgeCases:
     def test_extreme_model_prediction_low(self):
         """Model predicting 5% win probability should never recommend a bet at -110."""
         result = optimal_bet_size(
-            model_prob=0.05, market_odds=-110, bankroll=10000,
-            kelly_fraction=0.25, min_edge=0.01,
+            model_prob=0.05,
+            market_odds=-110,
+            bankroll=10000,
+            kelly_fraction=0.25,
+            min_edge=0.01,
         )
         assert result["should_bet"] is False
 
@@ -647,8 +746,11 @@ class TestEdgeCases:
     def test_large_positive_odds(self):
         """Large underdog odds (+500) should work correctly through the pipeline."""
         result = optimal_bet_size(
-            model_prob=0.30, market_odds=500, bankroll=10000,
-            kelly_fraction=0.25, min_edge=0.01,
+            model_prob=0.30,
+            market_odds=500,
+            bankroll=10000,
+            kelly_fraction=0.25,
+            min_edge=0.01,
         )
         # Implied at +500: 100/600 = 16.67%. Model 30% => edge = 13.33%
         assert result["should_bet"] is True

@@ -18,6 +18,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+
 torch = pytest.importorskip("torch")  # optional: uv sync --extra torch
 import xgboost as xgb
 from sklearn.datasets import make_regression

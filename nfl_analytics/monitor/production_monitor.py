@@ -15,6 +15,7 @@ Usage:
     # Weekly monitoring job (run after week completes)
     python nfl_analytics/monitor/production_monitor.py --weekly-report --season 2025 --week 5
 """
+
 import argparse
 import json
 import logging
@@ -58,8 +59,7 @@ class ProductionMonitor:
         cur.execute("CREATE SCHEMA IF NOT EXISTS monitoring")
 
         # Predictions log table
-        cur.execute(
-            """
+        cur.execute("""
             CREATE TABLE IF NOT EXISTS monitoring.predictions (
                 prediction_id SERIAL PRIMARY KEY,
                 game_id TEXT NOT NULL,
@@ -81,12 +81,10 @@ class ProductionMonitor:
                 log_loss FLOAT,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """
-        )
+        """)
 
         # Performance metrics table
-        cur.execute(
-            """
+        cur.execute("""
             CREATE TABLE IF NOT EXISTS monitoring.model_metrics (
                 metric_id SERIAL PRIMARY KEY,
                 model_version TEXT NOT NULL,
@@ -101,12 +99,10 @@ class ProductionMonitor:
                 calibration_score FLOAT,
                 computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """
-        )
+        """)
 
         # Feature drift table
-        cur.execute(
-            """
+        cur.execute("""
             CREATE TABLE IF NOT EXISTS monitoring.feature_drift (
                 drift_id SERIAL PRIMARY KEY,
                 feature_name TEXT NOT NULL,
@@ -120,12 +116,10 @@ class ProductionMonitor:
                 drift_score FLOAT,
                 computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
-        """
-        )
+        """)
 
         # Alerts table
-        cur.execute(
-            """
+        cur.execute("""
             CREATE TABLE IF NOT EXISTS monitoring.alerts (
                 alert_id SERIAL PRIMARY KEY,
                 alert_type TEXT NOT NULL,
@@ -136,8 +130,7 @@ class ProductionMonitor:
                 resolved_at TIMESTAMP,
                 resolved_by TEXT
             )
-        """
-        )
+        """)
 
         conn.commit()
         cur.close()

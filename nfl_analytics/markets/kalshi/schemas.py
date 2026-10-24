@@ -355,7 +355,11 @@ def parse_contract(data: dict) -> Contract:
         contract_type=_CONTRACT_TYPE_MAP.get(data.get("market_type", ""), ContractType.CUSTOM),
         sport=_infer_sport(ticker),
         strike=None,
-        expiry=_parse_timestamp(data.get("expected_expiration_time")) if data.get("expected_expiration_time") else None,
+        expiry=(
+            _parse_timestamp(data.get("expected_expiration_time"))
+            if data.get("expected_expiration_time")
+            else None
+        ),
         last_price_cents=data.get("last_price", 0),
         volume=data.get("volume", 0),
         open_interest=data.get("open_interest", 0),

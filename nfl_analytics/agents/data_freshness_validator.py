@@ -481,13 +481,11 @@ class DataFreshnessValidator:
         try:
             with psycopg2.connect(**self.db_config) as conn:
                 with conn.cursor() as cur:
-                    cur.execute(
-                        """
+                    cur.execute("""
                     SELECT COUNT(*)
                     FROM ml.r_model_predictions
                     WHERE created_at > NOW() - INTERVAL '7 days'
-                    """
-                    )
+                    """)
                     count = cur.fetchone()[0]
                     return count > 0
         except Exception as e:

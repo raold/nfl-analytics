@@ -261,13 +261,11 @@ class PerformanceProfilingAgent:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
 
             # Check if pg_stat_statements is enabled
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT EXISTS (
                     SELECT 1 FROM pg_extension WHERE extname = 'pg_stat_statements'
                 ) AS enabled
-            """
-            )
+            """)
             enabled = cursor.fetchone()["enabled"]
 
             if not enabled:
@@ -313,8 +311,7 @@ class PerformanceProfilingAgent:
                 )
 
             # Detect N+1 query patterns (high call count, low average time)
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT
                     query,
                     calls,
@@ -324,15 +321,13 @@ class PerformanceProfilingAgent:
                 WHERE calls > 100 AND mean_exec_time < 10
                 ORDER BY calls DESC
                 LIMIT 20
-            """
-            )
+            """)
 
             n_plus_one = cursor.fetchall()
             report.n_plus_one_queries = [dict(q) for q in n_plus_one]
 
             # Detect missing indexes (sequential scans on large tables)
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT
                     schemaname,
                     tablename,
@@ -344,8 +339,7 @@ class PerformanceProfilingAgent:
                 WHERE seq_scan > 0
                 ORDER BY seq_tup_read DESC
                 LIMIT 20
-            """
-            )
+            """)
 
             missing_indexes = cursor.fetchall()
             report.missing_indexes = [dict(m) for m in missing_indexes]

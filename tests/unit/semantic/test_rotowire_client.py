@@ -94,7 +94,7 @@ class TestRotoWireClientParsing:
 
     def test_parse_extracted_json_basic(self, client):
         """Parse basic JSON structure."""
-        json_content = '''[
+        json_content = """[
             {
                 "player": "Patrick Mahomes",
                 "headline": "Full practice Monday",
@@ -103,7 +103,7 @@ class TestRotoWireClientParsing:
                 "injury": "",
                 "analysis": "Mahomes was a full participant in practice."
             }
-        ]'''
+        ]"""
 
         items = client._parse_extracted_json(json_content, limit=10)
 
@@ -114,7 +114,7 @@ class TestRotoWireClientParsing:
 
     def test_parse_extracted_json_with_injury(self, client):
         """Parse JSON with injury indicator."""
-        json_content = '''[
+        json_content = """[
             {
                 "player": "Josh Allen",
                 "headline": "Day-to-day with foot injury",
@@ -123,7 +123,7 @@ class TestRotoWireClientParsing:
                 "injury": "Foot",
                 "analysis": "Allen is questionable for Week 16."
             }
-        ]'''
+        ]"""
 
         items = client._parse_extracted_json(json_content, limit=10)
 
@@ -212,6 +212,7 @@ class TestRotoWireClientIntegration:
     def test_fetch_news_returns_items(self, client):
         """Fetch should return news items."""
         import asyncio
+
         items = asyncio.run(client.fetch_news(limit=5))
 
         # Should get at least some items
@@ -223,6 +224,7 @@ class TestRotoWireClientIntegration:
     def test_health_status_healthy(self, client):
         """Health check should return healthy."""
         import asyncio
+
         health = asyncio.run(client.get_health_status())
 
         assert health["status"] == "healthy"

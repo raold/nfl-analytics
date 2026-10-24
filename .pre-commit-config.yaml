@@ -1,19 +1,19 @@
 repos:
   # Python code formatting
   - repo: https://github.com/psf/black
-    rev: 23.7.0
+    rev: 26.10.1  # keep in step with black in uv.lock (CI runs `uv run black --check`)
     hooks:
       - id: black
-        language_version: python3.11
-        files: ^nfl_analytics/
+        files: ^(nfl_analytics|tests)/
 
-  # Python linting & auto-fixing
+  # Python linting: same blocking subset as CI (syntax errors, undefined names).
+  # The full pyproject rule set reports ~1,300 legacy findings; run it manually.
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.0.286
+    rev: v0.17.2  # keep in step with ruff in uv.lock
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
-        files: ^nfl_analytics/
+        args: [--select, "E9,F63,F7,F82"]
+        files: ^(nfl_analytics|tests|scripts|api)/
 
   # Python type checking
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -133,7 +133,7 @@ repos:
 
 # Global settings
 default_language_version:
-  python: python3.11
+  python: python3  # any interpreter satisfying requires-python (>=3.11)
 
 # CI settings
 ci:

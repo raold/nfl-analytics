@@ -13,7 +13,6 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 
 from nfl_analytics.markets.kalshi.auth import KalshiAuth
 
-
 # ============================================================
 # Test RSA key generation helper
 # ============================================================
@@ -148,10 +147,13 @@ class TestAuthFromEnv:
         """Load credentials when KALSHI_PRIVATE_KEY is PEM inline."""
         _, pem = _generate_test_key()
 
-        with patch.dict(os.environ, {
-            "KALSHI_KEY_ID": "my-key-id",
-            "KALSHI_PRIVATE_KEY": pem,
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "KALSHI_KEY_ID": "my-key-id",
+                "KALSHI_PRIVATE_KEY": pem,
+            },
+        ):
             auth = KalshiAuth.from_env()
             assert auth.key_id == "my-key-id"
 
@@ -161,10 +163,13 @@ class TestAuthFromEnv:
         key_file = tmp_path / "kalshi.pem"
         key_file.write_text(pem)
 
-        with patch.dict(os.environ, {
-            "KALSHI_KEY_ID": "my-key-id",
-            "KALSHI_PRIVATE_KEY": str(key_file),
-        }):
+        with patch.dict(
+            os.environ,
+            {
+                "KALSHI_KEY_ID": "my-key-id",
+                "KALSHI_PRIVATE_KEY": str(key_file),
+            },
+        ):
             auth = KalshiAuth.from_env()
             assert auth.key_id == "my-key-id"
 

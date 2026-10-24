@@ -8,6 +8,7 @@ Uses hardcoded impact values based on position importance.
 Usage:
     python nfl_analytics/predict/injury_adjustments.py --season 2025 --week 5
 """
+
 import argparse
 import logging
 

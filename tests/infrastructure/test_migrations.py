@@ -229,14 +229,12 @@ class TestMigrationSchemaValidation:
         ]
 
         with prod_db_conn.cursor() as cur:
-            cur.execute(
-                """
+            cur.execute("""
                 SELECT table_name
                 FROM information_schema.tables
                 WHERE table_schema = 'public'
                 AND table_type = 'BASE TABLE'
-            """
-            )
+            """)
 
             existing_tables = {row[0] for row in cur.fetchall()}
 
@@ -257,25 +255,21 @@ class TestMigrationSchemaValidation:
 
         with prod_db_conn.cursor() as cur:
             # Check if TimescaleDB extension exists
-            cur.execute(
-                """
+            cur.execute("""
                 SELECT COUNT(*)
                 FROM pg_extension
                 WHERE extname = 'timescaledb'
-            """
-            )
+            """)
 
             if cur.fetchone()[0] == 0:
                 pytest.skip("TimescaleDB extension not installed")
 
             # Get list of hypertables
-            cur.execute(
-                """
+            cur.execute("""
                 SELECT hypertable_name
                 FROM timescaledb_information.hypertables
                 WHERE hypertable_schema = 'public'
-            """
-            )
+            """)
 
             existing_hypertables = {row[0] for row in cur.fetchall()}
 
@@ -289,8 +283,7 @@ class TestMigrationSchemaValidation:
     def test_primary_keys_exist(self, prod_db_conn):
         """Test that all tables have primary keys."""
         with prod_db_conn.cursor() as cur:
-            cur.execute(
-                """
+            cur.execute("""
                 SELECT t.table_name
                 FROM information_schema.tables t
                 WHERE t.table_schema = 'public'
@@ -302,8 +295,7 @@ class TestMigrationSchemaValidation:
                     AND tc.table_name = t.table_name
                     AND tc.constraint_type = 'PRIMARY KEY'
                 )
-            """
-            )
+            """)
 
             tables_without_pk = [row[0] for row in cur.fetchall()]
 
@@ -466,16 +458,14 @@ class TestMigrationDataPreservation:
         """Test that primary key columns don't have NULLs."""
         with prod_db_conn.cursor() as cur:
             # Get all tables with primary keys
-            cur.execute(
-                """
+            cur.execute("""
                 SELECT kcu.table_name, kcu.column_name
                 FROM information_schema.table_constraints tc
                 JOIN information_schema.key_column_usage kcu
                     ON tc.constraint_name = kcu.constraint_name
                 WHERE tc.table_schema = 'public'
                 AND tc.constraint_type = 'PRIMARY KEY'
-            """
-            )
+            """)
 
             pk_columns = cur.fetchall()
 

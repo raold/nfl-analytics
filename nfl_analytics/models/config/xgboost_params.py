@@ -14,7 +14,6 @@ Last Updated: December 13, 2025
 
 from typing import Any
 
-
 # Default hyperparameters optimized for NFL game prediction
 DEFAULT_XGB_PARAMS: dict[str, Any] = {
     # === Model Complexity ===

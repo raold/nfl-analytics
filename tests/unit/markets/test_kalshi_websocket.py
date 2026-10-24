@@ -9,7 +9,6 @@ import pytest
 from nfl_analytics.markets.base import OrderBookLevel, Side
 from nfl_analytics.markets.kalshi.websocket import KalshiWebSocket, LocalOrderBook
 
-
 # ============================================================
 # Local orderbook state
 # ============================================================
@@ -135,6 +134,7 @@ class TestMessageHandling:
     def _make_ws(self) -> KalshiWebSocket:
         """Create a WebSocket client with mock auth."""
         from unittest.mock import MagicMock
+
         auth = MagicMock()
         auth.sign.return_value = {}
         auth.sign_websocket.return_value = {}
@@ -146,18 +146,22 @@ class TestMessageHandling:
         received = []
         ws.on_ticker = lambda md: received.append(md)
 
-        ws._handle_message(json.dumps({
-            "type": "ticker",
-            "sid": 1,
-            "msg": {
-                "market_ticker": "KXNFL-26-WIN-KC",
-                "yes_bid": 54,
-                "yes_ask": 56,
-                "price": 55,
-                "volume": 1000,
-                "open_interest": 500,
-            }
-        }))
+        ws._handle_message(
+            json.dumps(
+                {
+                    "type": "ticker",
+                    "sid": 1,
+                    "msg": {
+                        "market_ticker": "KXNFL-26-WIN-KC",
+                        "yes_bid": 54,
+                        "yes_ask": 56,
+                        "price": 55,
+                        "volume": 1000,
+                        "open_interest": 500,
+                    },
+                }
+            )
+        )
 
         assert len(received) == 1
         assert received[0].contract_id == "KXNFL-26-WIN-KC"
@@ -169,22 +173,26 @@ class TestMessageHandling:
         received = []
         ws.on_fill = lambda fill: received.append(fill)
 
-        ws._handle_message(json.dumps({
-            "type": "fill",
-            "sid": 13,
-            "msg": {
-                "fill_id": "fill-123",
-                "trade_id": "trade-456",
-                "order_id": "order-789",
-                "market_ticker": "KXNFL-26-WIN-KC",
-                "side": "yes",
-                "action": "buy",
-                "count": 5,
-                "yes_price": 55,
-                "no_price": 45,
-                "is_taker": True,
-            }
-        }))
+        ws._handle_message(
+            json.dumps(
+                {
+                    "type": "fill",
+                    "sid": 13,
+                    "msg": {
+                        "fill_id": "fill-123",
+                        "trade_id": "trade-456",
+                        "order_id": "order-789",
+                        "market_ticker": "KXNFL-26-WIN-KC",
+                        "side": "yes",
+                        "action": "buy",
+                        "count": 5,
+                        "yes_price": 55,
+                        "no_price": 45,
+                        "is_taker": True,
+                    },
+                }
+            )
+        )
 
         assert len(received) == 1
         assert received[0].fill_id == "fill-123"
@@ -197,16 +205,20 @@ class TestMessageHandling:
         received = []
         ws.on_orderbook = lambda ob: received.append(ob)
 
-        ws._handle_message(json.dumps({
-            "type": "orderbook_snapshot",
-            "sid": 2,
-            "seq": 1,
-            "msg": {
-                "market_ticker": "TEST-01",
-                "yes": [[50, 100], [55, 200]],
-                "no": [[45, 150]],
-            }
-        }))
+        ws._handle_message(
+            json.dumps(
+                {
+                    "type": "orderbook_snapshot",
+                    "sid": 2,
+                    "seq": 1,
+                    "msg": {
+                        "market_ticker": "TEST-01",
+                        "yes": [[50, 100], [55, 200]],
+                        "no": [[45, 150]],
+                    },
+                }
+            )
+        )
 
         assert len(received) == 1
         assert received[0].contract_id == "TEST-01"
@@ -216,32 +228,40 @@ class TestMessageHandling:
         """Orderbook delta modifies existing local book."""
         ws = self._make_ws()
         # First set up with snapshot
-        ws._handle_message(json.dumps({
-            "type": "orderbook_snapshot",
-            "sid": 2,
-            "seq": 1,
-            "msg": {
-                "market_ticker": "TEST-01",
-                "yes": [[50, 100]],
-                "no": [],
-            }
-        }))
+        ws._handle_message(
+            json.dumps(
+                {
+                    "type": "orderbook_snapshot",
+                    "sid": 2,
+                    "seq": 1,
+                    "msg": {
+                        "market_ticker": "TEST-01",
+                        "yes": [[50, 100]],
+                        "no": [],
+                    },
+                }
+            )
+        )
 
         received = []
         ws.on_orderbook = lambda ob: received.append(ob)
 
         # Apply delta
-        ws._handle_message(json.dumps({
-            "type": "orderbook_delta",
-            "sid": 2,
-            "seq": 2,
-            "msg": {
-                "market_ticker": "TEST-01",
-                "price": 50,
-                "delta": 50,
-                "side": "yes",
-            }
-        }))
+        ws._handle_message(
+            json.dumps(
+                {
+                    "type": "orderbook_delta",
+                    "sid": 2,
+                    "seq": 2,
+                    "msg": {
+                        "market_ticker": "TEST-01",
+                        "price": 50,
+                        "delta": 50,
+                        "side": "yes",
+                    },
+                }
+            )
+        )
 
         assert len(received) == 1
         local = ws._orderbooks["TEST-01"]
@@ -251,11 +271,11 @@ class TestMessageHandling:
         """Subscription confirmation is recorded."""
         ws = self._make_ws()
 
-        ws._handle_message(json.dumps({
-            "type": "subscribed",
-            "id": 1,
-            "msg": {"sid": 2, "channel": "orderbook_delta"}
-        }))
+        ws._handle_message(
+            json.dumps(
+                {"type": "subscribed", "id": 1, "msg": {"sid": 2, "channel": "orderbook_delta"}}
+            )
+        )
 
         assert 2 in ws._subscriptions
 
@@ -267,11 +287,15 @@ class TestMessageHandling:
     def test_unknown_message_type_ignored(self):
         """Unknown message types are silently ignored."""
         ws = self._make_ws()
-        ws._handle_message(json.dumps({
-            "type": "unknown_future_type",
-            "sid": 99,
-            "msg": {},
-        }))
+        ws._handle_message(
+            json.dumps(
+                {
+                    "type": "unknown_future_type",
+                    "sid": 99,
+                    "msg": {},
+                }
+            )
+        )
         # No error
 
     def test_get_orderbook_returns_none_for_unknown(self):
@@ -283,16 +307,20 @@ class TestMessageHandling:
         """get_orderbook returns the locally-maintained book."""
         ws = self._make_ws()
 
-        ws._handle_message(json.dumps({
-            "type": "orderbook_snapshot",
-            "sid": 2,
-            "seq": 1,
-            "msg": {
-                "market_ticker": "TEST-01",
-                "yes": [[50, 100]],
-                "no": [[48, 200]],
-            }
-        }))
+        ws._handle_message(
+            json.dumps(
+                {
+                    "type": "orderbook_snapshot",
+                    "sid": 2,
+                    "seq": 1,
+                    "msg": {
+                        "market_ticker": "TEST-01",
+                        "yes": [[50, 100]],
+                        "no": [[48, 200]],
+                    },
+                }
+            )
+        )
 
         ob = ws.get_orderbook("TEST-01")
         assert ob is not None

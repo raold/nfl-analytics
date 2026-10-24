@@ -478,7 +478,7 @@ def main():
     engine = EnvironmentalContextualEngine()
 
     # Generate ALL features for 2020-2025 seasons
-    (thursday_night, travel_impact, venue_adaptation, rivalry) = engine.generate_all_features(
+    thursday_night, travel_impact, venue_adaptation, rivalry = engine.generate_all_features(
         start_season=2020, end_season=2025
     )
 

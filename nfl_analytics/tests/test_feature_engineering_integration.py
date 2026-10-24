@@ -42,15 +42,13 @@ def test_database_connectivity():
         with psycopg.connect(DB_URL) as conn:
             with conn.cursor() as cur:
                 # Test games table exists and has correct columns
-                cur.execute(
-                    """
+                cur.execute("""
                     SELECT column_name
                     FROM information_schema.columns
                     WHERE table_schema = 'public'
                     AND table_name = 'games'
                     ORDER BY ordinal_position
-                """
-                )
+                """)
                 columns = [row[0] for row in cur.fetchall()]
 
                 # Verify critical columns from DATABASE_SCHEMA_AUDIT.md
@@ -77,15 +75,13 @@ def test_database_connectivity():
                     print(f"⚠️  WARNING: Found deprecated column names: {found_incorrect}")
 
                 # Check plays table
-                cur.execute(
-                    """
+                cur.execute("""
                     SELECT column_name
                     FROM information_schema.columns
                     WHERE table_schema = 'public'
                     AND table_name = 'plays'
                     ORDER BY ordinal_position
-                """
-                )
+                """)
                 play_columns = [row[0] for row in cur.fetchall()]
 
                 required_play_columns = [

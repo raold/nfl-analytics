@@ -86,14 +86,10 @@ class HealthReport:
             lines.append(
                 f"Status: {'CRITICAL' if critical else 'ELEVATED' if elevated else 'WARNING'}"
             )
-            lines.append(
-                f"Alerts: {critical} critical, {elevated} elevated, {warning} warning"
-            )
+            lines.append(f"Alerts: {critical} critical, {elevated} elevated, {warning} warning")
             lines.append("")
             for alert in self.alerts:
-                lines.append(
-                    f"  [{alert.level.upper()}] {alert.category}: {alert.message}"
-                )
+                lines.append(f"  [{alert.level.upper()}] {alert.category}: {alert.message}")
 
         if self.pnl_summary:
             equity = self.pnl_summary.get("total_equity_cents", 0)
@@ -156,38 +152,44 @@ class PortfolioMonitor:
             dd_pct = self._drawdown.current_drawdown_pct
 
             if dd_pct >= self.config.drawdown_critical_pct:
-                alerts.append(HealthAlert(
-                    level="critical",
-                    category="drawdown",
-                    message=(
-                        f"Drawdown at {dd_pct:.1%} — exceeds critical threshold "
-                        f"{self.config.drawdown_critical_pct:.1%}"
-                    ),
-                    value=dd_pct,
-                    threshold=self.config.drawdown_critical_pct,
-                ))
+                alerts.append(
+                    HealthAlert(
+                        level="critical",
+                        category="drawdown",
+                        message=(
+                            f"Drawdown at {dd_pct:.1%} — exceeds critical threshold "
+                            f"{self.config.drawdown_critical_pct:.1%}"
+                        ),
+                        value=dd_pct,
+                        threshold=self.config.drawdown_critical_pct,
+                    )
+                )
             elif dd_pct >= self.config.drawdown_elevated_pct:
-                alerts.append(HealthAlert(
-                    level="elevated",
-                    category="drawdown",
-                    message=(
-                        f"Drawdown at {dd_pct:.1%} — exceeds elevated threshold "
-                        f"{self.config.drawdown_elevated_pct:.1%}"
-                    ),
-                    value=dd_pct,
-                    threshold=self.config.drawdown_elevated_pct,
-                ))
+                alerts.append(
+                    HealthAlert(
+                        level="elevated",
+                        category="drawdown",
+                        message=(
+                            f"Drawdown at {dd_pct:.1%} — exceeds elevated threshold "
+                            f"{self.config.drawdown_elevated_pct:.1%}"
+                        ),
+                        value=dd_pct,
+                        threshold=self.config.drawdown_elevated_pct,
+                    )
+                )
             elif dd_pct >= self.config.drawdown_warning_pct:
-                alerts.append(HealthAlert(
-                    level="warning",
-                    category="drawdown",
-                    message=(
-                        f"Drawdown at {dd_pct:.1%} — exceeds warning threshold "
-                        f"{self.config.drawdown_warning_pct:.1%}"
-                    ),
-                    value=dd_pct,
-                    threshold=self.config.drawdown_warning_pct,
-                ))
+                alerts.append(
+                    HealthAlert(
+                        level="warning",
+                        category="drawdown",
+                        message=(
+                            f"Drawdown at {dd_pct:.1%} — exceeds warning threshold "
+                            f"{self.config.drawdown_warning_pct:.1%}"
+                        ),
+                        value=dd_pct,
+                        threshold=self.config.drawdown_warning_pct,
+                    )
+                )
 
         # Check daily P&L loss
         total_equity = pnl_summary.get("total_equity_cents", 0)
@@ -195,32 +197,36 @@ class PortfolioMonitor:
         if total_equity > 0 and daily_pnl < 0:
             daily_loss_pct = abs(daily_pnl) / total_equity
             if daily_loss_pct >= self.config.max_daily_loss_pct:
-                alerts.append(HealthAlert(
-                    level="critical",
-                    category="daily_loss",
-                    message=(
-                        f"Daily loss {daily_loss_pct:.1%} exceeds threshold "
-                        f"{self.config.max_daily_loss_pct:.1%}"
-                    ),
-                    value=daily_loss_pct,
-                    threshold=self.config.max_daily_loss_pct,
-                ))
+                alerts.append(
+                    HealthAlert(
+                        level="critical",
+                        category="daily_loss",
+                        message=(
+                            f"Daily loss {daily_loss_pct:.1%} exceeds threshold "
+                            f"{self.config.max_daily_loss_pct:.1%}"
+                        ),
+                        value=daily_loss_pct,
+                        threshold=self.config.max_daily_loss_pct,
+                    )
+                )
 
         # Check win rate (only if enough trades)
         trade_count = pnl_summary.get("trade_count", 0)
         win_rate = pnl_summary.get("win_rate", 0.0)
         if trade_count >= self.config.min_trades_for_win_rate:
             if win_rate < self.config.min_win_rate:
-                alerts.append(HealthAlert(
-                    level="warning",
-                    category="win_rate",
-                    message=(
-                        f"Win rate {win_rate:.1%} below minimum {self.config.min_win_rate:.1%} "
-                        f"({trade_count} trades)"
-                    ),
-                    value=win_rate,
-                    threshold=self.config.min_win_rate,
-                ))
+                alerts.append(
+                    HealthAlert(
+                        level="warning",
+                        category="win_rate",
+                        message=(
+                            f"Win rate {win_rate:.1%} below minimum {self.config.min_win_rate:.1%} "
+                            f"({trade_count} trades)"
+                        ),
+                        value=win_rate,
+                        threshold=self.config.min_win_rate,
+                    )
+                )
 
         # Check position concentration
         if positions and total_equity > 0:
@@ -228,16 +234,18 @@ class PortfolioMonitor:
                 position_value = pos.avg_entry_cents * pos.quantity
                 concentration = position_value / total_equity
                 if concentration >= self.config.max_position_concentration_pct:
-                    alerts.append(HealthAlert(
-                        level="warning",
-                        category="concentration",
-                        message=(
-                            f"Position {pos.contract_id} is {concentration:.1%} of portfolio "
-                            f"(max {self.config.max_position_concentration_pct:.1%})"
-                        ),
-                        value=concentration,
-                        threshold=self.config.max_position_concentration_pct,
-                    ))
+                    alerts.append(
+                        HealthAlert(
+                            level="warning",
+                            category="concentration",
+                            message=(
+                                f"Position {pos.contract_id} is {concentration:.1%} of portfolio "
+                                f"(max {self.config.max_position_concentration_pct:.1%})"
+                            ),
+                            value=concentration,
+                            threshold=self.config.max_position_concentration_pct,
+                        )
+                    )
 
         # Dispatch alerts via AlertManager if configured
         if self._alert_manager is not None and alerts:

@@ -43,15 +43,13 @@ def test_database_table():
     cursor = conn.cursor()
 
     # Check table exists
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT EXISTS (
             SELECT FROM information_schema.tables
             WHERE table_schema = 'ml'
             AND table_name = 'game_predictions'
         );
-    """
-    )
+    """)
     exists = cursor.fetchone()[0]
 
     if not exists:
@@ -59,15 +57,13 @@ def test_database_table():
         return False
 
     # Check columns
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT column_name, data_type
         FROM information_schema.columns
         WHERE table_schema = 'ml'
         AND table_name = 'game_predictions'
         ORDER BY ordinal_position;
-    """
-    )
+    """)
     columns = cursor.fetchall()
 
     print(f"✅ Table exists with {len(columns)} columns:")
@@ -103,15 +99,13 @@ def test_predict_game_full():
     # Find a recent game
     conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT game_id, season, week, home_team, away_team
         FROM games
         WHERE season = 2024
         ORDER BY kickoff DESC
         LIMIT 1;
-    """
-    )
+    """)
     game = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -206,14 +200,12 @@ def test_get_game_prediction():
     # Find a game with stored prediction
     conn = psycopg2.connect(**DB_CONFIG)
     cursor = conn.cursor()
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT game_id
         FROM ml.game_predictions
         ORDER BY predicted_at DESC
         LIMIT 1;
-    """
-    )
+    """)
     result = cursor.fetchone()
     cursor.close()
     conn.close()

@@ -238,9 +238,7 @@ class PaperMarketClient(MarketClient):
         required_cents = order.price_cents * order.quantity
         if required_cents > self._balance_cents:
             order.status = OrderStatus.REJECTED
-            raise InsufficientBalanceError(
-                f"Need {required_cents}¢, have {self._balance_cents}¢"
-            )
+            raise InsufficientBalanceError(f"Need {required_cents}¢, have {self._balance_cents}¢")
 
         # Reserve funds
         self._balance_cents -= required_cents

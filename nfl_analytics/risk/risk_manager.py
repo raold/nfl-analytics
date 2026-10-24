@@ -264,12 +264,12 @@ class RiskManager:
         return {
             "kill_switch": self._kill_switch.status(),
             "feature_health": {
-                "last_check": self._last_health_result.summary()
-                if self._last_health_result
-                else "no check yet",
-                "healthy": self._last_health_result.healthy
-                if self._last_health_result
-                else None,
+                "last_check": (
+                    self._last_health_result.summary()
+                    if self._last_health_result
+                    else "no check yet"
+                ),
+                "healthy": self._last_health_result.healthy if self._last_health_result else None,
             },
             "stats": {
                 "total_checks": self._total_checks,

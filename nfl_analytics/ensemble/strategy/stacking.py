@@ -8,7 +8,6 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-
 import numpy as np
 
 from .base import EnsemblePrediction, EnsembleStrategy, ModelPrediction

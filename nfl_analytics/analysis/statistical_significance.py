@@ -13,7 +13,6 @@ from scipy import stats
 _PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
 
 
-
 def diebold_mariano_test(
     losses1: np.ndarray, losses2: np.ndarray, h: int = 1, alternative: str = "two-sided"
 ) -> dict[str, float]:

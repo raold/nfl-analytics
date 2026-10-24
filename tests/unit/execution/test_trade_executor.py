@@ -57,9 +57,11 @@ def _filled_order(order: Order) -> Order:
 def _mock_client() -> MagicMock:
     """Create a mock MarketClient."""
     client = AsyncMock(spec=MarketClient)
+
     # Default: place_order returns a FILLED order
     async def _place_order(order):
         return _filled_order(order)
+
     client.place_order.side_effect = _place_order
     return client
 
@@ -99,9 +101,11 @@ class TestSingleSignal:
     async def test_submit_signal_resting(self):
         """Signal becomes a resting order."""
         client = _mock_client()
+
         async def _place_resting(order):
             order.status = OrderStatus.OPEN
             return order
+
         client.place_order.side_effect = _place_resting
         executor = TradeExecutor(client, ExecutorConfig(max_retries=0))
 
@@ -125,12 +129,14 @@ class TestRetryLogic:
         """Rate limit error triggers retry."""
         client = _mock_client()
         call_count = 0
+
         async def _rate_limit_then_success(order):
             nonlocal call_count
             call_count += 1
             if call_count == 1:
                 raise RateLimitError()
             return _filled_order(order)
+
         client.place_order.side_effect = _rate_limit_then_success
 
         executor = TradeExecutor(client, ExecutorConfig(max_retries=2, initial_backoff_ms=10))
@@ -144,12 +150,14 @@ class TestRetryLogic:
         """Connection error triggers retry."""
         client = _mock_client()
         call_count = 0
+
         async def _connect_fail_then_success(order):
             nonlocal call_count
             call_count += 1
             if call_count == 1:
                 raise MarketConnectionError("Network down")
             return _filled_order(order)
+
         client.place_order.side_effect = _connect_fail_then_success
 
         executor = TradeExecutor(client, ExecutorConfig(max_retries=2, initial_backoff_ms=10))
@@ -210,10 +218,12 @@ class TestMultipleSignals:
     async def test_submit_batch(self):
         """Multiple signals submitted via batch API."""
         client = _mock_client()
+
         async def _batch_place(orders):
             for o in orders:
                 _filled_order(o)
             return orders
+
         client.batch_place_orders.side_effect = _batch_place
 
         executor = TradeExecutor(
@@ -286,10 +296,12 @@ class TestOrderManagement:
     async def test_cancel_tracked_order(self):
         """Cancel a tracked order."""
         client = _mock_client()
+
         async def _cancel(oid):
             o = Order(order_id=oid, contract_id="C-1", side=Side.YES, price_cents=50, quantity=1)
             o.status = OrderStatus.CANCELLED
             return o
+
         client.cancel_order.side_effect = _cancel
 
         executor = TradeExecutor(client, ExecutorConfig(max_retries=0))
@@ -312,9 +324,11 @@ class TestOrderManagement:
     async def test_get_active_orders(self):
         """List only active (resting) orders."""
         client = _mock_client()
+
         async def _place_resting(order):
             order.status = OrderStatus.OPEN
             return order
+
         client.place_order.side_effect = _place_resting
         executor = TradeExecutor(client, ExecutorConfig(max_retries=0, use_batch_api=False))
 
@@ -337,12 +351,14 @@ class TestStats:
         """Stats correctly count submitted, filled, rejected."""
         client = _mock_client()
         call_count = 0
+
         async def _alternate(order):
             nonlocal call_count
             call_count += 1
             if call_count % 2 == 0:
                 raise OrderRejectedError("Nope")
             return _filled_order(order)
+
         client.place_order.side_effect = _alternate
 
         executor = TradeExecutor(client, ExecutorConfig(max_retries=0, use_batch_api=False))

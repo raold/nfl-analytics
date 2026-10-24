@@ -125,9 +125,7 @@ class DrawdownMonitor:
     # Core API
     # ------------------------------------------------------------------
 
-    def record_equity(
-        self, equity_cents: int, timestamp: datetime | None = None
-    ) -> None:
+    def record_equity(self, equity_cents: int, timestamp: datetime | None = None) -> None:
         """Record an equity snapshot.
 
         Call this on every fill, settlement, or periodic equity update.
@@ -360,8 +358,12 @@ class DrawdownMonitor:
             "in_drawdown": self.in_drawdown,
             "time_in_drawdown_days": round(self.time_in_drawdown_days, 1),
             "sharpe_ratio": round(self.sharpe_ratio, 2) if self.sharpe_ratio is not None else None,
-            "sortino_ratio": round(self.sortino_ratio, 2) if self.sortino_ratio is not None else None,
-            "recovery_factor": round(self.recovery_factor, 2) if self.recovery_factor is not None else None,
+            "sortino_ratio": (
+                round(self.sortino_ratio, 2) if self.sortino_ratio is not None else None
+            ),
+            "recovery_factor": (
+                round(self.recovery_factor, 2) if self.recovery_factor is not None else None
+            ),
             "completed_drawdowns": len(self._events),
             "snapshots_stored": len(self._snapshots),
             "daily_returns_stored": len(self._daily_returns),

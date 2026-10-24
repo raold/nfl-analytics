@@ -319,6 +319,7 @@ class DataQualityValidator:
         if "season" in df.columns:
             max_season = df["season"].max()
             from datetime import datetime
+
             now = datetime.now()
             current_season = now.year if now.month >= 9 else now.year - 1
 

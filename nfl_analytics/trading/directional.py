@@ -112,9 +112,7 @@ class GamePrediction:
 # These patterns are configurable — real Kalshi IDs may differ.
 # The parser is lenient and extracts what it can.
 
-_WIN_PATTERN = re.compile(
-    r"KXNFL-(\d{2})-WIN-([A-Z]{2,3})$", re.IGNORECASE
-)
+_WIN_PATTERN = re.compile(r"KXNFL-(\d{2})-WIN-([A-Z]{2,3})$", re.IGNORECASE)
 _SPREAD_PATTERN = re.compile(
     r"KXNFL-(\d{2})-SPREAD-([A-Z]{2,3})-([A-Z]{2,3})-([\d.+-]+)$",
     re.IGNORECASE,
@@ -433,8 +431,10 @@ class DirectionalStrategy(TradingStrategy):
             if hasattr(self._model, "feature_extractor"):
                 try:
                     features = self._model.feature_extractor.extract_game_features(
-                        parsed.home_team, parsed.away_team,
-                        parsed.season, self._current_week,
+                        parsed.home_team,
+                        parsed.away_team,
+                        parsed.season,
+                        self._current_week,
                     )
                 except Exception:
                     logger.debug("Feature extraction for meta-labeling failed")
@@ -471,9 +471,7 @@ class DirectionalStrategy(TradingStrategy):
             )
             return None
 
-    def _contract_probability(
-        self, parsed: ParsedContract, pred: GamePrediction
-    ) -> float | None:
+    def _contract_probability(self, parsed: ParsedContract, pred: GamePrediction) -> float | None:
         """Convert model prediction to a probability for the specific contract type.
 
         Each contract type maps to a different model output:
@@ -498,11 +496,13 @@ class DirectionalStrategy(TradingStrategy):
 
             # spread is home perspective: negative = home underdog
             # line from contract: positive means home must win by that much
-            prob = float(norm.cdf(
-                pred.home_spread + parsed.line,
-                loc=0,
-                scale=pred.spread_std,
-            ))
+            prob = float(
+                norm.cdf(
+                    pred.home_spread + parsed.line,
+                    loc=0,
+                    scale=pred.spread_std,
+                )
+            )
             return max(0.01, min(0.99, prob))
 
         if parsed.contract_type == "total":
@@ -511,18 +511,18 @@ class DirectionalStrategy(TradingStrategy):
             # P(total > line) using normal CDF
             from scipy.stats import norm
 
-            prob = 1.0 - float(norm.cdf(
-                parsed.line,
-                loc=pred.total_points,
-                scale=pred.total_std,
-            ))
+            prob = 1.0 - float(
+                norm.cdf(
+                    parsed.line,
+                    loc=pred.total_points,
+                    scale=pred.total_std,
+                )
+            )
             return max(0.01, min(0.99, prob))
 
         return None
 
-    def _get_market_price(
-        self, market_data: MarketData, orderbook: OrderBook | None
-    ) -> int | None:
+    def _get_market_price(self, market_data: MarketData, orderbook: OrderBook | None) -> int | None:
         """Extract the market price in cents for edge calculation.
 
         Prefers mid-price from the order book (most accurate), falls
@@ -536,9 +536,7 @@ class DirectionalStrategy(TradingStrategy):
             return market_data.yes_ask_cents
         return None
 
-    def _compute_meta_prob(
-        self, pred: GamePrediction, market_price_cents: int
-    ) -> float:
+    def _compute_meta_prob(self, pred: GamePrediction, market_price_cents: int) -> float:
         """Run meta-labeling classifier on this trade opportunity.
 
         Builds meta-features from the model prediction and game features,

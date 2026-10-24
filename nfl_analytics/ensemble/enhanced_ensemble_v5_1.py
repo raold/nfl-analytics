@@ -186,7 +186,9 @@ class EnhancedEnsemble4Way:
 
         # Load Hybrid XGBoost
         if self.hybrid_xgboost_path.exists():
-            from nfl_analytics.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
+            from nfl_analytics.online.hybrid_static_incremental import (
+                HybridStaticIncrementalXGBoost,
+            )
 
             self.hybrid_xgboost_model = HybridStaticIncrementalXGBoost()
             self.hybrid_xgboost_model.load(str(self.hybrid_xgboost_path))

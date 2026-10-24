@@ -38,7 +38,11 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector, LeakageSeverity, LeakageType
+from nfl_analytics.utils.data_leakage_detector import (
+    DataLeakageDetector,
+    LeakageSeverity,
+    LeakageType,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

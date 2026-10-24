@@ -35,7 +35,14 @@ def _position(contract_id: str = "C-1", side: Side = Side.YES, quantity: int = 1
 
 
 def _fill(fill_id: str = "f-1", order_id: str = "o-1", contract_id: str = "C-1") -> Fill:
-    return Fill(fill_id=fill_id, order_id=order_id, contract_id=contract_id, side=Side.YES, price_cents=50, quantity=5)
+    return Fill(
+        fill_id=fill_id,
+        order_id=order_id,
+        contract_id=contract_id,
+        side=Side.YES,
+        price_cents=50,
+        quantity=5,
+    )
 
 
 # ============================================================

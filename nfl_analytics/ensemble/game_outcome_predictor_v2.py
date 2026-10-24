@@ -134,7 +134,9 @@ class GameOutcomePredictorV2:
         """Lazy-load ensemble for QB predictions."""
         if self._ensemble is None and self.use_ensemble_qb:
             try:
-                from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+                from nfl_analytics.ensemble.enhanced_ensemble_v6_production import (
+                    EnhancedEnsemble5Way,
+                )
 
                 self._ensemble = EnhancedEnsemble5Way()
                 logger.info("Ensemble v6.1 loaded for QB predictions")

@@ -65,9 +65,7 @@ class KalshiAuth:
         if not key_data.startswith("-----") and Path(key_data).is_file():
             key_data = Path(key_data).read_text()
 
-        private_key = serialization.load_pem_private_key(
-            key_data.encode(), password=None
-        )
+        private_key = serialization.load_pem_private_key(key_data.encode(), password=None)
         if not isinstance(private_key, rsa.RSAPrivateKey):
             raise TypeError(f"Expected RSA private key, got {type(private_key).__name__}")
 
@@ -78,9 +76,7 @@ class KalshiAuth:
     def from_key_file(cls, key_id: str, key_path: str | Path) -> KalshiAuth:
         """Load credentials from a PEM key file."""
         key_data = Path(key_path).read_text()
-        private_key = serialization.load_pem_private_key(
-            key_data.encode(), password=None
-        )
+        private_key = serialization.load_pem_private_key(key_data.encode(), password=None)
         if not isinstance(private_key, rsa.RSAPrivateKey):
             raise TypeError(f"Expected RSA private key, got {type(private_key).__name__}")
         return cls(key_id=key_id, private_key=private_key)

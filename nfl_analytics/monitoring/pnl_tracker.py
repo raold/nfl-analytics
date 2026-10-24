@@ -260,7 +260,5 @@ class PnLTracker:
             "trade_count": self._trade_count,
             "winning_trades": self._winning_trades,
             "win_rate": round(self.win_rate, 4),
-            "open_positions": sum(
-                1 for p in self._positions.values() if p.quantity > 0
-            ),
+            "open_positions": sum(1 for p in self._positions.values() if p.quantity > 0),
         }

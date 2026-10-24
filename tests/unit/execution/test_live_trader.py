@@ -335,8 +335,15 @@ class TestStats:
     async def test_keys(self):
         trader, _ = _make_trader()
         s = trader.stats
-        expected = {"mode", "running", "cycles", "signals_generated",
-                    "signals_approved", "signals_blocked", "api_errors"}
+        expected = {
+            "mode",
+            "running",
+            "cycles",
+            "signals_generated",
+            "signals_approved",
+            "signals_blocked",
+            "api_errors",
+        }
         assert set(s.keys()) == expected
 
     async def test_counts(self):

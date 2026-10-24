@@ -15,35 +15,37 @@ import numpy as np
 # =============================================================================
 # DISSERTATION COLOR PALETTE (synchronized with main.tex / tikz_diagram_style.tex)
 # =============================================================================
-ACCENT_BLUE = "#1f77b4"     # RGB(31,119,180) - Primary
-ACCENT_ORANGE = "#ff7f0e"   # RGB(255,127,14) - Secondary/contrast
-ACCENT_GREEN = "#2ca02c"    # RGB(44,160,44) - Success
-ACCENT_RED = "#d62728"      # RGB(214,39,40) - Warning
-GREY_DARK = "#4d4d4d"       # grey3 = 0.3 - Axes, labels
-GREY_MED = "#808080"        # grey5 = 0.5 - Secondary text
-GREY_LIGHT = "#b3b3b3"      # grey7 = 0.7 - Gridlines
+ACCENT_BLUE = "#1f77b4"  # RGB(31,119,180) - Primary
+ACCENT_ORANGE = "#ff7f0e"  # RGB(255,127,14) - Secondary/contrast
+ACCENT_GREEN = "#2ca02c"  # RGB(44,160,44) - Success
+ACCENT_RED = "#d62728"  # RGB(214,39,40) - Warning
+GREY_DARK = "#4d4d4d"  # grey3 = 0.3 - Axes, labels
+GREY_MED = "#808080"  # grey5 = 0.5 - Secondary text
+GREY_LIGHT = "#b3b3b3"  # grey7 = 0.7 - Gridlines
 
 # Set publication-quality style (academic/serif)
-plt.rcParams.update({
-    "figure.facecolor": "white",
-    "axes.facecolor": "white",
-    "savefig.facecolor": "white",
-    "font.family": "serif",
-    "font.serif": ["Computer Modern Roman", "Times New Roman", "DejaVu Serif"],
-    "mathtext.fontset": "cm",
-    "axes.labelsize": 11,
-    "axes.titlesize": 12,
-    "xtick.labelsize": 10,
-    "ytick.labelsize": 10,
-    "legend.fontsize": 9,
-    "axes.linewidth": 0.8,
-    "axes.edgecolor": GREY_DARK,
-    "axes.labelcolor": GREY_DARK,
-    "xtick.color": GREY_MED,
-    "ytick.color": GREY_MED,
-    "grid.color": GREY_LIGHT,
-    "grid.linewidth": 0.5,
-})
+plt.rcParams.update(
+    {
+        "figure.facecolor": "white",
+        "axes.facecolor": "white",
+        "savefig.facecolor": "white",
+        "font.family": "serif",
+        "font.serif": ["Computer Modern Roman", "Times New Roman", "DejaVu Serif"],
+        "mathtext.fontset": "cm",
+        "axes.labelsize": 11,
+        "axes.titlesize": 12,
+        "xtick.labelsize": 10,
+        "ytick.labelsize": 10,
+        "legend.fontsize": 9,
+        "axes.linewidth": 0.8,
+        "axes.edgecolor": GREY_DARK,
+        "axes.labelcolor": GREY_DARK,
+        "xtick.color": GREY_MED,
+        "ytick.color": GREY_MED,
+        "grid.color": GREY_LIGHT,
+        "grid.linewidth": 0.5,
+    }
+)
 
 
 def analytic_joint_exceedance(rho):

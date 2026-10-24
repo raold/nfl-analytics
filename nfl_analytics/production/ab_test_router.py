@@ -50,7 +50,9 @@ import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
-from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way as EnsembleV6
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import (
+    EnhancedEnsemble5Way as EnsembleV6,
+)
 
 from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way as EnsembleV5
 

@@ -64,8 +64,7 @@ class TestInit:
         tl = TradeLogger(TradeLoggerConfig(log_dir=""))
         # Only the NullHandler from logging, not a RotatingFileHandler
         file_handlers = [
-            h for h in tl._logger.handlers
-            if isinstance(h, logging.handlers.RotatingFileHandler)
+            h for h in tl._logger.handlers if isinstance(h, logging.handlers.RotatingFileHandler)
         ]
         assert len(file_handlers) == 0
 
@@ -86,7 +85,9 @@ class TestSignalLogging:
     def test_with_risk_result(self):
         tl, handler = _make_logger_with_capture()
         signal = _make_signal()
-        result = RiskCheckResult(approved=False, signal=signal, reason="kill switch active", layer="kill_switch")
+        result = RiskCheckResult(
+            approved=False, signal=signal, reason="kill switch active", layer="kill_switch"
+        )
         tl.log_signal(signal, result)
         data = handler.records[0].event_data  # type: ignore[attr-defined]
         assert data["risk_approved"] is False

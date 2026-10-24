@@ -136,9 +136,7 @@ class PositionLimitChecker:
             layer="all_passed",
         )
 
-    def _check_single_position(
-        self, signal: Signal, positions: list[Position]
-    ) -> LimitCheckResult:
+    def _check_single_position(self, signal: Signal, positions: list[Position]) -> LimitCheckResult:
         """Layer 1: Max position size as % of bankroll."""
         max_cost_cents = int(self.bankroll_cents * self.config.max_position_pct)
 
@@ -153,9 +151,7 @@ class PositionLimitChecker:
         total_cost = total_qty * signal.price_cents
 
         if total_cost <= max_cost_cents:
-            return LimitCheckResult(
-                approved=True, signal=signal, original_quantity=signal.quantity
-            )
+            return LimitCheckResult(approved=True, signal=signal, original_quantity=signal.quantity)
 
         # Try to reduce quantity
         max_new_qty = max(0, (max_cost_cents // signal.price_cents) - existing_qty)
@@ -188,9 +184,7 @@ class PositionLimitChecker:
             layer="position_size",
         )
 
-    def _check_total_exposure(
-        self, signal: Signal, positions: list[Position]
-    ) -> LimitCheckResult:
+    def _check_total_exposure(self, signal: Signal, positions: list[Position]) -> LimitCheckResult:
         """Layer 2: Max total exposure across all positions."""
         max_exposure_cents = int(self.bankroll_cents * self.config.max_exposure_pct)
 
@@ -200,9 +194,7 @@ class PositionLimitChecker:
         total_exposure = current_exposure + signal_cost
 
         if total_exposure <= max_exposure_cents:
-            return LimitCheckResult(
-                approved=True, signal=signal, original_quantity=signal.quantity
-            )
+            return LimitCheckResult(approved=True, signal=signal, original_quantity=signal.quantity)
 
         # Try to reduce
         available = max(0, max_exposure_cents - current_exposure)
@@ -238,9 +230,7 @@ class PositionLimitChecker:
         group = self.correlation_groups.get(signal.contract_id)
         if group is None:
             # No group assigned, skip check
-            return LimitCheckResult(
-                approved=True, signal=signal, original_quantity=signal.quantity
-            )
+            return LimitCheckResult(approved=True, signal=signal, original_quantity=signal.quantity)
 
         max_group_cents = int(self.bankroll_cents * self.config.max_correlation_pct)
 
@@ -255,9 +245,7 @@ class PositionLimitChecker:
         total_group = group_exposure + signal_cost
 
         if total_group <= max_group_cents:
-            return LimitCheckResult(
-                approved=True, signal=signal, original_quantity=signal.quantity
-            )
+            return LimitCheckResult(approved=True, signal=signal, original_quantity=signal.quantity)
 
         available = max(0, max_group_cents - group_exposure)
         max_qty = available // signal.price_cents if signal.price_cents > 0 else 0
@@ -285,18 +273,14 @@ class PositionLimitChecker:
             layer="correlation",
         )
 
-    def _check_cash_reserve(
-        self, signal: Signal, positions: list[Position]
-    ) -> LimitCheckResult:
+    def _check_cash_reserve(self, signal: Signal, positions: list[Position]) -> LimitCheckResult:
         """Ensure minimum cash reserve is maintained."""
         min_reserve = int(self.bankroll_cents * self.config.min_bankroll_reserve_pct)
         current_exposure = sum(pos.avg_entry_cents * pos.quantity for pos in positions)
         cash_after = self.bankroll_cents - current_exposure - (signal.price_cents * signal.quantity)
 
         if cash_after >= min_reserve:
-            return LimitCheckResult(
-                approved=True, signal=signal, original_quantity=signal.quantity
-            )
+            return LimitCheckResult(approved=True, signal=signal, original_quantity=signal.quantity)
 
         # Try to reduce
         available_cash = self.bankroll_cents - current_exposure - min_reserve

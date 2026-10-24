@@ -179,7 +179,9 @@ class MessagePassingLayer(nn.Module):
         if edge_index.numel() == 0:
             # No edges, return updated embeddings with no messages
             return self.update_mlp(
-                torch.cat([dst_embeddings, torch.zeros_like(dst_embeddings[:, :self.out_dim])], dim=1)
+                torch.cat(
+                    [dst_embeddings, torch.zeros_like(dst_embeddings[:, : self.out_dim])], dim=1
+                )
             )
 
         src_indices, dst_indices = edge_index[0], edge_index[1]

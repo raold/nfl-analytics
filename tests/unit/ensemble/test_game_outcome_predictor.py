@@ -35,7 +35,9 @@ class TestGameOutcomePredictor:
     @pytest.fixture
     def predictor(self):
         """Create predictor instance with mocked ensemble."""
-        with patch("nfl_analytics.ensemble.game_outcome_predictor.EnhancedEnsemble5Way") as mock_ensemble:
+        with patch(
+            "nfl_analytics.ensemble.game_outcome_predictor.EnhancedEnsemble5Way"
+        ) as mock_ensemble:
             # Mock ensemble predict method
             mock_instance = Mock()
             mock_instance.predict.return_value = {"ensemble_mean": 250.0, "ensemble_std": 40.0}
@@ -213,7 +215,8 @@ class TestGameOutcomePredictor:
             mock_conn.cursor.return_value = mock_cursor
 
             with patch(
-                "nfl_analytics.ensemble.game_outcome_predictor.psycopg2.connect", return_value=mock_conn
+                "nfl_analytics.ensemble.game_outcome_predictor.psycopg2.connect",
+                return_value=mock_conn,
             ):
                 result = predictor.predict_game("KC", "BUF", 2025, 12)
 

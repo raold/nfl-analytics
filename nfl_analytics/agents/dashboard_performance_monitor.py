@@ -380,8 +380,7 @@ class DashboardPerformanceMonitor:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
 
             # Query pg_stat_statements for repeated queries
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT
                     query,
                     calls,
@@ -393,8 +392,7 @@ class DashboardPerformanceMonitor:
                 AND mean_exec_time > 100  -- Slow queries
                 ORDER BY calls DESC
                 LIMIT 20
-            """
-            )
+            """)
 
             repeated_queries = cursor.fetchall()
 

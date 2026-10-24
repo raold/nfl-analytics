@@ -386,8 +386,7 @@ class FrontendEngineeringAgent:
             with psycopg.connect(**self.db_config) as conn:
                 with conn.cursor() as cur:
                     # Get all tables and views
-                    cur.execute(
-                        """
+                    cur.execute("""
                         SELECT
                             table_schema,
                             table_name,
@@ -395,8 +394,7 @@ class FrontendEngineeringAgent:
                         FROM information_schema.tables
                         WHERE table_schema NOT IN ('pg_catalog', 'information_schema')
                         ORDER BY table_schema, table_name
-                    """
-                    )
+                    """)
 
                     for schema_name, table_name, table_type in cur.fetchall():
                         full_name = f"{schema_name}.{table_name}"

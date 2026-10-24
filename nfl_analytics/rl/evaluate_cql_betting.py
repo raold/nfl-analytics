@@ -36,7 +36,6 @@ import psycopg
 import torch
 import torch.nn as nn
 
-
 # ============================================================================
 # Database Connection & Outcome Loading
 # ============================================================================
@@ -87,6 +86,7 @@ def load_game_outcomes(season_start: int = 2019, season_end: int = 2024) -> pd.D
     with get_connection() as conn:
         df = pd.read_sql(query, conn, params=(season_start, season_end))
     return df
+
 
 # ============================================================================
 # Q-Network Architecture (must match cql_agent.py)

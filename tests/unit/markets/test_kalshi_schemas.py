@@ -18,7 +18,6 @@ from nfl_analytics.markets.kalshi.schemas import (
     parse_ticker_message,
 )
 
-
 # ============================================================
 # Order parsing
 # ============================================================
@@ -461,7 +460,9 @@ class TestRequestBodyBuilders:
         from nfl_analytics.markets.base import Order, Side
 
         orders = [
-            Order(order_id=f"o-{i}", contract_id=f"C-{i}", side=Side.YES, price_cents=50, quantity=1)
+            Order(
+                order_id=f"o-{i}", contract_id=f"C-{i}", side=Side.YES, price_cents=50, quantity=1
+            )
             for i in range(3)
         ]
         body = build_batch_create_body(orders)

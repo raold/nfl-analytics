@@ -42,10 +42,10 @@ from nfl_analytics.feedback.feature_memory import (
     FeatureStats,
 )
 
-
 # ===========================================================================
 #  Helpers / Fixtures
 # ===========================================================================
+
 
 def _make_mock_connection():
     """Build a mock psycopg2 connection with context-manager support."""
@@ -71,7 +71,7 @@ SAMPLE_GAME = {
     "home_score": 27,
     "away_score": 20,
     "actual_total": 47,
-    "actual_spread": 7,       # KC won by 7
+    "actual_spread": 7,  # KC won by 7
     "home_won": True,
 }
 
@@ -79,7 +79,7 @@ SAMPLE_PREDICTION = {
     "id": 101,
     "game_id": "2025_16_KC_PIT",
     "model_id": "ensemble",
-    "predicted_spread": 3.5,   # Model had KC -3.5
+    "predicted_spread": 3.5,  # Model had KC -3.5
     "predicted_total": 45.0,
     "actual_home_score": None,
     "actual_spread": None,
@@ -89,6 +89,7 @@ SAMPLE_PREDICTION = {
 # ===========================================================================
 #  1. WeeklyOutcomeUpdater Tests
 # ===========================================================================
+
 
 class TestWeeklyOutcomeUpdater:
     """Tests for outcome_updater.py -- updating predictions with actuals."""
@@ -198,8 +199,8 @@ class TestWeeklyOutcomeUpdater:
         orphan_pred = {**SAMPLE_PREDICTION, "game_id": "2025_16_MISSING_GAME"}
 
         mock_cursor.fetchall.side_effect = [
-            [SAMPLE_GAME],      # completed games -- does NOT contain MISSING_GAME
-            [orphan_pred],      # predictions needing update
+            [SAMPLE_GAME],  # completed games -- does NOT contain MISSING_GAME
+            [orphan_pred],  # predictions needing update
         ]
 
         updater = WeeklyOutcomeUpdater()
@@ -212,6 +213,7 @@ class TestWeeklyOutcomeUpdater:
 # ===========================================================================
 #  2. RetrainTrigger Tests
 # ===========================================================================
+
 
 class TestRetrainTrigger:
     """Tests for retrain_trigger.py -- detecting retraining needs."""
@@ -280,7 +282,7 @@ class TestRetrainTrigger:
         trigger.THRESHOLDS = RetrainTrigger.THRESHOLDS
 
         baseline = {"accuracy": 0.545}  # 54.5% ATS
-        recent = {"accuracy": 0.48}     # 48% -- drop of 6.5pp > 5pp threshold
+        recent = {"accuracy": 0.48}  # 48% -- drop of 6.5pp > 5pp threshold
 
         check = trigger.check_accuracy_trigger(baseline, recent)
 
@@ -337,7 +339,7 @@ class TestRetrainTrigger:
         # Baseline query
         mock_cursor.fetchone.side_effect = [
             {"mae": 10.5, "accuracy": 0.53, "brier": 0.24, "games": 64},  # baseline
-            {"mae": 11.5, "accuracy": 0.40, "brier": 0.30, "games": 5},   # recent (too few)
+            {"mae": 11.5, "accuracy": 0.40, "brier": 0.30, "games": 5},  # recent (too few)
         ]
 
         trigger = RetrainTrigger()
@@ -371,6 +373,7 @@ class TestRetrainTrigger:
 # ===========================================================================
 #  3. ModelErrorDecomposition Tests
 # ===========================================================================
+
 
 class TestErrorClassification:
     """Tests for the helper classification functions."""
@@ -423,16 +426,16 @@ class TestModelErrorDecomposer:
             "week": 16,
             "home_team": "KC",
             "away_team": "PIT",
-            "pred_home_spread": -3.5,   # Model had KC favored by 3.5
+            "pred_home_spread": -3.5,  # Model had KC favored by 3.5
             "pred_total": 45.0,
             "pred_home_win_prob": 0.62,
             "spread_std": 4.5,
             "total_std": 5.0,
-            "vegas_spread": -4.0,       # Vegas had KC favored by 4
+            "vegas_spread": -4.0,  # Vegas had KC favored by 4
             "vegas_total": 46.5,
             "actual_home_score": 27,
             "actual_away_score": 20,
-            "actual_spread": 7,          # KC won by 7
+            "actual_spread": 7,  # KC won by 7
             "actual_total": 47,
             "model_version": "v2.0",
             "inference_time_ms": 105.0,
@@ -517,7 +520,7 @@ class TestModelErrorDecomposer:
         # Simulate three games' errors
         spread_errors = np.array([2.0, -5.0, 8.0])
         report.model_spread_mae = float(np.mean(np.abs(spread_errors)))  # 5.0
-        report.model_spread_rmse = float(np.sqrt(np.mean(spread_errors ** 2)))
+        report.model_spread_rmse = float(np.sqrt(np.mean(spread_errors**2)))
         report.model_spread_bias = float(np.mean(spread_errors))  # 1.667
 
         assert report.model_spread_mae == pytest.approx(5.0, abs=0.01)
@@ -548,6 +551,7 @@ class TestModelErrorDecomposer:
 # ===========================================================================
 #  4. AutoFeatureSelector Tests
 # ===========================================================================
+
 
 class TestAutoFeatureSelector:
     """Tests for auto_feature_selector.py -- feature state transitions."""
@@ -678,6 +682,7 @@ class TestAutoFeatureSelector:
 #  5. FeaturePerformanceMemory Tests
 # ===========================================================================
 
+
 class TestFeaturePerformanceMemory:
     """Tests for feature_memory.py -- rolling window feature tracking."""
 
@@ -736,9 +741,9 @@ class TestFeaturePerformanceMemory:
         memory.STABILITY_THRESHOLD = FeaturePerformanceMemory.STABILITY_THRESHOLD
 
         rec = memory._compute_recommendation(
-            mean_contrib=0.01,   # neutral
+            mean_contrib=0.01,  # neutral
             corr=0.0,
-            stability=0.3,      # below 0.5 threshold
+            stability=0.3,  # below 0.5 threshold
             contrib_correct=0.01,
             contrib_incorrect=0.01,
         )
@@ -753,7 +758,7 @@ class TestFeaturePerformanceMemory:
 
         rec = memory._compute_recommendation(
             mean_contrib=0.01,
-            corr=0.3,            # > 0.2 threshold
+            corr=0.3,  # > 0.2 threshold
             stability=0.8,
             contrib_correct=0.01,
             contrib_incorrect=0.01,
@@ -784,8 +789,12 @@ class TestFeaturePerformanceMemory:
 
         # Return only 10 rows, below MIN_SAMPLES=20
         mock_cursor.fetchall.return_value = [
-            {"feature_value": 0.5, "prediction_error": 3.0,
-             "correct_prediction": True, "marginal_contribution": 0.02}
+            {
+                "feature_value": 0.5,
+                "prediction_error": 3.0,
+                "correct_prediction": True,
+                "marginal_contribution": 0.02,
+            }
         ] * 10
 
         memory = FeaturePerformanceMemory()
@@ -809,12 +818,14 @@ class TestFeaturePerformanceMemory:
         for i in range(30):
             correct = i % 6 != 0  # 25 correct, 5 incorrect
             contrib = 0.05 if correct else -0.01
-            rows.append({
-                "feature_value": float(np.random.uniform(0.1, 0.9)),
-                "prediction_error": float(np.random.uniform(2.0, 12.0)),
-                "correct_prediction": correct,
-                "marginal_contribution": contrib,
-            })
+            rows.append(
+                {
+                    "feature_value": float(np.random.uniform(0.1, 0.9)),
+                    "prediction_error": float(np.random.uniform(2.0, 12.0)),
+                    "correct_prediction": correct,
+                    "marginal_contribution": contrib,
+                }
+            )
 
         mock_cursor.fetchall.return_value = rows
 

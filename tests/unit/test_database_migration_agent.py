@@ -284,7 +284,9 @@ class TestMigrationValidation:
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
         # Postgres raises ProgrammingError (a psycopg2.Error) for syntax errors
-        mock_cursor.execute.side_effect = psycopg2.ProgrammingError("syntax error at or near 'TABEL'")
+        mock_cursor.execute.side_effect = psycopg2.ProgrammingError(
+            "syntax error at or near 'TABEL'"
+        )
         mock_conn.cursor.return_value = mock_cursor
         mock_connect.return_value = mock_conn
 

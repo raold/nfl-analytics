@@ -24,7 +24,6 @@ from nfl_analytics.features.extractors.base import (
 )
 from nfl_analytics.features.extractors.registry import FeatureRegistry
 
-
 # ============================================================================
 # Test Fixtures - Mock Extractors
 # ============================================================================
@@ -173,17 +172,13 @@ class TestFeatureExtractionResult:
 
     def test_feature_count_auto_computed(self):
         """Test that feature_count is computed from features dict."""
-        result = FeatureExtractionResult(
-            features={"a": 1.0, "b": 2.0, "c": 3.0}
-        )
+        result = FeatureExtractionResult(features={"a": 1.0, "b": 2.0, "c": 3.0})
         assert result.feature_count == 3
 
     def test_failed_result(self):
         """Test creating a failed result."""
         result = FeatureExtractionResult(
-            success=False,
-            error_message="Test error",
-            extractor_name="test_extractor"
+            success=False, error_message="Test error", extractor_name="test_extractor"
         )
         assert not result.success
         assert result.error_message == "Test error"
@@ -399,7 +394,7 @@ class TestFeatureRegistry:
         assert "off_epa_per_play" in names
         assert "home_off_epa_per_play" not in names
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_extract_all_team_features(self, mock_connect):
         """Test extracting all features for a game."""
         mock_conn = MagicMock()
@@ -422,7 +417,7 @@ class TestFeatureRegistry:
         assert "away_off_epa_per_play" in summary.features
         assert "away_def_epa_allowed_per_play" in summary.features
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_extract_all_with_game_level(self, mock_connect):
         """Test extracting with game-level extractors."""
         mock_conn = MagicMock()
@@ -438,7 +433,7 @@ class TestFeatureRegistry:
         assert "offensive_mismatch" in summary.features
         assert "defensive_mismatch" in summary.features
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_extract_all_handles_failures(self, mock_connect):
         """Test that extraction handles non-critical failures gracefully."""
         mock_conn = MagicMock()
@@ -458,7 +453,7 @@ class TestFeatureRegistry:
         assert "home_fail_feature1" in summary.features
         assert summary.features["home_fail_feature1"] == 0.0
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_extraction_time_recorded(self, mock_connect):
         """Test that extraction time is recorded."""
         mock_conn = MagicMock()
@@ -471,7 +466,7 @@ class TestFeatureRegistry:
 
         assert summary.extraction_time_ms >= 0
 
-    @patch('psycopg2.connect')
+    @patch("psycopg2.connect")
     def test_extractor_results_recorded(self, mock_connect):
         """Test that individual extractor results are recorded."""
         mock_conn = MagicMock()

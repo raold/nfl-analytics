@@ -297,7 +297,9 @@ def main():
     analyzer.create_visualization(viz_path)
 
     # Save LaTeX table
-    latex_path = _PROJECT_ROOT / "analysis/dissertation/figures/out/phase1_prior_sensitivity_table.tex"
+    latex_path = (
+        _PROJECT_ROOT / "analysis/dissertation/figures/out/phase1_prior_sensitivity_table.tex"
+    )
     analyzer.save_latex_table(latex_path)
 
     print("\n" + "=" * 80)

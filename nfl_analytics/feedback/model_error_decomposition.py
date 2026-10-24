@@ -32,9 +32,9 @@ logger = logging.getLogger(__name__)
 
 
 # Error magnitude thresholds (points)
-ERROR_SMALL = 3.0      # Within a field goal
-ERROR_MEDIUM = 7.0     # Within a touchdown
-ERROR_LARGE = 14.0     # Within two touchdowns
+ERROR_SMALL = 3.0  # Within a field goal
+ERROR_MEDIUM = 7.0  # Within a touchdown
+ERROR_LARGE = 14.0  # Within two touchdowns
 # Above LARGE = blowout miss
 
 
@@ -74,12 +74,12 @@ class ErrorDecomposition:
     # Comparison
     model_beat_vegas_spread: bool | None = None
     model_beat_vegas_total: bool | None = None
-    model_correct_side: bool = False       # Did model pick the right side?
+    model_correct_side: bool = False  # Did model pick the right side?
     vegas_correct_side: bool | None = None  # Did Vegas pick the right side?
 
     # Categorization
-    error_magnitude: str = ""   # small / medium / large / blowout
-    game_context: str = ""      # close_game / moderate / blowout
+    error_magnitude: str = ""  # small / medium / large / blowout
+    game_context: str = ""  # close_game / moderate / blowout
 
     # Metadata
     model_version: str = ""
@@ -130,7 +130,7 @@ class SeasonErrorReport:
     model_spread_rmse: float = 0.0
     model_total_mae: float = 0.0
     model_total_rmse: float = 0.0
-    model_spread_bias: float = 0.0   # Mean signed error (positive = model underestimates)
+    model_spread_bias: float = 0.0  # Mean signed error (positive = model underestimates)
     model_total_bias: float = 0.0
 
     # Vegas performance
@@ -167,11 +167,21 @@ class SeasonErrorReport:
             "model_total_bias": round(self.model_total_bias, 4),
             "vegas_spread_mae": round(self.vegas_spread_mae, 4) if self.vegas_spread_mae else None,
             "vegas_total_mae": round(self.vegas_total_mae, 4) if self.vegas_total_mae else None,
-            "model_beat_vegas_spread_pct": round(self.model_beat_vegas_spread_pct, 4) if self.model_beat_vegas_spread_pct else None,
-            "model_beat_vegas_total_pct": round(self.model_beat_vegas_total_pct, 4) if self.model_beat_vegas_total_pct else None,
+            "model_beat_vegas_spread_pct": (
+                round(self.model_beat_vegas_spread_pct, 4)
+                if self.model_beat_vegas_spread_pct
+                else None
+            ),
+            "model_beat_vegas_total_pct": (
+                round(self.model_beat_vegas_total_pct, 4)
+                if self.model_beat_vegas_total_pct
+                else None
+            ),
             "games_with_vegas": self.games_with_vegas,
             "model_correct_side_pct": round(self.model_correct_side_pct, 4),
-            "vegas_correct_side_pct": round(self.vegas_correct_side_pct, 4) if self.vegas_correct_side_pct else None,
+            "vegas_correct_side_pct": (
+                round(self.vegas_correct_side_pct, 4) if self.vegas_correct_side_pct else None
+            ),
             "error_magnitude_counts": self.error_magnitude_counts,
             "weekly_mae": {k: round(v, 4) for k, v in self.weekly_mae.items()},
             "worst_games": self.worst_games,
@@ -324,9 +334,8 @@ class ModelErrorDecomposer:
             model_beat_vegas_spread = abs(model_spread_error) < abs(vegas_spread_error)
             # Vegas correct side: did vegas pick the right winner direction?
             if actual_spread != 0:
-                vegas_correct_side = (
-                    (vegas_spread > 0 and actual_spread > 0)
-                    or (vegas_spread < 0 and actual_spread < 0)
+                vegas_correct_side = (vegas_spread > 0 and actual_spread > 0) or (
+                    vegas_spread < 0 and actual_spread < 0
                 )
 
         if vegas_total is not None:
@@ -337,9 +346,8 @@ class ModelErrorDecomposer:
         # Model correct side: did model pick the right winner direction?
         model_correct_side = False
         if actual_spread != 0:
-            model_correct_side = (
-                (pred_spread > 0 and actual_spread > 0)
-                or (pred_spread < 0 and actual_spread < 0)
+            model_correct_side = (pred_spread > 0 and actual_spread > 0) or (
+                pred_spread < 0 and actual_spread < 0
             )
 
         # Categorize
@@ -365,8 +373,12 @@ class ModelErrorDecomposer:
             vegas_total=float(row["vegas_total"]) if row.get("vegas_total") else None,
             model_spread_error=round(model_spread_error, 4),
             model_total_error=round(model_total_error, 4),
-            vegas_spread_error=round(vegas_spread_error, 4) if vegas_spread_error is not None else None,
-            vegas_total_error=round(vegas_total_error, 4) if vegas_total_error is not None else None,
+            vegas_spread_error=(
+                round(vegas_spread_error, 4) if vegas_spread_error is not None else None
+            ),
+            vegas_total_error=(
+                round(vegas_total_error, 4) if vegas_total_error is not None else None
+            ),
             model_beat_vegas_spread=model_beat_vegas_spread,
             model_beat_vegas_total=model_beat_vegas_total,
             model_correct_side=model_correct_side,
@@ -374,7 +386,9 @@ class ModelErrorDecomposer:
             error_magnitude=error_magnitude,
             game_context=game_context,
             model_version=row.get("model_version", ""),
-            inference_time_ms=float(row["inference_time_ms"]) if row.get("inference_time_ms") else None,
+            inference_time_ms=(
+                float(row["inference_time_ms"]) if row.get("inference_time_ms") else None
+            ),
         )
 
     def decompose_game_error(self, game_id: str) -> ErrorDecomposition | None:
@@ -389,7 +403,9 @@ class ModelErrorDecomposer:
         """
         row = self._fetch_game(game_id)
         if not row:
-            logger.warning(f"No prediction/outcome found in ml.game_outcome_predictions for {game_id}")
+            logger.warning(
+                f"No prediction/outcome found in ml.game_outcome_predictions for {game_id}"
+            )
             return None
 
         return self._build_decomposition(row)
@@ -451,9 +467,9 @@ class ModelErrorDecomposer:
             season=season,
             total_games=len(decompositions),
             model_spread_mae=float(np.mean(np.abs(spread_errors))),
-            model_spread_rmse=float(np.sqrt(np.mean(spread_errors ** 2))),
+            model_spread_rmse=float(np.sqrt(np.mean(spread_errors**2))),
             model_total_mae=float(np.mean(np.abs(total_errors))),
-            model_total_rmse=float(np.sqrt(np.mean(total_errors ** 2))),
+            model_total_rmse=float(np.sqrt(np.mean(total_errors**2))),
             model_spread_bias=float(np.mean(spread_errors)),
             model_total_bias=float(np.mean(total_errors)),
         )
@@ -485,9 +501,7 @@ class ModelErrorDecomposer:
             if beat_total or vegas_total_games:
                 total_comparable = [d for d in vegas_games if d.model_beat_vegas_total is not None]
                 if total_comparable:
-                    report.model_beat_vegas_total_pct = (
-                        len(beat_total) / len(total_comparable)
-                    )
+                    report.model_beat_vegas_total_pct = len(beat_total) / len(total_comparable)
 
             vegas_side_correct = [d for d in vegas_games if d.vegas_correct_side]
             vegas_non_push = [d for d in vegas_games if d.actual_spread != 0]
@@ -504,12 +518,12 @@ class ModelErrorDecomposer:
         weekly_errors: dict[int, list[float]] = {}
         for d in decompositions:
             weekly_errors.setdefault(d.week, []).append(abs(d.model_spread_error))
-        report.weekly_mae = {
-            wk: float(np.mean(errs)) for wk, errs in sorted(weekly_errors.items())
-        }
+        report.weekly_mae = {wk: float(np.mean(errs)) for wk, errs in sorted(weekly_errors.items())}
 
         # Top 5 worst misses
-        sorted_by_error = sorted(decompositions, key=lambda d: abs(d.model_spread_error), reverse=True)
+        sorted_by_error = sorted(
+            decompositions, key=lambda d: abs(d.model_spread_error), reverse=True
+        )
         report.worst_games = [
             {
                 "game_id": d.game_id,
@@ -592,14 +606,29 @@ class ModelErrorDecomposer:
 
         values = [
             (
-                d.game_id, d.season, d.week, d.home_team, d.away_team,
-                d.actual_spread, d.actual_total, d.pred_home_spread, d.pred_total,
-                d.pred_home_win_prob, d.vegas_spread, d.vegas_total,
-                d.model_spread_error, d.model_total_error,
-                d.vegas_spread_error, d.vegas_total_error,
-                d.model_beat_vegas_spread, d.model_beat_vegas_total,
-                d.model_correct_side, d.vegas_correct_side,
-                d.error_magnitude, d.game_context, d.model_version,
+                d.game_id,
+                d.season,
+                d.week,
+                d.home_team,
+                d.away_team,
+                d.actual_spread,
+                d.actual_total,
+                d.pred_home_spread,
+                d.pred_total,
+                d.pred_home_win_prob,
+                d.vegas_spread,
+                d.vegas_total,
+                d.model_spread_error,
+                d.model_total_error,
+                d.vegas_spread_error,
+                d.vegas_total_error,
+                d.model_beat_vegas_spread,
+                d.model_beat_vegas_total,
+                d.model_correct_side,
+                d.vegas_correct_side,
+                d.error_magnitude,
+                d.game_context,
+                d.model_version,
             )
             for d in decompositions
         ]
@@ -697,9 +726,13 @@ def test_decomposition():
         print(f"\n  {result.away_team} @ {result.home_team} (Week {result.week})")
         print(f"  Score: {result.actual_away_score:.0f}-{result.actual_home_score:.0f}")
         print(f"  Actual spread (home): {result.actual_spread:+.1f}")
-        print(f"  Model prediction:     {result.pred_home_spread:+.1f}  (error: {result.model_spread_error:+.1f})")
+        print(
+            f"  Model prediction:     {result.pred_home_spread:+.1f}  (error: {result.model_spread_error:+.1f})"
+        )
         if result.vegas_spread is not None:
-            print(f"  Vegas spread:         {result.vegas_spread:+.1f}  (error: {result.vegas_spread_error:+.1f})")
+            print(
+                f"  Vegas spread:         {result.vegas_spread:+.1f}  (error: {result.vegas_spread_error:+.1f})"
+            )
             beat = "YES" if result.model_beat_vegas_spread else "NO"
             print(f"  Model beat Vegas:     {beat}")
         print(f"  Model correct side:   {result.model_correct_side}")

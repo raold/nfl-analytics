@@ -52,13 +52,11 @@ def fix_kickoff_times():
 
     try:
         # Get all games with their current kickoff times
-        cur.execute(
-            """
+        cur.execute("""
             SELECT game_id, season, week, kickoff, home_team, away_team
             FROM games
             ORDER BY season, week, game_id
-        """
-        )
+        """)
 
         games = cur.fetchall()
         print(f"Found {len(games)} games to process")
@@ -129,16 +127,14 @@ def fix_kickoff_times():
         print(f"Successfully updated {len(updates)} games")
 
         # Verify a sample
-        cur.execute(
-            """
+        cur.execute("""
             SELECT game_id, season, week, kickoff,
                    kickoff AT TIME ZONE 'America/New_York' as kickoff_et
             FROM games
             WHERE season = 2024 AND week = 1
             ORDER BY kickoff
             LIMIT 10
-        """
-        )
+        """)
 
         print("\nSample of updated games (2024 Week 1):")
         print("Game ID | Kickoff UTC | Kickoff ET")

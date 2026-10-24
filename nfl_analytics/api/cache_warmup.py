@@ -109,7 +109,9 @@ class CacheWarmer:
                         # Trigger model loading by accessing cache
                         # This populates Redis cache via _load_model_with_redis()
                         if path.suffix == ".pkl":
-                            from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
+                            from nfl_analytics.models.bayesian_neural_network import (
+                                BayesianNeuralNetwork,
+                            )
 
                             def loader(p):
                                 return BayesianNeuralNetwork.load(p)

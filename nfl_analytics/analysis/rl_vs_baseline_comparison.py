@@ -3,6 +3,7 @@
 Generate RL vs baseline comparison table for Chapter 5.
 Compares RL-style policies to Kelly-LCB stateless baseline.
 """
+
 import argparse
 import os
 from pathlib import Path

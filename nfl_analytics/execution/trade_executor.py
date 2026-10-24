@@ -207,7 +207,11 @@ class TradeExecutor:
                 except RateLimitError:
                     if attempt < self._config.max_retries:
                         backoff = self._backoff_ms(attempt, base_ms=500)
-                        logger.warning("Rate limited on batch (attempt %d), backing off %dms", attempt + 1, backoff)
+                        logger.warning(
+                            "Rate limited on batch (attempt %d), backing off %dms",
+                            attempt + 1,
+                            backoff,
+                        )
                         await asyncio.sleep(backoff / 1000)
                     else:
                         # Mark all as rejected
@@ -218,7 +222,11 @@ class TradeExecutor:
                 except MarketConnectionError:
                     if attempt < self._config.max_retries:
                         backoff = self._backoff_ms(attempt)
-                        logger.warning("Connection error on batch (attempt %d), retrying in %dms", attempt + 1, backoff)
+                        logger.warning(
+                            "Connection error on batch (attempt %d), retrying in %dms",
+                            attempt + 1,
+                            backoff,
+                        )
                         await asyncio.sleep(backoff / 1000)
                     else:
                         for order, sig in zip(chunk_orders, chunk_signals):
@@ -230,6 +238,7 @@ class TradeExecutor:
 
     async def _submit_individual(self, orders: list[Order], signals: list[Signal]) -> list[Order]:
         """Submit orders individually with concurrency control."""
+
         async def _submit_one(order: Order, signal: Signal) -> Order:
             async with self._semaphore:
                 return await self._submit_with_retry(order, signal)
@@ -253,7 +262,9 @@ class TradeExecutor:
             except RateLimitError:
                 if attempt < self._config.max_retries:
                     backoff = self._backoff_ms(attempt, base_ms=500)
-                    logger.warning("Rate limited (attempt %d), backing off %dms", attempt + 1, backoff)
+                    logger.warning(
+                        "Rate limited (attempt %d), backing off %dms", attempt + 1, backoff
+                    )
                     await asyncio.sleep(backoff / 1000)
                 else:
                     order.status = OrderStatus.REJECTED
@@ -335,8 +346,9 @@ class TradeExecutor:
     def _backoff_ms(self, attempt: int, base_ms: int | None = None) -> int:
         """Exponential backoff with jitter."""
         import random
+
         base = base_ms or self._config.initial_backoff_ms
-        delay = base * (2 ** attempt)
+        delay = base * (2**attempt)
         jitter = random.randint(0, delay // 2)
         return delay + jitter
 
@@ -347,10 +359,7 @@ class TradeExecutor:
     @property
     def stats(self) -> dict:
         """Executor statistics."""
-        active = sum(
-            1 for t in self._tracked.values()
-            if t.order.is_active
-        )
+        active = sum(1 for t in self._tracked.values() if t.order.is_active)
         return {
             "submitted": self._submitted_count,
             "filled": self._filled_count,

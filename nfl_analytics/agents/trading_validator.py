@@ -130,9 +130,7 @@ class TradingValidator:
 
         # Check contract_id prefix
         if self.config.known_prefixes:
-            prefix_match = any(
-                signal.contract_id.startswith(p) for p in self.config.known_prefixes
-            )
+            prefix_match = any(signal.contract_id.startswith(p) for p in self.config.known_prefixes)
             if not prefix_match:
                 self._total_blocked += 1
                 return ValidationResult(

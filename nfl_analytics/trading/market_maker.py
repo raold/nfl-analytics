@@ -129,9 +129,7 @@ class MarketMaker(TradingStrategy):
     # Fair value management
     # ------------------------------------------------------------------
 
-    def set_fair_value(
-        self, contract_id: str, value_cents: float, confidence: float = 0.8
-    ) -> None:
+    def set_fair_value(self, contract_id: str, value_cents: float, confidence: float = 0.8) -> None:
         """Set the fair value for a contract.
 
         Args:
@@ -190,32 +188,36 @@ class MarketMaker(TradingStrategy):
         if bid is not None:
             bid_qty = self._quote_size_for_side(inventory, adding_yes=True)
             if bid_qty > 0:
-                signals.append(Signal(
-                    contract_id=contract_id,
-                    side=Side.YES,
-                    quantity=bid_qty,
-                    price_cents=bid,
-                    edge_cents=max(1, round(fair_value_cents - bid)),
-                    model_prob=fair_value_cents / 100.0,
-                    confidence=confidence,
-                    strategy=self.name,
-                ))
+                signals.append(
+                    Signal(
+                        contract_id=contract_id,
+                        side=Side.YES,
+                        quantity=bid_qty,
+                        price_cents=bid,
+                        edge_cents=max(1, round(fair_value_cents - bid)),
+                        model_prob=fair_value_cents / 100.0,
+                        confidence=confidence,
+                        strategy=self.name,
+                    )
+                )
                 self._stats["bid_signals"] += 1
 
         if ask is not None:
             ask_qty = self._quote_size_for_side(inventory, adding_yes=False)
             no_price = 100 - ask
             if ask_qty > 0 and 1 <= no_price <= 99:
-                signals.append(Signal(
-                    contract_id=contract_id,
-                    side=Side.NO,
-                    quantity=ask_qty,
-                    price_cents=no_price,
-                    edge_cents=max(1, round(ask - fair_value_cents)),
-                    model_prob=(100.0 - fair_value_cents) / 100.0,
-                    confidence=confidence,
-                    strategy=self.name,
-                ))
+                signals.append(
+                    Signal(
+                        contract_id=contract_id,
+                        side=Side.NO,
+                        quantity=ask_qty,
+                        price_cents=no_price,
+                        edge_cents=max(1, round(ask - fair_value_cents)),
+                        model_prob=(100.0 - fair_value_cents) / 100.0,
+                        confidence=confidence,
+                        strategy=self.name,
+                    )
+                )
                 self._stats["ask_signals"] += 1
 
         if signals:
@@ -236,9 +238,7 @@ class MarketMaker(TradingStrategy):
 
         return signals
 
-    async def on_fill(
-        self, contract_id: str, side: str, price_cents: int, quantity: int
-    ) -> None:
+    async def on_fill(self, contract_id: str, side: str, price_cents: int, quantity: int) -> None:
         """Update inventory on fill.
 
         YES fill → inventory increases (long more YES).
@@ -306,7 +306,9 @@ class MarketMaker(TradingStrategy):
         # Spread: base + uncertainty premium
         uncertainty_premium = (1.0 - confidence) * self._config.uncertainty_multiplier
         total_spread = self._config.base_spread_cents + uncertainty_premium
-        total_spread = max(self._config.min_spread_cents, min(self._config.max_spread_cents, total_spread))
+        total_spread = max(
+            self._config.min_spread_cents, min(self._config.max_spread_cents, total_spread)
+        )
         half_spread = total_spread / 2.0
 
         # Inventory skew: pushes quotes toward reducing inventory

@@ -66,8 +66,7 @@ def load_rushing_data_with_features(
     conn = psycopg2.connect(**DB_CONFIG)
 
     # Build query based on requested features
-    query_parts = [
-        f"""
+    query_parts = [f"""
         WITH rushing_data AS (
             SELECT
                 pgs.player_id,
@@ -95,13 +94,11 @@ def load_rushing_data_with_features(
               AND pgs.stat_attempts >= 5
               AND pgs.stat_yards IS NOT NULL
         )
-    """
-    ]
+    """]
 
     # Add opponent defense CTE if needed
     if include_opp:
-        query_parts.append(
-            """,
+        query_parts.append(""",
         opponent_defense AS (
             SELECT
                 pgs.season,
@@ -133,8 +130,7 @@ def load_rushing_data_with_features(
                 ) as rush_rank
             FROM (SELECT DISTINCT season, week, defense_team, rush_yds_allowed_avg, rush_yds_allowed_l3 FROM opponent_defense) t
         )
-        """
-        )
+        """)
 
     # Main SELECT
     select_parts = ["rd.*"]
@@ -166,26 +162,21 @@ def load_rushing_data_with_features(
             ]
         )
 
-    query_parts.append(
-        f"""
+    query_parts.append(f"""
         SELECT {', '.join(select_parts)}
         FROM rushing_data rd
-    """
-    )
+    """)
 
     if include_vegas or include_env:
-        query_parts.append(
-            """
+        query_parts.append("""
         LEFT JOIN games g
             ON rd.season = g.season
             AND rd.week = g.week
             AND (rd.team = g.home_team OR rd.team = g.away_team)
-        """
-        )
+        """)
 
     if include_opp:
-        query_parts.append(
-            """
+        query_parts.append("""
         LEFT JOIN opponent_ranks opp
             ON rd.season = opp.season
             AND rd.week = opp.week
@@ -193,18 +184,15 @@ def load_rushing_data_with_features(
                 (rd.team = g.home_team AND g.away_team = opp.defense_team)
                 OR (rd.team = g.away_team AND g.home_team = opp.defense_team)
             )
-        """
-        )
+        """)
 
     # Add WHERE clause for Vegas features if needed
     if include_vegas:
-        query_parts.append(
-            """
+        query_parts.append("""
         WHERE rd.stat_yards IS NOT NULL
           AND g.spread_close IS NOT NULL
           AND g.total_close IS NOT NULL
-        """
-        )
+        """)
 
     query_parts.append("ORDER BY rd.season, rd.week, rd.stat_yards DESC")
 

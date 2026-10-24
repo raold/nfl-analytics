@@ -24,7 +24,6 @@ from nfl_analytics.trading.directional import (
 )
 from nfl_analytics.trading.signal import Signal
 
-
 # ============================================================
 # Contract ID parsing
 # ============================================================
@@ -186,7 +185,9 @@ class TestDirectionalStrategy:
         md = _market_data(last_price=55)
         ob = _orderbook(bid=54, ask=56)
         signals = await strategy.on_market_data(
-            "KXNFL-26-SPREAD-KC-BUF-3.5", md, ob,
+            "KXNFL-26-SPREAD-KC-BUF-3.5",
+            md,
+            ob,
         )
         assert len(signals) == 1
         sig = signals[0]
@@ -209,7 +210,9 @@ class TestDirectionalStrategy:
         md = _market_data(last_price=55)
         ob = _orderbook(bid=54, ask=56)
         signals = await strat.on_market_data(
-            "KXNFL-26-SPREAD-KC-BUF-3.5", md, ob,
+            "KXNFL-26-SPREAD-KC-BUF-3.5",
+            md,
+            ob,
         )
         assert len(signals) == 0
 
@@ -229,7 +232,9 @@ class TestDirectionalStrategy:
         md = _market_data(last_price=55)
         ob = _orderbook(bid=54, ask=56)
         signals = await strat.on_market_data(
-            "KXNFL-26-SPREAD-KC-BUF-3.5", md, ob,
+            "KXNFL-26-SPREAD-KC-BUF-3.5",
+            md,
+            ob,
         )
         assert len(signals) == 1
         assert signals[0].side == Side.NO  # Buy NO = bet against
@@ -269,7 +274,8 @@ class TestDirectionalStrategy:
 
         md = _market_data(last_price=55)
         signals = await strat.on_market_data(
-            "KXNFL-26-SPREAD-KC-BUF-3.5", md,
+            "KXNFL-26-SPREAD-KC-BUF-3.5",
+            md,
         )
         assert len(signals) == 0
 
@@ -278,13 +284,17 @@ class TestDirectionalStrategy:
         md = _market_data(last_price=55)
         ob = _orderbook(bid=54, ask=56)
         signals1 = await strategy.on_market_data(
-            "KXNFL-26-SPREAD-KC-BUF-3.5", md, ob,
+            "KXNFL-26-SPREAD-KC-BUF-3.5",
+            md,
+            ob,
         )
         assert len(signals1) == 1
 
         # Immediately try again — should be blocked by cooldown
         signals2 = await strategy.on_market_data(
-            "KXNFL-26-SPREAD-KC-BUF-3.5", md, ob,
+            "KXNFL-26-SPREAD-KC-BUF-3.5",
+            md,
+            ob,
         )
         assert len(signals2) == 0
 
@@ -293,7 +303,9 @@ class TestDirectionalStrategy:
         md = _market_data(last_price=55)
         ob = _orderbook(bid=54, ask=56)
         await strategy.on_market_data(
-            "KXNFL-26-SPREAD-KC-BUF-3.5", md, ob,
+            "KXNFL-26-SPREAD-KC-BUF-3.5",
+            md,
+            ob,
         )
         # Model should have been called once
         assert strategy._model.predict.call_count == 1
@@ -313,9 +325,16 @@ class TestDirectionalStrategy:
     def test_set_week_clears_cache(self, strategy):
         """Changing week clears the prediction cache."""
         strategy._prediction_cache["2026-KC-BUF"] = GamePrediction(
-            home_team="KC", away_team="BUF", season=2026, week=5,
-            home_spread=-3.0, total_points=48.5, home_win_probability=0.65,
-            spread_std=10.0, total_std=8.0, features={},
+            home_team="KC",
+            away_team="BUF",
+            season=2026,
+            week=5,
+            home_spread=-3.0,
+            total_points=48.5,
+            home_win_probability=0.65,
+            spread_std=10.0,
+            total_std=8.0,
+            features={},
         )
         assert len(strategy._prediction_cache) == 1
         strategy.set_week(2026, 6)  # New week

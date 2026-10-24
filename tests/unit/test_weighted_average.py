@@ -9,7 +9,6 @@ Author: NFL Analytics Team
 Date: November 9, 2025
 """
 
-
 import numpy as np
 import pytest
 

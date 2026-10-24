@@ -11,6 +11,7 @@ Usage:
     python nfl_analytics/models/ensemble_stacking.py --v2-model models/xgboost/v2_1/model.json \
                                           --v3-model models/xgboost/v3_production/model.json
 """
+
 import argparse
 import json
 import logging

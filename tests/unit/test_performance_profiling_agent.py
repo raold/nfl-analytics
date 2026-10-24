@@ -206,8 +206,7 @@ class TestPythonProfiling:
         """Test profiling simple Python code."""
         # Create test file
         test_file = tmp_path / "test.py"
-        test_file.write_text(
-            """
+        test_file.write_text("""
 def slow_function():
     total = 0
     for i in range(1000):
@@ -215,8 +214,7 @@ def slow_function():
     return total
 
 result = slow_function()
-"""
-        )
+""")
 
         report = agent.profile_python_code(str(test_file), track_memory=True)
 
@@ -227,11 +225,9 @@ result = slow_function()
         """Test memory tracking during profiling."""
         # Create test file with memory usage
         test_file = tmp_path / "test.py"
-        test_file.write_text(
-            """
+        test_file.write_text("""
 data = [i for i in range(1000)]
-"""
-        )
+""")
 
         report = agent.profile_python_code(str(test_file), track_memory=True)
 
@@ -416,7 +412,9 @@ class TestBottleneckDetection:
 
         # detect_bottlenecks() starts from an empty list, so inject through a stubbed profiler
         with patch.object(
-            agent, "profile_database_queries", side_effect=lambda: agent.bottlenecks.extend(injected)
+            agent,
+            "profile_database_queries",
+            side_effect=lambda: agent.bottlenecks.extend(injected),
         ):
             bottlenecks = agent.detect_bottlenecks(
                 profile_database=True,

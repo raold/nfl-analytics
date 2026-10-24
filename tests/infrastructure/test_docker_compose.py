@@ -149,13 +149,11 @@ class TestDockerCompose:
             with psycopg.connect(conn_string, connect_timeout=10) as conn:
                 with conn.cursor() as cur:
                     # Get list of tables
-                    cur.execute(
-                        """
+                    cur.execute("""
                         SELECT tablename FROM pg_tables
                         WHERE schemaname = 'public'
                         ORDER BY tablename
-                    """
-                    )
+                    """)
 
                     tables = [row[0] for row in cur.fetchall()]
                     print(f"✅ Found {len(tables)} tables: {tables}")
@@ -174,13 +172,11 @@ class TestDockerCompose:
         try:
             with psycopg.connect(conn_string, connect_timeout=10) as conn:
                 with conn.cursor() as cur:
-                    cur.execute(
-                        """
+                    cur.execute("""
                         SELECT extname, extversion
                         FROM pg_extension
                         WHERE extname = 'timescaledb'
-                    """
-                    )
+                    """)
 
                     result = cur.fetchone()
 
@@ -201,13 +197,11 @@ class TestDockerCompose:
             with psycopg.connect(conn_string, connect_timeout=10) as conn:
                 with conn.cursor() as cur:
                     # Check if table is hypertable
-                    cur.execute(
-                        """
+                    cur.execute("""
                         SELECT hypertable_name
                         FROM timescaledb_information.hypertables
                         WHERE hypertable_name = 'odds_history'
-                    """
-                    )
+                    """)
 
                     result = cur.fetchone()
 
@@ -228,13 +222,11 @@ class TestDockerCompose:
             with psycopg.connect(conn_string, connect_timeout=10) as conn:
                 with conn.cursor() as cur:
                     # Get list of materialized views
-                    cur.execute(
-                        """
+                    cur.execute("""
                         SELECT schemaname, matviewname
                         FROM pg_matviews
                         ORDER BY schemaname, matviewname
-                    """
-                    )
+                    """)
 
                     views = cur.fetchall()
                     view_names = [f"{schema}.{name}" for schema, name in views]
@@ -255,11 +247,9 @@ class TestDockerCompose:
         try:
             with psycopg.connect(conn_string, connect_timeout=10) as conn:
                 with conn.cursor() as cur:
-                    cur.execute(
-                        """
+                    cur.execute("""
                         SELECT pg_size_pretty(pg_database_size('devdb01')) as size
-                    """
-                    )
+                    """)
 
                     size = cur.fetchone()[0]
                     print(f"✅ Database size: {size}")

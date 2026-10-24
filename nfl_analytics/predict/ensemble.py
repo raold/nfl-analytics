@@ -9,6 +9,7 @@ Usage:
     python nfl_analytics/predict/ensemble.py --season 2025 --week 5 --method weighted
     python nfl_analytics/predict/ensemble.py --game-ids 2025_05_KC_NO --method fallback
 """
+
 import argparse
 import json
 import logging

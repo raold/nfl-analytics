@@ -151,9 +151,7 @@ class TestESPNApiClientParsing:
             "description": "Big trade news",
             "published": "2025-02-10T03:00:00Z",
             "links": {"web": {"href": "http://espn.com/article/12345"}},
-            "categories": [
-                {"type": "team", "teamId": 12}  # KC
-            ],
+            "categories": [{"type": "team", "teamId": 12}],  # KC
         }
         item = client._parse_news_article(article)
 
@@ -196,9 +194,7 @@ class TestESPNApiClientParsing:
             "description": "News about player",
             "published": "2025-02-10T03:00:00Z",
             "links": {"web": {"href": "http://espn.com/article/12345"}},
-            "categories": [
-                {"type": "athlete", "description": "Patrick Mahomes"}
-            ],
+            "categories": [{"type": "athlete", "description": "Patrick Mahomes"}],
         }
         item = client._parse_news_article(article)
 

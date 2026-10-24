@@ -35,7 +35,8 @@ _PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproj
 
 
 spec = importlib.util.spec_from_file_location(
-    "game_trajectory_cvae", os.path.join(project_root, "nfl_analytics/models/game_trajectory_cvae.py")
+    "game_trajectory_cvae",
+    os.path.join(project_root, "nfl_analytics/models/game_trajectory_cvae.py"),
 )
 game_trajectory_cvae_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(game_trajectory_cvae_module)

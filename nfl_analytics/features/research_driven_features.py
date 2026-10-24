@@ -523,12 +523,10 @@ class ResearchDrivenEngine:
             cur = conn.cursor()
 
             # Check if xyac column exists
-            cur.execute(
-                """
+            cur.execute("""
                 SELECT column_name FROM information_schema.columns
                 WHERE table_name = 'plays' AND column_name = 'xyac_mean_yardage'
-            """
-            )
+            """)
             has_xyac = cur.fetchone() is not None
 
             if has_xyac:

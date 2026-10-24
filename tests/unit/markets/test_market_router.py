@@ -160,16 +160,20 @@ class TestEdgeCases:
         """Longest prefix should win."""
         router = MarketRouter()
         # Register a short and long prefix
-        router.register_sport(SportConfig(
-            sport_name="generic",
-            contract_prefix="KX",
-            strategy_factory=lambda: _DummyStrategy("generic"),
-        ))
-        router.register_sport(SportConfig(
-            sport_name="nfl",
-            contract_prefix="KXNFL",
-            strategy_factory=lambda: _DummyStrategy("nfl_specific"),
-        ))
+        router.register_sport(
+            SportConfig(
+                sport_name="generic",
+                contract_prefix="KX",
+                strategy_factory=lambda: _DummyStrategy("generic"),
+            )
+        )
+        router.register_sport(
+            SportConfig(
+                sport_name="nfl",
+                contract_prefix="KXNFL",
+                strategy_factory=lambda: _DummyStrategy("nfl_specific"),
+            )
+        )
         # "KXNFL-26-KC" should match the longer "KXNFL" prefix
         assert router.route("KXNFL-26-KC") == "nfl"
         # "KXMLB-26-NYY" should match the shorter "KX" prefix

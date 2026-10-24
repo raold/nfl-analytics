@@ -10,6 +10,7 @@ Similar to spread coverage model but focuses on total scoring.
 Usage:
     python nfl_analytics/models/totals_model.py --features-csv data/processed/features/asof_team_features_v3.csv
 """
+
 import argparse
 import json
 import logging

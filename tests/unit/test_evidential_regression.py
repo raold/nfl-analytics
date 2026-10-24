@@ -19,6 +19,7 @@ import sys
 
 import numpy as np
 import pytest
+
 torch = pytest.importorskip("torch")  # optional: uv sync --extra torch
 from sklearn.datasets import make_regression
 

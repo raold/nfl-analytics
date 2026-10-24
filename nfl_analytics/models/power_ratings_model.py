@@ -36,6 +36,7 @@ MIN_GAMES_DEFAULT = 4
 @dataclass
 class BacktestResult:
     """Single season backtest metrics."""
+
     season: int
     total_games: int
     qualified_bets: int
@@ -71,8 +72,17 @@ def load_games(seasons: list[int]) -> pd.DataFrame:
         WHERE season IN ({ph}) AND home_score IS NOT NULL AND away_score IS NOT NULL
         ORDER BY season, week, kickoff
     """
-    cols = ["game_id", "season", "week", "game_type",
-            "home_team", "away_team", "home_score", "away_score", "spread_close"]
+    cols = [
+        "game_id",
+        "season",
+        "week",
+        "game_type",
+        "home_team",
+        "away_team",
+        "home_score",
+        "away_score",
+        "spread_close",
+    ]
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(query, seasons)
@@ -83,7 +93,9 @@ def load_games(seasons: list[int]) -> pd.DataFrame:
 
 
 def compute_power_ratings(
-    games_df: pd.DataFrame, season: int, through_week: int,
+    games_df: pd.DataFrame,
+    season: int,
+    through_week: int,
     half_life: float = HALF_LIFE_DEFAULT,
 ) -> dict[str, float]:
     """Compute exponentially weighted point differential ratings per team.
@@ -101,10 +113,12 @@ def compute_power_ratings(
     for team in set(sg["home_team"]) | set(sg["away_team"]):
         home_g = sg[sg["home_team"] == team]
         away_g = sg[sg["away_team"] == team]
-        margins = np.concatenate([
-            (home_g["home_score"] - home_g["away_score"]).values,
-            (away_g["away_score"] - away_g["home_score"]).values,
-        ]).astype(float)
+        margins = np.concatenate(
+            [
+                (home_g["home_score"] - home_g["away_score"]).values,
+                (away_g["away_score"] - away_g["home_score"]).values,
+            ]
+        ).astype(float)
         weeks = np.concatenate([home_g["week"].values, away_g["week"].values]).astype(float)
         if len(margins) == 0:
             continue
@@ -124,8 +138,12 @@ def _roi_from_pct(pct: float) -> float:
 
 
 def backtest_season(
-    games_df: pd.DataFrame, season: int, half_life: float = HALF_LIFE_DEFAULT,
-    hfa: float = HFA_DEFAULT, min_games: int = MIN_GAMES_DEFAULT, min_edge: float = 0.0,
+    games_df: pd.DataFrame,
+    season: int,
+    half_life: float = HALF_LIFE_DEFAULT,
+    hfa: float = HFA_DEFAULT,
+    min_games: int = MIN_GAMES_DEFAULT,
+    min_edge: float = 0.0,
 ) -> BacktestResult:
     """Walk-forward backtest for one season.
 
@@ -178,46 +196,65 @@ def backtest_season(
     decided = stats["w"] + stats["l"]
     pct = stats["w"] / decided if decided > 0 else 0.0
     return BacktestResult(
-        season=season, total_games=stats["games"], qualified_bets=stats["bets"],
-        ats_wins=stats["w"], ats_losses=stats["l"], ats_pushes=stats["p"],
-        ats_pct=pct, roi_pct=_roi_from_pct(pct) if decided > 0 else 0.0,
+        season=season,
+        total_games=stats["games"],
+        qualified_bets=stats["bets"],
+        ats_wins=stats["w"],
+        ats_losses=stats["l"],
+        ats_pushes=stats["p"],
+        ats_pct=pct,
+        roi_pct=_roi_from_pct(pct) if decided > 0 else 0.0,
         pred_mae=float(np.mean(pred_err)) if pred_err else 0.0,
         vegas_mae=float(np.mean(vegas_err)) if vegas_err else 0.0,
-        edge_threshold=min_edge, per_week=per_week,
+        edge_threshold=min_edge,
+        per_week=per_week,
     )
 
 
 def run_backtest(
-    seasons: list[int], half_life: float = HALF_LIFE_DEFAULT, hfa: float = HFA_DEFAULT,
-    min_games: int = MIN_GAMES_DEFAULT, min_edge: float = 0.0,
+    seasons: list[int],
+    half_life: float = HALF_LIFE_DEFAULT,
+    hfa: float = HFA_DEFAULT,
+    min_games: int = MIN_GAMES_DEFAULT,
+    min_edge: float = 0.0,
 ) -> list[BacktestResult]:
     """Run walk-forward backtests across multiple seasons."""
     games_df = load_games(seasons)
-    return [backtest_season(games_df, s, half_life, hfa, min_games, min_edge)
-            for s in sorted(seasons)]
+    return [
+        backtest_season(games_df, s, half_life, hfa, min_games, min_edge) for s in sorted(seasons)
+    ]
 
 
-def print_results(results: list[BacktestResult], hfa: float = HFA_DEFAULT,
-                  half_life: float = HALF_LIFE_DEFAULT) -> None:
+def print_results(
+    results: list[BacktestResult], hfa: float = HFA_DEFAULT, half_life: float = HALF_LIFE_DEFAULT
+) -> None:
     """Print formatted backtest results table."""
     edge = results[0].edge_threshold if results else 0.0
     print(f"\n{'=' * 80}")
     print("POWER RATINGS MODEL - BACKTEST RESULTS")
     print(f"Parameters: HFA={hfa}, half_life={half_life}, min_edge={edge}")
     print("=" * 80)
-    print(f"{'Season':>6} | {'Games':>5} | {'Bets':>4} | {'ATS W-L-P':>10} | "
-          f"{'ATS%':>6} | {'ROI%':>7} | {'Pred MAE':>8} | {'Vegas MAE':>9}")
+    print(
+        f"{'Season':>6} | {'Games':>5} | {'Bets':>4} | {'ATS W-L-P':>10} | "
+        f"{'ATS%':>6} | {'ROI%':>7} | {'Pred MAE':>8} | {'Vegas MAE':>9}"
+    )
     print("-" * 80)
 
     tw, tl, tp = 0, 0, 0
     pred_maes, vegas_maes = [], []
     for r in results:
         rec = f"{r.ats_wins}-{r.ats_losses}-{r.ats_pushes}"
-        print(f"{r.season:>6} | {r.total_games:>5} | {r.qualified_bets:>4} | {rec:>10} | "
-              f"{r.ats_pct:>5.1%} | {r.roi_pct:>+6.1f}% | {r.pred_mae:>8.2f} | {r.vegas_mae:>9.2f}")
-        tw += r.ats_wins; tl += r.ats_losses; tp += r.ats_pushes
-        if r.pred_mae > 0: pred_maes.append(r.pred_mae)
-        if r.vegas_mae > 0: vegas_maes.append(r.vegas_mae)
+        print(
+            f"{r.season:>6} | {r.total_games:>5} | {r.qualified_bets:>4} | {rec:>10} | "
+            f"{r.ats_pct:>5.1%} | {r.roi_pct:>+6.1f}% | {r.pred_mae:>8.2f} | {r.vegas_mae:>9.2f}"
+        )
+        tw += r.ats_wins
+        tl += r.ats_losses
+        tp += r.ats_pushes
+        if r.pred_mae > 0:
+            pred_maes.append(r.pred_mae)
+        if r.vegas_mae > 0:
+            vegas_maes.append(r.vegas_mae)
 
     print("-" * 80)
     td = tw + tl
@@ -227,8 +264,10 @@ def print_results(results: list[BacktestResult], hfa: float = HFA_DEFAULT,
     trec = f"{tw}-{tl}-{tp}"
     pm = float(np.mean(pred_maes)) if pred_maes else 0.0
     vm = float(np.mean(vegas_maes)) if vegas_maes else 0.0
-    print(f"{'TOTAL':>6} | {'':>5} | {tb:>4} | {trec:>10} | "
-          f"{tpct:>5.1%} | {troi:>+6.1f}% | {pm:>8.2f} | {vm:>9.2f}")
+    print(
+        f"{'TOTAL':>6} | {'':>5} | {tb:>4} | {trec:>10} | "
+        f"{tpct:>5.1%} | {troi:>+6.1f}% | {pm:>8.2f} | {vm:>9.2f}"
+    )
     print("=" * 80)
     print(f"\nBreakeven at -110: 52.4%")
     print(f"Overall ATS: {tpct:.1%} ({'PROFITABLE' if tpct > 0.524 else 'UNPROFITABLE'})")
@@ -247,14 +286,27 @@ def main() -> None:
     """CLI entry point for power ratings backtests."""
     parser = argparse.ArgumentParser(description="Power Ratings: point diff + HFA baseline")
     parser.add_argument("--seasons", default="2020-2025", help="e.g. '2020-2025' or '2024'")
-    parser.add_argument("--half-life", type=float, default=HALF_LIFE_DEFAULT,
-                        help=f"Decay half-life in games (default: {HALF_LIFE_DEFAULT})")
-    parser.add_argument("--hfa", type=float, default=HFA_DEFAULT,
-                        help=f"Home field advantage points (default: {HFA_DEFAULT})")
-    parser.add_argument("--min-games", type=int, default=MIN_GAMES_DEFAULT,
-                        help=f"Min games before rating trusted (default: {MIN_GAMES_DEFAULT})")
-    parser.add_argument("--min-edge", type=float, default=0.0,
-                        help="Min model-vs-Vegas edge to bet (default: 0.0)")
+    parser.add_argument(
+        "--half-life",
+        type=float,
+        default=HALF_LIFE_DEFAULT,
+        help=f"Decay half-life in games (default: {HALF_LIFE_DEFAULT})",
+    )
+    parser.add_argument(
+        "--hfa",
+        type=float,
+        default=HFA_DEFAULT,
+        help=f"Home field advantage points (default: {HFA_DEFAULT})",
+    )
+    parser.add_argument(
+        "--min-games",
+        type=int,
+        default=MIN_GAMES_DEFAULT,
+        help=f"Min games before rating trusted (default: {MIN_GAMES_DEFAULT})",
+    )
+    parser.add_argument(
+        "--min-edge", type=float, default=0.0, help="Min model-vs-Vegas edge to bet (default: 0.0)"
+    )
     parser.add_argument("--sweep", action="store_true", help="Parameter sweep across HFA/HL/edge")
     args = parser.parse_args()
     seasons = parse_seasons(args.seasons)
@@ -268,8 +320,10 @@ def main() -> None:
         for hfa in [1.5, 2.0, 2.5, 3.0, 3.5]:
             for hl in [5, 8, 10, 14, 18]:
                 for edge in [0.0, 1.0, 1.5, 2.0, 3.0]:
-                    res = [backtest_season(games_df, s, hl, hfa, args.min_games, edge)
-                           for s in sorted(seasons)]
+                    res = [
+                        backtest_season(games_df, s, hl, hfa, args.min_games, edge)
+                        for s in sorted(seasons)
+                    ]
                     w = sum(r.ats_wins for r in res)
                     l = sum(r.ats_losses for r in res)
                     b = sum(r.qualified_bets for r in res)
@@ -278,12 +332,16 @@ def main() -> None:
                         continue
                     pct = w / d
                     roi = _roi_from_pct(pct)
-                    print(f"{hfa:>5.1f} | {hl:>4} | {edge:>4.1f} | {b:>5} | {pct:>5.1%} | {roi:>+6.1f}%")
+                    print(
+                        f"{hfa:>5.1f} | {hl:>4} | {edge:>4.1f} | {b:>5} | {pct:>5.1%} | {roi:>+6.1f}%"
+                    )
                     if roi > best_roi:
                         best_roi = roi
                         best_params = {"hfa": hfa, "half_life": hl, "min_edge": edge}
-        print(f"\nBest: HFA={best_params.get('hfa')}, HL={best_params.get('half_life')}, "
-              f"Edge={best_params.get('min_edge')}, ROI={best_roi:+.1f}%")
+        print(
+            f"\nBest: HFA={best_params.get('hfa')}, HL={best_params.get('half_life')}, "
+            f"Edge={best_params.get('min_edge')}, ROI={best_roi:+.1f}%"
+        )
     else:
         results = run_backtest(seasons, args.half_life, args.hfa, args.min_games, args.min_edge)
         print_results(results, hfa=args.hfa, half_life=args.half_life)

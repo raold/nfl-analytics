@@ -135,9 +135,7 @@ class ClaudeSignalValidator:
                 )
                 logger.info("ClaudeSignalValidator initialized (model=%s)", self._config.model)
             except ImportError:
-                logger.warning(
-                    "anthropic package not installed — ClaudeSignalValidator disabled"
-                )
+                logger.warning("anthropic package not installed — ClaudeSignalValidator disabled")
                 self._client = None
         else:
             logger.debug("ClaudeSignalValidator disabled by config")
@@ -240,9 +238,7 @@ class ClaudeSignalValidator:
             "rejected": self._rejected,
             "cache_hits": self._cache_hits,
             "api_errors": self._api_errors,
-            "avg_latency_ms": (
-                self._total_latency_ms / api_calls if api_calls > 0 else 0.0
-            ),
+            "avg_latency_ms": (self._total_latency_ms / api_calls if api_calls > 0 else 0.0),
         }
 
     # ------------------------------------------------------------------

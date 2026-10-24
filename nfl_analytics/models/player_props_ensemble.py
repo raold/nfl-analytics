@@ -331,7 +331,9 @@ class PlayerPropsEnsemble:
                 logger.warning(traceback.format_exc())
                 self.use_bnn = False
         else:
-            logger.warning(f"  ✗ BNN model not found: {bnn_passing_ensemble_path} or {bnn_multioutput_path}")
+            logger.warning(
+                f"  ✗ BNN model not found: {bnn_passing_ensemble_path} or {bnn_multioutput_path}"
+            )
             self.use_bnn = False
 
     def _load_bnn_calibrated_model(self):

@@ -7,7 +7,6 @@ import pytest
 from nfl_analytics.markets.base import Position, Side
 from nfl_analytics.monitoring.pnl_tracker import PnLConfig, PnLTracker
 
-
 # ============================================================
 # Initialization
 # ============================================================
@@ -46,7 +45,7 @@ class TestFillProcessing:
         """Buy YES at 60, close (opposite side) at 70 → +10¢/contract profit."""
         tracker = PnLTracker(initial_equity_cents=100_000)
         tracker.record_fill("KXNFL-KC", Side.YES, 60, 10)  # Buy
-        tracker.record_fill("KXNFL-KC", Side.NO, 70, 10)   # Close
+        tracker.record_fill("KXNFL-KC", Side.NO, 70, 10)  # Close
         assert tracker.realized_pnl_cents == 100  # (70-60)*10
         assert tracker.trade_count == 1
         assert tracker.win_rate == 1.0
@@ -173,9 +172,9 @@ class TestWinRate:
     def test_mixed(self):
         tracker = PnLTracker(initial_equity_cents=100_000)
         tracker.record_fill("A", Side.YES, 50, 5)
-        tracker.record_fill("A", Side.NO, 60, 5)   # Win
+        tracker.record_fill("A", Side.NO, 60, 5)  # Win
         tracker.record_fill("B", Side.YES, 40, 5)
-        tracker.record_fill("B", Side.NO, 30, 5)   # Loss
+        tracker.record_fill("B", Side.NO, 30, 5)  # Loss
         assert tracker.win_rate == pytest.approx(0.5)
 
 

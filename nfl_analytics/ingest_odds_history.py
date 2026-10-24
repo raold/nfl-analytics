@@ -8,6 +8,7 @@ See: etl/extract/odds_api.py for the new implementation.
 
 This legacy script will be maintained but not enhanced.
 """
+
 from __future__ import annotations
 
 import argparse

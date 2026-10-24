@@ -421,42 +421,34 @@ class PredictionCacheManager:
             unique_models = cursor.fetchone()[0]
 
             # Cache size
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT pg_total_relation_size('ml.r_model_predictions') / 1024.0 / 1024.0
-            """
-            )
+            """)
             cache_size_mb = cursor.fetchone()[0] or 0.0
 
             # Oldest/newest predictions
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT MIN(created_at), MAX(last_updated)
                 FROM ml.r_model_predictions
-            """
-            )
+            """)
             oldest, newest = cursor.fetchone()
 
             # Predictions by model
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT model_name, COUNT(*)
                 FROM ml.r_model_predictions
                 GROUP BY model_name
                 ORDER BY COUNT(*) DESC
-            """
-            )
+            """)
             predictions_by_model = dict(cursor.fetchall())
 
             # Predictions by stat type
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT stat_type, COUNT(*)
                 FROM ml.r_model_predictions
                 GROUP BY stat_type
                 ORDER BY COUNT(*) DESC
-            """
-            )
+            """)
             predictions_by_stat_type = dict(cursor.fetchall())
 
             # Calculate hit rate
@@ -517,13 +509,11 @@ class PredictionCacheManager:
                     (sample_size,),
                 )
             else:
-                cursor.execute(
-                    """
+                cursor.execute("""
                     SELECT player_id, season, week, model_name, stat_type,
                            prediction, created_at, last_updated
                     FROM ml.r_model_predictions
-                """
-                )
+                """)
 
             predictions = cursor.fetchall()
             total_checked = len(predictions)
@@ -569,29 +559,25 @@ class PredictionCacheManager:
                 valid_predictions += 1
 
             # Check for duplicates
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT player_id, season, week, model_name, stat_type, COUNT(*)
                 FROM ml.r_model_predictions
                 GROUP BY player_id, season, week, model_name, stat_type
                 HAVING COUNT(*) > 1
-            """
-            )
+            """)
             duplicates = cursor.fetchall()
             duplicate_predictions = len(duplicates)
             for dup in duplicates[:10]:  # Show first 10
                 issues.append(f"Duplicate prediction: {dup[:-1]} (count={dup[-1]})")
 
             # Check for orphaned predictions (player not in database)
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT COUNT(*)
                 FROM ml.r_model_predictions rp
                 LEFT JOIN player_game_stats pgs
                   ON rp.player_id = pgs.player_id
                 WHERE pgs.player_id IS NULL
-            """
-            )
+            """)
             orphaned_predictions = cursor.fetchone()[0] or 0
             if orphaned_predictions > 0:
                 issues.append(f"{orphaned_predictions} predictions for players not in database")

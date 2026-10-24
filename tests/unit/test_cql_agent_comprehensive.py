@@ -28,6 +28,7 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 import pytest
+
 torch = pytest.importorskip("torch")  # optional: uv sync --extra torch
 import torch.nn as nn
 

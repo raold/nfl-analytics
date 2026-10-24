@@ -288,12 +288,10 @@ def create_roster_stability_view(db_config: dict | None = None) -> None:
     conn.commit()
 
     # Create index for fast lookups
-    cur.execute(
-        """
+    cur.execute("""
         CREATE INDEX idx_roster_stability_lookup
         ON mart.roster_stability (team, season, week);
-    """
-    )
+    """)
     conn.commit()
 
     logger.info("✅ Created materialized view: mart.roster_stability")

@@ -171,15 +171,13 @@ def test_load_schema_snapshot_success(agent, sample_schema):
 def test_extract_sql_queries_multiline(agent, tmp_path):
     """Test extracting multi-line SQL queries"""
     python_file = tmp_path / "test.py"
-    python_file.write_text(
-        '''
+    python_file.write_text('''
 query = """
     SELECT game_id, season, week
     FROM public.games
     WHERE season = 2024
 """
-'''
-    )
+''')
 
     queries = agent.extract_sql_queries(python_file)
 
@@ -193,11 +191,9 @@ query = """
 def test_extract_sql_queries_single_line(agent, tmp_path):
     """Test extracting single-line SQL queries"""
     python_file = tmp_path / "test.py"
-    python_file.write_text(
-        """
+    python_file.write_text("""
 result = conn.execute("SELECT * FROM games WHERE season = 2024")
-"""
-    )
+""")
 
     queries = agent.extract_sql_queries(python_file)
 
@@ -209,12 +205,10 @@ result = conn.execute("SELECT * FROM games WHERE season = 2024")
 def test_extract_sql_queries_execute_pattern(agent, tmp_path):
     """Test extracting queries from execute() calls"""
     python_file = tmp_path / "test.py"
-    python_file.write_text(
-        """
+    python_file.write_text("""
 cur.execute("SELECT COUNT(*) FROM games")
 conn.execute("SELECT player_id FROM mart.player_game_stats")
-"""
-    )
+""")
 
     queries = agent.extract_sql_queries(python_file)
 
@@ -315,16 +309,14 @@ def test_validate_dashboard_schema_success(agent, sample_schema, tmp_path):
     # Create dashboard with valid queries
     dashboard_path = tmp_path / "dashboard" / "app.py"
     dashboard_path.parent.mkdir(parents=True, exist_ok=True)
-    dashboard_path.write_text(
-        '''
+    dashboard_path.write_text('''
 result = conn.execute("""
     SELECT g.game_id, g.season
     FROM public.games g
     WHERE g.season = 2024
     LIMIT 100
 """)
-'''
-    )
+''')
 
     agent.dashboard_path = dashboard_path
     agent._schema_cache = sample_schema
@@ -341,16 +333,14 @@ def test_validate_dashboard_schema_with_errors(agent, sample_schema, tmp_path):
     # Create dashboard with INVALID queries (the DOZENS of times bug)
     dashboard_path = tmp_path / "dashboard" / "app.py"
     dashboard_path.parent.mkdir(parents=True, exist_ok=True)
-    dashboard_path.write_text(
-        '''
+    dashboard_path.write_text('''
 # This is the bug that occurred DOZENS of times
 result = conn.execute("""
     SELECT pgs.game_id
     FROM mart.player_game_stats pgs
     WHERE pgs.player_id = '00-0033873'
 """)
-'''
-    )
+''')
 
     agent.dashboard_path = dashboard_path
     agent._schema_cache = sample_schema
@@ -711,8 +701,7 @@ def test_end_to_end_validation_workflow(agent, sample_schema, tmp_path):
     # 2. Create dashboard with valid and invalid queries
     dashboard_path = tmp_path / "dashboard" / "app.py"
     dashboard_path.parent.mkdir(parents=True, exist_ok=True)
-    dashboard_path.write_text(
-        '''
+    dashboard_path.write_text('''
 # Valid query
 valid_result = conn.execute("""
     SELECT g.game_id, g.season
@@ -725,8 +714,7 @@ invalid_result = conn.execute("""
     SELECT pgs.game_id
     FROM mart.player_game_stats pgs
 """)
-'''
-    )
+''')
 
     agent.dashboard_path = dashboard_path
 

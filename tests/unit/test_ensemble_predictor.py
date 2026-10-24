@@ -25,7 +25,9 @@ from nfl_analytics.ensemble.strategy.base import ModelType
 def _no_redis(monkeypatch):
     """Use only the in-memory model cache: constructing the predictor otherwise waits
     ~5s for a Redis connection and lets a local Redis leak state between tests."""
-    monkeypatch.setattr("nfl_analytics.ensemble.strategy.ensemble_predictor.get_default_cache", None)
+    monkeypatch.setattr(
+        "nfl_analytics.ensemble.strategy.ensemble_predictor.get_default_cache", None
+    )
 
 
 class TestBNNModelLoading:
@@ -129,7 +131,9 @@ class TestBNNModelLoading:
             np.array([40.0]),  # High std
         )
 
-        with patch("nfl_analytics.models.bayesian_neural_network.BayesianNeuralNetwork.load") as mock_load:
+        with patch(
+            "nfl_analytics.models.bayesian_neural_network.BayesianNeuralNetwork.load"
+        ) as mock_load:
             # Low uncertainty prediction
             mock_load.return_value = mock_model_low_std
             result_low = predictor._predict_bnn_model(
@@ -157,7 +161,9 @@ class TestBNNModelLoading:
         model_path = Path("models/bayesian/bnn_passing_v1.pkl")
 
         # Mock BayesianNeuralNetwork as None (not installed)
-        with patch("nfl_analytics.ensemble.strategy.ensemble_predictor.BayesianNeuralNetwork", None):
+        with patch(
+            "nfl_analytics.ensemble.strategy.ensemble_predictor.BayesianNeuralNetwork", None
+        ):
             result = predictor._predict_bnn_model(
                 model_name="bnn_v1",
                 path=model_path,

@@ -320,14 +320,12 @@ def test_transaction_support(connection_pool):
     cursor.execute("DROP TABLE IF EXISTS test_transactions")
 
     # Create table
-    cursor.execute(
-        """
+    cursor.execute("""
         CREATE TABLE test_transactions (
             id SERIAL PRIMARY KEY,
             value TEXT
         )
-    """
-    )
+    """)
     conn.commit()
     cursor.close()
     pool_obj.putconn(conn)

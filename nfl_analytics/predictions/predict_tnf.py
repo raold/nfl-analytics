@@ -27,21 +27,20 @@ import numpy as np
 import pandas as pd
 import xgboost as xgb
 
-
 FEATURE_COLS = [
-    'prior_epa_mean_diff',
-    'epa_pp_last3_diff',
-    'season_win_pct_diff',
-    'win_pct_last5_diff',
-    'prior_margin_avg_diff',
-    'points_for_last3_diff',
-    'points_against_last3_diff',
-    'rest_diff',
-    'week',
-    'fourth_downs_diff',
-    'fourth_down_epa_diff',
-    'injury_load_diff',
-    'qb_injury_diff',
+    "prior_epa_mean_diff",
+    "epa_pp_last3_diff",
+    "season_win_pct_diff",
+    "win_pct_last5_diff",
+    "prior_margin_avg_diff",
+    "points_for_last3_diff",
+    "points_against_last3_diff",
+    "rest_diff",
+    "week",
+    "fourth_downs_diff",
+    "fourth_down_epa_diff",
+    "injury_load_diff",
+    "qb_injury_diff",
 ]
 
 
@@ -55,8 +54,8 @@ def load_model(model_path: Path) -> xgb.Booster:
 
 def load_game_data(
     features_csv: Path,
-    home_team: str = 'NYG',
-    away_team: str = 'PHI',
+    home_team: str = "NYG",
+    away_team: str = "PHI",
     season: int = 2025,
     week: int = 6,
 ) -> pd.DataFrame:
@@ -65,10 +64,10 @@ def load_game_data(
 
     # Filter to the specific game
     game = df[
-        (df['season'] == season) &
-        (df['week'] == week) &
-        (df['home_team'] == home_team) &
-        (df['away_team'] == away_team)
+        (df["season"] == season)
+        & (df["week"] == week)
+        & (df["home_team"] == home_team)
+        & (df["away_team"] == away_team)
     ]
 
     if len(game) == 0:
@@ -151,25 +150,25 @@ def generate_betting_recommendation(
     # Mock odds (to be replaced with real API data)
     # These are example odds for Eagles @ Giants
     mock_odds = {
-        'moneyline': {
-            'PHI': -270,  # Eagles favorite
-            'NYG': +220,  # Giants underdog
+        "moneyline": {
+            "PHI": -270,  # Eagles favorite
+            "NYG": +220,  # Giants underdog
         },
-        'spread': {
-            'PHI': {'line': -6.5, 'odds': -110},
-            'NYG': {'line': +6.5, 'odds': -110},
+        "spread": {
+            "PHI": {"line": -6.5, "odds": -110},
+            "NYG": {"line": +6.5, "odds": -110},
         },
-        'total': {
-            'over': {'line': 42.5, 'odds': -110},
-            'under': {'line': 42.5, 'odds': -110},
+        "total": {
+            "over": {"line": 42.5, "odds": -110},
+            "under": {"line": 42.5, "odds": -110},
         },
     }
 
     recommendations = []
 
     # Moneyline analysis
-    for team, odds in mock_odds['moneyline'].items():
-        if team == 'PHI':
+    for team, odds in mock_odds["moneyline"].items():
+        if team == "PHI":
             true_prob = away_win_prob
             team_name = "Eagles"
         else:
@@ -185,85 +184,67 @@ def generate_betting_recommendation(
         edge = true_prob - market_prob
 
         if edge > 0.02:  # At least 2% edge
-            recommendations.append({
-                'bet_type': 'moneyline',
-                'team': team_name,
-                'odds': odds,
-                'market_prob': f"{market_prob:.1%}",
-                'model_prob': f"{true_prob:.1%}",
-                'edge': f"{edge:.1%}",
-                'ev_per_100': f"${ev_100:.2f}",
-                'kelly_fraction': f"{kelly_pct:.1%}",
-                'recommendation': 'BET' if edge > 0.05 else 'LEAN',
-                'confidence': 'HIGH' if edge > 0.10 else 'MEDIUM' if edge > 0.05 else 'LOW',
-            })
+            recommendations.append(
+                {
+                    "bet_type": "moneyline",
+                    "team": team_name,
+                    "odds": odds,
+                    "market_prob": f"{market_prob:.1%}",
+                    "model_prob": f"{true_prob:.1%}",
+                    "edge": f"{edge:.1%}",
+                    "ev_per_100": f"${ev_100:.2f}",
+                    "kelly_fraction": f"{kelly_pct:.1%}",
+                    "recommendation": "BET" if edge > 0.05 else "LEAN",
+                    "confidence": "HIGH" if edge > 0.10 else "MEDIUM" if edge > 0.05 else "LOW",
+                }
+            )
 
     return {
-        'game': {
-            'away_team': game_data['away_team'].values[0],
-            'home_team': game_data['home_team'].values[0],
-            'season': int(game_data['season'].values[0]),
-            'week': int(game_data['week'].values[0]),
-            'game_id': game_data['game_id'].values[0],
+        "game": {
+            "away_team": game_data["away_team"].values[0],
+            "home_team": game_data["home_team"].values[0],
+            "season": int(game_data["season"].values[0]),
+            "week": int(game_data["week"].values[0]),
+            "game_id": game_data["game_id"].values[0],
         },
-        'predictions': {
-            'home_win_prob': f"{home_win_prob:.1%}",
-            'away_win_prob': f"{away_win_prob:.1%}",
+        "predictions": {
+            "home_win_prob": f"{home_win_prob:.1%}",
+            "away_win_prob": f"{away_win_prob:.1%}",
         },
-        'model_info': {
-            'features_used': len(FEATURE_COLS),
-            'test_brier': 0.1641,
-            'test_auc': 0.8399,
+        "model_info": {
+            "features_used": len(FEATURE_COLS),
+            "test_brier": 0.1641,
+            "test_auc": 0.8399,
         },
-        'recommendations': recommendations,
-        'odds_source': 'MOCK (replace with real API)',
+        "recommendations": recommendations,
+        "odds_source": "MOCK (replace with real API)",
     }
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Generate TNF predictions')
+    parser = argparse.ArgumentParser(description="Generate TNF predictions")
     parser.add_argument(
-        '--model',
+        "--model",
         type=Path,
-        default=Path('models/xgboost/v2/model_2024_full.json'),
-        help='Path to trained model'
+        default=Path("models/xgboost/v2/model_2024_full.json"),
+        help="Path to trained model",
     )
     parser.add_argument(
-        '--features',
+        "--features",
         type=Path,
-        default=Path('data/processed/features/asof_team_features_v2.csv'),
-        help='Path to features CSV'
+        default=Path("data/processed/features/asof_team_features_v2.csv"),
+        help="Path to features CSV",
     )
     parser.add_argument(
-        '--output',
+        "--output",
         type=Path,
-        default=Path('predictions/tnf_2025_week6.json'),
-        help='Output path for predictions'
+        default=Path("predictions/tnf_2025_week6.json"),
+        help="Output path for predictions",
     )
-    parser.add_argument(
-        '--home-team',
-        type=str,
-        default='NYG',
-        help='Home team abbreviation'
-    )
-    parser.add_argument(
-        '--away-team',
-        type=str,
-        default='PHI',
-        help='Away team abbreviation'
-    )
-    parser.add_argument(
-        '--season',
-        type=int,
-        default=2025,
-        help='Season year'
-    )
-    parser.add_argument(
-        '--week',
-        type=int,
-        default=6,
-        help='Week number'
-    )
+    parser.add_argument("--home-team", type=str, default="NYG", help="Home team abbreviation")
+    parser.add_argument("--away-team", type=str, default="PHI", help="Away team abbreviation")
+    parser.add_argument("--season", type=int, default=2025, help="Season year")
+    parser.add_argument("--week", type=int, default=6, help="Week number")
 
     args = parser.parse_args()
 
@@ -297,8 +278,8 @@ def main():
     result = generate_betting_recommendation(home_win_prob, away_win_prob, game_data)
 
     print(f"\n=== Betting Recommendations ===")
-    if result['recommendations']:
-        for rec in result['recommendations']:
+    if result["recommendations"]:
+        for rec in result["recommendations"]:
             print(f"\n{rec['recommendation']}: {rec['bet_type'].upper()} on {rec['team']}")
             print(f"  Odds: {rec['odds']}")
             print(f"  Market probability: {rec['market_prob']}")
@@ -312,7 +293,7 @@ def main():
 
     # Save results
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    with open(args.output, 'w') as f:
+    with open(args.output, "w") as f:
         json.dump(result, f, indent=2)
 
     print(f"\n[SUCCESS] Predictions saved to {args.output}")
@@ -320,5 +301,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

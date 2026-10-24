@@ -71,8 +71,7 @@ class TaskQueue:
 
     def _init_db(self):
         """Initialize database schema."""
-        self.conn.executescript(
-            """
+        self.conn.executescript("""
             CREATE TABLE IF NOT EXISTS tasks (
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL,
@@ -116,8 +115,7 @@ class TaskQueue:
                 temperature REAL,
                 active_tasks INTEGER
             );
-        """
-        )
+        """)
         self.conn.commit()
 
     def add_task(
@@ -269,8 +267,7 @@ class TaskQueue:
 
     def get_queue_status(self) -> dict[str, Any]:
         """Get overall queue status."""
-        cursor = self.conn.execute(
-            """
+        cursor = self.conn.execute("""
             SELECT
                 status,
                 COUNT(*) as count,
@@ -279,8 +276,7 @@ class TaskQueue:
                 SUM(gpu_hours) as total_gpu_hours
             FROM tasks
             GROUP BY status
-        """
-        )
+        """)
 
         stats = {}
         for row in cursor:

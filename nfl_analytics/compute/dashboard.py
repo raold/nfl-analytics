@@ -63,8 +63,7 @@ class PerformanceDashboard:
         scoreboard = []
 
         # Get performance data for each model type
-        cursor = self.tracker.conn.execute(
-            """
+        cursor = self.tracker.conn.execute("""
             SELECT
                 mp.model_id,
                 mp.metrics,
@@ -78,8 +77,7 @@ class PerformanceDashboard:
                 SELECT MAX(id) FROM model_performance GROUP BY model_id
             )
             ORDER BY mp.timestamp DESC
-        """
-        )
+        """)
 
         for row in cursor:
             metrics = json.loads(row["metrics"])
@@ -150,11 +148,9 @@ class PerformanceDashboard:
         trends = {}
 
         # Get trend data for each model type
-        cursor = self.tracker.conn.execute(
-            """
+        cursor = self.tracker.conn.execute("""
             SELECT * FROM performance_trends
-        """
-        )
+        """)
 
         for row in cursor:
             trend_data = json.loads(row["trend_data"]) if row["trend_data"] else {}
@@ -168,13 +164,11 @@ class PerformanceDashboard:
 
         # Get milestone timeline
         milestones = []
-        cursor = self.tracker.conn.execute(
-            """
+        cursor = self.tracker.conn.execute("""
             SELECT * FROM performance_milestones
             ORDER BY timestamp DESC
             LIMIT 20
-        """
-        )
+        """)
 
         for row in cursor:
             milestones.append(
@@ -198,13 +192,11 @@ class PerformanceDashboard:
         allocation_report = self.scheduler.get_compute_allocation_report()
 
         # Get pending tasks with expected values
-        cursor = self.queue.conn.execute(
-            """
+        cursor = self.queue.conn.execute("""
             SELECT * FROM tasks
             WHERE status = 'pending'
             LIMIT 10
-        """
-        )
+        """)
 
         pending_with_values = []
         for row in cursor:
@@ -236,13 +228,11 @@ class PerformanceDashboard:
         """Get compute resource statistics."""
 
         # Get recent compute stats
-        cursor = self.queue.conn.execute(
-            """
+        cursor = self.queue.conn.execute("""
             SELECT * FROM compute_stats
             ORDER BY timestamp DESC
             LIMIT 100
-        """
-        )
+        """)
 
         stats_history = []
         for row in cursor:
@@ -291,8 +281,7 @@ class PerformanceDashboard:
 
     def _get_task_value_matrix(self) -> dict[str, Any]:
         """Get expected value matrix for pending tasks."""
-        cursor = self.queue.conn.execute(
-            """
+        cursor = self.queue.conn.execute("""
             SELECT t.*, tve.expected_roi, tve.confidence_lower, tve.confidence_upper
             FROM tasks t
             LEFT JOIN task_value_estimates tve ON
@@ -301,8 +290,7 @@ class PerformanceDashboard:
             WHERE t.status = 'pending'
             ORDER BY t.priority, t.created_at
             LIMIT 20
-        """
-        )
+        """)
 
         matrix = []
         for row in cursor:

@@ -248,7 +248,9 @@ def main():
         comparator.print_summary()
 
         # Generate LaTeX table
-        output_path = _PROJECT_ROOT / "analysis/dissertation/figures/out/baseline_comparison_table.tex"
+        output_path = (
+            _PROJECT_ROOT / "analysis/dissertation/figures/out/baseline_comparison_table.tex"
+        )
         comparator.generate_latex_table(output_path)
 
         print("\n✓ Baseline comparison table generated successfully")

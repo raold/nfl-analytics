@@ -21,7 +21,6 @@ from nfl_analytics.trading.claude_signal_validator import (
 )
 from nfl_analytics.trading.signal import Signal
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -59,7 +58,9 @@ def _mock_claude_response(data: dict) -> MagicMock:
     return response
 
 
-def _make_validator_with_mock(response_data: dict | None = None) -> tuple[ClaudeSignalValidator, MagicMock]:
+def _make_validator_with_mock(
+    response_data: dict | None = None,
+) -> tuple[ClaudeSignalValidator, MagicMock]:
     """Create a validator with a mocked Anthropic client.
 
     Returns (validator, mock_client) so tests can assert on calls.
@@ -128,11 +129,13 @@ class TestPassthrough:
 class TestAPIResponses:
     def test_approve_response(self):
         """Mock Claude returning approve JSON -> APPROVE result."""
-        validator, _ = _make_validator_with_mock({
-            "decision": "approve",
-            "confidence": 0.85,
-            "reasoning": "Signal looks reasonable given current edge",
-        })
+        validator, _ = _make_validator_with_mock(
+            {
+                "decision": "approve",
+                "confidence": 0.85,
+                "reasoning": "Signal looks reasonable given current edge",
+            }
+        )
         result = validator.validate(_make_signal())
 
         assert result.decision == ValidationDecision.APPROVE
@@ -143,12 +146,14 @@ class TestAPIResponses:
 
     def test_reduce_response(self):
         """Mock Claude returning reduce JSON with suggested_quantity -> REDUCE."""
-        validator, _ = _make_validator_with_mock({
-            "decision": "reduce",
-            "confidence": 0.70,
-            "reasoning": "Edge is marginal, reduce position size",
-            "suggested_quantity": 5,
-        })
+        validator, _ = _make_validator_with_mock(
+            {
+                "decision": "reduce",
+                "confidence": 0.70,
+                "reasoning": "Edge is marginal, reduce position size",
+                "suggested_quantity": 5,
+            }
+        )
         result = validator.validate(_make_signal(quantity=10))
 
         assert result.decision == ValidationDecision.REDUCE
@@ -158,11 +163,13 @@ class TestAPIResponses:
 
     def test_reject_response(self):
         """Mock Claude returning reject JSON -> REJECT result."""
-        validator, _ = _make_validator_with_mock({
-            "decision": "reject",
-            "confidence": 0.92,
-            "reasoning": "Key player injury not reflected in model probability",
-        })
+        validator, _ = _make_validator_with_mock(
+            {
+                "decision": "reject",
+                "confidence": 0.92,
+                "reasoning": "Key player injury not reflected in model probability",
+            }
+        )
         result = validator.validate(_make_signal())
 
         assert result.decision == ValidationDecision.REJECT
@@ -204,11 +211,13 @@ class TestAPIResponses:
 class TestCaching:
     def test_cache_hit(self):
         """Validate same signal twice -> second is from_cache=True."""
-        validator, mock_client = _make_validator_with_mock({
-            "decision": "approve",
-            "confidence": 0.80,
-            "reasoning": "Looks good",
-        })
+        validator, mock_client = _make_validator_with_mock(
+            {
+                "decision": "approve",
+                "confidence": 0.80,
+                "reasoning": "Looks good",
+            }
+        )
         signal = _make_signal()
 
         result1 = validator.validate(signal)
@@ -223,11 +232,13 @@ class TestCaching:
 
     def test_cache_miss_different_signal(self):
         """Different contract_id -> cache miss, separate API call."""
-        validator, mock_client = _make_validator_with_mock({
-            "decision": "approve",
-            "confidence": 0.80,
-            "reasoning": "OK",
-        })
+        validator, mock_client = _make_validator_with_mock(
+            {
+                "decision": "approve",
+                "confidence": 0.80,
+                "reasoning": "OK",
+            }
+        )
 
         validator.validate(_make_signal(contract_id="KXNFL-26-KC"))
         validator.validate(_make_signal(contract_id="KXNFL-26-BUF"))
@@ -280,28 +291,34 @@ class TestStats:
         validator, mock_client = _make_validator_with_mock()
 
         # First call: approve
-        mock_client.messages.create.return_value = _mock_claude_response({
-            "decision": "approve",
-            "confidence": 0.8,
-            "reasoning": "OK",
-        })
+        mock_client.messages.create.return_value = _mock_claude_response(
+            {
+                "decision": "approve",
+                "confidence": 0.8,
+                "reasoning": "OK",
+            }
+        )
         validator.validate(_make_signal(contract_id="A"))
 
         # Second call: reject
-        mock_client.messages.create.return_value = _mock_claude_response({
-            "decision": "reject",
-            "confidence": 0.9,
-            "reasoning": "Bad",
-        })
+        mock_client.messages.create.return_value = _mock_claude_response(
+            {
+                "decision": "reject",
+                "confidence": 0.9,
+                "reasoning": "Bad",
+            }
+        )
         validator.validate(_make_signal(contract_id="B"))
 
         # Third call: reduce
-        mock_client.messages.create.return_value = _mock_claude_response({
-            "decision": "reduce",
-            "confidence": 0.7,
-            "reasoning": "Cut",
-            "suggested_quantity": 3,
-        })
+        mock_client.messages.create.return_value = _mock_claude_response(
+            {
+                "decision": "reduce",
+                "confidence": 0.7,
+                "reasoning": "Cut",
+                "suggested_quantity": 3,
+            }
+        )
         validator.validate(_make_signal(contract_id="C"))
 
         # Fourth call: API error
@@ -327,12 +344,14 @@ class TestParseResponse:
     def test_parse_response_valid(self):
         """_parse_response with valid JSON returns correct result."""
         validator, _ = _make_validator_with_mock()
-        text = json.dumps({
-            "decision": "reduce",
-            "confidence": 0.65,
-            "reasoning": "Edge is thin",
-            "suggested_quantity": 3,
-        })
+        text = json.dumps(
+            {
+                "decision": "reduce",
+                "confidence": 0.65,
+                "reasoning": "Edge is thin",
+                "suggested_quantity": 3,
+            }
+        )
         result = validator._parse_response(text)
 
         assert result.decision == ValidationDecision.REDUCE

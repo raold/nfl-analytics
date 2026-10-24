@@ -14,7 +14,6 @@ to improve maintainability and enable empirical validation.
 from dataclasses import dataclass
 from typing import Dict
 
-
 # ==============================================================================
 # INJURY IMPACT WEIGHTS
 # ==============================================================================

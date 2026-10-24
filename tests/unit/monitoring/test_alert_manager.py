@@ -9,7 +9,6 @@ import pytest
 
 from nfl_analytics.monitoring.alert_manager import Alert, AlertConfig, AlertLevel, AlertManager
 
-
 # ============================================================
 # Initialization
 # ============================================================

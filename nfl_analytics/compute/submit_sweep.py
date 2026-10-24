@@ -248,7 +248,9 @@ def main():
     print("\nNext steps:")
     print("  1. Start workers: python nfl_analytics/compute/worker_enhanced.py --worker-id <id>")
     print("  2. Monitor progress: python nfl_analytics/compute/dashboard.py")
-    print(f"  3. View results: python nfl_analytics/compute/model_registry.py list {sweep.model_type}")
+    print(
+        f"  3. View results: python nfl_analytics/compute/model_registry.py list {sweep.model_type}"
+    )
 
 
 if __name__ == "__main__":

@@ -132,9 +132,7 @@ class ExecutionAuditor:
             if self.config.alert_on_any_discrepancy:
                 for d in report.discrepancies:
                     alert_level = (
-                        AlertLevel.CRITICAL
-                        if d.severity == "critical"
-                        else AlertLevel.WARNING
+                        AlertLevel.CRITICAL if d.severity == "critical" else AlertLevel.WARNING
                     )
                     sent = self._alert_manager.alert(
                         alert_level,
@@ -169,8 +167,6 @@ class ExecutionAuditor:
             "total_audits": self._total_audits,
             "total_discrepancies": self._total_discrepancies,
             "last_audit_timestamp": (
-                self._last_audit_timestamp.isoformat()
-                if self._last_audit_timestamp
-                else None
+                self._last_audit_timestamp.isoformat() if self._last_audit_timestamp else None
             ),
         }

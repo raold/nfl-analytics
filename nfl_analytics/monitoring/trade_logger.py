@@ -137,14 +137,18 @@ class TradeLogger:
         strategy: str,
     ) -> None:
         """Log an order submission."""
-        self._log(logging.INFO, "order", {
-            "order_id": order_id,
-            "contract_id": contract_id,
-            "side": side,
-            "price_cents": price_cents,
-            "quantity": quantity,
-            "strategy": strategy,
-        })
+        self._log(
+            logging.INFO,
+            "order",
+            {
+                "order_id": order_id,
+                "contract_id": contract_id,
+                "side": side,
+                "price_cents": price_cents,
+                "quantity": quantity,
+                "strategy": strategy,
+            },
+        )
 
     def log_fill(
         self,
@@ -167,26 +171,34 @@ class TradeLogger:
 
     def log_risk_breach(self, result: RiskCheckResult) -> None:
         """Log a risk layer blocking a signal."""
-        self._log(logging.WARNING, "risk_breach", {
-            "layer": result.layer,
-            "reason": result.reason,
-            "contract_id": result.signal.contract_id,
-            "side": result.signal.side.value,
-            "quantity": result.signal.quantity,
-            "original_quantity": result.original_quantity,
-        })
+        self._log(
+            logging.WARNING,
+            "risk_breach",
+            {
+                "layer": result.layer,
+                "reason": result.reason,
+                "contract_id": result.signal.contract_id,
+                "side": result.signal.side.value,
+                "quantity": result.signal.quantity,
+                "original_quantity": result.original_quantity,
+            },
+        )
 
     def log_kill_switch(self, event: KillSwitchEvent) -> None:
         """Log a kill switch activation at CRITICAL level."""
-        self._log(logging.CRITICAL, "kill_switch", {
-            "reason": event.reason,
-            "trigger_value": event.trigger_value,
-            "threshold": event.threshold,
-            "equity_at_trigger_cents": event.equity_at_trigger_cents,
-            "peak_equity_cents": event.peak_equity_cents,
-            "positions_open": event.positions_open,
-            "orders_open": event.orders_open,
-        })
+        self._log(
+            logging.CRITICAL,
+            "kill_switch",
+            {
+                "reason": event.reason,
+                "trigger_value": event.trigger_value,
+                "threshold": event.threshold,
+                "equity_at_trigger_cents": event.equity_at_trigger_cents,
+                "peak_equity_cents": event.peak_equity_cents,
+                "positions_open": event.positions_open,
+                "orders_open": event.orders_open,
+            },
+        )
 
     def log_equity_snapshot(
         self,
@@ -196,9 +208,13 @@ class TradeLogger:
         trade_count: int,
     ) -> None:
         """Log a periodic equity snapshot."""
-        self._log(logging.INFO, "equity_snapshot", {
-            "equity_cents": equity_cents,
-            "realized_pnl_cents": realized_pnl_cents,
-            "unrealized_pnl_cents": unrealized_pnl_cents,
-            "trade_count": trade_count,
-        })
+        self._log(
+            logging.INFO,
+            "equity_snapshot",
+            {
+                "equity_cents": equity_cents,
+                "realized_pnl_cents": realized_pnl_cents,
+                "unrealized_pnl_cents": unrealized_pnl_cents,
+                "trade_count": trade_count,
+            },
+        )

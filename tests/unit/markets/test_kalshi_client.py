@@ -51,7 +51,11 @@ def _mock_response(status_code: int = 200, json_data: dict | None = None) -> htt
 class MockTransport(httpx.AsyncBaseTransport):
     """Mock httpx transport that returns pre-configured responses."""
 
-    def __init__(self, responses: dict[str, httpx.Response] | None = None, default_response: httpx.Response | None = None):
+    def __init__(
+        self,
+        responses: dict[str, httpx.Response] | None = None,
+        default_response: httpx.Response | None = None,
+    ):
         self._responses = responses or {}
         self._default = default_response or _mock_response()
         self.requests: list[httpx.Request] = []
@@ -90,20 +94,23 @@ class TestPlaceOrder:
     async def test_place_order_success(self, client_and_transport):
         """Successful order placement."""
         client, transport = client_and_transport
-        transport._default = _mock_response(201, {
-            "order": {
-                "order_id": "exchange-123",
-                "client_order_id": "my-order",
-                "ticker": "KXNFL-26-WIN-KC",
-                "side": "yes",
-                "status": "resting",
-                "yes_price": 55,
-                "initial_count": 10,
-                "fill_count": 0,
-                "taker_fill_cost": 0,
-                "maker_fill_cost": 0,
-            }
-        })
+        transport._default = _mock_response(
+            201,
+            {
+                "order": {
+                    "order_id": "exchange-123",
+                    "client_order_id": "my-order",
+                    "ticker": "KXNFL-26-WIN-KC",
+                    "side": "yes",
+                    "status": "resting",
+                    "yes_price": 55,
+                    "initial_count": 10,
+                    "fill_count": 0,
+                    "taker_fill_cost": 0,
+                    "maker_fill_cost": 0,
+                }
+            },
+        )
 
         order = Order(
             order_id="my-order",
@@ -122,20 +129,23 @@ class TestPlaceOrder:
     async def test_place_order_immediately_filled(self, client_and_transport):
         """Order fills immediately (crosses spread)."""
         client, transport = client_and_transport
-        transport._default = _mock_response(201, {
-            "order": {
-                "order_id": "exchange-456",
-                "client_order_id": "my-order",
-                "ticker": "TEST-01",
-                "side": "yes",
-                "status": "executed",
-                "yes_price": 55,
-                "initial_count": 5,
-                "fill_count": 5,
-                "taker_fill_cost": 275,
-                "maker_fill_cost": 0,
-            }
-        })
+        transport._default = _mock_response(
+            201,
+            {
+                "order": {
+                    "order_id": "exchange-456",
+                    "client_order_id": "my-order",
+                    "ticker": "TEST-01",
+                    "side": "yes",
+                    "status": "executed",
+                    "yes_price": 55,
+                    "initial_count": 5,
+                    "fill_count": 5,
+                    "taker_fill_cost": 275,
+                    "maker_fill_cost": 0,
+                }
+            },
+        )
 
         order = Order(
             order_id="my-order",
@@ -161,17 +171,20 @@ class TestCancelOrder:
     async def test_cancel_order(self, client_and_transport):
         """Cancel a resting order."""
         client, transport = client_and_transport
-        transport._responses[f"DELETE /trade-api/v2/portfolio/orders/order-123"] = _mock_response(200, {
-            "order": {
-                "order_id": "order-123",
-                "ticker": "TEST-01",
-                "side": "yes",
-                "status": "canceled",
-                "yes_price": 50,
-                "initial_count": 10,
-                "fill_count": 0,
-            }
-        })
+        transport._responses[f"DELETE /trade-api/v2/portfolio/orders/order-123"] = _mock_response(
+            200,
+            {
+                "order": {
+                    "order_id": "order-123",
+                    "ticker": "TEST-01",
+                    "side": "yes",
+                    "status": "canceled",
+                    "yes_price": 50,
+                    "initial_count": 10,
+                    "fill_count": 0,
+                }
+            },
+        )
 
         result = await client.cancel_order("order-123")
         assert result.status == OrderStatus.CANCELLED
@@ -188,9 +201,12 @@ class TestGetBalance:
     async def test_get_balance(self, client_and_transport):
         """Get balance in cents."""
         client, transport = client_and_transport
-        transport._responses["GET /trade-api/v2/portfolio/balance"] = _mock_response(200, {
-            "balance": 50000,
-        })
+        transport._responses["GET /trade-api/v2/portfolio/balance"] = _mock_response(
+            200,
+            {
+                "balance": 50000,
+            },
+        )
 
         balance = await client.get_balance_cents()
         assert balance == 50000
@@ -207,13 +223,16 @@ class TestGetPositions:
     async def test_get_positions(self, client_and_transport):
         """Get positions from single page."""
         client, transport = client_and_transport
-        transport._default = _mock_response(200, {
-            "market_positions": [
-                {"ticker": "KXNFL-26-WIN-KC", "position": 10, "market_exposure": 550},
-                {"ticker": "KXNFL-26-WIN-BUF", "position": -5, "market_exposure": 225},
-            ],
-            "cursor": "",
-        })
+        transport._default = _mock_response(
+            200,
+            {
+                "market_positions": [
+                    {"ticker": "KXNFL-26-WIN-KC", "position": 10, "market_exposure": 550},
+                    {"ticker": "KXNFL-26-WIN-BUF", "position": -5, "market_exposure": 225},
+                ],
+                "cursor": "",
+            },
+        )
 
         positions = await client.get_positions()
 
@@ -236,12 +255,15 @@ class TestGetOrderbook:
     async def test_get_orderbook(self, client_and_transport):
         """Get orderbook with levels."""
         client, transport = client_and_transport
-        transport._default = _mock_response(200, {
-            "orderbook": {
-                "yes": [[50, 100], [55, 200]],
-                "no": [[45, 150], [50, 300]],
-            }
-        })
+        transport._default = _mock_response(
+            200,
+            {
+                "orderbook": {
+                    "yes": [[50, 100], [55, 200]],
+                    "no": [[45, 150], [50, 300]],
+                }
+            },
+        )
 
         ob = await client.get_orderbook("TEST-01")
 
@@ -262,16 +284,19 @@ class TestGetMarketData:
     async def test_get_market_data(self, client_and_transport):
         """Get market data for a contract."""
         client, transport = client_and_transport
-        transport._default = _mock_response(200, {
-            "market": {
-                "ticker": "KXNFL-26-WIN-KC",
-                "last_price": 55,
-                "yes_bid": 54,
-                "yes_ask": 56,
-                "volume": 1000,
-                "open_interest": 500,
-            }
-        })
+        transport._default = _mock_response(
+            200,
+            {
+                "market": {
+                    "ticker": "KXNFL-26-WIN-KC",
+                    "last_price": 55,
+                    "yes_bid": 54,
+                    "yes_ask": 56,
+                    "volume": 1000,
+                    "open_interest": 500,
+                }
+            },
+        )
 
         md = await client.get_market_data("KXNFL-26-WIN-KC")
 
@@ -299,14 +324,20 @@ class TestErrorHandling:
     async def test_400_insufficient_balance(self, client_and_transport):
         """400 with balance message maps to InsufficientBalanceError."""
         client, transport = client_and_transport
-        transport._default = _mock_response(400, {
-            "message": "Insufficient balance to place order",
-            "code": "insufficient_balance",
-        })
+        transport._default = _mock_response(
+            400,
+            {
+                "message": "Insufficient balance to place order",
+                "code": "insufficient_balance",
+            },
+        )
 
         order = Order(
-            order_id="test", contract_id="TEST-01",
-            side=Side.YES, price_cents=50, quantity=1,
+            order_id="test",
+            contract_id="TEST-01",
+            side=Side.YES,
+            price_cents=50,
+            quantity=1,
         )
         with pytest.raises(InsufficientBalanceError):
             await client.place_order(order)
@@ -314,14 +345,20 @@ class TestErrorHandling:
     async def test_400_generic_rejection(self, client_and_transport):
         """400 without balance message maps to OrderRejectedError."""
         client, transport = client_and_transport
-        transport._default = _mock_response(400, {
-            "message": "Invalid order parameters",
-            "code": "bad_request",
-        })
+        transport._default = _mock_response(
+            400,
+            {
+                "message": "Invalid order parameters",
+                "code": "bad_request",
+            },
+        )
 
         order = Order(
-            order_id="test", contract_id="TEST-01",
-            side=Side.YES, price_cents=50, quantity=1,
+            order_id="test",
+            contract_id="TEST-01",
+            side=Side.YES,
+            price_cents=50,
+            quantity=1,
         )
         with pytest.raises(OrderRejectedError):
             await client.place_order(order)
@@ -358,28 +395,38 @@ class TestBatchOperations:
     async def test_batch_place_orders(self, client_and_transport):
         """Batch placement of multiple orders."""
         client, transport = client_and_transport
-        transport._default = _mock_response(200, {
-            "orders": [
-                {
-                    "order": {
-                        "order_id": f"exchange-{i}",
-                        "client_order_id": f"my-{i}",
-                        "ticker": f"C-{i}",
-                        "side": "yes",
-                        "status": "resting",
-                        "yes_price": 50,
-                        "initial_count": 1,
-                        "fill_count": 0,
-                        "taker_fill_cost": 0,
-                        "maker_fill_cost": 0,
+        transport._default = _mock_response(
+            200,
+            {
+                "orders": [
+                    {
+                        "order": {
+                            "order_id": f"exchange-{i}",
+                            "client_order_id": f"my-{i}",
+                            "ticker": f"C-{i}",
+                            "side": "yes",
+                            "status": "resting",
+                            "yes_price": 50,
+                            "initial_count": 1,
+                            "fill_count": 0,
+                            "taker_fill_cost": 0,
+                            "maker_fill_cost": 0,
+                        }
                     }
-                }
-                for i in range(3)
-            ]
-        })
+                    for i in range(3)
+                ]
+            },
+        )
 
         orders = [
-            Order(order_id=f"my-{i}", contract_id=f"C-{i}", side=Side.YES, price_cents=50, quantity=1, strategy="test")
+            Order(
+                order_id=f"my-{i}",
+                contract_id=f"C-{i}",
+                side=Side.YES,
+                price_cents=50,
+                quantity=1,
+                strategy="test",
+            )
             for i in range(3)
         ]
         results = await client.batch_place_orders(orders)
@@ -390,27 +437,30 @@ class TestBatchOperations:
     async def test_batch_with_partial_failure(self, client_and_transport):
         """Batch with one order failing."""
         client, transport = client_and_transport
-        transport._default = _mock_response(200, {
-            "orders": [
-                {
-                    "order": {
-                        "order_id": "exchange-0",
-                        "client_order_id": "my-0",
-                        "ticker": "C-0",
-                        "side": "yes",
-                        "status": "resting",
-                        "yes_price": 50,
-                        "initial_count": 1,
-                        "fill_count": 0,
-                        "taker_fill_cost": 0,
-                        "maker_fill_cost": 0,
-                    }
-                },
-                {
-                    "error": "insufficient_balance",
-                },
-            ]
-        })
+        transport._default = _mock_response(
+            200,
+            {
+                "orders": [
+                    {
+                        "order": {
+                            "order_id": "exchange-0",
+                            "client_order_id": "my-0",
+                            "ticker": "C-0",
+                            "side": "yes",
+                            "status": "resting",
+                            "yes_price": 50,
+                            "initial_count": 1,
+                            "fill_count": 0,
+                            "taker_fill_cost": 0,
+                            "maker_fill_cost": 0,
+                        }
+                    },
+                    {
+                        "error": "insufficient_balance",
+                    },
+                ]
+            },
+        )
 
         orders = [
             Order(order_id="my-0", contract_id="C-0", side=Side.YES, price_cents=50, quantity=1),

@@ -13,7 +13,6 @@ from scipy import stats
 _PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
 
 
-
 def get_benchmark_data() -> pd.DataFrame:
     """
     Compile benchmark data from literature and public sources.

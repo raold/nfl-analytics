@@ -166,8 +166,7 @@ def calculate_priority(
 def get_games_needing_odds(conn: psycopg.Connection) -> list[GameOddsStatus]:
     """Get list of games and their odds coverage status."""
     with conn.cursor() as cur:
-        cur.execute(
-            """
+        cur.execute("""
             SELECT
                 g.game_id,
                 g.odds_api_event_id,
@@ -178,8 +177,7 @@ def get_games_needing_odds(conn: psycopg.Connection) -> list[GameOddsStatus]:
             WHERE g.season >= 2024  -- Focus on current/recent seasons
             AND g.kickoff > NOW() - INTERVAL '7 days'  -- Recent or upcoming games
             ORDER BY g.kickoff
-        """
-        )
+        """)
 
         games = []
         now = dt.datetime.now(dt.UTC)

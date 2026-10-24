@@ -31,9 +31,11 @@ def _build_features(
         pad_to: Minimum total features (pads with extra features).
     """
     features = {}
-    targets = groups if groups is not None else {
-        name: gdef["min_count"] for name, gdef in FEATURE_GROUPS.items()
-    }
+    targets = (
+        groups
+        if groups is not None
+        else {name: gdef["min_count"] for name, gdef in FEATURE_GROUPS.items()}
+    )
 
     for group_name, count in targets.items():
         gdef = FEATURE_GROUPS[group_name]
@@ -208,9 +210,7 @@ class TestZeroRatio:
                 features[key] = 0.0
         result = checker.check_features(features)
         # Should flag base_offensive for low nonzero ratio
-        offensive_status = next(
-            s for s in result.group_statuses if s.name == "base_offensive"
-        )
+        offensive_status = next(s for s in result.group_statuses if s.name == "base_offensive")
         assert not offensive_status.healthy
 
 
@@ -288,16 +288,12 @@ class TestHealthCheckResult:
 
     def test_nonzero_ratio(self):
         """Nonzero ratio calculated correctly."""
-        result = HealthCheckResult(
-            healthy=True, total_features=100, nonzero_features=75
-        )
+        result = HealthCheckResult(healthy=True, total_features=100, nonzero_features=75)
         assert result.nonzero_ratio == pytest.approx(0.75)
 
     def test_nonzero_ratio_empty(self):
         """Zero total features returns 0.0 ratio."""
-        result = HealthCheckResult(
-            healthy=True, total_features=0, nonzero_features=0
-        )
+        result = HealthCheckResult(healthy=True, total_features=0, nonzero_features=0)
         assert result.nonzero_ratio == 0.0
 
     def test_critical_issues_filtered(self):
@@ -305,10 +301,14 @@ class TestHealthCheckResult:
         statuses = [
             FeatureGroupStatus("ok_group", 10, 15, 14, critical=True, healthy=True),
             FeatureGroupStatus("bad_crit", 10, 5, 3, critical=True, healthy=False, issue="missing"),
-            FeatureGroupStatus("bad_noncrit", 10, 5, 3, critical=False, healthy=False, issue="also missing"),
+            FeatureGroupStatus(
+                "bad_noncrit", 10, 5, 3, critical=False, healthy=False, issue="also missing"
+            ),
         ]
         result = HealthCheckResult(
-            healthy=False, total_features=25, nonzero_features=20,
+            healthy=False,
+            total_features=25,
+            nonzero_features=20,
             group_statuses=statuses,
         )
         assert len(result.critical_issues) == 1

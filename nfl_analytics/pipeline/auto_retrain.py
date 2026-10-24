@@ -19,6 +19,7 @@ Usage:
     # Dry run
     python nfl_analytics/pipeline/auto_retrain.py --auto --dry-run
 """
+
 import argparse
 import json
 import logging

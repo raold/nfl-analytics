@@ -203,14 +203,22 @@ class HybridStrategy(TradingStrategy):
         if abs(edge_cents) >= self._config.directional_edge_cents:
             # Large edge -> directional
             signals = self._directional_signal(
-                contract_id, fair_value_cents, edge_cents,
-                market_price_cents, confidence, model_prob, prediction,
+                contract_id,
+                fair_value_cents,
+                edge_cents,
+                market_price_cents,
+                confidence,
+                model_prob,
+                prediction,
             )
             if signals:
                 self._stats["directional_signals"] += len(signals)
                 logger.info(
                     "HYBRID directional: %s edge=%d fv=%.1f mkt=%d",
-                    contract_id, edge_cents, fair_value_cents, market_price_cents,
+                    contract_id,
+                    edge_cents,
+                    fair_value_cents,
+                    market_price_cents,
                 )
             return signals
         else:
@@ -221,9 +229,7 @@ class HybridStrategy(TradingStrategy):
                 self._stats["mm_signals"] += len(signals)
             return signals
 
-    async def on_fill(
-        self, contract_id: str, side: str, price_cents: int, quantity: int
-    ) -> None:
+    async def on_fill(self, contract_id: str, side: str, price_cents: int, quantity: int) -> None:
         """Forward fills to MM for inventory tracking.
 
         Both directional and MM fills update the same inventory, so the
@@ -232,7 +238,9 @@ class HybridStrategy(TradingStrategy):
         await self._mm.on_fill(contract_id, side, price_cents, quantity)
 
         if side == "yes":
-            self._stats["directional_fills" if quantity > self._config.mm_config.quote_size else "mm_fills"] += 1
+            self._stats[
+                "directional_fills" if quantity > self._config.mm_config.quote_size else "mm_fills"
+            ] += 1
         else:
             self._stats["mm_fills"] += 1
 
@@ -367,8 +375,10 @@ class HybridStrategy(TradingStrategy):
             if hasattr(self._model, "feature_extractor"):
                 try:
                     features = self._model.feature_extractor.extract_game_features(
-                        parsed.home_team, parsed.away_team,
-                        parsed.season, self._current_week,
+                        parsed.home_team,
+                        parsed.away_team,
+                        parsed.season,
+                        self._current_week,
                     )
                 except Exception:
                     pass
@@ -393,9 +403,7 @@ class HybridStrategy(TradingStrategy):
             logger.exception("Prediction failed for %s@%s", parsed.away_team, parsed.home_team)
             return None
 
-    def _contract_probability(
-        self, parsed: ParsedContract, pred: GamePrediction
-    ) -> float | None:
+    def _contract_probability(self, parsed: ParsedContract, pred: GamePrediction) -> float | None:
         """Convert model prediction to probability for this contract type."""
         if parsed.contract_type == "win":
             return pred.home_win_probability
@@ -405,11 +413,13 @@ class HybridStrategy(TradingStrategy):
                 return None
             from scipy.stats import norm
 
-            prob = float(norm.cdf(
-                pred.home_spread + parsed.line,
-                loc=0,
-                scale=pred.spread_std,
-            ))
+            prob = float(
+                norm.cdf(
+                    pred.home_spread + parsed.line,
+                    loc=0,
+                    scale=pred.spread_std,
+                )
+            )
             return max(0.01, min(0.99, prob))
 
         if parsed.contract_type == "total":
@@ -417,18 +427,18 @@ class HybridStrategy(TradingStrategy):
                 return None
             from scipy.stats import norm
 
-            prob = 1.0 - float(norm.cdf(
-                parsed.line,
-                loc=pred.total_points,
-                scale=pred.total_std,
-            ))
+            prob = 1.0 - float(
+                norm.cdf(
+                    parsed.line,
+                    loc=pred.total_points,
+                    scale=pred.total_std,
+                )
+            )
             return max(0.01, min(0.99, prob))
 
         return None
 
-    def _get_market_price(
-        self, market_data: MarketData, orderbook: OrderBook | None
-    ) -> int | None:
+    def _get_market_price(self, market_data: MarketData, orderbook: OrderBook | None) -> int | None:
         """Extract market price from order book mid or last trade."""
         if orderbook is not None and orderbook.mid_price_cents is not None:
             return int(orderbook.mid_price_cents)
@@ -438,9 +448,7 @@ class HybridStrategy(TradingStrategy):
             return market_data.yes_ask_cents
         return None
 
-    def _compute_meta_prob(
-        self, pred: GamePrediction | None, market_price_cents: int
-    ) -> float:
+    def _compute_meta_prob(self, pred: GamePrediction | None, market_price_cents: int) -> float:
         """Run meta-labeling classifier."""
         if self._meta_classifier is None or pred is None:
             return 1.0
@@ -460,9 +468,7 @@ class HybridStrategy(TradingStrategy):
         except Exception:
             return 1.0
 
-    def _compute_quantity(
-        self, model_prob: float, price_cents: int, meta_prob: float
-    ) -> int:
+    def _compute_quantity(self, model_prob: float, price_cents: int, meta_prob: float) -> int:
         """Kelly-optimal position size for directional signals."""
         if price_cents <= 0 or price_cents >= 100:
             return 0

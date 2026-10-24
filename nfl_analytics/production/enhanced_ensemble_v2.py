@@ -14,7 +14,10 @@ import logging
 import pandas as pd
 from nfl_analytics.ensemble.stacked_meta_learner import StackedMetaLearner
 
-from nfl_analytics.optimization.portfolio_optimizer import BetOpportunity, CorrelatedPortfolioOptimizer
+from nfl_analytics.optimization.portfolio_optimizer import (
+    BetOpportunity,
+    CorrelatedPortfolioOptimizer,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

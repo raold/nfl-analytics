@@ -187,52 +187,60 @@ class Reconciler:
 
             if local and not exchange:
                 # We think we have a position, exchange says no
-                report.discrepancies.append(Discrepancy(
-                    category="position",
-                    contract_id=contract_id,
-                    description="Phantom position — local has position, exchange does not",
-                    local_value=f"{local.side.value} {local.quantity}",
-                    exchange_value="none",
-                    severity="critical",
-                    auto_fixable=True,
-                ))
+                report.discrepancies.append(
+                    Discrepancy(
+                        category="position",
+                        contract_id=contract_id,
+                        description="Phantom position — local has position, exchange does not",
+                        local_value=f"{local.side.value} {local.quantity}",
+                        exchange_value="none",
+                        severity="critical",
+                        auto_fixable=True,
+                    )
+                )
 
             elif exchange and not local:
                 # Exchange has a position we don't know about
-                report.discrepancies.append(Discrepancy(
-                    category="position",
-                    contract_id=contract_id,
-                    description="Missing position — exchange has position, local does not",
-                    local_value="none",
-                    exchange_value=f"{exchange.side.value} {exchange.quantity}",
-                    severity="critical",
-                    auto_fixable=True,
-                ))
+                report.discrepancies.append(
+                    Discrepancy(
+                        category="position",
+                        contract_id=contract_id,
+                        description="Missing position — exchange has position, local does not",
+                        local_value="none",
+                        exchange_value=f"{exchange.side.value} {exchange.quantity}",
+                        severity="critical",
+                        auto_fixable=True,
+                    )
+                )
 
             elif local and exchange:
                 # Both have position — check quantity and side
                 if local.side != exchange.side:
-                    report.discrepancies.append(Discrepancy(
-                        category="position",
-                        contract_id=contract_id,
-                        description="Side mismatch",
-                        local_value=local.side.value,
-                        exchange_value=exchange.side.value,
-                        severity="critical",
-                        auto_fixable=True,
-                    ))
+                    report.discrepancies.append(
+                        Discrepancy(
+                            category="position",
+                            contract_id=contract_id,
+                            description="Side mismatch",
+                            local_value=local.side.value,
+                            exchange_value=exchange.side.value,
+                            severity="critical",
+                            auto_fixable=True,
+                        )
+                    )
                 elif local.quantity != exchange.quantity:
                     diff = abs(local.quantity - exchange.quantity)
                     severity = "critical" if diff > 5 else "warning"
-                    report.discrepancies.append(Discrepancy(
-                        category="position",
-                        contract_id=contract_id,
-                        description=f"Quantity mismatch (off by {diff})",
-                        local_value=str(local.quantity),
-                        exchange_value=str(exchange.quantity),
-                        severity=severity,
-                        auto_fixable=True,
-                    ))
+                    report.discrepancies.append(
+                        Discrepancy(
+                            category="position",
+                            contract_id=contract_id,
+                            description=f"Quantity mismatch (off by {diff})",
+                            local_value=str(local.quantity),
+                            exchange_value=str(exchange.quantity),
+                            severity=severity,
+                            auto_fixable=True,
+                        )
+                    )
 
     # -------------------------------------------------------------------
     # Balance reconciliation
@@ -247,15 +255,17 @@ class Reconciler:
 
         if diff > self._balance_tolerance:
             severity = "critical" if diff > 1000 else "warning"  # >$10 is critical
-            report.discrepancies.append(Discrepancy(
-                category="balance",
-                contract_id="",
-                description=f"Balance mismatch (off by {diff}¢ = ${diff/100:.2f})",
-                local_value=f"{self._local_balance}¢",
-                exchange_value=f"{exchange_balance}¢",
-                severity=severity,
-                auto_fixable=True,
-            ))
+            report.discrepancies.append(
+                Discrepancy(
+                    category="balance",
+                    contract_id="",
+                    description=f"Balance mismatch (off by {diff}¢ = ${diff/100:.2f})",
+                    local_value=f"{self._local_balance}¢",
+                    exchange_value=f"{exchange_balance}¢",
+                    severity=severity,
+                    auto_fixable=True,
+                )
+            )
 
     # -------------------------------------------------------------------
     # Fill reconciliation
@@ -274,12 +284,14 @@ class Reconciler:
                 missing += 1
 
         if missing > 0:
-            report.discrepancies.append(Discrepancy(
-                category="fill",
-                contract_id="",
-                description=f"Missing {missing} fills from local records",
-                local_value=str(len(self._local_fills)),
-                exchange_value=str(len(exchange_fills)),
-                severity="warning" if missing <= 3 else "critical",
-                auto_fixable=False,
-            ))
+            report.discrepancies.append(
+                Discrepancy(
+                    category="fill",
+                    contract_id="",
+                    description=f"Missing {missing} fills from local records",
+                    local_value=str(len(self._local_fills)),
+                    exchange_value=str(len(exchange_fills)),
+                    severity="warning" if missing <= 3 else "critical",
+                    auto_fixable=False,
+                )
+            )

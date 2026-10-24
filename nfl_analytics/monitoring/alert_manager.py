@@ -122,13 +122,18 @@ class AlertManager:
         msg = f"{side} {quantity}x {contract_id} @{price_cents}¢"
         if pnl_cents:
             msg += f" (P&L: {pnl_cents}¢)"
-        return self.alert(AlertLevel.INFO, "Fill", msg, {
-            "contract_id": contract_id,
-            "side": side,
-            "price_cents": price_cents,
-            "quantity": quantity,
-            "pnl_cents": pnl_cents,
-        })
+        return self.alert(
+            AlertLevel.INFO,
+            "Fill",
+            msg,
+            {
+                "contract_id": contract_id,
+                "side": side,
+                "price_cents": price_cents,
+                "quantity": quantity,
+                "pnl_cents": pnl_cents,
+            },
+        )
 
     def alert_risk_breach(
         self,

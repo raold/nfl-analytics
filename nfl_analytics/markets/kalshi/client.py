@@ -219,10 +219,17 @@ class KalshiClient(MarketClient):
             except httpx.ConnectError as e:
                 if attempt < self._config.max_retries:
                     backoff = self._backoff_ms(attempt)
-                    logger.warning("Connection error (attempt %d), retrying in %dms: %s", attempt + 1, backoff, e)
+                    logger.warning(
+                        "Connection error (attempt %d), retrying in %dms: %s",
+                        attempt + 1,
+                        backoff,
+                        e,
+                    )
                     await asyncio.sleep(backoff / 1000)
                     continue
-                raise MarketConnectionError(f"Failed to connect after {self._config.max_retries + 1} attempts: {e}") from e
+                raise MarketConnectionError(
+                    f"Failed to connect after {self._config.max_retries + 1} attempts: {e}"
+                ) from e
             except httpx.TimeoutException as e:
                 if attempt < self._config.max_retries:
                     backoff = self._backoff_ms(attempt)
@@ -235,7 +242,9 @@ class KalshiClient(MarketClient):
             if response.status_code == 429:
                 if attempt < self._config.max_retries:
                     backoff = self._backoff_ms(attempt, base_ms=500)
-                    logger.warning("Rate limited (attempt %d), backing off %dms", attempt + 1, backoff)
+                    logger.warning(
+                        "Rate limited (attempt %d), backing off %dms", attempt + 1, backoff
+                    )
                     await asyncio.sleep(backoff / 1000)
                     continue
                 raise RateLimitError(retry_after_ms=1000)
@@ -243,7 +252,12 @@ class KalshiClient(MarketClient):
             if response.status_code >= 500:
                 if attempt < self._config.max_retries:
                     backoff = self._backoff_ms(attempt)
-                    logger.warning("Server error %d (attempt %d), retrying in %dms", response.status_code, attempt + 1, backoff)
+                    logger.warning(
+                        "Server error %d (attempt %d), retrying in %dms",
+                        response.status_code,
+                        attempt + 1,
+                        backoff,
+                    )
                     await asyncio.sleep(backoff / 1000)
                     continue
                 raise MarketError(f"Server error {response.status_code}: {response.text}")
@@ -270,8 +284,9 @@ class KalshiClient(MarketClient):
     def _backoff_ms(self, attempt: int, base_ms: int | None = None) -> int:
         """Exponential backoff with jitter."""
         import random
+
         base = base_ms or self._config.initial_backoff_ms
-        delay = base * (2 ** attempt)
+        delay = base * (2**attempt)
         jitter = random.randint(0, delay // 2)
         return delay + jitter
 
@@ -408,7 +423,9 @@ class KalshiClient(MarketClient):
             self._order_strategies[o.order_id] = o.strategy
 
         body = build_batch_create_body(orders)
-        data = await self._request("POST", "/portfolio/orders/batched", json_body=body, is_write=True)
+        data = await self._request(
+            "POST", "/portfolio/orders/batched", json_body=body, is_write=True
+        )
 
         results = []
         for i, item in enumerate(data.get("orders", [])):
@@ -446,10 +463,14 @@ class KalshiClient(MarketClient):
         for i in range(0, len(order_ids), MAX_BATCH_SIZE):
             chunk = order_ids[i : i + MAX_BATCH_SIZE]
             body = build_batch_cancel_body(chunk)
-            await self._request("DELETE", "/portfolio/orders/batched", json_body=body, is_write=True)
+            await self._request(
+                "DELETE", "/portfolio/orders/batched", json_body=body, is_write=True
+            )
             cancelled += len(chunk)
 
-        logger.info("Cancelled %d orders%s", cancelled, f" for {contract_id}" if contract_id else "")
+        logger.info(
+            "Cancelled %d orders%s", cancelled, f" for {contract_id}" if contract_id else ""
+        )
         return cancelled
 
     # -------------------------------------------------------------------

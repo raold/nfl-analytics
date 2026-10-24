@@ -6,12 +6,15 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from nfl_analytics.agents.trading_validator import TradingValidator, ValidationResult, ValidatorConfig
+from nfl_analytics.agents.trading_validator import (
+    TradingValidator,
+    ValidationResult,
+    ValidatorConfig,
+)
 from nfl_analytics.markets.base import Side
 from nfl_analytics.risk.feature_health import FEATURE_GROUPS, HealthCheckResult
 from nfl_analytics.risk.risk_manager import RiskManager
 from nfl_analytics.trading.signal import Signal
-
 
 # ============================================================
 # Helpers
@@ -238,9 +241,9 @@ class TestBatchValidation:
         """Batch with valid and invalid signals."""
         validator = TradingValidator()
         signals = [
-            _signal(edge_cents=5),         # Valid
-            _signal(edge_cents=35),        # Too large edge
-            _signal(contract_id="BAD-01"), # Unknown prefix
+            _signal(edge_cents=5),  # Valid
+            _signal(edge_cents=35),  # Too large edge
+            _signal(contract_id="BAD-01"),  # Unknown prefix
         ]
         results = validator.validate_batch(signals)
         assert len(results) == 3
@@ -276,7 +279,7 @@ class TestSummary:
     def test_summary_counts(self):
         """Summary reflects validation outcomes."""
         validator = TradingValidator()
-        validator.validate(_signal(edge_cents=5))   # Approved
+        validator.validate(_signal(edge_cents=5))  # Approved
         validator.validate(_signal(edge_cents=35))  # Blocked
         validator.validate(_signal(edge_cents=25))  # Approved with warning
         s = validator.summary()

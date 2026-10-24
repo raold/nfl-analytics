@@ -415,13 +415,11 @@ class AsofFeatureExtractor:
 
         try:
             cur = self.conn.cursor()
-            cur.execute(
-                """
+            cur.execute("""
                 SELECT column_name
                 FROM information_schema.columns
                 WHERE table_name = 'games'
-            """
-            )
+            """)
             existing_cols = {r[0] for r in cur.fetchall()}
             self._v2_columns_available = all(
                 col in existing_cols for col in self.V2_OPTIONAL_COLUMNS

@@ -3,6 +3,7 @@
 Generate RL vs baseline comparison table for Chapter 5 with reasonable estimates.
 Based on typical performance differences observed in sports betting RL research.
 """
+
 import argparse
 from pathlib import Path
 

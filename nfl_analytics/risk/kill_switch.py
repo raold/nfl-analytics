@@ -120,9 +120,8 @@ class KillSwitch:
         if self._day_start_equity_cents == 0:
             return 0.0
         return (
-            (self._current_equity_cents - self._day_start_equity_cents)
-            / self._day_start_equity_cents
-        )
+            self._current_equity_cents - self._day_start_equity_cents
+        ) / self._day_start_equity_cents
 
     @property
     def drawdown_pct(self) -> float:
@@ -180,9 +179,7 @@ class KillSwitch:
 
         return None
 
-    def record_error(
-        self, positions_open: int = 0, orders_open: int = 0
-    ) -> KillSwitchEvent | None:
+    def record_error(self, positions_open: int = 0, orders_open: int = 0) -> KillSwitchEvent | None:
         """Record an API/exchange error. Triggers after N consecutive errors."""
         self._consecutive_errors += 1
 

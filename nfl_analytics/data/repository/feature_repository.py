@@ -39,7 +39,9 @@ class FeatureRepository(BaseRepository):
         }
 
         if feature_set not in view_map:
-            raise ValueError(f"Unknown feature_set '{feature_set}'. Must be one of: {list(view_map.keys())}")
+            raise ValueError(
+                f"Unknown feature_set '{feature_set}'. Must be one of: {list(view_map.keys())}"
+            )
 
         view = view_map[feature_set]
         schema, table = view.split(".")
@@ -100,9 +102,11 @@ class FeatureRepository(BaseRepository):
 
         for view in views:
             schema, table = view.split(".")
-            self.execute(sql.SQL("REFRESH MATERIALIZED VIEW CONCURRENTLY {}.{}").format(
-                sql.Identifier(schema), sql.Identifier(table)
-            ))
+            self.execute(
+                sql.SQL("REFRESH MATERIALIZED VIEW CONCURRENTLY {}.{}").format(
+                    sql.Identifier(schema), sql.Identifier(table)
+                )
+            )
 
         # Clear all feature caches
         self.clear_cache()

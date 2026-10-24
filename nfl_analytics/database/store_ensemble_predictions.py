@@ -56,13 +56,11 @@ MODEL_COLUMN_MAPPING = {
 
 def load_model_registry(cursor) -> dict[str, int]:
     """Load model registry and return mapping of model_name -> model_id."""
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT model_id, model_name, model_type, status
         FROM ml.model_registry
         WHERE status IN ('production', 'staging')
-    """
-    )
+    """)
 
     registry = {}
     for row in cursor.fetchall():
@@ -273,8 +271,7 @@ def verify_storage(cursor):
     print(f"\nTotal predictions: {total_count:,}")
 
     # Count by model
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT
             mr.model_name,
             mr.model_type,
@@ -288,8 +285,7 @@ def verify_storage(cursor):
         JOIN ml.model_registry mr ON p.model_id = mr.model_id
         GROUP BY mr.model_id, mr.model_name, mr.model_type
         ORDER BY count DESC
-    """
-    )
+    """)
 
     print("\nPredictions by Model:")
     print(
@@ -309,8 +305,7 @@ def verify_storage(cursor):
         )
 
     # Count by season
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT
             season,
             COUNT(*) as count,
@@ -322,8 +317,7 @@ def verify_storage(cursor):
         WHERE actual_value IS NOT NULL
         GROUP BY season
         ORDER BY season
-    """
-    )
+    """)
 
     print("\nPredictions by Season:")
     print(f"{'Season':8s} {'Count':8s} {'MAE':8s} {'W-L':10s} {'PnL':12s}")
@@ -337,8 +331,7 @@ def verify_storage(cursor):
         print(f"{row['season']:8d} {row['count']:8,} {mae_str:8s} {wl_str:10s} {pnl_str:12s}")
 
     # Sample predictions
-    cursor.execute(
-        """
+    cursor.execute("""
         SELECT
             p.*,
             mr.model_name
@@ -346,8 +339,7 @@ def verify_storage(cursor):
         JOIN ml.model_registry mr ON p.model_id = mr.model_id
         ORDER BY p.prediction_id
         LIMIT 5
-    """
-    )
+    """)
 
     print("\nSample Predictions (first 5 rows):")
     print(

@@ -101,8 +101,7 @@ class PerformanceTracker:
 
     def _init_performance_tables(self):
         """Initialize performance tracking tables."""
-        self.conn.executescript(
-            """
+        self.conn.executescript("""
             -- Model performance history
             CREATE TABLE IF NOT EXISTS model_performance (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -206,8 +205,7 @@ class PerformanceTracker:
                 timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 PRIMARY KEY (model_a, model_b, metric_name)
             );
-        """
-        )
+        """)
         self.conn.commit()
 
     def record_performance(
@@ -966,8 +964,7 @@ class PerformanceTracker:
         summary = {}
 
         # Get best performers
-        cursor = self.conn.execute(
-            """
+        cursor = self.conn.execute("""
             SELECT
                 model_id,
                 json_extract(metrics, '$.accuracy') as accuracy,
@@ -978,8 +975,7 @@ class PerformanceTracker:
             WHERE is_baseline = 0
             ORDER BY timestamp DESC
             LIMIT 50
-        """
-        )
+        """)
 
         models = {}
         for row in cursor:
@@ -1006,13 +1002,11 @@ class PerformanceTracker:
         summary["trends"] = trends
 
         # Get recent milestones
-        cursor = self.conn.execute(
-            """
+        cursor = self.conn.execute("""
             SELECT * FROM performance_milestones
             ORDER BY timestamp DESC
             LIMIT 10
-        """
-        )
+        """)
 
         milestones = []
         for row in cursor:
@@ -1026,16 +1020,14 @@ class PerformanceTracker:
         summary["recent_milestones"] = milestones
 
         # Get recent statistical comparisons
-        cursor = self.conn.execute(
-            """
+        cursor = self.conn.execute("""
             SELECT comparison_name, baseline_model, treatment_model,
                    effect_size, p_value, is_significant, practical_significance,
                    interpretation, performed_at
             FROM statistical_comparisons
             ORDER BY performed_at DESC
             LIMIT 10
-        """
-        )
+        """)
 
         comparisons = []
         for row in cursor:
@@ -1055,15 +1047,13 @@ class PerformanceTracker:
         summary["recent_comparisons"] = comparisons
 
         # Get regression alerts
-        cursor = self.conn.execute(
-            """
+        cursor = self.conn.execute("""
             SELECT model_id, p_value, is_regression, performed_at
             FROM regression_tests
             WHERE is_regression = 1
             ORDER BY performed_at DESC
             LIMIT 5
-        """
-        )
+        """)
 
         regressions = []
         for row in cursor:
@@ -1089,12 +1079,10 @@ class PerformanceTracker:
         }
 
         # Get all active models
-        cursor = self.conn.execute(
-            """
+        cursor = self.conn.execute("""
             SELECT DISTINCT model_id FROM model_performance
             WHERE timestamp > datetime('now', '-7 days')
-        """
-        )
+        """)
 
         active_models = [row["model_id"] for row in cursor]
 

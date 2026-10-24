@@ -13,6 +13,7 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 
 import logging
 import subprocess
+
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 logger = logging.getLogger(__name__)
 

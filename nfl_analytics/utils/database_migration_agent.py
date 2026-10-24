@@ -408,8 +408,7 @@ class DatabaseMigrationAgent:
             cursor.execute("CREATE SCHEMA IF NOT EXISTS admin;")
 
             # Create migration tracking table
-            cursor.execute(
-                """
+            cursor.execute("""
                 CREATE TABLE IF NOT EXISTS admin.migration_history (
                     migration_id        SERIAL PRIMARY KEY,
                     migration_file      TEXT NOT NULL UNIQUE,
@@ -421,16 +420,13 @@ class DatabaseMigrationAgent:
                     error_message       TEXT,
                     rollback_sql        TEXT
                 );
-            """
-            )
+            """)
 
             # Create index on applied_at
-            cursor.execute(
-                """
+            cursor.execute("""
                 CREATE INDEX IF NOT EXISTS idx_migration_history_applied_at
                 ON admin.migration_history(applied_at DESC);
-            """
-            )
+            """)
 
             cursor.close()
             logger.info("Migration tracking table ensured: admin.migration_history")
@@ -469,12 +465,10 @@ class DatabaseMigrationAgent:
         """Get list of applied migrations."""
         conn = self._get_connection()
         cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT * FROM admin.migration_history
             ORDER BY applied_at DESC;
-        """
-        )
+        """)
         migrations = cursor.fetchall()
         cursor.close()
         return migrations

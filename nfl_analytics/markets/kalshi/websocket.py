@@ -193,9 +193,7 @@ class KalshiWebSocket:
 
     async def connect(self) -> None:
         """Connect to the Kalshi WebSocket with RSA auth."""
-        headers = self._auth.sign_websocket(
-            ws_path="/trade-api/ws/v2"
-        )
+        headers = self._auth.sign_websocket(ws_path="/trade-api/ws/v2")
 
         self._ws = await websockets.asyncio.client.connect(
             self._ws_url,
@@ -251,7 +249,12 @@ class KalshiWebSocket:
             if self.on_disconnect:
                 self.on_disconnect()
 
-            logger.info("Reconnecting in %.1fs (attempt %d/%d)", self._reconnect_delay, reconnect_count, self._max_reconnects)
+            logger.info(
+                "Reconnecting in %.1fs (attempt %d/%d)",
+                self._reconnect_delay,
+                reconnect_count,
+                self._max_reconnects,
+            )
             await asyncio.sleep(self._reconnect_delay)
 
     # -------------------------------------------------------------------

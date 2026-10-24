@@ -17,7 +17,6 @@ from nfl_analytics.monitoring.alert_manager import AlertLevel, AlertManager
 from nfl_analytics.monitoring.pnl_tracker import PnLTracker
 from nfl_analytics.risk.drawdown_monitor import DrawdownMonitor
 
-
 # ============================================================
 # Helpers
 # ============================================================
@@ -122,7 +121,7 @@ class TestDailyLoss:
         pnl = _tracker(100_000)
         # Simulate loss: buy high, close low
         pnl.record_fill("KXNFL-KC", Side.YES, 80, 50)  # Buy 50@80
-        pnl.record_fill("KXNFL-KC", Side.NO, 60, 50)    # Close at 60 → -1000¢
+        pnl.record_fill("KXNFL-KC", Side.NO, 60, 50)  # Close at 60 → -1000¢
 
         config = MonitorConfig(max_daily_loss_pct=0.005)  # Very low threshold
         monitor = PortfolioMonitor(pnl_tracker=pnl, config=config)
@@ -265,23 +264,39 @@ class TestReportProperties:
 
     def test_has_critical_true(self):
         """has_critical is True when critical alert exists."""
-        report = HealthReport(alerts=[
-            HealthAlert(level="critical", category="test", message="msg", value=0.2, threshold=0.15),
-        ])
+        report = HealthReport(
+            alerts=[
+                HealthAlert(
+                    level="critical", category="test", message="msg", value=0.2, threshold=0.15
+                ),
+            ]
+        )
         assert report.has_critical
 
     def test_has_critical_false(self):
         """has_critical is False when only warnings."""
-        report = HealthReport(alerts=[
-            HealthAlert(level="warning", category="test", message="msg", value=0.06, threshold=0.05),
-        ])
+        report = HealthReport(
+            alerts=[
+                HealthAlert(
+                    level="warning", category="test", message="msg", value=0.06, threshold=0.05
+                ),
+            ]
+        )
         assert not report.has_critical
 
     def test_summary_string(self):
         """Report summary includes alert details."""
-        report = HealthReport(alerts=[
-            HealthAlert(level="warning", category="drawdown", message="5% DD", value=0.05, threshold=0.05),
-        ])
+        report = HealthReport(
+            alerts=[
+                HealthAlert(
+                    level="warning",
+                    category="drawdown",
+                    message="5% DD",
+                    value=0.05,
+                    threshold=0.05,
+                ),
+            ]
+        )
         summary = report.summary()
         assert "WARNING" in summary
         assert "drawdown" in summary

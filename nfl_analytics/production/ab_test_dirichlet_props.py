@@ -367,8 +367,7 @@ class DirichletABTestRouter:
         cursor = conn.cursor(cursor_factory=RealDictCursor)
 
         try:
-            cursor.execute(
-                """
+            cursor.execute("""
                 SELECT
                     ab_group,
                     model_version,
@@ -382,8 +381,7 @@ class DirichletABTestRouter:
                 FROM ml.ab_test_results
                 WHERE model_version IN ('v6.0', 'v6.1')
                 GROUP BY ab_group, model_version
-                """
-            )
+                """)
             rows = cursor.fetchall()
 
             summary = {

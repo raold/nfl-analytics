@@ -214,8 +214,7 @@ def main():
     if not args.results.exists():
         print(f"ERROR: Results file not found: {args.results}")
         print("\nExpected JSON format:")
-        print(
-            """
+        print("""
 {
   "experiments": [
     {
@@ -235,8 +234,7 @@ OR
   },
   ...
 ]
-        """
-        )
+        """)
         return 1
 
     # Generate plot

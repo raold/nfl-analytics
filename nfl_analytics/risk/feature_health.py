@@ -157,9 +157,7 @@ class HealthCheckResult:
 
     @property
     def critical_issues(self) -> list[str]:
-        return [
-            s.issue for s in self.group_statuses if not s.healthy and s.critical
-        ]
+        return [s.issue for s in self.group_statuses if not s.healthy and s.critical]
 
     def summary(self) -> str:
         status = "HEALTHY" if self.healthy else "DEGRADED"
@@ -218,9 +216,7 @@ class FeatureHealthChecker:
 
         # Check total feature count
         if total < self.config.min_total_features:
-            issues.append(
-                f"Low feature count: {total} < {self.config.min_total_features}"
-            )
+            issues.append(f"Low feature count: {total} < {self.config.min_total_features}")
 
         # Check overall zero ratio (the compression detector)
         zero_ratio = 1.0 - (nonzero / total if total > 0 else 0)

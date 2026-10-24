@@ -209,9 +209,7 @@ class MethodologyDocumenter:
         """Load methodology section templates."""
         templates = {}
 
-        templates[
-            "study_design"
-        ] = """
+        templates["study_design"] = """
         ## Study Design
 
         This {design_type} study was conducted to {study_objective}.
@@ -224,9 +222,7 @@ class MethodologyDocumenter:
         {power_analysis_description}
         """
 
-        templates[
-            "statistical_methods"
-        ] = """
+        templates["statistical_methods"] = """
         ## Statistical Analysis
 
         All statistical analyses were performed using {software} version {version}.
@@ -251,9 +247,7 @@ class MethodologyDocumenter:
         {assumptions_description}
         """
 
-        templates[
-            "reproducibility"
-        ] = """
+        templates["reproducibility"] = """
         ## Reproducibility and Data Availability
 
         {reproducibility_statement}

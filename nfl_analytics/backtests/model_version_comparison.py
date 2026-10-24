@@ -167,12 +167,10 @@ class ModelVersionComparison:
             pandas2ri.activate()
 
             # Load R model
-            ro.r(
-                """
+            ro.r("""
             library(brms)
             model <- readRDS("models/bayesian/passing_informative_priors_v1.rds")
-            """
-            )
+            """)
 
             logger.info("✓ Loaded v2.5 informative priors model")
 

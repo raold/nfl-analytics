@@ -405,8 +405,8 @@ def main():
     engine = VegasLineBiasEngine()
 
     # Generate ALL features for 2020-2025 seasons
-    (team_line_performance, market_efficiency, key_number_performance) = (
-        engine.generate_all_features(start_season=2020, end_season=2025)
+    team_line_performance, market_efficiency, key_number_performance = engine.generate_all_features(
+        start_season=2020, end_season=2025
     )
 
     # Display sample statistics

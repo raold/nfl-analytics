@@ -216,7 +216,9 @@ def main():
         print("=" * 60)
         print("\nInfrastructure is ready for production use!")
         print("\nNext steps:")
-        print("  1. Start worker: python nfl_analytics/compute/worker_enhanced.py --worker-id macbook_m4")
+        print(
+            "  1. Start worker: python nfl_analytics/compute/worker_enhanced.py --worker-id macbook_m4"
+        )
         print(
             "  2. Submit sweep: python nfl_analytics/compute/submit_sweep.py --model test --param epochs 10 20 30"
         )

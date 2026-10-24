@@ -227,7 +227,6 @@ class DependencyChecker:
             ("scikit-learn", "sklearn"),
             ("scipy", "scipy"),
             ("torch", "torch"),
-
         ]
 
         for package_name, import_name in optional_packages:

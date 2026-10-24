@@ -266,8 +266,7 @@ class AdaptiveScheduler:
 
     def _init_bandit_tables(self):
         """Initialize bandit-related database tables."""
-        self.queue.conn.executescript(
-            """
+        self.queue.conn.executescript("""
             -- Bandit arms tracking
             CREATE TABLE IF NOT EXISTS bandit_arms (
                 arm_id TEXT PRIMARY KEY,
@@ -306,8 +305,7 @@ class AdaptiveScheduler:
                 total_pulls INTEGER DEFAULT 0,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
-        """
-        )
+        """)
         self.queue.conn.commit()
 
     def _load_bandit_state(self):
@@ -339,11 +337,9 @@ class AdaptiveScheduler:
             self.bandit.arms[arm.arm_id] = arm
 
         # Load total pulls
-        cursor = self.queue.conn.execute(
-            """
+        cursor = self.queue.conn.execute("""
             SELECT SUM(n_pulls) as total FROM bandit_arms
-        """
-        )
+        """)
         row = cursor.fetchone()
         self.bandit.total_pulls = row["total"] if row and row["total"] else 0
 
@@ -443,8 +439,7 @@ class AdaptiveScheduler:
 
         # Log selection reasoning
         hardware_score = selected_task.get("hardware_score", 0.5)
-        logger.info(
-            f"""
+        logger.info(f"""
         Hardware-Aware Bandit Selection ({self.bandit_strategy.value}):
           Task: {selected_task['name']}
           Arm ID: {selected_arm.arm_id}
@@ -452,8 +447,7 @@ class AdaptiveScheduler:
           Hardware Score: {hardware_score:.3f}
           Pulls: {selected_arm.n_pulls}
           Total Pulls: {self.bandit.total_pulls}
-        """
-        )
+        """)
 
         # Mark task as running with machine identification
         self.queue.conn.execute(
@@ -680,14 +674,12 @@ class AdaptiveScheduler:
             Comparison results
         """
         # Get historical task/reward data for simulation
-        cursor = self.queue.conn.execute(
-            """
+        cursor = self.queue.conn.execute("""
             SELECT bp.arm_id, bp.reward
             FROM bandit_pulls bp
             ORDER BY bp.pulled_at DESC
             LIMIT 500
-        """
-        )
+        """)
 
         historical_data = {}
         for row in cursor:
@@ -922,11 +914,9 @@ class AdaptiveScheduler:
         logger.info("Rebalancing task queue based on performance...")
 
         # Get all pending tasks
-        cursor = self.queue.conn.execute(
-            """
+        cursor = self.queue.conn.execute("""
             SELECT * FROM tasks WHERE status = 'pending'
-        """
-        )
+        """)
 
         updates = []
         for row in cursor:
@@ -961,12 +951,10 @@ class AdaptiveScheduler:
         suggestions = []
 
         # Get performance trends
-        cursor = self.tracker.conn.execute(
-            """
+        cursor = self.tracker.conn.execute("""
             SELECT * FROM performance_trends
             WHERE trend_direction = 'improving'
-        """
-        )
+        """)
 
         improving_models = []
         for row in cursor:
@@ -1010,13 +998,11 @@ class AdaptiveScheduler:
                     )
 
         # Check for plateauing models that need new approaches
-        cursor = self.tracker.conn.execute(
-            """
+        cursor = self.tracker.conn.execute("""
             SELECT * FROM performance_trends
             WHERE trend_direction = 'plateau'
             AND diminishing_returns_point < 50
-        """
-        )
+        """)
 
         for row in cursor:
             if row["model_type"] == "glm":
@@ -1038,8 +1024,7 @@ class AdaptiveScheduler:
         report = {}
 
         # Calculate compute hours by task type
-        cursor = self.queue.conn.execute(
-            """
+        cursor = self.queue.conn.execute("""
             SELECT
                 type as task_type,
                 SUM(cpu_hours + gpu_hours) as total_hours,
@@ -1048,8 +1033,7 @@ class AdaptiveScheduler:
             FROM tasks
             WHERE status = 'completed'
             GROUP BY type
-        """
-        )
+        """)
 
         allocation = {}
         total_compute = 0

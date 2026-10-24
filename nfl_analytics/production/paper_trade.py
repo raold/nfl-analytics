@@ -113,9 +113,13 @@ def recommend_bets(week: int, season: int = 2025):
     print("\nNext steps:")
     print(f"1. Review recommendations in {output_path}")
     print("2. For each bet you want to place, run:")
-    print("   python nfl_analytics/production/paper_trade.py log --game-id <game> --bet-type <type> ...")
+    print(
+        "   python nfl_analytics/production/paper_trade.py log --game-id <game> --bet-type <type> ..."
+    )
     print("3. After games finish, update results with:")
-    print("   python nfl_analytics/production/paper_trade.py update --bet-id <id> --result <win/loss> ...")
+    print(
+        "   python nfl_analytics/production/paper_trade.py update --bet-id <id> --result <win/loss> ..."
+    )
 
 
 def log_bet(args: argparse.Namespace):

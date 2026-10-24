@@ -28,8 +28,18 @@ DATA = Path(__file__).resolve().parents[2] / "data" / "historical_weather_2018_2
 def games() -> pd.DataFrame:
     if not DATA.exists():
         pytest.skip(f"{DATA} not available")
-    df = pd.read_csv(DATA, usecols=["game_id", "season", "home_team", "away_team",
-                                    "home_score", "away_score", "spread_close"])
+    df = pd.read_csv(
+        DATA,
+        usecols=[
+            "game_id",
+            "season",
+            "home_team",
+            "away_team",
+            "home_score",
+            "away_score",
+            "spread_close",
+        ],
+    )
     df = df.dropna().drop_duplicates("game_id")
     df["home_margin"] = df["home_score"] - df["away_score"]
     return df
@@ -69,7 +79,9 @@ class TestHelpers:
         assert np.isnan(home_cover(3, 3.0))
 
     def test_series_index_preserved(self):
-        s = home_cover(pd.Series([10, -3, 7], index=[5, 6, 7]), pd.Series([7.0, -3.0, 3.0], index=[5, 6, 7]))
+        s = home_cover(
+            pd.Series([10, -3, 7], index=[5, 6, 7]), pd.Series([7.0, -3.0, 3.0], index=[5, 6, 7])
+        )
         assert list(s.index) == [5, 6, 7]
         assert s.iloc[0] == 1.0 and np.isnan(s.iloc[1]) and s.iloc[2] == 1.0
 
@@ -106,15 +118,25 @@ class TestPopulation:
 
     def test_prior_season_power_ratings_have_no_edge(self, games):
         """Prior-season point differential + 2.5 HFA is ~50% ATS once graded correctly."""
-        team_games = pd.concat([
-            games[["season", "home_team", "home_margin"]].set_axis(["season", "team", "margin"], axis=1),
-            games[["season", "away_team", "home_margin"]].set_axis(["season", "team", "margin"], axis=1)
-            .assign(margin=lambda d: -d["margin"]),
-        ])
+        team_games = pd.concat(
+            [
+                games[["season", "home_team", "home_margin"]].set_axis(
+                    ["season", "team", "margin"], axis=1
+                ),
+                games[["season", "away_team", "home_margin"]]
+                .set_axis(["season", "team", "margin"], axis=1)
+                .assign(margin=lambda d: -d["margin"]),
+            ]
+        )
         ratings = team_games.groupby(["season", "team"])["margin"].mean().reset_index()
         ratings["season"] += 1
-        x = (games.merge(ratings.rename(columns={"team": "home_team", "margin": "r_home"}), on=["season", "home_team"])
-                  .merge(ratings.rename(columns={"team": "away_team", "margin": "r_away"}), on=["season", "away_team"]))
+        x = games.merge(
+            ratings.rename(columns={"team": "home_team", "margin": "r_home"}),
+            on=["season", "home_team"],
+        ).merge(
+            ratings.rename(columns={"team": "away_team", "margin": "r_away"}),
+            on=["season", "away_team"],
+        )
         pred = x["r_home"] - x["r_away"] + 2.5
         edge = model_edge(pred, x["spread_close"])
         cover = home_cover(x["home_margin"], x["spread_close"])

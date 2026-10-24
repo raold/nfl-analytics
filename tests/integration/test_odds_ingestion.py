@@ -43,8 +43,7 @@ def test_db_with_schema(test_db_dsn: str) -> Generator[psycopg.Connection, None,
     cursor = conn.cursor()
 
     # Apply schema (simplified for testing)
-    cursor.execute(
-        """
+    cursor.execute("""
         CREATE TABLE IF NOT EXISTS odds_history (
             event_id TEXT NOT NULL,
             sport_key TEXT,
@@ -62,8 +61,7 @@ def test_db_with_schema(test_db_dsn: str) -> Generator[psycopg.Connection, None,
             book_last_update TIMESTAMPTZ,
             PRIMARY KEY (event_id, bookmaker_key, market_key, outcome_name, snapshot_at)
         );
-    """
-    )
+    """)
     conn.commit()
 
     try:
@@ -191,20 +189,16 @@ class TestOddsIngestionFlow:
         test_db_with_schema.commit()
 
         # Query FanDuel odds only
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT COUNT(*) FROM odds_history WHERE bookmaker_key = 'fanduel';
-        """
-        )
+        """)
         fanduel_count = cursor.fetchone()[0]
         assert fanduel_count == 6  # 2 spreads + 2 totals + 2 h2h
 
         # Query DraftKings odds only
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT COUNT(*) FROM odds_history WHERE bookmaker_key = 'draftkings';
-        """
-        )
+        """)
         draftkings_count = cursor.fetchone()[0]
         assert draftkings_count == 2  # 2 spreads only
 
@@ -233,14 +227,12 @@ class TestOddsIngestionFlow:
         test_db_with_schema.commit()
 
         # Count by market
-        cursor.execute(
-            """
+        cursor.execute("""
             SELECT market_key, COUNT(*)
             FROM odds_history
             GROUP BY market_key
             ORDER BY market_key;
-        """
-        )
+        """)
         market_counts = cursor.fetchall()
 
         market_dict = {row[0]: row[1] for row in market_counts}

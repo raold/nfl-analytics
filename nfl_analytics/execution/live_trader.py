@@ -339,9 +339,7 @@ class LiveTrader:
         if self._trade_logger:
             self._trade_logger.log_kill_switch(event)
         if self._alert_manager:
-            self._alert_manager.alert_kill_switch(
-                event.reason, event.equity_at_trigger_cents
-            )
+            self._alert_manager.alert_kill_switch(event.reason, event.equity_at_trigger_cents)
         try:
             await self._executor.cancel_all()
         except Exception:

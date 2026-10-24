@@ -592,13 +592,11 @@ class DirichletBayesianStackingByStatType:
 
         try:
             cur = conn.cursor()
-            cur.execute(
-                """
+            cur.execute("""
                 SELECT stat_type, component_name, alpha, prior_alpha
                 FROM ml.dirichlet_alpha_by_stat_type
                 ORDER BY stat_type, component_order
-            """
-            )
+            """)
 
             rows = cur.fetchall()
             conn.close()

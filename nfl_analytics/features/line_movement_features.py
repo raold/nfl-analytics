@@ -133,15 +133,13 @@ class LineMovementFeatures:
         try:
             # Check if odds_history table exists and has data
             with conn.cursor() as cur:
-                cur.execute(
-                    """
+                cur.execute("""
                     SELECT EXISTS (
                         SELECT FROM information_schema.tables
                         WHERE table_schema = 'public'
                         AND table_name = 'odds_history'
                     );
-                """
-                )
+                """)
                 table_exists = cur.fetchone()[0]
 
             if not table_exists:
