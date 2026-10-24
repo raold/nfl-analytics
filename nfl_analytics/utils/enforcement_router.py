@@ -31,6 +31,7 @@ import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
+from pathlib import Path
 from typing import Any
 
 # Configure logging
@@ -357,9 +358,12 @@ class EnforcementRouter:
         self.rules["data_sufficiency_gate"] = EnforcementRule(
             name="data_sufficiency_gate",
             description="Warn about potential underpowered experiments",
+            # Keep in step with the patterns in _validate_data_sufficiency: the old literal
+            # "meta_learning" trigger missed the exact v7.0 code ("meta-learning", meta_weight)
             triggers=[
-                r"meta_learning",  # Meta-learning code
-                r"adaptive.*weight",  # Adaptive weighting
+                r"meta[\s_-]?learning",  # Meta-learning code
+                r"meta_weight",  # Meta-learned ensemble weights
+                r"(adaptive|contextual).*weight",  # Adaptive / contextual weighting
                 r"online.*learning",  # Online learning methods
             ],
             validator=self._validate_data_sufficiency,
@@ -1509,9 +1513,18 @@ class EnforcementRouter:
                 message="Not a Python file",
             )
 
-        # Skip test files, examples, demos, and scripts
-        skip_patterns = ["test", "example", "demo", "fixture", "mock", "scripts/"]
-        if any(p in file_path.lower() for p in skip_patterns):
+        # Skip test files, examples, demos, and scripts. Match path components, not substrings:
+        # a substring check on "test" also exempted everything under backtest/ and latest/.
+        path = Path(file_path)
+        skip_dirs = {"tests", "test", "examples", "example", "demos", "fixtures", "scripts"}
+        name = path.name.lower()
+        is_exempt = (
+            any(part.lower() in skip_dirs for part in path.parts[:-1])
+            or name.startswith("test_")
+            or name.endswith("_test.py")
+            or any(word in name for word in ("example", "demo", "fixture", "mock"))
+        )
+        if is_exempt:
             return ValidationResult(
                 status=ValidationStatus.SKIPPED,
                 agent_name="data_sufficiency_gate",
@@ -1519,6 +1532,10 @@ class EnforcementRouter:
             )
 
         issues = []
+
+        # Match against code only: a comment such as "# TODO: assert len(X) >= 5000" must not
+        # count as a data check
+        code = re.sub(r"#[^\n]*", "", content)
 
         # Pattern 1: Meta-learning without data validation
         if re.search(r"meta.*learning|adaptive.*weight|contextual.*weight", content, re.IGNORECASE):
@@ -1529,14 +1546,14 @@ class EnforcementRouter:
                     r"if\s+len\(.*\)\s*<\s*\d+.*raise|"
                     r"validate.*sample.*size|"
                     r"check.*data.*sufficiency)",
-                    content,
+                    code,
                     re.IGNORECASE,
                 )
             )
 
             # Check for training calls
             has_training = bool(
-                re.search(r"\.fit\(|\.train\(|lightgbm\.train", content, re.IGNORECASE)
+                re.search(r"\.fit\(|\.train\(|lightgbm\.train", code, re.IGNORECASE)
             )
 
             if has_training and not has_data_check:
@@ -1560,13 +1577,13 @@ class EnforcementRouter:
                     r"(if\s+len\(.*\)\s*<\s*\d+.*warm.*start|"
                     r"initial.*batch.*size|"
                     r"bootstrap.*samples)",
-                    content,
+                    code,
                     re.IGNORECASE,
                 )
             )
 
             has_training = bool(
-                re.search(r"\.partial_fit\(|\.update\(|incremental", content, re.IGNORECASE)
+                re.search(r"\.partial_fit\(|\.update\(|incremental", code, re.IGNORECASE)
             )
 
             if has_training and not has_init_check:

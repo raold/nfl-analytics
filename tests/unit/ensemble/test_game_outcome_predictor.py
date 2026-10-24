@@ -151,6 +151,8 @@ class TestGameOutcomePredictor:
             {"player_id": "00-0039163", "player_display_name": "C.J. Stroud", "stat_attempts": 33},
             # Away QB (not found)
             None,
+            # Away QB previous-season fallback (also not found)
+            None,
             # Home defense EPA
             (-0.05,),
             # Away defense EPA

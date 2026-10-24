@@ -126,6 +126,8 @@ class DataLeakageDetector:
         "_final",  # Final scores
         "winner",  # Game winner
         "_margin",  # Actual margin
+        "next_",  # Values from the following game/week
+        "future_",  # Explicitly forward-looking values
     ]
 
     # Temporal keywords that require careful review

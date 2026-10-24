@@ -79,7 +79,7 @@ def mock_ensemble_v6_all_components(mock_db_config):
     - Hybrid Static-Incremental: 10%
     """
     with (
-        patch("nfl_analytics.ensemble.enhanced_ensemble_v6_production.RModelInterface"),
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v6_production.RPredictionLookup"),
         patch("nfl_analytics.ensemble.enhanced_ensemble_v6_production.HybridStaticIncrementalXGBoost"),
     ):
 
@@ -114,7 +114,7 @@ def mock_ensemble_v6_partial_components(mock_db_config):
     Scenario: Hierarchical and Informative Priors fail.
     """
     with (
-        patch("nfl_analytics.ensemble.enhanced_ensemble_v6_production.RModelInterface"),
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v6_production.RPredictionLookup"),
         patch("nfl_analytics.ensemble.enhanced_ensemble_v6_production.HybridStaticIncrementalXGBoost"),
     ):
 

@@ -171,181 +171,6 @@ def train_online_learning_model(stream_data):
         assert result.passed
 
 
-class TestRule20TreeModels:
-    """Test Rule 20: Complex tree model data sufficiency validation."""
-
-    def test_lightgbm_without_sample_check_warns(self, router, tmp_path):
-        """LightGBM training without sample validation should warn."""
-        file_path = tmp_path / "train_lgb.py"
-        content = """
-import lightgbm as lgb
-
-def train_lightgbm_model(X, y):
-    # 15 features detected but no sample validation
-    n_features = 15
-
-    model = lgb.train({'objective': 'regression'},
-                     lgb.Dataset(X, y))
-    return model
-"""
-        file_path.write_text(content)
-
-        results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
-
-        assert len(rule_20_results) == 1
-        result = rule_20_results[0]
-        assert result.failed
-        issues = [i for i in result.details["issues"] if "Complex tree model" in i["pattern"]]
-        assert len(issues) == 1
-        assert issues[0]["severity"] == "HIGH"
-        assert issues[0]["required_samples"] == 1500  # 15 features * 100
-        assert issues[0]["features_detected"] == 15
-
-    def test_xgboost_with_validation_passes(self, router, tmp_path):
-        """XGBoost with proper sample validation should PASS."""
-        file_path = tmp_path / "train_xgb_safe.py"
-        content = """
-import xgboost as xgb
-
-def train_xgboost_model(X, y):
-    n_features = X.shape[1]
-
-    # Proper validation
-    assert len(X) >= n_features * 100, f"Need {n_features * 100}+ samples"
-
-    model = xgb.train({'objective': 'reg:squarederror'},
-                     xgb.DMatrix(X, y))
-    return model
-"""
-        file_path.write_text(content)
-
-        results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
-
-        assert len(rule_20_results) == 1
-        result = rule_20_results[0]
-        assert result.passed
-
-
-class TestRule20EnsembleReweighting:
-    """Test Rule 20: Ensemble reweighting data sufficiency validation."""
-
-    def test_ensemble_optimization_without_component_check_warns(self, router, tmp_path):
-        """Ensemble weight optimization without per-component validation should warn."""
-        file_path = tmp_path / "optimize_ensemble_weights.py"
-        content = """
-import cvxpy as cvx
-
-def optimize_ensemble_weights(component_predictions, actuals):
-    # No validation of games per component
-    weights = cvx.Variable(len(component_predictions))
-
-    objective = cvx.Minimize(cvx.sum_squares(
-        sum([w * pred for w, pred in zip(weights, component_predictions)]) - actuals
-    ))
-
-    problem = cvx.Problem(objective)
-    problem.solve()
-
-    return weights.value
-"""
-        file_path.write_text(content)
-
-        results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
-
-        assert len(rule_20_results) == 1
-        result = rule_20_results[0]
-        assert result.failed
-        issues = [i for i in result.details["issues"] if "Ensemble reweighting" in i["pattern"]]
-        assert len(issues) == 1
-        assert issues[0]["severity"] == "MEDIUM"
-        assert issues[0]["required_samples"] == 100
-
-    def test_ensemble_optimization_with_validation_passes(self, router, tmp_path):
-        """Ensemble optimization with component validation should PASS."""
-        file_path = tmp_path / "optimize_ensemble_weights_safe.py"
-        content = """
-import cvxpy as cvx
-
-def optimize_ensemble_weights(component_predictions, actuals):
-    # Proper per-component validation
-    games_per_component = [len(pred) for pred in component_predictions]
-    assert min(games_per_component) >= 100, "Need ≥100 games per component"
-
-    weights = cvx.Variable(len(component_predictions))
-
-    objective = cvx.Minimize(cvx.sum_squares(
-        sum([w * pred for w, pred in zip(weights, component_predictions)]) - actuals
-    ))
-
-    problem = cvx.Problem(objective)
-    problem.solve()
-
-    return weights.value
-"""
-        file_path.write_text(content)
-
-        results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
-
-        assert len(rule_20_results) == 1
-        result = rule_20_results[0]
-        assert result.passed
-
-
-class TestRule20StatisticalTests:
-    """Test Rule 20: Statistical test data sufficiency validation."""
-
-    def test_t_test_without_sample_check_warns(self, router, tmp_path):
-        """t-test without minimum sample validation should warn."""
-        file_path = tmp_path / "statistical_analysis.py"
-        content = """
-from scipy.stats import ttest_ind
-
-def compare_models(model_a_errors, model_b_errors):
-    # No validation of sample size (need n≥30 for CLT)
-    t_stat, p_value = ttest_ind(model_a_errors, model_b_errors)
-    return t_stat, p_value
-"""
-        file_path.write_text(content)
-
-        results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
-
-        assert len(rule_20_results) == 1
-        result = rule_20_results[0]
-        assert result.failed
-        issues = [i for i in result.details["issues"] if "Statistical tests" in i["pattern"]]
-        assert len(issues) == 1
-        assert issues[0]["severity"] == "MEDIUM"
-        assert issues[0]["required_samples"] == 30
-
-    def test_statistical_test_with_validation_passes(self, router, tmp_path):
-        """Statistical test with proper sample validation should PASS."""
-        file_path = tmp_path / "statistical_analysis_safe.py"
-        content = """
-from scipy.stats import ttest_ind
-
-def compare_models(model_a_errors, model_b_errors):
-    # Proper CLT validation
-    n = min(len(model_a_errors), len(model_b_errors))
-    assert n >= 30, "Need ≥30 samples per group for CLT"
-
-    t_stat, p_value = ttest_ind(model_a_errors, model_b_errors)
-    return t_stat, p_value
-"""
-        file_path.write_text(content)
-
-        results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
-
-        assert len(rule_20_results) == 1
-        result = rule_20_results[0]
-        assert result.passed
-
-
 class TestRule20EdgeCases:
     """Test Rule 20: Edge cases and special scenarios."""
 
@@ -382,34 +207,6 @@ python train_meta_learning.py
         assert len(rule_20_results) == 1
         result = rule_20_results[0]
         assert result.status == ValidationStatus.SKIPPED
-
-    def test_multiple_issues_reported(self, router, tmp_path):
-        """Multiple data sufficiency issues should all be reported."""
-        file_path = tmp_path / "complex_training.py"
-        content = """
-import lightgbm as lgb
-from scipy.stats import ttest_ind
-
-def train_and_test(meta_features, y, test_results_a, test_results_b):
-    # Issue 1: Meta-learning without validation
-    meta_model = lgb.train({'objective': 'regression'},
-                          lgb.Dataset(meta_features, y))
-
-    # Issue 2: Statistical test without sample check
-    t_stat, p_val = ttest_ind(test_results_a, test_results_b)
-
-    return meta_model, t_stat
-"""
-        file_path.write_text(content)
-
-        results = router.validate_file(str(file_path), content)
-        rule_20_results = [r for r in results if r.agent_name == "data_sufficiency_gate"]
-
-        assert len(rule_20_results) == 1
-        result = rule_20_results[0]
-        assert result.failed
-        # Should detect both tree model issue and statistical test issue
-        assert len(result.details["issues"]) >= 2
 
     def test_v7_failure_prevented(self, router, tmp_path):
         """Ensure Rule 20 would have prevented v7.0 failure."""
@@ -472,7 +269,7 @@ class TestRule20Decorator:
 
 # Integration test
 def test_rule_20_integration(router, tmp_path):
-    """Full integration test: detect all 5 patterns in one file."""
+    """Full integration test: detect both remaining patterns in one file."""
     file_path = tmp_path / "comprehensive_training.py"
     content = """
 import lightgbm as lgb
@@ -516,11 +313,10 @@ def comprehensive_training_pipeline():
     issues = result.details["issues"]
     patterns_detected = [i["pattern"] for i in issues]
 
+    # Patterns 3-5 (tree models, ensemble reweighting, statistical tests) were removed from
+    # the rule for false positives; only meta-learning and online learning remain
     assert any("Meta-learning" in p for p in patterns_detected)
     assert any("Online learning" in p for p in patterns_detected)
-    assert any("Complex tree model" in p for p in patterns_detected)
-    assert any("Ensemble reweighting" in p for p in patterns_detected)
-    assert any("Statistical tests" in p for p in patterns_detected)
 
     # Verify severity classification
     critical_count = result.details["critical_count"]

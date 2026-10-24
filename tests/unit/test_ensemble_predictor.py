@@ -21,8 +21,20 @@ import pytest
 from nfl_analytics.ensemble.strategy.base import ModelType
 
 
+@pytest.fixture(autouse=True)
+def _no_redis(monkeypatch):
+    """Use only the in-memory model cache: constructing the predictor otherwise waits
+    ~5s for a Redis connection and lets a local Redis leak state between tests."""
+    monkeypatch.setattr("nfl_analytics.ensemble.strategy.ensemble_predictor.get_default_cache", None)
+
+
 class TestBNNModelLoading:
     """Test BNN model loading (Task 3)."""
+
+    @pytest.fixture(autouse=True)
+    def _requires_pymc(self):
+        # bayesian_neural_network imports pymc/arviz at module level (uv sync --extra bayes)
+        pytest.importorskip("pymc")
 
     @pytest.fixture
     def mock_bnn_model(self):
@@ -40,11 +52,11 @@ class TestBNNModelLoading:
     def predictor(self):
         """EnsemblePredictor instance."""
         # Import here to avoid circular dependencies
-        from nfl_analytics.ensemble.strategy.ensemble_predictor import EnsemblePredictor
-        from nfl_analytics.ensemble.strategy.weighted_average import WeightedAverageStrategy
+        from nfl_analytics.ensemble.strategy.base import EnsembleConfig
+        from nfl_analytics.ensemble.strategy.ensemble_predictor import UnifiedEnsemblePredictor
 
-        strategy = WeightedAverageStrategy()
-        return EnsemblePredictor(strategy=strategy)
+        predictor = UnifiedEnsemblePredictor(EnsembleConfig(strategy_name="weighted_average"))
+        return predictor
 
     def test_bnn_model_loads_and_caches(self, predictor, mock_bnn_model):
         """Test that BNN model is loaded and cached."""
@@ -169,11 +181,11 @@ class TestXGBoostModelLoading:
     @pytest.fixture
     def predictor(self):
         """EnsemblePredictor instance."""
-        from nfl_analytics.ensemble.strategy.ensemble_predictor import EnsemblePredictor
-        from nfl_analytics.ensemble.strategy.weighted_average import WeightedAverageStrategy
+        from nfl_analytics.ensemble.strategy.base import EnsembleConfig
+        from nfl_analytics.ensemble.strategy.ensemble_predictor import UnifiedEnsemblePredictor
 
-        strategy = WeightedAverageStrategy()
-        return EnsemblePredictor(strategy=strategy)
+        predictor = UnifiedEnsemblePredictor(EnsembleConfig(strategy_name="weighted_average"))
+        return predictor
 
     def test_xgboost_model_loads_and_caches(self, predictor, mock_xgb_model):
         """Test that XGBoost model is loaded and cached."""
@@ -284,18 +296,18 @@ class TestRModelLoading:
         result.success = True
         result.stdout = '{"mean": 255.50, "std": 19.20}'
         result.stderr = ""
-        service.execute.return_value = result
+        service.execute_with_cache.return_value = result
 
         return service
 
     @pytest.fixture
     def predictor(self):
         """EnsemblePredictor instance."""
-        from nfl_analytics.ensemble.strategy.ensemble_predictor import EnsemblePredictor
-        from nfl_analytics.ensemble.strategy.weighted_average import WeightedAverageStrategy
+        from nfl_analytics.ensemble.strategy.base import EnsembleConfig
+        from nfl_analytics.ensemble.strategy.ensemble_predictor import UnifiedEnsemblePredictor
 
-        strategy = WeightedAverageStrategy()
-        return EnsemblePredictor(strategy=strategy)
+        predictor = UnifiedEnsemblePredictor(EnsembleConfig(strategy_name="weighted_average"))
+        return predictor
 
     def test_r_model_checks_service_health(self, predictor, mock_r_service):
         """Test that R service health is checked before prediction."""
@@ -377,7 +389,7 @@ class TestRModelLoading:
             )
 
             # Execute should be called with retry=True
-            call_args = mock_r_service.execute.call_args
+            call_args = mock_r_service.execute_with_cache.call_args
             assert call_args[1]["retry"] is True
             assert call_args[1]["timeout"] == 60
 
@@ -403,11 +415,11 @@ class TestFeatureConversion:
     @pytest.fixture
     def predictor(self):
         """EnsemblePredictor instance."""
-        from nfl_analytics.ensemble.strategy.ensemble_predictor import EnsemblePredictor
-        from nfl_analytics.ensemble.strategy.weighted_average import WeightedAverageStrategy
+        from nfl_analytics.ensemble.strategy.base import EnsembleConfig
+        from nfl_analytics.ensemble.strategy.ensemble_predictor import UnifiedEnsemblePredictor
 
-        strategy = WeightedAverageStrategy()
-        return EnsemblePredictor(strategy=strategy)
+        predictor = UnifiedEnsemblePredictor(EnsembleConfig(strategy_name="weighted_average"))
+        return predictor
 
     def test_converts_dict_to_sorted_array(self, predictor):
         """Test that features dict is converted to sorted numpy array."""
@@ -451,8 +463,8 @@ class TestModelLoadingIntegration:
     @pytest.fixture
     def predictor(self):
         """EnsemblePredictor with weighted average strategy."""
-        from nfl_analytics.ensemble.strategy.ensemble_predictor import EnsemblePredictor
-        from nfl_analytics.ensemble.strategy.weighted_average import WeightedAverageStrategy
+        from nfl_analytics.ensemble.strategy.base import EnsembleConfig
+        from nfl_analytics.ensemble.strategy.ensemble_predictor import UnifiedEnsemblePredictor
 
         weights = {
             "state_space_v2": 0.30,
@@ -460,11 +472,14 @@ class TestModelLoadingIntegration:
             "bnn_v1": 0.25,
             "xgboost_v1": 0.20,
         }
-        strategy = WeightedAverageStrategy(weights=weights)
-        return EnsemblePredictor(strategy=strategy)
+        predictor = UnifiedEnsemblePredictor(
+            EnsembleConfig(strategy_name="weighted_average", weights=weights)
+        )
+        return predictor
 
     def test_model_cache_shared_across_predictions(self, predictor):
         """Test that model cache is shared across different predictions."""
+        pytest.importorskip("pymc")  # BNN path; uv sync --extra bayes
         # Clear cache
         predictor._model_cache.clear()
 

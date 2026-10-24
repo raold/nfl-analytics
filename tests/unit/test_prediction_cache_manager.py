@@ -42,9 +42,17 @@ def cache_manager(mock_db_connection):
     """Create cache manager with mocked database."""
     conn, cursor = mock_db_connection
 
-    with patch("psycopg2.connect", return_value=conn):
-        manager = PredictionCacheManager(db_url="postgresql://test/testdb")
-        return manager
+    # The manager connects lazily (_get_connection), so keep the patches active for the test.
+    # execute_values needs a real connection (it reads cursor.connection.encoding); route it
+    # through cursor.execute so tests can inject failures with cursor.execute.side_effect.
+    with (
+        patch("psycopg2.connect", return_value=conn),
+        patch(
+            "nfl_analytics.utils.prediction_cache_manager.execute_values",
+            side_effect=lambda cur, query, values, **kwargs: cur.execute(query, values),
+        ),
+    ):
+        yield PredictionCacheManager(db_url="postgresql://test/testdb")
 
 
 @pytest.fixture

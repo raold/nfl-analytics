@@ -125,6 +125,15 @@ def sample_odds_api_response() -> dict:
     }
 
 
+@pytest.fixture(autouse=True)
+def _db_password_placeholder(request, monkeypatch):
+    """Unit tests construct DB-backed classes with mocked connections, but the classes now
+    refuse to start without DB_PASSWORD (no hardcoded fallback). Give them a placeholder;
+    integration tests keep the real environment."""
+    if "DB_PASSWORD" not in os.environ and request.node.get_closest_marker("integration") is None:
+        monkeypatch.setenv("DB_PASSWORD", "unit-test-placeholder")
+
+
 @pytest.fixture
 def mock_env_vars(monkeypatch):
     """Set up environment variables for testing."""

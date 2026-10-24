@@ -22,7 +22,7 @@ import os
 import time
 from collections.abc import Callable
 from contextlib import contextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, TypeVar
 
 import psycopg2
@@ -62,14 +62,16 @@ class DatabaseConfig:
     from environment variables. See .env.example for configuration template.
     """
 
-    host: str = os.getenv("DB_HOST", "localhost")
-    port: int = int(os.getenv("DB_PORT", "5544"))
-    dbname: str = os.getenv("DB_NAME", "devdb01")
-    user: str = os.getenv("DB_USER", "dro")
-    password: str = os.getenv("DB_PASSWORD", "")
-    min_connections: int = int(os.getenv("DB_MIN_CONNECTIONS", "5"))
-    max_connections: int = int(os.getenv("DB_MAX_CONNECTIONS", "50"))
-    connection_timeout: int = int(os.getenv("DB_TIMEOUT", "30"))
+    # default_factory reads the environment when the config is created, not once at import
+    # time (otherwise variables set later, e.g. by load_dotenv(), are silently ignored)
+    host: str = field(default_factory=lambda: os.getenv("DB_HOST", "localhost"))
+    port: int = field(default_factory=lambda: int(os.getenv("DB_PORT", "5544")))
+    dbname: str = field(default_factory=lambda: os.getenv("DB_NAME", "devdb01"))
+    user: str = field(default_factory=lambda: os.getenv("DB_USER", "dro"))
+    password: str = field(default_factory=lambda: os.getenv("DB_PASSWORD", ""))
+    min_connections: int = field(default_factory=lambda: int(os.getenv("DB_MIN_CONNECTIONS", "5")))
+    max_connections: int = field(default_factory=lambda: int(os.getenv("DB_MAX_CONNECTIONS", "50")))
+    connection_timeout: int = field(default_factory=lambda: int(os.getenv("DB_TIMEOUT", "30")))
 
     def __post_init__(self):
         """Validate configuration after initialization."""
@@ -213,7 +215,7 @@ class QueryCache:
             value: Value to cache
             ttl_seconds: Time-to-live in seconds (uses default if None)
         """
-        ttl = ttl_seconds or self._default_ttl
+        ttl = self._default_ttl if ttl_seconds is None else ttl_seconds
 
         # Try Redis first
         if self._redis_cache:
@@ -540,19 +542,19 @@ class BaseRepository:
         # Check 2: Ensure temporal filtering exists for game/play queries
         is_game_query = any(table in sql_lower for table in ["games", "plays", "player_stats"])
 
-        if is_game_query:
-            has_temporal_filter = any(
-                [
-                    "where" in sql_lower and "kickoff" in sql_lower,
-                    "where" in sql_lower and "game_date" in sql_lower,  # Allow if explicit filter
-                    "asof" in sql_lower,  # ASOF join
-                    "lag(" in sql_lower,  # Lag window function
-                    "lead(" in sql_lower,  # Lead window function
-                    "row_number()" in sql_lower
-                    and "partition by" in sql_lower,  # Window with partition
-                ]
-            )
+        has_temporal_filter = any(
+            [
+                "where" in sql_lower and "kickoff" in sql_lower,
+                "where" in sql_lower and "game_date" in sql_lower,  # Allow if explicit filter
+                "asof" in sql_lower,  # ASOF join
+                "lag(" in sql_lower,  # Lag window function
+                "lead(" in sql_lower,  # Lead window function
+                "row_number()" in sql_lower
+                and "partition by" in sql_lower,  # Window with partition
+            ]
+        )
 
+        if is_game_query:
             if not has_temporal_filter:
                 logger.warning(
                     "⚠️  TEMPORAL SAFETY WARNING: Game/play query missing explicit date filter. "
@@ -561,8 +563,13 @@ class BaseRepository:
                     sql[:100],
                 )
 
-        # Check 3: Warn on SELECT * from games without date filter
-        if "select *" in sql_lower and "games" in sql_lower and "where" not in sql_lower:
+        # Check 3: Warn on SELECT * from games without any temporal construct
+        if (
+            "select *" in sql_lower
+            and "games" in sql_lower
+            and "where" not in sql_lower
+            and not has_temporal_filter
+        ):
             logger.warning(
                 "⚠️  TEMPORAL SAFETY WARNING: SELECT * FROM games without WHERE clause. "
                 "This may include future data. Add explicit date filtering."

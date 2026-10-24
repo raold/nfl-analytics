@@ -12,7 +12,7 @@ Date: November 9, 2025
 """
 
 import os
-from unittest.mock import Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import psycopg2
 import pytest
@@ -21,8 +21,26 @@ from nfl_analytics.data.repository.base import (
     BaseRepository,
     ConnectionPoolError,
     DatabaseConfig,
+    QueryCache,
+    QueryResult,
     RepositoryError,
 )
+
+
+@pytest.fixture(autouse=True)
+def _no_real_pool():
+    """BaseRepository opens a class-level ThreadedConnectionPool in __init__. Stub it so unit
+    tests never touch Postgres, and reset the singleton so state doesn't leak between tests."""
+    BaseRepository._pool = None
+    BaseRepository._pool_config = None
+    with (
+        patch("nfl_analytics.data.repository.base.pool.ThreadedConnectionPool"),
+        # QueryCache() otherwise probes Redis (~5s timeout when it isn't running)
+        patch("nfl_analytics.data.repository.base.REDIS_AVAILABLE", False),
+    ):
+        yield
+    BaseRepository._pool = None
+    BaseRepository._pool_config = None
 
 
 class TestDatabaseConfig:
@@ -51,7 +69,7 @@ class TestDatabaseConfig:
             config = DatabaseConfig()
             assert config.host == "test-host"
             assert config.port == 5555
-            assert config.database == "test-db"
+            assert config.dbname == "test-db"
             assert config.user == "test-user"
             assert config.password == "test-password"
             assert config.min_connections == 3
@@ -65,7 +83,7 @@ class TestDatabaseConfig:
             config = DatabaseConfig()
             assert config.host == "localhost"
             assert config.port == 5544
-            assert config.database == "devdb01"
+            assert config.dbname == "devdb01"
             assert config.user == "dro"
             assert config.min_connections == 5
             assert config.max_connections == 50
@@ -77,25 +95,18 @@ class TestTemporalLeakageProtection:
     @pytest.fixture
     def mock_pool(self):
         """Mock connection pool for testing."""
-        pool = Mock()
-        conn = Mock()
+        pool = MagicMock()
+        conn = MagicMock()
         pool.getconn.return_value = conn
         return pool
 
     @pytest.fixture
     def repository(self, mock_pool):
         """Repository with mocked pool."""
-        # Mock DatabaseConfig to bypass password validation
-        mock_config = Mock()
-        mock_config.host = "localhost"
-        mock_config.port = 5544
-        mock_config.database = "devdb01"
-        mock_config.user = "test_user"
-        mock_config.password = "test_password"
-
-        repo = BaseRepository(config=mock_config)
+        config = DatabaseConfig(user="test_user", password="test_password")
+        repo = BaseRepository(config=config)
         repo._pool = mock_pool
-        repo._cache = {}
+        repo._cache = QueryCache()  # fresh per test; the class-level cache is shared
         return repo
 
     def test_blocks_deprecated_game_date_column(self, repository):
@@ -120,7 +131,7 @@ class TestTemporalLeakageProtection:
 
         # Should not raise
         result = repository.query(sql)
-        assert result.success
+        assert isinstance(result, QueryResult)
 
     def test_warns_on_missing_temporal_filter(self, repository, mock_pool, caplog):
         """Test warning when query lacks temporal filter."""
@@ -203,7 +214,7 @@ class TestTemporalLeakageProtection:
 
         # Should not raise when validation disabled
         result = repository.query(sql, validate_temporal=False)
-        assert result.success
+        assert isinstance(result, QueryResult)
 
 
 class TestConnectionRetryLogic:
@@ -214,7 +225,7 @@ class TestConnectionRetryLogic:
         """Repository for testing retry logic."""
         with patch.dict(os.environ, {"DB_PASSWORD": "test"}):
             repo = BaseRepository()
-            repo._cache = {}
+            repo._cache = QueryCache()  # fresh per test; the class-level cache is shared
             return repo
 
     def test_retries_on_operational_error(self, repository):
@@ -279,7 +290,7 @@ class TestConnectionRetryLogic:
     def test_connection_returned_to_pool_on_success(self, repository):
         """Test that connection is returned to pool after use."""
         with patch.object(repository, "_pool") as mock_pool:
-            mock_conn = Mock()
+            mock_conn = MagicMock()
             mock_pool.getconn.return_value = mock_conn
 
             with repository.get_connection() as conn:
@@ -291,7 +302,7 @@ class TestConnectionRetryLogic:
     def test_connection_returned_to_pool_on_error(self, repository):
         """Test that connection is returned even if query fails."""
         with patch.object(repository, "_pool") as mock_pool:
-            mock_conn = Mock()
+            mock_conn = MagicMock()
             mock_pool.getconn.return_value = mock_conn
 
             try:
@@ -306,7 +317,7 @@ class TestConnectionRetryLogic:
     def test_rollback_on_error(self, repository):
         """Test that connection is rolled back on error."""
         with patch.object(repository, "_pool") as mock_pool:
-            mock_conn = Mock()
+            mock_conn = MagicMock()
             mock_pool.getconn.return_value = mock_conn
 
             try:
@@ -328,16 +339,16 @@ class TestQueryCaching:
         with patch.dict(os.environ, {"DB_PASSWORD": "test"}):
             repo = BaseRepository()
             repo._pool = Mock()
-            repo._cache = {}
+            repo._cache = QueryCache()  # fresh per test; the class-level cache is shared
             return repo
 
     def test_caches_query_results(self, repository):
         """Test that query results are cached."""
-        mock_conn = Mock()
+        mock_conn = MagicMock()
         repository._pool.getconn.return_value = mock_conn
-        mock_cursor = mock_conn.cursor.return_value.__enter__.return_value
-        mock_cursor.fetchall.return_value = [(1, "test")]
-        mock_cursor.description = [("id",), ("name",)]
+        # get_cursor() calls conn.cursor(cursor_factory=RealDictCursor): rows are dicts
+        mock_cursor = mock_conn.cursor.return_value
+        mock_cursor.fetchall.return_value = [{"id": 1, "name": "test"}]
 
         # First query
         result1 = repository.query("SELECT * FROM test", cache_key="test_query", cache_ttl=60)
@@ -351,11 +362,11 @@ class TestQueryCaching:
 
     def test_cache_respects_ttl(self, repository):
         """Test that cache expires after TTL."""
-        mock_conn = Mock()
+        mock_conn = MagicMock()
         repository._pool.getconn.return_value = mock_conn
-        mock_cursor = mock_conn.cursor.return_value.__enter__.return_value
-        mock_cursor.fetchall.return_value = [(1, "test")]
-        mock_cursor.description = [("id",), ("name",)]
+        # get_cursor() calls conn.cursor(cursor_factory=RealDictCursor): rows are dicts
+        mock_cursor = mock_conn.cursor.return_value
+        mock_cursor.fetchall.return_value = [{"id": 1, "name": "test"}]
 
         # First query
         repository.query("SELECT * FROM test", cache_key="test_query", cache_ttl=0)

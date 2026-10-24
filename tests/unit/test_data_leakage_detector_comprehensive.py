@@ -534,7 +534,7 @@ def test_property_clean_data_no_critical_issues(n_rows):
 
     df = pd.DataFrame(
         {
-            "kickoff": pd.date_range("2020-01-01", periods=n_rows, freq="H"),
+            "kickoff": pd.date_range("2020-01-01", periods=n_rows, freq="h"),
             "player_id": np.random.randint(1, 100, n_rows),
             "passing_yards": np.random.randint(100, 400, n_rows),
             "feature_1": np.random.randn(n_rows),
@@ -557,7 +557,7 @@ def test_property_perfect_correlation_always_critical(n_rows):
 
     df = pd.DataFrame(
         {
-            "kickoff": pd.date_range("2020-01-01", periods=n_rows, freq="H"),
+            "kickoff": pd.date_range("2020-01-01", periods=n_rows, freq="h"),
             "passing_yards": np.random.randint(100, 400, n_rows),
         }
     )
@@ -583,7 +583,7 @@ def test_performance_large_dataframe(detector):
     n = 10000
     df = pd.DataFrame(
         {
-            "kickoff": pd.date_range("2020-01-01", periods=n, freq="H"),
+            "kickoff": pd.date_range("2020-01-01", periods=n, freq="h"),
             "player_id": np.random.randint(1, 500, n),
             "passing_yards": np.random.randint(100, 400, n),
             "feature_1": np.random.randn(n),
@@ -607,7 +607,7 @@ def test_performance_split_validation(detector):
 
     train_df = pd.DataFrame(
         {
-            "kickoff": pd.date_range("2020-01-01", periods=5000, freq="H"),
+            "kickoff": pd.date_range("2020-01-01", periods=5000, freq="h"),
             "player_id": np.random.randint(1, 500, 5000),
             "passing_yards": np.random.randint(100, 400, 5000),
         }
@@ -615,7 +615,7 @@ def test_performance_split_validation(detector):
 
     test_df = pd.DataFrame(
         {
-            "kickoff": pd.date_range("2021-01-01", periods=2000, freq="H"),
+            "kickoff": pd.date_range("2021-01-01", periods=2000, freq="h"),
             "player_id": np.random.randint(1, 500, 2000),
             "passing_yards": np.random.randint(100, 400, 2000),
         }

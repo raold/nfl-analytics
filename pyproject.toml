@@ -59,6 +59,7 @@ api = [
 # Kalshi client and trading (nfl_analytics/markets, trading); Sibyl is the maintained successor
 trading = [
     "cryptography>=42.0.0",
+    "h2>=4.1.0",  # KalshiClient uses httpx with http2=True
     "websockets>=12.0",
     "anthropic>=0.40.0",
 ]
