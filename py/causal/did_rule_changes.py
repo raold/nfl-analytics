@@ -32,6 +32,8 @@ import psycopg2
 import seaborn as sns
 from scipy import stats
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -545,9 +547,6 @@ class DiDRuleChangeAnalyzer:
         df["time_numeric"] = df[time_var] - df[time_var].min()
 
         from scipy.stats import linregress
-
-_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
-
 
         slope, intercept, r_value, p_value, std_err = linregress(df["time_numeric"], df[outcome])
 

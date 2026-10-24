@@ -63,6 +63,8 @@ sys.path.append(str(Path(__file__).parent.parent.parent))
 # Import feature extractor
 from py.features.player_feature_extractor import PlayerFeatureExtractor
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
@@ -1181,9 +1183,6 @@ class PlayerPropsEnsemble:
 def main():
     """CLI for testing ensemble predictions."""
     import argparse
-
-_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
-
 
     parser = argparse.ArgumentParser(description="Player Props Ensemble Predictor")
     parser.add_argument("--player-id", required=True, help="Player ID (e.g., 00-0036355)")

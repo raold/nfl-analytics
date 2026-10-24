@@ -29,6 +29,8 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 try:
     import psycopg2
     from psycopg2 import sql
@@ -39,9 +41,6 @@ except ImportError:
 
 try:
     import docker
-
-_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
-
 
     DOCKER_AVAILABLE = True
 except ImportError:

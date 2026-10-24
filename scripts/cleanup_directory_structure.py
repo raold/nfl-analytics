@@ -8,6 +8,8 @@ import shutil
 from datetime import datetime
 from pathlib import Path
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 # Root directory
 ROOT = _PROJECT_ROOT
 
@@ -238,9 +240,6 @@ def analyze_remaining_files():
 
 if __name__ == "__main__":
     import sys
-
-_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
-
 
     # Default to dry run
     dry_run = "--execute" not in sys.argv

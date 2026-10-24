@@ -33,6 +33,8 @@ import xgboost as xgb
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel, Field, validator
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
@@ -428,9 +430,6 @@ class PropsModelManager:
 
         try:
             import psycopg2
-
-_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
-
 
             # Get player features from database
             if self._db_conn is None or self._db_conn.closed:

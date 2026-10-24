@@ -21,6 +21,8 @@ import numpy as np
 import pandas as pd
 from sklearn.calibration import calibration_curve
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 
 class BaselineCalibrationComparator:
     """Generate calibration comparison figure for baseline models"""
@@ -254,9 +256,6 @@ def main():
     except Exception as e:
         print(f"\n❌ Error: {e}")
         import traceback
-
-_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
-
 
         traceback.print_exc()
         return 1
