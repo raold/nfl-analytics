@@ -146,8 +146,8 @@
 
 ## Related Decisions
 
-- [ADR-XXX: Related Decision Title](./ADR-XXX-related-decision.md) - [Relationship description]
-- [ADR-YYY: Another Related Decision](./ADR-YYY-another-decision.md) - [Relationship description]
+- ADR-NNN: Related decision title (`NNN-short-title.md`) - [Relationship description]
+- ADR-NNN: Another related decision (`NNN-short-title.md`) - [Relationship description]
 
 ---
 
@@ -155,8 +155,8 @@
 
 ### Documentation
 
-- [Link to design doc](../path/to/doc.md)
-- [Link to implementation](../../path/to/code.py)
+- Design doc: `docs/<path>.md`
+- Implementation: `nfl_analytics/<module>.py`
 
 ### External Resources
 

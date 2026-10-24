@@ -13,9 +13,9 @@ jobs:
     name: Leakage detector and spread convention
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: '3.11'
           enable-cache: true
@@ -33,4 +33,4 @@ jobs:
           tests/unit/test_data_leakage_detector_comprehensive.py
 
       - name: Reject sportsbook-style spread math
-        run: uvx pre-commit run spread-sign-convention --all-files
+        run: uvx pre-commit@4.7.0 run spread-sign-convention --all-files
