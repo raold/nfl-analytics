@@ -11,7 +11,7 @@ services:
       - POSTGRES_PASSWORD=sicillionbillions
       - POSTGRES_DB=devdb01
     ports:
-      - "5544:5432"
+      - "127.0.0.1:5544:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -31,7 +31,7 @@ services:
     image: redis:7-alpine
     container_name: nfl-analytics-redis
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     command:
       - redis-server
       - --requirepass
@@ -78,7 +78,7 @@ services:
       - DB_USER=dro
       - DB_PASSWORD=sicillionbillions
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     volumes:
       - ./api:/app/api
       - ./nfl_analytics:/app/nfl_analytics:ro  # Mount nfl_analytics/ directory for ensemble module (read-only)
@@ -121,7 +121,7 @@ services:
       - FASTAPI_URL=http://api:8000
       - LOG_LEVEL=INFO
     ports:
-      - "8501:8501"
+      - "127.0.0.1:8501:8501"
     volumes:
       - ./dashboard:/app
       - ./models:/app/models:ro  # Mount models directory (read-only)
@@ -149,7 +149,7 @@ services:
     container_name: nfl-analytics-prometheus
     user: "65534"
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./prometheus/recording_rules.yml:/etc/prometheus/recording_rules.yml:ro
@@ -187,7 +187,7 @@ services:
       - GF_LOG_LEVEL=info
       - GF_PATHS_CONFIG=/etc/grafana/grafana.ini
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     volumes:
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
@@ -299,7 +299,7 @@ services:
     environment:
       - DATA_SOURCE_NAME=postgresql://dro:sicillionbillions@nfl-analytics-pg-1:5432/devdb01?sslmode=disable
     ports:
-      - "9187:9187"
+      - "127.0.0.1:9187:9187"
     depends_on:
       pg-1:
         condition: service_healthy
@@ -317,7 +317,7 @@ services:
     image: prom/node-exporter:latest
     container_name: nfl-analytics-node-exporter
     ports:
-      - "9100:9100"
+      - "127.0.0.1:9100:9100"
     command:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
@@ -340,7 +340,7 @@ services:
     image: prom/alertmanager:latest
     container_name: nfl-analytics-alertmanager
     ports:
-      - "9093:9093"
+      - "127.0.0.1:9093:9093"
     volumes:
       - ./prometheus/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
       - alertmanager_data:/alertmanager
