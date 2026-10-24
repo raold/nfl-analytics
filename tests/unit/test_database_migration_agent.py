@@ -19,6 +19,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, Mock, patch
 
+import psycopg2
 import pytest
 
 # Import agent (with conditional import for CI environments)
@@ -282,7 +283,8 @@ class TestMigrationValidation:
         # Mock database connection to raise syntax error
         mock_conn = MagicMock()
         mock_cursor = MagicMock()
-        mock_cursor.execute.side_effect = Exception("syntax error at or near 'TABEL'")
+        # Postgres raises ProgrammingError (a psycopg2.Error) for syntax errors
+        mock_cursor.execute.side_effect = psycopg2.ProgrammingError("syntax error at or near 'TABEL'")
         mock_conn.cursor.return_value = mock_cursor
         mock_connect.return_value = mock_conn
 
@@ -505,7 +507,8 @@ class TestBackfillManagement:
             mock_conn.cursor.return_value = mock_cursor
             return mock_conn
 
-        mock_connect.side_effect = [create_mock_conn() for _ in range(10)]
+        # One fresh connection per request, however many batches the workers open
+        mock_connect.side_effect = lambda *args, **kwargs: create_mock_conn()
 
         agent._conn = create_mock_conn()
 
@@ -674,7 +677,7 @@ class TestMigrationResult:
         summary = result.summary()
         assert "✅ MIGRATION SUCCESS" in summary
         assert "ID: 42" in summary
-        assert "3.5s" in summary
+        assert "3.50s" in summary
 
     def test_migration_result_failure(self):
         """Test MigrationResult for failed migration."""

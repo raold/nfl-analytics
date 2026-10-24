@@ -393,7 +393,7 @@ class TestBottleneckDetection:
 
     def test_detect_bottlenecks_sorting(self, agent):
         """Test bottlenecks are sorted by severity."""
-        agent.bottlenecks = [
+        injected = [
             Bottleneck(
                 severity=BottleneckSeverity.LOW,
                 bottleneck_type=BottleneckType.DATABASE_QUERY,
@@ -414,12 +414,15 @@ class TestBottleneckDetection:
             ),
         ]
 
-        # Re-detect to trigger sorting
-        bottlenecks = agent.detect_bottlenecks(
-            profile_database=False,
-            profile_python=False,
-            profile_api=False,
-        )
+        # detect_bottlenecks() starts from an empty list, so inject through a stubbed profiler
+        with patch.object(
+            agent, "profile_database_queries", side_effect=lambda: agent.bottlenecks.extend(injected)
+        ):
+            bottlenecks = agent.detect_bottlenecks(
+                profile_database=True,
+                profile_python=False,
+                profile_api=False,
+            )
 
         # Critical should come first
         assert bottlenecks[0].severity == BottleneckSeverity.CRITICAL

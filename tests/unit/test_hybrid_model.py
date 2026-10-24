@@ -87,7 +87,7 @@ def test_initialization_default():
     model = HybridStaticIncrementalXGBoost()
 
     assert model.static_weight == 0.7
-    assert model.incremental_weight == 0.3
+    assert model.incremental_weight == pytest.approx(0.3)
     assert not model.static_trained
     assert model.feature_names is None
 
@@ -382,7 +382,7 @@ def test_get_metrics(hybrid_model, synthetic_data):
     assert "incremental_retrains" in metrics
 
     assert metrics["static_weight"] == 0.7
-    assert metrics["incremental_weight"] == 0.3
+    assert metrics["incremental_weight"] == pytest.approx(0.3)
     assert metrics["static_trained"]
 
 
@@ -463,6 +463,10 @@ def test_full_workflow(hybrid_model, synthetic_data):
         hybrid_model.learn_one(x, y)
 
     np.mean([abs(y - p) for y, p in zip(y_test, predictions)])
+
+    # The online predictions above were made while the model kept learning; a saved and
+    # reloaded model must reproduce the *final* model's predictions
+    predictions = [hybrid_model.predict_one(x) for x in X_test]
 
     # Save model
     with tempfile.TemporaryDirectory() as tmpdir:

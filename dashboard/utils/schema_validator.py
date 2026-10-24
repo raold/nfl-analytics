@@ -172,7 +172,9 @@ def validate_schema(
                     default = col_spec.get(
                         "default", 0 if "int" in expected_type or "float" in expected_type else ""
                     )
-                    validated_df[col_name].fillna(default, inplace=True)
+                    # Assign back: inplace fillna on a column selection is a no-op under
+                    # pandas copy-on-write (default since pandas 3)
+                    validated_df[col_name] = validated_df[col_name].fillna(default)
 
         # Range validation for numeric columns
         if expected_type in ["int64", "float64", "int32", "float32"]:

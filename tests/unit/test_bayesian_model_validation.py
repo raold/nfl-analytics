@@ -111,9 +111,9 @@ def mock_calibration_data_good():
     true_values = np.random.normal(250, 50, n)
     predictions = true_values + np.random.normal(0, 10, n)  # Small prediction error
 
-    # 90% credible intervals (well-calibrated)
-    lower = predictions - 1.645 * 25  # ~90% coverage
-    upper = predictions + 1.645 * 25
+    # 90% credible intervals: well-calibrated means the width matches the error SD (10)
+    lower = predictions - 1.645 * 10
+    upper = predictions + 1.645 * 10
 
     return pd.DataFrame(
         {
@@ -342,8 +342,8 @@ def test_calibration_multiple_levels():
     z_scores = [0.674, 1.0, 1.645, 1.96]
 
     for level, z in zip(levels, z_scores):
-        lower = predictions - z * 25
-        upper = predictions + z * 25
+        lower = predictions - z * 10  # interval SD matches the prediction error SD
+        upper = predictions + z * 10
 
         in_interval = (true_values >= lower) & (true_values <= upper)
         coverage = in_interval.mean()
@@ -554,12 +554,14 @@ def test_validation_workflow_integration():
     # Simulate predictions
     np.random.seed(42)
     n_test = 500
+    true_value = np.random.normal(250, 50, n_test)
+    prediction = true_value + np.random.normal(0, 20, n_test)  # error SD 20
     calib_df = pd.DataFrame(
         {
-            "true_value": np.random.normal(250, 50, n_test),
-            "prediction": np.random.normal(250, 50, n_test),
-            "lower_90": np.random.normal(200, 50, n_test),
-            "upper_90": np.random.normal(300, 50, n_test),
+            "true_value": true_value,
+            "prediction": prediction,
+            "lower_90": prediction - 1.645 * 20,  # calibrated 90% interval
+            "upper_90": prediction + 1.645 * 20,
         }
     )
 

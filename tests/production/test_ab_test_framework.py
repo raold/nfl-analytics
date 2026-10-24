@@ -35,7 +35,7 @@ class TestABTestRouter:
         router = ABTestRouter(split_ratio=0.5)
 
         assert router.split_ratio == 0.5
-        assert router.test_name == "ensemble_v5_vs_v5_1"
+        assert router.test_name == "ensemble_v5_vs_v6_xgboost_ridge"
         assert router.enabled is True
         assert router._models_loaded is False
 
@@ -105,7 +105,7 @@ class TestABTestRouter:
             player_id = f"player_{i:04d}"
             group, version = router._get_assignment(player_id, 2024, 10)
             assert group == "B"
-            assert version == "v5.1"
+            assert version == "v6.0"
 
     def test_disabled_always_assigns_to_control(self):
         """Test that disabled test always assigns to control."""
@@ -118,7 +118,7 @@ class TestABTestRouter:
             assert version == "v5.0"
 
     @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
-    @patch("nfl_analytics.production.ab_test_router.EnsembleV5_1")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_predict_routes_to_correct_ensemble(self, mock_v5_1, mock_v5):
         """Test that predictions are routed to correct ensemble."""
         # Mock ensemble predictions
@@ -154,7 +154,7 @@ class TestABTestRouter:
         assert "ab_group" in result
         assert "model_version" in result
         assert "test_name" in result
-        assert result["test_name"] == "ensemble_v5_vs_v5_1"
+        assert result["test_name"] == "ensemble_v5_vs_v6_xgboost_ridge"
 
     def test_disable_test(self):
         """Test disabling A/B test."""
@@ -181,7 +181,7 @@ class TestABTestRouter:
         for i in range(100):
             group, version = router._get_assignment(f"player_{i:04d}", 2024, 10)
             assert group == "B"
-            assert version == "v5.1"
+            assert version == "v6.0"
 
     def test_get_test_summary_no_data(self):
         """Test get_test_summary when no predictions exist."""
@@ -197,7 +197,7 @@ class TestABTestRouter:
 
             assert "test_name" in summary
             assert "groups" in summary
-            assert summary["test_name"] == "ensemble_v5_vs_v5_1"
+            assert summary["test_name"] == "ensemble_v5_vs_v6_xgboost_ridge"
 
 
 class TestABTestAnalyzer:
@@ -356,7 +356,7 @@ class TestIntegration:
         """Test complete A/B test workflow (mocked)."""
         with (
             patch("nfl_analytics.production.ab_test_router.EnsembleV5"),
-            patch("nfl_analytics.production.ab_test_router.EnsembleV5_1"),
+            patch("nfl_analytics.production.ab_test_router.EnsembleV6"),
             patch("psycopg2.connect"),
         ):
 

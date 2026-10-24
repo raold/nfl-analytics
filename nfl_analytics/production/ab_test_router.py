@@ -274,7 +274,10 @@ class ABTestRouter:
                 logger.warning(f"Failed to log prediction to database: {e}")
 
         logger.info(f"\n✅ Prediction complete (Group {ab_group})")
-        logger.info(f"   {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards")
+        if result.get("ensemble_mean") is not None:
+            logger.info(f"   {result['ensemble_mean']:.1f} ± {result['ensemble_std']:.1f} yards")
+        else:
+            logger.warning("   No prediction available (all ensemble components failed)")
 
         return result
 

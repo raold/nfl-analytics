@@ -162,8 +162,6 @@ class SchemaValidationReport:
     def add_issue(self, issue: ValidationIssue):
         """Add validation issue"""
         self.issues.append(issue)
-        if issue.severity in [Severity.ERROR, Severity.CRITICAL]:
-            self.queries_invalid += 1
 
     def generate_report(self) -> str:
         """Generate human-readable report"""
@@ -515,9 +513,10 @@ class FrontendEngineeringAgent:
 
         # Pattern 1: Multi-line SQL strings
         # Matches: """ SELECT ... """ or ''' SELECT ... '''
-        multi_line_pattern = r'["\']{{3}}(.*?SELECT.*?)["\']{{3}}'
+        # ({{3}} was f-string escaping in a plain raw string, so this never matched)
+        multi_line_pattern = r'("""|\'\'\')(.*?SELECT.*?)\1'
         for match in re.finditer(multi_line_pattern, content, re.DOTALL | re.IGNORECASE):
-            query = match.group(1).strip()
+            query = match.group(2).strip()
             line_num = content[: match.start()].count("\n") + 1
             queries.append((query, line_num))
 
@@ -535,7 +534,7 @@ class FrontendEngineeringAgent:
         execute_pattern = r'(?:conn|cur|cursor)\.execute\s*\(\s*["\']([^"\']+)["\']'
         for match in re.finditer(execute_pattern, content, re.IGNORECASE):
             query = match.group(1).strip()
-            if "SELECT" in query.upper():
+            if "SELECT" in query.upper() and not any(query in q[0] for q in queries):
                 line_num = content[: match.start()].count("\n") + 1
                 queries.append((query, line_num))
 
@@ -559,7 +558,12 @@ class FrontendEngineeringAgent:
 
         # Extract table references
         # Pattern: FROM schema.table or JOIN schema.table
-        table_pattern = r"(?:FROM|JOIN)\s+([a-zA-Z_][a-zA-Z0-9_]*\.?[a-zA-Z_][a-zA-Z0-9_]*)"
+        # plus an optional alias ("FROM mart.player_game_stats pgs" / "... AS pgs")
+        table_pattern = (
+            r"(?:FROM|JOIN)\s+([a-zA-Z_][a-zA-Z0-9_]*\.?[a-zA-Z_][a-zA-Z0-9_]*)"
+            r"(?:\s+(?:AS\s+)?(?!(?:WHERE|JOIN|ON|USING|LEFT|RIGHT|INNER|OUTER|FULL|CROSS|"
+            r"GROUP|ORDER|LIMIT|HAVING|UNION|WINDOW)\b)([a-zA-Z_][a-zA-Z0-9_]*))?"
+        )
         table_matches = re.findall(table_pattern, query, re.IGNORECASE)
 
         all_tables = {
@@ -568,7 +572,7 @@ class FrontendEngineeringAgent:
             **schema.get("materialized_views", {}),
         }
 
-        for table_ref in table_matches:
+        for table_ref, alias in table_matches:
             # Normalize table reference
             if "." not in table_ref:
                 # Assume public schema
@@ -587,11 +591,13 @@ class FrontendEngineeringAgent:
                 )
                 continue
 
-            # Extract column references for this table
-            # Pattern: table_alias.column_name
-            table_alias = table_ref.split(".")[-1]
-            col_pattern = rf"{table_alias}\.([a-zA-Z_][a-zA-Z0-9_]*)"
-            col_matches = re.findall(col_pattern, query, re.IGNORECASE)
+            # Extract column references for this table via its alias or bare table name
+            # (queries almost always use an alias, e.g. pgs.game_id)
+            qualifiers = {table_ref.split(".")[-1]} | ({alias} if alias else set())
+            col_matches = []
+            for qualifier in qualifiers:
+                col_pattern = rf"\b{re.escape(qualifier)}\.([a-zA-Z_][a-zA-Z0-9_]*)"
+                col_matches += re.findall(col_pattern, query, re.IGNORECASE)
 
             table_info = all_tables[table_ref]
             available_columns = set(table_info["columns"])
@@ -668,11 +674,14 @@ class FrontendEngineeringAgent:
         for query, line_num in queries:
             issues = self.validate_sql_query(query, schema)
 
-            if issues:
-                for issue in issues:
-                    issue.file_path = str(self.dashboard_path)
-                    issue.line_number = line_num
-                    report.add_issue(issue)
+            for issue in issues:
+                issue.file_path = str(self.dashboard_path)
+                issue.line_number = line_num
+                report.add_issue(issue)
+
+            # Count queries, not issues: a query is invalid if it has any ERROR/CRITICAL issue
+            if any(i.severity in (Severity.ERROR, Severity.CRITICAL) for i in issues):
+                report.queries_invalid += 1
             else:
                 report.queries_valid += 1
 

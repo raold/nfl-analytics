@@ -85,6 +85,7 @@ class TestLineMovementFeatures:
         clv = calculate_clv(bet_spread=-3.0, closing_spread=-2.5, bet_on_home=False)
         assert clv == 0.5
 
+    @pytest.mark.integration  # extract() queries the database
     def test_extract_returns_dict(self):
         """Test that extract always returns a dictionary."""
         from nfl_analytics.features.line_movement_features import LineMovementFeatures

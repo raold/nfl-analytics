@@ -101,7 +101,8 @@ def mock_ensemble_v6_all_components(mock_db_config):
         ensemble._predict_hierarchical = Mock(return_value=(235.0, 42.0))
         ensemble._predict_xgboost_v4 = Mock(return_value=(245.0, 40.0))
         ensemble._predict_informative_priors = Mock(return_value=(230.0, 48.0))
-        ensemble._predict_hybrid = Mock(return_value=(250.0, 51.0))
+        # Any value except 250.0, the placeholder sentinel the tests below guard against
+        ensemble._predict_hybrid = Mock(return_value=(252.0, 51.0))
 
         return ensemble
 
@@ -127,7 +128,8 @@ def mock_ensemble_v6_partial_components(mock_db_config):
         ensemble._predict_hierarchical = Mock(return_value=(None, None))  # FAILS
         ensemble._predict_xgboost_v4 = Mock(return_value=(245.0, 40.0))
         ensemble._predict_informative_priors = Mock(return_value=(None, None))  # FAILS
-        ensemble._predict_hybrid = Mock(return_value=(250.0, 51.0))
+        # Any value except 250.0, the placeholder sentinel the tests below guard against
+        ensemble._predict_hybrid = Mock(return_value=(252.0, 51.0))
 
         return ensemble
 
@@ -340,13 +342,14 @@ class TestWeightValidation:
         """Weights should match v6.0 canonical values."""
         weights = mock_ensemble_v6_all_components.weights
 
-        # v6.0 canonical weights (from Nov 15, 2025)
+        # v6.0 canonical weights after XGBoost v4 was disabled for target leakage
+        # (Dec 2025, ADR-003); its 23% was redistributed across the other components
         expected = {
-            "state_space_v2": 0.27,
-            "hierarchical_v2": 0.27,
-            "xgboost_v4_ridge": 0.23,
-            "informative_priors_v2": 0.13,
-            "hybrid_static_incremental": 0.10,
+            "state_space_v2": 0.35,
+            "hierarchical_v2": 0.35,
+            "xgboost_v4_ridge": 0.00,
+            "informative_priors_v2": 0.15,
+            "hybrid_static_incremental": 0.15,
         }
 
         for component, expected_weight in expected.items():

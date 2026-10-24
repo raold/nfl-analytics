@@ -53,7 +53,7 @@ def test_wrong_column_names_in_games(validator):
 
 def test_la_team_abbreviation_warning(validator):
     """Test detection of ambiguous LA team abbreviation."""
-    query = "SELECT * FROM games WHERE home_team = 'LA'"
+    query = "SELECT game_id FROM games WHERE home_team = 'LA'"  # no SELECT * (separate warning)
     errors = validator.validate_query(query)
 
     assert len(errors) == 1

@@ -45,7 +45,7 @@ class TestABTestRouterUnit:
         router = ABTestRouter(split_ratio=0.5)
 
         assert router.split_ratio == 0.5
-        assert router.test_name == "ensemble_v5_vs_v6_sagarin"
+        assert router.test_name == "ensemble_v5_vs_v6_xgboost_ridge"
         assert router.enabled is True
         assert router._models_loaded is False
         assert router.ensemble_v5 is None
@@ -305,7 +305,7 @@ class TestABTestRouterIntegration:
         # Should have A/B metadata
         assert result["ab_group"] == "A"
         assert result["model_version"] == "v5.0"
-        assert result["test_name"] == "ensemble_v5_vs_v6_sagarin"
+        assert result["test_name"] == "ensemble_v5_vs_v6_xgboost_ridge"
 
     @patch("psycopg2.connect")
     @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
@@ -335,7 +335,7 @@ class TestABTestRouterIntegration:
         # Should have A/B metadata
         assert result["ab_group"] == "B"
         assert result["model_version"] == "v6.0"
-        assert result["test_name"] == "ensemble_v5_vs_v6_sagarin"
+        assert result["test_name"] == "ensemble_v5_vs_v6_xgboost_ridge"
 
     @patch("psycopg2.connect")
     @patch("nfl_analytics.production.ab_test_router.EnsembleV5")

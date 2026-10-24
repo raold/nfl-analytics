@@ -544,7 +544,7 @@ def test_profiling_recommendations():
         recommendations.append("Optimize SQL queries (add indexes, reduce JOINs)")
 
     if profile_results["training_time"] > 60:
-        recommendations.append("Consider faster model or reduce hyperparameters")
+        recommendations.append("Training is slow: use a faster model or fewer hyperparameters")
 
     assert len(recommendations) == 2
     assert any("SQL" in r for r in recommendations)

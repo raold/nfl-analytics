@@ -498,6 +498,17 @@ class BayesianStacker:
 
         start_time = time.time()
 
+        if not loo_results:
+            logger.error("❌ Optimization failed: no LOO results to stack")
+            return StackingResult(
+                weights={},
+                elpd_loo_stacking=-np.inf,
+                elpd_loo_equal=-np.inf,
+                improvement=0.0,
+                status="FAILED",
+                optimization_time_sec=time.time() - start_time,
+            )
+
         # Extract log-likelihoods matrix (N x K)
         model_names = list(loo_results.keys())
         K = len(model_names)
@@ -995,8 +1006,14 @@ class ValidationFramework:
         loss_stacking = errors_stacking**2
         d = loss_heuristic - loss_stacking
 
-        # t-test on loss differential
-        t_stat, p_value = ttest_rel(loss_heuristic, loss_stacking)
+        # t-test on loss differential. With zero variance in d the t-test returns NaN:
+        # identical losses mean no evidence of a difference (p = 1); a constant non-zero
+        # difference is decisive (p = 0).
+        if np.allclose(d, d[0]):
+            t_stat = 0.0 if np.isclose(d[0], 0.0) else np.sign(d[0]) * np.inf
+            p_value = 1.0 if np.isclose(d[0], 0.0) else 0.0
+        else:
+            t_stat, p_value = ttest_rel(loss_heuristic, loss_stacking)
 
         mean_d = np.mean(d)
         se_d = np.std(d) / np.sqrt(len(d))

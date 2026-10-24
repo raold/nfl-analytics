@@ -19,15 +19,15 @@ class TestEnsembleV6API:
 
     def test_canonical_class_exists(self):
         """Test that canonical class can be imported."""
-        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-        assert EnhancedEnsemble4Way is not None
+        assert EnhancedEnsemble5Way is not None
 
     def test_init_signature(self):
         """Test __init__ signature has required parameters."""
-        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-        sig = inspect.signature(EnhancedEnsemble4Way.__init__)
+        sig = inspect.signature(EnhancedEnsemble5Way.__init__)
         params = list(sig.parameters.keys())
 
         # Required parameters
@@ -36,7 +36,8 @@ class TestEnsembleV6API:
         assert "hierarchical_path" in params
         assert "informative_path" in params
         assert "ridge_path" in params  # XGBoost v4 Ridge Residuals
-        assert "xgboost_path" in params
+        assert "xgboost_v4_path" in params
+        assert "hybrid_base_path" in params
 
         # Optional parameters
         assert "weights" in params
@@ -49,9 +50,9 @@ class TestEnsembleV6API:
 
     def test_no_deprecated_params(self):
         """Test that deprecated parameters have been removed."""
-        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-        sig = inspect.signature(EnhancedEnsemble4Way.__init__)
+        sig = inspect.signature(EnhancedEnsemble5Way.__init__)
         params = list(sig.parameters.keys())
 
         # Should NOT have deprecated params from old versions
@@ -61,38 +62,43 @@ class TestEnsembleV6API:
         assert "adaptive_weights_path" not in params  # Research version only
 
     def test_default_weights_structure(self):
-        """Test DEFAULT_WEIGHTS has correct structure."""
-        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        """Test DEFAULT_WEIGHTS structure (game predictions, v6.0 production)."""
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-        weights = EnhancedEnsemble4Way.DEFAULT_WEIGHTS
+        weights = EnhancedEnsemble5Way.DEFAULT_WEIGHTS
 
         # Should be a dictionary
         assert isinstance(weights, dict)
 
-        # Should have exactly 4 models (4-way ensemble)
-        assert len(weights) == 4
+        # Five components (5-way ensemble)
+        assert len(weights) == 5
 
         # Should have correct model names
         assert "state_space_v2" in weights
         assert "hierarchical_v2" in weights
         assert "xgboost_v4_ridge" in weights
         assert "informative_priors_v2" in weights
+        assert "hybrid_static_incremental" in weights
 
         # Weights should sum to 1.0 (within tolerance)
         total = sum(weights.values())
         assert abs(total - 1.0) < 0.01
 
-        # Individual weights should be positive
+        # XGBoost v4 ridge residuals stays disabled: its results were target leakage (ADR-003)
+        assert weights["xgboost_v4_ridge"] == 0.0
+
+        # Every other component carries weight
         for model, weight in weights.items():
-            assert weight > 0, f"{model} has non-positive weight: {weight}"
+            if model != "xgboost_v4_ridge":
+                assert weight > 0, f"{model} has non-positive weight: {weight}"
 
     def test_predict_method_exists(self):
         """Test that predict method exists with correct signature."""
-        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-        assert hasattr(EnhancedEnsemble4Way, "predict")
+        assert hasattr(EnhancedEnsemble5Way, "predict")
 
-        sig = inspect.signature(EnhancedEnsemble4Way.predict)
+        sig = inspect.signature(EnhancedEnsemble5Way.predict)
         params = list(sig.parameters.keys())
 
         # Required parameters
@@ -103,9 +109,9 @@ class TestEnsembleV6API:
 
     def test_return_type_annotations(self):
         """Test that predict method has return type annotation."""
-        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-        sig = inspect.signature(EnhancedEnsemble4Way.predict)
+        sig = inspect.signature(EnhancedEnsemble5Way.predict)
 
         # Should have return annotation
         assert sig.return_annotation != inspect.Signature.empty
@@ -154,17 +160,17 @@ class TestAPIDocumentation:
 
     def test_canonical_has_docstring(self):
         """Test that canonical class has docstring."""
-        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-        assert EnhancedEnsemble4Way.__doc__ is not None
-        assert len(EnhancedEnsemble4Way.__doc__.strip()) > 0
+        assert EnhancedEnsemble5Way.__doc__ is not None
+        assert len(EnhancedEnsemble5Way.__doc__.strip()) > 0
 
     def test_predict_has_docstring(self):
         """Test that predict method has docstring."""
-        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
-        assert EnhancedEnsemble4Way.predict.__doc__ is not None
-        assert len(EnhancedEnsemble4Way.predict.__doc__.strip()) > 0
+        assert EnhancedEnsemble5Way.predict.__doc__ is not None
+        assert len(EnhancedEnsemble5Way.predict.__doc__.strip()) > 0
 
 
 if __name__ == "__main__":

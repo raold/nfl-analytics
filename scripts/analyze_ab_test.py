@@ -382,10 +382,16 @@ class ABTestAnalyzer:
                 f"MAE improved by {mae_improvement:.1%} (target: {self.TARGET_MAE_IMPROVEMENT:.1%})"
             )
 
-        # Check 3: Statistical significance
-        if statistical_tests.get("ttest", {}).get("significant"):
+        # Check 3: Statistical significance. The t-test is two-sided, so a significant
+        # result only supports deployment when the treatment is the better model.
+        significant = bool(statistical_tests.get("ttest", {}).get("significant"))
+        if significant and mae_improvement > 0:
             decision["reasons"].append(
                 f"Statistically significant improvement (p={statistical_tests['ttest']['p_value']:.4f})"
+            )
+        elif significant:
+            decision["blockers"].append(
+                f"Group B is significantly WORSE (p={statistical_tests['ttest']['p_value']:.4f})"
             )
         else:
             decision["blockers"].append(
@@ -421,8 +427,11 @@ class ABTestAnalyzer:
                 f"RMSE degraded by {rmse_change:.1%} (B: {rmse_b:.2f} vs A: {rmse_a:.2f})"
             )
 
-        # Make final decision
-        if len(decision["blockers"]) == 0:
+        # Make final decision. A worse treatment is never deployed, whatever the other votes.
+        if mae_improvement < 0:
+            decision["recommendation"] = "ROLLBACK" if significant else "WAIT"
+            decision["confidence"] = "HIGH" if significant else "LOW"
+        elif len(decision["blockers"]) == 0:
             decision["recommendation"] = "DEPLOY"
             decision["confidence"] = "HIGH"
             decision["reasons"].append("All criteria met - safe to deploy v5.1 to 100%")

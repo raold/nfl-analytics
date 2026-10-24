@@ -434,8 +434,8 @@ class SportsAnalyticsValidator:
                             )
                         )
 
-            # Check attempts
-            if "stat_attempts" in row:
+            # Check attempts (only categories with an attempts limit, e.g. not receiving)
+            if "stat_attempts" in row and "attempts" in limits:
                 attempts = row.get("stat_attempts")
                 if pd.notna(attempts):
                     min_attempts, max_attempts = limits["attempts"]
@@ -755,7 +755,7 @@ class SportsAnalyticsValidator:
             )
 
         # Check for incorrect column names
-        if re.search(r"\.game_date\b", query, re.IGNORECASE):
+        if re.search(r"\bgame_date\b", query, re.IGNORECASE):
             issues.append(
                 ValidationIssue(
                     severity=Severity.WARNING,
@@ -765,7 +765,7 @@ class SportsAnalyticsValidator:
                 )
             )
 
-        if re.search(r"\.spread_line\b", query, re.IGNORECASE):
+        if re.search(r"\bspread_line\b", query, re.IGNORECASE):
             issues.append(
                 ValidationIssue(
                     severity=Severity.WARNING,
