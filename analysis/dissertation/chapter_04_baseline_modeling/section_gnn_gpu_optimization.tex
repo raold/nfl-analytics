@@ -225,7 +225,7 @@ This observation exemplifies a key benefit of eliminating computational bottlene
 
 \paragraph{Generalization to other sports.} The optimization techniques (batch parallelization, mixed precision, async transfers) apply directly to graph-structured prediction in basketball, soccer, and hockey. Any domain with relational data (teams, players, matchups) can benefit from similar GPU acceleration.
 
-\paragraph{Reproducibility.} Complete training code with all optimizations is available at \url{https://github.com/raold/nfl-analytics/tree/main/py/models}. Key implementation files:
+\paragraph{Reproducibility.} Complete training code with all optimizations is available at \url{https://github.com/raold/nfl-analytics/tree/main/nfl_analytics/models}. Key implementation files:
 \begin{itemize}
     \item \texttt{hierarchical\_gnn\_v1.py}: Model architecture with batch-parallel support
     \item \texttt{train\_hierarchical\_gnn.py}: Training loop with FP16, async transfers, monitoring

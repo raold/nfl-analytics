@@ -1,5 +1,5 @@
 """
-Unit tests for py/trading/claude_signal_validator.py — Claude signal validation PoC.
+Unit tests for nfl_analytics/trading/claude_signal_validator.py — Claude signal validation PoC.
 
 All tests mock the Anthropic SDK. No real API calls are made.
 """
@@ -12,14 +12,14 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from py.markets.base import Side
-from py.trading.claude_signal_validator import (
+from nfl_analytics.markets.base import Side
+from nfl_analytics.trading.claude_signal_validator import (
     ClaudeSignalValidator,
     ClaudeValidatorConfig,
     ClaudeValidationResult,
     ValidationDecision,
 )
-from py.trading.signal import Signal
+from nfl_analytics.trading.signal import Signal
 
 
 # ---------------------------------------------------------------------------

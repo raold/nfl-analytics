@@ -3,7 +3,7 @@
 # Test Suite Generator - Generate comprehensive tests targeting 80%+ coverage
 #
 # Usage:
-#   ./scripts/generate_tests.sh py/models/train_bnn_passing.py    # Generate tests for specific file
+#   ./scripts/generate_tests.sh nfl_analytics/models/train_bnn_passing.py    # Generate tests for specific file
 #   ./scripts/generate_tests.sh --full                             # Generate full test suite
 #   ./scripts/generate_tests.sh --coverage                         # Check current coverage
 #
@@ -24,12 +24,12 @@ if [ "$1" == "--full" ]; then
     echo ""
 
     python3 -c "
-from py.utils.test_generator import TestGenerator
+from nfl_analytics.utils.test_generator import TestGenerator
 
 generator = TestGenerator()
 
-# Generate tests for all Python files in py/
-generator.generate_full_suite(target_coverage=0.80, source_dirs=['py/'])
+# Generate tests for all Python files in nfl_analytics/
+generator.generate_full_suite(target_coverage=0.80, source_dirs=['nfl_analytics/'])
 
 print('\\n✅ Full test suite generated')
 print('\\nNext steps:')
@@ -66,7 +66,7 @@ elif [ -n "$1" ]; then
     echo ""
 
     python3 -c "
-from py.utils.test_generator import TestGenerator
+from nfl_analytics.utils.test_generator import TestGenerator
 from pathlib import Path
 
 generator = TestGenerator()
@@ -110,8 +110,8 @@ else
     echo "  ./scripts/generate_tests.sh --coverage        # Check current coverage"
     echo ""
     echo "Examples:"
-    echo "  ./scripts/generate_tests.sh py/models/train_bnn_passing.py"
-    echo "  ./scripts/generate_tests.sh py/ensemble/enhanced_ensemble_v5_canonical.py"
+    echo "  ./scripts/generate_tests.sh nfl_analytics/models/train_bnn_passing.py"
+    echo "  ./scripts/generate_tests.sh nfl_analytics/ensemble/enhanced_ensemble_v5_canonical.py"
     echo "  ./scripts/generate_tests.sh --full"
     echo ""
     echo "Test types generated:"

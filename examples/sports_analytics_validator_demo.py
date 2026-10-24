@@ -10,7 +10,7 @@ Run:
 
 import pandas as pd
 
-from py.utils.sports_analytics_validator import (
+from nfl_analytics.utils.sports_analytics_validator import (
     SportsAnalyticsValidator,
 )
 

@@ -2,7 +2,7 @@
 
 **Author:** Claude Code (Sonnet 4.5)
 **Date:** November 9, 2025
-**Location:** `py/utils/query_model_registry.py`
+**Location:** `nfl_analytics/utils/query_model_registry.py`
 
 ## Overview
 
@@ -15,13 +15,13 @@ A comprehensive command-line interface for querying, comparing, and managing mac
 uv pip install tabulate click psycopg2-binary
 
 # View all commands
-uv run python py/utils/query_model_registry.py --help
+uv run python nfl_analytics/utils/query_model_registry.py --help
 
 # List all models
-uv run python py/utils/query_model_registry.py list
+uv run python nfl_analytics/utils/query_model_registry.py list
 
 # Get detailed info about a model
-uv run python py/utils/query_model_registry.py info bnn_v2 --show-training
+uv run python nfl_analytics/utils/query_model_registry.py info bnn_v2 --show-training
 ```
 
 ## Database Connection
@@ -41,7 +41,7 @@ List all models in the registry with optional filtering and sorting.
 
 **Usage:**
 ```bash
-uv run python py/utils/query_model_registry.py list [OPTIONS]
+uv run python nfl_analytics/utils/query_model_registry.py list [OPTIONS]
 ```
 
 **Options:**
@@ -56,16 +56,16 @@ uv run python py/utils/query_model_registry.py list [OPTIONS]
 **Examples:**
 ```bash
 # List production models only
-uv run python py/utils/query_model_registry.py list --status production
+uv run python nfl_analytics/utils/query_model_registry.py list --status production
 
 # List BNN models trained on 2018-2024 window
-uv run python py/utils/query_model_registry.py list --model-type bnn --training-window "2018-2024"
+uv run python nfl_analytics/utils/query_model_registry.py list --model-type bnn --training-window "2018-2024"
 
 # List all models sorted by training duration
-uv run python py/utils/query_model_registry.py list --sort-by duration --limit 10
+uv run python nfl_analytics/utils/query_model_registry.py list --sort-by duration --limit 10
 
 # Show only production models
-uv run python py/utils/query_model_registry.py list --production-only
+uv run python nfl_analytics/utils/query_model_registry.py list --production-only
 ```
 
 **Output:**
@@ -87,7 +87,7 @@ Search models using flexible criteria and multiple filters.
 
 **Usage:**
 ```bash
-uv run python py/utils/query_model_registry.py search [OPTIONS]
+uv run python nfl_analytics/utils/query_model_registry.py search [OPTIONS]
 ```
 
 **Options:**
@@ -101,16 +101,16 @@ uv run python py/utils/query_model_registry.py search [OPTIONS]
 **Examples:**
 ```bash
 # Search for BNN models
-uv run python py/utils/query_model_registry.py search --model-type bnn
+uv run python nfl_analytics/utils/query_model_registry.py search --model-type bnn
 
 # Search for completed models trained on RTX 4090
-uv run python py/utils/query_model_registry.py search --status completed --hardware RTX_4090
+uv run python nfl_analytics/utils/query_model_registry.py search --status completed --hardware RTX_4090
 
 # Search for models with MAE < 50
-uv run python py/utils/query_model_registry.py search --max-mae 50
+uv run python nfl_analytics/utils/query_model_registry.py search --max-mae 50
 
 # Search for models from main branch
-uv run python py/utils/query_model_registry.py search --git-branch main
+uv run python nfl_analytics/utils/query_model_registry.py search --git-branch main
 ```
 
 **Output:**
@@ -135,7 +135,7 @@ Side-by-side comparison of two model versions.
 
 **Usage:**
 ```bash
-uv run python py/utils/query_model_registry.py compare MODEL1 MODEL2 [OPTIONS]
+uv run python nfl_analytics/utils/query_model_registry.py compare MODEL1 MODEL2 [OPTIONS]
 ```
 
 **Options:**
@@ -144,10 +144,10 @@ uv run python py/utils/query_model_registry.py compare MODEL1 MODEL2 [OPTIONS]
 **Examples:**
 ```bash
 # Compare two BNN versions
-uv run python py/utils/query_model_registry.py compare bnn_v1 bnn_v2
+uv run python nfl_analytics/utils/query_model_registry.py compare bnn_v1 bnn_v2
 
 # Compare with only differences shown
-uv run python py/utils/query_model_registry.py compare bnn_v1 bnn_v2 --show-diff-only
+uv run python nfl_analytics/utils/query_model_registry.py compare bnn_v1 bnn_v2 --show-diff-only
 ```
 
 **Output:**
@@ -187,7 +187,7 @@ Rank models by performance metrics with customizable output formats.
 
 **Usage:**
 ```bash
-uv run python py/utils/query_model_registry.py leaderboard [OPTIONS]
+uv run python nfl_analytics/utils/query_model_registry.py leaderboard [OPTIONS]
 ```
 
 **Options:**
@@ -200,19 +200,19 @@ uv run python py/utils/query_model_registry.py leaderboard [OPTIONS]
 **Examples:**
 ```bash
 # Show top models by MAE
-uv run python py/utils/query_model_registry.py leaderboard --metric mae_yards
+uv run python nfl_analytics/utils/query_model_registry.py leaderboard --metric mae_yards
 
 # Filter by passing models only
-uv run python py/utils/query_model_registry.py leaderboard --metric mae_yards --stat-type passing
+uv run python nfl_analytics/utils/query_model_registry.py leaderboard --metric mae_yards --stat-type passing
 
 # Export leaderboard as LaTeX
-uv run python py/utils/query_model_registry.py leaderboard --metric mae_yards --format latex > results.tex
+uv run python nfl_analytics/utils/query_model_registry.py leaderboard --metric mae_yards --format latex > results.tex
 
 # Export as CSV for analysis
-uv run python py/utils/query_model_registry.py leaderboard --metric roi --format csv > leaderboard.csv
+uv run python nfl_analytics/utils/query_model_registry.py leaderboard --metric roi --format csv > leaderboard.csv
 
 # Show top 10 models sorted by accuracy (descending)
-uv run python py/utils/query_model_registry.py leaderboard --metric accuracy --limit 10
+uv run python nfl_analytics/utils/query_model_registry.py leaderboard --metric accuracy --limit 10
 ```
 
 **Output (table format):**
@@ -235,16 +235,16 @@ Verify if a model can be safely deleted without breaking dependencies.
 
 **Usage:**
 ```bash
-uv run python py/utils/query_model_registry.py check-safe-delete MODEL_NAME
+uv run python nfl_analytics/utils/query_model_registry.py check-safe-delete MODEL_NAME
 ```
 
 **Examples:**
 ```bash
 # Check if bnn_old_v1 is safe to delete
-uv run python py/utils/query_model_registry.py check-safe-delete bnn_old_v1
+uv run python nfl_analytics/utils/query_model_registry.py check-safe-delete bnn_old_v1
 
 # Check production model (will show unsafe)
-uv run python py/utils/query_model_registry.py check-safe-delete bnn_multioutput_v1
+uv run python nfl_analytics/utils/query_model_registry.py check-safe-delete bnn_multioutput_v1
 ```
 
 **Output:**
@@ -286,7 +286,7 @@ Show comprehensive information about a specific model.
 
 **Usage:**
 ```bash
-uv run python py/utils/query_model_registry.py info MODEL_NAME [OPTIONS]
+uv run python nfl_analytics/utils/query_model_registry.py info MODEL_NAME [OPTIONS]
 ```
 
 **Options:**
@@ -297,13 +297,13 @@ uv run python py/utils/query_model_registry.py info MODEL_NAME [OPTIONS]
 **Examples:**
 ```bash
 # Basic info
-uv run python py/utils/query_model_registry.py info bnn_v2
+uv run python nfl_analytics/utils/query_model_registry.py info bnn_v2
 
 # Full details with all sections
-uv run python py/utils/query_model_registry.py info bnn_v2 --show-training --show-metrics --show-artifacts
+uv run python nfl_analytics/utils/query_model_registry.py info bnn_v2 --show-training --show-metrics --show-artifacts
 
 # Just training runs
-uv run python py/utils/query_model_registry.py info state_space_v1 --show-training
+uv run python nfl_analytics/utils/query_model_registry.py info state_space_v1 --show-training
 ```
 
 **Output:**
@@ -360,7 +360,7 @@ Export model information to various formats for documentation or analysis.
 
 **Usage:**
 ```bash
-uv run python py/utils/query_model_registry.py export [OPTIONS]
+uv run python nfl_analytics/utils/query_model_registry.py export [OPTIONS]
 ```
 
 **Options:**
@@ -372,19 +372,19 @@ uv run python py/utils/query_model_registry.py export [OPTIONS]
 **Examples:**
 ```bash
 # Export all models as LaTeX table
-uv run python py/utils/query_model_registry.py export --format latex > models.tex
+uv run python nfl_analytics/utils/query_model_registry.py export --format latex > models.tex
 
 # Export production models to CSV
-uv run python py/utils/query_model_registry.py export --format csv --status production --output models.csv
+uv run python nfl_analytics/utils/query_model_registry.py export --format csv --status production --output models.csv
 
 # Export as JSON for programmatic use
-uv run python py/utils/query_model_registry.py export --format json --output models.json
+uv run python nfl_analytics/utils/query_model_registry.py export --format json --output models.json
 
 # Export as Markdown table for documentation
-uv run python py/utils/query_model_registry.py export --format markdown > MODELS.md
+uv run python nfl_analytics/utils/query_model_registry.py export --format markdown > MODELS.md
 
 # Export models with specific metric to LaTeX
-uv run python py/utils/query_model_registry.py export --format latex --metric mae_yards > leaderboard.tex
+uv run python nfl_analytics/utils/query_model_registry.py export --format latex --metric mae_yards > leaderboard.tex
 ```
 
 **LaTeX Output Example:**
@@ -452,23 +452,23 @@ state_space_v1,state_space,time_series,v1.0,completed,True,2015-2024,45.2m,Mac M
 
 ```bash
 # View leaderboard sorted by your target metric
-uv run python py/utils/query_model_registry.py leaderboard --metric mae_yards --limit 10
+uv run python nfl_analytics/utils/query_model_registry.py leaderboard --metric mae_yards --limit 10
 
 # Get detailed info on top candidate
-uv run python py/utils/query_model_registry.py info state_space_v2 --show-training --show-metrics
+uv run python nfl_analytics/utils/query_model_registry.py info state_space_v2 --show-training --show-metrics
 
 # Compare against current production model
-uv run python py/utils/query_model_registry.py compare state_space_v1 state_space_v2
+uv run python nfl_analytics/utils/query_model_registry.py compare state_space_v1 state_space_v2
 ```
 
 ### 2. Clean Up Old Models
 
 ```bash
 # List archived models
-uv run python py/utils/query_model_registry.py list --status archived
+uv run python nfl_analytics/utils/query_model_registry.py list --status archived
 
 # Check if safe to delete
-uv run python py/utils/query_model_registry.py check-safe-delete bnn_old_v1
+uv run python nfl_analytics/utils/query_model_registry.py check-safe-delete bnn_old_v1
 
 # If safe, delete from database
 psql devdb01 -c "DELETE FROM ml.model_registry WHERE model_name = 'bnn_old_v1';"
@@ -478,40 +478,40 @@ psql devdb01 -c "DELETE FROM ml.model_registry WHERE model_name = 'bnn_old_v1';"
 
 ```bash
 # Export all production models as LaTeX table for dissertation
-uv run python py/utils/query_model_registry.py export --format latex --status production > dissertation/tables/models.tex
+uv run python nfl_analytics/utils/query_model_registry.py export --format latex --status production > dissertation/tables/models.tex
 
 # Export full registry as CSV for analysis
-uv run python py/utils/query_model_registry.py export --format csv --output analysis/models.csv
+uv run python nfl_analytics/utils/query_model_registry.py export --format csv --output analysis/models.csv
 
 # Create Markdown documentation
-uv run python py/utils/query_model_registry.py export --format markdown > docs/MODEL_REGISTRY.md
+uv run python nfl_analytics/utils/query_model_registry.py export --format markdown > docs/MODEL_REGISTRY.md
 ```
 
 ### 4. Model Investigation
 
 ```bash
 # Search for models trained on specific hardware
-uv run python py/utils/query_model_registry.py search --hardware RTX_4090
+uv run python nfl_analytics/utils/query_model_registry.py search --hardware RTX_4090
 
 # Find models with good performance
-uv run python py/utils/query_model_registry.py search --max-mae 50
+uv run python nfl_analytics/utils/query_model_registry.py search --max-mae 50
 
 # Get full details on interesting model
-uv run python py/utils/query_model_registry.py info bnn_mixture_experts_v2 --show-training --show-metrics --show-artifacts
+uv run python nfl_analytics/utils/query_model_registry.py info bnn_mixture_experts_v2 --show-training --show-metrics --show-artifacts
 ```
 
 ### 5. Performance Analysis
 
 ```bash
 # Export leaderboard as JSON for Python analysis
-uv run python py/utils/query_model_registry.py leaderboard --metric mae_yards --format json > leaderboard.json
+uv run python nfl_analytics/utils/query_model_registry.py leaderboard --metric mae_yards --format json > leaderboard.json
 
 # Compare multiple versions
-uv run python py/utils/query_model_registry.py compare bnn_v1 bnn_v2
-uv run python py/utils/query_model_registry.py compare bnn_v2 bnn_v3
+uv run python nfl_analytics/utils/query_model_registry.py compare bnn_v1 bnn_v2
+uv run python nfl_analytics/utils/query_model_registry.py compare bnn_v2 bnn_v3
 
 # Export metrics to CSV for R analysis
-uv run python py/utils/query_model_registry.py export --format csv > metrics.csv
+uv run python nfl_analytics/utils/query_model_registry.py export --format csv > metrics.csv
 ```
 
 ---
@@ -630,13 +630,13 @@ psql devdb01 -c "\d ml.model_registry"
 # deploy_best_model.sh
 
 # Find best model by MAE
-BEST_MODEL=$(uv run python py/utils/query_model_registry.py leaderboard \
+BEST_MODEL=$(uv run python nfl_analytics/utils/query_model_registry.py leaderboard \
   --metric mae_yards --limit 1 --format json | jq -r '.leaderboard[0].model_name')
 
 echo "Deploying model: $BEST_MODEL"
 
 # Check if safe (not already in production with active deployment)
-uv run python py/utils/query_model_registry.py check-safe-delete "$BEST_MODEL"
+uv run python nfl_analytics/utils/query_model_registry.py check-safe-delete "$BEST_MODEL"
 
 # Deploy model...
 ```
@@ -649,7 +649,7 @@ import json
 
 # Run CLI command from Python
 result = subprocess.run(
-    ["uv", "run", "python", "py/utils/query_model_registry.py",
+    ["uv", "run", "python", "nfl_analytics/utils/query_model_registry.py",
      "leaderboard", "--metric", "mae_yards", "--format", "json"],
     capture_output=True,
     text=True
@@ -664,7 +664,7 @@ print(f"Best model: {best_model['model_name']} (MAE: {best_model['metric_value']
 
 ```r
 # Export data and load in R
-system("uv run python py/utils/query_model_registry.py export --format csv --output /tmp/models.csv")
+system("uv run python nfl_analytics/utils/query_model_registry.py export --format csv --output /tmp/models.csv")
 models <- read.csv("/tmp/models.csv")
 
 # Analyze in R
@@ -696,7 +696,7 @@ Potential additions to the CLI:
 For issues or questions:
 
 1. Check database schema: `db/migrations/025_model_registry.sql`
-2. Review model registry module: `py/registry/model_registry.py`
+2. Review model registry module: `nfl_analytics/registry/model_registry.py`
 3. Check CLAUDE.md for project context
 4. Run with `--help` flag for command-specific documentation
 

@@ -288,11 +288,11 @@ def sample_v2_data(sample_enhanced_data: pd.DataFrame) -> pd.DataFrame:
 
 
 class TestBaseAsofFeatures:
-    """Tests for py.features.asof_features module."""
+    """Tests for nfl_analytics.features.asof_features module."""
 
     def test_import(self):
         """Verify base module can be imported."""
-        from py.features import asof_features
+        from nfl_analytics.features import asof_features
         assert hasattr(asof_features, 'compute_team_history')
         assert hasattr(asof_features, 'pivot_to_games')
         assert hasattr(asof_features, 'validate_team_history')
@@ -301,7 +301,7 @@ class TestBaseAsofFeatures:
 
     def test_team_feature_columns_count(self):
         """Verify expected number of base team features."""
-        from py.features.asof_features import TEAM_FEATURE_COLUMNS
+        from nfl_analytics.features.asof_features import TEAM_FEATURE_COLUMNS
         # Base module should have 36 team features
         assert len(TEAM_FEATURE_COLUMNS) == 36, (
             f"Expected 36 base team features, got {len(TEAM_FEATURE_COLUMNS)}"
@@ -309,7 +309,7 @@ class TestBaseAsofFeatures:
 
     def test_diff_feature_columns_count(self):
         """Verify expected number of diff features."""
-        from py.features.asof_features import DIFF_FEATURE_COLUMNS
+        from nfl_analytics.features.asof_features import DIFF_FEATURE_COLUMNS
         # Should have differential features
         assert len(DIFF_FEATURE_COLUMNS) > 20
         assert 'prior_epa_mean' in DIFF_FEATURE_COLUMNS
@@ -317,7 +317,7 @@ class TestBaseAsofFeatures:
 
     def test_rename_with_prefix(self):
         """Test the rename utility function."""
-        from py.features.asof_features import rename_with_prefix
+        from nfl_analytics.features.asof_features import rename_with_prefix
 
         columns = ['epa_mean', 'plays', 'rest_days']
         result = rename_with_prefix(columns, 'home')
@@ -330,7 +330,7 @@ class TestBaseAsofFeatures:
 
     def test_rename_with_prefix_away(self):
         """Test rename with away prefix."""
-        from py.features.asof_features import rename_with_prefix
+        from nfl_analytics.features.asof_features import rename_with_prefix
 
         columns = ['prior_games', 'margin_last3']
         result = rename_with_prefix(columns, 'away')
@@ -340,7 +340,7 @@ class TestBaseAsofFeatures:
 
     def test_compute_team_history_prior_games(self, sample_team_game_data: pd.DataFrame):
         """Test that prior_games increments correctly (temporal safety)."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(sample_team_game_data)
 
@@ -356,7 +356,7 @@ class TestBaseAsofFeatures:
 
     def test_compute_team_history_prior_epa_sum(self, sample_team_game_data: pd.DataFrame):
         """Test that prior_epa_sum uses only past games."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(sample_team_game_data)
         kc = result[result['team'] == 'KC'].sort_values('week')
@@ -372,7 +372,7 @@ class TestBaseAsofFeatures:
 
     def test_compute_team_history_rest_days(self, sample_team_game_data: pd.DataFrame):
         """Test that rest_days is computed correctly."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(sample_team_game_data)
         kc = result[result['team'] == 'KC'].sort_values('week')
@@ -385,7 +385,7 @@ class TestBaseAsofFeatures:
 
     def test_compute_team_history_rolling_last3(self, sample_team_game_data: pd.DataFrame):
         """Test that rolling window features use shift(1)."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(sample_team_game_data)
         kc = result[result['team'] == 'KC'].sort_values('week')
@@ -402,7 +402,7 @@ class TestBaseAsofFeatures:
 
     def test_compute_team_history_qb_change(self, sample_team_game_data: pd.DataFrame):
         """Test QB change detection."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(sample_team_game_data)
         kc = result[result['team'] == 'KC'].sort_values('week')
@@ -414,7 +414,7 @@ class TestBaseAsofFeatures:
 
     def test_compute_team_history_surface_encoding(self, sample_team_game_data: pd.DataFrame):
         """Test surface one-hot encoding."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(sample_team_game_data)
 
@@ -428,7 +428,7 @@ class TestBaseAsofFeatures:
 
     def test_validate_team_history_passes(self, sample_team_game_data: pd.DataFrame):
         """Test validation passes for correctly computed history."""
-        from py.features.asof_features import compute_team_history, validate_team_history
+        from nfl_analytics.features.asof_features import compute_team_history, validate_team_history
 
         result = compute_team_history(sample_team_game_data)
 
@@ -437,7 +437,7 @@ class TestBaseAsofFeatures:
 
     def test_validate_team_history_detects_prior_games_error(self, sample_team_game_data: pd.DataFrame):
         """Test validation catches prior_games inconsistency."""
-        from py.features.asof_features import compute_team_history, validate_team_history
+        from nfl_analytics.features.asof_features import compute_team_history, validate_team_history
 
         result = compute_team_history(sample_team_game_data)
 
@@ -449,7 +449,7 @@ class TestBaseAsofFeatures:
 
     def test_validate_team_history_detects_negative_rest(self, sample_team_game_data: pd.DataFrame):
         """Test validation catches negative rest days."""
-        from py.features.asof_features import compute_team_history, validate_team_history
+        from nfl_analytics.features.asof_features import compute_team_history, validate_team_history
 
         result = compute_team_history(sample_team_game_data)
 
@@ -461,7 +461,7 @@ class TestBaseAsofFeatures:
 
     def test_pivot_to_games_creates_home_away(self, sample_team_game_data: pd.DataFrame):
         """Test pivoting creates home/away prefixed columns."""
-        from py.features.asof_features import compute_team_history, pivot_to_games
+        from nfl_analytics.features.asof_features import compute_team_history, pivot_to_games
 
         history = compute_team_history(sample_team_game_data)
 
@@ -532,7 +532,7 @@ class TestBaseAsofFeatures:
 
     def test_pivot_to_games_diff_columns(self, sample_team_game_data: pd.DataFrame):
         """Test pivoting creates differential columns."""
-        from py.features.asof_features import compute_team_history, pivot_to_games
+        from nfl_analytics.features.asof_features import compute_team_history, pivot_to_games
 
         # Create a paired game
         game_df = pd.DataFrame([{
@@ -599,19 +599,19 @@ class TestBaseAsofFeatures:
 
 
 class TestEnhancedAsofFeatures:
-    """Tests for py.features.asof_features_enhanced module."""
+    """Tests for nfl_analytics.features.asof_features_enhanced module."""
 
     def test_import(self):
         """Verify enhanced module can be imported."""
-        from py.features import asof_features_enhanced
+        from nfl_analytics.features import asof_features_enhanced
         assert hasattr(asof_features_enhanced, 'compute_team_history_enhanced')
         assert hasattr(asof_features_enhanced, 'pivot_to_games_enhanced')
         assert hasattr(asof_features_enhanced, 'TEAM_FEATURE_COLUMNS_ENHANCED')
 
     def test_enhanced_columns_extend_base(self):
         """Verify enhanced columns include all base columns."""
-        from py.features.asof_features import TEAM_FEATURE_COLUMNS
-        from py.features.asof_features_enhanced import TEAM_FEATURE_COLUMNS_ENHANCED
+        from nfl_analytics.features.asof_features import TEAM_FEATURE_COLUMNS
+        from nfl_analytics.features.asof_features_enhanced import TEAM_FEATURE_COLUMNS_ENHANCED
 
         # Enhanced should be superset of base
         base_set = set(TEAM_FEATURE_COLUMNS)
@@ -623,14 +623,14 @@ class TestEnhancedAsofFeatures:
 
     def test_enhanced_columns_count(self):
         """Verify expected number of enhanced features."""
-        from py.features.asof_features_enhanced import TEAM_FEATURE_COLUMNS_ENHANCED
+        from nfl_analytics.features.asof_features_enhanced import TEAM_FEATURE_COLUMNS_ENHANCED
 
         # Should have more than base (46 + ~17 = 63)
         assert len(TEAM_FEATURE_COLUMNS_ENHANCED) > 50
 
     def test_enhanced_features_present(self):
         """Verify key enhanced features are defined."""
-        from py.features.asof_features_enhanced import TEAM_FEATURE_COLUMNS_ENHANCED
+        from nfl_analytics.features.asof_features_enhanced import TEAM_FEATURE_COLUMNS_ENHANCED
 
         enhanced_only = [
             'prior_turnovers_avg',
@@ -648,7 +648,7 @@ class TestEnhancedAsofFeatures:
 
     def test_compute_team_history_enhanced_includes_base(self, sample_enhanced_data: pd.DataFrame):
         """Test enhanced computation includes all base features."""
-        from py.features.asof_features_enhanced import compute_team_history_enhanced
+        from nfl_analytics.features.asof_features_enhanced import compute_team_history_enhanced
 
         result = compute_team_history_enhanced(sample_enhanced_data)
 
@@ -659,7 +659,7 @@ class TestEnhancedAsofFeatures:
 
     def test_compute_team_history_enhanced_turnovers(self, sample_enhanced_data: pd.DataFrame):
         """Test enhanced turnover features."""
-        from py.features.asof_features_enhanced import compute_team_history_enhanced
+        from nfl_analytics.features.asof_features_enhanced import compute_team_history_enhanced
 
         result = compute_team_history_enhanced(sample_enhanced_data)
 
@@ -670,7 +670,7 @@ class TestEnhancedAsofFeatures:
 
     def test_compute_team_history_enhanced_success_rate(self, sample_enhanced_data: pd.DataFrame):
         """Test enhanced success rate rolling features."""
-        from py.features.asof_features_enhanced import compute_team_history_enhanced
+        from nfl_analytics.features.asof_features_enhanced import compute_team_history_enhanced
 
         result = compute_team_history_enhanced(sample_enhanced_data)
         kc = result[result['team'] == 'KC'].sort_values('week')
@@ -687,7 +687,7 @@ class TestEnhancedAsofFeatures:
 
     def test_compute_team_history_enhanced_explosive_rate(self, sample_enhanced_data: pd.DataFrame):
         """Test enhanced explosive play rate features."""
-        from py.features.asof_features_enhanced import compute_team_history_enhanced
+        from nfl_analytics.features.asof_features_enhanced import compute_team_history_enhanced
 
         result = compute_team_history_enhanced(sample_enhanced_data)
 
@@ -701,19 +701,19 @@ class TestEnhancedAsofFeatures:
 
 
 class TestV2AsofFeatures:
-    """Tests for py.features.asof_features_v2 module."""
+    """Tests for nfl_analytics.features.asof_features_v2 module."""
 
     def test_import(self):
         """Verify v2 module can be imported."""
-        from py.features import asof_features_v2
+        from nfl_analytics.features import asof_features_v2
         assert hasattr(asof_features_v2, 'compute_team_history_v2')
         assert hasattr(asof_features_v2, 'pivot_to_games_v2')
         assert hasattr(asof_features_v2, 'TEAM_FEATURE_COLUMNS_V2')
 
     def test_v2_columns_extend_enhanced(self):
         """Verify v2 columns include all enhanced columns."""
-        from py.features.asof_features_enhanced import TEAM_FEATURE_COLUMNS_ENHANCED
-        from py.features.asof_features_v2 import TEAM_FEATURE_COLUMNS_V2
+        from nfl_analytics.features.asof_features_enhanced import TEAM_FEATURE_COLUMNS_ENHANCED
+        from nfl_analytics.features.asof_features_v2 import TEAM_FEATURE_COLUMNS_V2
 
         # V2 should be superset of enhanced
         enhanced_set = set(TEAM_FEATURE_COLUMNS_ENHANCED)
@@ -725,7 +725,7 @@ class TestV2AsofFeatures:
 
     def test_v2_features_present(self):
         """Verify key v2 features are defined."""
-        from py.features.asof_features_v2 import TEAM_FEATURE_COLUMNS_V2
+        from nfl_analytics.features.asof_features_v2 import TEAM_FEATURE_COLUMNS_V2
 
         v2_only = [
             'is_division_game',
@@ -742,7 +742,7 @@ class TestV2AsofFeatures:
 
     def test_compute_team_history_v2_division_features(self, sample_v2_data: pd.DataFrame):
         """Test v2 division game features."""
-        from py.features.asof_features_v2 import compute_team_history_v2
+        from nfl_analytics.features.asof_features_v2 import compute_team_history_v2
 
         result = compute_team_history_v2(sample_v2_data)
 
@@ -752,7 +752,7 @@ class TestV2AsofFeatures:
 
     def test_compute_team_history_v2_thursday_features(self, sample_v2_data: pd.DataFrame):
         """Test v2 Thursday night features."""
-        from py.features.asof_features_v2 import compute_team_history_v2
+        from nfl_analytics.features.asof_features_v2 import compute_team_history_v2
 
         result = compute_team_history_v2(sample_v2_data)
 
@@ -762,7 +762,7 @@ class TestV2AsofFeatures:
 
     def test_compute_team_history_v2_short_week_features(self, sample_v2_data: pd.DataFrame):
         """Test v2 short week features."""
-        from py.features.asof_features_v2 import compute_team_history_v2
+        from nfl_analytics.features.asof_features_v2 import compute_team_history_v2
 
         result = compute_team_history_v2(sample_v2_data)
 
@@ -780,7 +780,7 @@ class TestTemporalSafety:
 
     def test_prior_features_use_only_past_data(self, sample_team_game_data: pd.DataFrame):
         """Verify prior features don't include current game data."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(sample_team_game_data)
         kc = result[result['team'] == 'KC'].sort_values('week')
@@ -795,7 +795,7 @@ class TestTemporalSafety:
 
     def test_rolling_features_exclude_current(self, sample_team_game_data: pd.DataFrame):
         """Verify rolling window features use shift(1)."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(sample_team_game_data)
         kc = result[result['team'] == 'KC'].sort_values('week')
@@ -811,7 +811,7 @@ class TestTemporalSafety:
 
     def test_win_percentage_excludes_current_result(self, sample_team_game_data: pd.DataFrame):
         """Verify win percentage doesn't include current game result."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(sample_team_game_data)
         kc = result[result['team'] == 'KC'].sort_values('week')
@@ -830,7 +830,7 @@ class TestTemporalSafety:
 
     def test_season_specific_features_reset(self, sample_team_game_data: pd.DataFrame):
         """Verify season-specific features reset at season boundaries."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         # Add a new season game
         new_season = pd.DataFrame([{
@@ -881,7 +881,7 @@ class TestEdgeCases:
 
     def test_empty_dataframe(self):
         """Test handling of empty input."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         empty_df = pd.DataFrame(columns=[
             'game_id', 'team', 'is_home', 'season', 'week', 'kickoff',
@@ -896,7 +896,7 @@ class TestEdgeCases:
 
     def test_single_game(self):
         """Test handling of single game."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         single_game = pd.DataFrame([{
             'game_id': 'SINGLE_GAME',
@@ -932,7 +932,7 @@ class TestEdgeCases:
 
     def test_null_kickoff_handling(self, sample_team_game_data: pd.DataFrame):
         """Test handling of NULL kickoff times."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         df = sample_team_game_data.copy()
         df.loc[df.index[0], 'kickoff'] = None
@@ -944,7 +944,7 @@ class TestEdgeCases:
 
     def test_missing_qb_id(self, sample_team_game_data: pd.DataFrame):
         """Test handling of missing QB ID."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         df = sample_team_game_data.copy()
         df.loc[df.index[0], 'qb_id'] = None
@@ -956,7 +956,7 @@ class TestEdgeCases:
 
     def test_zero_plays_game(self, sample_team_game_data: pd.DataFrame):
         """Test handling of game with zero plays (data quality issue)."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         df = sample_team_game_data.copy()
         df.loc[df.index[0], 'plays'] = 0
@@ -978,7 +978,7 @@ class TestDatabaseIntegration:
 
     def test_fetch_team_game_features(self):
         """Test fetching real data from database."""
-        from py.features.asof_features import get_connection, fetch_team_game_features
+        from nfl_analytics.features.asof_features import get_connection, fetch_team_game_features
 
         try:
             conn = get_connection()
@@ -997,7 +997,7 @@ class TestDatabaseIntegration:
 
     def test_full_pipeline_base(self):
         """Test full pipeline with base module."""
-        from py.features.asof_features import (
+        from nfl_analytics.features.asof_features import (
             get_connection, fetch_team_game_features,
             compute_team_history, validate_team_history, pivot_to_games
         )

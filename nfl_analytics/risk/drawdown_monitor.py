@@ -15,7 +15,7 @@ Metrics provided:
 - Daily P&L series for Sharpe/Sortino computation
 
 Usage:
-    from py.risk.drawdown_monitor import DrawdownMonitor, DrawdownConfig
+    from nfl_analytics.risk.drawdown_monitor import DrawdownMonitor, DrawdownConfig
 
     monitor = DrawdownMonitor(initial_equity_cents=100_000)
     monitor.record_equity(98_000)   # Lost $20

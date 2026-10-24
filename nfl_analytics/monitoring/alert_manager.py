@@ -6,7 +6,7 @@ Discord, PagerDuty, etc.). Per-title cooldown prevents alert fatigue
 during high-frequency events.
 
 Usage:
-    from py.monitoring.alert_manager import AlertManager, AlertConfig
+    from nfl_analytics.monitoring.alert_manager import AlertManager, AlertConfig
 
     mgr = AlertManager(AlertConfig(webhook_url="https://hooks.slack.com/..."))
     mgr.alert(AlertLevel.WARNING, "Drawdown Warning", "5% drawdown reached")

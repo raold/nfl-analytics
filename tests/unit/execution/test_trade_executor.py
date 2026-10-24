@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from py.markets.base import (
+from nfl_analytics.markets.base import (
     ConnectionError as MarketConnectionError,
     MarketClient,
     MarketError,
@@ -16,8 +16,8 @@ from py.markets.base import (
     RateLimitError,
     Side,
 )
-from py.execution.trade_executor import ExecutorConfig, TradeExecutor
-from py.trading.signal import Signal
+from nfl_analytics.execution.trade_executor import ExecutorConfig, TradeExecutor
+from nfl_analytics.trading.signal import Signal
 
 pytestmark = pytest.mark.anyio
 

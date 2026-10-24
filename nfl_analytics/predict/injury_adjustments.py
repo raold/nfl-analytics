@@ -6,7 +6,7 @@ Applies position-based win probability adjustments when key players are out.
 Uses hardcoded impact values based on position importance.
 
 Usage:
-    python py/predict/injury_adjustments.py --season 2025 --week 5
+    python nfl_analytics/predict/injury_adjustments.py --season 2025 --week 5
 """
 import argparse
 import logging

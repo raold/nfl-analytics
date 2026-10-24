@@ -25,14 +25,14 @@ if project_root not in sys.path:
 os.chdir(project_root)
 
 # Import causal modules
-from py.causal.confounder_identification import ConfounderIdentifier
-from py.causal.diff_in_diff import DifferenceInDifferences
-from py.causal.model_integration import CausalModelIntegrator
-from py.causal.panel_constructor import PanelConstructor
-from py.causal.structural_causal_models import create_nfl_rushing_dag
-from py.causal.synthetic_control import SyntheticControl
-from py.causal.treatment_definitions import TreatmentDefiner
-from py.causal.validation import CausalValidator
+from nfl_analytics.causal.confounder_identification import ConfounderIdentifier
+from nfl_analytics.causal.diff_in_diff import DifferenceInDifferences
+from nfl_analytics.causal.model_integration import CausalModelIntegrator
+from nfl_analytics.causal.panel_constructor import PanelConstructor
+from nfl_analytics.causal.structural_causal_models import create_nfl_rushing_dag
+from nfl_analytics.causal.synthetic_control import SyntheticControl
+from nfl_analytics.causal.treatment_definitions import TreatmentDefiner
+from nfl_analytics.causal.validation import CausalValidator
 
 _PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
 

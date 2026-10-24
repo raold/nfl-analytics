@@ -484,7 +484,7 @@ class EnhancedBayesianOnlineUpdater:
 
         # Initialize Dirichlet stacker for ensemble weights
         try:
-            from py.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStackingByStatType
+            from nfl_analytics.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStackingByStatType
 
             self.dirichlet_stacker = DirichletBayesianStackingByStatType(
                 db_config=self.db_config,

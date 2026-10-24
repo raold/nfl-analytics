@@ -21,7 +21,7 @@ Key Features:
     5. **Rollback Support** - Undo migrations safely
 
 Usage:
-    from py.utils.database_migration_agent import DatabaseMigrationAgent
+    from nfl_analytics.utils.database_migration_agent import DatabaseMigrationAgent
 
     agent = DatabaseMigrationAgent()
 

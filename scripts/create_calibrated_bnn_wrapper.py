@@ -27,7 +27,7 @@ import joblib
 import numpy as np
 import torch
 
-from py.models.bnn_calibrated_wrapper import CalibratedBNNWrapper
+from nfl_analytics.models.bnn_calibrated_wrapper import CalibratedBNNWrapper
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

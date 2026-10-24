@@ -26,9 +26,9 @@ from pathlib import Path
 
 # File patterns to search
 PYTORCH_PATTERNS = [
-    "py/models/**/*.py",
-    "py/rl/**/*.py",
-    "py/ensemble/**/*.py",
+    "nfl_analytics/models/**/*.py",
+    "nfl_analytics/rl/**/*.py",
+    "nfl_analytics/ensemble/**/*.py",
 ]
 
 # Device detection patterns (regex)
@@ -42,7 +42,7 @@ DEVICE_PATTERNS = [
 ]
 
 # Import statement to add
-IMPORT_STATEMENT = "from py.utils.device_utils import get_best_device"
+IMPORT_STATEMENT = "from nfl_analytics.utils.device_utils import get_best_device"
 
 # Replacement code
 REPLACEMENT_CODE = "device = get_best_device()"
@@ -258,7 +258,7 @@ def main():
         print()
         print("Next steps:")
         print("1. Run tests: pytest tests/performance/test_mps_acceleration.py")
-        print("2. Validate training: python py/models/bnn_multioutput_pytorch.py")
+        print("2. Validate training: python nfl_analytics/models/bnn_multioutput_pytorch.py")
         print("3. If issues: python scripts/enable_mps_acceleration.py --revert")
 
 

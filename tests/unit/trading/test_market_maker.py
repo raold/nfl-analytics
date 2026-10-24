@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from py.markets.base import MarketData, OrderBook, OrderBookLevel, Side
-from py.trading.market_maker import MarketMaker, MarketMakerConfig
-from py.trading.signal import Signal
+from nfl_analytics.markets.base import MarketData, OrderBook, OrderBookLevel, Side
+from nfl_analytics.trading.market_maker import MarketMaker, MarketMakerConfig
+from nfl_analytics.trading.signal import Signal
 
 pytestmark = pytest.mark.anyio
 

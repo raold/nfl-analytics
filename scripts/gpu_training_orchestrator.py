@@ -74,7 +74,7 @@ class GPUTrainingOrchestrator:
             GPUTrainingJob(
                 name="BNN Multi-Output",
                 command=(
-                    "python3 py/models/bnn_multioutput_v1.py "
+                    "python3 nfl_analytics/models/bnn_multioutput_v1.py "
                     "--device cuda --batch-size 128 --epochs 200 "
                     "--learning-rate 0.001 "
                     "--checkpoint-dir models/bayesian/bnn_multioutput_checkpoints "
@@ -89,7 +89,7 @@ class GPUTrainingOrchestrator:
             GPUTrainingJob(
                 name="GNN Ablation Study",
                 command=(
-                    "python3 py/models/gnn_ablation_study.py "
+                    "python3 nfl_analytics/models/gnn_ablation_study.py "
                     "--seasons 2016 2017 2018 2019 2020 2021 2022 2023 2024 2025 "
                     "--epochs 50 --batch-size 256 --device cuda "
                     "--output-dir models/gnn/ablation --checkpoint-freq 10"
@@ -104,7 +104,7 @@ class GPUTrainingOrchestrator:
             GPUTrainingJob(
                 name="cVAE Training",
                 command=(
-                    "python3 py/models/train_cvae.py "
+                    "python3 nfl_analytics/models/train_cvae.py "
                     "--start-season 2016 --end-season 2024 "
                     "--epochs 200 --batch-size 256 "
                     "--learning-rate 0.0005 --latent-dim 64 --beta 1.0 "
@@ -120,7 +120,7 @@ class GPUTrainingOrchestrator:
             GPUTrainingJob(
                 name="DQN RL Agent",
                 command=(
-                    "python3 py/rl/train_experiment_rl.py "
+                    "python3 nfl_analytics/rl/train_experiment_rl.py "
                     "--agent dqn --episodes 10000 --batch-size 256 "
                     "--learning-rate 0.0001 --device cuda "
                     "--checkpoint-dir models/rl/dqn_checkpoints "
@@ -135,7 +135,7 @@ class GPUTrainingOrchestrator:
             GPUTrainingJob(
                 name="PPO RL Agent",
                 command=(
-                    "python3 py/rl/train_experiment_rl.py "
+                    "python3 nfl_analytics/rl/train_experiment_rl.py "
                     "--agent ppo --episodes 10000 --batch-size 512 "
                     "--learning-rate 0.0001 --device cuda "
                     "--checkpoint-dir models/rl/ppo_checkpoints "
@@ -151,7 +151,7 @@ class GPUTrainingOrchestrator:
             GPUTrainingJob(
                 name="BNN Hyperparameter Search",
                 command=(
-                    "python3 py/optimization/bnn_hyperparameter_search.py "
+                    "python3 nfl_analytics/optimization/bnn_hyperparameter_search.py "
                     "--trials 50 --device cuda --timeout-per-trial 1200 "
                     "--output-dir experiments/optimization"
                 ),
@@ -165,7 +165,7 @@ class GPUTrainingOrchestrator:
             GPUTrainingJob(
                 name="BNN Variant Evaluation",
                 command=(
-                    "python3 py/analysis/evaluate_bnn_variants.py "
+                    "python3 nfl_analytics/analysis/evaluate_bnn_variants.py "
                     "--season 2024 --device cuda --num-samples 2000 "
                     "--output-dir experiments/evaluation"
                 ),
@@ -178,7 +178,7 @@ class GPUTrainingOrchestrator:
             GPUTrainingJob(
                 name="Ensemble Backtest",
                 command=(
-                    "python3 py/backtests/comprehensive_ensemble_backtest.py "
+                    "python3 nfl_analytics/backtests/comprehensive_ensemble_backtest.py "
                     "--start-season 2020 --end-season 2024 "
                     "--initial-bankroll 10000 --device cuda "
                     "--output-dir reports/backtest"

@@ -56,7 +56,7 @@ done
 
 # Run Python agent
 python3 -c "
-from py.agents.dashboard_performance_monitor import DashboardPerformanceMonitor
+from nfl_analytics.agents.dashboard_performance_monitor import DashboardPerformanceMonitor
 import time
 
 monitor = DashboardPerformanceMonitor(

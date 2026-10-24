@@ -20,7 +20,7 @@ import time
 
 import numpy as np
 
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")

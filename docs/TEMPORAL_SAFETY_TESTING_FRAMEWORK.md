@@ -142,7 +142,7 @@ Full pipeline validation:
 
 ### Existing Infrastructure
 
-4. **`py/utils/data_leakage_detector.py`** (548 lines - existing)
+4. **`nfl_analytics/utils/data_leakage_detector.py`** (548 lines - existing)
    - Core leakage detection engine
    - DataFrame validation
    - Code pattern analysis
@@ -210,7 +210,7 @@ pytest tests/integration/test_temporal_safety_comprehensive.py -v
 pytest tests/integration/test_temporal_safety_comprehensive.py::TestLagFeatureSafety -v
 
 # With coverage
-pytest tests/integration/test_temporal_safety_comprehensive.py --cov=py/features
+pytest tests/integration/test_temporal_safety_comprehensive.py --cov=nfl_analytics/features
 ```
 
 ### Pre-Training Validation
@@ -218,7 +218,7 @@ pytest tests/integration/test_temporal_safety_comprehensive.py --cov=py/features
 **CRITICAL:** Always validate before training any model:
 
 ```python
-from py.utils.data_leakage_detector import DataLeakageDetector
+from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector
 
 detector = DataLeakageDetector()
 
@@ -370,7 +370,7 @@ python scripts/validate_temporal_safety.py --full
 cat temporal_safety_report.json
 
 # 3. Fix code (e.g., add shift to rolling operation)
-# Edit py/features/player_features.py
+# Edit nfl_analytics/features/player_features.py
 
 # 4. Re-validate
 python scripts/validate_temporal_safety.py --code-only
@@ -379,7 +379,7 @@ python scripts/validate_temporal_safety.py --code-only
 pytest tests/integration/test_temporal_safety_comprehensive.py::TestRollingWindowSafety -v
 
 # 6. Commit with descriptive message
-git add py/features/player_features.py
+git add nfl_analytics/features/player_features.py
 git commit -m "fix: add shift(1) to rolling window in player_features.py
 
 - Rolling window was including current game (temporal leakage)

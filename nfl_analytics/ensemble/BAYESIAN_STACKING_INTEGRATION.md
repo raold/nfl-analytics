@@ -87,7 +87,7 @@ First, generate predictions from all 4 ensemble models on 2022-2023 validation d
 
 ```bash
 # Run ensemble predictions on validation period
-python3 py/ensemble/generate_validation_predictions.py \
+python3 nfl_analytics/ensemble/generate_validation_predictions.py \
   --start-season 2022 \
   --end-season 2023 \
   --output data/validation_predictions_2022_2023.csv
@@ -103,7 +103,7 @@ Expected CSV columns:
 ### Step 2: Optimize Stacking Weights
 
 ```bash
-python3 py/ensemble/bayesian_stacking.py \
+python3 nfl_analytics/ensemble/bayesian_stacking.py \
   --mode optimize \
   --validation-data data/validation_predictions_2022_2023.csv \
   --output models/ensemble/stacking_report.md
@@ -167,7 +167,7 @@ python3 scripts/update_registry_weights.py \
 #### Example 1: Basic Stacking
 
 ```python
-from py.ensemble.bayesian_stacking import BayesianStacker
+from nfl_analytics.ensemble.bayesian_stacking import BayesianStacker
 import pandas as pd
 
 # Initialize stacker
@@ -199,7 +199,7 @@ report = stacker.generate_report(
 #### Example 2: Custom Validation Period
 
 ```python
-from py.ensemble.bayesian_stacking import ValidationFramework
+from nfl_analytics.ensemble.bayesian_stacking import ValidationFramework
 
 # Initialize validation framework
 framework = ValidationFramework()
@@ -266,7 +266,7 @@ else:
 #### Example 5: Statistical Tests
 
 ```python
-from py.ensemble.bayesian_stacking import ValidationFramework
+from nfl_analytics.ensemble.bayesian_stacking import ValidationFramework
 import numpy as np
 
 framework = ValidationFramework()
@@ -453,7 +453,7 @@ uv pip install arviz
 **Solution:**
 ```bash
 # Regenerate validation predictions with all models
-python3 py/ensemble/generate_validation_predictions.py \
+python3 nfl_analytics/ensemble/generate_validation_predictions.py \
   --start-season 2022 \
   --end-season 2023 \
   --output data/validation_predictions_2022_2023.csv \

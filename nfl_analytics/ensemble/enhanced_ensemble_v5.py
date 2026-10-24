@@ -19,7 +19,7 @@ Target Performance:
 - <500ms inference time
 
 Usage:
-    from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+    from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
     ensemble = EnhancedEnsemble4Way()
     result = ensemble.predict(

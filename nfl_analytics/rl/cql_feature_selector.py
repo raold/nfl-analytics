@@ -21,14 +21,14 @@ Why CQL over DQN?
 
 Usage:
   # Training
-  python py/rl/cql_feature_selector.py \\
+  python nfl_analytics/rl/cql_feature_selector.py \\
       --dataset data/feature_performance.csv \\
       --output models/cql_feature_selector.pth \\
       --alpha 2.0 \\
       --epochs 500
 
   # Inference
-  from py.rl.cql_feature_selector import CQLFeatureSelector
+  from nfl_analytics.rl.cql_feature_selector import CQLFeatureSelector
   agent = CQLFeatureSelector.load("models/cql_feature_selector.pth")
   feature_mask = agent.select_features(base_features, budget=100)
 

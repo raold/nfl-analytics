@@ -77,7 +77,7 @@ except ImportError:
 
 # Import GameFeatureExtractor for feature loading
 try:
-    from py.features.game_feature_extractor import GameFeatureExtractor
+    from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
     FEATURE_EXTRACTOR_AVAILABLE = True
 except ImportError:

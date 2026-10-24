@@ -4,7 +4,7 @@ Runs a small grid of feature lists and decision thresholds using the
 `baseline_glm` module, then writes a summary CSV and optional TeX table.
 
 Example:
-  python py/backtest/harness.py \
+  python nfl_analytics/backtest/harness.py \
     --features-csv analysis/features/asof_team_features.csv \
     --start-season 2003 --end-season 2024 \
     --output-csv analysis/results/glm_harness_metrics.csv \

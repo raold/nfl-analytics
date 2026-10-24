@@ -2,7 +2,7 @@
 
 **Test File:** `tests/unit/test_bnn_conformal.py`
 
-**Module Under Test:** `py/models/bnn_conformal.py`
+**Module Under Test:** `nfl_analytics/models/bnn_conformal.py`
 
 **Created:** November 9, 2025
 
@@ -184,7 +184,7 @@ pytest tests/unit/test_bnn_conformal.py -v -k "performance"
 ### Run with Coverage
 
 ```bash
-pytest tests/unit/test_bnn_conformal.py --cov=py.models.bnn_conformal --cov-report=html
+pytest tests/unit/test_bnn_conformal.py --cov=nfl_analytics.models.bnn_conformal --cov-report=html
 open htmlcov/index.html
 ```
 
@@ -269,7 +269,7 @@ Add to `.github/workflows/test.yml`:
 - name: Test BNN Conformal Prediction
   run: |
     pytest tests/unit/test_bnn_conformal.py \
-      --cov=py.models.bnn_conformal \
+      --cov=nfl_analytics.models.bnn_conformal \
       --cov-report=xml \
       --cov-fail-under=80
 ```

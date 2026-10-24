@@ -7,8 +7,8 @@ import logging
 import random
 import time
 
-from py.compute.redis_task_queue import RedisTaskQueue
-from py.compute.task_queue import TaskPriority
+from nfl_analytics.compute.redis_task_queue import RedisTaskQueue
+from nfl_analytics.compute.task_queue import TaskPriority
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

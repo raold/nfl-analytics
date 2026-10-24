@@ -6,9 +6,9 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from py.execution.live_trader import LiveTrader, LiveTraderConfig
-from py.execution.trade_executor import TradeExecutor
-from py.markets.base import (
+from nfl_analytics.execution.live_trader import LiveTrader, LiveTraderConfig
+from nfl_analytics.execution.trade_executor import TradeExecutor
+from nfl_analytics.markets.base import (
     MarketClient,
     MarketData,
     MarketError,
@@ -17,14 +17,14 @@ from py.markets.base import (
     OrderStatus,
     Side,
 )
-from py.monitoring.alert_manager import AlertManager
-from py.monitoring.pnl_tracker import PnLTracker
-from py.monitoring.trade_logger import TradeLogger, TradeLoggerConfig
-from py.risk.drawdown_monitor import DrawdownMonitor
-from py.risk.kill_switch import KillSwitch, KillSwitchEvent
-from py.risk.risk_manager import RiskCheckResult, RiskManager
-from py.trading.base_strategy import TradingStrategy
-from py.trading.signal import Signal
+from nfl_analytics.monitoring.alert_manager import AlertManager
+from nfl_analytics.monitoring.pnl_tracker import PnLTracker
+from nfl_analytics.monitoring.trade_logger import TradeLogger, TradeLoggerConfig
+from nfl_analytics.risk.drawdown_monitor import DrawdownMonitor
+from nfl_analytics.risk.kill_switch import KillSwitch, KillSwitchEvent
+from nfl_analytics.risk.risk_manager import RiskCheckResult, RiskManager
+from nfl_analytics.trading.base_strategy import TradingStrategy
+from nfl_analytics.trading.signal import Signal
 
 pytestmark = pytest.mark.anyio
 

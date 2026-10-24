@@ -137,8 +137,8 @@ Based on being available but not preventing compression:
 
 | File | Purpose |
 |------|---------|
-| `py/models/power_ratings_model.py` | Standalone power ratings model with CLI backtest |
-| `py/feedback/model_error_decomposition.py` | Rewritten to use real data from ml.game_outcome_predictions |
+| `nfl_analytics/models/power_ratings_model.py` | Standalone power ratings model with CLI backtest |
+| `nfl_analytics/feedback/model_error_decomposition.py` | Rewritten to use real data from ml.game_outcome_predictions |
 | `docs/investigations/2026-02-season-review/ws3_model_performance.md` | This report |
 
 ---

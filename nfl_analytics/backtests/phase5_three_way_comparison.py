@@ -21,10 +21,10 @@ from pathlib import Path
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from py.backtests.game_outcome_backtest import GameOutcomeBacktest
-from py.ensemble.game_outcome_ensemble import GameOutcomeEnsemble, fetch_games
-from py.ensemble.game_outcome_ensemble_enhanced import EnhancedGameOutcomeEnsemble
-from py.ensemble.game_outcome_ensemble_optimized import OptimizedGameOutcomeEnsemble
+from nfl_analytics.backtests.game_outcome_backtest import GameOutcomeBacktest
+from nfl_analytics.ensemble.game_outcome_ensemble import GameOutcomeEnsemble, fetch_games
+from nfl_analytics.ensemble.game_outcome_ensemble_enhanced import EnhancedGameOutcomeEnsemble
+from nfl_analytics.ensemble.game_outcome_ensemble_optimized import OptimizedGameOutcomeEnsemble
 
 
 def train_model(model_cls, train_df, model_name):

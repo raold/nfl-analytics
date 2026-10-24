@@ -12,8 +12,8 @@ Uses existing trained prop models to generate predictions for upcoming games
 and stores them in predictions.prop_predictions table for dashboard display.
 
 Usage:
-    python py/production/generate_prop_predictions_v2.py --week 6 --season 2025
-    python py/production/generate_prop_predictions_v2.py --auto  # Auto-detect current week
+    python nfl_analytics/production/generate_prop_predictions_v2.py --week 6 --season 2025
+    python nfl_analytics/production/generate_prop_predictions_v2.py --auto  # Auto-detect current week
 """
 
 import argparse
@@ -31,7 +31,7 @@ import xgboost as xgb
 sys.path.append(str(Path(__file__).parent.parent))
 
 # Import repositories
-from py.data.repository import DatabaseConfig, GameRepository, PredictionRepository
+from nfl_analytics.data.repository import DatabaseConfig, GameRepository, PredictionRepository
 
 logging.basicConfig(
     level=logging.INFO,
@@ -345,7 +345,7 @@ def main():
         logger.warning("No predictions generated")
 
     # Show cache statistics
-    from py.data.repository import BaseRepository
+    from nfl_analytics.data.repository import BaseRepository
 
     stats = BaseRepository.cache_stats()
     logger.info(

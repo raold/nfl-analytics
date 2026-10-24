@@ -29,8 +29,8 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from py.ensemble.strategy.base import ModelPrediction, ModelType
-from py.models.hierarchical_gnn_v1 import NFLGraph
+from nfl_analytics.ensemble.strategy.base import ModelPrediction, ModelType
+from nfl_analytics.models.hierarchical_gnn_v1 import NFLGraph
 
 logger = logging.getLogger(__name__)
 
@@ -147,7 +147,7 @@ class GNNComponent:
 
             sys.path.insert(0, str(self.project_root))
 
-            from py.models.hierarchical_gnn_v1 import HierarchicalGNN
+            from nfl_analytics.models.hierarchical_gnn_v1 import HierarchicalGNN
 
             # Load metadata
             if self.metadata_path.exists():
@@ -201,7 +201,7 @@ class GNNComponent:
 
             sys.path.insert(0, str(self.project_root))
 
-            from py.models.gnn_graph_builder_cuda import NFLDatabase, NFLGraphBuilder
+            from nfl_analytics.models.gnn_graph_builder_cuda import NFLDatabase, NFLGraphBuilder
 
             db = NFLDatabase(self.db_url)
             self.graph_builder = NFLGraphBuilder(db)

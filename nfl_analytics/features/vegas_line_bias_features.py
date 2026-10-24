@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 
-from py.utils.spread_convention import book_home_line, home_cover_margin
+from nfl_analytics.utils.spread_convention import book_home_line, home_cover_margin
 
 # Configure logging
 logging.basicConfig(

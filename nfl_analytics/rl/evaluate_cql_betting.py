@@ -17,7 +17,7 @@ Metrics:
 - Calibration (Q-value accuracy)
 
 Usage:
-    python py/rl/evaluate_cql_betting.py \\
+    python nfl_analytics/rl/evaluate_cql_betting.py \\
         --best-model models/cql/805ae9f0 \\
         --ensemble-dir models/cql \\
         --data data/rl_logged.csv \\

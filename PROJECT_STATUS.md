@@ -20,7 +20,7 @@
 ### New Files (Dec 31)
 
 ```
-py/config/
+nfl_analytics/config/
 ├── __init__.py           # Package exports
 ├── feature_weights.yaml  # Feature group enable/disable config
 └── feature_weights.py    # Config loader with is_feature_enabled()
@@ -75,7 +75,7 @@ Implemented a complete weekly feedback loop that closes the gap between predicti
 
 ```
 New Files (Dec 22, 2025):
-├── py/feedback/
+├── nfl_analytics/feedback/
 │   ├── __init__.py               # Module exports (10 components)
 │   ├── outcome_updater.py        # Phase 6.1
 │   ├── semantic_attribution.py   # Phase 6.2
@@ -140,12 +140,12 @@ Added AI/LLM capabilities to enhance win rate through semantic understanding of 
 
 | Component | Status | Files | Description |
 |-----------|--------|-------|-------------|
-| **Inference Layer** | ✅ Complete | `py/semantic/models/` | Ollama (qwen3:8b) + MLX + Gemini fallback |
-| **News Ingestion** | ✅ Complete | `py/semantic/ingestion/` | ESPN + social media (Twitter/X) |
-| **Semantic Features** | ✅ Complete | `py/semantic/features/` | 26 features integrated into GameFeatureExtractor |
-| **Value Bet Detector** | ✅ Complete | `py/production/value_bet_detector.py` | LLM-generated explanations |
-| **Training Pipeline** | ✅ Complete | `py/semantic/training/` | 5,000 NER + 2,000 sentiment samples |
-| **Fine-tuning Utils** | ✅ Complete | `py/semantic/training/fine_tune.py` | Ollama Modelfile + MLX LoRA |
+| **Inference Layer** | ✅ Complete | `nfl_analytics/semantic/models/` | Ollama (qwen3:8b) + MLX + Gemini fallback |
+| **News Ingestion** | ✅ Complete | `nfl_analytics/semantic/ingestion/` | ESPN + social media (Twitter/X) |
+| **Semantic Features** | ✅ Complete | `nfl_analytics/semantic/features/` | 26 features integrated into GameFeatureExtractor |
+| **Value Bet Detector** | ✅ Complete | `nfl_analytics/production/value_bet_detector.py` | LLM-generated explanations |
+| **Training Pipeline** | ✅ Complete | `nfl_analytics/semantic/training/` | 5,000 NER + 2,000 sentiment samples |
+| **Fine-tuning Utils** | ✅ Complete | `nfl_analytics/semantic/training/fine_tune.py` | Ollama Modelfile + MLX LoRA |
 
 ### Semantic Features (26 total)
 
@@ -167,7 +167,7 @@ Added AI/LLM capabilities to enhance win rate through semantic understanding of 
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  SemanticInferenceClient (py/semantic/models/inference.py)  │
+│  SemanticInferenceClient (nfl_analytics/semantic/models/inference.py)  │
 ├─────────────────────────────────────────────────────────┤
 │  Fallback Chain (prefer_local=True):                    │
 │  1. MLX (Apple Silicon) - mlx-community/Qwen2.5-7B     │
@@ -194,7 +194,7 @@ Added AI/LLM capabilities to enhance win rate through semantic understanding of 
 
 ```
 New Files (Dec 21, 2025):
-├── py/semantic/
+├── nfl_analytics/semantic/
 │   ├── __init__.py
 │   ├── models/
 │   │   ├── __init__.py
@@ -214,7 +214,7 @@ New Files (Dec 21, 2025):
 │       ├── __init__.py
 │       ├── annotation_pipeline.py # DB → training data
 │       └── fine_tune.py           # Ollama/MLX fine-tuning
-├── py/production/
+├── nfl_analytics/production/
 │   └── value_bet_detector.py     # LLM-explained value bets
 └── data/semantic_training/
     ├── train.jsonl
@@ -223,8 +223,8 @@ New Files (Dec 21, 2025):
     └── sentiment_training_*.jsonl
 
 Modified Files:
-├── py/features/game_feature_extractor.py  # Semantic feature integration
-└── py/semantic/models/inference.py         # 240s timeout (from 120s)
+├── nfl_analytics/features/game_feature_extractor.py  # Semantic feature integration
+└── nfl_analytics/semantic/models/inference.py         # 240s timeout (from 120s)
 ```
 
 ### Git Commits (Dec 21, 2025)
@@ -271,33 +271,33 @@ Following a comprehensive 6-agent code review that identified 90+ issues, a syst
 
 ### New Architecture Components
 
-- **ValidatorRegistry** (`py/validation/validators/registry.py`): Strategy pattern for extensible validation
-- **FeatureExtractorStrategy** (`py/features/extractors/base.py`): Interface for feature extraction plugins
-- **XGBoost Config** (`py/models/config/xgboost_params.py`): Documented hyperparameters with explanations
+- **ValidatorRegistry** (`nfl_analytics/validation/validators/registry.py`): Strategy pattern for extensible validation
+- **FeatureExtractorStrategy** (`nfl_analytics/features/extractors/base.py`): Interface for feature extraction plugins
+- **XGBoost Config** (`nfl_analytics/models/config/xgboost_params.py`): Documented hyperparameters with explanations
 
 ### Key Files Added/Modified
 
 ```
 New Files:
-├── py/validation/validators/    # Validation framework
+├── nfl_analytics/validation/validators/    # Validation framework
 │   ├── base.py                  # Strategy interface
 │   ├── registry.py              # ValidatorRegistry
 │   ├── temporal.py              # TemporalSafetyValidator
 │   ├── schema.py                # SchemaValidator
 │   └── feature_range.py         # FeatureRangeValidator
-├── py/features/
+├── nfl_analytics/features/
 │   ├── asof_features_unified.py # Consolidated asof (1000 lines)
 │   └── extractors/base.py       # FeatureExtractorStrategy
-├── py/models/config/
+├── nfl_analytics/models/config/
 │   └── xgboost_params.py        # Documented hyperparameters
-├── py/utils/team_mapping.py     # Team abbreviation utility
+├── nfl_analytics/utils/team_mapping.py     # Team abbreviation utility
 └── tests/unit/validation/       # 20 validation tests
 
 Modified Files:
-├── py/models/game_outcome_model_fixed.py  # Season-based split, RMSE uncertainty
-├── py/services/game_outcome_runs.py       # Context manager for connections
-├── py/features/asof_features_enhanced.py  # Deprecation warning
-└── py/features/asof_features_v2.py        # Deprecation warning
+├── nfl_analytics/models/game_outcome_model_fixed.py  # Season-based split, RMSE uncertainty
+├── nfl_analytics/services/game_outcome_runs.py       # Context manager for connections
+├── nfl_analytics/features/asof_features_enhanced.py  # Deprecation warning
+└── nfl_analytics/features/asof_features_v2.py        # Deprecation warning
 ```
 
 ### Lessons Learned (Added to CLAUDE.md)
@@ -377,9 +377,9 @@ Modified Files:
 | **GNN (NEW)** | - | **10%** |
 
 **New Files:**
-- `py/ensemble/components/gnn_component.py` - MC Dropout uncertainty
-- `py/ensemble/enhanced_ensemble_v6_2_gnn.py` - 6-way ensemble
-- `py/models/gnn_graph_builder_cuda.py` - CUDA-optimized graph builder
+- `nfl_analytics/ensemble/components/gnn_component.py` - MC Dropout uncertainty
+- `nfl_analytics/ensemble/enhanced_ensemble_v6_2_gnn.py` - 6-way ensemble
+- `nfl_analytics/models/gnn_graph_builder_cuda.py` - CUDA-optimized graph builder
 
 ### Infrastructure Updates
 - Model registry: `hierarchical_gnn_v2` (model_id: 6, status: production)
@@ -409,7 +409,7 @@ Modified Files:
 
 ### 2. DC (Defensive Coordinator) Features Module
 - **Status:** ✅ COMPLETE
-- **Module:** `py/features/dc_features.py` (293 lines)
+- **Module:** `nfl_analytics/features/dc_features.py` (293 lines)
 - **Features:** 5 DC features per team (10 total)
   - `dc_continuity`: Binary (same DC as prior season)
   - `games_with_dc`: Games with current DC (0-17)
@@ -426,14 +426,14 @@ Modified Files:
 - **Root Cause:** Systematic over-prediction bias (+2.3 pts avg)
 - **Fix:** Apply -3.5 pt bias correction + restrict to 3-4 pt edge bets (51.4% O/U rate)
 - **Sweet Spot:** Only bet 3-4 pt edge games (185 opportunities, 51.4% hit rate)
-- **Implementation:** `py/ensemble/game_outcome_predictor.py` edge filtering
+- **Implementation:** `nfl_analytics/ensemble/game_outcome_predictor.py` edge filtering
 
 ### 4. Ensemble Dual-Weight Strategy
 - **Status:** ✅ INTEGRATED
 - **Decision:** Use v6.0 for games, v8.0 for props (domain-specific optimization)
 - **Files Modified:**
-  - `py/ensemble/enhanced_ensemble_v6_production.py` - Added `use_dirichlet_weights()` and `use_default_weights()` methods
-  - `py/ensemble/strategy/base.py` - Added `DEFAULT_WEIGHTS_V6` and `DIRICHLET_WEIGHTS_V8` constants
+  - `nfl_analytics/ensemble/enhanced_ensemble_v6_production.py` - Added `use_dirichlet_weights()` and `use_default_weights()` methods
+  - `nfl_analytics/ensemble/strategy/base.py` - Added `DEFAULT_WEIGHTS_V6` and `DIRICHLET_WEIGHTS_V8` constants
 - **API Integration:** Auto-detect prediction type (player_id → v8.0, home/away teams → v6.0)
 - **Reconciliation with ADR-009:** v8.0 uses **static** weights (learned offline), NOT dynamic meta-learning (rejected in ADR-009)
 
@@ -494,7 +494,7 @@ Modified Files:
 
 **DC Features Module** (Nov 26, 2025):
 - **Status**: ✅ COMPLETE
-- **File**: `py/features/dc_features.py` (293 lines)
+- **File**: `nfl_analytics/features/dc_features.py` (293 lines)
 - **Features**: 5 DC features (continuity, tenure, games, adjustment, opponent continuity)
 - **Validation**: KC (Spagnuolo 6yr tenure), BUF (Babich new DC with 0.8 decay)
 - **Integration**: Added to XGBoost v5 (`scripts/train_xgboost_player_agg_v5.py`)
@@ -505,13 +505,13 @@ Modified Files:
 - **Root Cause**: +2.3 pts over-prediction bias (2022-2024)
 - **Sweet Spot**: 3-4 pt edge bets (185 games, 51.4% hit rate)
 - **Fix**: -3.5 pt bias correction + edge filtering
-- **Implementation**: Pending in `py/ensemble/game_outcome_predictor.py`
+- **Implementation**: Pending in `nfl_analytics/ensemble/game_outcome_predictor.py`
 
 **Ensemble Dual-Weight Integration** (Nov 27, 2025):
 - **Status**: ✅ INTEGRATED
 - **Files Modified**:
-  - `py/ensemble/enhanced_ensemble_v6_production.py` - `use_dirichlet_weights()` / `use_default_weights()`
-  - `py/ensemble/strategy/base.py` - `DEFAULT_WEIGHTS_V6` / `DIRICHLET_WEIGHTS_V8` constants
+  - `nfl_analytics/ensemble/enhanced_ensemble_v6_production.py` - `use_dirichlet_weights()` / `use_default_weights()`
+  - `nfl_analytics/ensemble/strategy/base.py` - `DEFAULT_WEIGHTS_V6` / `DIRICHLET_WEIGHTS_V8` constants
 - **Decision Tree**:
   - Game predictions (spreads, totals) → v6.0 (State-Space 27%, XGBoost 23%)
   - Player props (yards, TDs) → v8.0 (Hierarchical 39.6%, Priors 39.5%)
@@ -540,7 +540,7 @@ Modified Files:
 
 **2. O/U Bias Correction Implementation**
 - **Goal**: Apply -3.5 pt correction to total predictions
-- **File**: `py/ensemble/game_outcome_predictor.py`
+- **File**: `nfl_analytics/ensemble/game_outcome_predictor.py`
 - **Edge Filtering**: Only bet 3-4 pt edge games (51.4% expected hit rate)
 - **Timeline**: 1-2 days
 - **Impact**: +3-5% O/U rate improvement

@@ -19,7 +19,7 @@ These were integrated into XGBoost v2.1 and tested against v2 baseline on the 20
 
 ### Implementation
 
-Created `py/config/feature_weights.yaml` with weight=0.0 for both groups:
+Created `nfl_analytics/config/feature_weights.yaml` with weight=0.0 for both groups:
 - Features are extracted only when `is_feature_enabled("group_name")` returns True
 - Code remains in place for easy re-enabling
 - Reason and date documented in config
@@ -92,11 +92,11 @@ Created `py/config/feature_weights.yaml` with weight=0.0 for both groups:
 
 | File | Change |
 |------|--------|
-| `py/config/feature_weights.yaml` | Created - feature group weights |
-| `py/config/feature_weights.py` | Created - config loader |
-| `py/config/__init__.py` | Created - package exports |
-| `py/features/game_feature_extractor.py` | Added `is_feature_enabled()` checks |
-| `py/features/possession_value.py` | Fixed schema bug (returns defaults) |
+| `nfl_analytics/config/feature_weights.yaml` | Created - feature group weights |
+| `nfl_analytics/config/feature_weights.py` | Created - config loader |
+| `nfl_analytics/config/__init__.py` | Created - package exports |
+| `nfl_analytics/features/game_feature_extractor.py` | Added `is_feature_enabled()` checks |
+| `nfl_analytics/features/possession_value.py` | Fixed schema bug (returns defaults) |
 
 ## Lessons Learned
 

@@ -14,7 +14,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from py.features.extractors.base import (
+from nfl_analytics.features.extractors.base import (
     ExtractionLevel,
     FeatureExtractionError,
     FeatureExtractionResult,
@@ -22,7 +22,7 @@ from py.features.extractors.base import (
     FeaturePriority,
     GameLevelExtractorStrategy,
 )
-from py.features.extractors.registry import FeatureRegistry
+from nfl_analytics.features.extractors.registry import FeatureRegistry
 
 
 # ============================================================================

@@ -23,7 +23,7 @@ from psycopg2.extras import RealDictCursor
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.ensemble.game_outcome_predictor import GameOutcomePredictor
+from nfl_analytics.ensemble.game_outcome_predictor import GameOutcomePredictor
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)

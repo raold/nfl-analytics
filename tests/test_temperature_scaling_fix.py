@@ -202,7 +202,7 @@ def main():
     print("TEMPERATURE SCALING DIVISION BY ZERO FIX - UNIT TESTS")
     print("=" * 70)
     print("Testing fix for ZeroDivisionError in _apply_temperature_scaling")
-    print("File: py/models/player_props_ensemble.py:438")
+    print("File: nfl_analytics/models/player_props_ensemble.py:438")
     print("=" * 70)
 
     tests = [

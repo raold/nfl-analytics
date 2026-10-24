@@ -6,8 +6,8 @@ Uses v3 as the primary model, falling back to v2.1 if v3 features are unavailabl
 Optionally blends predictions using weighted average.
 
 Usage:
-    python py/predict/ensemble.py --season 2025 --week 5 --method weighted
-    python py/predict/ensemble.py --game-ids 2025_05_KC_NO --method fallback
+    python nfl_analytics/predict/ensemble.py --season 2025 --week 5 --method weighted
+    python nfl_analytics/predict/ensemble.py --game-ids 2025_05_KC_NO --method fallback
 """
 import argparse
 import json

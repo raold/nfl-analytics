@@ -18,7 +18,7 @@ Expected inputs (CSV/Parquet):
   trades: optional, one row per executed trade for richer post-mortems (not required here)
 
 Usage:
-  python py/ops/report_failure_analysis.py \
+  python nfl_analytics/ops/report_failure_analysis.py \
     --stakes data/weekly_stakes.csv \
     --output-tex analysis/dissertation/results/zero_weeks_rows.tex
 

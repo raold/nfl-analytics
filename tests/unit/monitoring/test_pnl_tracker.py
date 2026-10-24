@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from py.markets.base import Position, Side
-from py.monitoring.pnl_tracker import PnLConfig, PnLTracker
+from nfl_analytics.markets.base import Position, Side
+from nfl_analytics.monitoring.pnl_tracker import PnLConfig, PnLTracker
 
 
 # ============================================================

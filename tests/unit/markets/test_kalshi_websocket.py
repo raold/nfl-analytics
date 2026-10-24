@@ -6,8 +6,8 @@ import json
 
 import pytest
 
-from py.markets.base import OrderBookLevel, Side
-from py.markets.kalshi.websocket import KalshiWebSocket, LocalOrderBook
+from nfl_analytics.markets.base import OrderBookLevel, Side
+from nfl_analytics.markets.kalshi.websocket import KalshiWebSocket, LocalOrderBook
 
 
 # ============================================================
@@ -20,7 +20,7 @@ class TestLocalOrderBook:
 
     def test_apply_snapshot(self):
         """Snapshot replaces all state."""
-        from py.markets.base import OrderBook
+        from nfl_analytics.markets.base import OrderBook
 
         local = LocalOrderBook(contract_id="TEST-01")
 
@@ -104,7 +104,7 @@ class TestLocalOrderBook:
 
     def test_snapshot_clears_previous_state(self):
         """New snapshot replaces old data completely."""
-        from py.markets.base import OrderBook
+        from nfl_analytics.markets.base import OrderBook
 
         local = LocalOrderBook(contract_id="TEST-01")
         local.yes_levels = {50: 100, 55: 200}

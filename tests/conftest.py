@@ -11,7 +11,7 @@ This file is automatically loaded by pytest and provides:
 import sys
 from pathlib import Path
 
-# Ensure project root is first in sys.path so local py/ package imports work
+# Ensure project root is first in sys.path so local nfl_analytics/ package imports work
 # This prevents conflicts with pytest's legacy 'py' package dependency
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))

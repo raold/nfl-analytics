@@ -392,7 +392,7 @@ def main():
         print(f"\n{'='*70}")
         print("RECOMMENDATION: ADOPT v8.0 WEIGHTS")
         print(f"{'='*70}")
-        print("\nAction: Update py/ensemble/enhanced_ensemble_v6_production.py")
+        print("\nAction: Update nfl_analytics/ensemble/enhanced_ensemble_v6_production.py")
         print("        with Dirichlet-learned weights.")
     else:
         print(f"\n{'='*70}")

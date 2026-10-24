@@ -11,7 +11,7 @@ Key Differences:
 - v6.1 (Treatment): Dirichlet-optimized weights for player props (31.5% MAE improvement)
 
 Usage:
-    from py.production.ab_test_dirichlet_props import DirichletABTestRouter
+    from nfl_analytics.production.ab_test_dirichlet_props import DirichletABTestRouter
 
     router = DirichletABTestRouter(split_ratio=0.5)
     result = router.predict_props(
@@ -42,7 +42,7 @@ from psycopg2.extras import RealDictCursor
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

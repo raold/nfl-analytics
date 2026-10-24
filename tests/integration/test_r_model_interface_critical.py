@@ -39,7 +39,7 @@ import psutil
 import psycopg2
 import pytest
 
-from py.ensemble.r_model_interface import RModelInterface
+from nfl_analytics.ensemble.r_model_interface import RModelInterface
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

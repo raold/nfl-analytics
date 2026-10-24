@@ -6,11 +6,11 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from py.agents.trading_validator import TradingValidator, ValidationResult, ValidatorConfig
-from py.markets.base import Side
-from py.risk.feature_health import FEATURE_GROUPS, HealthCheckResult
-from py.risk.risk_manager import RiskManager
-from py.trading.signal import Signal
+from nfl_analytics.agents.trading_validator import TradingValidator, ValidationResult, ValidatorConfig
+from nfl_analytics.markets.base import Side
+from nfl_analytics.risk.feature_health import FEATURE_GROUPS, HealthCheckResult
+from nfl_analytics.risk.risk_manager import RiskManager
+from nfl_analytics.trading.signal import Signal
 
 
 # ============================================================

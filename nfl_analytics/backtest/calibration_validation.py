@@ -17,7 +17,7 @@ from scipy import stats
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

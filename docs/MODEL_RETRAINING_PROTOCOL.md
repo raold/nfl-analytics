@@ -137,7 +137,7 @@ DBI::dbWriteTable(conn, "mart.bayesian_team_ratings", ratings, overwrite = TRUE)
 
 ```bash
 # Generate Bayesian-enhanced features
-python py/features/bayesian_features.py \
+python nfl_analytics/features/bayesian_features.py \
   --input data/processed/features/asof_team_features_v3.csv \
   --output data/processed/features/asof_team_features_v3_bayesian.csv \
   --home-advantage 2.4 \
@@ -183,7 +183,7 @@ python py/features/bayesian_features.py \
 
 ```bash
 # Retrain XGBoost v3 with Bayesian features
-uv run python py/models/xgboost_gpu_v3.py \
+uv run python nfl_analytics/models/xgboost_gpu_v3.py \
   --features-csv data/processed/features/asof_team_features_v3_bayesian.csv \
   --start-season 2006 \
   --end-season 2023 \
@@ -266,7 +266,7 @@ assert new_metrics["ats_accuracy"] >= 0.515  # Absolute minimum
 
 ```bash
 # Generate predictions for upcoming week
-python py/predictions/generate_predictions.py \
+python nfl_analytics/predictions/generate_predictions.py \
   --season 2025 \
   --week 7 \
   --version "5_days_out" \
@@ -285,13 +285,13 @@ python py/predictions/generate_predictions.py \
 Track prediction evolution as information updates:
 ```bash
 # 5 days before games
-python py/predictions/generate_predictions.py --week 7 --version "5_days_out"
+python nfl_analytics/predictions/generate_predictions.py --week 7 --version "5_days_out"
 
 # Day before games (with updated injury reports)
-python py/predictions/generate_predictions.py --week 7 --version "day_before"
+python nfl_analytics/predictions/generate_predictions.py --week 7 --version "day_before"
 
 # Day of games (final predictions)
-python py/predictions/generate_predictions.py --week 7 --version "day_of"
+python nfl_analytics/predictions/generate_predictions.py --week 7 --version "day_of"
 ```
 
 ---
@@ -303,7 +303,7 @@ python py/predictions/generate_predictions.py --week 7 --version "day_of"
 **Every Tuesday after new data loads:**
 ```bash
 # Analyze completed games
-python py/predictions/retrospective_analyzer.py --auto
+python nfl_analytics/predictions/retrospective_analyzer.py --auto
 ```
 
 **Automated Classification:**
@@ -316,7 +316,7 @@ python py/predictions/retrospective_analyzer.py --auto
 **First Tuesday of each month:**
 ```bash
 # Extract learning patterns
-python py/predictions/extract_learning_patterns.py \
+python nfl_analytics/predictions/extract_learning_patterns.py \
   --min-sample-size 10 \
   --verbose
 ```

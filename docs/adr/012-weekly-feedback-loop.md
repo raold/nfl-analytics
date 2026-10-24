@@ -161,6 +161,6 @@ The system will be validated using:
 
 - ADR-009: Abandon Ensemble v7 Meta-Learning
 - ADR-011: XGBoost Feature Optimization
-- `py/feedback/__init__.py`: Module exports
+- `nfl_analytics/feedback/__init__.py`: Module exports
 - `scripts/run_weekly_feedback.py`: Weekly orchestrator
 - `scripts/ab_test_semantic_2025.py`: 2025 holdout comparison

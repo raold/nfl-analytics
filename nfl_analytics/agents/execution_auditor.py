@@ -5,7 +5,7 @@ Compares local fills vs exchange fills, detects discrepancies, and
 generates audit trail entries.
 
 Usage:
-    from py.agents.execution_auditor import ExecutionAuditor, AuditorConfig
+    from nfl_analytics.agents.execution_auditor import ExecutionAuditor, AuditorConfig
 
     auditor = ExecutionAuditor(client=kalshi_client)
     report = await auditor.run_audit(local_positions=positions, local_balance=balance)
@@ -17,9 +17,9 @@ import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from py.execution.reconciliation import Reconciler, ReconciliationReport
-from py.markets.base import Fill, MarketClient, Position
-from py.monitoring.alert_manager import AlertLevel, AlertManager
+from nfl_analytics.execution.reconciliation import Reconciler, ReconciliationReport
+from nfl_analytics.markets.base import Fill, MarketClient, Position
+from nfl_analytics.monitoring.alert_manager import AlertLevel, AlertManager
 
 logger = logging.getLogger(__name__)
 

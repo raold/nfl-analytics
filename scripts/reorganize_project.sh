@@ -203,14 +203,14 @@ log_info "Phase 5: Organizing Python Package"
 echo ""
 
 # Move odds ingestion to ETL
-if [[ -f "py/ingest_odds_history.py" ]]; then
-    log_info "Note: py/ingest_odds_history.py will be refactored into etl/extract/odds_api.py"
+if [[ -f "nfl_analytics/ingest_odds_history.py" ]]; then
+    log_info "Note: nfl_analytics/ingest_odds_history.py will be refactored into etl/extract/odds_api.py"
     # Keep original for now, will refactor after ETL framework complete
 fi
 
 # Move weather ingestion to ETL
-if [[ -f "py/weather_meteostat.py" ]]; then
-    log_info "Note: py/weather_meteostat.py will be refactored into etl/extract/weather.py"
+if [[ -f "nfl_analytics/weather_meteostat.py" ]]; then
+    log_info "Note: nfl_analytics/weather_meteostat.py will be refactored into etl/extract/weather.py"
     # Keep original for now
 fi
 
@@ -277,7 +277,7 @@ else
     echo "📁 New Structure Created:"
     echo "  ├── docs/           (all documentation)"
     echo "  ├── etl/            (data pipelines)"
-    echo "  ├── py/             (Python package)"
+    echo "  ├── nfl_analytics/             (Python package)"
     echo "  ├── R/              (R scripts)"
     echo "  ├── db/             (database schema)"
     echo "  ├── data/           (organized data storage)"

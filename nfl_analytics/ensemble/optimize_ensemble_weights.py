@@ -15,7 +15,7 @@ Target ensemble configuration (from MODEL_REGISTRY.yaml):
 - Informative Priors v2: 0% (redundant with Hierarchical)
 
 Usage:
-    python py/ensemble/optimize_ensemble_weights.py \
+    python nfl_analytics/ensemble/optimize_ensemble_weights.py \
         --predictions analysis/results/ensemble_predictions_2025_holdout.csv \
         --output models/ensemble_weights_2025_optimized.json
 
@@ -625,12 +625,12 @@ def main():
         epilog="""
 Examples:
   # Optimize weights on 2025 hold-out
-  python py/ensemble/optimize_ensemble_weights.py \\
+  python nfl_analytics/ensemble/optimize_ensemble_weights.py \\
       --predictions analysis/results/ensemble_predictions_2025_holdout.csv \\
       --output models/ensemble_weights_2025_optimized.json
 
   # With custom targets
-  python py/ensemble/optimize_ensemble_weights.py \\
+  python nfl_analytics/ensemble/optimize_ensemble_weights.py \\
       --predictions analysis/results/ensemble_predictions_2025_holdout.csv \\
       --output models/ensemble_weights_2025_optimized.json \\
       --target-mae 45.0 \\

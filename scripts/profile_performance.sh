@@ -23,7 +23,7 @@
 #   ./scripts/profile_performance.sh database --min-duration 200
 #
 #   # Profile specific Python file
-#   ./scripts/profile_performance.sh code py/ensemble/enhanced_ensemble_v5.py
+#   ./scripts/profile_performance.sh code nfl_analytics/ensemble/enhanced_ensemble_v5.py
 #
 #   # Profile API with HTML report
 #   ./scripts/profile_performance.sh api --format html --output api_report.html
@@ -126,7 +126,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from py.utils.performance_profiling_agent import PerformanceProfilingAgent
+from nfl_analytics.utils.performance_profiling_agent import PerformanceProfilingAgent
 
 logging.basicConfig(level=logging.INFO)
 
@@ -214,7 +214,7 @@ elif mode == "backtest":
     print("="*70)
 
     # Profile backtest code
-    backtest_file = project_root / "py/backtest/historical_validation_4way.py"
+    backtest_file = project_root / "nfl_analytics/backtest/historical_validation_4way.py"
     if backtest_file.exists():
         report = agent.profile_python_code(str(backtest_file))
         print(f"\nBacktest Total Time: {report.total_time_s:.2f}s")

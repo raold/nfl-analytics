@@ -25,7 +25,7 @@ Target Performance:
 - Expected ROI: +5.5-7.5%
 
 Usage:
-    from py.ensemble.enhanced_ensemble_v5_1 import EnhancedEnsemble4Way
+    from nfl_analytics.ensemble.enhanced_ensemble_v5_1 import EnhancedEnsemble4Way
 
     ensemble = EnhancedEnsemble4Way()
     result = ensemble.predict(
@@ -186,7 +186,7 @@ class EnhancedEnsemble4Way:
 
         # Load Hybrid XGBoost
         if self.hybrid_xgboost_path.exists():
-            from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
+            from nfl_analytics.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
 
             self.hybrid_xgboost_model = HybridStaticIncrementalXGBoost()
             self.hybrid_xgboost_model.load(str(self.hybrid_xgboost_path))

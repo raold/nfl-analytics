@@ -13,7 +13,7 @@ Performance Impact:
 - Automatic connection health checks and recycling
 
 Usage:
-    from py.utils.psycopg_pool import get_connection_pool
+    from nfl_analytics.utils.psycopg_pool import get_connection_pool
 
     # Get singleton pool instance
     pool = get_connection_pool(
@@ -264,7 +264,7 @@ def get_connection_pool(
         Psycopg3PoolManager instance
 
     Example:
-        from py.utils.psycopg_pool import get_connection_pool
+        from nfl_analytics.utils.psycopg_pool import get_connection_pool
 
         pool = get_connection_pool(password="your_password")
         with pool.get_connection() as conn:

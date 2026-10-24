@@ -13,7 +13,7 @@ Test Categories:
 5. Environment Variable Configuration
 
 Run with:
-    pytest tests/integration/test_ab_test_api_integration.py -v --cov=py.production.real_time_api
+    pytest tests/integration/test_ab_test_api_integration.py -v --cov=nfl_analytics.production.real_time_api
 
 Author: Claude Code (Sonnet 4.5)
 Date: November 14, 2025
@@ -32,7 +32,7 @@ from unittest.mock import Mock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from py.production.real_time_api import app
+from nfl_analytics.production.real_time_api import app
 
 # ============================================================================
 # FIXTURES
@@ -42,7 +42,7 @@ from py.production.real_time_api import app
 @pytest.fixture
 def mock_ab_router():
     """Mock A/B test router for testing."""
-    with patch("py.production.real_time_api.ABTestRouter") as mock_router_class:
+    with patch("nfl_analytics.production.real_time_api.ABTestRouter") as mock_router_class:
         mock_router = Mock()
         mock_router.enabled = True
         mock_router.split_ratio = 0.5
@@ -95,7 +95,7 @@ def mock_ab_router():
 @pytest.fixture
 def mock_db_pool():
     """Mock database connection pool."""
-    with patch("py.production.real_time_api.db_pool") as mock_pool:
+    with patch("nfl_analytics.production.real_time_api.db_pool") as mock_pool:
         mock_conn = Mock()
         mock_cursor = Mock()
         mock_conn.cursor.return_value = mock_cursor
@@ -130,9 +130,9 @@ class TestHealthChecks:
         assert "/predict" in data["endpoints"]
         assert "/ab-test/status" in data["endpoints"]
 
-    @patch("py.production.real_time_api.ab_router")
-    @patch("py.production.real_time_api.db_pool")
-    @patch("py.production.real_time_api.redis_client")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.db_pool")
+    @patch("nfl_analytics.production.real_time_api.redis_client")
     def test_health_check_all_healthy(self, mock_redis, mock_db, mock_router, client):
         """Test health check when all services are healthy."""
         # Mock database
@@ -159,8 +159,8 @@ class TestHealthChecks:
         assert "redis" in data
         assert "models_loaded" in data
 
-    @patch("py.production.real_time_api.ab_router")
-    @patch("py.production.real_time_api.db_pool")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.db_pool")
     def test_health_check_database_down(self, mock_db, mock_router, client):
         """Test health check when database is down."""
         # Mock database failure
@@ -183,7 +183,7 @@ class TestHealthChecks:
 class TestPredictionEndpoints:
     """Tests for prediction API endpoints."""
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_predict_endpoint_success(self, mock_router, client):
         """Test /predict endpoint returns valid prediction."""
         # Mock A/B router
@@ -217,7 +217,7 @@ class TestPredictionEndpoints:
         assert "confidence_interval" in data
         assert "latency_ms" in data
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_predict_endpoint_control_group(self, mock_router, client):
         """Test prediction routed to control group."""
         # Mock control group assignment
@@ -244,7 +244,7 @@ class TestPredictionEndpoints:
         data = response.json()
         assert data["model_version"] == "v5.0"
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_predict_endpoint_treatment_group(self, mock_router, client):
         """Test prediction routed to treatment group."""
         # Mock treatment group assignment
@@ -271,7 +271,7 @@ class TestPredictionEndpoints:
         data = response.json()
         assert data["model_version"] == "v6.0"
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_predict_endpoint_invalid_week(self, mock_router, client):
         """Test prediction endpoint validates week number."""
         response = client.post(
@@ -286,11 +286,11 @@ class TestPredictionEndpoints:
 
         assert response.status_code == 422  # Validation error
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_predict_endpoint_router_not_initialized(self, mock_router, client):
         """Test prediction endpoint when router not initialized."""
         # Simulate uninitialized router
-        with patch("py.production.real_time_api.ab_router", None):
+        with patch("nfl_analytics.production.real_time_api.ab_router", None):
             response = client.post(
                 "/predict",
                 json={
@@ -303,7 +303,7 @@ class TestPredictionEndpoints:
 
             assert response.status_code == 503  # Service unavailable
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_predict_ensemble_endpoint_with_individual_models(self, mock_router, client):
         """Test /predict/ensemble endpoint returns individual model predictions."""
         # Mock ensemble prediction with individual results
@@ -340,7 +340,7 @@ class TestPredictionEndpoints:
         assert "recommendation" in data
         assert "edge" in data
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_batch_prediction_endpoint(self, mock_router, client):
         """Test /predict/batch endpoint processes multiple predictions."""
         # Mock individual predictions
@@ -399,7 +399,7 @@ class TestPredictionEndpoints:
 class TestABTestStatusEndpoint:
     """Tests for A/B test status endpoint."""
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_ab_test_status_enabled(self, mock_router, client):
         """Test /ab-test/status when test is enabled."""
         mock_router.enabled = True
@@ -427,7 +427,7 @@ class TestABTestStatusEndpoint:
         assert "control" in data
         assert "treatment" in data
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_ab_test_status_disabled(self, mock_router, client):
         """Test /ab-test/status when test is disabled."""
         mock_router.enabled = False
@@ -441,7 +441,7 @@ class TestABTestStatusEndpoint:
 
     def test_ab_test_status_router_not_initialized(self, client):
         """Test /ab-test/status when router not initialized."""
-        with patch("py.production.real_time_api.ab_router", None):
+        with patch("nfl_analytics.production.real_time_api.ab_router", None):
             response = client.get("/ab-test/status")
 
             assert response.status_code == 200
@@ -459,7 +459,7 @@ class TestABTestStatusEndpoint:
 class TestDatabaseLoggingIntegration:
     """Tests for database logging integration."""
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_prediction_logged_to_database(self, mock_router, client):
         """Test that predictions are automatically logged to ml.predictions."""
         # Mock prediction with log_to_db=True
@@ -489,7 +489,7 @@ class TestDatabaseLoggingIntegration:
         call_kwargs = mock_router.predict.call_args[1]
         assert call_kwargs["log_to_db"] is True
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_batch_predictions_logged_to_database(self, mock_router, client):
         """Test that batch predictions are logged to database."""
         # Mock predictions
@@ -534,7 +534,7 @@ class TestEnvironmentConfiguration:
     """Tests for environment variable configuration."""
 
     @patch.dict(os.environ, {"AB_TEST_ENABLED": "false"})
-    @patch("py.production.real_time_api.ABTestRouter")
+    @patch("nfl_analytics.production.real_time_api.ABTestRouter")
     def test_ab_test_disabled_via_env_var(self, mock_router_class):
         """Test that AB_TEST_ENABLED=false disables test."""
         # Simulate startup event
@@ -547,7 +547,7 @@ class TestEnvironmentConfiguration:
         assert ab_test_enabled is False
 
     @patch.dict(os.environ, {"AB_TEST_SPLIT_RATIO": "0.3"})
-    @patch("py.production.real_time_api.ABTestRouter")
+    @patch("nfl_analytics.production.real_time_api.ABTestRouter")
     def test_ab_test_split_ratio_via_env_var(self, mock_router_class):
         """Test that AB_TEST_SPLIT_RATIO env var is used."""
         # Simulate startup event
@@ -568,7 +568,7 @@ class TestEnvironmentConfiguration:
 class TestModelRegistryLookup:
     """Tests for model registry integration."""
 
-    @patch("py.production.real_time_api.db_pool")
+    @patch("nfl_analytics.production.real_time_api.db_pool")
     def test_models_endpoint_returns_versions(self, mock_db, client):
         """Test /models endpoint returns available model versions."""
         # Mock database query
@@ -599,7 +599,7 @@ class TestModelRegistryLookup:
 class TestErrorHandling:
     """Tests for error handling in API."""
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_prediction_error_handling(self, mock_router, client):
         """Test that prediction errors return 500."""
         # Mock prediction error
@@ -619,7 +619,7 @@ class TestErrorHandling:
         data = response.json()
         assert "detail" in data
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_ab_test_status_error_handling(self, mock_router, client):
         """Test that get_test_summary errors are handled."""
         # Mock get_test_summary error
@@ -640,4 +640,4 @@ class TestErrorHandling:
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v", "--tb=short", "--cov=py.production.real_time_api"])
+    pytest.main([__file__, "-v", "--tb=short", "--cov=nfl_analytics.production.real_time_api"])

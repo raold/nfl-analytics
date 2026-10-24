@@ -19,7 +19,7 @@ Key Features:
 - Integration with Prometheus/Grafana
 
 Usage:
-    from py.utils.performance_profiling_agent import PerformanceProfilingAgent
+    from nfl_analytics.utils.performance_profiling_agent import PerformanceProfilingAgent
 
     agent = PerformanceProfilingAgent()
 
@@ -27,7 +27,7 @@ Usage:
     report = agent.profile_database_queries(min_duration_ms=100)
 
     # Profile Python code
-    profile = agent.profile_python_code("py/models/train.py", function="train_model")
+    profile = agent.profile_python_code("nfl_analytics/models/train.py", function="train_model")
 
     # Profile API endpoints
     endpoints = agent.profile_api_endpoints(duration_hours=1)
@@ -845,9 +845,9 @@ class PerformanceProfilingAgent:
             logger.info("Profiling Python code...")
             # Profile key Python files
             python_files = [
-                "py/ensemble/enhanced_ensemble_v5.py",
-                "py/backtest/historical_validation_4way.py",
-                "py/data/feature_engineering.py",
+                "nfl_analytics/ensemble/enhanced_ensemble_v5.py",
+                "nfl_analytics/backtest/historical_validation_4way.py",
+                "nfl_analytics/data/feature_engineering.py",
             ]
 
             for file_path in python_files:
@@ -944,7 +944,7 @@ class PerformanceProfilingAgent:
                 import gc
                 gc.collect()  # Force garbage collection
                 """,
-                reference_docs=["py/utils/performance_profiling_agent.py"],
+                reference_docs=["nfl_analytics/utils/performance_profiling_agent.py"],
             )
 
         elif bottleneck.bottleneck_type == BottleneckType.EXPENSIVE_COMPUTATION:
@@ -960,7 +960,7 @@ class PerformanceProfilingAgent:
                 # vs
                 result = sum(a * w for a, w in zip(array, weights))  # Slow
                 """,
-                reference_docs=["py/utils/performance_optimizer.py"],
+                reference_docs=["nfl_analytics/utils/performance_optimizer.py"],
             )
 
         elif bottleneck.bottleneck_type == BottleneckType.MISSING_CACHE:
@@ -971,12 +971,12 @@ class PerformanceProfilingAgent:
                 expected_improvement="10-100x faster for repeated queries",
                 implementation_difficulty="Easy",
                 code_example="""
-                from py.utils.feature_cache import FeatureCache
+                from nfl_analytics.utils.feature_cache import FeatureCache
 
                 cache = FeatureCache()
                 features = cache.get_or_compute(key, compute_func)
                 """,
-                reference_docs=["py/utils/feature_cache.py"],
+                reference_docs=["nfl_analytics/utils/feature_cache.py"],
             )
 
         else:

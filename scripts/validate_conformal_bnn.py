@@ -50,7 +50,7 @@ except ImportError:
 
 # Try to import BNN conformal wrapper
 try:
-    from py.models.bnn_conformal import BNNConformalPredictor, PyTorchBNNWrapper
+    from nfl_analytics.models.bnn_conformal import BNNConformalPredictor, PyTorchBNNWrapper
 
     BNN_CONFORMAL_AVAILABLE = True
 except ImportError:

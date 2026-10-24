@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 import psycopg2
 
-from py.ensemble.enhanced_ensemble_v3 import EnhancedEnsembleV3
+from nfl_analytics.ensemble.enhanced_ensemble_v3 import EnhancedEnsembleV3
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -67,7 +67,7 @@ T_{\text{total}} = 148 \times 1,312 \text{ ms} \approx 194 \text{ seconds} = 3.2
 We implemented \texttt{psycopg2.pool.SimpleConnectionPool} with pre-warmed connections:
 
 \begin{verbatim}
-from py.utils.database_pool import DatabasePoolManager
+from nfl_analytics.utils.database_pool import DatabasePoolManager
 
 # Initialize pool at application startup (one-time cost)
 pool = DatabasePoolManager(
@@ -166,7 +166,7 @@ Total redundant query time: $12 + 15 + 18 = 45$ ms per prediction (despite ident
 We implemented in-memory feature cache with Least Recently Used (LRU) eviction policy:
 
 \begin{verbatim}
-from py.utils.feature_cache import FeatureCache
+from nfl_analytics.utils.feature_cache import FeatureCache
 
 # Initialize cache at application startup
 cache = FeatureCache(

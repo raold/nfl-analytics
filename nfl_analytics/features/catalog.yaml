@@ -7,9 +7,9 @@ meta:
   version: "2.0"
   last_updated: "2025-10-17"
   source_scripts:
-    - py/features/asof_features.py
-    - py/features/asof_features_enhanced.py
-    - py/features/merge_advanced_features.py
+    - nfl_analytics/features/asof_features.py
+    - nfl_analytics/features/asof_features_enhanced.py
+    - nfl_analytics/features/merge_advanced_features.py
   database_schema: mart
   temporal_policy: |
     All features marked asof_safe:true are guaranteed to use only information
@@ -23,7 +23,7 @@ feature_groups:
   - name: team_history_base
     description: Cumulative team performance metrics
     source_table: games, plays
-    source_script: py/features/asof_features.py
+    source_script: nfl_analytics/features/asof_features.py
     asof_safe: true
     temporal_cutoff: kickoff
     features:
@@ -116,7 +116,7 @@ feature_groups:
   - name: team_context
     description: Rest, travel, and personnel changes
     source_table: games
-    source_script: py/features/asof_features.py
+    source_script: nfl_analytics/features/asof_features.py
     asof_safe: true
     temporal_cutoff: kickoff
     features:
@@ -164,7 +164,7 @@ feature_groups:
   - name: team_personnel
     description: QB and coach stability metrics
     source_table: games
-    source_script: py/features/asof_features.py
+    source_script: nfl_analytics/features/asof_features.py
     asof_safe: true
     temporal_cutoff: kickoff
     features:
@@ -201,7 +201,7 @@ feature_groups:
   - name: team_venue
     description: Stadium surface and roof type
     source_table: games
-    source_script: py/features/asof_features.py
+    source_script: nfl_analytics/features/asof_features.py
     asof_safe: true
     temporal_cutoff: null  # Static venue properties
     features:
@@ -231,7 +231,7 @@ feature_groups:
   - name: team_efficiency_advanced
     description: Play-level efficiency metrics (success rate, passing)
     source_table: plays
-    source_script: py/features/asof_features_enhanced.py
+    source_script: nfl_analytics/features/asof_features_enhanced.py
     asof_safe: true
     temporal_cutoff: kickoff
     features:
@@ -298,7 +298,7 @@ feature_groups:
   - name: team_turnovers_penalties
     description: Turnover and penalty metrics from games table
     source_table: games
-    source_script: py/features/asof_features_enhanced.py
+    source_script: nfl_analytics/features/asof_features_enhanced.py
     asof_safe: true
     temporal_cutoff: kickoff
     features:
@@ -328,7 +328,7 @@ feature_groups:
   - name: fourth_down_coaching
     description: 4th down decision-making and coaching aggressiveness
     source_table: mart.team_4th_down_features
-    source_script: py/features/merge_advanced_features.py
+    source_script: nfl_analytics/features/merge_advanced_features.py
     asof_safe: true
     temporal_cutoff: kickoff
     features:
@@ -384,7 +384,7 @@ feature_groups:
   - name: injury_load
     description: Injury impact metrics by position group
     source_table: mart.team_injury_load
-    source_script: py/features/merge_advanced_features.py
+    source_script: nfl_analytics/features/merge_advanced_features.py
     asof_safe: true
     temporal_cutoff: kickoff
     features:
@@ -443,7 +443,7 @@ feature_groups:
   - name: playoff_context
     description: Playoff probability and stakes (optional)
     source_table: mart.team_playoff_context
-    source_script: py/features/merge_advanced_features.py
+    source_script: nfl_analytics/features/merge_advanced_features.py
     asof_safe: true
     temporal_cutoff: kickoff
     features:
@@ -485,7 +485,7 @@ feature_groups:
   - name: matchup_differentials
     description: Home vs away team differentials
     source_table: derived
-    source_script: py/features/asof_features.py, py/features/asof_features_enhanced.py
+    source_script: nfl_analytics/features/asof_features.py, nfl_analytics/features/asof_features_enhanced.py
     asof_safe: true
     temporal_cutoff: null  # Derived from asof_safe base features
     features:
@@ -539,7 +539,7 @@ feature_groups:
   - name: game_outcomes
     description: Post-game results - LEAKAGE RISK if used for prediction
     source_table: games
-    source_script: py/features/asof_features.py
+    source_script: nfl_analytics/features/asof_features.py
     asof_safe: false  # ❌ POST-GAME DATA
     temporal_cutoff: null
     features:
@@ -605,11 +605,11 @@ validation_tests:
     description: Validates CV fold boundaries prevent leakage
 
   - test_name: validate_team_history
-    location: py/features/asof_features.py:354-367
+    location: nfl_analytics/features/asof_features.py:354-367
     description: Runtime validation of team history features
 
   - test_name: validate_game_features
-    location: py/features/asof_features.py:435-437
+    location: nfl_analytics/features/asof_features.py:435-437
     description: Validates no duplicate game_id rows
 
 # =============================================================================

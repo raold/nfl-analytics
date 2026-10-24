@@ -28,7 +28,7 @@ sys.path.insert(0, str(project_root))
 
 import logging
 
-from py.features.game_feature_extractor import GameFeatureExtractor
+from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

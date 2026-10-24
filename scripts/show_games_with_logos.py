@@ -13,7 +13,7 @@ import psycopg2
 
 # Add parent directory to path to import team_logos
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from py.utils.team_logos import format_matchup, format_team_with_logo, get_team_logo
+from nfl_analytics.utils.team_logos import format_matchup, format_team_with_logo, get_team_logo
 
 # Database connection parameters
 DB_PARAMS = {

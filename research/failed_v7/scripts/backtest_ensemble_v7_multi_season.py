@@ -33,11 +33,11 @@ import warnings
 import numpy as np
 import pandas as pd
 import psycopg2
-from py.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way as EnsembleV7
+from nfl_analytics.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way as EnsembleV7
 from scipy import stats
 from tqdm import tqdm
 
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way as EnsembleV6
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way as EnsembleV6
 
 # Suppress warnings for cleaner output
 warnings.filterwarnings("ignore")

@@ -4,7 +4,7 @@ NFL Analytics Configuration Module.
 Provides centralized configuration for database, feature weights, and settings.
 
 Usage:
-    from py.config import get_settings, is_feature_enabled
+    from nfl_analytics.config import get_settings, is_feature_enabled
 
     # Database config
     settings = get_settings()
@@ -16,8 +16,8 @@ Usage:
         ...
 """
 
-from py.config.settings import get_settings, DatabaseSettings, Settings
-from py.config.feature_weights import (
+from nfl_analytics.config.settings import get_settings, DatabaseSettings, Settings
+from nfl_analytics.config.feature_weights import (
     get_feature_weight,
     is_feature_enabled,
     get_feature_reason,

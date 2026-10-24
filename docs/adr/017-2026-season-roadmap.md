@@ -111,7 +111,7 @@ Implement the following improvements organized into three tiers by expected impa
 **Problem:** Simple 2024 point differential + 2.5 HFA model achieved +43% ROI on 2025 holdout in experiments. Not integrated into production.
 
 **Actions:**
-- Create standalone `py/models/power_ratings_model.py`
+- Create standalone `nfl_analytics/models/power_ratings_model.py`
 - Train on historical season-level point differentials
 - Add as 6th ensemble member or standalone betting signal
 - Backtest across 2020-2025 to validate the +43% finding

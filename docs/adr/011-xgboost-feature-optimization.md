@@ -145,7 +145,7 @@ Rejected. No consistent benefit observed across validation sets.
 ### Neutral
 
 - **Documentation:** Experiment results saved to `data/feature_optimization_results.csv`
-- **Code:** Experiment script at `py/models/feature_optimization_experiment.py`
+- **Code:** Experiment script at `nfl_analytics/models/feature_optimization_experiment.py`
 
 ### Risks
 
@@ -199,7 +199,7 @@ Primary metric: Spread MAE on held-out validation set (2024 season games)
 ### Documentation
 
 - Experiment results (no longer in the repo; see [HISTORY](../HISTORY.md))
-- [Experiment script](../../py/models/feature_optimization_experiment.py)
+- [Experiment script](../../nfl_analytics/models/feature_optimization_experiment.py)
 - Best config (no longer in the repo; see [HISTORY](../HISTORY.md))
 
 ### External Resources

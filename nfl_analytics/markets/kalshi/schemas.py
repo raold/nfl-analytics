@@ -14,7 +14,7 @@ Kalshi conventions:
     - Orderbook: [[price, quantity], ...] arrays
 
 Usage:
-    from py.markets.kalshi.schemas import parse_order, parse_fill, parse_orderbook
+    from nfl_analytics.markets.kalshi.schemas import parse_order, parse_fill, parse_orderbook
 
     order = parse_order(kalshi_json["order"])
     fills = [parse_fill(f) for f in kalshi_json["fills"]]
@@ -25,7 +25,7 @@ from __future__ import annotations
 import logging
 from datetime import UTC, datetime
 
-from py.markets.base import (
+from nfl_analytics.markets.base import (
     Contract,
     ContractType,
     Fill,

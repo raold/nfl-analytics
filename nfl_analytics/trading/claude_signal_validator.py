@@ -13,7 +13,7 @@ Architecture position:
                                    (optional, opt-in)
 
 Usage:
-    from py.trading.claude_signal_validator import (
+    from nfl_analytics.trading.claude_signal_validator import (
         ClaudeSignalValidator,
         ClaudeValidatorConfig,
     )
@@ -34,7 +34,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-from py.trading.signal import Signal
+from nfl_analytics.trading.signal import Signal
 
 logger = logging.getLogger(__name__)
 

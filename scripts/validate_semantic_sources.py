@@ -30,8 +30,8 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.semantic.ingestion.espn_api import ESPNApiClient
-from py.semantic.ingestion.rotowire_client import RotoWireClient
+from nfl_analytics.semantic.ingestion.espn_api import ESPNApiClient
+from nfl_analytics.semantic.ingestion.rotowire_client import RotoWireClient
 
 
 @dataclass

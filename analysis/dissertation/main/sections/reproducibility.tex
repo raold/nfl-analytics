@@ -28,7 +28,7 @@ Player prop lines (over/under passing yards) are collected from multiple sources
 
 \begin{itemize}
     \item \textbf{Historical (2022-2023)}: Archived props from DraftKings, FanDuel via \texttt{props-history} dataset
-    \item \textbf{Live (2024-2025)}: Real-time collection via \texttt{py/odds/} module
+    \item \textbf{Live (2024-2025)}: Real-time collection via \texttt{nfl\_analytics/odds/} module
     \item \textbf{Storage}: \texttt{ml.sportsbook\_lines} table
     \item \textbf{Vig Model}: Standard -110 odds (10\% commission)
 \end{itemize}
@@ -87,7 +87,7 @@ All performance metrics reported in this dissertation follow a strict \textbf{mu
     \item \textbf{Training}: Models trained on 2018-2024 data with exponential decay
     \item \textbf{Validation}: Separate 2022-2024 holdout set for backtesting (3 seasons, 854 games)
     \item \textbf{No Lookahead}: Predictions generated using only information available before game kickoff
-    \item \textbf{Temporal Leakage Detection}: Automated checks via \texttt{py/validation/temporal\_leakage\_detector.py}
+    \item \textbf{Temporal Leakage Detection}: Automated checks via \texttt{nfl\_analytics/validation/temporal\_leakage\_detector.py}
 \end{enumerate}
 
 \subsection{Most Recent Comprehensive Backtest}
@@ -192,7 +192,7 @@ This suggests that while our models generate accurate predictions, the \textbf{b
 All code is version-controlled in a private Git repository with the following structure:
 
 \begin{itemize}
-    \item \texttt{py/} - Python modules (ML, ensemble, features, validation)
+    \item \texttt{nfl\_analytics/} - Python modules (ML, ensemble, features, validation)
     \item \texttt{R/} - R scripts (Bayesian models, batch prediction)
     \item \texttt{db/} - Database schema and migrations
     \item \texttt{models/} - Trained model artifacts (tracked with Git LFS)

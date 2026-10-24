@@ -9,7 +9,7 @@ Uses Python's RotatingFileHandler for automatic log rotation when files
 exceed max_file_size_mb.
 
 Usage:
-    from py.monitoring.trade_logger import TradeLogger, TradeLoggerConfig
+    from nfl_analytics.monitoring.trade_logger import TradeLogger, TradeLoggerConfig
 
     logger = TradeLogger()
     logger.log_signal(signal, risk_result)
@@ -25,9 +25,9 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 
-from py.risk.kill_switch import KillSwitchEvent
-from py.risk.risk_manager import RiskCheckResult
-from py.trading.signal import Signal
+from nfl_analytics.risk.kill_switch import KillSwitchEvent
+from nfl_analytics.risk.risk_manager import RiskCheckResult
+from nfl_analytics.trading.signal import Signal
 
 _logger = logging.getLogger(__name__)
 

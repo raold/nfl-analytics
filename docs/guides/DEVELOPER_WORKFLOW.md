@@ -257,7 +257,7 @@ The project uses an automated enforcement framework to catch errors at commit ti
 **Framework Components:**
 
 1. **Git Pre-Commit Hook** (`.git/hooks/pre-commit`)
-2. **Enforcement Router** (`py/utils/enforcement_router.py`)
+2. **Enforcement Router** (`nfl_analytics/utils/enforcement_router.py`)
 3. **Specialized Validators** (11 agents)
 
 **What Gets Validated:**
@@ -278,10 +278,10 @@ The project uses an automated enforcement framework to catch errors at commit ti
 
 ```bash
 # Make changes
-vim py/features/build_features.py
+vim nfl_analytics/features/build_features.py
 
 # Commit (hook runs automatically)
-git add py/features/build_features.py
+git add nfl_analytics/features/build_features.py
 git commit -m "feat(features): add new rolling features"
 
 # If validation fails, commit is blocked:
@@ -293,7 +293,7 @@ git commit -m "feat(features): add new rolling features"
 
 ```bash
 # Validate specific file
-python py/utils/enforcement_router.py scripts/train_new_model.py
+python nfl_analytics/utils/enforcement_router.py scripts/train_new_model.py
 
 # Validate all staged files
 pre-commit run --all-files
@@ -354,7 +354,7 @@ pre-commit autoupdate
 # tests/unit/test_feature_engineering.py
 
 import pytest
-from py.features.rolling_stats import compute_rolling_average
+from nfl_analytics.features.rolling_stats import compute_rolling_average
 
 def test_rolling_average_basic():
     """Test rolling average with simple data."""
@@ -410,7 +410,7 @@ open htmlcov/index.html
 # tests/integration/test_ensemble_predictions.py
 
 import pytest
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble
 
 @pytest.fixture
 def ensemble(db_connection):
@@ -485,7 +485,7 @@ Rscript R/train_state_space_v2.R
 
 # 2. Validate model
 echo "[2/5] Validating model..."
-python py/utils/statistical_model_validator.py \
+python nfl_analytics/utils/statistical_model_validator.py \
   models/bayesian/state_space_v2_metadata.json
 
 # 3. Register model
@@ -496,7 +496,7 @@ python scripts/model_registry.py register \
 
 # 4. Run backtest
 echo "[4/5] Running backtest..."
-python py/backtest/historical_validation_4way.py \
+python nfl_analytics/backtest/historical_validation_4way.py \
   --season 2024 \
   --weeks 1-5
 
@@ -634,7 +634,7 @@ pytest -m gpu --gpu
 psql $DATABASE_URL -c "SELECT COUNT(*) FROM mart.player_game_stats;"
 
 # 2. Pre-training validation
-python py/utils/data_leakage_detector.py \
+python nfl_analytics/utils/data_leakage_detector.py \
   --validate-split \
   --train-start 2018 \
   --train-end 2023 \
@@ -644,7 +644,7 @@ python py/utils/data_leakage_detector.py \
 Rscript R/train_state_space_v3.R
 
 # 4. Post-training validation
-python py/utils/statistical_model_validator.py \
+python nfl_analytics/utils/statistical_model_validator.py \
   models/bayesian/state_space_v3_metadata.json
 
 # 5. Register to database
@@ -654,7 +654,7 @@ python scripts/model_registry.py register \
   --version "3.0.0"
 
 # 6. Run backtest
-python py/backtest/historical_validation_4way.py \
+python nfl_analytics/backtest/historical_validation_4way.py \
   --season 2022-2024
 
 # 7. Compare to baseline
@@ -695,7 +695,7 @@ python scripts/compare_models.py \
 
 ```bash
 # Run 3-season backtest (canonical validation)
-python py/backtest/historical_validation_4way.py \
+python nfl_analytics/backtest/historical_validation_4way.py \
   --seasons 2022 2023 2024 \
   --weeks 1-18 \
   --output results/backtest_$(date +%Y%m%d).pkl
@@ -861,7 +861,7 @@ library(tidyverse)
 git checkout -b feature/new-rolling-stats
 
 # 2. Implement feature
-# Edit py/features/rolling_stats.py
+# Edit nfl_analytics/features/rolling_stats.py
 
 # 3. Add unit tests
 # Edit tests/unit/test_rolling_stats.py
@@ -898,7 +898,7 @@ git checkout -b fix/sql-join-error
 pytest tests/unit/test_sql_queries.py::test_player_game_join -v
 
 # 4. Fix the bug
-# Edit py/data/sql_queries.py
+# Edit nfl_analytics/data/sql_queries.py
 
 # 5. Run test again (should pass)
 pytest tests/unit/test_sql_queries.py::test_player_game_join -v
@@ -923,10 +923,10 @@ gh pr create
 git checkout -b refactor/simplify-ensemble
 
 # 2. Add tests first (ensure current behavior captured)
-pytest tests/unit/test_ensemble.py -v --cov=py/ensemble
+pytest tests/unit/test_ensemble.py -v --cov=nfl_analytics/ensemble
 
 # 3. Refactor code
-# Edit py/ensemble/enhanced_ensemble_v5.py
+# Edit nfl_analytics/ensemble/enhanced_ensemble_v5.py
 
 # 4. Verify tests still pass
 pytest tests/unit/test_ensemble.py -v

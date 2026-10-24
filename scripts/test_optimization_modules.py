@@ -33,7 +33,7 @@ def test_database_pool():
     logger.info("=" * 70)
 
     try:
-        from py.utils.database_pool import DatabasePoolManager
+        from nfl_analytics.utils.database_pool import DatabasePoolManager
 
         # Create pool
         pool = DatabasePoolManager(minconn=2, maxconn=5)
@@ -74,7 +74,7 @@ def test_feature_cache():
     logger.info("=" * 70)
 
     try:
-        from py.utils.feature_cache import FeatureCache
+        from nfl_analytics.utils.feature_cache import FeatureCache
 
         # Create cache
         cache = FeatureCache(max_size=100, ttl_seconds=10)
@@ -138,7 +138,7 @@ def test_optimized_backtest_imports():
     logger.info("=" * 70)
 
     try:
-        from py.backtest.historical_validation_4way_optimized import OptimizedHistoricalValidator
+        from nfl_analytics.backtest.historical_validation_4way_optimized import OptimizedHistoricalValidator
 
         logger.info("  ✅ OptimizedHistoricalValidator imported successfully")
 

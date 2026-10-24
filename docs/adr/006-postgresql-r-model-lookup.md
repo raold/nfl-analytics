@@ -98,7 +98,7 @@ ON ml.r_model_predictions(model_name, player_id, season, week);
 4. Python ensemble queries PostgreSQL instead of calling R
 
 **Implementation:**
-- `py/ensemble/r_prediction_lookup.py`: PostgreSQL client with LRU cache
+- `nfl_analytics/ensemble/r_prediction_lookup.py`: PostgreSQL client with LRU cache
 - `scripts/generate_r_predictions.R`: Batch prediction generator
 - Migration 047: Creates `ml.r_model_predictions` table
 
@@ -239,7 +239,7 @@ Rejected because Stan's posterior sampling doesn't map cleanly to ONNX, and we'd
 3. Validated schema in development environment
 
 **Phase 2: Prediction Client (4 hours)** - Complete
-1. Created `py/ensemble/r_prediction_lookup.py` (533 lines)
+1. Created `nfl_analytics/ensemble/r_prediction_lookup.py` (533 lines)
 2. Implemented LRU cache (10,000 entries)
 3. Added staleness detection and fallback logic
 4. Integrated with `EnhancedEnsemble5Way`
@@ -305,8 +305,8 @@ Rejected because Stan's posterior sampling doesn't map cleanly to ONNX, and we'd
 
 ### Code
 
-- Lookup Client: `py/ensemble/r_prediction_lookup.py`
-- Ensemble Integration: `py/ensemble/enhanced_ensemble_v6_production.py`
+- Lookup Client: `nfl_analytics/ensemble/r_prediction_lookup.py`
+- Ensemble Integration: `nfl_analytics/ensemble/enhanced_ensemble_v6_production.py`
 - Migration: `db/migrations/047_create_r_model_predictions.sql`
 
 ### External Resources

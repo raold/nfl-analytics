@@ -2,7 +2,7 @@
 Generate LaTeX performance table from CQL training log.
 
 Usage:
-    python py/viz/cql_performance_table.py \
+    python nfl_analytics/viz/cql_performance_table.py \
       --input models/cql/cql_training_log.json \
       --output analysis/dissertation/figures/out/cql_performance_table.tex
 """

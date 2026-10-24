@@ -20,10 +20,10 @@ where:
 
 Usage:
   # Fit model on historical data
-  python py/models/state_space.py --seasons 2020,2021,2022,2023 --output models/state_space_ratings.csv
+  python nfl_analytics/models/state_space.py --seasons 2020,2021,2022,2023 --output models/state_space_ratings.csv
 
   # Evaluate predictions
-  python py/models/state_space.py --seasons 2024 --load models/state_space_ratings.csv --evaluate
+  python nfl_analytics/models/state_space.py --seasons 2024 --load models/state_space_ratings.csv --evaluate
 """
 
 from __future__ import annotations

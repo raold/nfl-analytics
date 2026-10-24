@@ -15,7 +15,7 @@ Date: November 6, 2025
 Version: 1.0
 
 Usage:
-    from py.production.risk_gates import RiskGateSystem
+    from nfl_analytics.production.risk_gates import RiskGateSystem
 
     gates = RiskGateSystem(
         min_edge=0.025,          # 2.5% for Pinnacle

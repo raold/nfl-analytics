@@ -24,7 +24,7 @@ Comprehensive Sync Strategy:
 6. Cache Invalidation - Event-based cache flush (not just TTL)
 
 Usage:
-    from py.agents.backend_frontend_sync import BackendFrontendSync
+    from nfl_analytics.agents.backend_frontend_sync import BackendFrontendSync
 
     sync = BackendFrontendSync(
         api_url="http://localhost:8000",

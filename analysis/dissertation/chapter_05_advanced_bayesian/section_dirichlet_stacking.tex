@@ -266,7 +266,7 @@ The analysis confirms that 84\% of prediction variance stems from within-player 
 The grid search results motivate a novel \textbf{dual-weight strategy}: maintain separate weight configurations optimized for distinct prediction domains.
 
 \paragraph{Implementation Architecture.}
-We define two weight presets as module-level constants in \texttt{py/ensemble/strategy/base.py}:
+We define two weight presets as module-level constants in \texttt{nfl\_analytics/ensemble/strategy/base.py}:
 \begin{verbatim}
 # v6.0 Weights: Optimized for game-level predictions (spreads, totals)
 # NOTE: Backtest claims (54.5%, +4.0% ROI) were computed before
@@ -561,7 +561,7 @@ Dirichlet stacking uniquely combines closed-form updates, probabilistic interpre
 \label{subsec:production-integration}
 
 \paragraph{Deployment Architecture.}
-The dual-weight system is integrated into the production ensemble API (\texttt{py/api/routes/game\_predictions.py}) with automatic routing:
+The dual-weight system is integrated into the production ensemble API (\texttt{nfl\_analytics/api/routes/game\_predictions.py}) with automatic routing:
 \begin{verbatim}
 @app.get("/predict")
 def predict(player_id: Optional[str] = None,

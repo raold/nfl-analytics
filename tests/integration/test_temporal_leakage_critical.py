@@ -35,7 +35,7 @@ import pandas as pd
 import psycopg2
 import pytest
 
-from py.utils.data_leakage_detector import DataLeakageDetector, LeakageSeverity
+from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector, LeakageSeverity
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -409,7 +409,7 @@ def test_feature_code_patterns():
     Time saved: 5 hours code review
     """
     # Check a sample feature engineering file
-    feature_file = project_root / "py/features/asof_features.py"
+    feature_file = project_root / "nfl_analytics/features/asof_features.py"
 
     if not feature_file.exists():
         pytest.skip(f"Feature file not found: {feature_file}")

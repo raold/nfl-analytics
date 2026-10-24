@@ -8,7 +8,7 @@ Target: actual_total - betting_total (positive = over, negative = under)
 Similar to spread coverage model but focuses on total scoring.
 
 Usage:
-    python py/models/totals_model.py --features-csv data/processed/features/asof_team_features_v3.csv
+    python nfl_analytics/models/totals_model.py --features-csv data/processed/features/asof_team_features_v3.csv
 """
 import argparse
 import json

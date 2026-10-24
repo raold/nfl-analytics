@@ -38,11 +38,11 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import psycopg2
 
-from py.feedback.outcome_updater import WeeklyOutcomeUpdater
-from py.feedback.semantic_attribution import SemanticAttributionTracker
-from py.feedback.ensemble_weight_adjuster import EnsembleWeightAdjuster
-from py.feedback.retrain_trigger import RetrainTrigger
-from py.feedback.annotation_generator import AnnotationGenerator
+from nfl_analytics.feedback.outcome_updater import WeeklyOutcomeUpdater
+from nfl_analytics.feedback.semantic_attribution import SemanticAttributionTracker
+from nfl_analytics.feedback.ensemble_weight_adjuster import EnsembleWeightAdjuster
+from nfl_analytics.feedback.retrain_trigger import RetrainTrigger
+from nfl_analytics.feedback.annotation_generator import AnnotationGenerator
 
 logging.basicConfig(
     level=logging.INFO,

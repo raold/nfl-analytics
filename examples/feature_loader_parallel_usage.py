@@ -19,7 +19,7 @@ import time
 
 import pandas as pd
 
-from py.features.feature_loader_parallel import ParallelFeatureLoader
+from nfl_analytics.features.feature_loader_parallel import ParallelFeatureLoader
 
 
 def example_1_single_season():

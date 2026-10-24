@@ -13,13 +13,13 @@ Generates features for individual player prop predictions including:
 
 Usage:
     # Generate all player features for a season
-    python py/features/player_features.py --season 2024 --output data/player_features_2024.csv
+    python nfl_analytics/features/player_features.py --season 2024 --output data/player_features_2024.csv
 
     # Generate features for specific positions
-    python py/features/player_features.py --season 2024 --positions QB RB WR --output data/player_features_2024.csv
+    python nfl_analytics/features/player_features.py --season 2024 --positions QB RB WR --output data/player_features_2024.csv
 
     # Historical features (all seasons)
-    python py/features/player_features.py --start-season 2010 --end-season 2024 --output data/player_features_all.csv
+    python nfl_analytics/features/player_features.py --start-season 2010 --end-season 2024 --output data/player_features_all.csv
 """
 
 import argparse

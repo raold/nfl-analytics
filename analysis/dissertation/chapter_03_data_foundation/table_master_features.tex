@@ -6,7 +6,7 @@
 \begin{table}[!ht]
 \centering
 \small
-\caption[Master Feature Catalog]{Master Feature Catalog: 386 catalog entries (382 used as model predictors; 4 game-identifier columns excluded from model input). Features marked \texttt{asof\_safe} use only pre-game information. See \texttt{py/features/} for implementation details.}
+\caption[Master Feature Catalog]{Master Feature Catalog: 386 catalog entries (382 used as model predictors; 4 game-identifier columns excluded from model input). Features marked \texttt{asof\_safe} use only pre-game information. See \texttt{nfl\_analytics/features/} for implementation details.}
 \label{tab:master-features}
 \begin{adjustbox}{max width=\textwidth}
 \begin{tabular}{@{}llccl@{}}
@@ -67,7 +67,7 @@ Two experimental feature groups were disabled after A/B testing revealed negativ
     \item \textbf{Kalman EPA Filter (18 features):} Team EPA regime detection with CUSUM---disabled due to $-10.2$ percentage point accuracy drop in holdout testing.
     \item \textbf{GP Injury Recovery (17 features):} Gaussian process recovery curves---disabled because underlying GP models never successfully trained on available data.
 \end{itemize}
-These features remain in the codebase with \texttt{weight=0.0} in \texttt{py/config/\allowbreak feature\_weights.yaml} for potential future iteration.
+These features remain in the codebase with \texttt{weight=0.0} in \texttt{nfl\_analytics/config/\allowbreak feature\_weights.yaml} for potential future iteration.
 
 \paragraph{Cross-References.}
 \begin{itemize}
@@ -85,4 +85,4 @@ The feature catalog balances three principles:
     \item \textbf{Empirical validation}: Features are retained only if they demonstrate positive signal in A/B testing
 \end{enumerate}
 
-For detailed definitions of all 382 predictor features, see the feature modules in \texttt{py/features/} and the unified extraction interface via \texttt{GameFeatureExtractor}.
+For detailed definitions of all 382 predictor features, see the feature modules in \texttt{nfl\_analytics/features/} and the unified extraction interface via \texttt{GameFeatureExtractor}.

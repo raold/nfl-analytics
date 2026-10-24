@@ -120,7 +120,7 @@ class GameOutcomePredictorV2:
         """Lazy-load feature extractor."""
         if self._feature_extractor is None:
             try:
-                from py.features.game_feature_extractor import GameFeatureExtractor
+                from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
                 self._feature_extractor = GameFeatureExtractor()
                 logger.info("GameFeatureExtractor loaded")
@@ -134,7 +134,7 @@ class GameOutcomePredictorV2:
         """Lazy-load ensemble for QB predictions."""
         if self._ensemble is None and self.use_ensemble_qb:
             try:
-                from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+                from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
                 self._ensemble = EnhancedEnsemble5Way()
                 logger.info("Ensemble v6.1 loaded for QB predictions")

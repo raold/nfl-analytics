@@ -23,7 +23,7 @@ import psycopg2
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.models.game_outcome_model_fixed import GameOutcomeModel
+from nfl_analytics.models.game_outcome_model_fixed import GameOutcomeModel
 
 # Database config
 DB_CONFIG = {
@@ -148,7 +148,7 @@ def train_model_without_synthetic(training_seasons):
     print("\n[Model B] Training WITHOUT synthetic features...")
 
     # Import and modify the feature extractor to skip synthetic features
-    from py.features.game_feature_extractor import GameFeatureExtractor
+    from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
     # Create a patched version that disables synthetic engines
     original_init = GameFeatureExtractor.__init__

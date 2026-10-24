@@ -19,7 +19,7 @@ Cache Strategy:
 - In-memory Python dict (no Redis dependency)
 
 Usage:
-    from py.utils.feature_cache import FeatureCache
+    from nfl_analytics.utils.feature_cache import FeatureCache
 
     cache = FeatureCache(max_size=10000, ttl_seconds=3600)
 
@@ -276,7 +276,7 @@ def get_default_cache(max_size: int = 10000, ttl_seconds: int = 3600) -> Feature
         FeatureCache instance
 
     Example:
-        from py.utils.feature_cache import get_default_cache
+        from nfl_analytics.utils.feature_cache import get_default_cache
 
         cache = get_default_cache()
         features = cache.get("00-0019596", 2024, 9)

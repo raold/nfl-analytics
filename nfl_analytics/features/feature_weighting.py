@@ -11,7 +11,7 @@ Two approaches:
    shrunk toward zero but not eliminated, preserving weak signals.
 
 Usage:
-    from py.features.feature_weighting import FeatureWeighter
+    from nfl_analytics.features.feature_weighting import FeatureWeighter
 
     weighter = FeatureWeighter.from_shap_csv("data/feature_importance_shap.csv")
     X_weighted = weighter.transform(X, method="bayesian_shrinkage")

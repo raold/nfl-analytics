@@ -17,7 +17,7 @@ Performance Targets:
 - Memory: <2GB total (vs 4GB+ sequential)
 
 Usage:
-    from py.ensemble.r_model_interface_batched import BatchedRModelInterface
+    from nfl_analytics.ensemble.r_model_interface_batched import BatchedRModelInterface
 
     interface = BatchedRModelInterface(db_config)
     interface.load_models()  # Load once

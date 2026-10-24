@@ -9,17 +9,17 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from py.validation.validators import (
+from nfl_analytics.validation.validators import (
     ValidationCategory,
     ValidationSeverity,
     ValidationSummary,
     ValidatorRegistry,
     create_default_validator_registry,
 )
-from py.validation.validators.base import ValidationIssue, ValidationResult
-from py.validation.validators.feature_range import FeatureRangeValidator
-from py.validation.validators.schema import SchemaValidator
-from py.validation.validators.temporal import TemporalSafetyValidator
+from nfl_analytics.validation.validators.base import ValidationIssue, ValidationResult
+from nfl_analytics.validation.validators.feature_range import FeatureRangeValidator
+from nfl_analytics.validation.validators.schema import SchemaValidator
+from nfl_analytics.validation.validators.temporal import TemporalSafetyValidator
 
 
 class TestValidationInfrastructure:

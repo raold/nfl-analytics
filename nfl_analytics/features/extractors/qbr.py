@@ -14,11 +14,11 @@ from typing import Optional
 
 import psycopg2
 
-from py.features.extractors.base import (
+from nfl_analytics.features.extractors.base import (
     FeatureExtractorStrategy,
     FeaturePriority,
 )
-from py.features.qbr_features import QBRFeatures
+from nfl_analytics.features.qbr_features import QBRFeatures
 
 
 class QBRFeatureExtractor(FeatureExtractorStrategy):

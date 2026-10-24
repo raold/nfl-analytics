@@ -13,9 +13,9 @@ Expected runtime: 3-6 hours per config (12-24 hours total)
 Can be parallelized on 4090 or run sequentially on M4.
 
 Usage:
-    python py/models/bnn_nuts_comparison.py
+    python nfl_analytics/models/bnn_nuts_comparison.py
     # OR run single config:
-    python py/models/bnn_nuts_comparison.py --config 1
+    python nfl_analytics/models/bnn_nuts_comparison.py --config 1
 """
 
 import os
@@ -32,7 +32,7 @@ import numpy as np
 import pandas as pd
 import psycopg2
 
-from py.models.bayesian_neural_network import BayesianNeuralNetwork
+from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)

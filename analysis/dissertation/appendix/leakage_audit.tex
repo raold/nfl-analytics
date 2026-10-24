@@ -12,11 +12,11 @@ This appendix documents the comprehensive temporal leakage audit conducted acros
 The leakage audit consists of four complementary layers:
 
 \begin{enumerate}
-\item \textbf{Feature Catalog}: A machine-readable YAML manifest (\texttt{py/\allowbreak features/\allowbreak catalog.yaml}) documenting baseline features plus Phase~2 advanced analytics modules (232 total features, see \Cref{sec:phase2-advanced-stats}) with explicit \texttt{asof\_safe} tags.
+\item \textbf{Feature Catalog}: A machine-readable YAML manifest (\texttt{nfl\_analytics/\allowbreak features/\allowbreak catalog.yaml}) documenting baseline features plus Phase~2 advanced analytics modules (232 total features, see \Cref{sec:phase2-advanced-stats}) with explicit \texttt{asof\_safe} tags.
 
 \item \textbf{Automated Scanner}: A static analysis tool (\texttt{scripts/audit\_leakage.py}) that scans all Python and SQL code for references to post-decision fields.
 
-\item \textbf{Runtime Validator}: A validation pipeline (\texttt{py/features/catalog\_validator.py}) that rejects unsafe features during model training.
+\item \textbf{Runtime Validator}: A validation pipeline (\texttt{nfl\_analytics/features/catalog\_validator.py}) that rejects unsafe features during model training.
 
 \item \textbf{Unit Tests}: 15 pytest tests (\texttt{tests/unit/test\_asof\_features.py}) covering temporal integrity scenarios.
 \end{enumerate}
@@ -74,7 +74,7 @@ The audit flagged 25 warnings across 47 scripts. Manual review confirmed these a
 The catalog validator integrates with training pipelines to enforce temporal safety at runtime. Example usage:
 
 \begin{lstlisting}[language=Python, caption=Training Pipeline Validation]
-from py.features.catalog_validator import validate_feature_list
+from nfl_analytics.features.catalog_validator import validate_feature_list
 
 # Feature selection
 features = ['prior_epa_mean', 'rest_days', 'home_score']  # ERROR!
@@ -223,7 +223,7 @@ To maintain temporal safety as the system evolves:
 \begin{itemize}
 \item Chapter~3, \S~3.3: Leakage Prevention Architecture (conceptual overview)
 \item Appendix~\ref{app:feature-catalog}: Full Feature Catalog YAML
-\item \texttt{py/features/catalog.yaml}: Machine-readable feature manifest
+\item \texttt{nfl\_analytics/features/catalog.yaml}: Machine-readable feature manifest
 \item \texttt{tests/unit/test\_asof\_features.py}: Test suite source
 \item \texttt{scripts/audit\_leakage.py}: Audit scanner source
 \end{itemize}

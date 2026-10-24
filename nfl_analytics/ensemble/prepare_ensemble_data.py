@@ -14,7 +14,7 @@ For now, we'll create a simplified version that uses available features
 and computes market_prob from spread.
 
 Usage:
-    python py/ensemble/prepare_ensemble_data.py \
+    python nfl_analytics/ensemble/prepare_ensemble_data.py \
         --input data/processed/features/asof_team_features_v2.csv \
         --output data/processed/features/ensemble_features_2024.csv \
         --season 2024

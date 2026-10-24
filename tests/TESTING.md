@@ -41,9 +41,9 @@
 - **Speed**: < 1s per module
 - **Mocking**: External APIs, database, file I/O
 - **Examples**:
-  - `py/ingest_odds_history.py::flatten_events()` - JSON parsing
-  - `py/risk/generate_scenarios.py::simulate_returns()` - Monte Carlo logic
-  - `py/rl/ope_gate.py` - DR estimator calculations
+  - `nfl_analytics/ingest_odds_history.py::flatten_events()` - JSON parsing
+  - `nfl_analytics/risk/generate_scenarios.py::simulate_returns()` - Monte Carlo logic
+  - `nfl_analytics/rl/ope_gate.py` - DR estimator calculations
 
 ### Integration Tests (30%)
 - **Scope**: Multi-module workflows, database interactions
@@ -154,7 +154,7 @@ markers =
 ```python
 # tests/unit/test_odds_parsing.py
 import datetime as dt
-from py.ingest_odds_history import flatten_events, parse_iso
+from nfl_analytics.ingest_odds_history import flatten_events, parse_iso
 
 def test_parse_iso_with_timezone():
     """Test ISO timestamp parsing with Z suffix."""
@@ -212,7 +212,7 @@ def test_flatten_events_single_market():
 import pytest
 import responses
 from datetime import datetime, timezone
-from py.ingest_odds_history import build_request, flatten_events, upsert_rows
+from nfl_analytics.ingest_odds_history import build_request, flatten_events, upsert_rows
 
 @pytest.fixture
 def test_db(postgresql):
@@ -261,7 +261,7 @@ repos:
     hooks:
       - id: black
         language_version: python3.10
-        files: ^py/
+        files: ^nfl_analytics/
 
   # Python linting
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -269,7 +269,7 @@ repos:
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
-        files: ^py/
+        files: ^nfl_analytics/
 
   # Python type checking
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -277,7 +277,7 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies: [types-requests]
-        files: ^py/
+        files: ^nfl_analytics/
 
   # R code formatting
   - repo: https://github.com/lorenzwalthert/precommit
@@ -473,13 +473,13 @@ jobs:
         run: pip install black ruff mypy
       
       - name: Check formatting (black)
-        run: black --check py/
+        run: black --check nfl_analytics/
       
       - name: Lint (ruff)
-        run: ruff check py/
+        run: ruff check nfl_analytics/
       
       - name: Type check (mypy)
-        run: mypy py/ --ignore-missing-imports
+        run: mypy nfl_analytics/ --ignore-missing-imports
 
   security:
     name: Security Scan
@@ -602,9 +602,9 @@ jobs:
 
 ### Phase 1 (MVP - Week 1)
 - **Unit tests**: 40% coverage on core modules
-  - `py/ingest_odds_history.py`: parsing functions
-  - `py/risk/generate_scenarios.py`: simulation logic
-  - `py/pricing/teaser.py`: EV calculations
+  - `nfl_analytics/ingest_odds_history.py`: parsing functions
+  - `nfl_analytics/risk/generate_scenarios.py`: simulation logic
+  - `nfl_analytics/pricing/teaser.py`: EV calculations
 - **Integration tests**: 2-3 critical paths
   - Odds ingestion smoke test
   - Feature engineering pipeline

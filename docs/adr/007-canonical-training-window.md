@@ -371,7 +371,7 @@ def compute_canonical_weights(season: int, eval_season: int = 2025) -> float:
 ### Phase 2: Ensemble Integration (Week of Nov 18-22, 2025)
 
 **Tasks**:
-- [ ] Update `py/ensemble/enhanced_ensemble_v5.py` to use v2 models
+- [ ] Update `nfl_analytics/ensemble/enhanced_ensemble_v5.py` to use v2 models
 - [ ] Optimize ensemble weights (inverse variance weighting)
 - [ ] Validate 4-way ensemble on 2025 holdout
 - [ ] Run full backtest (2022-2024)
@@ -432,9 +432,9 @@ def compute_canonical_weights(season: int, eval_season: int = 2025) -> float:
 
 ### Code
 
-1. **Python Implementation**: `py/utils/weighting.py::compute_canonical_weights()`
+1. **Python Implementation**: `nfl_analytics/utils/weighting.py::compute_canonical_weights()`
 2. **R Implementation**: `R/utils/weighting.R::compute_decay_weights()`
-3. **XGBoost Training**: `py/models/train_xgboost_canonical.py`
+3. **XGBoost Training**: `nfl_analytics/models/train_xgboost_canonical.py`
 4. **State-Space Training**: `R/state_space/train_simplified_random_walk.R`
 
 ### Dissertation

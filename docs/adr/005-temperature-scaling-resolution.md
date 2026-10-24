@@ -222,11 +222,11 @@ Success measured by:
 ### Documentation
 
 - Temperature Fix Postmortem (no longer in the repo; see [HISTORY](../HISTORY.md))
-- [Ensemble v6 Production Code](../../py/ensemble/enhanced_ensemble_v6_production.py)
+- [Ensemble v6 Production Code](../../nfl_analytics/ensemble/enhanced_ensemble_v6_production.py)
 
 ### Code
 
-- Production: `py/ensemble/enhanced_ensemble_v6_production.py` (lines 194, 280)
+- Production: `nfl_analytics/ensemble/enhanced_ensemble_v6_production.py` (lines 194, 280)
 - Calibration: `models/calibration/temperature_scaler_5way.pkl`
 - Fallback: `models/calibration/temperature_scaler_4way.pkl`
 

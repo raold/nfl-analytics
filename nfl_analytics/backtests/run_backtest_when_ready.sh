@@ -11,7 +11,7 @@ while true; do
         echo "Starting multi-year backtest..."
 
         cd $(cd "$(dirname "")/.." \&\& pwd)
-        uv run python py/backtests/bayesian_props_multiyear_backtest.py 2>&1 | tee reports/multiyear_backtest_with_bayesian.log
+        uv run python nfl_analytics/backtests/bayesian_props_multiyear_backtest.py 2>&1 | tee reports/multiyear_backtest_with_bayesian.log
 
         echo ""
         echo "✅ Backtest complete! Results saved to:"

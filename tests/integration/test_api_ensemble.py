@@ -160,7 +160,7 @@ def main():
         print(f"\n❌ API not running at {API_BASE}")
         print(f"   Error: {e}")
         print("\n   Start the API with:")
-        print("   uvicorn py.api.main:app --reload --port 8000")
+        print("   uvicorn nfl_analytics.api.main:app --reload --port 8000")
         sys.exit(1)
 
     # Run tests

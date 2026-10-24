@@ -11,7 +11,7 @@ Key differences from game-level betting:
 - Correlation between props (don't overbet correlated props)
 
 Usage:
-    python py/production/props_ev_selector.py \
+    python nfl_analytics/production/props_ev_selector.py \
         --predictions props_predictions.csv \
         --prop-lines prop_lines.csv \
         --min-edge 0.03 \

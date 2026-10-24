@@ -68,7 +68,7 @@ def verify_ensemble_integration():
     logger.info("=" * 80)
 
     try:
-        from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
         # Initialize ensemble (should load temperature_scaler_v6.pkl first, fallback to v4 if not found)
         ensemble = EnhancedEnsemble5Way(

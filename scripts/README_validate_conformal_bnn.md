@@ -8,7 +8,7 @@
 
 ## Overview
 
-This script validates the BNN Conformal Prediction wrapper (`py/models/bnn_conformal.py`) by:
+This script validates the BNN Conformal Prediction wrapper (`nfl_analytics/models/bnn_conformal.py`) by:
 
 1. **Loading NFL rushing yards data** (2018-2024) from the database
 2. **Splitting data temporally** into train/calib/test (60/20/20)
@@ -401,7 +401,7 @@ y_pred, y_intervals = cp.predict_interval(X_test)
 Once validated, integrate conformal prediction into production ensemble:
 
 ```python
-from py.models.bnn_conformal import BNNConformalPredictor
+from nfl_analytics.models.bnn_conformal import BNNConformalPredictor
 
 # Load BNN
 bnn = torch.load('models/bayesian/bnn_multioutput_v1_final.pt')
@@ -483,5 +483,5 @@ Implement **Adaptive Conformal Inference** (Gibbs & Candès, 2021) for:
 
 **For questions or issues, see:**
 - **Project Documentation:** `CLAUDE.md`
-- **BNN Conformal Wrapper:** `py/models/bnn_conformal.py`
-- **Baseline Conformal:** `py/models/conformal_prediction_baseline.py`
+- **BNN Conformal Wrapper:** `nfl_analytics/models/bnn_conformal.py`
+- **Baseline Conformal:** `nfl_analytics/models/conformal_prediction_baseline.py`

@@ -13,7 +13,7 @@ Features generated:
     - prior_season_oc_continuity: Whether OC was retained from season N-1
 
 Usage:
-    from py.features.oc_features import OCFeatureGenerator
+    from nfl_analytics.features.oc_features import OCFeatureGenerator
 
     oc_gen = OCFeatureGenerator()
     features = oc_gen.get_features(team='KC', season=2024, week=3)

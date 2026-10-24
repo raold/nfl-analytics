@@ -19,13 +19,13 @@ class TestEnsembleV6API:
 
     def test_canonical_class_exists(self):
         """Test that canonical class can be imported."""
-        from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
 
         assert EnhancedEnsemble4Way is not None
 
     def test_init_signature(self):
         """Test __init__ signature has required parameters."""
-        from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
 
         sig = inspect.signature(EnhancedEnsemble4Way.__init__)
         params = list(sig.parameters.keys())
@@ -49,7 +49,7 @@ class TestEnsembleV6API:
 
     def test_no_deprecated_params(self):
         """Test that deprecated parameters have been removed."""
-        from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
 
         sig = inspect.signature(EnhancedEnsemble4Way.__init__)
         params = list(sig.parameters.keys())
@@ -62,7 +62,7 @@ class TestEnsembleV6API:
 
     def test_default_weights_structure(self):
         """Test DEFAULT_WEIGHTS has correct structure."""
-        from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
 
         weights = EnhancedEnsemble4Way.DEFAULT_WEIGHTS
 
@@ -88,7 +88,7 @@ class TestEnsembleV6API:
 
     def test_predict_method_exists(self):
         """Test that predict method exists with correct signature."""
-        from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
 
         assert hasattr(EnhancedEnsemble4Way, "predict")
 
@@ -103,7 +103,7 @@ class TestEnsembleV6API:
 
     def test_return_type_annotations(self):
         """Test that predict method has return type annotation."""
-        from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
 
         sig = inspect.signature(EnhancedEnsemble4Way.predict)
 
@@ -121,13 +121,13 @@ class TestEnsembleV6ELO_API:
 
     def test_elo_version_exists(self):
         """Test that ELO research version can be imported."""
-        from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
         assert EnhancedEnsemble6Way is not None
 
     def test_elo_has_adaptive_weights_param(self):
         """Test that ELO version has adaptive_weights_path parameter."""
-        from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
         sig = inspect.signature(EnhancedEnsemble6Way.__init__)
         params = list(sig.parameters.keys())
@@ -138,7 +138,7 @@ class TestEnsembleV6ELO_API:
 
     def test_elo_default_weights_has_5_models(self):
         """Test that ELO version has 5 models (including ELO)."""
-        from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
         weights = EnhancedEnsemble6Way.DEFAULT_WEIGHTS
 
@@ -154,14 +154,14 @@ class TestAPIDocumentation:
 
     def test_canonical_has_docstring(self):
         """Test that canonical class has docstring."""
-        from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
 
         assert EnhancedEnsemble4Way.__doc__ is not None
         assert len(EnhancedEnsemble4Way.__doc__.strip()) > 0
 
     def test_predict_has_docstring(self):
         """Test that predict method has docstring."""
-        from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
 
         assert EnhancedEnsemble4Way.predict.__doc__ is not None
         assert len(EnhancedEnsemble4Way.predict.__doc__.strip()) > 0

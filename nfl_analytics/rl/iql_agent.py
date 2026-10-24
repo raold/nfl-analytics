@@ -30,7 +30,7 @@ Hyperparameters:
 
 Usage:
     # Train IQL agent
-    python py/rl/iql_agent.py \\
+    python nfl_analytics/rl/iql_agent.py \\
         --dataset data/rl_logged.csv \\
         --output models/iql_model.pth \\
         --expectile 0.9 \\

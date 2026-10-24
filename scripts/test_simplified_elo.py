@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
 
-from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+from nfl_analytics.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -26,8 +26,8 @@ def audit_feature_leakage():
     print("FEATURE LEAKAGE AUDIT")
     print("=" * 80)
 
-    from py.ensemble.game_outcome_ensemble import fetch_games
-    from py.features.feature_loader import AdvancedFeatureLoader
+    from nfl_analytics.ensemble.game_outcome_ensemble import fetch_games
+    from nfl_analytics.features.feature_loader import AdvancedFeatureLoader
 
     # Load recent games (2023-2024)
     df = fetch_games([2023, 2024])
@@ -92,8 +92,8 @@ def audit_vegas_features():
     print("VEGAS FEATURES AUDIT")
     print(f"{'='*80}")
 
-    from py.ensemble.game_outcome_ensemble import fetch_games
-    from py.features.feature_loader import AdvancedFeatureLoader
+    from nfl_analytics.ensemble.game_outcome_ensemble import fetch_games
+    from nfl_analytics.features.feature_loader import AdvancedFeatureLoader
 
     df = fetch_games([2023, 2024])
     df = df[df["spread_close"].notna()]
@@ -135,7 +135,7 @@ def audit_time_based_splits():
     print("TIME-BASED SPLIT AUDIT")
     print(f"{'='*80}")
 
-    from py.ensemble.game_outcome_ensemble import fetch_games
+    from nfl_analytics.ensemble.game_outcome_ensemble import fetch_games
 
     # Check the split used in the backtest
     train_seasons = [2020, 2021]

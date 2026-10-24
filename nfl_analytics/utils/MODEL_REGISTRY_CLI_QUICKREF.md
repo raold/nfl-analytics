@@ -1,6 +1,6 @@
 # Model Registry CLI - Quick Reference Card
 
-**Location:** `py/utils/query_model_registry.py`
+**Location:** `nfl_analytics/utils/query_model_registry.py`
 
 ## Installation
 
@@ -12,13 +12,13 @@ uv pip install click tabulate psycopg2-binary
 
 | Command | Purpose | Example |
 |---------|---------|---------|
-| `list` | List models | `uv run python py/utils/query_model_registry.py list --status production` |
-| `search` | Advanced search | `uv run python py/utils/query_model_registry.py search --model-type bnn` |
-| `compare` | Compare versions | `uv run python py/utils/query_model_registry.py compare bnn_v1 bnn_v2` |
-| `leaderboard` | Rank by metric | `uv run python py/utils/query_model_registry.py leaderboard --metric mae_yards` |
-| `check-safe-delete` | Deletion safety | `uv run python py/utils/query_model_registry.py check-safe-delete old_model` |
-| `info` | Model details | `uv run python py/utils/query_model_registry.py info bnn_v2 --show-training` |
-| `export` | Export data | `uv run python py/utils/query_model_registry.py export --format latex > out.tex` |
+| `list` | List models | `uv run python nfl_analytics/utils/query_model_registry.py list --status production` |
+| `search` | Advanced search | `uv run python nfl_analytics/utils/query_model_registry.py search --model-type bnn` |
+| `compare` | Compare versions | `uv run python nfl_analytics/utils/query_model_registry.py compare bnn_v1 bnn_v2` |
+| `leaderboard` | Rank by metric | `uv run python nfl_analytics/utils/query_model_registry.py leaderboard --metric mae_yards` |
+| `check-safe-delete` | Deletion safety | `uv run python nfl_analytics/utils/query_model_registry.py check-safe-delete old_model` |
+| `info` | Model details | `uv run python nfl_analytics/utils/query_model_registry.py info bnn_v2 --show-training` |
+| `export` | Export data | `uv run python nfl_analytics/utils/query_model_registry.py export --format latex > out.tex` |
 
 ## Common Filters
 
@@ -65,23 +65,23 @@ uv pip install click tabulate psycopg2-binary
 
 ### Find best model
 ```bash
-uv run python py/utils/query_model_registry.py leaderboard --metric mae_yards --limit 1
+uv run python nfl_analytics/utils/query_model_registry.py leaderboard --metric mae_yards --limit 1
 ```
 
 ### Compare versions
 ```bash
-uv run python py/utils/query_model_registry.py compare current_prod new_candidate
+uv run python nfl_analytics/utils/query_model_registry.py compare current_prod new_candidate
 ```
 
 ### Export for dissertation
 ```bash
-uv run python py/utils/query_model_registry.py export --format latex --status production > models.tex
+uv run python nfl_analytics/utils/query_model_registry.py export --format latex --status production > models.tex
 ```
 
 ### Clean up old models
 ```bash
 # 1. Check safety
-uv run python py/utils/query_model_registry.py check-safe-delete old_model
+uv run python nfl_analytics/utils/query_model_registry.py check-safe-delete old_model
 
 # 2. If safe, delete
 psql devdb01 -c "DELETE FROM ml.model_registry WHERE model_name = 'old_model';"
@@ -89,7 +89,7 @@ psql devdb01 -c "DELETE FROM ml.model_registry WHERE model_name = 'old_model';"
 
 ### Full model investigation
 ```bash
-uv run python py/utils/query_model_registry.py info model_name \
+uv run python nfl_analytics/utils/query_model_registry.py info model_name \
   --show-training \
   --show-metrics \
   --show-artifacts
@@ -111,4 +111,4 @@ Modify in script if needed (lines 40-46).
 
 ## Full Documentation
 
-See: `py/utils/README_MODEL_REGISTRY_CLI.md`
+See: `nfl_analytics/utils/README_MODEL_REGISTRY_CLI.md`

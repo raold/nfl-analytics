@@ -10,12 +10,12 @@ This module identifies and optimizes performance bottlenecks across the stack:
 Target: <10s predictions, <1h backtests (2022-2024, ~148 games)
 
 Usage:
-    from py.utils.performance_optimizer import PerformanceOptimizer
+    from nfl_analytics.utils.performance_optimizer import PerformanceOptimizer
 
     optimizer = PerformanceOptimizer()
 
     # Profile Python code
-    stats = optimizer.profile_python("py/models/train_bnn_passing.py")
+    stats = optimizer.profile_python("nfl_analytics/models/train_bnn_passing.py")
 
     # Analyze SQL query
     suggestions = optimizer.analyze_query("SELECT * FROM...")

@@ -24,10 +24,10 @@ Since we don't have tracking data, we infer coverage schemes from:
 
 Usage:
     # Generate WR-CB matchup features for 2024
-    python py/features/receiver_coverage_matchups.py --season 2024 --output data/wr_cb_matchups_2024.csv
+    python nfl_analytics/features/receiver_coverage_matchups.py --season 2024 --output data/wr_cb_matchups_2024.csv
 
     # Historical features
-    python py/features/receiver_coverage_matchups.py --start-season 2018 --end-season 2024
+    python nfl_analytics/features/receiver_coverage_matchups.py --start-season 2018 --end-season 2024
 """
 
 import argparse

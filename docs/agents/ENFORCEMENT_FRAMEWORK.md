@@ -23,7 +23,7 @@ Implemented a comprehensive unified enforcement framework that automatically rou
 
 ## What Was Built
 
-### 1. Enforcement Router (`py/utils/enforcement_router.py` - 1,566 lines)
+### 1. Enforcement Router (`nfl_analytics/utils/enforcement_router.py` - 1,566 lines)
 
 **Core Capabilities:**
 - **20 enforcement rules** (SQL, backtest health, model training, security, ensemble, schema, docs, **data sufficiency**)
@@ -35,7 +35,7 @@ Implemented a comprehensive unified enforcement framework that automatically rou
 
 ```python
 # Runtime enforcement (decorator)
-from py.utils.enforcement_router import enforce_data_sufficiency
+from nfl_analytics.utils.enforcement_router import enforce_data_sufficiency
 
 @enforce_data_sufficiency
 def train_meta_model(X, y):
@@ -48,7 +48,7 @@ def train_meta_model(X, y):
 # Validates: All staged files against applicable rules
 
 # Manual validation
-python py/utils/enforcement_router.py file1.py file2.sql
+python nfl_analytics/utils/enforcement_router.py file1.py file2.sql
 ```
 
 ### 2. Git Pre-Commit Hook (`.git/hooks/pre-commit`)
@@ -67,10 +67,10 @@ git commit --no-verify
 ### 3. Integration with Existing Agents
 
 **Agents Integrated:**
-- SQL Validator (`py/utils/sql_validator.py`) - Rule 1
-- Ensemble Health Monitor (`py/utils/ensemble_health_monitor.py`) - Rule 2
-- Data Leakage Detector (`py/utils/data_leakage_detector.py`) - Rule 3
-- Security Auditor (`py/utils/security_auditor.py`) - Rule 4
+- SQL Validator (`nfl_analytics/utils/sql_validator.py`) - Rule 1
+- Ensemble Health Monitor (`nfl_analytics/utils/ensemble_health_monitor.py`) - Rule 2
+- Data Leakage Detector (`nfl_analytics/utils/data_leakage_detector.py`) - Rule 3
+- Security Auditor (`nfl_analytics/utils/security_auditor.py`) - Rule 4
 
 ---
 
@@ -82,7 +82,7 @@ git commit --no-verify
 | 2 | Backtest Health | `*_validation.py`, `historical_backtest_*.py` | Ensemble Health Monitor | BLOCKING | Nov 13: 3.5 hours lost |
 | 3 | Model Training | `train_*.py`, `train_*.R` | Data Leakage Detector | BLOCKING | BNN: 84 hours wasted |
 | 4 | Security Audit | `.env`, credentials in code | Security Auditor | BLOCKING | Hardcoded secrets (4 found) |
-| 5 | Ensemble Guard | `py/ensemble/enhanced_ensemble_*.py` | Ensemble Health Monitor | WARNING | Silent performance degradation |
+| 5 | Ensemble Guard | `nfl_analytics/ensemble/enhanced_ensemble_*.py` | Ensemble Health Monitor | WARNING | Silent performance degradation |
 | 6 | Schema Change | `db/*.sql`, `CREATE VIEW`, `ALTER TABLE` | SQL Validator | WARNING | Cascading query failures |
 | 7 | Documentation Sync | `docs/milestones/*.md`, `MODEL_REGISTRY.yaml` | Documentation Agent | INFO | Stale CLAUDE.md |
 | 8-19 | Various Rules | (R convergence, temporal values, multi-season, etc.) | Multiple | BLOCKING/WARNING | Various recurring issues |
@@ -178,7 +178,7 @@ $ git commit -m "Add meta-learning"
 ### Runtime Decorator
 
 ```python
-from py.utils.enforcement_router import enforce_data_sufficiency
+from nfl_analytics.utils.enforcement_router import enforce_data_sufficiency
 
 @enforce_data_sufficiency
 def train_meta_model(X, y):
@@ -242,7 +242,7 @@ Validating staged files...
 ### Runtime Decorator Pattern
 
 ```python
-from py.utils.enforcement_router import enforce_backtest_health, enforce_data_sufficiency
+from nfl_analytics.utils.enforcement_router import enforce_backtest_health, enforce_data_sufficiency
 
 @enforce_backtest_health
 @enforce_data_sufficiency
@@ -270,7 +270,7 @@ git commit -m "Add new model"
 
 ```bash
 # Validate before running expensive operation
-python py/utils/enforcement_router.py scripts/train_meta_model.py
+python nfl_analytics/utils/enforcement_router.py scripts/train_meta_model.py
 
 # Output:
 # ✅ PASSED: sql_validation
@@ -284,7 +284,7 @@ python py/utils/enforcement_router.py scripts/train_meta_model.py
 ## Files Created/Modified
 
 **Created (3 files, 2,108 lines):**
-1. `py/utils/enforcement_router.py` (1,566 lines) - Core framework + Rule 20
+1. `nfl_analytics/utils/enforcement_router.py` (1,566 lines) - Core framework + Rule 20
 2. `tests/unit/test_rule_20_data_sufficiency.py` (542 lines) - Comprehensive tests
 3. `.git/hooks/pre-commit` (50 lines) - Git integration
 
@@ -300,7 +300,7 @@ python py/utils/enforcement_router.py scripts/train_meta_model.py
 
 ```bash
 # Test Rule 20 on v7.0-style meta-learning code
-$ python py/utils/enforcement_router.py scripts/train_meta_model.py
+$ python nfl_analytics/utils/enforcement_router.py scripts/train_meta_model.py
 
 INFO:__main__:Rule 'data_sufficiency_gate' triggered
 ❌ BLOCKING: data_sufficiency_gate: Data sufficiency validation missing: 1 CRITICAL, 0 HIGH

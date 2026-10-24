@@ -17,7 +17,7 @@
 | **Kalshi Trading System** | **Complete (Feb 13)** | **6 phases, 437 tests, 37 files** |
 | Infrastructure | 8/9 Docker services | ~105ms inference |
 
-**Critical Files:** `py/ensemble/enhanced_ensemble_v6_production.py`, `py/ensemble/strategy/base.py`, `py/features/game_feature_extractor.py`, `py/feedback/`
+**Critical Files:** `nfl_analytics/ensemble/enhanced_ensemble_v6_production.py`, `nfl_analytics/ensemble/strategy/base.py`, `nfl_analytics/features/game_feature_extractor.py`, `nfl_analytics/feedback/`
 
 **Quick Links:** [DATABASE_QUICK_REFERENCE](docs/database/DATABASE_QUICK_REFERENCE.md) | [SQL_PATTERNS](docs/database/SQL_PATTERNS.md) | [ARCHITECTURE](docs/architecture/ARCHITECTURE_REFERENCE.md)
 
@@ -72,7 +72,7 @@ uv pip list               # List installed packages (79+ packages)
 **Languages:** R (brms, Stan), Python (PyMC, XGBoost), SQL (PostgreSQL), LaTeX
 
 **Key Directories:**
-- `py/` - Python ML modules (causal, ensemble, RL, features)
+- `nfl_analytics/` - Python ML modules (causal, ensemble, RL, features)
 - `R/` - Statistical models (brms, Stan, state-space)
 - `analysis/dissertation/` - 693-page LaTeX dissertation
 - `models/` - Trained artifacts (~60 files)
@@ -95,10 +95,10 @@ uv pip list               # List installed packages (79+ packages)
 | **Synthetic Interaction** | 11 | `synthetic_interaction_features.py` |
 | **Synthetic Momentum** | 11 | `synthetic_momentum_features.py` |
 | **Research-Driven** | 15 | `research_driven_features.py` |
-| **Semantic (LLM)** | 38 | `py/semantic/features/semantic_features.py` (17/team × 2 + 4 matchup) |
-| ~~Kalman EPA~~ | ~~18~~ | `py/features/kalman_epa_filter.py` (**DISABLED** ADR-015) |
-| ~~GP Injury Recovery~~ | ~~17~~ | `py/features/gp_injury_recovery.py` (**DISABLED** ADR-015) |
-| Props Stability | N/A | `py/ensemble/props_stability_weights.py` |
+| **Semantic (LLM)** | 38 | `nfl_analytics/semantic/features/semantic_features.py` (17/team × 2 + 4 matchup) |
+| ~~Kalman EPA~~ | ~~18~~ | `nfl_analytics/features/kalman_epa_filter.py` (**DISABLED** ADR-015) |
+| ~~GP Injury Recovery~~ | ~~17~~ | `nfl_analytics/features/gp_injury_recovery.py` (**DISABLED** ADR-015) |
+| Props Stability | N/A | `nfl_analytics/ensemble/props_stability_weights.py` |
 
 **Entry Points:**
 - `GameFeatureExtractor` - Base 305 + 37 synthetic + 6 rest + 38 semantic = 386 features (unified API, <500ms)
@@ -150,19 +150,19 @@ uv pip list               # List installed packages (79+ packages)
 - Chargers: `LAC` in both
 - Raiders: Database uses `LV` (current), `OAK` (historical)
 - Washington: `WAS` (current)
-- Use `py.utils.team_mapping.normalize_team()` for conversions
+- Use `nfl_analytics.utils.team_mapping.normalize_team()` for conversions
 
 ### SCHEMA-FIRST DISCIPLINE
 - `mart.player_game_stats` has NO `game_id` column - use `(season, week, team)` composite key
 - Always check schema before writing SQL: `docs/database/DATABASE_QUICK_REFERENCE.md`
-- Validate queries: `python py/utils/sql_validator.py "YOUR QUERY"`
+- Validate queries: `python nfl_analytics/utils/sql_validator.py "YOUR QUERY"`
 
 ### Data Ingestion Pipelines
 
 | Pipeline | Source | Schedule | Script |
 |----------|--------|----------|--------|
 | NFL play-by-play | nflreadr | Weekly (Tue) | `R/ingestion/ingest_current_season.R` |
-| Odds data | The Odds API | 3x daily | `py/ingest_odds_smart.py` |
+| Odds data | The Odds API | 3x daily | `nfl_analytics/ingest_odds_smart.py` |
 | Injuries | nflreadr | Weekly | `R/ingestion/ingest_injuries.R` |
 | Materialized views | Internal | Daily 5am | `scripts/refresh_marts.py` |
 
@@ -258,11 +258,11 @@ Pipeline: MarketData → Strategy → RiskManager → TradeExecutor → Exchange
 
 | Module | Files | LOC | Purpose |
 |--------|-------|-----|---------|
-| `py/trading/` | 6 | ~3,400 | Strategies (directional, market maker, hybrid) |
-| `py/markets/` | 8 | ~3,500 | MarketClient ABC, Kalshi API, paper trading, market router |
-| `py/risk/` | 9 | ~4,000 | Kill switch, drawdown, position limits, feature health, CVaR |
-| `py/execution/` | 8 | ~2,800 | Trade executor, live trader, reconciliation, execution models |
-| `py/monitoring/` | 6 | ~3,200 | PnL tracker, trade logger, alert manager, calibration |
+| `nfl_analytics/trading/` | 6 | ~3,400 | Strategies (directional, market maker, hybrid) |
+| `nfl_analytics/markets/` | 8 | ~3,500 | MarketClient ABC, Kalshi API, paper trading, market router |
+| `nfl_analytics/risk/` | 9 | ~4,000 | Kill switch, drawdown, position limits, feature health, CVaR |
+| `nfl_analytics/execution/` | 8 | ~2,800 | Trade executor, live trader, reconciliation, execution models |
+| `nfl_analytics/monitoring/` | 6 | ~3,200 | PnL tracker, trade logger, alert manager, calibration |
 
 ### Key Classes & Entry Points
 
@@ -310,7 +310,7 @@ uv run pytest tests/unit/risk/ tests/unit/trading/ tests/unit/markets/ tests/uni
 ### Architecture
 
 ```
-py/semantic/
+nfl_analytics/semantic/
 ├── models/           # LLM inference clients
 │   ├── ollama_client.py   # qwen3:8b (chat endpoint, 240s timeout)
 │   ├── mlx_client.py      # Apple Silicon (Qwen2.5-7B-Instruct-4bit)
@@ -378,13 +378,13 @@ py/semantic/
 
 ```python
 # Semantic features auto-integrated into GameFeatureExtractor
-from py.features.game_feature_extractor import GameFeatureExtractor
+from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 extractor = GameFeatureExtractor()
 features = extractor.extract_game_features(game_id)
 # Access: features['sem_home_sentiment_24h'], features['sem_injury_advantage'], etc.
 
 # Value bet detection with LLM explanations
-from py.production.value_bet_detector import ValueBetDetector
+from nfl_analytics.production.value_bet_detector import ValueBetDetector
 detector = ValueBetDetector(min_edge=0.03, use_llm_explanations=True)
 bets = detector.detect_value_bets(predictions)
 ```
@@ -399,7 +399,7 @@ bets = detector.detect_value_bets(predictions)
 ### Architecture
 
 ```
-py/feedback/
+nfl_analytics/feedback/
 ├── outcome_updater.py           # Phase 6.1: Update actuals after games
 ├── semantic_attribution.py      # Phase 6.2: Track feature contribution (True SHAP)
 ├── ensemble_weight_adjuster.py  # Phase 6.3: Adjust weights on performance
@@ -491,27 +491,27 @@ python scripts/ab_test_semantic_2025.py --weeks 1-16
 
 ```python
 # Weekly feedback orchestration
-from py.feedback import WeeklyFeedbackOrchestrator
+from nfl_analytics.feedback import WeeklyFeedbackOrchestrator
 orchestrator = WeeklyFeedbackOrchestrator()
 result = orchestrator.run(season=2025, week=16)
 if result.triggers_fired:
     print(f"Retraining recommended: {result.triggers_fired}")
 
 # Meta-learning insights
-from py.feedback import SemanticMetaLearner
+from nfl_analytics.feedback import SemanticMetaLearner
 learner = SemanticMetaLearner()
 result = learner.update_from_outcomes(season=2025, week=16)
 for insight in result.feature_insights:
     print(f"{insight.feature_name}: {insight.recommendation}")
 
 # Automatic feature selection
-from py.feedback import AutoFeatureSelector
+from nfl_analytics.feedback import AutoFeatureSelector
 selector = AutoFeatureSelector()
 selection = selector.evaluate_features(season=2025, week=16)
 selector.apply_selection(selection)  # Updates ml.feature_selection_state
 
 # A/B testing
-from py.feedback import SemanticABTest
+from nfl_analytics.feedback import SemanticABTest
 test = SemanticABTest()
 test_id = test.setup_test(season=2025, start_week=1)
 results = test.analyze_results(test_id)
@@ -551,7 +551,7 @@ NEW FEATURE
 | Model Training | BLOCKING | Data leakage |
 | Security Audit | BLOCKING | Hardcoded secrets |
 
-**Usage:** Automatic via pre-commit hooks. Manual: `python py/utils/enforcement_router.py <file>`
+**Usage:** Automatic via pre-commit hooks. Manual: `python nfl_analytics/utils/enforcement_router.py <file>`
 
 See [docs/agents/ENFORCEMENT_FRAMEWORK.md](docs/agents/ENFORCEMENT_FRAMEWORK.md)
 
@@ -718,7 +718,7 @@ dchap list                          # Show all chapters with build status
 | Figure Type | Source | Regenerate Command |
 |-------------|--------|-------------------|
 | R/ggplot2 plots | `R/dissertation_figures.R` | `Rscript R/dissertation_figures.R` |
-| Python plots | `py/visualizations/*.py` | `python py/visualizations/create_*.py` |
+| Python plots | `nfl_analytics/visualizations/*.py` | `python nfl_analytics/visualizations/create_*.py` |
 | TikZ diagrams | `figures/*.tex` | Edit directly, auto-compiled |
 | Performance tables | `figures/out/*.tex` | Generated by R/Python scripts |
 
@@ -787,7 +787,7 @@ evince /tmp/section.pdf
   - Added MCMC convergence checks and TRUNCATE safeguards
 - **Path Normalization (Feb 12, 2026):** Replaced /Users/dro → /home/dro across 300+ files (macOS → Linux migration)
 - **Kalman/GP Features DISABLED (Dec 31):** ADR-015 documents decision to disable negative-signal features
-  - Created `py/config/feature_weights.yaml` for feature group enable/disable via config
+  - Created `nfl_analytics/config/feature_weights.yaml` for feature group enable/disable via config
   - Kalman EPA (18 features): -10.2pp accuracy drop in A/B test
   - GP Injury (17 features): GP never trained, used fake estimated data
   - Code preserved with weight=0.0 for potential future iteration
@@ -806,23 +806,23 @@ evince /tmp/section.pdf
   - Root cause: Training data had STATUS labels but inference prompt didn't list STATUS category
   - Added STATUS to system prompt with valid values: out, doubtful, questionable, probable
   - **Validation: 0%→100% STATUS extraction** (exceeds 70% target)
-  - File: `py/semantic/models/inference.py:56-60`
+  - File: `nfl_analytics/semantic/models/inference.py:56-60`
 - **Rest Differential & BTB Detection (Dec 28):** Fixed `rest_differential=0` placeholder in game_feature_extractor.py
   - 7 new features: rest_differential, home/away_days_rest, is_home/away_short_week, is_home/away_long_week
   - **Strong 2025 signal**: Home +3 days rest = 69.2% cover, Away +3 days = 44.4% (25 point swing!)
   - r=0.146 correlation with ATS outcome (meaningful for sports betting)
   - Total features now 348 (305 base + 37 synthetic + 6 rest/BTB)
-- **S1.1: Kalman EPA Filter (Dec 28):** `py/features/kalman_epa_filter.py` - Team EPA regime detection
+- **S1.1: Kalman EPA Filter (Dec 28):** `nfl_analytics/features/kalman_epa_filter.py` - Team EPA regime detection
   - Local Level (Random Walk + Noise) state-space model
   - CUSUM on standardized innovations for regime change detection
   - Noise parameters: σ_v²=0.025 (observation), σ_w²=0.001 (process) calibrated for NFL EPA
   - Features: kalman_epa, kalman_epa_uncertainty, kalman_cusum_up/down, kalman_regime_change
-- **S1.2: GP Injury Recovery (Dec 28):** `py/features/gp_injury_recovery.py` - Uncertainty-aware recovery curves
+- **S1.2: GP Injury Recovery (Dec 28):** `nfl_analytics/features/gp_injury_recovery.py` - Uncertainty-aware recovery curves
   - Kernel: Matern 5/2 + Constant + White Noise (Gemini consultation)
   - Logit transform for bounded [0, 100%] performance output
   - Hierarchical per injury category: muscle, structural, concussion, other
   - Features: gp_recovery_pct, gp_recovery_lower_95, gp_recovery_upper_95, injury_days_since_return
-- **S2: WHY System Complete (Dec 28):** 3 new modules in `py/feedback/` for prediction explainability
+- **S2: WHY System Complete (Dec 28):** 3 new modules in `nfl_analytics/feedback/` for prediction explainability
   - `model_error_decomposition.py`: C_i = w_i × (Y - Ŷ_i) signed contribution per model
   - `temporal_causality.py`: Trace News→Sentiment→Feature→Prediction→Outcome chain
   - `feature_interactions.py`: SHAP interaction_values for semantic × base synergies

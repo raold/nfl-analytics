@@ -6,7 +6,7 @@ Compares 5-way ensemble performance against each individual model on 2025 hold-o
 Includes statistical significance tests and effect size analysis.
 
 Usage:
-    python py/analysis/ablation_study.py \
+    python nfl_analytics/analysis/ablation_study.py \
         --test-season 2025 \
         --test-weeks 1-6 \
         --output analysis/results/ablation_study_results.csv

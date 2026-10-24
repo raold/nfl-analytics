@@ -593,7 +593,7 @@ experiments:
     results: null  # NOT RECENTLY TRAINED
 
     outputs:
-      code: py/rl/*.py
+      code: nfl_analytics/rl/*.py
       old_models: models/rl/*.pt  # May be outdated
 
     dissertation_chapters: [5, 11, 12]
@@ -610,7 +610,7 @@ experiments:
       - Need to audit code status
 
     next_steps:
-      - URGENT: Audit RL code status (py/rl/)
+      - URGENT: Audit RL code status (nfl_analytics/rl/)
       - Check if models are loadable
       - Retrain on 2019-2024 data if needed
       - INT-003: Integrate RL policy with ensemble
@@ -651,7 +651,7 @@ experiments:
     results: null  # NOT YET APPLIED
 
     outputs:
-      code: py/causal/*.py
+      code: nfl_analytics/causal/*.py
       documentation: docs/causal/CAUSAL_INFERENCE_FRAMEWORK.md
 
     dissertation_chapters: [8, 12]

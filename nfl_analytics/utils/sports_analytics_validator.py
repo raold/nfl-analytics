@@ -16,7 +16,7 @@ This validator was created to prevent recurring SQL bugs documented in
 docs/fixes/SQL_SCHEMA_AUDIT_NOV14.md - issues that occurred "DOZENS of times".
 
 Usage:
-    from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+    from nfl_analytics.utils.sports_analytics_validator import SportsAnalyticsValidator
 
     validator = SportsAnalyticsValidator()
 
@@ -32,13 +32,13 @@ Usage:
 
 CLI Usage:
     # Validate DataFrame
-    python py/utils/sports_analytics_validator.py --validate-df data/features.csv
+    python nfl_analytics/utils/sports_analytics_validator.py --validate-df data/features.csv
 
     # Check SQL query logic
-    python py/utils/sports_analytics_validator.py --check-query query.sql
+    python nfl_analytics/utils/sports_analytics_validator.py --check-query query.sql
 
     # Generate validation report
-    python py/utils/sports_analytics_validator.py --report
+    python nfl_analytics/utils/sports_analytics_validator.py --report
 
 Integration:
     - Pre-training validation (before model.fit())

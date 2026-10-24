@@ -11,14 +11,14 @@ Features:
 
 Usage:
     # Train single model
-    python py/models/xgboost_gpu.py \
+    python nfl_analytics/models/xgboost_gpu.py \
         --features-csv data/processed/features/asof_team_features_enhanced.csv \
         --start-season 2010 \
         --end-season 2024 \
         --output models/xgboost/best_model.json
 
     # Hyperparameter sweep
-    python py/models/xgboost_gpu.py \
+    python nfl_analytics/models/xgboost_gpu.py \
         --features-csv data/processed/features/asof_team_features_enhanced.csv \
         --start-season 2010 \
         --end-season 2024 \

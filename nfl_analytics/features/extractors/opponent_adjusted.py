@@ -14,11 +14,11 @@ from typing import Optional
 
 import psycopg2
 
-from py.features.extractors.base import (
+from nfl_analytics.features.extractors.base import (
     FeatureExtractorStrategy,
     FeaturePriority,
 )
-from py.features.opponent_adjusted_features import OpponentAdjustedFeatures
+from nfl_analytics.features.opponent_adjusted_features import OpponentAdjustedFeatures
 
 
 class OpponentAdjustedFeatureExtractor(FeatureExtractorStrategy):
@@ -128,7 +128,7 @@ class OpponentAdjustedFeatureExtractor(FeatureExtractorStrategy):
         Raises:
             FeatureExtractionError: If opponent is not provided
         """
-        from py.features.extractors.base import FeatureExtractionError
+        from nfl_analytics.features.extractors.base import FeatureExtractionError
 
         if opponent is None:
             raise FeatureExtractionError(

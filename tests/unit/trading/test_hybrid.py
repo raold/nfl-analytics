@@ -6,10 +6,10 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from py.markets.base import MarketData, OrderBook, OrderBookLevel, Side
-from py.trading.hybrid import HybridConfig, HybridStrategy
-from py.trading.market_maker import MarketMakerConfig
-from py.trading.signal import Signal
+from nfl_analytics.markets.base import MarketData, OrderBook, OrderBookLevel, Side
+from nfl_analytics.trading.hybrid import HybridConfig, HybridStrategy
+from nfl_analytics.trading.market_maker import MarketMakerConfig
+from nfl_analytics.trading.signal import Signal
 
 pytestmark = pytest.mark.anyio
 

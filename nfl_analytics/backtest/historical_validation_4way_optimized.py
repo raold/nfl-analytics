@@ -20,7 +20,7 @@ Risk Gate:
 - No accuracy degradation allowed
 
 Usage:
-    python py/backtest/historical_validation_4way_optimized.py \
+    python nfl_analytics/backtest/historical_validation_4way_optimized.py \
         --start-season 2022 \
         --end-season 2024 \
         --end-week 10 \
@@ -28,11 +28,11 @@ Usage:
 
 Benchmark:
     # Run unoptimized version (baseline)
-    time python py/backtest/historical_validation_5way.py \
+    time python nfl_analytics/backtest/historical_validation_5way.py \
         --start-season 2024 --end-season 2024 --end-week 10
 
     # Run optimized version
-    time python py/backtest/historical_validation_4way_optimized.py \
+    time python nfl_analytics/backtest/historical_validation_4way_optimized.py \
         --start-season 2024 --end-season 2024 --end-week 10
 
     # Compare results (should be identical)
@@ -56,8 +56,8 @@ import time
 import numpy as np
 import pandas as pd
 
-from py.utils.database_pool import DatabasePoolManager
-from py.utils.feature_cache import FeatureCache
+from nfl_analytics.utils.database_pool import DatabasePoolManager
+from nfl_analytics.utils.feature_cache import FeatureCache
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

@@ -76,7 +76,7 @@ BENCHMARK_PROMPTS = [
 def test_ner_with_ollama(test_cases: list[dict], model: str = "qwen3:8b") -> dict[str, Any]:
     """Test NER accuracy using Ollama."""
     try:
-        from py.semantic.models.ollama_client import OllamaClient
+        from nfl_analytics.semantic.models.ollama_client import OllamaClient
     except ImportError:
         logger.error("Could not import OllamaClient")
         return {"error": "Import failed"}
@@ -186,7 +186,7 @@ def compare_inference_performance(prompts: list[str], iterations: int = 3) -> di
     # Test Ollama
     logger.info("Testing Ollama inference...")
     try:
-        from py.semantic.models.ollama_client import OllamaClient
+        from nfl_analytics.semantic.models.ollama_client import OllamaClient
         client = OllamaClient(timeout=240.0, default_model="qwen3:8b")
 
         if client.is_available():
@@ -210,7 +210,7 @@ def compare_inference_performance(prompts: list[str], iterations: int = 3) -> di
     # Test MLX
     logger.info("Testing MLX inference...")
     try:
-        from py.semantic.models.mlx_client import MLXClient
+        from nfl_analytics.semantic.models.mlx_client import MLXClient
         mlx_client = MLXClient()
 
         if mlx_client.is_available():

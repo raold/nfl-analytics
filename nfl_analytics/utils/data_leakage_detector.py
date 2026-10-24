@@ -13,7 +13,7 @@ Leakage Types Detected:
 5. Suspicious Performance - Metrics too good to be true
 
 Usage:
-    from py.utils.data_leakage_detector import DataLeakageDetector
+    from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector
 
     detector = DataLeakageDetector()
 

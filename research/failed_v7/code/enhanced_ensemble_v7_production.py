@@ -62,8 +62,8 @@ import pandas as pd
 import psycopg2
 
 # Import v7.0 components
-from py.ensemble.meta_learning_weight_predictor import MetaLearningWeightPredictor
-from py.features.meta_learning_context import MetaLearningContextEngine
+from nfl_analytics.ensemble.meta_learning_weight_predictor import MetaLearningWeightPredictor
+from nfl_analytics.features.meta_learning_context import MetaLearningContextEngine
 
 # Optional R imports (lazy loaded when needed)
 try:
@@ -305,7 +305,7 @@ class EnhancedEnsemble7Way:
 
         # Initialize R model interface for Bayesian predictions (v7.0)
         try:
-            from py.ensemble.r_model_interface import RModelInterface
+            from nfl_analytics.ensemble.r_model_interface import RModelInterface
 
             self.r_interface = RModelInterface(self.db_config)
             logger.info("✅ R model interface initialized")
@@ -443,7 +443,7 @@ class EnhancedEnsemble7Way:
             return None
 
         try:
-            from py.ensemble.r_model_interface import RModelInterface
+            from nfl_analytics.ensemble.r_model_interface import RModelInterface
 
             if self.r_interface is None:
                 self.r_interface = RModelInterface(self.db_config)
@@ -479,7 +479,7 @@ class EnhancedEnsemble7Way:
             return None
 
         try:
-            from py.ensemble.r_model_interface import RModelInterface
+            from nfl_analytics.ensemble.r_model_interface import RModelInterface
 
             if self.r_interface is None:
                 self.r_interface = RModelInterface(self.db_config)
@@ -521,7 +521,7 @@ class EnhancedEnsemble7Way:
             return None
 
         try:
-            from py.ensemble.r_model_interface import RModelInterface
+            from nfl_analytics.ensemble.r_model_interface import RModelInterface
 
             if self.r_interface is None:
                 self.r_interface = RModelInterface(self.db_config)

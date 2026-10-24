@@ -22,7 +22,7 @@ fi
 if [ "$1" == "--mcmc" ]; then
     echo "=== MCMC Configuration Check ==="
     python3 -c "
-from py.utils.performance_optimizer import PerformanceOptimizer
+from nfl_analytics.utils.performance_optimizer import PerformanceOptimizer
 
 optimizer = PerformanceOptimizer()
 
@@ -44,7 +44,7 @@ elif [ "$1" == "--sql" ]; then
 
     echo "=== SQL Query Analysis ==="
     python3 -c "
-from py.utils.performance_optimizer import PerformanceOptimizer
+from nfl_analytics.utils.performance_optimizer import PerformanceOptimizer
 
 optimizer = PerformanceOptimizer()
 sql_code = open('$2').read()
@@ -60,7 +60,7 @@ print(optimizer.generate_report())
 elif [ "$1" == "--backtest" ]; then
     echo "=== Backtest Time Estimation ==="
     python3 -c "
-from py.utils.performance_optimizer import PerformanceOptimizer
+from nfl_analytics.utils.performance_optimizer import PerformanceOptimizer
 
 optimizer = PerformanceOptimizer()
 
@@ -92,14 +92,14 @@ else
     echo ""
 
     python3 -c "
-from py.utils.performance_optimizer import PerformanceOptimizer
+from nfl_analytics.utils.performance_optimizer import PerformanceOptimizer
 from pathlib import Path
 
 optimizer = PerformanceOptimizer()
 
 # Check Python files for performance issues
 print('Scanning Python files for bottlenecks...')
-py_files = list(Path('py/').rglob('*.py'))
+py_files = list(Path('nfl_analytics/').rglob('*.py'))
 
 for py_file in py_files[:5]:  # Sample first 5 files
     code = py_file.read_text()

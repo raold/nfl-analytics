@@ -19,7 +19,7 @@ from unittest.mock import MagicMock, patch
 import numpy as np
 import pytest
 
-from py.production.kelly_sizing import (
+from nfl_analytics.production.kelly_sizing import (
     american_odds_to_implied_prob,
     american_to_decimal_odds,
     decimal_to_american_odds,
@@ -28,14 +28,14 @@ from py.production.kelly_sizing import (
     optimal_bet_size,
     simulate_kelly_growth,
 )
-from py.production.kelly_sizing_enhanced import (
+from nfl_analytics.production.kelly_sizing_enhanced import (
     BetOpportunity,
     CVaRCalculator,
     EdgeDecayFunction,
     EnhancedKellySizer,
     PortfolioConstraints,
 )
-from py.production.value_bet_detector import (
+from nfl_analytics.production.value_bet_detector import (
     BetType,
     Confidence,
     ValueBet,

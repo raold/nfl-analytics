@@ -5,7 +5,7 @@ repos:
     hooks:
       - id: black
         language_version: python3.11
-        files: ^py/
+        files: ^nfl_analytics/
 
   # Python linting & auto-fixing
   - repo: https://github.com/astral-sh/ruff-pre-commit
@@ -13,7 +13,7 @@ repos:
     hooks:
       - id: ruff
         args: [--fix, --exit-non-zero-on-fix]
-        files: ^py/
+        files: ^nfl_analytics/
 
   # Python type checking
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -21,7 +21,7 @@ repos:
     hooks:
       - id: mypy
         additional_dependencies: [types-requests, types-python-dateutil]
-        files: ^py/
+        files: ^nfl_analytics/
         args: [--ignore-missing-imports, --warn-unused-ignores]
 
   # General file checks
@@ -57,7 +57,7 @@ repos:
       - id: bandit
         args: [-c, pyproject.toml]
         additional_dependencies: ["bandit[toml]", "pbr"]
-        files: ^py/
+        files: ^nfl_analytics/
 
   # SQL formatting (optional - can be slow)
   # - repo: https://github.com/sqlfluff/sqlfluff
@@ -82,14 +82,14 @@ repos:
       - id: spread-sign-convention
         name: Reject sportsbook-style spread cover math on nflverse spreads
         # games.spread_close / spread_line are nflverse (positive = home favored): the home
-        # team covers when margin - spread_close > 0. Use py/utils/spread_convention.py.
+        # team covers when margin - spread_close > 0. Use nfl_analytics/utils/spread_convention.py.
         language: pygrep
         entry: '(margin|_score|_diff)\W*\s*\+\s*\S*(spread_close|spread_line|vegas_spread)\b'
         files: \.(py|R|sql)$
         # Historical migrations (superseded by 104), the regression test that asserts the
         # old rule is wrong, and dependence_calibration.py (queries a non-existent `odds`
         # table of unknown sign convention)
-        exclude: ^(archive/|research/|docs/|db/migrations/(005|006|100)_|tests/unit/test_spread_convention\.py$|py/analysis/dependence_calibration\.py$)
+        exclude: ^(archive/|research/|docs/|db/migrations/(005|006|100)_|tests/unit/test_spread_convention\.py$|nfl_analytics/analysis/dependence_calibration\.py$)
 
       - id: check-convergence-template
         name: Check MCMC convergence checks present
@@ -101,7 +101,7 @@ repos:
       # Phase 3 Enforcement Rules (Nov 15, 2025)
       - id: validate-api-contracts
         name: API Contract Validation
-        entry: python py/utils/enforcement_router.py
+        entry: python nfl_analytics/utils/enforcement_router.py
         language: system
         files: \.(py)$
         pass_filenames: true
@@ -109,7 +109,7 @@ repos:
 
       - id: validate-sql-results
         name: SQL Result Validation
-        entry: python py/utils/enforcement_router.py
+        entry: python nfl_analytics/utils/enforcement_router.py
         language: system
         files: \.(py)$
         pass_filenames: true
@@ -117,7 +117,7 @@ repos:
 
       - id: validate-r-predictions
         name: R Prediction Validation
-        entry: python py/utils/enforcement_router.py
+        entry: python nfl_analytics/utils/enforcement_router.py
         language: system
         files: \.(py)$
         pass_filenames: true
@@ -125,7 +125,7 @@ repos:
 
       - id: validate-ensemble-components
         name: Ensemble Component Validation
-        entry: python py/utils/enforcement_router.py
+        entry: python nfl_analytics/utils/enforcement_router.py
         language: system
         files: \.(py)$
         pass_filenames: true

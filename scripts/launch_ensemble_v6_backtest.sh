@@ -13,7 +13,7 @@
 set -euo pipefail
 
 # Configuration
-BACKTEST_SCRIPT="py/backtest/historical_validation_v6.py"
+BACKTEST_SCRIPT="nfl_analytics/backtest/historical_validation_v6.py"
 LOG_FILE="/tmp/ensemble_v6_backtest.log"
 PID_FILE="/tmp/ensemble_v6_backtest.pid"
 CHECKPOINT_FILE="/tmp/ensemble_v6_checkpoint.pkl"

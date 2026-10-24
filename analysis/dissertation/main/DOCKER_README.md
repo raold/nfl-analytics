@@ -244,7 +244,7 @@ docker-compose down -v
 docker-compose exec dashboard bash
 
 # Run Python script
-docker-compose exec dashboard python -m py.analysis.some_script
+docker-compose exec dashboard python -m nfl_analytics.analysis.some_script
 
 # Access PostgreSQL
 docker-compose exec postgres psql -U nfl -d nfl_analytics

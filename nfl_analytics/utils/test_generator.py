@@ -9,12 +9,12 @@ This module automatically generates comprehensive test cases targeting 80%+ cove
 - Mock data generators (synthetic player stats)
 
 Usage:
-    from py.utils.test_generator import TestGenerator
+    from nfl_analytics.utils.test_generator import TestGenerator
 
     generator = TestGenerator()
 
     # Generate tests for a module
-    tests = generator.generate_tests_for_file("py/models/train_bnn_passing.py")
+    tests = generator.generate_tests_for_file("nfl_analytics/models/train_bnn_passing.py")
 
     # Write tests to file
     generator.write_tests("tests/unit/test_bnn_passing.py", tests)
@@ -458,10 +458,10 @@ def test_{func_name}_error_handling():
 
         Args:
             target_coverage: Target code coverage (default: 80%)
-            source_dirs: Source directories to test (default: py/)
+            source_dirs: Source directories to test (default: nfl_analytics/)
         """
         if source_dirs is None:
-            source_dirs = ["py/"]
+            source_dirs = ["nfl_analytics/"]
 
         total_tests = 0
 
@@ -503,7 +503,7 @@ if __name__ == "__main__":
     generator = TestGenerator()
 
     # Generate tests for a specific file
-    suite = generator.generate_tests_for_file("py/models/train_bnn_passing.py")
+    suite = generator.generate_tests_for_file("nfl_analytics/models/train_bnn_passing.py")
 
     if suite.test_cases:
         print(f"Generated {len(suite.test_cases)} tests for {suite.module_name}")

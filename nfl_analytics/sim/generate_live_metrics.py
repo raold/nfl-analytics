@@ -11,7 +11,7 @@ This script:
 Output: data/live_metrics.csv
 
 Usage:
-    python py/sim/generate_live_metrics.py
+    python nfl_analytics/sim/generate_live_metrics.py
 """
 
 import json

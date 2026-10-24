@@ -12,7 +12,7 @@ Best model then retrained with NUTS for production.
 Expected: Reduction from ~1000 yards std → ~60-80 yards std
 
 Usage:
-    python py/models/bnn_grid_search.py
+    python nfl_analytics/models/bnn_grid_search.py
 """
 
 import os
@@ -27,7 +27,7 @@ import numpy as np
 import pandas as pd
 import psycopg2
 
-from py.models.bayesian_neural_network import BayesianNeuralNetwork
+from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -290,7 +290,7 @@ def grid_search():
 
         logger.info("\nNEXT STEP: Retrain best model with NUTS for production")
         logger.info(
-            f"  python py/models/train_bnn_passing_nuts.py --prior-scale {best['prior_scale']} "
+            f"  python nfl_analytics/models/train_bnn_passing_nuts.py --prior-scale {best['prior_scale']} "
             + f"--hidden-dims {best['hidden_dims']}"
         )
     else:

@@ -124,7 +124,7 @@ def populate_test_predictions():
                 'ensemble',
                 'meta_learning_wls',
                 'v7.0',
-                'py/ensemble/enhanced_ensemble_v7_production.py',
+                'nfl_analytics/ensemble/enhanced_ensemble_v7_production.py',
                 'testing',
                 'v7.0 ensemble with WLS adjustment testing data'
             )

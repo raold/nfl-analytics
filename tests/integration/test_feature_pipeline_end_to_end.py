@@ -29,8 +29,8 @@ import psycopg2
 import pytest
 
 # Import feature modules
-from py.features.asof_features import TEAM_FEATURE_COLUMNS
-from py.utils.data_leakage_detector import DataLeakageDetector
+from nfl_analytics.features.asof_features import TEAM_FEATURE_COLUMNS
+from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector
 
 # ============================================================================
 # FIXTURES

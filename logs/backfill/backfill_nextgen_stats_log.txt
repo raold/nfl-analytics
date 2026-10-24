@@ -215,7 +215,7 @@ Error traceback:
            }, conn = conn)
        log_message("=== Next Gen Stats Backfill Complete ===", level = "INFO")
        log_message("Next steps:", level = "INFO")
-       log_message("  1. Integrate NGS features into py/features/asof_features_enhanced.py", 
+       log_message("  1. Integrate NGS features into nfl_analytics/features/asof_features_enhanced.py", 
            level = "INFO")
        log_message("  2. Test team-level NGS aggregates (avg CPOE, avg separation, etc.)", 
            level = "INFO")
@@ -289,7 +289,7 @@ Error traceback:
 [2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] Pipeline step 'Verify Next Gen Stats backfill' completed in 0.01 seconds 
 [2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] === Next Gen Stats Backfill Complete === 
 [2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] Next steps: 
-[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   1. Integrate NGS features into py/features/asof_features_enhanced.py 
+[2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   1. Integrate NGS features into nfl_analytics/features/asof_features_enhanced.py 
 [2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   2. Test team-level NGS aggregates (avg CPOE, avg separation, etc.) 
 [2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R]   3. Retrain models with new NGS features 
 [2025-10-10 09:53:26] [INFO] [backfill_nextgen_stats.R] Database transaction committed 

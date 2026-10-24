@@ -344,7 +344,7 @@ We will:
 ### Phase 2: Calibration Validation (Nov 10-11, 2025)
 
 **Tasks**:
-1. ⏳ Fix standalone calibration script (`py/backtest/calibration_validation.py`)
+1. ⏳ Fix standalone calibration script (`nfl_analytics/backtest/calibration_validation.py`)
    - Resolve dependency issues
    - Use direct `psycopg2` connection (like backtest script)
 2. ⏳ Generate 4-way ensemble predictions on weeks 1-10 (182 games)
@@ -396,7 +396,7 @@ We will:
 - ✅ MAE < 46 yards
 
 **Tasks**:
-1. ⏳ Update ensemble configuration (`py/ensemble/enhanced_ensemble_v5.py`)
+1. ⏳ Update ensemble configuration (`nfl_analytics/ensemble/enhanced_ensemble_v5.py`)
    - Weights: State-Space v2 (30%), Hierarchical v2 (25%), Informative Priors v2 (15%), XGBoost v2 (30%)
    - Add temperature scaling parameter if needed
 2. ⏳ Deploy to production environment (Docker container)
@@ -539,9 +539,9 @@ To preserve research integrity for the dissertation, we will validate Approach B
 4. **Convergence Threshold**: `docs/adr/020-relaxed-convergence-threshold.md`
 
 ### Code
-1. **Ensemble Script**: `py/ensemble/enhanced_ensemble_v5.py`
-2. **Backtest Script**: `py/backtest/ensemble_5way_backtest.py`
-3. **Calibration Script**: `py/backtest/calibration_validation.py` (created but not executed)
+1. **Ensemble Script**: `nfl_analytics/ensemble/enhanced_ensemble_v5.py`
+2. **Backtest Script**: `nfl_analytics/backtest/ensemble_5way_backtest.py`
+3. **Calibration Script**: `nfl_analytics/backtest/calibration_validation.py` (created but not executed)
 4. **Hierarchical Model**: `R/bayesian/fit_hierarchical_v2.R`
 5. **Informative Priors Model**: `R/bayesian/fit_informative_priors_v2.R`
 

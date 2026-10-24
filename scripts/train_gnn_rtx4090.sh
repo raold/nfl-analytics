@@ -52,7 +52,7 @@ echo "  Per-season graphs: Enabled (no temporal leakage)"
 echo ""
 
 # Run training
-python py/models/train_hierarchical_gnn.py \
+python nfl_analytics/models/train_hierarchical_gnn.py \
     --seasons 2020 2021 2022 2023 2024 \
     --batch-size 512 \
     --epochs 50 \

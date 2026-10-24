@@ -20,7 +20,7 @@ import pickle
 import numpy as np
 from sklearn.preprocessing import StandardScaler
 
-from py.data.cvae_data_pipeline import CVAEDataPipeline
+from nfl_analytics.data.cvae_data_pipeline import CVAEDataPipeline
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

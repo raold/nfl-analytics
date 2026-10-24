@@ -16,7 +16,7 @@ Key Features:
 - Alert on pool exhaustion
 
 Usage:
-    from py.agents.connection_pool_manager import ConnectionPoolManager
+    from nfl_analytics.agents.connection_pool_manager import ConnectionPoolManager
 
     # Initialize pool manager
     pool_manager = ConnectionPoolManager(

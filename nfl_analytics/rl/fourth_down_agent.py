@@ -1,7 +1,7 @@
 """
 Conservative Q-Learning Agent for NFL 4th Down Decisions
 
-Extends py/rl/cql_agent.py for the 4th down decision problem:
+Extends nfl_analytics/rl/cql_agent.py for the 4th down decision problem:
   - State: 10-dimensional (distance, field position, score, time, etc.)
   - Actions: 3 discrete (go, punt, field_goal)
   - Reward: Δ win probability + outcome bonuses
@@ -15,7 +15,7 @@ Key differences from betting CQL agent:
 
 Usage:
   # Train agent
-  python py/rl/fourth_down_agent.py \\
+  python nfl_analytics/rl/fourth_down_agent.py \\
       --train-data data/fourth_down_dataset_train.csv \\
       --test-data data/fourth_down_dataset_test.csv \\
       --output models/fourth_down/cql_agent.pth \\
@@ -23,13 +23,13 @@ Usage:
       --epochs 500
 
   # Evaluate policy
-  python py/rl/fourth_down_agent.py \\
+  python nfl_analytics/rl/fourth_down_agent.py \\
       --test-data data/fourth_down_dataset_test.csv \\
       --load models/fourth_down/cql_agent.pth \\
       --evaluate
 
   # Compare vs baseline (NYT bot)
-  python py/rl/fourth_down_agent.py \\
+  python nfl_analytics/rl/fourth_down_agent.py \\
       --test-data data/fourth_down_dataset_test.csv \\
       --load models/fourth_down/cql_agent.pth \\
       --compare-nyt
@@ -54,10 +54,10 @@ import pandas as pd
 import torch
 
 # Import base CQL agent
-from py.rl.cql_agent import CQLAgent, get_device, set_seed
+from nfl_analytics.rl.cql_agent import CQLAgent, get_device, set_seed
 
 # Import MDP definitions
-from py.rl.fourth_down_mdp import (
+from nfl_analytics.rl.fourth_down_mdp import (
     ACTION_DIM,
     ACTION_NAMES,
     STATE_DIM,

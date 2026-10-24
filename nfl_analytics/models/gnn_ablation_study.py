@@ -141,7 +141,7 @@ def run_single_ablation(
         "uv",
         "run",
         "python",
-        "py/models/train_hierarchical_gnn.py",
+        "nfl_analytics/models/train_hierarchical_gnn.py",
         "--seasons",
         *[str(s) for s in seasons],
         "--embedding-dim",

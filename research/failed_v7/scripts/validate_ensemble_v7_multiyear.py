@@ -31,7 +31,7 @@ from scipy import stats
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.ensemble.enhanced_ensemble_v7_production import (
+from nfl_analytics.ensemble.enhanced_ensemble_v7_production import (
     load_ensemble_v7,
 )
 

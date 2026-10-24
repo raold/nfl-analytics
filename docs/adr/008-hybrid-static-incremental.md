@@ -510,7 +510,7 @@ Conclusion: Hybrid is most stable and accurate ✅
 ### Phase 1: Integration (Week of Nov 18-22, 2025)
 
 **Tasks**:
-- [x] Implement hybrid model (py/online/hybrid_static_incremental.py)
+- [x] Implement hybrid model (nfl_analytics/online/hybrid_static_incremental.py)
 - [x] Multi-season validation (2022-2024)
 - [x] Statistical significance tests
 - [ ] Integrate into enhanced_ensemble_v6.py
@@ -647,9 +647,9 @@ None (first online learning ADR)
 
 ### Code
 
-1. **Hybrid Implementation**: `py/online/hybrid_static_incremental.py`
+1. **Hybrid Implementation**: `nfl_analytics/online/hybrid_static_incremental.py`
 2. **Validation Script**: `scripts/validate_hybrid_model.py`
-3. **Ensemble Integration**: `py/ensemble/enhanced_ensemble_v6.py` (pending)
+3. **Ensemble Integration**: `nfl_analytics/ensemble/enhanced_ensemble_v6.py` (pending)
 
 ---
 

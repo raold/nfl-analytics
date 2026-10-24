@@ -13,7 +13,7 @@ Demonstrates end-to-end integration of:
 This is the production workflow for bet sizing with meta-labeling.
 
 Usage:
-    python py/production/examples/meta_kelly_integration_example.py
+    python nfl_analytics/production/examples/meta_kelly_integration_example.py
 
 Author: Claude Code
 Date: December 11, 2025
@@ -30,8 +30,8 @@ from pathlib import Path
 
 import numpy as np
 
-from py.production.kelly_sizing import optimal_bet_size
-from py.production.meta_labeling_v2 import MetaFeatureExtractor, MetaLabelingClassifier
+from nfl_analytics.production.kelly_sizing import optimal_bet_size
+from nfl_analytics.production.meta_labeling_v2 import MetaFeatureExtractor, MetaLabelingClassifier
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

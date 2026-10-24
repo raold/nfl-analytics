@@ -296,9 +296,9 @@ docker compose exec dev bash
 
 ```bash
 # Inside container
-uv run python py/analysis/explore_data.py
+uv run python nfl_analytics/analysis/explore_data.py
 uv run pytest tests/
-uv run python -m py.ensemble.game_outcome_ensemble
+uv run python -m nfl_analytics.ensemble.game_outcome_ensemble
 ```
 
 #### 5. Start Dashboard (Optional)
@@ -348,9 +348,9 @@ docker compose exec training bash
 
 ```bash
 # Inside container
-uv run python py/models/bnn_multioutput_v1.py
-uv run python py/models/gnn_ablation_study.py --device cuda
-uv run python py/backtests/comprehensive_ensemble_backtest.py
+uv run python nfl_analytics/models/bnn_multioutput_v1.py
+uv run python nfl_analytics/models/gnn_ablation_study.py --device cuda
+uv run python nfl_analytics/backtests/comprehensive_ensemble_backtest.py
 ```
 
 #### 6. Monitor GPU Usage
@@ -384,7 +384,7 @@ git pull origin main
 
 ```
 nfl-analytics/
-├── py/                          # All Python code (ALWAYS sync)
+├── nfl_analytics/                          # All Python code (ALWAYS sync)
 ├── dashboard/                   # Streamlit app (ALWAYS sync)
 ├── schema/                      # Database schema (ALWAYS sync)
 ├── analysis/                    # Documentation (ALWAYS sync)
@@ -503,7 +503,7 @@ No syncing needed - both machines read/write to same database.
 
 ### Workflow 3: Hyperparameter Search on Desktop
 
-1. **Mac:** Write hyperparameter search script (py/optimization/)
+1. **Mac:** Write hyperparameter search script (nfl_analytics/optimization/)
 2. **Mac:** Test with 2-3 trials locally
 3. **Mac:** Commit and push
 4. **Desktop:** Pull latest code
@@ -561,7 +561,7 @@ tmux new -s training
 
 # Inside tmux: run training
 docker compose exec training bash
-uv run python py/models/bnn_mixture_v2.py
+uv run python nfl_analytics/models/bnn_mixture_v2.py
 
 # Detach: Ctrl+B, then D
 # Reattach later: tmux attach -t training
@@ -744,7 +744,7 @@ with torch.device("cpu"):
 Or train entire model on CPU:
 
 ```bash
-uv run python py/models/train.py --device cpu
+uv run python nfl_analytics/models/train.py --device cpu
 ```
 
 ---

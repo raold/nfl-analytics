@@ -13,7 +13,7 @@ Date: November 6, 2025
 Version: 1.0
 
 Usage:
-    from py.models.pinnacle_calibration import PinnacleCalibrator
+    from nfl_analytics.models.pinnacle_calibration import PinnacleCalibrator
 
     calibrator = PinnacleCalibrator(
         standard_vig=0.055,  # DraftKings/FanDuel typical

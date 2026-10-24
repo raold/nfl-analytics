@@ -33,28 +33,28 @@ This document comprehensively catalogs all environment variables used across the
 | POSTGRES_USER | String | Yes | R (45 files) | dro | Database username (R convention) |
 | POSTGRES_PASSWORD | String | Yes* | R (45 files) | sicillionbillions | Database password (R convention) |
 | **DATABASE ADVANCED** | | | | | |
-| DB_MIN_CONNECTIONS | Int | No | py/data/repository/base.py | 5 | Connection pool min size |
-| DB_MAX_CONNECTIONS | Int | No | py/data/repository/base.py | 50 | Connection pool max size |
-| DB_TIMEOUT | Int | No | py/data/repository/base.py | 30 | Connection timeout (seconds) |
+| DB_MIN_CONNECTIONS | Int | No | nfl_analytics/data/repository/base.py | 5 | Connection pool min size |
+| DB_MAX_CONNECTIONS | Int | No | nfl_analytics/data/repository/base.py | 50 | Connection pool max size |
+| DB_TIMEOUT | Int | No | nfl_analytics/data/repository/base.py | 30 | Connection timeout (seconds) |
 | TEST_DATABASE_URL | String | No | testing | postgresql://... | Separate test DB URL |
 | POSTGRES_TEST_DB | String | No | R testing | testdb | Test database name |
 | TEST_DB | Boolean | No | R tests | false | Enable test DB mode |
 | **API & EXTERNAL SERVICES** | | | | | |
 | ANTHROPIC_API_KEY | String | No | mcp_server/config.py | - | Claude API key (MCP server) |
 | APIFY_API_KEY | String | No | mcp_server/config.py | - | Web scraping API key |
-| ODDS_API_KEY | String | No* | py/data/odds_update_service.py | - | Odds API key (6 files) |
+| ODDS_API_KEY | String | No* | nfl_analytics/data/odds_update_service.py | - | Odds API key (6 files) |
 | GITHUB_TOKEN | String | No | mcp_server/tools/github_ops.py | - | GitHub API token |
 | ESPN_API_BASE_URL | String | No | mcp_server/config.py | https://site.api.espn.com | ESPN API base URL |
 | **REDIS CACHE** | | | | | |
-| REDIS_HOST | String | No | py/api/main.py | localhost | Redis hostname |
-| REDIS_PORT | Int | No | py/api/main.py | 6379 | Redis port |
-| REDIS_DB | Int | No | py/api/main.py | 0 | Redis DB index |
+| REDIS_HOST | String | No | nfl_analytics/api/main.py | localhost | Redis hostname |
+| REDIS_PORT | Int | No | nfl_analytics/api/main.py | 6379 | Redis port |
+| REDIS_DB | Int | No | nfl_analytics/api/main.py | 0 | Redis DB index |
 | REDIS_PASSWORD | String | No | docker-compose.yml | - | Redis authentication |
-| REDIS_CACHE_TTL | Int | No | py/api/main.py | 604800 | Cache TTL (seconds, default 7 days) |
+| REDIS_CACHE_TTL | Int | No | nfl_analytics/api/main.py | 604800 | Cache TTL (seconds, default 7 days) |
 | REDIS_URL | String | No | api/main.py | redis://localhost:6379 | Full Redis URL (alternative) |
 | **LOGGING & MONITORING** | | | | | |
 | LOG_LEVEL | String | No | api/main.py | INFO | Log level (DEBUG, INFO, WARNING, ERROR) |
-| API_LOG_LEVEL | String | No | py/api/main.py | INFO | API-specific log level |
+| API_LOG_LEVEL | String | No | nfl_analytics/api/main.py | INFO | API-specific log level |
 | MCP_LOG_LEVEL | String | No | mcp_server/config.py | INFO | MCP server log level |
 | R_LOG_DIR | String | No | R/utils/error_handling.R | logs/r_etl | R logging directory |
 | LOG_DIR | String | No | .env.example | logs | Default logging directory |
@@ -63,21 +63,21 @@ This document comprehensively catalogs all environment variables used across the
 | API_PORT | Int | No | api/main.py | 8000 | API port |
 | API_RELOAD | Boolean | No | api/main.py | false | Enable hot reload (dev only) |
 | MODELS_DIR | String | No | api/main.py | /app/models | Models directory path |
-| MODELS_PATH | String | No | py/api/main.py | /models | Alternate models path |
-| CORS_ORIGINS | String | No | py/api/main.py | "*" | CORS allowed origins |
-| CACHE_TTL_SECONDS | Int | No | py/api/main.py | 3600 | HTTP cache TTL |
+| MODELS_PATH | String | No | nfl_analytics/api/main.py | /models | Alternate models path |
+| CORS_ORIGINS | String | No | nfl_analytics/api/main.py | "*" | CORS allowed origins |
+| CACHE_TTL_SECONDS | Int | No | nfl_analytics/api/main.py | 3600 | HTTP cache TTL |
 | **MCP SERVER** | | | | | |
 | MCP_SERVER_PORT | Int | No | mcp_server/config.py | 3000 | MCP server port |
 | **REAL-TIME ODDS** | | | | | |
-| POLL_INTERVAL | Int | No | py/data/odds_update_service.py | 900 | Polling interval (seconds) |
-| LINE_MOVE_THRESHOLD | Float | No | py/data/odds_update_service.py | 5.0 | Line movement alert threshold |
-| ALERT_WEBHOOK_URL | String | No | py/data/odds_update_service.py | - | Webhook for line move alerts |
+| POLL_INTERVAL | Int | No | nfl_analytics/data/odds_update_service.py | 900 | Polling interval (seconds) |
+| LINE_MOVE_THRESHOLD | Float | No | nfl_analytics/data/odds_update_service.py | 5.0 | Line movement alert threshold |
+| ALERT_WEBHOOK_URL | String | No | nfl_analytics/data/odds_update_service.py | - | Webhook for line move alerts |
 | **EMAIL ALERTS** | | | | | |
-| SMTP_HOST | String | No | py/production/settle_paper_trades.py | - | SMTP server hostname |
-| SMTP_PORT | Int | No | py/production/settle_paper_trades.py | 587 | SMTP port |
-| SMTP_USER | String | No | py/production/settle_paper_trades.py | - | SMTP username |
-| SMTP_PASSWORD | String | No | py/production/settle_paper_trades.py | - | SMTP password |
-| ALERT_EMAIL | String | No | py/production/settle_paper_trades.py | dro@example.com | Alert recipient email |
+| SMTP_HOST | String | No | nfl_analytics/production/settle_paper_trades.py | - | SMTP server hostname |
+| SMTP_PORT | Int | No | nfl_analytics/production/settle_paper_trades.py | 587 | SMTP port |
+| SMTP_USER | String | No | nfl_analytics/production/settle_paper_trades.py | - | SMTP username |
+| SMTP_PASSWORD | String | No | nfl_analytics/production/settle_paper_trades.py | - | SMTP password |
+| ALERT_EMAIL | String | No | nfl_analytics/production/settle_paper_trades.py | dro@example.com | Alert recipient email |
 | **TRAINING & MODELS** | | | | | |
 | MODELS_DIR | String | No | .env.example | models | Model artifacts directory |
 | TRAINING_LOGS_DIR | String | No | .env.example | analysis/training_logs | Training output logs |
@@ -120,7 +120,7 @@ This document comprehensively catalogs all environment variables used across the
 Used across **60+ files** in all Python modules.
 
 ```python
-# py/data/repository/base.py - Standard approach
+# nfl_analytics/data/repository/base.py - Standard approach
 db_config = {
     'host': os.getenv('DB_HOST', 'localhost'),
     'port': int(os.getenv('DB_PORT', '5544')),
@@ -132,7 +132,7 @@ db_config = {
 }
 ```
 
-**Files:** api/main.py, mcp_server/config.py, py/data/*.py, py/models/*.py, py/production/*.py, py/online/*.py, py/rl/*.py, scripts/*.py
+**Files:** api/main.py, mcp_server/config.py, nfl_analytics/data/*.py, nfl_analytics/models/*.py, nfl_analytics/production/*.py, nfl_analytics/online/*.py, nfl_analytics/rl/*.py, scripts/*.py
 
 ---
 
@@ -158,7 +158,7 @@ con <- DBI::dbConnect(
 
 ### API Service
 
-**File:** api/main.py, py/api/main.py
+**File:** api/main.py, nfl_analytics/api/main.py
 
 ```python
 # FastAPI configuration
@@ -200,7 +200,7 @@ MCP_LOG_LEVEL = os.getenv("MCP_LOG_LEVEL", "INFO")
 
 ### Real-Time Odds Service
 
-**File:** py/data/odds_update_service.py
+**File:** nfl_analytics/data/odds_update_service.py
 
 ```python
 # Real-time odds polling configuration
@@ -217,7 +217,7 @@ odds_service = OddsUpdateService(
 
 ### Email Alerts
 
-**File:** py/production/settle_paper_trades.py
+**File:** nfl_analytics/production/settle_paper_trades.py
 
 ```python
 # Email configuration for trade settlement alerts
@@ -237,7 +237,7 @@ email_config = {
 Used by API and distributed caching.
 
 ```python
-# py/api/main.py
+# nfl_analytics/api/main.py
 redis_config = {
     'host': os.getenv("REDIS_HOST", "localhost"),
     'port': int(os.getenv("REDIS_PORT", "6379")),
@@ -290,11 +290,11 @@ These variables are used in the codebase but **NOT documented in .env.example**:
 | APIFY_API_KEY | mcp_server/config.py | No | - | ADD to .env.example |
 | GITHUB_TOKEN | mcp_server/tools/github_ops.py | No | - | ADD to .env.example |
 | ESPN_API_BASE_URL | mcp_server/config.py | No | https://site.api.espn.com | ADD to .env.example |
-| SMTP_HOST | py/production/settle_paper_trades.py | No | - | ADD to .env.example |
-| SMTP_PORT | py/production/settle_paper_trades.py | No | 587 | ADD to .env.example |
-| SMTP_USER | py/production/settle_paper_trades.py | No | - | ADD to .env.example |
-| SMTP_PASSWORD | py/production/settle_paper_trades.py | No | - | ADD to .env.example |
-| ALERT_EMAIL | py/production/settle_paper_trades.py | No | dro@example.com | ADD to .env.example |
+| SMTP_HOST | nfl_analytics/production/settle_paper_trades.py | No | - | ADD to .env.example |
+| SMTP_PORT | nfl_analytics/production/settle_paper_trades.py | No | 587 | ADD to .env.example |
+| SMTP_USER | nfl_analytics/production/settle_paper_trades.py | No | - | ADD to .env.example |
+| SMTP_PASSWORD | nfl_analytics/production/settle_paper_trades.py | No | - | ADD to .env.example |
+| ALERT_EMAIL | nfl_analytics/production/settle_paper_trades.py | No | dro@example.com | ADD to .env.example |
 | GRAFANA_ADMIN_PASSWORD | docker-compose.yml | No | sicillionbillions | ADD to .env.example |
 | API_RELOAD | api/main.py | No | false | ADD to .env.example |
 
@@ -434,7 +434,7 @@ These variables should NEVER be logged or exposed:
 
 ```bash
 # Check for hardcoded secrets in code
-grep -r "sicillionbillions" py/ R/ --include="*.py" --include="*.R"
+grep -r "sicillionbillions" nfl_analytics/ R/ --include="*.py" --include="*.R"
 
 # Check .env file permissions
 ls -la .env  # Should be: -rw------- (600)

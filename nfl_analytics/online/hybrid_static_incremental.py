@@ -29,7 +29,7 @@ import numpy as np
 import xgboost as xgb
 from sklearn.preprocessing import StandardScaler
 
-from py.online.incremental_xgboost import IncrementalXGBoost
+from nfl_analytics.online.incremental_xgboost import IncrementalXGBoost
 
 logger = logging.getLogger(__name__)
 

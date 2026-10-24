@@ -36,7 +36,7 @@ def test_ensemble_initialization():
     logger.info("=" * 70)
 
     try:
-        from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
         # Test with adaptive weights path (correct API)
         ensemble = EnhancedEnsemble6Way(
@@ -63,7 +63,7 @@ def test_prediction_structure():
     logger.info("=" * 70)
 
     try:
-        from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
         ensemble = EnhancedEnsemble6Way(
             db_password=os.getenv("DB_PASSWORD"),
@@ -142,7 +142,7 @@ def test_elo_skill_factor_realistic():
     logger.info("TEST 5: ELO Skill Factor Realism (Fix 5)")
     logger.info("=" * 70)
 
-    from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+    from nfl_analytics.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
     try:
         ensemble = EnhancedEnsemble6Way(db_password=os.getenv("DB_PASSWORD"))

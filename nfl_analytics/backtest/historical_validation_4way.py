@@ -21,7 +21,7 @@ Temperature Scaling:
 - Target: 89-91% calibration on 90% CI
 
 Usage:
-    python py/backtest/historical_validation_4way.py \
+    python nfl_analytics/backtest/historical_validation_4way.py \
         --start-season 2022 \
         --end-season 2024 \
         --output analysis/results/ensemble_4way_backtest_2022_2024.csv
@@ -68,7 +68,7 @@ class HistoricalValidator4Way:
         self.use_temperature_scaling = use_temperature_scaling
 
         # Initialize ensemble
-        from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
         logger.info("Initializing 4-way ensemble (canonical training window)...")
         logger.info(f"Temperature scaling: {'ENABLED' if use_temperature_scaling else 'DISABLED'}")

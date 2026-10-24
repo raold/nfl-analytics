@@ -7,7 +7,7 @@ Solves the CVaR optimization problem:
 Uses cvxpy if available, otherwise falls back to a capped-Kelly heuristic.
 
 Usage:
-  python py/risk/cvar_lp.py --scenarios data/returns.csv --alpha 0.95 \
+  python nfl_analytics/risk/cvar_lp.py --scenarios data/returns.csv --alpha 0.95 \
       --cap 0.02 --budget 1.0 --output reports/cvar_stakes.json
 """
 

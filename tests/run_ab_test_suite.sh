@@ -89,7 +89,7 @@ else
 fi
 
 if [ "$COVERAGE" = true ]; then
-    PYTEST_ARGS="$PYTEST_ARGS --cov=py.production.ab_test_router --cov=py.production.real_time_api --cov-report=term-missing --cov-report=html"
+    PYTEST_ARGS="$PYTEST_ARGS --cov=nfl_analytics.production.ab_test_router --cov=nfl_analytics.production.real_time_api --cov-report=term-missing --cov-report=html"
 fi
 
 # Test results summary

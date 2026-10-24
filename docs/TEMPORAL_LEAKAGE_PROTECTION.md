@@ -30,7 +30,7 @@ The Repository pattern now includes **automatic temporal validation** for all qu
 ### How It Works
 
 ```python
-from py.data.repository import GameRepository
+from nfl_analytics.data.repository import GameRepository
 
 repo = GameRepository()
 
@@ -100,7 +100,7 @@ all_games = repo.query(
 For comprehensive validation before training:
 
 ```python
-from py.utils.data_leakage_detector import DataLeakageDetector
+from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector
 
 # Validate DataFrame
 detector = DataLeakageDetector()
@@ -208,7 +208,7 @@ GROUP BY player_id
 
 ### Unit Test Template
 ```python
-from py.data.repository import BaseRepository, RepositoryError
+from nfl_analytics.data.repository import BaseRepository, RepositoryError
 import pytest
 
 def test_temporal_validation_blocks_game_date():
@@ -264,8 +264,8 @@ When migrating existing SQL code to Repository pattern:
 ## References
 
 - Database Schema: `docs/database/DATABASE_QUICK_REFERENCE.md`
-- Data Leakage Detector: `py/utils/data_leakage_detector.py`
-- Repository Base: `py/data/repository/base.py`
+- Data Leakage Detector: `nfl_analytics/utils/data_leakage_detector.py`
+- Repository Base: `nfl_analytics/data/repository/base.py`
 - CLAUDE.md: "never take shortcuts. we are gambling with actual dollars."
 
 ---

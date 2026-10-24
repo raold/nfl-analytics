@@ -12,7 +12,7 @@ Security Focus Areas:
 5. Dependency Vulnerabilities (outdated packages, known CVEs)
 
 Usage:
-    from py.utils.security_auditor import SecurityAuditor
+    from nfl_analytics.utils.security_auditor import SecurityAuditor
 
     auditor = SecurityAuditor()
 
@@ -20,7 +20,7 @@ Usage:
     report = auditor.run_full_audit()
 
     # Check specific file
-    issues = auditor.scan_file("py/api/app.py")
+    issues = auditor.scan_file("nfl_analytics/api/app.py")
 
     # Scan Docker configurations
     issues = auditor.scan_docker_security()

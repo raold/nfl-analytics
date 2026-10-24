@@ -84,7 +84,7 @@ scrape_configs:
   # Model Quality Metrics
   # ============================================================================
   # DISABLED: These endpoints will be added when backtest tracking is implemented
-  # See: py/backtest/ for implementation roadmap
+  # See: nfl_analytics/backtest/ for implementation roadmap
 
   # Model calibration, MAE, coverage, drift detection
   # - job_name: 'nfl_model_quality'

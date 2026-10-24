@@ -90,7 +90,7 @@ ORDER BY
 
 ### 2.1 Create Python Module
 
-**File**: `py/features/did_roughing.py`
+**File**: `nfl_analytics/features/did_roughing.py`
 
 ```python
 """
@@ -105,7 +105,7 @@ Expected Impact:
 - Adds ~1-2% to ensemble feature importance
 
 Usage:
-    from py.features.did_roughing import calculate_did_roughing_feature
+    from nfl_analytics.features.did_roughing import calculate_did_roughing_feature
 
     feature_value = calculate_did_roughing_feature(
         opponent='HOU',
@@ -257,7 +257,7 @@ def list_low_roughing_defenses() -> list:
 """Unit tests for DiD roughing-the-passer feature."""
 
 import pytest
-from py.features.did_roughing import (
+from nfl_analytics.features.did_roughing import (
     calculate_did_roughing_feature,
     get_defense_roughing_info,
     list_high_roughing_defenses,
@@ -350,7 +350,7 @@ pytest tests/unit/test_did_roughing.py -v
 
 ### 3.1 Update Feature Engineering Module
 
-**File**: `py/data/feature_engineering.py` (add function)
+**File**: `nfl_analytics/data/feature_engineering.py` (add function)
 
 ```python
 def add_did_roughing_feature(df: pd.DataFrame) -> pd.DataFrame:
@@ -373,7 +373,7 @@ def add_did_roughing_feature(df: pd.DataFrame) -> pd.DataFrame:
         >>> df['did_roughing_yards'].iloc[0]
         17.7
     """
-    from py.features.did_roughing import calculate_did_roughing_feature
+    from nfl_analytics.features.did_roughing import calculate_did_roughing_feature
 
     df['did_roughing_yards'] = df.apply(
         lambda row: calculate_did_roughing_feature(row['opponent'], row['season']),
@@ -385,7 +385,7 @@ def add_did_roughing_feature(df: pd.DataFrame) -> pd.DataFrame:
 
 ### 3.2 Update Ensemble Feature List
 
-**File**: `py/ensemble/enhanced_ensemble_v5.py` (modify feature list)
+**File**: `nfl_analytics/ensemble/enhanced_ensemble_v5.py` (modify feature list)
 
 ```python
 # Add to feature list (around line 150)
@@ -397,7 +397,7 @@ FEATURE_COLUMNS = [
 # Update feature engineering section (around line 300)
 def prepare_features(self, df: pd.DataFrame) -> pd.DataFrame:
     """Prepare features for prediction."""
-    from py.data.feature_engineering import add_did_roughing_feature
+    from nfl_analytics.data.feature_engineering import add_did_roughing_feature
 
     # ... existing feature engineering ...
 
@@ -434,8 +434,8 @@ Usage:
 import pandas as pd
 import numpy as np
 from sklearn.metrics import mean_absolute_error
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsembleV5
-from py.data.feature_engineering import add_did_roughing_feature
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsembleV5
+from nfl_analytics.data.feature_engineering import add_did_roughing_feature
 
 def backtest_did_feature(start_season=2018, end_season=2024):
     """Run backtest comparing baseline vs DiD-enhanced model."""
@@ -564,7 +564,7 @@ features:
 
 ### 5.2 Update API Endpoint
 
-**File**: `py/production/real_time_api.py`
+**File**: `nfl_analytics/production/real_time_api.py`
 
 ```python
 @app.post("/predict/passing_yards")
@@ -575,7 +575,7 @@ async def predict_passing_yards(request: PredictionRequest):
     base_prediction = ensemble.predict(request.features)
 
     # Add DiD roughing feature adjustment
-    from py.features.did_roughing import calculate_did_roughing_feature
+    from nfl_analytics.features.did_roughing import calculate_did_roughing_feature
     did_adjustment = calculate_did_roughing_feature(
         opponent=request.opponent,
         season=request.season
@@ -703,7 +703,7 @@ If DiD feature degrades performance:
 ### Example 1: Patrick Mahomes vs Houston (2024)
 
 ```python
-from py.features.did_roughing import calculate_did_roughing_feature, get_defense_roughing_info
+from nfl_analytics.features.did_roughing import calculate_did_roughing_feature, get_defense_roughing_info
 
 # Get defense info
 defense_info = get_defense_roughing_info('HOU')

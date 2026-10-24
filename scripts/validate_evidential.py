@@ -40,7 +40,7 @@ import seaborn as sns
 from scipy import stats
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-from py.models.evidential_regression import EvidentialRegressor, load_rushing_data_from_db
+from nfl_analytics.models.evidential_regression import EvidentialRegressor, load_rushing_data_from_db
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

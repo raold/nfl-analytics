@@ -40,7 +40,7 @@ References
 
 Usage
 -----
-    from py.ensemble.bayesian_stacking import BayesianStacker
+    from nfl_analytics.ensemble.bayesian_stacking import BayesianStacker
 
     # 1. Load models
     stacker = BayesianStacker()

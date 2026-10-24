@@ -224,7 +224,7 @@ class PropsEndpointValidator:
 
         # Check API health
         if not self.check_health():
-            logger.error("API not available. Start with: uvicorn py.api.main:app")
+            logger.error("API not available. Start with: uvicorn nfl_analytics.api.main:app")
             return False
 
         # Check props health

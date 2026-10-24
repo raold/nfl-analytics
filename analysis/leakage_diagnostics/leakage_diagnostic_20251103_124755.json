@@ -137,9 +137,9 @@
     "test": "event_detection",
     "status": "MANUAL_INSPECTION_REQUIRED",
     "files_to_check": [
-      "py/features/asof_features.py",
-      "py/features/asof_features_enhanced.py",
-      "py/features/bayesian_player_features.py"
+      "nfl_analytics/features/asof_features.py",
+      "nfl_analytics/features/asof_features_enhanced.py",
+      "nfl_analytics/features/bayesian_player_features.py"
     ]
   }
 }

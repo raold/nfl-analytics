@@ -23,7 +23,7 @@ mkdir -p logs/training
 
 # Start training with GPU optimization
 echo "Starting training..."
-python py/models/bnn_multioutput_v1.py \
+python nfl_analytics/models/bnn_multioutput_v1.py \
     --device cuda \
     --batch-size 128 \
     --epochs 200 \

@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from py.risk.drawdown_monitor import DrawdownConfig, DrawdownMonitor
+from nfl_analytics.risk.drawdown_monitor import DrawdownConfig, DrawdownMonitor
 
 
 def _ts(days_offset: float = 0) -> datetime:

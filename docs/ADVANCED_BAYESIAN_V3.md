@@ -179,7 +179,7 @@ informative_priors <- c(
 
 ## Phase 3: Bayesian Neural Networks ✅
 
-**File:** `py/models/bayesian_neural_network.py` (370 lines)
+**File:** `nfl_analytics/models/bayesian_neural_network.py` (370 lines)
 
 ### Innovation
 
@@ -219,7 +219,7 @@ y ~ N(y_pred, σ)    [σ ~ HalfNormal(1)]
 ### Usage
 
 ```python
-from py.models.bayesian_neural_network import BayesianNeuralNetwork
+from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
 
 # Train
 bnn = BayesianNeuralNetwork(
@@ -258,7 +258,7 @@ bnn_loaded = BayesianNeuralNetwork.load("models/bayesian/bnn_passing_v1.pkl")
 
 ## Phase 4: Integration - 4-Way Ensemble ✅
 
-**File:** `py/ensemble/enhanced_ensemble_v3.py` (280 lines)
+**File:** `nfl_analytics/ensemble/enhanced_ensemble_v3.py` (280 lines)
 
 ### Architecture
 
@@ -348,7 +348,7 @@ R/
 ### Python ML (2 new files)
 
 ```
-py/
+nfl_analytics/
 ├── models/
 │   └── bayesian_neural_network.py          [NEW - 370 lines]
 └── ensemble/
@@ -393,7 +393,7 @@ Rscript R/advanced_priors_elicitation.R
 ### 3. Train Bayesian Neural Network
 
 ```python
-from py.models.bayesian_neural_network import BayesianNeuralNetwork
+from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
 
 bnn = BayesianNeuralNetwork(
     hidden_dims=(64, 32),
@@ -408,7 +408,7 @@ bnn.save("models/bayesian/bnn_passing_v1.pkl")
 ### 4. Generate 4-Way Ensemble Predictions
 
 ```python
-from py.ensemble.enhanced_ensemble_v3 import EnhancedEnsembleV3
+from nfl_analytics.ensemble.enhanced_ensemble_v3 import EnhancedEnsembleV3
 
 ensemble = EnhancedEnsembleV3(
     use_bnn=True,

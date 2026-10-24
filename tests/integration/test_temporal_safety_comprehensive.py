@@ -36,7 +36,7 @@ import psycopg
 import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from py.utils.data_leakage_detector import DataLeakageDetector, LeakageSeverity
+from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector, LeakageSeverity
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -52,18 +52,18 @@ DB_CONFIG = {
 
 # Feature engineering modules to check
 FEATURE_MODULES = [
-    "py/features/asof_features.py",
-    "py/features/asof_features_v2.py",
-    "py/features/asof_features_enhanced.py",
-    "py/features/player_features.py",
-    "py/features/bayesian_features.py",
-    "py/features/bayesian_player_features.py",
-    "py/features/vegas_line_bias_features_SAFE.py",
-    "py/features/defensive_situational_strength.py",
-    "py/features/defensive_game_script_indicators.py",
-    "py/features/environmental_contextual_features.py",
-    "py/features/matchup_features.py",
-    "py/features/feature_interactions.py",
+    "nfl_analytics/features/asof_features.py",
+    "nfl_analytics/features/asof_features_v2.py",
+    "nfl_analytics/features/asof_features_enhanced.py",
+    "nfl_analytics/features/player_features.py",
+    "nfl_analytics/features/bayesian_features.py",
+    "nfl_analytics/features/bayesian_player_features.py",
+    "nfl_analytics/features/vegas_line_bias_features_SAFE.py",
+    "nfl_analytics/features/defensive_situational_strength.py",
+    "nfl_analytics/features/defensive_game_script_indicators.py",
+    "nfl_analytics/features/environmental_contextual_features.py",
+    "nfl_analytics/features/matchup_features.py",
+    "nfl_analytics/features/feature_interactions.py",
 ]
 
 # R feature engineering modules

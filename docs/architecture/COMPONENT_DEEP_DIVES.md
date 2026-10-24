@@ -22,7 +22,7 @@
 
 ### Overview
 
-**Location**: `py/causal/`
+**Location**: `nfl_analytics/causal/`
 **Status**: ✅ Complete (Phase 6)
 **Documentation**: `docs/causal/CAUSAL_INFERENCE_FRAMEWORK.md`
 
@@ -200,7 +200,7 @@ print(f"Adjust for: {adjustment_set}")
 
 ```python
 from causal.model_integration import CausalAdjustedPredictor
-from py.models.bnn_calibrated_v2 import CalibratedBNN
+from nfl_analytics.models.bnn_calibrated_v2 import CalibratedBNN
 
 # Initialize BNN
 bnn = CalibratedBNN.load('models/bayesian/bnn_multioutput_v1_final.pt')
@@ -274,7 +274,7 @@ print(f"Backtest Coverage (90% CI): {backtest['coverage_90']:.1%}")
 
 - **Input**: Play-by-play data from database (`mart.player_game_stats`)
 - **Output**: Causal effect estimates, adjusted predictions
-- **Integration with BNN**: `py/models/bnn_calibrated_v2.py` accepts causal adjustments
+- **Integration with BNN**: `nfl_analytics/models/bnn_calibrated_v2.py` accepts causal adjustments
 - **Validation**: Backtesting against 2022-2024 season
 
 ### Documentation References
@@ -455,7 +455,7 @@ cat(f"KB-JJ chemistry effect: {chemistry_effect:.1f} yards\n")
 
 **Uncertainty Quantification**:
 ```python
-from py.models.bnn_calibrated_v2 import CalibratedBNN
+from nfl_analytics.models.bnn_calibrated_v2 import CalibratedBNN
 
 # Load BNN
 bnn = CalibratedBNN.load('models/bayesian/bnn_passing_v1.pkl')
@@ -513,7 +513,7 @@ Output Head 3: TD Prediction (Bernoulli)
 
 **Production Usage**:
 ```python
-from py.models.bnn_calibrated_v2 import CalibratedBNN
+from nfl_analytics.models.bnn_calibrated_v2 import CalibratedBNN
 import torch
 
 # Load model
@@ -543,7 +543,7 @@ print(f"TD probability: {td_prob['prob']}")
 
 #### 6. Calibrated BNN (v2.0) - PRODUCTION CLASS
 
-**File**: `py/models/bnn_calibrated_v2.py`
+**File**: `nfl_analytics/models/bnn_calibrated_v2.py`
 **Status**: ✅ Production-ready with monitoring hooks
 
 **Key Features**:
@@ -554,7 +554,7 @@ print(f"TD probability: {td_prob['prob']}")
 
 **Implementation Details**:
 ```python
-from py.models.bnn_calibrated_v2 import CalibratedBNN
+from nfl_analytics.models.bnn_calibrated_v2 import CalibratedBNN
 
 class CalibratedBNN:
     """Production-ready Bayesian Neural Network with calibration.
@@ -600,7 +600,7 @@ class CalibratedBNN:
 **Calibration Validation**:
 ```python
 # Verify 89.5% coverage on validation set
-from py.models.bnn_calibrated_v2 import validate_calibration
+from nfl_analytics.models.bnn_calibrated_v2 import validate_calibration
 
 results = validate_calibration(
     model=bnn,
@@ -711,7 +711,7 @@ ORDER BY pgs.season, pgs.week;
 
 ### Overview
 
-**Location**: `py/ensemble/enhanced_ensemble_v3.py`
+**Location**: `nfl_analytics/ensemble/enhanced_ensemble_v3.py`
 **Status**: ✅ v3.0 Complete
 **Documentation**: See this file + `docs/ADVANCED_BAYESIAN_V3.md`
 
@@ -746,7 +746,7 @@ ORDER BY pgs.season, pgs.week;
 **Disadvantage**: Assumes independence, doesn't capture correlations
 
 ```python
-from py.ensemble.enhanced_ensemble_v3 import EnsemblePredictor
+from nfl_analytics.ensemble.enhanced_ensemble_v3 import EnsemblePredictor
 import numpy as np
 
 # Initialize with component models
@@ -790,7 +790,7 @@ where w_i = 1/σ_i²
 **Disadvantage**: Requires training data, risk of overfitting
 
 ```python
-from py.ensemble.enhanced_ensemble_v3 import StackedMetaLearner
+from nfl_analytics.ensemble.enhanced_ensemble_v3 import StackedMetaLearner
 from sklearn.model_selection import cross_val_score
 
 # Prepare meta-features (component predictions on training set)
@@ -824,7 +824,7 @@ ensemble_pred = meta_learner.predict(test_meta_features)
 **Disadvantage**: Requires precise return estimates
 
 ```python
-from py.ensemble.enhanced_ensemble_v3 import PortfolioOptimizer
+from nfl_analytics.ensemble.enhanced_ensemble_v3 import PortfolioOptimizer
 
 # Get correlation matrix of component predictions
 pred_matrix = ensemble.get_prediction_matrix(X_backtest)  # (n_samples, 4)
@@ -863,7 +863,7 @@ ensemble_pred = (
 
 ```bash
 # Command-line usage
-uv run python py/ensemble/enhanced_ensemble_v3.py \
+uv run python nfl_analytics/ensemble/enhanced_ensemble_v3.py \
   --bayesian models/bayesian/informative_priors_v1.rds \
   --xgboost models/xgboost/v2_1.pkl \
   --bnn models/bayesian/bnn_passing_v1.pkl \
@@ -876,7 +876,7 @@ uv run python py/ensemble/enhanced_ensemble_v3.py \
 #### Python API
 
 ```python
-from py.ensemble.enhanced_ensemble_v3 import EnsemblePredictor
+from nfl_analytics.ensemble.enhanced_ensemble_v3 import EnsemblePredictor
 import pandas as pd
 
 # Load features
@@ -904,7 +904,7 @@ predictions.to_csv('predictions/ensemble_predictions.csv', index=False)
 #### Full Backtest
 
 ```python
-from py.ensemble.enhanced_ensemble_v3 import EnsembleBacktest
+from nfl_analytics.ensemble.enhanced_ensemble_v3 import EnsembleBacktest
 
 backtest = EnsembleBacktest(
     start_season=2022,
@@ -924,10 +924,10 @@ print(f"  Max Drawdown: {results['max_drawdown']:.1%}")
 
 ### Integration with Production
 
-**Bet Sizing**: Works with CQL bet sizer in `py/production/cql_bet_sizer.py`
+**Bet Sizing**: Works with CQL bet sizer in `nfl_analytics/production/cql_bet_sizer.py`
 
 ```python
-from py.production.cql_bet_sizer import CQLBetSizer
+from nfl_analytics.production.cql_bet_sizer import CQLBetSizer
 
 bet_sizer = CQLBetSizer(
     ensemble_predictor=ensemble,
@@ -958,7 +958,7 @@ print(f"Optimal bet: {bet['size']:.2f} on {'OVER' if bet['action']=='over' else 
 
 ### Overview
 
-**Location**: `py/rl/`
+**Location**: `nfl_analytics/rl/`
 **Status**: ✅ Complete (Oct 9, 2025)
 **Documentation**: `docs/milestones/CQL_COMPLETE_SUMMARY.md`
 
@@ -1046,11 +1046,11 @@ actions = {
 
 ### Training Script
 
-**File**: `py/rl/train_cql_agent.py`
+**File**: `nfl_analytics/rl/train_cql_agent.py`
 
 ```python
-from py.rl.cql_agent import CQLAgent
-from py.rl.dataset import OfflineBettingDataset
+from nfl_analytics.rl.cql_agent import CQLAgent
+from nfl_analytics.rl.dataset import OfflineBettingDataset
 import torch
 
 # Load offline dataset
@@ -1092,10 +1092,10 @@ print(f"  Policy Divergence: {eval_results['policy_divergence']:.3f}")
 
 ### Usage in Production
 
-**File**: `py/production/cql_bet_sizer.py`
+**File**: `nfl_analytics/production/cql_bet_sizer.py`
 
 ```python
-from py.production.cql_bet_sizer import CQLBetSizer
+from nfl_analytics.production.cql_bet_sizer import CQLBetSizer
 import torch
 
 # Load trained CQL model
@@ -1144,10 +1144,10 @@ device = torch.device('cuda' if torch.cuda.is_available() else
 
 ### Validation
 
-**Off-Policy Evaluation** (`py/rl/ope_gate.py`):
+**Off-Policy Evaluation** (`nfl_analytics/rl/ope_gate.py`):
 
 ```python
-from py.rl.ope_gate import OffPolicyEvaluator
+from nfl_analytics.rl.ope_gate import OffPolicyEvaluator
 
 ope = OffPolicyEvaluator(
     behavior_policy='logged',  # Historical decisions
@@ -1171,7 +1171,7 @@ print(f"95% CI: [{estimated_return['ci_lower']:.2%}, {estimated_return['ci_upper
 
 ### Overview
 
-**Location**: `py/compute/`, `run_compute.py`
+**Location**: `nfl_analytics/compute/`, `run_compute.py`
 **Status**: ✅ Complete
 **Documentation**: README.md section 7
 
@@ -1181,17 +1181,17 @@ print(f"95% CI: [{estimated_return['ci_lower']:.2%}, {estimated_return['ci_upper
 
 **Three-Layer System**:
 
-1. **Scheduling Layer** (`py/compute/adaptive_scheduler.py`)
+1. **Scheduling Layer** (`nfl_analytics/compute/adaptive_scheduler.py`)
    - Multi-armed bandit for task allocation
    - Learns which hardware excels at which tasks
    - Epsilon-greedy exploration vs exploitation
 
-2. **Routing Layer** (`py/compute/hardware/task_router.py`)
+2. **Routing Layer** (`nfl_analytics/compute/hardware/task_router.py`)
    - CPU tasks → M4 (MCMC, state-space modeling, statistical tests)
    - GPU tasks → 4090 (BNN training, XGBoost, RL)
    - Fallback logic if hardware unavailable
 
-3. **Synchronization Layer** (`py/compute/sync/`)
+3. **Synchronization Layer** (`nfl_analytics/compute/sync/`)
    - Google Drive bidirectional sync
    - Task queue: SQLite with WAL mode
    - Automatic conflict resolution
@@ -1219,7 +1219,7 @@ print(f"95% CI: [{estimated_return['ci_lower']:.2%}, {estimated_return['ci_upper
 
 ### Task Queue Structure
 
-**Database**: `py/compute/task_queue.db` (SQLite, WAL mode)
+**Database**: `nfl_analytics/compute/task_queue.db` (SQLite, WAL mode)
 
 **Tables**:
 ```sql
@@ -1270,10 +1270,10 @@ python run_compute.py --health-check
 
 ```bash
 # Authorize Google Drive access
-python -c "from py.compute.sync.google_drive_sync import setup_auth; setup_auth()"
+python -c "from nfl_analytics.compute.sync.google_drive_sync import setup_auth; setup_auth()"
 
 # Verify sync
-python -c "from py.compute.sync.google_drive_sync import GoogleDriveSync; \
+python -c "from nfl_analytics.compute.sync.google_drive_sync import GoogleDriveSync; \
   sync = GoogleDriveSync('nfl-analytics-compute'); \
   print(f'Root folder: {sync.root_folder_id}')"
 ```
@@ -1340,10 +1340,10 @@ python run_compute.py --verify-sync
 
 ### Task Router Configuration
 
-**File**: `py/compute/hardware/task_router.py`
+**File**: `nfl_analytics/compute/hardware/task_router.py`
 
 ```python
-from py.compute.hardware.task_router import task_router
+from nfl_analytics.compute.hardware.task_router import task_router
 
 # View routing decisions
 routing = task_router.get_routing_report()
@@ -1429,7 +1429,7 @@ grep "TaskRouter" logs/compute_system.log
 grep "GoogleDriveSync" logs/compute_system.log
 
 # Analyze performance
-python -c "from py.compute.analytics import ComputeAnalytics; \
+python -c "from nfl_analytics.compute.analytics import ComputeAnalytics; \
   analytics = ComputeAnalytics('logs/'); \
   print(analytics.generate_report())"
 ```
@@ -1838,15 +1838,15 @@ pytest tests/integration/test_bnn_calibration.py -v
 ```bash
 # Training
 Rscript R/train_and_save_passing_model.R
-uv run python py/models/train_bnn_passing.py
-python py/rl/train_cql_agent.py
+uv run python nfl_analytics/models/train_bnn_passing.py
+python nfl_analytics/rl/train_cql_agent.py
 
 # Prediction
-uv run python py/ensemble/enhanced_ensemble_v3.py --help
-python py/production/cql_bet_sizer.py
+uv run python nfl_analytics/ensemble/enhanced_ensemble_v3.py --help
+python nfl_analytics/production/cql_bet_sizer.py
 
 # Analysis
-uv run python py/causal/validation.py
+uv run python nfl_analytics/causal/validation.py
 
 # Dissertation
 cd analysis/dissertation/main && pdflatex main.tex && bibtex main && pdflatex main.tex

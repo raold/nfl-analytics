@@ -23,7 +23,7 @@ from psycopg2.extras import RealDictCursor
 from scipy import stats
 from sklearn.metrics import roc_auc_score
 
-from py.features.game_feature_extractor import GameFeatureExtractor
+from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
 
 # Database config

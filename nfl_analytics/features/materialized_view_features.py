@@ -13,7 +13,7 @@ Materialized Views Used:
   - mv_venue_weather_features: Stadium and weather conditions
 
 Example:
-  python py/features/materialized_view_features.py --output data/processed/features/mv_features.csv \\
+  python nfl_analytics/features/materialized_view_features.py --output data/processed/features/mv_features.csv \\
       --season-start 2010 --validate
 """
 
@@ -29,7 +29,7 @@ import pandas as pd
 import psycopg
 from psycopg import Connection
 
-from py.utils.spread_convention import home_cover, home_cover_margin
+from nfl_analytics.utils.spread_convention import home_cover, home_cover_margin
 
 # Add project root to path
 ROOT = Path(__file__).resolve().parents[2]

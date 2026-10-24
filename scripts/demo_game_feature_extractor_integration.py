@@ -31,7 +31,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from py.features.game_feature_extractor import GameFeatureExtractor
+from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

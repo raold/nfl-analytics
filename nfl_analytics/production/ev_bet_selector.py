@@ -12,7 +12,7 @@ Key improvements over probability-threshold approach:
 - Considers market microstructure (hold, line movement)
 
 Usage:
-    python py/production/ev_bet_selector.py \
+    python nfl_analytics/production/ev_bet_selector.py \
         --predictions predictions.csv \
         --min-edge 0.02 \
         --deadzone 0.002 \

@@ -53,7 +53,7 @@ source .venv/bin/activate  # Or your virtualenv path
 
 ```bash
 # Start FastAPI with ensemble v5.1
-uv run uvicorn py.api.main:app --host 0.0.0.0 --port 8000 --reload
+uv run uvicorn nfl_analytics.api.main:app --host 0.0.0.0 --port 8000 --reload
 
 # Server will start at: http://localhost:8000
 # API docs (interactive): http://localhost:8000/docs
@@ -342,8 +342,8 @@ home_qb_yards = predictions["home_prediction"]["predicted_passing_yards"]
 ### Code Files (Modified Today)
 
 1. `scripts/train_hybrid_xgboost_v1.py` - Fixed schema, trained model
-2. `py/ensemble/enhanced_ensemble_v5_1.py` - New ensemble with hybrid
-3. `py/api/main.py` - Removed mocks, integrated ensemble
+2. `nfl_analytics/ensemble/enhanced_ensemble_v5_1.py` - New ensemble with hybrid
+3. `nfl_analytics/api/main.py` - Removed mocks, integrated ensemble
 4. `dashboard/app.py` - Real predictions display
 5. `scripts/quick_api_test.py` - Test script (NEW)
 
@@ -372,7 +372,7 @@ models/xgboost/hybrid_static_incremental_v1/
 
 ```bash
 # Terminal 1: Start FastAPI
-uv run uvicorn py.api.main:app --host 0.0.0.0 --port 8000
+uv run uvicorn nfl_analytics.api.main:app --host 0.0.0.0 --port 8000
 
 # Terminal 2: Test API
 python3 scripts/quick_api_test.py

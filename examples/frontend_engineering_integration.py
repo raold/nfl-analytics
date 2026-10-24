@@ -40,7 +40,7 @@ def example_precommit_validation():
     print("EXAMPLE 1: Pre-commit Validation Workflow")
     print("=" * 80)
 
-    from py.utils.frontend_engineering_agent import FrontendEngineeringAgent
+    from nfl_analytics.utils.frontend_engineering_agent import FrontendEngineeringAgent
 
     agent = FrontendEngineeringAgent()
 
@@ -71,7 +71,7 @@ def example_dashboard_startup_validation():
     print("EXAMPLE 2: Dashboard Startup Validation")
     print("=" * 80)
 
-    from py.utils.frontend_engineering_agent import FrontendEngineeringAgent
+    from nfl_analytics.utils.frontend_engineering_agent import FrontendEngineeringAgent
 
     agent = FrontendEngineeringAgent()
 
@@ -184,7 +184,7 @@ def example_prometheus_monitoring():
         print("Install: pip install prometheus-client")
         return
 
-    from py.utils.frontend_engineering_agent import FrontendEngineeringAgent
+    from nfl_analytics.utils.frontend_engineering_agent import FrontendEngineeringAgent
 
     # Define metrics
     schema_errors = Counter(
@@ -254,7 +254,7 @@ def example_custom_validation_rules():
     print("EXAMPLE 5: Custom Validation Rules")
     print("=" * 80)
 
-    from py.utils.frontend_engineering_agent import (
+    from nfl_analytics.utils.frontend_engineering_agent import (
         FrontendEngineeringAgent,
         Severity,
         ValidationIssue,
@@ -350,14 +350,14 @@ def example_sports_analytics_integration():
     print("EXAMPLE 6: Sports Analytics Validator Integration")
     print("=" * 80)
 
-    from py.utils.frontend_engineering_agent import (
+    from nfl_analytics.utils.frontend_engineering_agent import (
         FrontendEngineeringAgent,
         Severity,
         ValidationIssue,
     )
 
     try:
-        from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+        from nfl_analytics.utils.sports_analytics_validator import SportsAnalyticsValidator
     except ImportError:
         print("⚠️  Sports Analytics Validator not available")
         return
@@ -431,7 +431,7 @@ def example_automated_migration():
     print("EXAMPLE 7: Automated Migration Application")
     print("=" * 80)
 
-    from py.utils.frontend_engineering_agent import (
+    from nfl_analytics.utils.frontend_engineering_agent import (
         FrontendEngineeringAgent,
         MigrationUpdate,
     )

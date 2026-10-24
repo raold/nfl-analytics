@@ -18,7 +18,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.features.weather_features_integration import compute_weather_features
+from nfl_analytics.features.weather_features_integration import compute_weather_features
 
 # Database config
 db_config = {

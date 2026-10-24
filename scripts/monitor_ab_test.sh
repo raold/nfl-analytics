@@ -56,7 +56,7 @@ ${GREEN}Examples:${NC}
   $0 status
 
   # Pre-backtest guardrail check
-  $0 check && python py/backtest/historical_validation_4way.py
+  $0 check && python nfl_analytics/backtest/historical_validation_4way.py
 
   # Auto-stop on violations (cron job)
   */15 * * * * $0 stop
@@ -95,21 +95,21 @@ check_dependencies() {
 
 cmd_status() {
     echo -e "${BLUE}Fetching A/B test status...${NC}\n"
-    python py/utils/ab_test_monitor.py status
+    python nfl_analytics/utils/ab_test_monitor.py status
 }
 
 cmd_metrics() {
     echo -e "${BLUE}Current A/B test metrics:${NC}\n"
-    python py/utils/ab_test_monitor.py metrics
+    python nfl_analytics/utils/ab_test_monitor.py metrics
 }
 
 cmd_check() {
     echo -e "${BLUE}Checking guardrails...${NC}\n"
-    python py/utils/ab_test_monitor.py check
+    python nfl_analytics/utils/ab_test_monitor.py check
 
     # Exit with error code if violations detected (for CI/CD)
     if python -c "
-from py.utils.ab_test_monitor import ABTestMonitor
+from nfl_analytics.utils.ab_test_monitor import ABTestMonitor
 monitor = ABTestMonitor()
 status = monitor.check_guardrails()
 exit(1 if status.violated else 0)
@@ -124,11 +124,11 @@ exit(1 if status.violated else 0)
 
 cmd_stop() {
     echo -e "${BLUE}Checking for auto-stop conditions...${NC}\n"
-    python py/utils/ab_test_monitor.py stop
+    python nfl_analytics/utils/ab_test_monitor.py stop
 
     # Check if test was stopped
     if python -c "
-from py.utils.ab_test_monitor import ABTestMonitor
+from nfl_analytics.utils.ab_test_monitor import ABTestMonitor
 monitor = ABTestMonitor()
 exit(0 if monitor.auto_stop_if_violated() else 1)
     "; then
@@ -155,7 +155,7 @@ cmd_dirichlet() {
     local season=${2:-2024}
     local week=${3:-12}
     echo -e "${BLUE}Testing Dirichlet A/B routing...${NC}\n"
-    python py/production/ab_test_dirichlet_props.py \
+    python nfl_analytics/production/ab_test_dirichlet_props.py \
         --player-id "$player_id" \
         --season "$season" \
         --week "$week"
@@ -163,11 +163,11 @@ cmd_dirichlet() {
 
 cmd_promote() {
     echo -e "${BLUE}Checking promotion eligibility...${NC}\n"
-    python py/utils/ab_test_monitor.py promote
+    python nfl_analytics/utils/ab_test_monitor.py promote
 
     # Get recommendation
     recommendation=$(python -c "
-from py.utils.ab_test_monitor import ABTestMonitor
+from nfl_analytics.utils.ab_test_monitor import ABTestMonitor
 monitor = ABTestMonitor()
 print(monitor.recommend_decision().value)
     ")

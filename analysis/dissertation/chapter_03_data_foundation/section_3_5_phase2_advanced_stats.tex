@@ -39,7 +39,7 @@ The 305 base metrics are organized into five integrated modules targeting three 
   \end{tabular}
 
   \vspace{1mm}
-  \footnotesize\textit{Note:} All features use 4-week rolling windows with H=4 exponential decay. See \texttt{py/features/\allowbreak game\_feature\_extractor.py} for unified API ($<$500ms latency).
+  \footnotesize\textit{Note:} All features use 4-week rolling windows with H=4 exponential decay. See \texttt{nfl\_analytics/features/\allowbreak game\_feature\_extractor.py} for unified API ($<$500ms latency).
 \end{table}
 
 The modular design enables independent validation and selective integration. Each module exposes a standardized interface accepting (team, season, week) tuples and returning feature dictionaries with consistent naming conventions (\texttt{home\_ngs\_*}, \texttt{away\_qbr\_*}, \texttt{home\_play\_*}, \texttt{home\_oadj\_*}). This architecture supports gradual rollout, A/B testing, and feature ablation studies to quantify marginal contributions.
@@ -260,7 +260,7 @@ Automated validation scans all feature modules for temporal violations (see \Cre
 Phase 2 features integrate through a unified extraction interface exposing a single-call API for all 232 features. The \texttt{GameFeatureExtractor} class orchestrates parallel extraction across modules with graceful degradation if Phase 2 tables unavailable (fallback to 112 production features).
 
 \begin{lstlisting}[language=Python,basicstyle=\ttfamily\scriptsize]
-from py.features.game_feature_extractor import GameFeatureExtractor
+from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
 extractor = GameFeatureExtractor()
 features = extractor.extract_game_features(
@@ -310,7 +310,7 @@ Conservative impact projections based on NFL analytics literature~\cite{lopez202
 \label{subsec:phase2-risks}
 
 \paragraph{Risk 1: Overfitting from Feature Expansion}
-Managing 382 predictor features with limited sample size (815 games per season) elevates overfitting risk. Mitigation: (i) SHAP-based feature selection identifying top contributors, (ii) L1/L2 regularization in XGBoost ($\alpha = 1.0$, $\lambda = 2.0$), (iii) season-based temporal splits (train on seasons $< N$, validate on season $N$), (iv) strict 2025 holdout validation, (v) config-based feature group disabling (\texttt{py/config/\allowbreak feature\_weights.yaml}).
+Managing 382 predictor features with limited sample size (815 games per season) elevates overfitting risk. Mitigation: (i) SHAP-based feature selection identifying top contributors, (ii) L1/L2 regularization in XGBoost ($\alpha = 1.0$, $\lambda = 2.0$), (iii) season-based temporal splits (train on seasons $< N$, validate on season $N$), (iv) strict 2025 holdout validation, (v) config-based feature group disabling (\texttt{nfl\_analytics/config/\allowbreak feature\_weights.yaml}).
 
 \paragraph{Risk 2: Multicollinearity Among Advanced Features}
 Many advanced metrics correlate (EPA vs.\ success rate: $\rho = 0.85$; explosive play rate vs.\ EPA: $\rho = 0.72$). Mitigation: Variance Inflation Factor (VIF) analysis pre-training, pruning features with VIF $> 10$. Alternative: XGBoost's tree-based splits naturally handle multicollinearity better than linear models.
@@ -327,11 +327,11 @@ Extracting 382 features could exceed latency requirements. Mitigation: (i) strat
 \paragraph{Production Deployment (December 2025)}
 The 382-feature production system is fully operational:
 \begin{itemize}
-  \item \texttt{py/features/\allowbreak game\_feature\_extractor.py}: Unified extraction interface ($<500$ms)
-  \item \texttt{py/features/nextgen\_features.py}: Next Gen Stats tracking integration
-  \item \texttt{py/features/qbr\_features.py}: ESPN QBR metrics
-  \item \texttt{py/features/semantic\_features.py}: LLM-derived sentiment and injury analysis
-  \item \texttt{py/features/synthetic\_*\_features.py}: Interaction and momentum features
+  \item \texttt{nfl\_analytics/features/\allowbreak game\_feature\_extractor.py}: Unified extraction interface ($<500$ms)
+  \item \texttt{nfl\_analytics/features/nextgen\_features.py}: Next Gen Stats tracking integration
+  \item \texttt{nfl\_analytics/features/qbr\_features.py}: ESPN QBR metrics
+  \item \texttt{nfl\_analytics/features/semantic\_features.py}: LLM-derived sentiment and injury analysis
+  \item \texttt{nfl\_analytics/features/synthetic\_*\_features.py}: Interaction and momentum features
 \end{itemize}
 
 \paragraph{Database Infrastructure}
@@ -386,7 +386,7 @@ All Phase 2 features use existing database infrastructure with no external API d
 The advanced analytics integration establishes a production feature pipeline with 382 predictor features across base metrics (305), synthetic interactions (37), semantic/LLM signals (38), and rest differentials (6), minus four game-identifier columns excluded from model input. The central contributions are:
 
 \begin{enumerate}
-  \item \textbf{Modular Architecture}: Standardized feature module interfaces enabling selective integration, A/B testing, and config-based feature group disabling (\texttt{py/config/\allowbreak feature\_weights.yaml}).
+  \item \textbf{Modular Architecture}: Standardized feature module interfaces enabling selective integration, A/B testing, and config-based feature group disabling (\texttt{nfl\_analytics/config/\allowbreak feature\_weights.yaml}).
 
   \item \textbf{Tracking Data Precision}: Next Gen Stats features isolating player skill from scheme effects through model-derived metrics (CPOE, RYOE, separation), addressing fundamental limitations of traditional box-score statistics.
 

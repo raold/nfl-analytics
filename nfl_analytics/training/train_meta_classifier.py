@@ -25,9 +25,9 @@ Trains the meta-labeling classifier on historical game predictions and outcomes.
 - Feature importance plot: models/meta_labeling_v2_feature_importance.png
 
 Usage:
-    python py/training/train_meta_classifier.py
-    python py/training/train_meta_classifier.py --start-season 2020 --end-season 2024
-    python py/training/train_meta_classifier.py --use-walk-forward
+    python nfl_analytics/training/train_meta_classifier.py
+    python nfl_analytics/training/train_meta_classifier.py --start-season 2020 --end-season 2024
+    python nfl_analytics/training/train_meta_classifier.py --use-walk-forward
 
 Author: Claude Code
 Date: December 11, 2025
@@ -47,8 +47,8 @@ import pandas as pd
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, project_root)
 
-from py.production.meta_labeling_v2 import MetaLabelingClassifier
-from py.utils.spread_convention import home_cover
+from nfl_analytics.production.meta_labeling_v2 import MetaLabelingClassifier
+from nfl_analytics.utils.spread_convention import home_cover
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

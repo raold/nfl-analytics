@@ -33,8 +33,8 @@ from unittest.mock import Mock, patch
 import pytest
 from fastapi.testclient import TestClient
 
-from py.production.ab_test_router import ABTestRouter
-from py.production.real_time_api import app
+from nfl_analytics.production.ab_test_router import ABTestRouter
+from nfl_analytics.production.real_time_api import app
 
 # ============================================================================
 # FIXTURES
@@ -45,8 +45,8 @@ from py.production.real_time_api import app
 def mock_ensembles():
     """Mock both ensemble models."""
     with (
-        patch("py.production.ab_test_router.EnsembleV5") as mock_v5,
-        patch("py.production.ab_test_router.EnsembleV6") as mock_v6,
+        patch("nfl_analytics.production.ab_test_router.EnsembleV5") as mock_v5,
+        patch("nfl_analytics.production.ab_test_router.EnsembleV6") as mock_v6,
     ):
 
         # Mock v5 predictions (control)
@@ -114,7 +114,7 @@ def client():
 class TestFullPredictionFlow:
     """Test complete prediction flow from API to database."""
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_single_prediction_control_group_e2e(
         self, mock_router, mock_ensembles, mock_database, client
     ):
@@ -160,7 +160,7 @@ class TestFullPredictionFlow:
         assert call_kwargs["week"] == 10
         assert call_kwargs["log_to_db"] is True
 
-    @patch("py.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
     def test_single_prediction_treatment_group_e2e(
         self, mock_router, mock_ensembles, mock_database, client
     ):
@@ -474,9 +474,9 @@ class TestPerformanceBenchmarks:
 class TestAPIHealthCheckE2E:
     """Test API health check with A/B test integration."""
 
-    @patch("py.production.real_time_api.ab_router")
-    @patch("py.production.real_time_api.db_pool")
-    @patch("py.production.real_time_api.redis_client")
+    @patch("nfl_analytics.production.real_time_api.ab_router")
+    @patch("nfl_analytics.production.real_time_api.db_pool")
+    @patch("nfl_analytics.production.real_time_api.redis_client")
     def test_health_check_shows_ab_test_status(self, mock_redis, mock_db, mock_router, client):
         """Test that health check includes A/B test status."""
         # Mock services

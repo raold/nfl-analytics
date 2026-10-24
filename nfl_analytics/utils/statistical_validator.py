@@ -18,7 +18,7 @@ Supported Frameworks:
 - Custom BNN models
 
 Usage:
-    from py.utils.statistical_validator import StatisticalValidator
+    from nfl_analytics.utils.statistical_validator import StatisticalValidator
 
     validator = StatisticalValidator()
 

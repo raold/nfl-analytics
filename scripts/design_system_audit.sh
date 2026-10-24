@@ -57,7 +57,7 @@ done
 case $ACTION in
     audit)
         python3 -c "
-from py.agents.uiux_design_engineer import UIUXDesignEngineer
+from nfl_analytics.agents.uiux_design_engineer import UIUXDesignEngineer
 
 designer = UIUXDesignEngineer(dashboard_path='dashboard/')
 audit = designer.audit_design_system()
@@ -89,7 +89,7 @@ if audit[\"issues\"]:
             exit 1
         fi
         python3 -c "
-from py.agents.uiux_design_engineer import UIUXDesignEngineer
+from nfl_analytics.agents.uiux_design_engineer import UIUXDesignEngineer
 
 designer = UIUXDesignEngineer()
 workflow = designer.analyze_user_workflow(
@@ -108,7 +108,7 @@ print(f'\nImplementation: {workflow.implementation_notes}')
 
     accessibility)
         python3 -c "
-from py.agents.uiux_design_engineer import UIUXDesignEngineer, WCAGLevel
+from nfl_analytics.agents.uiux_design_engineer import UIUXDesignEngineer, WCAGLevel
 
 designer = UIUXDesignEngineer()
 report = designer.validate_accessibility(wcag_level=WCAGLevel.AA)
@@ -135,7 +135,7 @@ if report.recommendations:
 
     generate-components)
         python3 -c "
-from py.agents.uiux_design_engineer import UIUXDesignEngineer
+from nfl_analytics.agents.uiux_design_engineer import UIUXDesignEngineer
 
 designer = UIUXDesignEngineer()
 components = designer.generate_component_library()
@@ -151,7 +151,7 @@ for name, code in components.items():
 
     navigation)
         python3 -c "
-from py.agents.uiux_design_engineer import UIUXDesignEngineer
+from nfl_analytics.agents.uiux_design_engineer import UIUXDesignEngineer
 
 designer = UIUXDesignEngineer()
 improvements = designer.suggest_navigation_improvements()
@@ -172,7 +172,7 @@ for i, improvement in enumerate(improvements, 1):
             exit 1
         fi
         python3 -c "
-from py.agents.uiux_design_engineer import UIUXDesignEngineer
+from nfl_analytics.agents.uiux_design_engineer import UIUXDesignEngineer
 
 designer = UIUXDesignEngineer()
 designer.export_design_system(output_path='${ARGS[0]}')

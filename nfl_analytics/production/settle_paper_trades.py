@@ -17,16 +17,16 @@ Version: 1.0
 
 Usage:
     # Run daily settlement (typically via cron)
-    python py/production/settle_paper_trades.py
+    python nfl_analytics/production/settle_paper_trades.py
 
     # Settle specific session
-    python py/production/settle_paper_trades.py --session-id paper_20241106_abc123
+    python nfl_analytics/production/settle_paper_trades.py --session-id paper_20241106_abc123
 
     # Dry run (no database updates)
-    python py/production/settle_paper_trades.py --dry-run
+    python nfl_analytics/production/settle_paper_trades.py --dry-run
 
     # Add to crontab:
-    0 12 * * * cd $PROJECT_ROOT && uv run python py/production/settle_paper_trades.py
+    0 12 * * * cd $PROJECT_ROOT && uv run python nfl_analytics/production/settle_paper_trades.py
 """
 
 import argparse

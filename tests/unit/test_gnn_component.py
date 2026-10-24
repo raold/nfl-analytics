@@ -26,8 +26,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 import pytest
 import torch
 
-from py.ensemble.components.gnn_component import GNNComponent
-from py.ensemble.strategy.base import ModelPrediction, ModelType
+from nfl_analytics.ensemble.components.gnn_component import GNNComponent
+from nfl_analytics.ensemble.strategy.base import ModelPrediction, ModelType
 
 
 class TestGNNComponent:
@@ -231,7 +231,7 @@ class TestGNNComponentIntegration:
 
 def test_component_import():
     """Test that component can be imported correctly."""
-    from py.ensemble.components import GNNComponent as ImportedComponent
+    from nfl_analytics.ensemble.components import GNNComponent as ImportedComponent
 
     assert ImportedComponent is GNNComponent
 

@@ -398,7 +398,7 @@ safe_db_operation(
 
     log_message("=== Next Gen Stats Backfill Complete ===", level = "INFO")
     log_message("Next steps:", level = "INFO")
-    log_message("  1. Integrate NGS features into py/features/asof_features_enhanced.py", level = "INFO")
+    log_message("  1. Integrate NGS features into nfl_analytics/features/asof_features_enhanced.py", level = "INFO")
     log_message("  2. Test team-level NGS aggregates (avg CPOE, avg separation, etc.)", level = "INFO")
     log_message("  3. Retrain models with new NGS features", level = "INFO")
   })

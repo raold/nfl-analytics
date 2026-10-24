@@ -22,7 +22,7 @@ import torch
 
 sys.path.append(str(Path(__file__).parent.parent))
 
-from py.models.lstm_drive_prediction import DriveLSTM
+from nfl_analytics.models.lstm_drive_prediction import DriveLSTM
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

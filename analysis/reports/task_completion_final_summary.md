@@ -168,7 +168,7 @@ WHERE g.season = ANY(%s) ...
 # Update XGBoost with weather features (automatic interaction detection)
 # State-space doesn't need weather (team strength only)
 
-python py/backtest/harness_multimodel.py --seasons 2020,2021,2022,2023,2024 \
+python nfl_analytics/backtest/harness_multimodel.py --seasons 2020,2021,2022,2023,2024 \
     --include-weather \
     --output-csv analysis/results/multimodel_weather_comparison.csv
 ```
@@ -212,7 +212,7 @@ python py/backtest/harness_multimodel.py --seasons 2020,2021,2022,2023,2024 \
 - `data/weather_ingestion.log` - Weather ingestion run log
 
 ### Modified:
-- `py/weather_meteostat.py`:
+- `nfl_analytics/weather_meteostat.py`:
   - Added NYG → MetLife Stadium mapping
   - Changed year filter: 2005 → 2020
   - Added batch commit strategy (every 100 records)

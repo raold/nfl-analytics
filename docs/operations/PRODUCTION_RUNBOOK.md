@@ -106,7 +106,7 @@ docker compose ps
 
 # Expected output:
 # NAME                COMMAND                  SERVICE             STATUS
-# nfl-fastapi         "uvicorn py.product…"   fastapi             Up 2 hours
+# nfl-fastapi         "uvicorn nfl_analytics.product…"   fastapi             Up 2 hours
 # nfl-grafana         "/run.sh"                grafana             Up 2 hours
 # nfl-postgres        "docker-entrypoint.s…"   pg                  Up 2 hours
 # nfl-prometheus      "/bin/prometheus --c…"   prometheus          Up 2 hours
@@ -369,7 +369,7 @@ free -h
 # If system swap high:
 # - Close unnecessary applications
 # - Consider upgrading system RAM
-# - Reduce model caching (py/ensemble/enhanced_ensemble_v6_production.py)
+# - Reduce model caching (nfl_analytics/ensemble/enhanced_ensemble_v6_production.py)
 ```
 
 #### Option 4: Handle Port Conflicts
@@ -1001,7 +1001,7 @@ docker compose logs fastapi | grep -i "informative"
 
 # Step 3: Test R model directly (Python REPL)
 docker compose exec fastapi python << 'EOF'
-from py.ensemble.r_model_interface import RModelInterface
+from nfl_analytics.ensemble.r_model_interface import RModelInterface
 import os
 
 # Initialize R interface
@@ -1129,7 +1129,7 @@ docker compose up -d fastapi
 ```bash
 # Check if batch prediction implemented
 docker compose exec fastapi python << 'EOF'
-from py.ensemble.r_model_interface import RModelInterface
+from nfl_analytics.ensemble.r_model_interface import RModelInterface
 
 # Check for batch method
 import inspect
@@ -1144,7 +1144,7 @@ print("Available methods:", methods)
 EOF
 
 # If batch methods missing:
-# Add to py/ensemble/r_model_interface.py:
+# Add to nfl_analytics/ensemble/r_model_interface.py:
 
 def predict_hierarchical_batch(self, player_ids, season, week, model_path):
     """Predict for multiple players at once (faster than loop)"""
@@ -1157,7 +1157,7 @@ docker compose restart fastapi
 
 #### Option 5: Fallback to 2-Way Ensemble (Temporary)
 ```bash
-# Edit py/ensemble/enhanced_ensemble_v6_production.py
+# Edit nfl_analytics/ensemble/enhanced_ensemble_v6_production.py
 # Comment out R models temporarily
 
 # Line ~150:
@@ -1324,7 +1324,7 @@ free -h
 
 #### Option 3: Reduce Model Caching (Memory-Intensive)
 ```bash
-# Edit py/ensemble/enhanced_ensemble_v6_production.py
+# Edit nfl_analytics/ensemble/enhanced_ensemble_v6_production.py
 # Reduce model caching to save memory
 
 # Option A: Disable R model caching
@@ -1372,7 +1372,7 @@ free -h
 docker compose exec pg psql -U dro -d devdb01 -c "SELECT sum(pg_database_size(datname))::bigint FROM pg_database;"  # pragma: allowlist secret
 
 # Reduce connection pool size
-# Edit py/utils/database_pool.py:
+# Edit nfl_analytics/utils/database_pool.py:
 
 # Line ~25:
 pool = psycopg2.pool.SimpleConnectionPool(
@@ -1730,7 +1730,7 @@ docker compose logs fastapi | grep -A 10 "POST /predict"
 
 # Step 4: Test individual components
 docker compose exec fastapi python << 'EOF'
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble
 
 ensemble = EnhancedEnsemble()
 
@@ -1775,7 +1775,7 @@ EOF
 ```bash
 # Check current weights
 docker compose exec fastapi python -c "
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble
 ensemble = EnhancedEnsemble()
 print('Weights:', ensemble.weights)
 print('Sum:', sum(ensemble.weights.values()))
@@ -1786,7 +1786,7 @@ print('Sum:', sum(ensemble.weights.values()))
 # Sum: 1.0
 
 # If sum != 1.0:
-# Edit py/ensemble/enhanced_ensemble_v6_production.py
+# Edit nfl_analytics/ensemble/enhanced_ensemble_v6_production.py
 # Line ~150:
 ensemble_weights = {
     'state_space_v2': 0.30,
@@ -1811,7 +1811,7 @@ docker compose logs fastapi | grep -i "nan"
 # - Model prediction error (invalid input)
 
 # Add NaN handling to ensemble:
-# Edit py/ensemble/enhanced_ensemble_v6_production.py
+# Edit nfl_analytics/ensemble/enhanced_ensemble_v6_production.py
 
 def predict(self, player_id, season, week):
     predictions = []
@@ -1841,7 +1841,7 @@ docker compose restart fastapi
 #### Option 3: Validate Player Input
 ```bash
 # Add input validation to API endpoint
-# Edit py/production/real_time_api.py
+# Edit nfl_analytics/production/real_time_api.py
 
 @app.post("/predict")
 async def predict(request: PredictionRequest):
@@ -1911,7 +1911,7 @@ docker compose restart fastapi
 #### Option 5: Implement Graceful Degradation
 ```bash
 # Add fallback to 3-way or 2-way ensemble
-# Edit py/ensemble/enhanced_ensemble_v6_production.py
+# Edit nfl_analytics/ensemble/enhanced_ensemble_v6_production.py
 
 def predict(self, player_id, season, week):
     predictions = {}
@@ -2028,8 +2028,8 @@ watch -n 300 './scripts/check_ensemble_health.sh'
 
 # Step 2: Test calibration on validation set
 docker compose exec fastapi python << 'EOF'
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble
-from py.calibration.temperature_scaling import TemperatureScaler
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble
+from nfl_analytics.calibration.temperature_scaling import TemperatureScaler
 import numpy as np
 
 ensemble = EnhancedEnsemble()
@@ -2061,7 +2061,7 @@ EOF
 
 # Step 3: Check component calibration
 docker compose exec fastapi python << 'EOF'
-from py.backtest.calibration_validation import CalibrationValidator
+from nfl_analytics.backtest.calibration_validation import CalibrationValidator
 
 validator = CalibrationValidator()
 
@@ -2086,7 +2086,7 @@ EOF
 ```bash
 # Retrain temperature scaler on recent data
 docker compose exec fastapi python << 'EOF'
-from py.calibration.temperature_scaling import TemperatureScaler
+from nfl_analytics.calibration.temperature_scaling import TemperatureScaler
 import pandas as pd
 
 # Load recent predictions (last 100 games)
@@ -2112,7 +2112,7 @@ with open('models/calibration/temperature_scaler_v2.pkl', 'wb') as f:
 EOF
 
 # Update ensemble to use new scaler
-# Edit py/ensemble/enhanced_ensemble_v6_production.py
+# Edit nfl_analytics/ensemble/enhanced_ensemble_v6_production.py
 # Line ~80:
 self.temperature_scaler = pickle.load(
     open('models/calibration/temperature_scaler_v2.pkl', 'rb')
@@ -2126,7 +2126,7 @@ docker compose restart fastapi
 ```bash
 # Identify which component is miscalibrated
 docker compose exec fastapi python << 'EOF'
-from py.backtest.calibration_validation import CalibrationValidator
+from nfl_analytics.backtest.calibration_validation import CalibrationValidator
 
 validator = CalibrationValidator()
 
@@ -2163,7 +2163,7 @@ EOF
 ```bash
 # Reweight ensemble to prioritize well-calibrated models
 docker compose exec fastapi python << 'EOF'
-from py.backtest.calibration_validation import CalibrationValidator
+from nfl_analytics.backtest.calibration_validation import CalibrationValidator
 
 validator = CalibrationValidator()
 
@@ -2191,7 +2191,7 @@ for name, weight, coverage in zip(components, weights, coverages):
 EOF
 
 # Update ensemble weights
-# Edit py/ensemble/enhanced_ensemble_v6_production.py
+# Edit nfl_analytics/ensemble/enhanced_ensemble_v6_production.py
 # Use calibration-based weights instead of fixed weights
 
 # Restart FastAPI
@@ -2201,7 +2201,7 @@ docker compose restart fastapi
 #### Option 4: Implement Adaptive Calibration
 ```bash
 # Add real-time calibration monitoring
-# Edit py/calibration/temperature_scaling.py
+# Edit nfl_analytics/calibration/temperature_scaling.py
 
 class AdaptiveTemperatureScaler:
     def __init__(self, window_size=100):
@@ -2231,7 +2231,7 @@ class AdaptiveTemperatureScaler:
         pass
 
 # Integrate into ensemble
-# py/ensemble/enhanced_ensemble_v6_production.py:
+# nfl_analytics/ensemble/enhanced_ensemble_v6_production.py:
 self.adaptive_scaler = AdaptiveTemperatureScaler(window_size=100)
 
 # Restart FastAPI
@@ -2251,7 +2251,7 @@ docker compose restart fastapi
 
 # Step 2: Validate on recent games
 docker compose exec fastapi python << 'EOF'
-from py.backtest.calibration_validation import CalibrationValidator
+from nfl_analytics.backtest.calibration_validation import CalibrationValidator
 import pandas as pd
 
 # Load last 50 games
@@ -2679,7 +2679,7 @@ EOF
 
 # 3. Save current ensemble config
 docker compose exec fastapi python -c "
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble
 ensemble = EnhancedEnsemble()
 print('Weights:', ensemble.weights)
 print('Temperature:', ensemble.temperature_scaler.temperature)
@@ -2764,8 +2764,8 @@ LAST_GOOD_COMMIT="5d4c3b2"  # Replace with actual commit
 git reset --hard $LAST_GOOD_COMMIT
 
 # Option B: Revert specific files (SAFER - keeps history)
-git checkout $LAST_GOOD_COMMIT -- py/ensemble/enhanced_ensemble_v6_production.py
-git checkout $LAST_GOOD_COMMIT -- py/production/real_time_api.py
+git checkout $LAST_GOOD_COMMIT -- nfl_analytics/ensemble/enhanced_ensemble_v6_production.py
+git checkout $LAST_GOOD_COMMIT -- nfl_analytics/production/real_time_api.py
 git checkout $LAST_GOOD_COMMIT -- docker-compose.yml
 
 # Verify changes
@@ -2774,8 +2774,8 @@ git status
 # Expected:
 # On branch main
 # Changes to be committed:
-#   modified: py/ensemble/enhanced_ensemble_v6_production.py
-#   modified: py/production/real_time_api.py
+#   modified: nfl_analytics/ensemble/enhanced_ensemble_v6_production.py
+#   modified: nfl_analytics/production/real_time_api.py
 ```
 
 #### Step 4: Rebuild and Restart Services (3 minutes)
@@ -2921,7 +2921,7 @@ vim docs/POSTMORTEMS.md
 
 ### Code Validation
 - [ ] All tests pass (`pytest tests/`)
-- [ ] No critical linting errors (`pylint py/`)
+- [ ] No critical linting errors (`pylint nfl_analytics/`)
 - [ ] Code review completed
 - [ ] No secrets in code (`git diff | grep -i password`)
 

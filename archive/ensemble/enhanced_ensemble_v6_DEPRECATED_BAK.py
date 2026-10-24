@@ -32,7 +32,7 @@ Target Performance:
 - <500ms inference time
 
 Usage:
-    from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble6Way
+    from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble6Way
 
     # With default weights
     ensemble = EnhancedEnsemble6Way()
@@ -133,7 +133,7 @@ class EnhancedEnsemble6Way:
 
         # Load State-Space predictor
         try:
-            from py.models.state_space_predictor import StateSpacePredictor
+            from nfl_analytics.models.state_space_predictor import StateSpacePredictor
 
             self.state_space_predictor = StateSpacePredictor(
                 model_path=self.state_space_path,
@@ -146,7 +146,7 @@ class EnhancedEnsemble6Way:
 
         # Load BNN
         if self.bnn_path.exists():
-            from py.models.bayesian_neural_network import BayesianNeuralNetwork
+            from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
 
             self.bnn_model = BayesianNeuralNetwork.load(self.bnn_path)
             logger.info(f"✓ BNN loaded: {self.bnn_path}")
@@ -155,7 +155,7 @@ class EnhancedEnsemble6Way:
 
         # Load Hybrid XGBoost
         if self.hybrid_xgboost_path.exists():
-            from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
+            from nfl_analytics.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
 
             self.hybrid_xgboost = HybridStaticIncrementalXGBoost()
             self.hybrid_xgboost.load(str(self.hybrid_xgboost_path))

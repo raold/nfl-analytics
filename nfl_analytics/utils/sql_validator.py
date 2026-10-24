@@ -10,7 +10,7 @@ Purpose:
     - Incorrect join patterns
 
 Usage:
-    from py.utils.sql_validator import validate_query, SQLValidator
+    from nfl_analytics.utils.sql_validator import validate_query, SQLValidator
 
     # Quick validation
     errors = validate_query(

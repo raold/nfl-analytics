@@ -13,13 +13,13 @@ Expected ROI: +6-10% from weather inefficiencies
 
 Usage:
     # Train model
-    python py/models/weather_totals_model.py \
+    python nfl_analytics/models/weather_totals_model.py \
         --train-seasons 2010-2023 \
         --test-season 2024 \
         --output models/weather/totals_v1.json
 
     # Predict this week's games
-    python py/models/weather_totals_model.py \
+    python nfl_analytics/models/weather_totals_model.py \
         --model models/weather/totals_v1.json \
         --predict \
         --season 2024 \

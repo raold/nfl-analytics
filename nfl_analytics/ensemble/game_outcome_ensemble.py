@@ -10,11 +10,11 @@ Architecture:
 
 Usage:
   # Train ensemble on historical data
-  python py/ensemble/game_outcome_ensemble.py --seasons 2019,2020,2021,2022,2023 \\
+  python nfl_analytics/ensemble/game_outcome_ensemble.py --seasons 2019,2020,2021,2022,2023 \\
       --val-season 2024 --test-season 2025
 
   # Generate predictions for all games 2019-2025
-  python py/ensemble/game_outcome_ensemble.py --predict --output models/ensemble/game_predictions.csv
+  python nfl_analytics/ensemble/game_outcome_ensemble.py --predict --output models/ensemble/game_predictions.csv
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ from sklearn.preprocessing import StandardScaler
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from py.models.state_space import StateSpaceRatings, fetch_games, get_connection
+from nfl_analytics.models.state_space import StateSpaceRatings, fetch_games, get_connection
 
 # ============================================================================
 # Feature Engineering for Game Outcomes

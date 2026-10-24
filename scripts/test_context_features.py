@@ -20,7 +20,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.features.meta_learning_context import MetaLearningContextEngine
+from nfl_analytics.features.meta_learning_context import MetaLearningContextEngine
 
 
 def test_context_extraction():

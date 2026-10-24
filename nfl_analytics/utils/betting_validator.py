@@ -18,7 +18,7 @@ Target Metrics:
 - Max Drawdown: <8% (target: <-8%)
 
 Usage:
-    from py.utils.betting_validator import BettingValidator
+    from nfl_analytics.utils.betting_validator import BettingValidator
 
     validator = BettingValidator()
 

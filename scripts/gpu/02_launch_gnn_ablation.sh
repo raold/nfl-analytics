@@ -23,7 +23,7 @@ mkdir -p logs/training
 
 # Start ablation study
 echo "Starting ablation study..."
-python py/models/gnn_ablation_study.py \
+python nfl_analytics/models/gnn_ablation_study.py \
     --seasons 2016 2017 2018 2019 2020 2021 2022 2023 2024 2025 \
     --epochs 50 \
     --batch-size 256 \

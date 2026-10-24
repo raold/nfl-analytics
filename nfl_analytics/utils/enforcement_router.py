@@ -152,7 +152,7 @@ class EnforcementRouter:
             name="model_training",
             description="Validate data splits and convergence",
             triggers=[
-                r"py/models/train_.*\.py$",
+                r"nfl_analytics/models/train_.*\.py$",
                 r"R/train_.*\.R$",
                 r"scripts/train_.*\.py$",
             ],
@@ -178,7 +178,7 @@ class EnforcementRouter:
             name="ensemble_guard",
             description="Validate ensemble modifications",
             triggers=[
-                r"py/ensemble/enhanced_ensemble_.*\.py$",
+                r"nfl_analytics/ensemble/enhanced_ensemble_.*\.py$",
             ],
             validator=self._validate_ensemble_modification,
             level=EnforcementLevel.WARNING,
@@ -251,7 +251,7 @@ class EnforcementRouter:
             name="multi_season_validation",
             description="Enforce multi-season validation (minimum 3 seasons)",
             triggers=[
-                r"py/backtest/.*\.py$",
+                r"nfl_analytics/backtest/.*\.py$",
                 r"scripts/validate_.*\.py$",
             ],
             validator=self._validate_multi_season,
@@ -344,7 +344,7 @@ class EnforcementRouter:
             name="placeholder_detection",
             description="Prevent hardcoded placeholder predictions from reaching production",
             triggers=[
-                r"py/ensemble/.*\.py$",  # All ensemble files
+                r"nfl_analytics/ensemble/.*\.py$",  # All ensemble files
                 r"predict\(",  # Predict methods
                 r"return.*dict",  # Dict returns
             ],
@@ -565,7 +565,7 @@ class EnforcementRouter:
             if str(project_root) not in sys.path:
                 sys.path.insert(0, str(project_root))
 
-            from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
+            from nfl_analytics.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
             monitor = EnsembleHealthMonitor()
             report = monitor.check_ensemble_health()

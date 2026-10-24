@@ -36,12 +36,12 @@ The NFL Analytics odds fetching system provides real-time betting odds data from
 
 ### System Components
 
-1. **Odds Update Service** (`py/data/odds_update_service.py`)
+1. **Odds Update Service** (`nfl_analytics/data/odds_update_service.py`)
    - Continuous polling service with error handling
    - Line movement detection and alerting
    - Metrics tracking and logging
 
-2. **Prop Odds Fetcher** (`py/data/fetch_prop_odds.py`)
+2. **Prop Odds Fetcher** (`nfl_analytics/data/fetch_prop_odds.py`)
    - Player prop odds parsing and enrichment
    - Player ID matching and game mapping
    - Database insertion with deduplication
@@ -201,7 +201,7 @@ Test your API key works:
 
 ```bash
 # One-time test fetch
-python py/data/odds_update_service.py --once --dry-run
+python nfl_analytics/data/odds_update_service.py --once --dry-run
 ```
 
 Expected output:
@@ -261,7 +261,7 @@ Default bookmakers (can customize in `OddsServiceConfig`):
 - **Pinnacle** (`pinnacle`) - Sharp book
 - **BetOnline** (`betonlineag`)
 
-To add/remove bookmakers, edit `py/data/odds_update_service.py`:
+To add/remove bookmakers, edit `nfl_analytics/data/odds_update_service.py`:
 
 ```python
 class OddsServiceConfig:
@@ -283,7 +283,7 @@ Default prop markets:
 - `player_reception_yds` - Receiving yards
 - `player_receptions` - Receptions
 
-Available markets (see `py/data/fetch_prop_odds.py` for full list):
+Available markets (see `nfl_analytics/data/fetch_prop_odds.py` for full list):
 - `player_pass_completions`
 - `player_pass_interceptions`
 - `player_rush_attempts`
@@ -334,13 +334,13 @@ docker rm odds-fetcher
 pip install -r requirements.txt
 
 # Run continuously
-python py/data/odds_update_service.py
+python nfl_analytics/data/odds_update_service.py
 
 # Run once (testing)
-python py/data/odds_update_service.py --once
+python nfl_analytics/data/odds_update_service.py --once
 
 # Dry run (no database writes)
-python py/data/odds_update_service.py --dry-run
+python nfl_analytics/data/odds_update_service.py --dry-run
 ```
 
 ### Graceful Shutdown
@@ -913,7 +913,7 @@ docker compose logs odds-fetcher | tail -100
 # - Network timeout
 
 # Run in dry-run mode to test
-docker compose run --rm odds-fetcher python py/data/odds_update_service.py --once --dry-run
+docker compose run --rm odds-fetcher python nfl_analytics/data/odds_update_service.py --once --dry-run
 ```
 
 ### Debug Mode
@@ -1053,7 +1053,7 @@ psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \
 
 ```
 nfl-analytics/
-├── py/data/
+├── nfl_analytics/data/
 │   ├── odds_update_service.py      # Main service (765 lines)
 │   ├── fetch_prop_odds.py           # Prop fetcher (638 lines)
 │   └── ingest_odds_history.py       # Historical ingestion

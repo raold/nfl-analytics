@@ -480,7 +480,7 @@ INSERT INTO ml.models (
 ### Short-Term (Next 2 Weeks)
 
 1. **Ensemble Integration** ✅ Next Step
-   - Update `py/ensemble/enhanced_ensemble_v3.py` to include state-space v2
+   - Update `nfl_analytics/ensemble/enhanced_ensemble_v3.py` to include state-space v2
    - Optimize ensemble weights using 2025 hold-out
    - Validate 4-way ensemble on 2025 (expected: 45-46 yards MAE)
 

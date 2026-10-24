@@ -17,8 +17,8 @@ import numpy as np
 from api.models import ModelContribution, ModelInfo, PredictionRequest, PredictionResponse, StatType
 
 # Import production ensemble
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
-from py.config.settings import get_settings
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+from nfl_analytics.config.settings import get_settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -1,6 +1,6 @@
 # Ensemble Methods
 
-**Location:** `py/ensemble/`
+**Location:** `nfl_analytics/ensemble/`
 **Purpose:** Ensemble models combining multiple base learners for improved predictions
 **Total Modules:** 11 Python files
 
@@ -164,13 +164,13 @@ ensemble.update(selected_model, success=True)
 
 ```bash
 # Train all base models first
-uv run python py/models/train_bnn_passing.py
-uv run python py/models/train_xgboost_props.py
+uv run python nfl_analytics/models/train_bnn_passing.py
+uv run python nfl_analytics/models/train_xgboost_props.py
 Rscript R/advanced_priors_elicitation.R
 Rscript R/state_space_player_skills.R
 
 # Train ensemble
-uv run python py/ensemble/enhanced_ensemble_v3.py \
+uv run python nfl_analytics/ensemble/enhanced_ensemble_v3.py \
   --output predictions/ensemble_v3_week8.csv
 ```
 
@@ -464,7 +464,7 @@ high_disagreement = pred_std > threshold
 ## 🔗 Related Documentation
 
 - **[docs/ADVANCED_BAYESIAN_V3.md](../../docs/ADVANCED_BAYESIAN_V3.md)** - v3.0 ensemble architecture
-- **[py/models/README.md](../models/README.md)** - Base model training
+- **[nfl_analytics/models/README.md](../models/README.md)** - Base model training
 - **[PROJECT_STATUS.md](../../PROJECT_STATUS.md)** - Ensemble status
 - **[docs/models/MODEL_REGISTRY.md](../../docs/models/MODEL_REGISTRY.md)** - Model inventory
 
@@ -472,7 +472,7 @@ high_disagreement = pred_std > threshold
 
 ## 🧑‍💻 Adding a New Ensemble Method
 
-1. Create new file: `py/ensemble/my_ensemble.py`
+1. Create new file: `nfl_analytics/ensemble/my_ensemble.py`
 2. Implement interface:
 ```python
 class MyEnsemble:
@@ -488,7 +488,7 @@ class MyEnsemble:
         """Return current model weights."""
         pass
 ```
-3. Add tests: `py/tests/test_my_ensemble.py`
+3. Add tests: `nfl_analytics/tests/test_my_ensemble.py`
 4. Document in this README
 5. Benchmark vs existing methods
 

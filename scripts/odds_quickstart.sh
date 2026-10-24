@@ -230,7 +230,7 @@ fi
 print_header "STEP 6: Running Test (Dry Run)"
 
 echo "Testing odds service with --once --dry-run..."
-if python3 py/data/odds_update_service.py --once --dry-run > /tmp/odds_test.log 2>&1; then
+if python3 nfl_analytics/data/odds_update_service.py --once --dry-run > /tmp/odds_test.log 2>&1; then
     print_success "Test run successful"
 
     # Show test results
@@ -261,10 +261,10 @@ echo "  docker run -d --name odds-fetcher --env-file .env --network nfl-analytic
 echo "  docker logs -f odds-fetcher"
 echo ""
 echo "Option 3: Direct Python"
-echo "  python3 py/data/odds_update_service.py"
+echo "  python3 nfl_analytics/data/odds_update_service.py"
 echo ""
 echo "For testing (run once, no database writes):"
-echo "  python3 py/data/odds_update_service.py --once --dry-run"
+echo "  python3 nfl_analytics/data/odds_update_service.py --once --dry-run"
 echo ""
 
 read -p "Start service with Docker Compose now? (y/n) " -n 1 -r
@@ -324,7 +324,7 @@ echo "  🧪 pytest tests/integration/test_odds_service.py -v"
 echo ""
 echo "Troubleshooting:"
 echo "  • Check logs: docker compose logs odds-fetcher"
-echo "  • Run tests: python3 py/data/odds_update_service.py --once --dry-run"
+echo "  • Run tests: python3 nfl_analytics/data/odds_update_service.py --once --dry-run"
 echo "  • View API usage: SELECT * FROM api_usage_tracker;"
 echo "  • Check odds coverage: SELECT * FROM mart.odds_coverage;"
 echo ""

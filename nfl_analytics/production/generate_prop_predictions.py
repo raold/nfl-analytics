@@ -6,8 +6,8 @@ Uses existing trained prop models to generate predictions for upcoming games
 and stores them in predictions.prop_predictions table for dashboard display.
 
 Usage:
-    python py/production/generate_prop_predictions.py --week 6 --season 2025
-    python py/production/generate_prop_predictions.py --auto  # Auto-detect current week
+    python nfl_analytics/production/generate_prop_predictions.py --week 6 --season 2025
+    python nfl_analytics/production/generate_prop_predictions.py --auto  # Auto-detect current week
 """
 
 import argparse

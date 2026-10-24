@@ -11,7 +11,7 @@ This replaces the inheritance chain of:
   asof_features.py → asof_features_enhanced.py → asof_features_v2.py
 
 Example:
-    from py.features.asof_features_unified import AsofFeatureExtractor
+    from nfl_analytics.features.asof_features_unified import AsofFeatureExtractor
 
     # Use v2 features (most complete)
     extractor = AsofFeatureExtractor(feature_level='v2')
@@ -36,7 +36,7 @@ import numpy as np
 import pandas as pd
 import psycopg
 
-from py.utils.spread_convention import home_cover
+from nfl_analytics.utils.spread_convention import home_cover
 
 logger = logging.getLogger(__name__)
 

@@ -6,9 +6,9 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from py.markets.base import MarketData, OrderBook, Side
-from py.trading.base_strategy import StrategyConfig, TradingStrategy
-from py.trading.signal import Signal
+from nfl_analytics.markets.base import MarketData, OrderBook, Side
+from nfl_analytics.trading.base_strategy import StrategyConfig, TradingStrategy
+from nfl_analytics.trading.signal import Signal
 
 pytestmark = pytest.mark.anyio
 

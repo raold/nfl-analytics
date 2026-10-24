@@ -1,6 +1,6 @@
 # ML Models
 
-**Location:** `py/models/`
+**Location:** `nfl_analytics/models/`
 **Purpose:** Machine learning model training and inference for NFL analytics
 **Total Modules:** 52 Python files (13 training scripts)
 
@@ -59,10 +59,10 @@ lower, upper = bnn.predict_interval(X_test, alpha=0.10)  # 90% PI
 **Training:**
 ```bash
 # Train passing yards BNN
-uv run python py/models/train_bnn_passing.py
+uv run python nfl_analytics/models/train_bnn_passing.py
 
 # Train with custom hyperparameters
-uv run python py/models/train_bnn_passing.py \
+uv run python nfl_analytics/models/train_bnn_passing.py \
   --hidden-dims 128 64 32 \
   --epochs 5000 \
   --learning-rate 0.001
@@ -216,13 +216,13 @@ predictions = ensemble.predict(X_test)
 
 ```bash
 # Train Bayesian Neural Network for passing yards
-uv run python py/models/train_bnn_passing.py
+uv run python nfl_analytics/models/train_bnn_passing.py
 
 # Train XGBoost for props
-uv run python py/models/train_xgboost_props.py --prop-type passing_yards
+uv run python nfl_analytics/models/train_xgboost_props.py --prop-type passing_yards
 
 # Train ensemble
-uv run python py/models/train_ensemble_v3.py
+uv run python nfl_analytics/models/train_ensemble_v3.py
 ```
 
 ### Load and Predict
@@ -294,10 +294,10 @@ tester.plot_calibration_curve()
 
 ```bash
 # 5-fold cross-validation
-uv run python py/models/train_bnn_passing.py --cv 5
+uv run python nfl_analytics/models/train_bnn_passing.py --cv 5
 
 # Time-series split (recommended for sports data)
-uv run python py/models/train_bnn_passing.py --cv-type timeseries --n-splits 5
+uv run python nfl_analytics/models/train_bnn_passing.py --cv-type timeseries --n-splits 5
 ```
 
 ---
@@ -392,7 +392,7 @@ cat RETRAINING_STATUS.md
 
 ```bash
 # Retrain BNN with latest data
-uv run python py/models/train_bnn_passing.py \
+uv run python nfl_analytics/models/train_bnn_passing.py \
   --data-end-date $(date +%Y-%m-%d) \
   --save-path models/bayesian/bnn_passing_v2.pkl
 ```
@@ -461,7 +461,7 @@ plt.show()
 - **[docs/ADVANCED_BAYESIAN_V3.md](../../docs/ADVANCED_BAYESIAN_V3.md)** - Advanced Bayesian methodology
 - **[docs/models/MODEL_REGISTRY.md](../../docs/models/MODEL_REGISTRY.md)** - Model inventory
 - **[PROJECT_STATUS.md](../../PROJECT_STATUS.md)** - Current model status
-- **[py/features/README.md](../features/README.md)** - Feature engineering
+- **[nfl_analytics/features/README.md](../features/README.md)** - Feature engineering
 
 ---
 
@@ -469,9 +469,9 @@ plt.show()
 
 ### Adding a New Model
 
-1. Create training script: `py/models/train_new_model.py`
+1. Create training script: `nfl_analytics/models/train_new_model.py`
 2. Implement model class in separate file
-3. Add tests: `py/tests/test_new_model.py`
+3. Add tests: `nfl_analytics/tests/test_new_model.py`
 4. Document in this README
 5. Add to ensemble if appropriate
 

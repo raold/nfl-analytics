@@ -11,10 +11,10 @@ Core Components:
 - ResearchDrivenEngine: nfelo EPA weighting, coaching rationality, injury curves
 
 Usage:
-    from py.features import GameFeatureExtractor
-    from py.features.synthetic_interaction_features import SyntheticInteractionEngine
-    from py.features.synthetic_momentum_features import SyntheticMomentumEngine
-    from py.features.research_driven_features import ResearchDrivenEngine
+    from nfl_analytics.features import GameFeatureExtractor
+    from nfl_analytics.features.synthetic_interaction_features import SyntheticInteractionEngine
+    from nfl_analytics.features.synthetic_momentum_features import SyntheticMomentumEngine
+    from nfl_analytics.features.research_driven_features import ResearchDrivenEngine
 
 Feature Count:
 - Base features: 305 (via GameFeatureExtractor)
@@ -25,18 +25,18 @@ Feature Count:
 """
 
 # Core extractors
-from py.features.game_feature_extractor import GameFeatureExtractor
+from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
 # Synthetic feature engines
-from py.features.synthetic_interaction_features import (
+from nfl_analytics.features.synthetic_interaction_features import (
     SyntheticInteractionEngine,
     InteractionFeatures,
 )
-from py.features.synthetic_momentum_features import (
+from nfl_analytics.features.synthetic_momentum_features import (
     SyntheticMomentumEngine,
     MomentumFeatures,
 )
-from py.features.research_driven_features import (
+from nfl_analytics.features.research_driven_features import (
     ResearchDrivenEngine,
     ResearchFeatures,
 )

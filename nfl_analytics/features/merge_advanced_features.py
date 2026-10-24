@@ -11,7 +11,7 @@ This creates the v2 feature set by joining:
 Output: asof_team_features_v2.csv (170+ features)
 
 Usage:
-    python py/features/merge_advanced_features.py \\
+    python nfl_analytics/features/merge_advanced_features.py \\
         --base data/processed/features/asof_team_features_enhanced.csv \\
         --output data/processed/features/asof_team_features_v2.csv \\
         [--include-playoff]

@@ -457,10 +457,10 @@ Add to `analysis/dissertation/references.bib`:
 - `analysis/dissertation/references.bib`
 
 **Implementation Code (to create):**
-- `py/conformal/` (new module)
-- `py/conformal/split_conformal.py`
-- `py/conformal/cqr.py`
-- `py/conformal/weighted_conformal.py`
+- `nfl_analytics/conformal/` (new module)
+- `nfl_analytics/conformal/split_conformal.py`
+- `nfl_analytics/conformal/cqr.py`
+- `nfl_analytics/conformal/weighted_conformal.py`
 
 **Experiments:**
 - `experiments/conformal_calibration_study.py`

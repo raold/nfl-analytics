@@ -55,7 +55,7 @@ done
 case $ACTION in
     check-config)
         python3 -c "
-from py.agents.dev_workflow_optimizer import DevWorkflowOptimizer
+from nfl_analytics.agents.dev_workflow_optimizer import DevWorkflowOptimizer
 
 optimizer = DevWorkflowOptimizer()
 config = optimizer.check_docker_dev_config()
@@ -79,7 +79,7 @@ if config['recommendations']:
 
     analyze-cycles)
         python3 -c "
-from py.agents.dev_workflow_optimizer import DevWorkflowOptimizer
+from nfl_analytics.agents.dev_workflow_optimizer import DevWorkflowOptimizer
 
 optimizer = DevWorkflowOptimizer()
 report = optimizer.analyze_cycle_times()
@@ -105,7 +105,7 @@ if report.rebuilds_by_type:
 
     suggest)
         python3 -c "
-from py.agents.dev_workflow_optimizer import DevWorkflowOptimizer
+from nfl_analytics.agents.dev_workflow_optimizer import DevWorkflowOptimizer
 
 optimizer = DevWorkflowOptimizer()
 suggestions = optimizer.suggest_optimizations()
@@ -133,7 +133,7 @@ for i, sug in enumerate(suggestions, 1):
         fi
 
         python3 -c "
-from py.agents.dev_workflow_optimizer import DevWorkflowOptimizer, ChangeType
+from nfl_analytics.agents.dev_workflow_optimizer import DevWorkflowOptimizer, ChangeType
 
 optimizer = DevWorkflowOptimizer()
 session = optimizer.start_monitoring_session()

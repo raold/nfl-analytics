@@ -101,7 +101,7 @@ correlate with game outcomes and betting value.
 **Usage Example:**
 ```python
 import psycopg2
-from py.features.playcalling_features import get_team_playcalling_features
+from nfl_analytics.features.playcalling_features import get_team_playcalling_features
 
 conn = psycopg2.connect(
     host="localhost",

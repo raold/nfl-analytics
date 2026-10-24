@@ -24,7 +24,7 @@ from sklearn.datasets import make_regression
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
-from py.models.evidential_regression import (
+from nfl_analytics.models.evidential_regression import (
     EvidentialLoss,
     EvidentialNeuralNetwork,
     EvidentialRegressor,

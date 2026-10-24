@@ -20,7 +20,7 @@ Date: November 22, 2025
 import tempfile
 from pathlib import Path
 
-from py.utils.database_migration_agent import DatabaseMigrationAgent
+from nfl_analytics.utils.database_migration_agent import DatabaseMigrationAgent
 
 
 def demo_migration_generation():
@@ -194,7 +194,7 @@ def demo_data_structures():
     print("DEMO 5: DATA STRUCTURES")
     print("=" * 70)
 
-    from py.utils.database_migration_agent import (
+    from nfl_analytics.utils.database_migration_agent import (
         DriftReport,
         MigrationResult,
         ValidationError,

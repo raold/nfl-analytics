@@ -10,7 +10,7 @@ Architecture:
 - Individual wrappers: Adapt existing extractors to the strategy pattern
 
 Usage:
-    from py.features.extractors import (
+    from nfl_analytics.features.extractors import (
         FeatureRegistry,
         OffensiveFeatureExtractor,
         DefensiveFeatureExtractor,
@@ -29,7 +29,7 @@ Created: December 13, 2025
 Phase 2 of code quality remediation plan.
 """
 
-from py.features.extractors.base import (
+from nfl_analytics.features.extractors.base import (
     ExtractionLevel,
     FeatureExtractionError,
     FeatureExtractionResult,
@@ -37,18 +37,18 @@ from py.features.extractors.base import (
     FeaturePriority,
     GameLevelExtractorStrategy,
 )
-from py.features.extractors.registry import (
+from nfl_analytics.features.extractors.registry import (
     ExtractionSummary,
     FeatureRegistry,
     create_default_registry,
 )
 
 # Strategy pattern wrappers for existing extractors
-from py.features.extractors.offensive import OffensiveFeatureExtractor
-from py.features.extractors.defensive import DefensiveFeatureExtractor
-from py.features.extractors.nextgen import NextGenFeatureExtractor
-from py.features.extractors.qbr import QBRFeatureExtractor
-from py.features.extractors.opponent_adjusted import OpponentAdjustedFeatureExtractor
+from nfl_analytics.features.extractors.offensive import OffensiveFeatureExtractor
+from nfl_analytics.features.extractors.defensive import DefensiveFeatureExtractor
+from nfl_analytics.features.extractors.nextgen import NextGenFeatureExtractor
+from nfl_analytics.features.extractors.qbr import QBRFeatureExtractor
+from nfl_analytics.features.extractors.opponent_adjusted import OpponentAdjustedFeatureExtractor
 
 __all__ = [
     # Base classes

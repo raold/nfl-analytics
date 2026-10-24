@@ -32,7 +32,7 @@ Target Performance vs v6.0:
 - ROI: +7-9% (vs +6-8% in v6.0)
 
 Usage:
-    from py.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way
+    from nfl_analytics.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way
 
     ensemble = EnhancedEnsemble5Way()
     result = ensemble.predict(
@@ -69,13 +69,13 @@ import psycopg2
 import xgboost as xgb
 from dotenv import load_dotenv
 
-from py.ensemble.r_model_interface import RModelInterface
+from nfl_analytics.ensemble.r_model_interface import RModelInterface
 
 # NEW: Import causal features module
-from py.features.causal_features_v1 import CausalFeaturesV1
+from nfl_analytics.features.causal_features_v1 import CausalFeaturesV1
 
 # Import hybrid model
-from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
+from nfl_analytics.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
 
 # Load environment variables
 load_dotenv()

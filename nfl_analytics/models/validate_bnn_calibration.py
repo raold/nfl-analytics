@@ -115,7 +115,7 @@ def validate_bnn_calibration():
         logger.info("FALLBACK RECOMMENDATION")
         logger.info("=" * 70)
         logger.info("Since no trained BNN model is available, use Conformal Prediction:")
-        logger.info("  File: py/models/conformal_prediction_baseline.py")
+        logger.info("  File: nfl_analytics/models/conformal_prediction_baseline.py")
         logger.info("  Benefit: Guarantees exact 90% coverage (model-agnostic)")
         logger.info("  Drawback: Slightly wider intervals than well-calibrated BNN")
         return None

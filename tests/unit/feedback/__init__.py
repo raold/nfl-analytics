@@ -1,1 +1,1 @@
-# Unit tests for py/feedback/ modules (feedback loop system).
+# Unit tests for nfl_analytics/feedback/ modules (feedback loop system).

@@ -24,7 +24,7 @@ project_root = Path(__file__).parent.parent.parent
 if str(project_root) not in sys.path:
     sys.path.insert(0, str(project_root))
 
-from py.feedback.feature_memory import FeaturePerformanceMemory
+from nfl_analytics.feedback.feature_memory import FeaturePerformanceMemory
 
 logger = logging.getLogger(__name__)
 

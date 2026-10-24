@@ -11,7 +11,7 @@ Outputs JSON with per-(book,market,tau_bucket) parameters for:
   latency: mu_log, sigma_log
 
 Usage:
-  python py/execution/fit_execution_priors.py --logs data/orders.csv \
+  python nfl_analytics/execution/fit_execution_priors.py --logs data/orders.csv \
       --out analysis/dissertation/results/execution_priors.json
 """
 

@@ -625,7 +625,7 @@ TO INTEGRATE INTO dashboard/app.py:
 4. Test the integration:
    ```bash
    # Start FastAPI (if not already running)
-   uvicorn py.api.main:app --host 0.0.0.0 --port 8000 --reload
+   uvicorn nfl_analytics.api.main:app --host 0.0.0.0 --port 8000 --reload
 
    # Start dashboard
    streamlit run dashboard/app.py

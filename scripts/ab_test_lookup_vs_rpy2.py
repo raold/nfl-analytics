@@ -33,11 +33,11 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 # Import lookup client
-from py.ensemble.r_prediction_lookup import RModelPredictionLookup
+from nfl_analytics.ensemble.r_prediction_lookup import RModelPredictionLookup
 
 # Import rpy2 interface (for comparison)
 try:
-    from py.ensemble.r_model_interface import RModelInterface
+    from nfl_analytics.ensemble.r_model_interface import RModelInterface
 
     RPY2_AVAILABLE = True
 except ImportError:

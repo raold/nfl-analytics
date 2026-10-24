@@ -26,7 +26,7 @@ project_root = str(Path(__file__).parent.parent.parent.parent)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from py.ensemble.game_outcome_predictor import GameOutcomePredictor
+from nfl_analytics.ensemble.game_outcome_predictor import GameOutcomePredictor
 
 
 class TestGameOutcomePredictor:
@@ -35,7 +35,7 @@ class TestGameOutcomePredictor:
     @pytest.fixture
     def predictor(self):
         """Create predictor instance with mocked ensemble."""
-        with patch("py.ensemble.game_outcome_predictor.EnhancedEnsemble5Way") as mock_ensemble:
+        with patch("nfl_analytics.ensemble.game_outcome_predictor.EnhancedEnsemble5Way") as mock_ensemble:
             # Mock ensemble predict method
             mock_instance = Mock()
             mock_instance.predict.return_value = {"ensemble_mean": 250.0, "ensemble_std": 40.0}
@@ -82,7 +82,7 @@ class TestGameOutcomePredictor:
         # Expected: just defensive uncertainty = 3.5
         assert score_std == pytest.approx(3.5, rel=0.01)
 
-    @patch("py.ensemble.game_outcome_predictor.psycopg2.connect")
+    @patch("nfl_analytics.ensemble.game_outcome_predictor.psycopg2.connect")
     def test_predict_game_known_teams(self, mock_connect, predictor):
         """Test full game prediction with known teams."""
         # Mock database connection
@@ -136,7 +136,7 @@ class TestGameOutcomePredictor:
         assert result["away_qb_id"] == "00-0036442"
         assert result["away_qb_name"] == "Josh Allen"
 
-    @patch("py.ensemble.game_outcome_predictor.psycopg2.connect")
+    @patch("nfl_analytics.ensemble.game_outcome_predictor.psycopg2.connect")
     def test_predict_game_missing_qb(self, mock_connect, predictor):
         """Test game prediction with missing QB (fallback to default)."""
         # Mock database connection
@@ -198,7 +198,7 @@ class TestGameOutcomePredictor:
 
     def test_prediction_schema(self, predictor):
         """Test that prediction returns all required fields."""
-        with patch("py.ensemble.game_outcome_predictor.psycopg2.connect"):
+        with patch("nfl_analytics.ensemble.game_outcome_predictor.psycopg2.connect"):
             # Mock minimal DB response
             mock_conn = Mock()
             mock_cursor = Mock()
@@ -211,7 +211,7 @@ class TestGameOutcomePredictor:
             mock_conn.cursor.return_value = mock_cursor
 
             with patch(
-                "py.ensemble.game_outcome_predictor.psycopg2.connect", return_value=mock_conn
+                "nfl_analytics.ensemble.game_outcome_predictor.psycopg2.connect", return_value=mock_conn
             ):
                 result = predictor.predict_game("KC", "BUF", 2025, 12)
 

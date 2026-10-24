@@ -23,7 +23,7 @@ from fastapi import BackgroundTasks, FastAPI, HTTPException
 from psycopg2.pool import SimpleConnectionPool
 from pydantic import BaseModel, Field
 
-from py.production.ab_test_router import ABTestRouter
+from nfl_analytics.production.ab_test_router import ABTestRouter
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

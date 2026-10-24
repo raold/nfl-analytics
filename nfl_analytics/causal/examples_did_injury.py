@@ -11,8 +11,8 @@ Examples:
 5. Custom analysis with control variables
 
 Run examples:
-    python py/causal/examples_did_injury.py --example 1
-    python py/causal/examples_did_injury.py --example all
+    python nfl_analytics/causal/examples_did_injury.py --example 1
+    python nfl_analytics/causal/examples_did_injury.py --example all
 """
 
 import argparse

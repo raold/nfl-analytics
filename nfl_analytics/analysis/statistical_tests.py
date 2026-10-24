@@ -18,7 +18,7 @@ References:
     Journal of Business & Economic Statistics, 13(3), 253-263.
 
 Usage:
-    python py/analysis/statistical_tests.py \
+    python nfl_analytics/analysis/statistical_tests.py \
         --predictions analysis/results/ensemble_predictions_2025_holdout.csv \
         --output analysis/results/statistical_tests_results.csv
 

@@ -23,7 +23,7 @@ import pytest
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way
+from nfl_analytics.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way
 
 # ============================================================================
 # FIXTURES
@@ -75,9 +75,9 @@ def mock_ensemble_with_all_components(mock_db_config):
     - Hybrid Static-Incremental: 10%
     """
     with (
-        patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1"),
-        patch("py.ensemble.enhanced_ensemble_v7.RModelInterface"),
-        patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v7.CausalFeaturesV1"),
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v7.RModelInterface"),
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
     ):
 
         ensemble = EnhancedEnsemble5Way(
@@ -111,9 +111,9 @@ def mock_ensemble_with_partial_components(mock_db_config):
     Scenario: Hierarchical and Informative Priors fail.
     """
     with (
-        patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1"),
-        patch("py.ensemble.enhanced_ensemble_v7.RModelInterface"),
-        patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v7.CausalFeaturesV1"),
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v7.RModelInterface"),
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
     ):
 
         ensemble = EnhancedEnsemble5Way(

@@ -156,10 +156,10 @@ final_bet_size = kelly_result["bet_amount"] * kelly_multiplier
 
 ```bash
 # Basic training (2020-2024, spread bets, walk-forward validation)
-python py/training/train_meta_classifier.py
+python nfl_analytics/training/train_meta_classifier.py
 
 # Custom parameters
-python py/training/train_meta_classifier.py \
+python nfl_analytics/training/train_meta_classifier.py \
     --start-season 2020 \
     --end-season 2024 \
     --bet-type spread \
@@ -198,7 +198,7 @@ models/
 ### 1. Basic Usage
 
 ```python
-from py.production.meta_labeling_v2 import MetaFeatureExtractor, MetaLabelingClassifier
+from nfl_analytics.production.meta_labeling_v2 import MetaFeatureExtractor, MetaLabelingClassifier
 
 # Initialize
 extractor = MetaFeatureExtractor()
@@ -251,7 +251,7 @@ top_bets = [r for r in recommendations if r["should_bet"]][:5]
 ### 3. Integration with CQL Bet Sizer
 
 ```python
-from py.production.cql_bet_sizer import CQLBetSizer
+from nfl_analytics.production.cql_bet_sizer import CQLBetSizer
 
 # Initialize both systems
 meta_clf = MetaLabelingClassifier(model_path="models/meta_labeling_v2.joblib")
@@ -447,9 +447,9 @@ print(meta_probs.describe())
 
 | File | Purpose |
 |------|---------|
-| `py/production/meta_labeling_v2.py` | Main implementation (extractor + classifier) |
-| `py/training/train_meta_classifier.py` | Training script |
-| `py/production/examples/meta_kelly_integration_example.py` | Integration example |
+| `nfl_analytics/production/meta_labeling_v2.py` | Main implementation (extractor + classifier) |
+| `nfl_analytics/training/train_meta_classifier.py` | Training script |
+| `nfl_analytics/production/examples/meta_kelly_integration_example.py` | Integration example |
 | `sql/migrations/create_meta_predictions_table.sql` | Database schema |
 | `models/meta_labeling_v2.joblib` | Trained model (created after training) |
 

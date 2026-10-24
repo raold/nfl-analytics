@@ -11,13 +11,13 @@ Runs bootstrap simulations on live production bets to verify model performance:
 
 Usage:
     # Run weekly stress test
-    python py/production/stress_test_monitor.py run --weeks 4
+    python nfl_analytics/production/stress_test_monitor.py run --weeks 4
 
     # Generate stress test report
-    python py/production/stress_test_monitor.py report
+    python nfl_analytics/production/stress_test_monitor.py report
 
     # Check if model failing stress tests
-    python py/production/stress_test_monitor.py check
+    python nfl_analytics/production/stress_test_monitor.py check
 """
 
 import argparse

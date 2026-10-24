@@ -45,7 +45,7 @@ import numpy as np
 import pandas as pd
 import psycopg2
 
-from py.online.online_learning_adapter import (
+from nfl_analytics.online.online_learning_adapter import (
     OnlinePredictionPipeline,
 )
 
@@ -293,7 +293,7 @@ def approach_2_multi_ensemble(df: pd.DataFrame, db_params: dict) -> dict[str, An
     logger.info("APPROACH 2: MULTI-MODEL ENSEMBLE")
     logger.info("=" * 60)
 
-    from py.online.multi_ensemble import MultiOnlineEnsemble
+    from nfl_analytics.online.multi_ensemble import MultiOnlineEnsemble
 
     # Initialize multi-ensemble
     ensemble = MultiOnlineEnsemble()
@@ -516,7 +516,7 @@ def approach_6_incremental_xgboost(df: pd.DataFrame, db_params: dict) -> dict[st
     logger.info("APPROACH 6: INCREMENTAL XGBOOST")
     logger.info("=" * 60)
 
-    from py.online.incremental_xgboost import IncrementalXGBoost
+    from nfl_analytics.online.incremental_xgboost import IncrementalXGBoost
 
     # Initialize incremental XGBoost
     model = IncrementalXGBoost(

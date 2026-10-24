@@ -22,18 +22,18 @@ Algorithm:
 
 Usage:
     # Initialize Thompson sampler
-    python py/production/thompson_switch_logic.py init
+    python nfl_analytics/production/thompson_switch_logic.py init
 
     # Select model for next bet
-    python py/production/thompson_switch_logic.py select
+    python nfl_analytics/production/thompson_switch_logic.py select
 
     # Update after bet result
-    python py/production/thompson_switch_logic.py update \
+    python nfl_analytics/production/thompson_switch_logic.py update \
         --model xgboost \
         --result win
 
     # Get current status
-    python py/production/thompson_switch_logic.py status
+    python nfl_analytics/production/thompson_switch_logic.py status
 """
 
 import argparse

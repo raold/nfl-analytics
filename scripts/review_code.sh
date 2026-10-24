@@ -11,7 +11,7 @@
 #
 # Usage:
 #   ./scripts/review_code.sh                     # Review all git changes
-#   ./scripts/review_code.sh py/models/train.py   # Review specific file
+#   ./scripts/review_code.sh nfl_analytics/models/train.py   # Review specific file
 #   ./scripts/review_code.sh --check-sql         # Check SQL files only
 #   ./scripts/review_code.sh --full              # Review entire codebase
 
@@ -39,7 +39,7 @@ import sys
 import glob
 sys.path.insert(0, '.')
 
-from py.utils.code_reviewer import CodeReviewer
+from nfl_analytics.utils.code_reviewer import CodeReviewer
 
 reviewer = CodeReviewer()
 

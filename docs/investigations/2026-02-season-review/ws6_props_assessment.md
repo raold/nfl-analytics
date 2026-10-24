@@ -123,21 +123,21 @@ This is sufficient to train props models, but the data needs to be joined with g
 
 | File | Purpose | Status |
 |------|---------|--------|
-| `py/models/props_predictor.py` | XGBoost props training/prediction | Complete code, but model files missing |
-| `py/models/player_props_ensemble.py` | 4-6 way ensemble | Well-architected but all models broken |
-| `py/models/train_xgboost_player_props.py` | Training script for XGBoost | Functional (produces `player_props_v1.json`) |
-| `py/ensemble/props_stability_weights.py` | Feature stability weighting | Complete, research-backed (SumerSports) |
-| `py/data/fetch_prop_odds.py` | Odds API integration | Complete code, needs API key + DB tables |
-| `py/features/player_feature_extractor.py` | Player feature extraction | Exists but untested at scale |
-| `py/features/player_features.py` | Player feature engineering | Exists |
-| `py/production/props_production_pipeline.py` | 8-step daily pipeline | Complete but all dependencies broken |
-| `py/production/generate_prop_predictions.py` | Dashboard prediction generator | v1, needs missing DB tables |
-| `py/production/generate_prop_predictions_v2.py` | v2 with Repository pattern | Improved architecture |
-| `py/production/props_ev_selector.py` | EV-based bet selection | Complete |
-| `py/production/ab_test_dirichlet_props.py` | A/B test Dirichlet weights | Complete |
-| `py/backtests/bayesian_props_backtest_2024.py` | 2024 backtest | Complete but depends on missing data |
-| `py/backtests/bayesian_props_multiyear_backtest.py` | Multi-year backtest | Complete |
-| `py/api/routes/props_predictions.py` | FastAPI endpoints | Production-ready, v2.0 |
+| `nfl_analytics/models/props_predictor.py` | XGBoost props training/prediction | Complete code, but model files missing |
+| `nfl_analytics/models/player_props_ensemble.py` | 4-6 way ensemble | Well-architected but all models broken |
+| `nfl_analytics/models/train_xgboost_player_props.py` | Training script for XGBoost | Functional (produces `player_props_v1.json`) |
+| `nfl_analytics/ensemble/props_stability_weights.py` | Feature stability weighting | Complete, research-backed (SumerSports) |
+| `nfl_analytics/data/fetch_prop_odds.py` | Odds API integration | Complete code, needs API key + DB tables |
+| `nfl_analytics/features/player_feature_extractor.py` | Player feature extraction | Exists but untested at scale |
+| `nfl_analytics/features/player_features.py` | Player feature engineering | Exists |
+| `nfl_analytics/production/props_production_pipeline.py` | 8-step daily pipeline | Complete but all dependencies broken |
+| `nfl_analytics/production/generate_prop_predictions.py` | Dashboard prediction generator | v1, needs missing DB tables |
+| `nfl_analytics/production/generate_prop_predictions_v2.py` | v2 with Repository pattern | Improved architecture |
+| `nfl_analytics/production/props_ev_selector.py` | EV-based bet selection | Complete |
+| `nfl_analytics/production/ab_test_dirichlet_props.py` | A/B test Dirichlet weights | Complete |
+| `nfl_analytics/backtests/bayesian_props_backtest_2024.py` | 2024 backtest | Complete but depends on missing data |
+| `nfl_analytics/backtests/bayesian_props_multiyear_backtest.py` | Multi-year backtest | Complete |
+| `nfl_analytics/api/routes/props_predictions.py` | FastAPI endpoints | Production-ready, v2.0 |
 
 ### 3.2 Feature Compatibility Issues
 
@@ -173,12 +173,12 @@ The architecture is sound; the problem is that 0/6 models can produce valid pred
 ### Tier 1: Minimum Viable Props Pipeline (Estimated: 2-3 days)
 
 1. **Retrain XGBoost prop models with `.ubj` output** (2-4 hours)
-   - Run `py/models/props_predictor.py --features <csv> --prop-type passing_yards --output models/props/passing_yards_v1.json`
+   - Run `nfl_analytics/models/props_predictor.py --features <csv> --prop-type passing_yards --output models/props/passing_yards_v1.json`
    - Repeat for rushing_yards, receiving_yards
    - This requires generating the player features CSV first
 
 2. **Generate player features CSV** (2-4 hours)
-   - Either run `py/features/player_features.py` to create `data/processed/features/player_features_*.csv`
+   - Either run `nfl_analytics/features/player_features.py` to create `data/processed/features/player_features_*.csv`
    - Or build a SQL pipeline that extracts rolling features from `mart.player_game_stats`
 
 3. **Create missing database tables** (1-2 hours)
@@ -200,9 +200,9 @@ The architecture is sound; the problem is that 0/6 models can produce valid pred
 7. **Set up prop odds fetching** (The Odds API)
    - Create `prop_lines_history` table
    - Create `latest_prop_lines` and `best_prop_lines` views
-   - Configure cron job for `py/data/fetch_prop_odds.py`
+   - Configure cron job for `nfl_analytics/data/fetch_prop_odds.py`
 
-8. **Integrate stability weights** from `py/ensemble/props_stability_weights.py` into the ensemble
+8. **Integrate stability weights** from `nfl_analytics/ensemble/props_stability_weights.py` into the ensemble
 
 ### Tier 3: Production-Ready Pipeline (Estimated: 2-4 weeks)
 
@@ -264,17 +264,17 @@ All paths are absolute from the project root `/home/dro/rice/nfl-analytics/`:
 - `/home/dro/rice/nfl-analytics/models/bayesian/qb_wr_chemistry_effects_v1.csv` -- chemistry effects
 
 ### Python Source
-- `/home/dro/rice/nfl-analytics/py/models/player_props_ensemble.py` -- 4-6 way ensemble
-- `/home/dro/rice/nfl-analytics/py/models/props_predictor.py` -- XGBoost training/prediction
-- `/home/dro/rice/nfl-analytics/py/models/train_xgboost_player_props.py` -- training script
-- `/home/dro/rice/nfl-analytics/py/ensemble/props_stability_weights.py` -- stability weights
-- `/home/dro/rice/nfl-analytics/py/data/fetch_prop_odds.py` -- odds API
-- `/home/dro/rice/nfl-analytics/py/production/props_production_pipeline.py` -- 8-step pipeline
-- `/home/dro/rice/nfl-analytics/py/production/generate_prop_predictions.py` -- v1 generator
-- `/home/dro/rice/nfl-analytics/py/production/generate_prop_predictions_v2.py` -- v2 repository pattern
-- `/home/dro/rice/nfl-analytics/py/production/props_ev_selector.py` -- EV bet selection
-- `/home/dro/rice/nfl-analytics/py/production/ab_test_dirichlet_props.py` -- A/B test router
-- `/home/dro/rice/nfl-analytics/py/api/routes/props_predictions.py` -- FastAPI endpoints
+- `/home/dro/rice/nfl-analytics/nfl_analytics/models/player_props_ensemble.py` -- 4-6 way ensemble
+- `/home/dro/rice/nfl-analytics/nfl_analytics/models/props_predictor.py` -- XGBoost training/prediction
+- `/home/dro/rice/nfl-analytics/nfl_analytics/models/train_xgboost_player_props.py` -- training script
+- `/home/dro/rice/nfl-analytics/nfl_analytics/ensemble/props_stability_weights.py` -- stability weights
+- `/home/dro/rice/nfl-analytics/nfl_analytics/data/fetch_prop_odds.py` -- odds API
+- `/home/dro/rice/nfl-analytics/nfl_analytics/production/props_production_pipeline.py` -- 8-step pipeline
+- `/home/dro/rice/nfl-analytics/nfl_analytics/production/generate_prop_predictions.py` -- v1 generator
+- `/home/dro/rice/nfl-analytics/nfl_analytics/production/generate_prop_predictions_v2.py` -- v2 repository pattern
+- `/home/dro/rice/nfl-analytics/nfl_analytics/production/props_ev_selector.py` -- EV bet selection
+- `/home/dro/rice/nfl-analytics/nfl_analytics/production/ab_test_dirichlet_props.py` -- A/B test router
+- `/home/dro/rice/nfl-analytics/nfl_analytics/api/routes/props_predictions.py` -- FastAPI endpoints
 
 ### Registry
 - `/home/dro/rice/nfl-analytics/models/MODEL_REGISTRY.yaml` -- production model tracking

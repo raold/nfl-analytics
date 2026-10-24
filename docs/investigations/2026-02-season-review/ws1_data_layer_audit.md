@@ -140,7 +140,7 @@ Note: No `.ubj` binary format files — using JSON serialization only.
 
 | model_name | version | status | path |
 |-----------|---------|--------|------|
-| game_outcome_predictor_v2 | v2.0.0 | staging | py/ensemble/... |
+| game_outcome_predictor_v2 | v2.0.0 | staging | nfl_analytics/ensemble/... |
 | hierarchical_gnn_v2 | v2.0.0 | production | models/gnn/... |
 | bayesian_state_space_v2 | v2.0.0 | production | models/bayesian/simplified_random_walk_v2.rds |
 | bayesian_hierarchical_v2 | v2.0.0 | production | models/bayesian/passing_yards_hierarchical_v2.rds |

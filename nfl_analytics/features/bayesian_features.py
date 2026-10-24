@@ -5,7 +5,7 @@ This module fetches Bayesian hierarchical team ratings from mart.bayesian_team_r
 and joins them to the game-level feature dataset for ensemble modeling.
 
 Usage:
-    python py/features/bayesian_features.py --input data/processed/features/asof_team_features_v3.csv \
+    python nfl_analytics/features/bayesian_features.py --input data/processed/features/asof_team_features_v3.csv \
                                              --output data/processed/features/asof_team_features_v3_bayesian.csv
 """
 

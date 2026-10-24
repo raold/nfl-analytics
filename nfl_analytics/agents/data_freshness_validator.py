@@ -13,7 +13,7 @@ Purpose:
 - Prevent serving predictions from incomplete ensemble
 
 Usage:
-    from py.agents.data_freshness_validator import DataFreshnessValidator
+    from nfl_analytics.agents.data_freshness_validator import DataFreshnessValidator
 
     validator = DataFreshnessValidator()
 

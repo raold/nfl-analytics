@@ -50,7 +50,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Python script path
-MIGRATION_AGENT="$PROJECT_ROOT/py/utils/database_migration_agent.py"
+MIGRATION_AGENT="$PROJECT_ROOT/nfl_analytics/utils/database_migration_agent.py"
 
 # Check if migration agent exists
 if [ ! -f "$MIGRATION_AGENT" ]; then

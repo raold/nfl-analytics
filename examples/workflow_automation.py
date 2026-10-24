@@ -14,7 +14,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.utils.agent_coordinator import AgentCoordinator
+from nfl_analytics.utils.agent_coordinator import AgentCoordinator
 
 try:
     from rich.console import Console
@@ -154,7 +154,7 @@ def example_6_integration_in_training():
 
     code = """
 # At top of your training script
-from py.utils.agent_coordinator import AgentCoordinator
+from nfl_analytics.utils.agent_coordinator import AgentCoordinator
 
 # Before training
 coordinator = AgentCoordinator()
@@ -190,7 +190,7 @@ def example_7_integration_in_backtest():
 
     code = """
 # At top of your backtest script
-from py.utils.agent_coordinator import AgentCoordinator
+from nfl_analytics.utils.agent_coordinator import AgentCoordinator
 
 # Before backtest
 coordinator = AgentCoordinator()

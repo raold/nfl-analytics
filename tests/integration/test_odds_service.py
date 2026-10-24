@@ -321,7 +321,7 @@ class TestOddsServiceImport:
     def test_import_odds_service(self):
         """Test importing odds update service."""
         try:
-            from py.data.odds_update_service import (
+            from nfl_analytics.data.odds_update_service import (
                 OddsServiceConfig,
                 OddsUpdateService,
                 ServiceMetrics,
@@ -334,7 +334,7 @@ class TestOddsServiceImport:
     def test_import_prop_fetcher(self):
         """Test importing prop odds fetcher."""
         try:
-            from py.data.fetch_prop_odds import PropOddsFetcher
+            from nfl_analytics.data.fetch_prop_odds import PropOddsFetcher
 
             print("\n✅ Successfully imported PropOddsFetcher")
         except ImportError as e:
@@ -342,7 +342,7 @@ class TestOddsServiceImport:
 
     def test_config_from_env(self, api_key):
         """Test creating config from environment."""
-        from py.data.odds_update_service import OddsServiceConfig
+        from nfl_analytics.data.odds_update_service import OddsServiceConfig
 
         os.environ["ODDS_API_KEY"] = api_key
         config = OddsServiceConfig.from_env()
@@ -360,7 +360,7 @@ class TestOddsServiceFunctionality:
 
     def test_service_initialization(self, api_key):
         """Test service can be initialized."""
-        from py.data.odds_update_service import OddsServiceConfig, OddsUpdateService
+        from nfl_analytics.data.odds_update_service import OddsServiceConfig, OddsUpdateService
 
         config = OddsServiceConfig(
             api_key=api_key,
@@ -376,7 +376,7 @@ class TestOddsServiceFunctionality:
 
     def test_fetch_events_method(self, api_key):
         """Test service _fetch_events method."""
-        from py.data.odds_update_service import OddsServiceConfig, OddsUpdateService
+        from nfl_analytics.data.odds_update_service import OddsServiceConfig, OddsUpdateService
 
         config = OddsServiceConfig(api_key=api_key, dry_run=True)
         service = OddsUpdateService(config)
@@ -389,7 +389,7 @@ class TestOddsServiceFunctionality:
 
     def test_american_odds_conversion(self):
         """Test American odds to implied probability conversion."""
-        from py.data.fetch_prop_odds import PropOddsFetcher
+        from nfl_analytics.data.fetch_prop_odds import PropOddsFetcher
 
         fetcher = PropOddsFetcher(api_key="dummy")
 
@@ -409,7 +409,7 @@ class TestOddsServiceFunctionality:
 
     def test_calculate_hold(self):
         """Test bookmaker hold calculation."""
-        from py.data.fetch_prop_odds import PropOddsFetcher
+        from nfl_analytics.data.fetch_prop_odds import PropOddsFetcher
 
         fetcher = PropOddsFetcher(api_key="dummy")
 

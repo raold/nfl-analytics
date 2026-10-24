@@ -65,7 +65,7 @@ done
 
 # Run Python agent
 python3 -c "
-from py.agents.connection_pool_manager import ConnectionPoolManager
+from nfl_analytics.agents.connection_pool_manager import ConnectionPoolManager
 import time
 
 pool_manager = ConnectionPoolManager(

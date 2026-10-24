@@ -154,13 +154,13 @@ Bayesian ratings are exported to the XGBoost feature pipeline as 13 new features
 
 These features are computed via:
 \begin{verbatim}
-python py/features/bayesian_features.py \
+python nfl_analytics/features/bayesian_features.py \
   --input data/processed/features/asof_team_features_v3.csv \
   --output data/processed/features/asof_team_features_v3_bayesian.csv \
   --add-predictions
 \end{verbatim}
 
-The ensemble prediction engine (\texttt{py/production/ensemble\_bayesian\_xgb.py}) integrates Bayesian posteriors with XGBoost probabilities, applies agreement filtering, and uses Bayesian SD for fractional Kelly sizing:
+The ensemble prediction engine (\texttt{nfl\_analytics/production/ensemble\_bayesian\_xgb.py}) integrates Bayesian posteriors with XGBoost probabilities, applies agreement filtering, and uses Bayesian SD for fractional Kelly sizing:
 \begin{equation}
 \text{Kelly fraction} = \frac{1}{4} \cdot \frac{1}{1 + \sigma_{\text{Bayes}}} \cdot \min\left(\frac{\text{edge}}{0.05}, 1\right).
 \end{equation}

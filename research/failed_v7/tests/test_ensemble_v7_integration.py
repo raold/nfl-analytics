@@ -26,7 +26,7 @@ import pytest
 # Add project root
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way
+from nfl_analytics.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way
 
 # ============================================================================
 # FIXTURES
@@ -75,9 +75,9 @@ def jalen_hurts_2024_week5():
 def ensemble_v7_with_mocks(test_db_config):
     """Create ensemble v7.0 with all components mocked."""
     with (
-        patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1") as mock_causal,
-        patch("py.ensemble.enhanced_ensemble_v7.RModelInterface"),
-        patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v7.CausalFeaturesV1") as mock_causal,
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v7.RModelInterface"),
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
     ):
 
         # Create ensemble

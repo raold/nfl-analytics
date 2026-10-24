@@ -36,7 +36,7 @@ Data Sources:
 - Podcasts: YouTube transcripts (Around the NFL, PFF)
 
 Usage:
-    from py.agents.nfl_domain_expert import NFLDomainExpert
+    from nfl_analytics.agents.nfl_domain_expert import NFLDomainExpert
 
     expert = NFLDomainExpert()
 

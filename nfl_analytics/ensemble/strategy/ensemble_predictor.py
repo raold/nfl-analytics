@@ -43,13 +43,13 @@ except ImportError:
     logger.warning("XGBoost not installed - XGBoost predictions will fail")
 
 try:
-    from py.models.bayesian_neural_network import BayesianNeuralNetwork
+    from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
 except ImportError:
     BayesianNeuralNetwork = None
     logger.warning("BNN module not found - BNN predictions will fail")
 
 try:
-    from py.utils.r_service import RServiceError, get_r_service
+    from nfl_analytics.utils.r_service import RServiceError, get_r_service
 except ImportError:
     get_r_service = None
     logger.warning("R Service not found - R model predictions will fail")
@@ -57,7 +57,7 @@ except ImportError:
 try:
     import base64
 
-    from py.utils.claude_cache import get_default_cache
+    from nfl_analytics.utils.claude_cache import get_default_cache
 except ImportError:
     get_default_cache = None
     logger.warning("ClaudeRedisCache not found - model caching disabled")

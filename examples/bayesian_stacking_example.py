@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import numpy as np
 import pandas as pd
 
-from py.ensemble.bayesian_stacking import BayesianStacker, ModelLoader, ValidationFramework
+from nfl_analytics.ensemble.bayesian_stacking import BayesianStacker, ModelLoader, ValidationFramework
 
 print("=" * 70)
 print("BAYESIAN STACKING EXAMPLE")
@@ -292,12 +292,12 @@ print(f"   6. Statistical significance: p = {test_results['p_value']:.4f}")
 
 print("\n🎯 Next Steps:")
 print("   1. Generate real validation predictions:")
-print("      python3 py/ensemble/generate_validation_predictions.py \\")
+print("      python3 nfl_analytics/ensemble/generate_validation_predictions.py \\")
 print("        --start-season 2022 --end-season 2023 \\")
 print("        --output data/validation_predictions_2022_2023.csv")
 print()
 print("   2. Optimize weights on real data:")
-print("      python3 py/ensemble/bayesian_stacking.py \\")
+print("      python3 nfl_analytics/ensemble/bayesian_stacking.py \\")
 print("        --mode optimize \\")
 print("        --validation-data data/validation_predictions_2022_2023.csv \\")
 print("        --output models/ensemble/stacking_report.md")

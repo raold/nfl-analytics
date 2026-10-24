@@ -9,7 +9,7 @@ a unified dataset for analysis with:
 - Rich feature set (105+ features: EPA, rest, QB changes, etc.)
 
 Usage:
-    python py/data/load_real_data.py --output data/processed/merged_predictions_features.csv
+    python nfl_analytics/data/load_real_data.py --output data/processed/merged_predictions_features.csv
 """
 
 import argparse
@@ -19,7 +19,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from py.utils.spread_convention import home_cover
+from nfl_analytics.utils.spread_convention import home_cover
 
 
 def load_predictions(predictions_path: Path) -> pd.DataFrame:

@@ -396,7 +396,7 @@ EOF
 
 # 3. Test Python connectivity
 python -c "
-from py.utils.db_helpers import get_db_connection
+from nfl_analytics.utils.db_helpers import get_db_connection
 with get_db_connection() as conn:
     cursor = conn.cursor()
     cursor.execute('SELECT COUNT(*) FROM public.games')

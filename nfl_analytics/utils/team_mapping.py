@@ -6,7 +6,7 @@ It resolves the recurring mismatch between nflverse data (LA, SD, OAK, STL) and
 standard NFL abbreviations (LAR, LAC, LV).
 
 Usage:
-    from py.utils.team_mapping import normalize_team, VALID_TEAMS, VALID_TEAMS_DB
+    from nfl_analytics.utils.team_mapping import normalize_team, VALID_TEAMS, VALID_TEAMS_DB
 
     # Normalize database abbreviation to canonical form
     team = normalize_team('LA')  # Returns 'LAR'

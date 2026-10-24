@@ -13,7 +13,7 @@ Target Metrics:
 - Calibration (90% CI): 88-92%
 
 Usage:
-    python py/backtest/historical_validation_5way.py \
+    python nfl_analytics/backtest/historical_validation_5way.py \
         --start-season 2022 \
         --end-season 2025 \
         --end-week 10 \
@@ -67,7 +67,7 @@ class HistoricalValidator:
         self.min_edge = min_edge
 
         # Initialize ensemble
-        from py.models.player_props_ensemble import PlayerPropsEnsemble
+        from nfl_analytics.models.player_props_ensemble import PlayerPropsEnsemble
 
         logger.info("Initializing 5-way ensemble (state-space ENABLED with log→yards fix)...")
         self.ensemble = PlayerPropsEnsemble(

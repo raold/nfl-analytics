@@ -26,9 +26,9 @@ import logging
 import numpy as np
 import pandas as pd
 
-from py.ensemble.stacked_meta_learner import StackedMetaLearner
-from py.models.bayesian_neural_network import BayesianNeuralNetwork
-from py.optimization.portfolio_optimizer import CorrelatedPortfolioOptimizer
+from nfl_analytics.ensemble.stacked_meta_learner import StackedMetaLearner
+from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
+from nfl_analytics.optimization.portfolio_optimizer import CorrelatedPortfolioOptimizer
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

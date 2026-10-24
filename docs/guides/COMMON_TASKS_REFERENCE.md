@@ -141,7 +141,7 @@ A complete backtest involves two main steps: building features and running the b
 Generate as-of features for your backtest period:
 
 ```bash
-python py/features/asof_features.py \
+python nfl_analytics/features/asof_features.py \
   --output analysis/features/asof_team_features.csv \
   --season-start 1999 \
   --season-end 2024 \
@@ -161,7 +161,7 @@ python py/features/asof_features.py \
 Run the backtest harness:
 
 ```bash
-python py/backtest/baseline_glm.py \
+python nfl_analytics/backtest/baseline_glm.py \
   --start-season 2003 \
   --end-season 2024 \
   --output-csv analysis/results/glm_baseline_metrics.csv \
@@ -201,10 +201,10 @@ print(f"Max drawdown: {results['roi'].cumsum().min():.2%}")
 
 | Script | Purpose | Notes |
 |--------|---------|-------|
-| `py/backtest/baseline_glm.py` | Generalized Linear Model baseline | Fast, reference implementation |
-| `py/backtest/bayesian_props_backtest.py` | Full Bayesian hierarchical | Produces calibration metrics |
-| `py/backtest/enhanced_ensemble_v3.py` | 4-way ensemble (Bayesian + XGBoost + BNN + State-Space) | Production model |
-| `py/backtest/harness.py` | Generic backtest framework | Extensible for custom models |
+| `nfl_analytics/backtest/baseline_glm.py` | Generalized Linear Model baseline | Fast, reference implementation |
+| `nfl_analytics/backtest/bayesian_props_backtest.py` | Full Bayesian hierarchical | Produces calibration metrics |
+| `nfl_analytics/backtest/enhanced_ensemble_v3.py` | 4-way ensemble (Bayesian + XGBoost + BNN + State-Space) | Production model |
+| `nfl_analytics/backtest/harness.py` | Generic backtest framework | Extensible for custom models |
 
 ### Key Considerations
 
@@ -579,7 +579,7 @@ Covers:
 """
 
 import pytest
-from py.my_module import my_function, MyClass
+from nfl_analytics.my_module import my_function, MyClass
 
 
 class TestMyFunction:
@@ -708,7 +708,7 @@ def test_feature_with_fixture(sample_data):
 ```python
 from unittest.mock import patch, MagicMock
 
-@patch('py.module.external_function')
+@patch('nfl_analytics.module.external_function')
 def test_with_mock(mock_external):
     """Test function that calls external code."""
     mock_external.return_value = 42

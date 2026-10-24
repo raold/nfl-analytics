@@ -171,7 +171,7 @@ The lower bound (50.4%) is below the 52.4% breakeven. **We cannot reject the nul
 
 ### Existing Kelly Implementation
 
-`py/production/kelly_sizing.py` implements:
+`nfl_analytics/production/kelly_sizing.py` implements:
 
 - **Full Kelly**: f* = (bp - q) / b
 - **Fractional Kelly**: f = fraction * f* (default quarter-Kelly at 0.25)
@@ -185,7 +185,7 @@ The implementation is correct but disconnected from the actual prediction pipeli
 
 ### Ensemble Strategy Architecture
 
-`py/ensemble/strategy/base.py` defines:
+`nfl_analytics/ensemble/strategy/base.py` defines:
 
 - **EnsembleStrategy** (ABC): Interface for combining model predictions
 - **ModelPrediction**: Individual model output (mean, std, confidence)
@@ -196,7 +196,7 @@ The confidence threshold (`confidence_threshold=0.5`) in EnsembleConfig could se
 
 ### Pricing Infrastructure
 
-The `py/pricing/` directory contains sophisticated tools:
+The `nfl_analytics/pricing/` directory contains sophisticated tools:
 
 1. **`teaser_ev.py`**: Two-leg teaser EV estimator using Skellam PMF for integer-margin distributions, with Gaussian/t-copula dependence modeling and key-number reweighting (3, 6, 7, 10)
 2. **`copula_parlays.py`**: Gaussian copula for correlated parlay pricing with Monte Carlo simulation
@@ -350,12 +350,12 @@ Worst week: Week 8 (3-10, 23.1%). Best regular season week: Week 14 (9-5, 64.3%)
 
 | File | Purpose | Key Finding |
 |------|---------|-------------|
-| `py/ensemble/strategy/base.py` | Ensemble strategy pattern | Constant spread_std (13.54), no variable confidence |
-| `py/production/kelly_sizing.py` | Kelly criterion implementation | Correct math, disconnected from pipeline |
-| `py/features/game_feature_extractor.py:1076-1199` | Rest differential computation | 7 features, short/long week detection |
-| `py/pricing/teaser_ev.py` | Teaser EV via Skellam + copulas | Most sophisticated pricing tool |
-| `py/pricing/copula_parlays.py` | Gaussian copula parlay pricing | Monte Carlo simulation framework |
-| `py/production/value_bet_detector.py` | LLM-enhanced value bet detection | Full infrastructure exists but untested |
+| `nfl_analytics/ensemble/strategy/base.py` | Ensemble strategy pattern | Constant spread_std (13.54), no variable confidence |
+| `nfl_analytics/production/kelly_sizing.py` | Kelly criterion implementation | Correct math, disconnected from pipeline |
+| `nfl_analytics/features/game_feature_extractor.py:1076-1199` | Rest differential computation | 7 features, short/long week detection |
+| `nfl_analytics/pricing/teaser_ev.py` | Teaser EV via Skellam + copulas | Most sophisticated pricing tool |
+| `nfl_analytics/pricing/copula_parlays.py` | Gaussian copula parlay pricing | Monte Carlo simulation framework |
+| `nfl_analytics/production/value_bet_detector.py` | LLM-enhanced value bet detection | Full infrastructure exists but untested |
 | `docs/adr/016-cql-target-leakage-fix.md` | CQL leakage root cause | Spread sign convention, temporal split |
 
 ---

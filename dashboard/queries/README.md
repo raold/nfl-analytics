@@ -395,4 +395,4 @@ with psycopg.connect(**DB_CONFIG) as conn:
 - **Database Schema**: `docs/database/DATABASE_QUICK_REFERENCE.md`
 - **SQL Patterns**: `docs/database/SQL_PATTERNS.md`
 - **Dashboard**: `dashboard/app.py`
-- **Caching**: `py/utils/claude_cache.py`
+- **Caching**: `nfl_analytics/utils/claude_cache.py`

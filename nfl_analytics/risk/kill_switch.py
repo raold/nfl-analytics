@@ -17,7 +17,7 @@ The kill switch tracks state across sessions. Once triggered, trading
 stays halted until manually re-armed.
 
 Usage:
-    from py.risk.kill_switch import KillSwitch, KillSwitchConfig
+    from nfl_analytics.risk.kill_switch import KillSwitch, KillSwitchConfig
 
     ks = KillSwitch(initial_equity_cents=100_000)
     ks.update_equity(current_equity_cents=92_000)

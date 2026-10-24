@@ -31,7 +31,7 @@ project_root = str(Path(__file__).parent.parent.parent)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 logger = logging.getLogger(__name__)
 

@@ -23,7 +23,7 @@ mkdir -p logs/training
 
 # Start cVAE training
 echo "Starting cVAE training..."
-python py/models/train_cvae.py \
+python nfl_analytics/models/train_cvae.py \
     --start-season 2016 \
     --end-season 2024 \
     --epochs 200 \

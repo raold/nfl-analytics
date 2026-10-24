@@ -27,7 +27,7 @@ import logging
 
 import numpy as np
 
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

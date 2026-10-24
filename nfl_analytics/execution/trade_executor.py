@@ -15,7 +15,7 @@ Features:
 Pipeline: Signal → RiskCheck → TradeExecutor → MarketClient → Exchange
 
 Usage:
-    from py.execution.trade_executor import TradeExecutor
+    from nfl_analytics.execution.trade_executor import TradeExecutor
 
     executor = TradeExecutor(market_client)
     results = await executor.submit_signals(approved_signals)
@@ -30,7 +30,7 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Callable
 
-from py.markets.base import (
+from nfl_analytics.markets.base import (
     ConnectionError as MarketConnectionError,
     Fill,
     MarketClient,
@@ -40,7 +40,7 @@ from py.markets.base import (
     OrderStatus,
     RateLimitError,
 )
-from py.trading.signal import Signal
+from nfl_analytics.trading.signal import Signal
 
 logger = logging.getLogger(__name__)
 

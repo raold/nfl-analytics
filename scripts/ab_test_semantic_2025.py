@@ -43,7 +43,7 @@ import pandas as pd
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-from py.feedback.semantic_ab_test import SemanticABTest, ABTestResults
+from nfl_analytics.feedback.semantic_ab_test import SemanticABTest, ABTestResults
 
 logging.basicConfig(
     level=logging.INFO,

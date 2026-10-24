@@ -38,7 +38,7 @@ cd "$PROJECT_ROOT"
 
 # Run the refresh pipeline
 echo "[1/1] Running prediction refresh pipeline..."
-uv run python py/pipeline/refresh_predictions.py --auto --weeks-ahead 2
+uv run python nfl_analytics/pipeline/refresh_predictions.py --auto --weeks-ahead 2
 
 EXIT_CODE=$?
 

@@ -13,7 +13,7 @@ Supported Models:
 3. Informative Priors v2 (brms)
 
 Usage:
-    from py.ensemble.r_model_interface import RModelInterface
+    from nfl_analytics.ensemble.r_model_interface import RModelInterface
 
     interface = RModelInterface(db_config)
     mean, std = interface.predict_hierarchical(

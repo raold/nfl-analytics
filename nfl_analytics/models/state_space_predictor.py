@@ -18,7 +18,7 @@ Key Innovation:
 - Provides uncertainty quantification compatible with ensemble
 
 Usage:
-    from py.models.state_space_predictor import StateSpacePredictor
+    from nfl_analytics.models.state_space_predictor import StateSpacePredictor
 
     predictor = StateSpacePredictor()
     mean, std = predictor.predict(

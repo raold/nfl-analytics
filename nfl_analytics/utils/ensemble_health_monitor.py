@@ -16,7 +16,7 @@ Key Capabilities:
 4. Inter-Model Agreement - Detect high uncertainty from model disagreement
 
 Usage:
-    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
+    from nfl_analytics.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
     monitor = EnsembleHealthMonitor()
 
@@ -44,9 +44,9 @@ Usage:
     report = monitor.generate_report()
 
 CLI Interface:
-    python py/utils/ensemble_health_monitor.py --check
-    python py/utils/ensemble_health_monitor.py --monitor
-    python py/utils/ensemble_health_monitor.py --report
+    python nfl_analytics/utils/ensemble_health_monitor.py --check
+    python nfl_analytics/utils/ensemble_health_monitor.py --monitor
+    python nfl_analytics/utils/ensemble_health_monitor.py --report
 
 Integration:
     - Pre-commit hook: Validate before backtest commits

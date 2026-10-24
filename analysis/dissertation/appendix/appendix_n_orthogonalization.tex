@@ -1069,7 +1069,7 @@ for week in range(4, 18):
 Beyond the core fix, we implemented three additional validation layers:
 
 \begin{enumerate}
-  \item \textbf{Temporal safety validators} (\texttt{py/validation/temporal.py}): Automated checks that no training data postdates prediction targets.
+  \item \textbf{Temporal safety validators} (\texttt{nfl\_analytics/validation/temporal.py}): Automated checks that no training data postdates prediction targets.
 
   \item \textbf{Expanding-window cross-validation}: Each fold trains only on seasons $< t$ and validates on season $t$, preventing any cross-season leakage.
 

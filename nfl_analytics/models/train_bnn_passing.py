@@ -3,7 +3,7 @@
 Train Bayesian Neural Network on Real NFL Passing Data
 
 Usage:
-    python py/models/train_bnn_passing.py
+    python nfl_analytics/models/train_bnn_passing.py
 
 Expected:
 - Training time: 2-5 min (ADVI) or 15-30 min (NUTS)
@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 import psycopg2
 
-from py.models.bayesian_neural_network import BayesianNeuralNetwork
+from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

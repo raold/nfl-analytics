@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-from py.semantic.models.ollama_client import OllamaClient
+from nfl_analytics.semantic.models.ollama_client import OllamaClient
 
 logging.basicConfig(
     level=logging.INFO,

@@ -165,7 +165,7 @@ main() {
         stats)
             check_database
             log_info "Fetching cache statistics..."
-            $PYTHON "$PROJECT_ROOT/py/utils/prediction_cache_manager.py" stats "$@"
+            $PYTHON "$PROJECT_ROOT/nfl_analytics/utils/prediction_cache_manager.py" stats "$@"
             ;;
 
         invalidate)
@@ -175,7 +175,7 @@ main() {
             echo
             if [[ $REPLY =~ ^[Yy]$ ]]; then
                 log_info "Invalidating cache..."
-                $PYTHON "$PROJECT_ROOT/py/utils/prediction_cache_manager.py" invalidate "$@"
+                $PYTHON "$PROJECT_ROOT/nfl_analytics/utils/prediction_cache_manager.py" invalidate "$@"
                 log_success "Cache invalidation complete"
             else
                 log_info "Cancelled"
@@ -187,14 +187,14 @@ main() {
             check_database
             log_info "Optimizing cache indexes and running VACUUM ANALYZE..."
             log_warning "This may take several minutes for large caches"
-            $PYTHON "$PROJECT_ROOT/py/utils/prediction_cache_manager.py" optimize "$@"
+            $PYTHON "$PROJECT_ROOT/nfl_analytics/utils/prediction_cache_manager.py" optimize "$@"
             log_success "Cache optimization complete"
             ;;
 
         validate)
             check_database
             log_info "Validating cache integrity..."
-            $PYTHON "$PROJECT_ROOT/py/utils/prediction_cache_manager.py" validate "$@"
+            $PYTHON "$PROJECT_ROOT/nfl_analytics/utils/prediction_cache_manager.py" validate "$@"
             EXIT_CODE=$?
             if [ $EXIT_CODE -eq 0 ]; then
                 log_success "Cache validation PASSED"
@@ -207,7 +207,7 @@ main() {
         backfill)
             check_database
             log_error "Backfill command requires custom implementation"
-            log_info "See py/utils/prediction_cache_manager.py:backfill_from_rpy2()"
+            log_info "See nfl_analytics/utils/prediction_cache_manager.py:backfill_from_rpy2()"
             exit 1
             ;;
 

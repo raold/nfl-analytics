@@ -185,17 +185,17 @@ These projections will be validated through empirical backtesting once training 
 The experiment-augmented RL implementation consists of three core modules:
 
 \begin{itemize}
-  \item \texttt{py/rl/experiment\_feature\_extractor.py} (600+ lines): Extracts 29 features from 25 experiments with database integration, caching, and batch processing support.
-  \item \texttt{py/rl/experiment\_augmented\_env.py} (400+ lines): Gym-compatible environment implementing the 44-dimensional state space, Kelly sizing, and reward shaping.
-  \item \texttt{py/rl/experiment\_rl\_agent.py} (700+ lines): DQN and PPO agents with feature importance tracking, ablation study runner, and save/load utilities.
-  \item \texttt{py/rl/train\_experiment\_rl.py} (400+ lines): Training pipeline with command-line interface, hyperparameter sweeps, evaluation protocols, and result logging.
+  \item \texttt{nfl\_analytics/rl/experiment\_feature\_extractor.py} (600+ lines): Extracts 29 features from 25 experiments with database integration, caching, and batch processing support.
+  \item \texttt{nfl\_analytics/rl/experiment\_augmented\_env.py} (400+ lines): Gym-compatible environment implementing the 44-dimensional state space, Kelly sizing, and reward shaping.
+  \item \texttt{nfl\_analytics/rl/experiment\_rl\_agent.py} (700+ lines): DQN and PPO agents with feature importance tracking, ablation study runner, and save/load utilities.
+  \item \texttt{nfl\_analytics/rl/train\_experiment\_rl.py} (400+ lines): Training pipeline with command-line interface, hyperparameter sweeps, evaluation protocols, and result logging.
 \end{itemize}
 
 \paragraph{Usage example.}
 Training both DQN and PPO agents with ablation studies:
 \begin{verbatim}
 # Train DQN for 1000 episodes with periodic evaluation
-python py/rl/train_experiment_rl.py \
+python nfl_analytics/rl/train_experiment_rl.py \
   --agent dqn \
   --episodes 1000 \
   --eval-freq 100 \
@@ -203,7 +203,7 @@ python py/rl/train_experiment_rl.py \
   --output-dir experiments/rl
 
 # Run ablation studies (8 configurations × 100 episodes each)
-python py/rl/train_experiment_rl.py \
+python nfl_analytics/rl/train_experiment_rl.py \
   --agent dqn \
   --ablation \
   --ablation-episodes 100 \

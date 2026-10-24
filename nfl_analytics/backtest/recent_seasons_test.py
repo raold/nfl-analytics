@@ -28,7 +28,7 @@ features_path = Path("data/processed/features/asof_FIXED_v2.csv")
 if not features_path.exists():
     print(f"[FAIL] Features not found at {features_path}")
     print(
-        "Run: bash -c 'source .venv/Scripts/activate && export PYTHONPATH=. && python py/features/asof_features.py --output data/processed/features/asof_FIXED_v2.csv --season-start 1999 --season-end 2024 --validate'"
+        "Run: bash -c 'source .venv/Scripts/activate && export PYTHONPATH=. && python nfl_analytics/features/asof_features.py --output data/processed/features/asof_FIXED_v2.csv --season-start 1999 --season-end 2024 --validate'"
     )
     exit(1)
 

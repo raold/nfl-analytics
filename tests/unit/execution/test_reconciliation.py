@@ -6,8 +6,8 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from py.markets.base import Fill, MarketClient, Position, Side
-from py.execution.reconciliation import Reconciler, ReconciliationReport
+from nfl_analytics.markets.base import Fill, MarketClient, Position, Side
+from nfl_analytics.execution.reconciliation import Reconciler, ReconciliationReport
 
 pytestmark = pytest.mark.anyio
 
@@ -268,7 +268,7 @@ class TestReportFormatting:
 
     def test_report_properties(self):
         """Report properties compute correctly."""
-        from py.execution.reconciliation import Discrepancy
+        from nfl_analytics.execution.reconciliation import Discrepancy
 
         report = ReconciliationReport()
         report.discrepancies = [

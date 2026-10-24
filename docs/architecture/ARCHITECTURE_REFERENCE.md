@@ -10,7 +10,7 @@
 
 ```
 nfl-analytics/
-├── py/                                   # Python modules
+├── nfl_analytics/                                   # Python modules
 │   ├── causal/                           # Causal inference framework (8 modules)
 │   │   ├── panel_constructor.py          # Build longitudinal datasets
 │   │   ├── treatment_definitions.py      # Define shock events

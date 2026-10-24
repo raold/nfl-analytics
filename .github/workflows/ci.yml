@@ -30,12 +30,12 @@ jobs:
       - name: Run Black
         run: |
           source .venv/bin/activate
-          black --check py/
+          black --check nfl_analytics/
 
       - name: Run Ruff
         run: |
           source .venv/bin/activate
-          ruff check py/
+          ruff check nfl_analytics/
 
       - name: Run detect-secrets
         run: |

@@ -12,7 +12,7 @@ Signature construction:
   Base64-encode the result
 
 Usage:
-    from py.markets.kalshi.auth import KalshiAuth
+    from nfl_analytics.markets.kalshi.auth import KalshiAuth
 
     auth = KalshiAuth.from_env()  # Reads KALSHI_KEY_ID + KALSHI_PRIVATE_KEY
     headers = auth.sign("POST", "/trade-api/v2/portfolio/orders")

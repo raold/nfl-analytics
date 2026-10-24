@@ -30,25 +30,25 @@ fi
 
 echo "Step 1/5: Fixing undefined names (F821) - CRITICAL"
 echo "------------------------------------------------------"
-ruff check py/ --select F821 --fix
+ruff check nfl_analytics/ --select F821 --fix
 echo "✓ Fixed undefined name errors"
 echo ""
 
 echo "Step 2/5: Formatting Python files with Black"
 echo "------------------------------------------------------"
-black py/
+black nfl_analytics/
 echo "✓ All files formatted"
 echo ""
 
 echo "Step 3/5: Removing unused imports (F401)"
 echo "------------------------------------------------------"
-ruff check py/ --select F401 --fix
+ruff check nfl_analytics/ --select F401 --fix
 echo "✓ Unused imports removed"
 echo ""
 
 echo "Step 4/5: Fixing import ordering (I001, E402)"
 echo "------------------------------------------------------"
-ruff check py/ --select I001 --fix
+ruff check nfl_analytics/ --select I001 --fix
 echo "✓ Imports organized"
 echo ""
 
@@ -86,7 +86,7 @@ echo "  4. Fix R bugs: edit files in /tmp/r_seq_bugs.txt"
 echo ""
 
 echo "Verification commands:"
-echo "  ruff check py/ --select F821          # Should show 0 errors"
-echo "  black --check py/                     # Should show 0 files to reformat"
-echo "  ruff check py/ | head -20             # Check remaining issues"
+echo "  ruff check nfl_analytics/ --select F821          # Should show 0 errors"
+echo "  black --check nfl_analytics/                     # Should show 0 files to reformat"
+echo "  ruff check nfl_analytics/ | head -20             # Check remaining issues"
 echo ""

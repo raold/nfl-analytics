@@ -756,7 +756,7 @@ class MetaLabelingClassifier:
         if model_data.get("label_convention") != LABEL_CONVENTION and not allow_legacy_labels:
             raise ValueError(
                 f"{path} was trained with the pre-fix spread cover labels; retrain it "
-                "(py/training/train_meta_classifier.py) or pass allow_legacy_labels=True"
+                "(nfl_analytics/training/train_meta_classifier.py) or pass allow_legacy_labels=True"
             )
         self.base_model = model_data["base_model"]
         self.calibrated_model = model_data["calibrated_model"]

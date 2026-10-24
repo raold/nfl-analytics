@@ -11,7 +11,7 @@ import pytest
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from py.markets.kalshi.auth import KalshiAuth
+from nfl_analytics.markets.kalshi.auth import KalshiAuth
 
 
 # ============================================================

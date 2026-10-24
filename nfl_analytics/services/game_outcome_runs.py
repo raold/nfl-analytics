@@ -18,8 +18,8 @@ import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_batch
 
-from py.models.game_outcome_model_fixed import GameOutcomeModel
-from py.config.settings import get_settings
+from nfl_analytics.models.game_outcome_model_fixed import GameOutcomeModel
+from nfl_analytics.config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 settings = get_settings()

@@ -184,7 +184,7 @@ docker run --rm --gpus all nvidia/cuda:12.2.0-base-ubuntu22.04 nvidia-smi
 ```bash
 # Reduce batch size
 docker exec nfl-analytics-gpu-trainer \
-  python py/models/bnn_multioutput_pytorch.py \
+  python nfl_analytics/models/bnn_multioutput_pytorch.py \
   --device cuda --batch-size 128
 
 # Clear cache

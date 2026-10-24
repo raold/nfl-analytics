@@ -34,15 +34,15 @@
 ./scripts/review_code.sh
 
 # Review specific file
-./scripts/review_code.sh py/models/train_bnn_passing.py
+./scripts/review_code.sh nfl_analytics/models/train_bnn_passing.py
 ```
 
 **Python API:**
 ```python
-from py.utils.code_reviewer import CodeReviewer
+from nfl_analytics.utils.code_reviewer import CodeReviewer
 
 reviewer = CodeReviewer()
-issues = reviewer.review_file("py/models/train.py")
+issues = reviewer.review_file("nfl_analytics/models/train.py")
 report = reviewer.review_changes(git_diff=True)
 ```
 
@@ -70,7 +70,7 @@ report = reviewer.review_changes(git_diff=True)
 
 **Python API:**
 ```python
-from py.utils.security_auditor import SecurityAuditor
+from nfl_analytics.utils.security_auditor import SecurityAuditor
 
 auditor = SecurityAuditor()
 report = auditor.run_full_audit()
@@ -92,7 +92,7 @@ auditor.save_report()  # → security_audit_report.json
 **Usage:**
 ```bash
 # Check feature engineering code
-./scripts/check_leakage.sh py/data/feature_engineering.py
+./scripts/check_leakage.sh nfl_analytics/data/feature_engineering.py
 
 # Check all feature files
 ./scripts/check_leakage.sh --code
@@ -100,7 +100,7 @@ auditor.save_report()  # → security_audit_report.json
 
 **Python API:**
 ```python
-from py.utils.data_leakage_detector import DataLeakageDetector
+from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector
 import pandas as pd
 
 detector = DataLeakageDetector()
@@ -168,7 +168,7 @@ model.fit(X_train, y_train)
 **Usage:**
 ```bash
 # Generate tests for specific file
-./scripts/generate_tests.sh py/models/train_bnn_passing.py
+./scripts/generate_tests.sh nfl_analytics/models/train_bnn_passing.py
 
 # Generate full test suite
 ./scripts/generate_tests.sh --full
@@ -272,7 +272,7 @@ model.fit(X_train, y_train)
 
 # Exit code 0 = healthy, 1 = critical issues found
 if [ $? -eq 0 ]; then
-    python py/backtest/historical_validation_4way.py
+    python nfl_analytics/backtest/historical_validation_4way.py
 fi
 ```
 
@@ -285,7 +285,7 @@ fi
 
 **Python API:**
 ```python
-from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
+from nfl_analytics.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
 monitor = EnsembleHealthMonitor()
 report = monitor.check_ensemble_health()
@@ -297,7 +297,7 @@ if not report.is_healthy:
 **ROI:** Would have saved 3.5 hours on Nov 13 + prevents future failures
 
 **Files:**
-- `py/utils/ensemble_health_monitor.py` (850 lines)
+- `nfl_analytics/utils/ensemble_health_monitor.py` (850 lines)
 - `scripts/check_ensemble_health.sh` (105 lines)
 - `docs/tools/ENSEMBLE_HEALTH_MONITOR.md` (18KB guide)
 - `examples/ensemble_health_integration.py` (256 lines, 4 patterns)
@@ -331,7 +331,7 @@ if not report.is_healthy:
 
 **Python API:**
 ```python
-from py.utils.model_registry_auditor import ModelRegistryAuditor
+from nfl_analytics.utils.model_registry_auditor import ModelRegistryAuditor
 
 auditor = ModelRegistryAuditor()
 report = auditor.audit_full()
@@ -349,7 +349,7 @@ print(f"Registered {results.success_count} models")
 **ROI:** Automates 337 registrations @ 5-10 min each = **28-56 hours saved**
 
 **Files:**
-- `py/utils/model_registry_auditor.py` (1,284 lines)
+- `nfl_analytics/utils/model_registry_auditor.py` (1,284 lines)
 - `scripts/model_registry_auditor.sh` (207 lines)
 - `docs/MODEL_REGISTRY_AUDITOR.md` (comprehensive guide)
 
@@ -382,7 +382,7 @@ print(f"Registered {results.success_count} models")
 
 **Python API:**
 ```python
-from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+from nfl_analytics.utils.sports_analytics_validator import SportsAnalyticsValidator
 
 validator = SportsAnalyticsValidator()
 
@@ -412,7 +412,7 @@ issues = validator.validate_sql_query(query)
 **ROI:** Prevents recurring SQL bugs, enforces domain knowledge, catches data quality issues early
 
 **Files:**
-- `py/utils/sports_analytics_validator.py` (792 lines)
+- `nfl_analytics/utils/sports_analytics_validator.py` (792 lines)
 - `scripts/validate_sports_analytics.sh` (101 lines)
 - `tests/unit/test_sports_analytics_validator.py` (513 lines, 30+ tests)
 - `docs/agents/SPORTS_ANALYTICS_VALIDATOR_GUIDE.md` (829 lines)
@@ -521,7 +521,7 @@ Phase 1+2+3+4 agents distributed across coordinator:
 
 **Python API:**
 ```python
-from py.agents.trading_validator import TradingValidator
+from nfl_analytics.agents.trading_validator import TradingValidator
 
 validator = TradingValidator(risk_manager=rm)
 result = validator.validate_signal(signal, features)
@@ -553,7 +553,7 @@ if not result.approved:
 
 **Python API:**
 ```python
-from py.agents.portfolio_monitor import PortfolioMonitor
+from nfl_analytics.agents.portfolio_monitor import PortfolioMonitor
 
 monitor = PortfolioMonitor(pnl_tracker=pnl, drawdown_monitor=dd, alert_manager=am)
 report = monitor.check_health()
@@ -579,7 +579,7 @@ print(report.summary())
 
 **Python API:**
 ```python
-from py.agents.execution_auditor import ExecutionAuditor
+from nfl_analytics.agents.execution_auditor import ExecutionAuditor
 
 auditor = ExecutionAuditor(client=kalshi_client, reconciler=reconciler)
 report = await auditor.run_audit()
@@ -590,9 +590,9 @@ if report.has_discrepancies:
 **ROI:** Prevents position drift, catches exchange/local desync before it causes P&L errors
 
 **Files:**
-- `py/agents/trading_validator.py`
-- `py/agents/portfolio_monitor.py`
-- `py/agents/execution_auditor.py`
+- `nfl_analytics/agents/trading_validator.py`
+- `nfl_analytics/agents/portfolio_monitor.py`
+- `nfl_analytics/agents/execution_auditor.py`
 - `scripts/trading_agents.sh`
 - `tests/unit/agents/test_trading_validator.py`
 - `tests/unit/agents/test_portfolio_monitor.py`

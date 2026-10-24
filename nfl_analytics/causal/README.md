@@ -108,16 +108,16 @@ Each module includes a `main()` function with example usage:
 
 ```bash
 # Test panel constructor
-python py/causal/panel_constructor.py
+python nfl_analytics/causal/panel_constructor.py
 
 # Test synthetic control
-python py/causal/synthetic_control.py
+python nfl_analytics/causal/synthetic_control.py
 
 # Test DiD
-python py/causal/diff_in_diff.py
+python nfl_analytics/causal/diff_in_diff.py
 
 # Run validation suite
-python py/causal/validation.py
+python nfl_analytics/causal/validation.py
 ```
 
 ## Dependencies

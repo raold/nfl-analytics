@@ -315,7 +315,7 @@ class AdaptiveStrategySelector:
         """Get Dirichlet stacking strategy."""
         if self._dirichlet is None:
             try:
-                from py.ensemble.dirichlet_bayesian_stacking import (
+                from nfl_analytics.ensemble.dirichlet_bayesian_stacking import (
                     DirichletBayesianStackingByStatType,
                 )
 

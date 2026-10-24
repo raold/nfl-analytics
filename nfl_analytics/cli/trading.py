@@ -5,11 +5,11 @@ Provides commands to start/stop paper and live trading sessions,
 check status, and manage positions.
 
 Usage:
-    python -m py.cli.trading start --mode paper
-    python -m py.cli.trading stop
-    python -m py.cli.trading status
-    python -m py.cli.trading positions
-    python -m py.cli.trading orders --status open
+    python -m nfl_analytics.cli.trading start --mode paper
+    python -m nfl_analytics.cli.trading stop
+    python -m nfl_analytics.cli.trading status
+    python -m nfl_analytics.cli.trading positions
+    python -m nfl_analytics.cli.trading orders --status open
 """
 
 from __future__ import annotations
@@ -149,7 +149,7 @@ def start(mode: str, balance: int, sport: str):
 
 async def _run_trading_loop(mode: str, balance_cents: int, sport: str):
     """Main trading loop (placeholder — wired up in Phase 2+)."""
-    from py.markets.paper_client import PaperMarketClient
+    from nfl_analytics.markets.paper_client import PaperMarketClient
 
     if mode == "paper":
         client = PaperMarketClient(initial_balance_cents=balance_cents)

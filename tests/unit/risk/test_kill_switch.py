@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from py.risk.kill_switch import KillSwitch, KillSwitchConfig, KillSwitchEvent
+from nfl_analytics.risk.kill_switch import KillSwitch, KillSwitchConfig, KillSwitchEvent
 
 
 class TestKillSwitchInit:

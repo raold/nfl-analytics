@@ -25,15 +25,15 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from py.backtests.game_outcome_backtest import GameOutcomeBacktest
-from py.ensemble.game_outcome_ensemble import fetch_games
+from nfl_analytics.backtests.game_outcome_backtest import GameOutcomeBacktest
+from nfl_analytics.ensemble.game_outcome_ensemble import fetch_games
 
 
 def train_baseline_ensemble(train_df, return_dict, proc_id):
     """Train baseline ensemble in separate process."""
     print(f"[Process {proc_id}] Starting BASELINE ensemble training...")
 
-    from py.ensemble.game_outcome_ensemble import GameOutcomeEnsemble
+    from nfl_analytics.ensemble.game_outcome_ensemble import GameOutcomeEnsemble
 
     # XGBoost params with GPU acceleration
     xgb_params = {
@@ -69,7 +69,7 @@ def train_enhanced_ensemble(train_df, return_dict, proc_id):
     """Train enhanced ensemble in separate process."""
     print(f"[Process {proc_id}] Starting ENHANCED ensemble training...")
 
-    from py.ensemble.game_outcome_ensemble_enhanced import EnhancedGameOutcomeEnsemble
+    from nfl_analytics.ensemble.game_outcome_ensemble_enhanced import EnhancedGameOutcomeEnsemble
 
     # XGBoost params with GPU acceleration
     xgb_params = {

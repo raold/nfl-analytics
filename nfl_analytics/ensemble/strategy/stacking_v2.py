@@ -403,7 +403,7 @@ class PerStatTypeStackingStrategy(EnsembleStrategy):
         """Lazy-load Dirichlet stacker for fallback."""
         if self._dirichlet_stacker is None:
             try:
-                from py.ensemble.dirichlet_bayesian_stacking import (
+                from nfl_analytics.ensemble.dirichlet_bayesian_stacking import (
                     DirichletBayesianStackingByStatType,
                 )
 

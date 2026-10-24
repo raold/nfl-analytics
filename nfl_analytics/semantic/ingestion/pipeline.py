@@ -8,9 +8,9 @@ Orchestrates data collection from all sources (ESPN, RotoWire) with:
 - Temporal metadata preservation
 
 Usage:
-    python py/semantic/ingestion/pipeline.py
-    python py/semantic/ingestion/pipeline.py --teams KC,BUF
-    python py/semantic/ingestion/pipeline.py --dry-run
+    python nfl_analytics/semantic/ingestion/pipeline.py
+    python nfl_analytics/semantic/ingestion/pipeline.py --teams KC,BUF
+    python nfl_analytics/semantic/ingestion/pipeline.py --dry-run
 """
 
 import argparse
@@ -24,9 +24,9 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from py.semantic.ingestion.espn_api import ESPNApiClient, ESPNNewsItem, ESPNInjuryItem
-from py.semantic.ingestion.rotowire_client import RotoWireClient, RotoWireNewsItem
-from py.database.semantic_repository import SemanticRepository
+from nfl_analytics.semantic.ingestion.espn_api import ESPNApiClient, ESPNNewsItem, ESPNInjuryItem
+from nfl_analytics.semantic.ingestion.rotowire_client import RotoWireClient, RotoWireNewsItem
+from nfl_analytics.database.semantic_repository import SemanticRepository
 
 logger = logging.getLogger(__name__)
 

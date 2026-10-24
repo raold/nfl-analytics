@@ -170,14 +170,14 @@ SELECT CORR(home_rest_days, ats_cover) FROM game_rest;"
 
 # GP Recovery (Docker)
 docker exec nfl-analytics-api python -c "
-from py.features.gp_injury_recovery import InjuryRecoveryGP
+from nfl_analytics.features.gp_injury_recovery import InjuryRecoveryGP
 gp = InjuryRecoveryGP()
 print(gp.predict_recovery(7, 'hamstring'))"
 # Result: 39.3% recovery
 
 # WHY System (Docker)
 docker exec nfl-analytics-api python -c "
-from py.feedback.model_error_decomposition import ENSEMBLE_WEIGHTS
+from nfl_analytics.feedback.model_error_decomposition import ENSEMBLE_WEIGHTS
 print(ENSEMBLE_WEIGHTS)"
 # Result: {'state_space': 0.27, ...}
 ```

@@ -49,7 +49,7 @@ class BetOpportunity:
         """
         Convert meta-probability to Kelly fraction multiplier.
 
-        Integration with MetaLabelingClassifier (py/production/meta_labeling.py):
+        Integration with MetaLabelingClassifier (nfl_analytics/production/meta_labeling.py):
         - meta_prob < 0.4 → no bet (return 0)
         - meta_prob 0.4-0.6 → half Kelly (linear interpolation)
         - meta_prob > 0.6 → full Kelly (return 1)

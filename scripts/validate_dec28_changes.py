@@ -83,7 +83,7 @@ class Dec28Validator:
         print("=" * 60)
 
         try:
-            from py.features.kalman_epa_filter import KalmanEPAFilter
+            from nfl_analytics.features.kalman_epa_filter import KalmanEPAFilter
 
             filter = KalmanEPAFilter()
 
@@ -210,7 +210,7 @@ class Dec28Validator:
         print("=" * 60)
 
         try:
-            from py.features.gp_injury_recovery import InjuryRecoveryGP
+            from nfl_analytics.features.gp_injury_recovery import InjuryRecoveryGP
 
             gp = InjuryRecoveryGP()
 
@@ -327,7 +327,7 @@ class Dec28Validator:
 
         # Test S2.2: Model Error Decomposition
         try:
-            from py.feedback.model_error_decomposition import ModelErrorDecomposer, ENSEMBLE_WEIGHTS
+            from nfl_analytics.feedback.model_error_decomposition import ModelErrorDecomposer, ENSEMBLE_WEIGHTS
 
             decomposer = ModelErrorDecomposer()
             print(f"\n✅ ModelErrorDecomposer imported")
@@ -376,7 +376,7 @@ class Dec28Validator:
 
         # Test S2.3: Temporal Causality
         try:
-            from py.feedback.temporal_causality import TemporalCausalityTracker
+            from nfl_analytics.feedback.temporal_causality import TemporalCausalityTracker
 
             tracker = TemporalCausalityTracker()
             print(f"\n✅ TemporalCausalityTracker imported")
@@ -400,7 +400,7 @@ class Dec28Validator:
 
         # Test S2.4: Feature Interactions
         try:
-            from py.feedback.feature_interactions import FeatureInteractionAnalyzer, SHAP_AVAILABLE
+            from nfl_analytics.feedback.feature_interactions import FeatureInteractionAnalyzer, SHAP_AVAILABLE
 
             print(f"\n✅ FeatureInteractionAnalyzer imported")
             print(f"   SHAP available: {'✅' if SHAP_AVAILABLE else '❌'}")
@@ -554,7 +554,7 @@ class Dec28Validator:
         print("=" * 60)
 
         try:
-            from py.features.game_feature_extractor import GameFeatureExtractor
+            from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
             extractor = GameFeatureExtractor()
 

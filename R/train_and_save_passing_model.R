@@ -318,4 +318,4 @@ cat(glue("  - Database: mart.bayesian_player_ratings\n"))
 cat(glue("  - Model version: hierarchical_v2.0\n\n"))
 
 cat("Predictions are ready for backtesting!\n")
-cat("Run: uv run python py/backtests/bayesian_props_multiyear_backtest.py\n\n")
+cat("Run: uv run python nfl_analytics/backtests/bayesian_props_multiyear_backtest.py\n\n")

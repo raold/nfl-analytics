@@ -173,7 +173,7 @@ services:
         condition: service_healthy
     networks:
       - nfl_network
-    command: ["python", "-m", "py.rl.train_experiment_rl", "--agent", "${RL_AGENT_TYPE:-dqn}", "--episodes", "${RL_NUM_EPISODES:-5000}"]
+    command: ["python", "-m", "nfl_analytics.rl.train_experiment_rl", "--agent", "${RL_AGENT_TYPE:-dqn}", "--episodes", "${RL_NUM_EPISODES:-5000}"]
     profiles:
       - rl_training
 

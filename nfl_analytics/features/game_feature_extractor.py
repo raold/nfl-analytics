@@ -149,98 +149,98 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
-from py.features.team_defensive_features import TeamDefensiveFeatures
-from py.features.team_offensive_features import TeamOffensiveFeatures
+from nfl_analytics.features.team_defensive_features import TeamDefensiveFeatures
+from nfl_analytics.features.team_offensive_features import TeamOffensiveFeatures
 
 # Optional advanced feature modules (graceful degradation if unavailable)
 try:
-    from py.features.nextgen_features import NextGenStatsFeatures
+    from nfl_analytics.features.nextgen_features import NextGenStatsFeatures
 except ImportError:
     NextGenStatsFeatures = None
 
 try:
-    from py.features.qbr_features import QBRFeatures
+    from nfl_analytics.features.qbr_features import QBRFeatures
 except ImportError:
     QBRFeatures = None
 
 try:
-    from py.features.possession_value import get_team_possession_value_features
+    from nfl_analytics.features.possession_value import get_team_possession_value_features
 except ImportError:
     get_team_possession_value_features = None
 
 try:
-    from py.features.playcalling_features import get_team_playcalling_features
+    from nfl_analytics.features.playcalling_features import get_team_playcalling_features
 except ImportError:
     get_team_playcalling_features = None
 
 try:
-    from py.features.opponent_adjusted_features import OpponentAdjustedFeatures
+    from nfl_analytics.features.opponent_adjusted_features import OpponentAdjustedFeatures
 except ImportError:
     OpponentAdjustedFeatures = None
 
 # Quick Wins: Turnover luck, primetime, and strength of victory features
 try:
-    from py.features.turnover_luck import TurnoverLuckEngine
+    from nfl_analytics.features.turnover_luck import TurnoverLuckEngine
 except ImportError:
     TurnoverLuckEngine = None
 
 try:
-    from py.features.primetime_features import PrimetimeFeaturesEngine
+    from nfl_analytics.features.primetime_features import PrimetimeFeaturesEngine
 except ImportError:
     PrimetimeFeaturesEngine = None
 
 try:
-    from py.features.opponent_strength import OpponentStrengthEngine
+    from nfl_analytics.features.opponent_strength import OpponentStrengthEngine
 except ImportError:
     OpponentStrengthEngine = None
 
 # Line movement features (Phase 1 - Dec 2025)
 try:
-    from py.features.line_movement_features import LineMovementFeatures
+    from nfl_analytics.features.line_movement_features import LineMovementFeatures
 except ImportError:
     LineMovementFeatures = None
 
 # Synthetic feature engines (Dec 9, 2025)
 # These capture QB-OL synergy, momentum, and research-driven insights
 try:
-    from py.features.synthetic_interaction_features import SyntheticInteractionEngine
+    from nfl_analytics.features.synthetic_interaction_features import SyntheticInteractionEngine
 except ImportError:
     SyntheticInteractionEngine = None
 
 try:
-    from py.features.synthetic_momentum_features import SyntheticMomentumEngine
+    from nfl_analytics.features.synthetic_momentum_features import SyntheticMomentumEngine
 except ImportError:
     SyntheticMomentumEngine = None
 
 try:
-    from py.features.research_driven_features import ResearchDrivenEngine
+    from nfl_analytics.features.research_driven_features import ResearchDrivenEngine
 except ImportError:
     ResearchDrivenEngine = None
 
 # Semantic features (LLM-derived sentiment, NER, media signals)
 try:
-    from py.semantic.features.semantic_features import SemanticFeatureExtractor
+    from nfl_analytics.semantic.features.semantic_features import SemanticFeatureExtractor
 except ImportError:
     SemanticFeatureExtractor = None
 
 # Kalman EPA Filter (Dec 28, 2025 - S1.1)
 # State-space model for EPA trend detection with regime change indicators
 try:
-    from py.features.kalman_epa_filter import KalmanEPAFilter
+    from nfl_analytics.features.kalman_epa_filter import KalmanEPAFilter
 except ImportError:
     KalmanEPAFilter = None
 
 # GP Injury Recovery (Dec 28, 2025 - S1.2)
 # Gaussian Process model for injury recovery curves with uncertainty
 try:
-    from py.features.gp_injury_recovery import InjuryRecoveryGP
+    from nfl_analytics.features.gp_injury_recovery import InjuryRecoveryGP
 except ImportError:
     InjuryRecoveryGP = None
 
 # Feature weights configuration (Dec 31, 2025)
 # Controls which feature groups are enabled/disabled via config
 try:
-    from py.config.feature_weights import is_feature_enabled
+    from nfl_analytics.config.feature_weights import is_feature_enabled
 except ImportError:
     # Fallback: all features enabled if config module not available
     def is_feature_enabled(group_name: str) -> bool:

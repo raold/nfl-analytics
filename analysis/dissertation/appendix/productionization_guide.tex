@@ -91,7 +91,7 @@ helm upgrade --install app-workers charts/app-workers -n nfl --create-namespace 
   \item \textbf{(Optional) Ingest odds history}
   \begin{verbatim}
   export ODDS_API_KEY=...
-  python py/ingest_odds_history.py \
+  python nfl_analytics/ingest_odds_history.py \
     --start-date 2023-09-01 --end-date 2023-09-03
   \end{verbatim}
   Respect provider rate limits; markets default to spreads/totals.

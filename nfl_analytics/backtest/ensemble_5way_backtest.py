@@ -22,7 +22,7 @@ Target Performance (from MODEL_REGISTRY.yaml):
 - Ensemble MAE: < 45.2 yards
 
 Usage:
-    python py/backtest/ensemble_5way_backtest.py \
+    python nfl_analytics/backtest/ensemble_5way_backtest.py \
         --start-season 2022 \
         --end-season 2024 \
         --initial-bankroll 10000 \
@@ -48,7 +48,7 @@ import numpy as np
 import pandas as pd
 import psycopg2
 
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)

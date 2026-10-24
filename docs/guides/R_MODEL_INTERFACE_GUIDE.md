@@ -11,7 +11,7 @@
 ### Basic Usage
 
 ```python
-from py.ensemble.r_model_interface import RModelInterface
+from nfl_analytics.ensemble.r_model_interface import RModelInterface
 
 # Initialize interface
 db_config = {
@@ -128,7 +128,7 @@ result = interface.predict_state_space(
 The ensemble automatically uses R interface for predictions:
 
 ```python
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 ensemble = EnhancedEnsemble5Way()
 
@@ -269,7 +269,7 @@ python scripts/test_r_integration.py
 
 ```python
 # Test individual R model
-from py.ensemble.r_model_interface import RModelInterface
+from nfl_analytics.ensemble.r_model_interface import RModelInterface
 from pathlib import Path
 
 interface = RModelInterface(db_config)
@@ -495,7 +495,7 @@ A: brms, cmdstanr, DBI, RPostgres (see R/setup_packages.R)
 
 ## Related Documentation
 
-- **Implementation:** `py/ensemble/r_model_interface.py`
+- **Implementation:** `nfl_analytics/ensemble/r_model_interface.py`
 - **Tests:** `scripts/test_r_integration.py`
 - **Milestone:** `docs/milestones/R_MODEL_INTEGRATION_COMPLETE.md`
 - **R Training:** `R/train_hierarchical_v2_production.R`, `R/train_informative_priors_v2_production.R`

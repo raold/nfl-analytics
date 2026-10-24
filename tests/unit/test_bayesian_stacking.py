@@ -3,7 +3,7 @@
 Unit Tests for Bayesian Stacking
 =================================
 
-Tests for py/ensemble/bayesian_stacking.py:
+Tests for nfl_analytics/ensemble/bayesian_stacking.py:
 - ModelLoader: Loading ensemble models
 - BayesianStacker: LOO-CV, weight optimization, prediction
 - ValidationFramework: Data splitting, statistical tests
@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from py.ensemble.bayesian_stacking import (
+from nfl_analytics.ensemble.bayesian_stacking import (
     BayesianStacker,
     LOOResult,
     ModelLoader,

@@ -96,41 +96,41 @@ All LaTeX tables are auto-generated from data and saved to `analysis/dissertatio
 **Core statistical tables**:
 ```bash
 # Key-number calibration (chi-square tests at key margins)
-python py/analysis/keymass_calibration.py
+python nfl_analytics/analysis/keymass_calibration.py
 # → keymass_chisq_table.tex, reweighting_ablation_table.tex
 
 # Copula goodness-of-fit (Gaussian vs t-copula)
-python py/models/copula_gof.py
+python nfl_analytics/models/copula_gof.py
 # → copula_gof_table.tex, tail_dependence_table.tex
 
 # Teaser pricing comparison (independence vs dependence)
-python py/analysis/teaser_pricing_comparison.py
+python nfl_analytics/analysis/teaser_pricing_comparison.py
 # → teaser_copula_impact_table.tex, teaser_ev_oos_table.tex
 ```
 
 **Model comparison tables**:
 ```bash
 # GLM baseline backtest results
-python py/models/glm_baseline.py --seasons 2015-2024
+python nfl_analytics/models/glm_baseline.py --seasons 2015-2024
 # → glm_baseline_table.tex, glm_reliability_panel.tex
 
 # Multi-model comparison (GLM, XGBoost, RF)
-python py/models/multimodel_harness.py
+python nfl_analytics/models/multimodel_harness.py
 # → multimodel_table.tex
 
 # RL agent comparison (DQN vs PPO)
-python py/analysis/rl_agent_comparison.py
+python nfl_analytics/analysis/rl_agent_comparison.py
 # → rl_agent_comparison_table.tex
 ```
 
 **Risk and portfolio tables**:
 ```bash
 # CVaR benchmark (risk-constrained sizing)
-python py/risk/cvar_report.py --alpha 0.95
+python nfl_analytics/risk/cvar_report.py --alpha 0.95
 # → cvar_benchmark_table.tex
 
 # OPE grid (SNIS/DR estimators with clipping)
-python py/rl/ope_gate.py --dataset data/rl_logged.csv \
+python nfl_analytics/rl/ope_gate.py --dataset data/rl_logged.csv \
   --policy models/dqn_candidate.pt --output reports/ope_gate.json \
   --tex analysis/dissertation/figures/out/ope_grid_table.tex
 # → ope_grid_table.tex
@@ -196,11 +196,11 @@ For deterministic results:
 redis-server
 
 # Launch workers (in separate terminals)
-python py/compute/redis_worker.py --queue high --worker-id 1
-python py/compute/redis_worker.py --queue high --worker-id 2
+python nfl_analytics/compute/redis_worker.py --queue high --worker-id 1
+python nfl_analytics/compute/redis_worker.py --queue high --worker-id 2
 
 # Submit tasks
-python py/compute/redis_task_queue.py submit --task my_task.json
+python nfl_analytics/compute/redis_task_queue.py submit --task my_task.json
 ```
 
 **Performance tracking**:

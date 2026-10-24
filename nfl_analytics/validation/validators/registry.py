@@ -20,7 +20,7 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
-from py.validation.validators.base import (
+from nfl_analytics.validation.validators.base import (
     ValidationCategory,
     ValidationIssue,
     ValidationResult,
@@ -290,9 +290,9 @@ def create_default_validator_registry() -> ValidatorRegistry:
         This function will be expanded as validators are implemented.
     """
     # Import here to avoid circular imports
-    from py.validation.validators.temporal import TemporalSafetyValidator
-    from py.validation.validators.schema import SchemaValidator
-    from py.validation.validators.feature_range import FeatureRangeValidator
+    from nfl_analytics.validation.validators.temporal import TemporalSafetyValidator
+    from nfl_analytics.validation.validators.schema import SchemaValidator
+    from nfl_analytics.validation.validators.feature_range import FeatureRangeValidator
 
     registry = ValidatorRegistry()
 

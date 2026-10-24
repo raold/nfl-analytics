@@ -11,13 +11,13 @@ Features:
 
 Usage:
     # Auto-detect device and start worker
-    python py/compute/worker_enhanced.py --worker-id macbook_m4
+    python nfl_analytics/compute/worker_enhanced.py --worker-id macbook_m4
 
     # Specify device explicitly
-    python py/compute/worker_enhanced.py --worker-id rtx_gpu0 --device cuda:0
+    python nfl_analytics/compute/worker_enhanced.py --worker-id rtx_gpu0 --device cuda:0
 
     # Set minimum priority (only claim high-priority tasks)
-    python py/compute/worker_enhanced.py --worker-id rtx_gpu0 --min-priority 5
+    python nfl_analytics/compute/worker_enhanced.py --worker-id rtx_gpu0 --min-priority 5
 """
 
 import argparse

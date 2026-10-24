@@ -32,7 +32,7 @@ ensemble for holistic NFL analytics.
 When advanced features unavailable (NGS, QBR, etc.), model uses 100 base features only.
 
 **Usage:**
-    from py.models.game_outcome_model import GameOutcomeModel
+    from nfl_analytics.models.game_outcome_model import GameOutcomeModel
 
     model = GameOutcomeModel()
     model.train(seasons=[2022, 2023, 2024])
@@ -69,7 +69,7 @@ import shap
 import xgboost as xgb
 from sklearn.preprocessing import StandardScaler
 
-from py.features.game_feature_extractor import GameFeatureExtractor
+from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

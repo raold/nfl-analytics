@@ -9,7 +9,7 @@ Test Categories:
 3. End-to-End Tests: Full prediction flow with real data
 
 Run with:
-    pytest tests/production/test_ab_test_router_comprehensive.py -v --cov=py.production.ab_test_router
+    pytest tests/production/test_ab_test_router_comprehensive.py -v --cov=nfl_analytics.production.ab_test_router
 
 Author: Claude Code (Sonnet 4.5)
 Date: November 14, 2025
@@ -30,7 +30,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from py.production.ab_test_router import ABTestRouter
+from nfl_analytics.production.ab_test_router import ABTestRouter
 
 # ============================================================================
 # UNIT TESTS - Router Logic and Hashing
@@ -232,8 +232,8 @@ class TestABTestRouterUnit:
             assert group == "B"
             assert version == "v6.0"
 
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_lazy_model_loading(self, mock_v6, mock_v5):
         """Test that models are only loaded when needed."""
         router = ABTestRouter(split_ratio=0.5)
@@ -256,8 +256,8 @@ class TestABTestRouterUnit:
         assert mock_v5.call_count == 1
         assert mock_v6.call_count == 1
 
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_model_loading_disabled_test(self, mock_v6, mock_v5):
         """Test that v6 is not loaded when test is disabled."""
         router = ABTestRouter(split_ratio=0.5, enabled=False)
@@ -278,8 +278,8 @@ class TestABTestRouterIntegration:
     """Integration tests for database logging and model registry."""
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_predict_calls_correct_ensemble_control(self, mock_v6, mock_v5, mock_db):
         """Test that control group predictions use v5 ensemble."""
         # Mock ensemble predictions
@@ -308,8 +308,8 @@ class TestABTestRouterIntegration:
         assert result["test_name"] == "ensemble_v5_vs_v6_sagarin"
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_predict_calls_correct_ensemble_treatment(self, mock_v6, mock_v5, mock_db):
         """Test that treatment group predictions use v6 ensemble."""
         # Mock ensemble predictions
@@ -338,8 +338,8 @@ class TestABTestRouterIntegration:
         assert result["test_name"] == "ensemble_v5_vs_v6_sagarin"
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_database_logging_enabled(self, mock_v6, mock_v5, mock_db):
         """Test that predictions are logged to database when log_to_db=True."""
         # Mock ensemble
@@ -381,8 +381,8 @@ class TestABTestRouterIntegration:
         mock_conn.commit.assert_called_once()
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_database_logging_disabled(self, mock_v6, mock_v5, mock_db):
         """Test that predictions are not logged when log_to_db=False."""
         # Mock ensemble
@@ -403,8 +403,8 @@ class TestABTestRouterIntegration:
         mock_db.assert_not_called()
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_model_registry_lookup_correct_version(self, mock_v6, mock_v5, mock_db):
         """Test that correct model_id is looked up from registry."""
         # Mock ensemble
@@ -442,8 +442,8 @@ class TestABTestRouterIntegration:
         assert "ensemble_v5.0" in str(query_args), "Wrong model name queried"
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_database_logging_handles_null_prediction(self, mock_v6, mock_v5, mock_db):
         """Test that null predictions are not logged to database."""
         # Mock ensemble with null prediction
@@ -464,8 +464,8 @@ class TestABTestRouterIntegration:
         mock_db.assert_not_called()
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_batch_predictions_split_ratio_accuracy(self, mock_v6, mock_v5, mock_db):
         """Test that batch predictions maintain accurate split ratio."""
         # Mock ensembles
@@ -560,8 +560,8 @@ class TestABTestRouterE2E:
     """End-to-end tests for complete prediction flow."""
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_full_prediction_flow_control(self, mock_v6, mock_v5, mock_db):
         """Test complete prediction flow for control group."""
         # Mock ensemble
@@ -613,8 +613,8 @@ class TestABTestRouterE2E:
         mock_conn.commit.assert_called_once()
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_full_prediction_flow_treatment(self, mock_v6, mock_v5, mock_db):
         """Test complete prediction flow for treatment group."""
         # Mock ensemble
@@ -661,8 +661,8 @@ class TestABTestRouterE2E:
         assert result["ensemble_std"] == 42.0
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_batch_predictions_full_flow(self, mock_v6, mock_v5, mock_db):
         """Test batch predictions with database logging."""
         # Mock ensembles
@@ -713,8 +713,8 @@ class TestABTestRouterE2E:
         assert 0.35 <= b_ratio <= 0.65, f"Split ratio {b_ratio:.3f} outside tolerance"
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_rollback_scenario_disable_test(self, mock_v6, mock_v5, mock_db):
         """Test emergency rollback by disabling test."""
         # Mock ensemble
@@ -766,8 +766,8 @@ class TestABTestRouterPerformance:
     """Performance tests for A/B test router."""
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_assignment_performance(self, mock_v6, mock_v5, mock_db):
         """Test that assignment is fast (<1ms per assignment)."""
         router = ABTestRouter(split_ratio=0.5)
@@ -781,8 +781,8 @@ class TestABTestRouterPerformance:
         assert avg_time_ms < 1.0, f"Assignment too slow: {avg_time_ms:.3f}ms"
 
     @patch("psycopg2.connect")
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV6")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV6")
     def test_hash_performance(self, mock_v6, mock_v5, mock_db):
         """Test that hash computation is fast."""
         router = ABTestRouter(split_ratio=0.5)
@@ -803,4 +803,4 @@ class TestABTestRouterPerformance:
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v", "--tb=short", "--cov=py.production.ab_test_router"])
+    pytest.main([__file__, "-v", "--tb=short", "--cov=nfl_analytics.production.ab_test_router"])

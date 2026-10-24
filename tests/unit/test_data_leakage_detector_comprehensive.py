@@ -28,7 +28,7 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from py.utils.data_leakage_detector import (
+from nfl_analytics.utils.data_leakage_detector import (
     DataLeakageDetector,
     LeakageSeverity,
     LeakageType,

@@ -58,13 +58,13 @@ import psycopg2
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
-from py.features.dc_features import DCFeatureGenerator
+from nfl_analytics.features.dc_features import DCFeatureGenerator
 
 # Import coaching features (OC and DC)
-from py.features.oc_features import OCFeatureGenerator
+from nfl_analytics.features.oc_features import OCFeatureGenerator
 
 # Import player aggregation features
-from py.features.player_aggregation_features import aggregate_player_projections_multi_season
+from nfl_analytics.features.player_aggregation_features import aggregate_player_projections_multi_season
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

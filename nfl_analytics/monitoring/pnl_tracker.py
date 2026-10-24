@@ -7,7 +7,7 @@ settlements. Uses FIFO matching for realized P&L on closing fills.
 All monetary values are in cents to match the rest of the system.
 
 Usage:
-    from py.monitoring.pnl_tracker import PnLTracker, PnLConfig
+    from nfl_analytics.monitoring.pnl_tracker import PnLTracker, PnLConfig
 
     tracker = PnLTracker(initial_equity_cents=100_000)
     tracker.record_fill("KXNFL-KC", Side.YES, 62, 10)   # Buy 10 @ 62¢
@@ -21,7 +21,7 @@ import logging
 from collections import deque
 from dataclasses import dataclass, field
 
-from py.markets.base import Position, Side
+from nfl_analytics.markets.base import Position, Side
 
 logger = logging.getLogger(__name__)
 

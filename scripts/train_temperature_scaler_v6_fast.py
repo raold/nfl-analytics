@@ -36,7 +36,7 @@ import pandas as pd
 from dotenv import load_dotenv
 
 # Import temperature scaling
-from py.calibration.temperature_scaling import TemperatureScaler
+from nfl_analytics.calibration.temperature_scaling import TemperatureScaler
 
 # Load environment variables
 load_dotenv()

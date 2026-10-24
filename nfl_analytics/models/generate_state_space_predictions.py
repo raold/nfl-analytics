@@ -7,7 +7,7 @@ This script:
 3. Saves predictions in ensemble-compatible format (game_id, prediction, target, home_team, away_team)
 
 Usage:
-    python py/models/generate_state_space_predictions.py --seasons 2019 2020 2021 2022 2023 2024 2025
+    python nfl_analytics/models/generate_state_space_predictions.py --seasons 2019 2020 2021 2022 2023 2024 2025
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ import pandas as pd
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.models.state_space import StateSpaceRatings, fetch_games
+from nfl_analytics.models.state_space import StateSpaceRatings, fetch_games
 
 
 def generate_game_id(row: pd.Series) -> str:

@@ -14,7 +14,7 @@ import pandas as pd
 import psycopg2
 import xgboost as xgb
 
-from py.utils.spread_convention import implied_home_win_prob
+from nfl_analytics.utils.spread_convention import implied_home_win_prob
 
 warnings.filterwarnings("ignore")
 

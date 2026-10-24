@@ -20,7 +20,7 @@ Usage:
 Output:
     - Summary statistics
     - Optimal weight estimates
-    - Recommendation for py/config/constants.py
+    - Recommendation for nfl_analytics/config/constants.py
 """
 
 import os
@@ -35,7 +35,7 @@ import psycopg
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from py.config.constants import INJURY_WEIGHTS
+from nfl_analytics.config.constants import INJURY_WEIGHTS
 
 
 @dataclass
@@ -309,7 +309,7 @@ def run_validation() -> ValidationResult:
 if __name__ == "__main__":
     try:
         result = run_validation()
-        print(f"\nValidation complete. See py/config/constants.py for weight definitions.")
+        print(f"\nValidation complete. See nfl_analytics/config/constants.py for weight definitions.")
     except ImportError as e:
         print(f"Missing dependency: {e}")
         print("Install with: pip install scikit-learn pandas psycopg")

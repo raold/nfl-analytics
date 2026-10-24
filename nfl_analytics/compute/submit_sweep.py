@@ -9,13 +9,13 @@ Supports:
 
 Usage:
     # Submit CQL alpha sweep
-    python py/compute/submit_sweep.py \
+    python nfl_analytics/compute/submit_sweep.py \
         --model cql \
         --config sweeps/cql_alpha_sweep.yaml \
         --priority 10
 
     # Submit with custom parameters
-    python py/compute/submit_sweep.py \
+    python nfl_analytics/compute/submit_sweep.py \
         --model iql \
         --base-config '{"batch_size": 256, "epochs": 200}' \
         --param alpha 0.1 0.5 1.0 \
@@ -23,7 +23,7 @@ Usage:
         --priority 8
 
     # Dry run (don't actually submit)
-    python py/compute/submit_sweep.py \
+    python nfl_analytics/compute/submit_sweep.py \
         --model cql \
         --config sweeps/cql_alpha_sweep.yaml \
         --dry-run
@@ -246,9 +246,9 @@ def main():
 
     print(f"\n✓ Successfully submitted {len(task_ids)} tasks")
     print("\nNext steps:")
-    print("  1. Start workers: python py/compute/worker_enhanced.py --worker-id <id>")
-    print("  2. Monitor progress: python py/compute/dashboard.py")
-    print(f"  3. View results: python py/compute/model_registry.py list {sweep.model_type}")
+    print("  1. Start workers: python nfl_analytics/compute/worker_enhanced.py --worker-id <id>")
+    print("  2. Monitor progress: python nfl_analytics/compute/dashboard.py")
+    print(f"  3. View results: python nfl_analytics/compute/model_registry.py list {sweep.model_type}")
 
 
 if __name__ == "__main__":

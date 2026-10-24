@@ -5,7 +5,7 @@ This script provides comprehensive comparison of Bayesian State-Space Model (Kal
 against Graph Neural Network to determine the optimal 5th ensemble component.
 
 Usage:
-    python py/analysis/compare_state_space_vs_gnn.py
+    python nfl_analytics/analysis/compare_state_space_vs_gnn.py
 """
 
 import json

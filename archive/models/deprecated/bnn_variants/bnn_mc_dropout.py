@@ -25,7 +25,7 @@ Expected Performance:
 - Training: 5-10 minutes per architecture
 
 Usage:
-    python py/models/bnn_mc_dropout.py
+    python nfl_analytics/models/bnn_mc_dropout.py
 """
 
 import logging

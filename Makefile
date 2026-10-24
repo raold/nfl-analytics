@@ -79,7 +79,7 @@ health:
 # Step 4: Generate predictions for target week
 predict:
 	@echo "=== PREDICTIONS: Season $(SEASON), Week $(WEEK) ==="
-	$(VENV) python py/services/game_outcome_runs.py --season $(SEASON) --week $(WEEK)
+	$(VENV) python nfl_analytics/services/game_outcome_runs.py --season $(SEASON) --week $(WEEK)
 	@echo "=== Predictions complete ==="
 
 # Step 5: Post-game feedback loop
@@ -122,13 +122,13 @@ db:
 # Generate features
 features:
 	@echo "Generating enhanced features..."
-	$(VENV) python py/features/asof_features_enhanced.py --validate
+	$(VENV) python nfl_analytics/features/asof_features_enhanced.py --validate
 	@echo "Features saved to data/processed/features/"
 
 # Run backtests
 backtest:
 	@echo "Running GLM baseline backtest..."
-	$(VENV) python py/backtest/baseline_glm.py \
+	$(VENV) python nfl_analytics/backtest/baseline_glm.py \
 		--features-csv data/processed/features/asof_team_features_enhanced_2025.csv \
 		--start-season 2003 --end-season 2024
 	@echo "Backtest complete"

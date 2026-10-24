@@ -60,7 +60,7 @@ import pandas as pd
 import psycopg2
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
-from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
+from nfl_analytics.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
 
 # Configure logging
 logging.basicConfig(

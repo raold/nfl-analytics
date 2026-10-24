@@ -222,7 +222,7 @@ def main():
     print("DIVISION BY ZERO FIX VALIDATION TESTS")
     print("=" * 70)
     print("Testing fix for ZeroDivisionError in player_props_ensemble.py:438")
-    print("See: py/models/player_props_ensemble.py")
+    print("See: nfl_analytics/models/player_props_ensemble.py")
     print("=" * 70)
 
     tests = [

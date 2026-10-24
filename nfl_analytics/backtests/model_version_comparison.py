@@ -194,7 +194,7 @@ class ModelVersionComparison:
             return None
 
         try:
-            from py.models.bayesian_neural_network import BayesianNeuralNetwork
+            from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
 
             logger.info("Loading BNN model...")
             BayesianNeuralNetwork.load(bnn_path)

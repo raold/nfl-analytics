@@ -28,7 +28,7 @@ def test_initialization():
     """Test model initialization."""
     logger.info("Test 1: Model initialization")
 
-    from py.models.game_outcome_model import GameOutcomeModel
+    from nfl_analytics.models.game_outcome_model import GameOutcomeModel
 
     try:
         model = GameOutcomeModel()
@@ -45,7 +45,7 @@ def test_feature_extraction():
     """Test feature extraction for a sample game."""
     logger.info("\nTest 2: Feature extraction")
 
-    from py.models.game_outcome_model import GameOutcomeModel
+    from nfl_analytics.models.game_outcome_model import GameOutcomeModel
 
     try:
         model = GameOutcomeModel()
@@ -80,7 +80,7 @@ def test_model_architecture():
 
     import xgboost as xgb
 
-    from py.models.game_outcome_model import GameOutcomeModel
+    from nfl_analytics.models.game_outcome_model import GameOutcomeModel
 
     try:
         model = GameOutcomeModel()

@@ -381,7 +381,7 @@ Rejected due to data fragmentation. The two-stage Ridge + XGBoost approach handl
 
 - Training script: `scripts/xgb_exp7_backtest_2024.py` (551 lines)
 - Validation script: `scripts/xgb_v4_multi_season_validation.py` (629 lines)
-- Ensemble integration: `py/ensemble/enhanced_ensemble_v6.py` (1,288 lines)
+- Ensemble integration: `nfl_analytics/ensemble/enhanced_ensemble_v6.py` (1,288 lines)
 
 ### Research
 

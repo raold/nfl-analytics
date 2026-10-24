@@ -97,8 +97,8 @@ See scripts/dev/init_dev.sh for an example of applying the initial schema steps.
   - R/backfill_pbp_advanced.R → advanced play-level enrichments
   - data/ingest_injuries.R → injuries
 - Python ingestion pipelines:
-  - py/ingest_odds_history.py → odds_history (time-series snapshots)
-  - py/weather_meteostat.py → weather (per game)
+  - nfl_analytics/ingest_odds_history.py → odds_history (time-series snapshots)
+  - nfl_analytics/weather_meteostat.py → weather (per game)
 - After loads, refresh marts:
   - psql ... -c "REFRESH MATERIALIZED VIEW mart.game_summary;"
   - SELECT mart.refresh_game_features();

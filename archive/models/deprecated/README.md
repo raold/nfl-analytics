@@ -91,10 +91,10 @@ If you need to reference these deprecated models:
 cat archive/models/deprecated/xgboost_v2/xgboost_gpu_v2.py
 
 # Compare with current version
-diff archive/models/deprecated/xgboost_v3/xgboost_gpu_v3.py py/models/xgboost_spread_predictor.py
+diff archive/models/deprecated/xgboost_v3/xgboost_gpu_v3.py nfl_analytics/models/xgboost_spread_predictor.py
 
 # Restore if needed (not recommended)
-git mv archive/models/deprecated/xgboost_v2/xgboost_gpu_v2.py py/models/
+git mv archive/models/deprecated/xgboost_v2/xgboost_gpu_v2.py nfl_analytics/models/
 ```
 
 ---

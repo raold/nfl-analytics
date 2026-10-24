@@ -99,7 +99,7 @@ class DataLayerAnalyzer:
         self.lineage: dict[str, list[ColumnUsage]] = defaultdict(list)
 
         # File patterns to scan
-        self.python_dirs = ["py/", "scripts/", "tests/", "etl/"]
+        self.python_dirs = ["nfl_analytics/", "scripts/", "tests/", "etl/"]
         self.r_dirs = ["R/", "scripts/analysis/"]
         self.sql_dirs = ["db/migrations/", "db/queries/", "db/views/"]
 

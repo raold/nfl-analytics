@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 # Import Redis cache
 try:
-    from py.utils.claude_cache import get_default_cache
+    from nfl_analytics.utils.claude_cache import get_default_cache
 
     REDIS_AVAILABLE = True
 except ImportError:

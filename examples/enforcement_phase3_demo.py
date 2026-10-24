@@ -6,7 +6,7 @@ Enforcement Framework Phase 3 - Demo Script
 This script demonstrates how Phase 3 enforcement rules catch common bugs.
 
 Run with:
-    python py/utils/enforcement_router.py examples/enforcement_phase3_demo.py
+    python nfl_analytics/utils/enforcement_router.py examples/enforcement_phase3_demo.py
 
 Expected output: 4 BLOCKING issues detected
 
@@ -47,7 +47,7 @@ class BuggyValidationScript:
 
         Would cause: TypeError - unexpected keyword argument 'use_adaptive_weights'
         """
-        from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
         # ❌ BLOCKING: api_contract_validation
         # Deprecated parameter: use_adaptive_weights
@@ -104,7 +104,7 @@ class BuggyValidationScript:
 
         Would cause: Poor predictions with only 2/4 components
         """
-        from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
         ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
 
@@ -124,7 +124,7 @@ class BuggyValidationScript:
 
     def corrected_example_1(self):
         """✅ CORRECT: Proper API contract usage."""
-        from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
         ensemble = EnhancedEnsemble4Way(
             db_password=os.getenv("DB_PASSWORD"),
@@ -181,7 +181,7 @@ class BuggyValidationScript:
 
     def corrected_example_4(self, player_id: str, season: int, week: int):
         """✅ CORRECT: Ensemble component validation."""
-        from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
         ensemble = EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
 
@@ -229,7 +229,7 @@ def main():
     print("This script demonstrates bugs that Phase 3 rules would catch.")
     print()
     print("Run enforcement validation:")
-    print("  python py/utils/enforcement_router.py examples/enforcement_phase3_demo.py")
+    print("  python nfl_analytics/utils/enforcement_router.py examples/enforcement_phase3_demo.py")
     print()
     print("Expected output:")
     print("  ❌ BLOCKING: api_contract_validation (Bug #1)")

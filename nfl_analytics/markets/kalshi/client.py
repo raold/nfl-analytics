@@ -7,8 +7,8 @@ authentication, rate limiting, retries, and response parsing.
 All monetary values in cents. Contract IDs are Kalshi tickers (e.g., "KXNFL-26-SPREAD-KC-BUF-3.5").
 
 Usage:
-    from py.markets.kalshi.client import KalshiClient
-    from py.markets.kalshi.auth import KalshiAuth
+    from nfl_analytics.markets.kalshi.client import KalshiClient
+    from nfl_analytics.markets.kalshi.auth import KalshiAuth
 
     auth = KalshiAuth.from_env()
     client = KalshiClient(auth=auth)
@@ -29,7 +29,7 @@ from dataclasses import dataclass, field
 
 import httpx
 
-from py.markets.base import (
+from nfl_analytics.markets.base import (
     ConnectionError as MarketConnectionError,
     Contract,
     ContractNotFoundError,
@@ -45,8 +45,8 @@ from py.markets.base import (
     Position,
     RateLimitError,
 )
-from py.markets.kalshi.auth import KalshiAuth
-from py.markets.kalshi.schemas import (
+from nfl_analytics.markets.kalshi.auth import KalshiAuth
+from nfl_analytics.markets.kalshi.schemas import (
     build_batch_cancel_body,
     build_batch_create_body,
     build_create_order_body,

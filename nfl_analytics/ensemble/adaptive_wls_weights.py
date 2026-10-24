@@ -31,7 +31,7 @@ to recent model performance.
 - **Production**: Update ensemble weights before each prediction batch
 
 **Usage**:
-    from py.ensemble.adaptive_wls_weights import AdaptiveWLSWeights
+    from nfl_analytics.ensemble.adaptive_wls_weights import AdaptiveWLSWeights
 
     # Initialize with validation set predictions
     wls = AdaptiveWLSWeights(
@@ -47,8 +47,8 @@ to recent model performance.
     ensemble = EnhancedEnsemble5Way(weights=optimal_weights)
 
 **Files Modified**:
-- py/ensemble/enhanced_ensemble_v5.py - Add adaptive weight loading
-- py/production/real_time_api.py - Re-optimize weights weekly
+- nfl_analytics/ensemble/enhanced_ensemble_v5.py - Add adaptive weight loading
+- nfl_analytics/production/real_time_api.py - Re-optimize weights weekly
 
 Author: Claude Code (Sonnet 4.5)
 Date: November 14, 2025

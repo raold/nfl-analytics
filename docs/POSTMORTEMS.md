@@ -295,7 +295,7 @@ CLAIM DOCUMENTATION REQUIREMENTS:
 - `docs/POSTMORTEMS.md` (this file)
 - `docs/adr/008-hybrid-static-incremental.md`
 - `docs/milestones/INCREMENTAL_XGB_CORRECTED_FINDINGS.md`
-- `py/online/hybrid_static_incremental.py` (corrected implementation)
+- `nfl_analytics/online/hybrid_static_incremental.py` (corrected implementation)
 - `scripts/validate_hybrid_model.py` (multi-season validation)
 
 **Updated:**
@@ -619,7 +619,7 @@ negative. That rule grades the favorite as if it were *receiving* the points.
 - ADR-013's rest-differential "25 point swing" (labels from `scripts/validate_dec28_changes.py`).
 - Training labels in `asof_features_unified/_v2/_enhanced`, `materialized_view_features`,
   `mart.game_summary`, `mv_betting_features` (and its rolling team cover-rate features).
-- The meta-labeling trade gate (`py/production/meta_labeling*.py`) used by the Kalshi strategies.
+- The meta-labeling trade gate (`nfl_analytics/production/meta_labeling*.py`) used by the Kalshi strategies.
 - Backtests `full_historical_backtest.py` / `clean_historical_backtest.py` (also an inverted
   spread→probability mapping).
 - This is the **third** occurrence: Nov 2025 leakage diagnostic (80% accuracy) and the CQL
@@ -631,7 +631,7 @@ pooled home cover rate (~49% correct vs ~56% with the bug).
 
 ### Fix (October 24, 2026)
 
-- `py/utils/spread_convention.py`: `home_cover`, `home_cover_margin`, `model_edge`,
+- `nfl_analytics/utils/spread_convention.py`: `home_cover`, `home_cover_margin`, `model_edge`,
   `book_home_line`, `implied_home_win_prob`, `assert_nflverse_convention`.
 - `tests/unit/test_spread_convention.py`: pins BUF@BAL 2018, GB@CHI 2019, CLE@NO 2018 (favorite
   wins 21-18 as a 10-point favorite: no cover), the pooled cover rate, and the ~50% ATS of prior-
@@ -650,14 +650,14 @@ pooled home cover rate (~49% correct vs ~56% with the bug).
 These **features** encode the sign inverted, but training and inference share the same code, so
 stored models are internally consistent. Flipping them without retraining would break inference:
 
-- `home_is_favorite` in `py/features/feature_loader.py` / `feature_loader_parallel.py` and
-  `is_favorite` in `py/features/feature_interactions.py` (both actually mean "home underdog").
+- `home_is_favorite` in `nfl_analytics/features/feature_loader.py` / `feature_loader_parallel.py` and
+  `is_favorite` in `nfl_analytics/features/feature_interactions.py` (both actually mean "home underdog").
 - Player `is_favored` (`CASE WHEN g.spread_close < 0`) in the R props models
   (`R/train_hierarchical_v2_canonical.R`, `R/train_informative_priors_v2_canonical.R`,
   `R/bayesian_receiving_with_qb_chemistry*.R`, `R/generate_2025_predictions_all_v2.R`) and their
-  Python mirrors (`py/ensemble/enhanced_ensemble_v5*.py`, `v6_elo.py`, `r_model_interface*.py`,
-  `py/backtest/historical_validation_4way_optimized.py`).
-- `implied_home_total` / `implied_away_total` in `py/features/player_features.py` (swapped).
+  Python mirrors (`nfl_analytics/ensemble/enhanced_ensemble_v5*.py`, `v6_elo.py`, `r_model_interface*.py`,
+  `nfl_analytics/backtest/historical_validation_4way_optimized.py`).
+- `implied_home_total` / `implied_away_total` in `nfl_analytics/features/player_features.py` (swapped).
 - `home_favorite` in the `scripts/validate_*` and `scripts/*incremental_xgb*` experiments.
 
 ### Lessons

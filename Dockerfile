@@ -62,7 +62,7 @@ check_and_install_packages()
 FROM base as worker
 
 # Copy application code
-COPY py/ ./py/
+COPY nfl_analytics/ ./nfl_analytics/
 COPY run_compute.py .
 COPY *.py .
 
@@ -73,7 +73,7 @@ COPY containers/config/ ./config/
 RUN mkdir -p /data/redis /data/results /data/checkpoints /data/logs
 
 # Set environment variables
-ENV PYTHONPATH="/app:/app/py:/app/py/compute"
+ENV PYTHONPATH="/app:/app/py:/app/nfl_analytics/compute"
 ENV REDIS_HOST="localhost"
 ENV REDIS_PORT="6379"
 ENV MACHINE_ID=""

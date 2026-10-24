@@ -125,7 +125,7 @@ def reorganize_structure(root_dir: str) -> dict[str, list[Path]]:
     root_path = Path(root_dir)
 
     # Categorize Python files
-    for file in root_path.glob("py/**/*.py"):
+    for file in root_path.glob("nfl_analytics/**/*.py"):
         if "ingest" in file.name:
             suggestions["src/python/ingestion"].append(file)
         elif "feature" in file.name:

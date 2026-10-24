@@ -10,7 +10,7 @@ Features:
 - Temporal holdout (train/test split by date)
 
 Usage:
-    python py/rl/simulate_betting.py \\
+    python nfl_analytics/rl/simulate_betting.py \\
         --model models/cql/805ae9f0 \\
         --data data/rl_logged.csv \\
         --initial-bankroll 10000 \\
@@ -25,7 +25,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from py.models.load_cql_ensemble import CQLEnsemble
+from nfl_analytics.models.load_cql_ensemble import CQLEnsemble
 
 
 class BettingSimulation:

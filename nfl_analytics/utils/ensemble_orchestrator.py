@@ -19,7 +19,7 @@ Responsibilities:
 Target: ROI >5%, Win Rate >59%, Sharpe >2.2
 
 Usage:
-    from py.utils.ensemble_orchestrator import EnsembleOrchestrator
+    from nfl_analytics.utils.ensemble_orchestrator import EnsembleOrchestrator
 
     orchestrator = EnsembleOrchestrator()
 
@@ -148,10 +148,10 @@ class EnsembleOrchestrator:
     # Training scripts
     TRAINING_SCRIPTS = {
         ModelType.BAYESIAN_HIERARCHICAL: "R/train_hierarchical_v2_canonical.R",
-        ModelType.XGBOOST: "py/models/train_xgboost_player_props.py",
-        ModelType.BNN: "py/models/train_bnn_passing.py",
+        ModelType.XGBOOST: "nfl_analytics/models/train_xgboost_player_props.py",
+        ModelType.BNN: "nfl_analytics/models/train_bnn_passing.py",
         ModelType.STATE_SPACE: "R/state_space/train_random_walk_v2.R",
-        ModelType.CQL: "py/rl/train_cql.py",
+        ModelType.CQL: "nfl_analytics/rl/train_cql.py",
     }
 
     def __init__(self, project_root: Path | None = None, config: EnsembleConfig | None = None):

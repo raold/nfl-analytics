@@ -17,7 +17,7 @@ class TestLineMovementFeatures:
 
     def test_default_features_structure(self):
         """Test that default features have correct structure."""
-        from py.features.line_movement_features import LineMovementFeatures
+        from nfl_analytics.features.line_movement_features import LineMovementFeatures
 
         extractor = LineMovementFeatures()
         defaults = extractor._get_default_features()
@@ -43,7 +43,7 @@ class TestLineMovementFeatures:
 
     def test_default_features_values(self):
         """Test that default features have sensible neutral values."""
-        from py.features.line_movement_features import LineMovementFeatures
+        from nfl_analytics.features.line_movement_features import LineMovementFeatures
 
         extractor = LineMovementFeatures()
         defaults = extractor._get_default_features()
@@ -63,7 +63,7 @@ class TestLineMovementFeatures:
 
     def test_clv_calculation_home_bet(self):
         """Test CLV calculation for home team bets."""
-        from py.features.line_movement_features import calculate_clv
+        from nfl_analytics.features.line_movement_features import calculate_clv
 
         # If you bet Home -3 and it closed at -3.5, you got 0.5 pts CLV
         clv = calculate_clv(bet_spread=-3.0, closing_spread=-3.5, bet_on_home=True)
@@ -75,7 +75,7 @@ class TestLineMovementFeatures:
 
     def test_clv_calculation_away_bet(self):
         """Test CLV calculation for away team bets."""
-        from py.features.line_movement_features import calculate_clv
+        from nfl_analytics.features.line_movement_features import calculate_clv
 
         # If you bet Away +3 and it closed at +3.5, you lost 0.5 pts CLV
         clv = calculate_clv(bet_spread=-3.0, closing_spread=-3.5, bet_on_home=False)
@@ -87,7 +87,7 @@ class TestLineMovementFeatures:
 
     def test_extract_returns_dict(self):
         """Test that extract always returns a dictionary."""
-        from py.features.line_movement_features import LineMovementFeatures
+        from nfl_analytics.features.line_movement_features import LineMovementFeatures
 
         extractor = LineMovementFeatures()
 
@@ -100,7 +100,7 @@ class TestLineMovementFeatures:
     @pytest.mark.integration
     def test_extract_real_game(self):
         """Integration test: extract features for a real game with odds data."""
-        from py.features.line_movement_features import LineMovementFeatures
+        from nfl_analytics.features.line_movement_features import LineMovementFeatures
 
         extractor = LineMovementFeatures()
 
@@ -121,7 +121,7 @@ class TestLineMovementFeatures:
     @pytest.mark.integration
     def test_extract_by_teams(self):
         """Integration test: extract features using team/week lookup."""
-        from py.features.line_movement_features import LineMovementFeatures
+        from nfl_analytics.features.line_movement_features import LineMovementFeatures
 
         extractor = LineMovementFeatures()
 
@@ -137,14 +137,14 @@ class TestLineMovementConstants:
 
     def test_sharp_movement_threshold(self):
         """Test sharp movement threshold is reasonable."""
-        from py.features.line_movement_features import SHARP_MOVEMENT_THRESHOLD
+        from nfl_analytics.features.line_movement_features import SHARP_MOVEMENT_THRESHOLD
 
         # Should be 1-2 points (industry standard)
         assert 1.0 <= SHARP_MOVEMENT_THRESHOLD <= 2.0
 
     def test_min_books_for_consensus(self):
         """Test minimum books threshold is reasonable."""
-        from py.features.line_movement_features import MIN_BOOKS_FOR_CONSENSUS
+        from nfl_analytics.features.line_movement_features import MIN_BOOKS_FOR_CONSENSUS
 
         # Should need at least 2-5 books for consensus
         assert 2 <= MIN_BOOKS_FOR_CONSENSUS <= 5
@@ -160,7 +160,7 @@ class TestMovementDirection:
         - Negative movement (line got smaller) = -1 (toward favorite)
         - Small movement = 0 (no significant move)
         """
-        from py.features.line_movement_features import LineMovementFeatures
+        from nfl_analytics.features.line_movement_features import LineMovementFeatures
 
         # These are conceptual tests - actual logic is in the extractor
         # Movement > 0.25: +1

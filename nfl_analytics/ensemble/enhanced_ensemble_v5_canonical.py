@@ -10,7 +10,7 @@ Combines 5 models trained on canonical window (2015-2024):
 5. XGBoost Player Props v1
 
 Usage:
-    python py/ensemble/enhanced_ensemble_v5_canonical.py \
+    python nfl_analytics/ensemble/enhanced_ensemble_v5_canonical.py \
       --player-id "00-0019596" \
       --season 2024 \
       --week 9 \
@@ -89,7 +89,7 @@ class EnhancedEnsemble5Way:
 
         # Load State-Space predictor
         try:
-            from py.models.state_space_predictor import StateSpacePredictor
+            from nfl_analytics.models.state_space_predictor import StateSpacePredictor
 
             self.state_space_predictor = StateSpacePredictor(
                 model_path=self.state_space_path,
@@ -102,7 +102,7 @@ class EnhancedEnsemble5Way:
 
         # Load BNN
         if self.bnn_path.exists():
-            from py.models.bayesian_neural_network import BayesianNeuralNetwork
+            from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
 
             self.bnn_model = BayesianNeuralNetwork.load(self.bnn_path)
             logger.info(f"✓ BNN loaded: {self.bnn_path}")

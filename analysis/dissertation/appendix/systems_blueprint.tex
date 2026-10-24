@@ -27,7 +27,7 @@ This appendix outlines concrete algorithms, interfaces, and deployment flows to 
 % End local \sloppy group
 \endgroup
 
-\paragraph{Implementation notes.} Use \texttt{py/ingest\_odds\_history.py} with chunked requests, exponential backoff, and database COPY for bulk upserts. Mirror the pattern for schedules and injuries in R with \texttt{data/ingest\_schedules.R}.
+\paragraph{Implementation notes.} Use \texttt{nfl\_analytics/ingest\_odds\_history.py} with chunked requests, exponential backoff, and database COPY for bulk upserts. Mirror the pattern for schedules and injuries in R with \texttt{data/ingest\_schedules.R}.
 
 \section{As-Of Feature Snapshot}
 \begin{algorithm}[H]\small

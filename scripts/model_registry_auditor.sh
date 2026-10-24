@@ -30,7 +30,7 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 # Python script
-PYTHON_SCRIPT="py/utils/model_registry_auditor.py"
+PYTHON_SCRIPT="nfl_analytics/utils/model_registry_auditor.py"
 
 # Check if script exists
 if [ ! -f "$PYTHON_SCRIPT" ]; then
@@ -126,7 +126,7 @@ if ! $PYTHON -c "import click" 2>/dev/null; then
     # Use Python API directly
     if [ "$COMMAND" = "scan" ]; then
         $PYTHON << EOF
-from py.utils.model_registry_auditor import ModelRegistryAuditor
+from nfl_analytics.utils.model_registry_auditor import ModelRegistryAuditor
 import json
 
 auditor = ModelRegistryAuditor()
@@ -152,9 +152,9 @@ if valid:
 EOF
     elif [ "$COMMAND" = "audit" ]; then
         $PYTHON << EOF
-from py.utils.model_registry_auditor import ModelRegistryAuditor
+from nfl_analytics.utils.model_registry_auditor import ModelRegistryAuditor
 import logging
-logging.getLogger('py.utils.model_registry_auditor').setLevel(logging.ERROR)
+logging.getLogger('nfl_analytics.utils.model_registry_auditor').setLevel(logging.ERROR)
 
 auditor = ModelRegistryAuditor()
 report = auditor.audit_full()
@@ -162,9 +162,9 @@ print(report.summary())
 EOF
     elif [ "$COMMAND" = "convergence" ]; then
         $PYTHON << EOF
-from py.utils.model_registry_auditor import ModelRegistryAuditor
+from nfl_analytics.utils.model_registry_auditor import ModelRegistryAuditor
 import logging
-logging.getLogger('py.utils.model_registry_auditor').setLevel(logging.ERROR)
+logging.getLogger('nfl_analytics.utils.model_registry_auditor').setLevel(logging.ERROR)
 
 auditor = ModelRegistryAuditor()
 registry_models = auditor.scan_registry_yaml()

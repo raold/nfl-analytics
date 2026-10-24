@@ -136,7 +136,7 @@ where $w$ is the week number (0-indexed, so week 1 uses $w=0$) and $H=4.0$ is th
   \item \textbf{Buffalo Bills (2024):} New DC Bobby Babich (\texttt{dc\_continuity=0}, \texttt{dc\_tenure\_seasons=1}, Week 1: \texttt{new\_dc\_adjustment=0.8}, Week 5: \texttt{new\_dc\_adjustment=0.294}). Elevated defensive uncertainty in early weeks.
 \end{itemize}
 
-\noindent\textbf{Implementation:} Computed via \texttt{py/features/\allowbreak oc\_features.py} and \texttt{py/features/\allowbreak dc\_features.py}, querying the \texttt{coaching\_staff} table with temporal joins. Integrated into XGBoost v5 training pipeline (\texttt{scripts/\allowbreak train\_xgboost\_player\_agg\_v5.py:\allowbreak merge\_coaching\_features()}) generating 16 total features (8 home + 8 away).
+\noindent\textbf{Implementation:} Computed via \texttt{nfl\_analytics/features/\allowbreak oc\_features.py} and \texttt{nfl\_analytics/features/\allowbreak dc\_features.py}, querying the \texttt{coaching\_staff} table with temporal joins. Integrated into XGBoost v5 training pipeline (\texttt{scripts/\allowbreak train\_xgboost\_player\_agg\_v5.py:\allowbreak merge\_coaching\_features()}) generating 16 total features (8 home + 8 away).
 
 \subsubsection{Coverage Rates and Data Quality}
 
@@ -199,7 +199,7 @@ WHERE season >= 2020;
 Phase 5 features integrate seamlessly with existing pipelines through a unified \texttt{AdvancedFeatureLoader} class:
 
 \begin{lstlisting}[language=Python,basicstyle=\ttfamily\footnotesize]
-from py.features.feature_loader import AdvancedFeatureLoader
+from nfl_analytics.features.feature_loader import AdvancedFeatureLoader
 
 loader = AdvancedFeatureLoader(
     db_url="postgresql://localhost:5544/devdb01"

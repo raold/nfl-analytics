@@ -19,7 +19,7 @@ import time
 from datetime import datetime, timedelta
 
 import numpy as np
-from py.utils.ab_test_monitor import ABTestMonitor, Decision
+from nfl_analytics.utils.ab_test_monitor import ABTestMonitor, Decision
 
 # Configure logging
 logging.basicConfig(
@@ -53,7 +53,7 @@ def example_1_pre_backtest_validation():
         return False
     else:
         logger.info("✅ Guardrails passed. Safe to run backtest.")
-        # Would run: python py/backtest/historical_validation_4way.py
+        # Would run: python nfl_analytics/backtest/historical_validation_4way.py
         return True
 
 

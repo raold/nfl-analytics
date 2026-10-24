@@ -58,7 +58,7 @@ After achieving 54.5% spread accuracy and 44.25 MAE on props with Ensemble v6.0,
 
 **Feature Modules:**
 
-1. **Synthetic Interaction Features** (`py/features/synthetic_interaction_features.py`)
+1. **Synthetic Interaction Features** (`nfl_analytics/features/synthetic_interaction_features.py`)
    - QB-OL Synergy: `(qb_any_a - league_avg) * (time_to_throw - league_avg)`
    - Defensive Balance Index: `abs(pass_epa - rush_epa) * consistency_score`
    - Explosive Mismatch: `off_explosive_rate / def_explosive_allowed`
@@ -66,14 +66,14 @@ After achieving 54.5% spread accuracy and 44.25 MAE on props with Ensemble v6.0,
    - Injury Replacement Value: `injury_severity * (1 - backup_quality)`
    - Plus 6 differential features (home - away)
 
-2. **Synthetic Momentum Features** (`py/features/synthetic_momentum_features.py`)
+2. **Synthetic Momentum Features** (`nfl_analytics/features/synthetic_momentum_features.py`)
    - Form Intensity: `(epa_last_2 - epa_weeks_3_to_6) / abs(epa_weeks_3_to_6)`
    - Pressure Consistency: `1 - (std(pressure_rate_4wk) / mean(pressure_rate_4wk))`
    - RZ Efficiency Differential: `off_rz_td_rate - opp_def_rz_td_rate_allowed`
    - Momentum Direction: `(epa_q34 - epa_q12) / max(abs(epa_q12), 0.01)`
    - Plus 7 differential/matchup features
 
-3. **Research-Driven Features** (`py/features/research_driven_features.py`)
+3. **Research-Driven Features** (`nfl_analytics/features/research_driven_features.py`)
    - Weighted Net EPA: `(off_epa * 1.6 - def_epa * 1.0) / 2.6` (nfelo 1.6:1.0 weighting)
    - Coaching Rationality Index: Weighted blend of 4th-down go rate, 2-pt attempts, 1st-down pass rate vs optimal
    - Rookie QB Adjustment: 25% penalty for first-year QBs (Tofte research)
@@ -218,7 +218,7 @@ Rejected. The 37 features are small enough to validate together. NFL season timi
 - **Feature Count:** 305 → 342 (+12% increase, within XGBoost capacity)
 - **Training Time:** XGBoost v5 retraining required (estimated 2-4 hours on full dataset)
 - **Documentation Update:** Dissertation Chapter 5 feature table needs update (232 → 342)
-- **Module Exports:** Updated `py/features/__init__.py` with new engines
+- **Module Exports:** Updated `nfl_analytics/features/__init__.py` with new engines
 
 ### Risks
 
@@ -247,7 +247,7 @@ Rejected. The 37 features are small enough to validate together. NFL season timi
 2. Implement `SyntheticMomentumEngine` (11 features)
 3. Implement `ResearchDrivenEngine` (15 features)
 4. Add transaction error handling (rollback in injury recovery)
-5. Update `py/features/__init__.py` module exports
+5. Update `nfl_analytics/features/__init__.py` module exports
 
 **Phase 3: Validation (2 hours)** - Complete
 1. Manual testing with 2024 game data
@@ -326,10 +326,10 @@ Rejected. The 37 features are small enough to validate together. NFL season timi
 
 ### Code
 
-- `py/features/synthetic_interaction_features.py` (650 lines) - QB-OL synergy, defensive balance, explosive mismatch, coaching confidence, injury replacement
-- `py/features/synthetic_momentum_features.py` (502 lines) - Form intensity, pressure consistency, RZ efficiency, momentum direction
-- `py/features/research_driven_features.py` (800 lines) - Weighted net EPA, coaching rationality, rookie adjustment, career year regression, injury recovery, YAC over expected
-- `py/features/__init__.py` (56 lines) - Module exports
+- `nfl_analytics/features/synthetic_interaction_features.py` (650 lines) - QB-OL synergy, defensive balance, explosive mismatch, coaching confidence, injury replacement
+- `nfl_analytics/features/synthetic_momentum_features.py` (502 lines) - Form intensity, pressure consistency, RZ efficiency, momentum direction
+- `nfl_analytics/features/research_driven_features.py` (800 lines) - Weighted net EPA, coaching rationality, rookie adjustment, career year regression, injury recovery, YAC over expected
+- `nfl_analytics/features/__init__.py` (56 lines) - Module exports
 
 ### External Research Sources
 

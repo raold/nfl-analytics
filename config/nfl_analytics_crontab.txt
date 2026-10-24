@@ -40,13 +40,13 @@ NFL_ANALYTICS_DIR=\
 # ====================================
 # 10am ET (15:00 UTC) - Morning line
 # Using smart odds script with priority-based fetching and quota tracking
-0 15 * * * cd $NFL_ANALYTICS_DIR && uv run python py/ingest_odds_smart.py --priority high --max-calls 10 >> /tmp/odds_fetcher_cron.log 2>&1
+0 15 * * * cd $NFL_ANALYTICS_DIR && uv run python nfl_analytics/ingest_odds_smart.py --priority high --max-calls 10 >> /tmp/odds_fetcher_cron.log 2>&1
 
 # 4pm ET (21:00 UTC) - Afternoon movement
-0 21 * * * cd $NFL_ANALYTICS_DIR && uv run python py/ingest_odds_smart.py --priority high --max-calls 10 >> /tmp/odds_fetcher_cron.log 2>&1
+0 21 * * * cd $NFL_ANALYTICS_DIR && uv run python nfl_analytics/ingest_odds_smart.py --priority high --max-calls 10 >> /tmp/odds_fetcher_cron.log 2>&1
 
 # 10pm ET (03:00 UTC next day) - Closing lines
-0 3 * * * cd $NFL_ANALYTICS_DIR && uv run python py/ingest_odds_smart.py --priority urgent --max-calls 15 >> /tmp/odds_fetcher_cron.log 2>&1
+0 3 * * * cd $NFL_ANALYTICS_DIR && uv run python nfl_analytics/ingest_odds_smart.py --priority urgent --max-calls 15 >> /tmp/odds_fetcher_cron.log 2>&1
 
 # ====================================
 # Outcome Backfill

@@ -403,5 +403,5 @@ COMMENT ON FUNCTION ml.compute_model_metrics IS 'Compute aggregate metrics for a
 -- ============================================================
 -- Migration 032 complete!
 -- Next steps:
---   1. Run py/database/register_ensemble_models.py to populate ml.model_registry
---   2. Run py/database/store_ensemble_predictions.py to populate ml.predictions
+--   1. Run nfl_analytics/database/register_ensemble_models.py to populate ml.model_registry
+--   2. Run nfl_analytics/database/store_ensemble_predictions.py to populate ml.predictions

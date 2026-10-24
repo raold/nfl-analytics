@@ -13,7 +13,7 @@ import logging
 from dataclasses import dataclass
 from typing import Any
 
-from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
+from nfl_analytics.utils.claude_cache import ClaudeRedisCache, get_default_cache
 
 logger = logging.getLogger(__name__)
 

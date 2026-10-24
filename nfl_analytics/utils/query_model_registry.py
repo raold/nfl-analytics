@@ -6,25 +6,25 @@ models in the PostgreSQL model registry database.
 
 Usage Examples:
     # List all production models
-    uv run python py/utils/query_model_registry.py list --status production
+    uv run python nfl_analytics/utils/query_model_registry.py list --status production
 
     # Search for BNN models trained on 2018-2024 window
-    uv run python py/utils/query_model_registry.py search --model-type bnn --training-window "2018-2024"
+    uv run python nfl_analytics/utils/query_model_registry.py search --model-type bnn --training-window "2018-2024"
 
     # Compare two model versions
-    uv run python py/utils/query_model_registry.py compare bnn_v1 bnn_v2
+    uv run python nfl_analytics/utils/query_model_registry.py compare bnn_v1 bnn_v2
 
     # Show leaderboard sorted by MAE
-    uv run python py/utils/query_model_registry.py leaderboard --metric mae_yards --stat-type passing
+    uv run python nfl_analytics/utils/query_model_registry.py leaderboard --metric mae_yards --stat-type passing
 
     # Check if model is safe to delete
-    uv run python py/utils/query_model_registry.py check-safe-delete bnn_old_v1
+    uv run python nfl_analytics/utils/query_model_registry.py check-safe-delete bnn_old_v1
 
     # Show detailed model information
-    uv run python py/utils/query_model_registry.py info bnn_v2 --show-training
+    uv run python nfl_analytics/utils/query_model_registry.py info bnn_v2 --show-training
 
     # Export leaderboard as LaTeX table
-    uv run python py/utils/query_model_registry.py leaderboard --format latex --metric mae_yards > results.tex
+    uv run python nfl_analytics/utils/query_model_registry.py leaderboard --format latex --metric mae_yards > results.tex
 
 Database Connection:
     postgresql://dro:sicillionbillions@localhost:5544/devdb01

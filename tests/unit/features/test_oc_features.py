@@ -31,7 +31,7 @@ from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from py.features.oc_features import OCFeatureGenerator
+from nfl_analytics.features.oc_features import OCFeatureGenerator
 
 
 class TestExponentialDecayAdjustment(unittest.TestCase):
@@ -104,7 +104,7 @@ class TestOCContinuityLogic(unittest.TestCase):
         """Initialize generator with mocked database."""
         self.generator = OCFeatureGenerator()
 
-    @patch("py.features.oc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.oc_features.psycopg2.connect")
     def test_continuity_same_oc(self, mock_connect):
         """Same OC as last season should return continuity=1."""
         mock_cursor = MagicMock()
@@ -122,7 +122,7 @@ class TestOCContinuityLogic(unittest.TestCase):
         self.assertEqual(current_oc, "Matt Nagy")
         self.assertEqual(prior_oc, "Matt Nagy")
 
-    @patch("py.features.oc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.oc_features.psycopg2.connect")
     def test_continuity_new_oc(self, mock_connect):
         """Different OC from last season should return continuity=0."""
         mock_cursor = MagicMock()
@@ -140,7 +140,7 @@ class TestOCContinuityLogic(unittest.TestCase):
         self.assertEqual(current_oc, "New Coordinator")
         self.assertEqual(prior_oc, "Old Coordinator")
 
-    @patch("py.features.oc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.oc_features.psycopg2.connect")
     def test_continuity_no_data_returns_defaults(self, mock_connect):
         """Missing OC data should return continuity=0 and None names."""
         mock_cursor = MagicMock()
@@ -199,7 +199,7 @@ class TestOCTenureCalculation(unittest.TestCase):
         """Initialize generator with mocked database."""
         self.generator = OCFeatureGenerator()
 
-    @patch("py.features.oc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.oc_features.psycopg2.connect")
     def test_tenure_long_serving_oc(self, mock_connect):
         """Long-serving OC should return high tenure count."""
         mock_cursor = MagicMock()
@@ -215,7 +215,7 @@ class TestOCTenureCalculation(unittest.TestCase):
 
         self.assertEqual(tenure, 5, "Long-serving OC should have 5-year tenure")
 
-    @patch("py.features.oc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.oc_features.psycopg2.connect")
     def test_tenure_new_oc(self, mock_connect):
         """New OC should return tenure=1."""
         mock_cursor = MagicMock()
@@ -231,7 +231,7 @@ class TestOCTenureCalculation(unittest.TestCase):
 
         self.assertEqual(tenure, 1, "New OC should have tenure=1")
 
-    @patch("py.features.oc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.oc_features.psycopg2.connect")
     def test_tenure_no_data_returns_1(self, mock_connect):
         """Missing tenure data should default to 1."""
         mock_cursor = MagicMock()
@@ -356,7 +356,7 @@ class TestCacheBehavior(unittest.TestCase):
         """Initialize generator."""
         self.generator = OCFeatureGenerator()
 
-    @patch("py.features.oc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.oc_features.psycopg2.connect")
     def test_continuity_cache_hit(self, mock_connect):
         """Second call with same args should hit cache (no DB query)."""
         mock_cursor = MagicMock()
@@ -380,7 +380,7 @@ class TestCacheBehavior(unittest.TestCase):
         # Database cursor should only execute once (due to cache)
         self.assertEqual(mock_cursor.execute.call_count, 1, "Second call should hit cache, not DB")
 
-    @patch("py.features.oc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.oc_features.psycopg2.connect")
     def test_tenure_cache_hit(self, mock_connect):
         """Second tenure call with same args should hit cache."""
         mock_cursor = MagicMock()

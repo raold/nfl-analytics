@@ -23,7 +23,7 @@ This module provides drop-in replacements for pandas rolling() calls:
 - rolling(8).mean() → exponential_rolling(df, col, halflife=8)
 
 **Usage**:
-    from py.features.exponential_weights import exponential_rolling
+    from nfl_analytics.features.exponential_weights import exponential_rolling
 
     # Before (linear):
     df['epa_last_4'] = df.groupby('team')['epa'].rolling(4).mean()
@@ -34,9 +34,9 @@ This module provides drop-in replacements for pandas rolling() calls:
     )
 
 **Files to Migrate**:
-- py/features/vegas_line_bias_features.py (ats_pct_last4, ats_pct_last8)
-- py/features/asof_features_v2.py (def_epa_last_4)
-- py/features/player_features.py (all rolling averages)
+- nfl_analytics/features/vegas_line_bias_features.py (ats_pct_last4, ats_pct_last8)
+- nfl_analytics/features/asof_features_v2.py (def_epa_last_4)
+- nfl_analytics/features/player_features.py (all rolling averages)
 - db/migrations/019_v2_model_features.sql (def_epa_last_4 SQL)
 
 Author: Claude Code (Sonnet 4.5)

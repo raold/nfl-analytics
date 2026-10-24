@@ -23,7 +23,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from py.utils.performance_profiling_agent import (
+from nfl_analytics.utils.performance_profiling_agent import (
     Bottleneck,
     BottleneckSeverity,
     BottleneckType,

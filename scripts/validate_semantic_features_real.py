@@ -32,7 +32,7 @@ import xgboost as xgb
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.features.game_feature_extractor import GameFeatureExtractor
+from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)

@@ -102,7 +102,7 @@ cmd_scan() {
     $PYTHON_CMD << EOF
 import sys
 sys.path.insert(0, '${PROJECT_ROOT}')
-from py.utils.data_layer_analyzer import DataLayerAnalyzer
+from nfl_analytics.utils.data_layer_analyzer import DataLayerAnalyzer
 
 analyzer = DataLayerAnalyzer('${PROJECT_ROOT}')
 analyzer.scan_codebase()
@@ -128,7 +128,7 @@ cmd_trace() {
     $PYTHON_CMD << EOF
 import sys
 sys.path.insert(0, '${PROJECT_ROOT}')
-from py.utils.data_layer_analyzer import DataLayerAnalyzer
+from nfl_analytics.utils.data_layer_analyzer import DataLayerAnalyzer
 
 analyzer = DataLayerAnalyzer('${PROJECT_ROOT}')
 analyzer.load_lineage('${CACHE_FILE}')
@@ -178,7 +178,7 @@ cmd_impact() {
     $PYTHON_CMD << EOF
 import sys
 sys.path.insert(0, '${PROJECT_ROOT}')
-from py.utils.data_layer_analyzer import DataLayerAnalyzer
+from nfl_analytics.utils.data_layer_analyzer import DataLayerAnalyzer
 
 analyzer = DataLayerAnalyzer('${PROJECT_ROOT}')
 analyzer.load_lineage('${CACHE_FILE}')
@@ -253,7 +253,7 @@ cmd_unused() {
     $PYTHON_CMD << EOF
 import sys
 sys.path.insert(0, '${PROJECT_ROOT}')
-from py.utils.data_layer_analyzer import DataLayerAnalyzer
+from nfl_analytics.utils.data_layer_analyzer import DataLayerAnalyzer
 
 analyzer = DataLayerAnalyzer('${PROJECT_ROOT}')
 analyzer.load_lineage('${CACHE_FILE}')
@@ -287,7 +287,7 @@ cmd_opportunities() {
     $PYTHON_CMD << EOF
 import sys
 sys.path.insert(0, '${PROJECT_ROOT}')
-from py.utils.data_layer_analyzer import DataLayerAnalyzer
+from nfl_analytics.utils.data_layer_analyzer import DataLayerAnalyzer
 
 analyzer = DataLayerAnalyzer('${PROJECT_ROOT}')
 analyzer.load_lineage('${CACHE_FILE}')
@@ -327,7 +327,7 @@ cmd_graph() {
     $PYTHON_CMD << EOF
 import sys
 sys.path.insert(0, '${PROJECT_ROOT}')
-from py.utils.data_layer_analyzer import DataLayerAnalyzer
+from nfl_analytics.utils.data_layer_analyzer import DataLayerAnalyzer
 
 analyzer = DataLayerAnalyzer('${PROJECT_ROOT}')
 analyzer.load_lineage('${CACHE_FILE}')

@@ -44,7 +44,7 @@ def test_gnn_component():
     print("=" * 80)
 
     try:
-        from py.ensemble.components.gnn_component import GNNComponent
+        from nfl_analytics.ensemble.components.gnn_component import GNNComponent
 
         gnn = GNNComponent(device="cpu")
         print("✓ GNN component initialized")
@@ -85,7 +85,7 @@ def test_ensemble_v6_2_initialization():
     print("=" * 80)
 
     try:
-        from py.ensemble.enhanced_ensemble_v6_2_gnn import EnhancedEnsemble6WayGNN
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_2_gnn import EnhancedEnsemble6WayGNN
 
         ensemble = EnhancedEnsemble6WayGNN(db_password=os.getenv("DB_PASSWORD"), enable_gnn=True)
 
@@ -121,7 +121,7 @@ def test_game_outcome_prediction():
     print("=" * 80)
 
     try:
-        from py.ensemble.enhanced_ensemble_v6_2_gnn import EnhancedEnsemble6WayGNN
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_2_gnn import EnhancedEnsemble6WayGNN
 
         ensemble = EnhancedEnsemble6WayGNN(db_password=os.getenv("DB_PASSWORD"), enable_gnn=True)
 
@@ -176,7 +176,7 @@ def test_graceful_degradation():
     print("=" * 80)
 
     try:
-        from py.ensemble.enhanced_ensemble_v6_2_gnn import EnhancedEnsemble6WayGNN
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_2_gnn import EnhancedEnsemble6WayGNN
 
         # Initialize with GNN disabled
         ensemble = EnhancedEnsemble6WayGNN(db_password=os.getenv("DB_PASSWORD"), enable_gnn=False)
@@ -211,7 +211,7 @@ def test_weight_strategies():
     print("=" * 80)
 
     try:
-        from py.ensemble.strategy.base import DEFAULT_WEIGHTS_V6, DEFAULT_WEIGHTS_V6_1_GNN
+        from nfl_analytics.ensemble.strategy.base import DEFAULT_WEIGHTS_V6, DEFAULT_WEIGHTS_V6_1_GNN
 
         print("v6.0 weights (5-way):")
         for name, weight in DEFAULT_WEIGHTS_V6.items():

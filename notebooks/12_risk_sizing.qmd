@@ -41,8 +41,8 @@ scenarios_path <- file.path("data", "scenarios.csv")
 json_out <- file.path("analysis", "reports", "cvar_stakes.json")
 dir.create(dirname(json_out), recursive = TRUE, showWarnings = FALSE)
 
-ok1 <- try(system2("python", c("py/risk/generate_scenarios.py", "--bets", bets_path, "--output", scenarios_path, "--sims", params$sims)), silent = TRUE)
-ok2 <- try(system2("python", c("py/risk/cvar_lp.py", "--scenarios", scenarios_path, "--alpha", params$alpha, "--output", json_out)), silent = TRUE)
+ok1 <- try(system2("python", c("nfl_analytics/risk/generate_scenarios.py", "--bets", bets_path, "--output", scenarios_path, "--sims", params$sims)), silent = TRUE)
+ok2 <- try(system2("python", c("nfl_analytics/risk/cvar_lp.py", "--scenarios", scenarios_path, "--alpha", params$alpha, "--output", json_out)), silent = TRUE)
 if (file.exists(json_out)) {
   res <- jsonlite::fromJSON(json_out)
   print(res)
@@ -51,4 +51,4 @@ if (file.exists(json_out)) {
 
 ## 3. Notes
 - For production runs, replace example bets with model outputs and expand to full slates.
-- If `cvxpy` is available, wire `py/risk/cvar_lp.py` to use it; otherwise the stub falls back to a simple heuristic.
+- If `cvxpy` is available, wire `nfl_analytics/risk/cvar_lp.py` to use it; otherwise the stub falls back to a simple heuristic.

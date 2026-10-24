@@ -61,7 +61,7 @@ case $ACTION in
         fi
 
         python3 -c "
-from py.agents.data_freshness_validator import DataFreshnessValidator
+from nfl_analytics.agents.data_freshness_validator import DataFreshnessValidator
 
 validator = DataFreshnessValidator()
 status = validator.check_data_freshness('$SOURCE')
@@ -77,7 +77,7 @@ print(f'Message: {status.message}')
 
     check-all)
         python3 -c "
-from py.agents.data_freshness_validator import DataFreshnessValidator
+from nfl_analytics.agents.data_freshness_validator import DataFreshnessValidator
 
 validator = DataFreshnessValidator()
 statuses = validator.get_all_freshness_statuses()
@@ -93,7 +93,7 @@ for source, status in statuses.items():
 
     validate-ensemble)
         python3 -c "
-from py.agents.data_freshness_validator import DataFreshnessValidator
+from nfl_analytics.agents.data_freshness_validator import DataFreshnessValidator
 
 validator = DataFreshnessValidator()
 health = validator.validate_ensemble_availability()
@@ -129,7 +129,7 @@ for comp in health.components:
         fi
 
         python3 -c "
-from py.agents.data_freshness_validator import DataFreshnessValidator
+from nfl_analytics.agents.data_freshness_validator import DataFreshnessValidator
 
 validator = DataFreshnessValidator()
 
@@ -153,7 +153,7 @@ if report.error:
         fi
 
         python3 -c "
-from py.agents.data_freshness_validator import DataFreshnessValidator
+from nfl_analytics.agents.data_freshness_validator import DataFreshnessValidator
 
 validator = DataFreshnessValidator()
 indicator = validator.get_freshness_indicator('$SOURCE')

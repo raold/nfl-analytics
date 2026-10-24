@@ -7,7 +7,7 @@ Provides automatic detection and configuration of:
 - CPU fallback
 
 Usage:
-    from py.utils.device_utils import get_best_device
+    from nfl_analytics.utils.device_utils import get_best_device
 
     device = get_best_device()  # Auto-detect
     model = model.to(device)

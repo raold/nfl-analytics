@@ -15,7 +15,7 @@ import xgboost as xgb
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
-from py.utils.spread_convention import implied_home_win_prob
+from nfl_analytics.utils.spread_convention import implied_home_win_prob
 
 warnings.filterwarnings("ignore")
 
@@ -29,7 +29,7 @@ features_path = Path("data/processed/features/asof_clean_backtest.csv")
 
 if not features_path.exists():
     print(f"[FAIL] Features not found at {features_path}")
-    print("Run: PYTHONPATH=. uv run python py/features/asof_features.py \\")
+    print("Run: PYTHONPATH=. uv run python nfl_analytics/features/asof_features.py \\")
     print("  --output data/processed/features/asof_clean_backtest.csv \\")
     print("  --season-start 1999 --season-end 2024 --validate")
     exit(1)

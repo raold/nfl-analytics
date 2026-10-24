@@ -242,7 +242,7 @@ def validate_no_leakage(df: pd.DataFrame, target_col: str) -> bool:
     Returns:
         True if no leakage detected
     """
-    from py.utils.data_leakage_detector import DataLeakageDetector
+    from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector
 
     detector = DataLeakageDetector()
     report = detector.check_dataframe(df, target_col=target_col, date_col="kickoff")

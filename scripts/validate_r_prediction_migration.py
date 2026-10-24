@@ -29,8 +29,8 @@ import logging
 import pandas as pd
 import psycopg2
 
-from py.ensemble.r_model_interface import RModelInterface
-from py.ensemble.r_prediction_lookup import RPredictionLookup
+from nfl_analytics.ensemble.r_model_interface import RModelInterface
+from nfl_analytics.ensemble.r_prediction_lookup import RPredictionLookup
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)

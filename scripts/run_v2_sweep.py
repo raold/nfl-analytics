@@ -63,7 +63,7 @@ def main():
     # Build command
     cmd = [
         sys.executable,  # Use current Python interpreter
-        "py/models/xgboost_gpu_v2.py",  # Will create this modified version
+        "nfl_analytics/models/xgboost_gpu_v2.py",  # Will create this modified version
         "--features-csv",
         "data/processed/features/asof_team_features_v2.csv",
         "--start-season",

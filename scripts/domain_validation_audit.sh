@@ -389,7 +389,7 @@ else:
 " 2>/dev/null | grep -q "PASS"; then
     log_success "Kelly criterion formula correct (55% @ -110 → 5.49%)"
   else
-    log_failure "Kelly criterion formula incorrect (check py/production/kelly_sizing.py)"
+    log_failure "Kelly criterion formula incorrect (check nfl_analytics/production/kelly_sizing.py)"
   fi
 
   # American odds conversion check
@@ -423,18 +423,18 @@ if [[ -z "$SPECIFIC_CHECK" || "$SPECIFIC_CHECK" == "fillna_audit" ]]; then
   echo "---[ Code Quality: fillna(0) Audit ]---"
   run_check
 
-  fillna_count=$(grep -rn "fillna(0)" py/ 2>/dev/null | wc -l | xargs || echo "0")
+  fillna_count=$(grep -rn "fillna(0)" nfl_analytics/ 2>/dev/null | wc -l | xargs || echo "0")
 
   if [[ "$fillna_count" -gt 0 ]]; then
     log_warning "Found $fillna_count occurrences of fillna(0) - audit for domain correctness (P2)"
     if [[ "$VERBOSE" == "true" ]]; then
       echo ""
       echo "  Locations:"
-      grep -rn "fillna(0)" py/ | head -10
+      grep -rn "fillna(0)" nfl_analytics/ | head -10
       echo "  ... (use grep for full list)"
     fi
   else
-    log_success "No fillna(0) occurrences found (or py/ directory not present)"
+    log_success "No fillna(0) occurrences found (or nfl_analytics/ directory not present)"
   fi
 
   echo ""
@@ -481,15 +481,15 @@ if [[ -z "$SPECIFIC_CHECK" || "$SPECIFIC_CHECK" == "production" ]]; then
   run_check
 
   # Check for risk gates
-  if grep -q "MIN_ROI\|MIN_WIN_RATE\|MIN_SHARPE" py/utils/betting_validator.py 2>/dev/null; then
+  if grep -q "MIN_ROI\|MIN_WIN_RATE\|MIN_SHARPE" nfl_analytics/utils/betting_validator.py 2>/dev/null; then
     log_success "Risk gates implemented (ROI, win rate, Sharpe, drawdown)"
   else
-    log_warning "Risk gates not found (check py/utils/betting_validator.py)"
+    log_warning "Risk gates not found (check nfl_analytics/utils/betting_validator.py)"
   fi
 
   # Check for Kelly fraction
   run_check
-  if grep -q "kelly_fraction.*0\.25\|kelly_fraction.*0\.35" py/production/*.py 2>/dev/null; then
+  if grep -q "kelly_fraction.*0\.25\|kelly_fraction.*0\.35" nfl_analytics/production/*.py 2>/dev/null; then
     log_success "Kelly fraction set to 25-35% (conservative, industry standard)"
   else
     log_warning "Kelly fraction configuration unclear"
@@ -497,7 +497,7 @@ if [[ -z "$SPECIFIC_CHECK" || "$SPECIFIC_CHECK" == "production" ]]; then
 
   # Check for CLV tracking
   run_check
-  if grep -q "closing_line\|CLV" py/models/player_props_ensemble.py 2>/dev/null; then
+  if grep -q "closing_line\|CLV" nfl_analytics/models/player_props_ensemble.py 2>/dev/null; then
     log_success "Closing line value (CLV) tracked in production"
   else
     log_warning "CLV not found in production pipeline (P2: implement before live betting)"

@@ -22,7 +22,7 @@ team-level features that capture:
 **Expected Impact**: +2-4 yards MAE improvement (Track A, Week 2)
 
 Usage:
-    from py.features.player_aggregation_features import aggregate_player_projections
+    from nfl_analytics.features.player_aggregation_features import aggregate_player_projections
 
     df = aggregate_player_projections(
         season=2024,

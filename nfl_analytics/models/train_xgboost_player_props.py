@@ -3,7 +3,7 @@
 Train XGBoost Model on Player-Level Passing Props
 
 Usage:
-    python py/models/train_xgboost_player_props.py
+    python nfl_analytics/models/train_xgboost_player_props.py
 
 Expected:
 - Training time: 5-10 minutes

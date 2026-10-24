@@ -46,7 +46,7 @@ import numpy as np
 import pandas as pd
 import psycopg2
 
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
 logging.basicConfig(
     level=logging.WARNING,  # Suppress info logs during profiling

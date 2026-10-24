@@ -6,7 +6,7 @@ Generates comprehensive visualizations and LaTeX tables from the GNN ablation st
 Outputs figures and tables for dissertation Chapter 4 (Model Architecture).
 
 Usage:
-    python py/analysis/visualize_gnn_ablation.py
+    python nfl_analytics/analysis/visualize_gnn_ablation.py
 
 Outputs:
     - analysis/dissertation/figures/out/gnn_ablation_summary_table.tex

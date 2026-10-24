@@ -31,7 +31,7 @@ def example_1_pre_backtest_validation():
 
     Run this BEFORE expensive backtests to catch R model loading failures.
     """
-    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
+    from nfl_analytics.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
     logger.info("=" * 80)
     logger.info("EXAMPLE 1: Pre-Backtest Validation")
@@ -67,8 +67,8 @@ def example_2_integrated_backtest():
     """
     import pandas as pd
 
-    from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
-    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
+    from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+    from nfl_analytics.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
     logger.info("=" * 80)
     logger.info("EXAMPLE 2: Integrated Backtest with Health Monitoring")
@@ -157,7 +157,7 @@ def example_3_continuous_monitoring():
     """
     import numpy as np
 
-    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
+    from nfl_analytics.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
     logger.info("=" * 80)
     logger.info("EXAMPLE 3: Continuous Monitoring")
@@ -224,7 +224,7 @@ def example_4_ci_cd_integration():
 
     Shows how to use health monitor in CI/CD pipelines.
     """
-    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
+    from nfl_analytics.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
     logger.info("=" * 80)
     logger.info("EXAMPLE 4: CI/CD Integration")

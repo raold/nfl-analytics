@@ -43,10 +43,10 @@ Early-week betting exploits the predictable pattern that NFL betting lines move 
 \subsection{Implementation}
 
 \paragraph{Line Movement Tracking.}
-The \texttt{LineMovementTracker} class (\texttt{py/features/line\_movement\_tracker.py}, 577 lines) monitors opening and closing spreads, identifies sharp indicators (early-week moves, steam moves, reverse line movement), and calculates closing line value (CLV).
+The \texttt{LineMovementTracker} class (\texttt{nfl\_analytics/features/line\_movement\_tracker.py}, 577 lines) monitors opening and closing spreads, identifies sharp indicators (early-week moves, steam moves, reverse line movement), and calculates closing line value (CLV).
 
 \paragraph{Deployment Pipeline.}
-The \texttt{EWBStrategy} class (\texttt{py/production/ewb\_deployment.py}, 505 lines) integrates model predictions with market line tracking:
+The \texttt{EWBStrategy} class (\texttt{nfl\_analytics/production/ewb\_deployment.py}, 505 lines) integrates model predictions with market line tracking:
 \begin{enumerate}
   \item Fetch Tuesday morning lines from The Odds API
   \item Run model predictions for upcoming week
@@ -84,7 +84,7 @@ This efficiency gap arises from several factors: (1) sportsbooks dedicate fewer 
 
 \subsection{Data Layer}
 
-Player-level feature engineering (\texttt{py/features/player\_features.py}, 699 lines) generates comprehensive game-level statistics:
+Player-level feature engineering (\texttt{nfl\_analytics/features/player\_features.py}, 699 lines) generates comprehensive game-level statistics:
 \begin{itemize}
   \item 63,055 player-game records (2020--2025)
   \item 91 engineered features per player-game
@@ -184,7 +184,7 @@ Empirical analysis of 3,631 games (2010--2023) confirms these relationships, wit
 
 \subsection{Model Implementation}
 
-The \texttt{WeatherTotalsModel} class (\texttt{py/models/weather\_totals\_model.py}, 489 lines) implements an XGBoost regression model targeting total points scored:
+The \texttt{WeatherTotalsModel} class (\texttt{nfl\_analytics/models/weather\_totals\_model.py}, 489 lines) implements an XGBoost regression model targeting total points scored:
 
 \paragraph{Feature Engineering.}
 \begin{itemize}

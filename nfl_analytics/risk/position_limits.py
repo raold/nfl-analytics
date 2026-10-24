@@ -11,7 +11,7 @@ signals are logged with the reason. Signals can also be REDUCED (quantity
 scaled down) to fit within limits.
 
 Usage:
-    from py.risk.position_limits import PositionLimitChecker, LimitConfig
+    from nfl_analytics.risk.position_limits import PositionLimitChecker, LimitConfig
 
     checker = PositionLimitChecker(bankroll_cents=100_000)
     result = checker.check(signal, current_positions)
@@ -27,8 +27,8 @@ import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from py.markets.base import Position, Side
-from py.trading.signal import Signal
+from nfl_analytics.markets.base import Position, Side
+from nfl_analytics.trading.signal import Signal
 
 logger = logging.getLogger(__name__)
 

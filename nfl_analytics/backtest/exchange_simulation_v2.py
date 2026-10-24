@@ -11,7 +11,7 @@ Key Formula:
 - Bet only when: EV > threshold (e.g., 0.02 for 2% edge)
 
 Usage:
-    python py/backtest/exchange_simulation_v2.py \
+    python nfl_analytics/backtest/exchange_simulation_v2.py \
         --test-seasons 2024 \
         --vig-pct 2.0 \
         --ev-threshold 0.02

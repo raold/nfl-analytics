@@ -6,7 +6,7 @@ production prediction pipelines. Integrates with training scripts and
 model deployment to enforce temporal safety guarantees.
 
 Usage:
-    from py.features.catalog_validator import validate_feature_list
+    from nfl_analytics.features.catalog_validator import validate_feature_list
 
     # In your training script:
     features_to_use = ['prior_epa_mean', 'rest_days', 'home_score']  # ❌ home_score!
@@ -51,8 +51,8 @@ class FeatureCatalog:
         # Try multiple potential locations
         possible_paths = [
             Path(__file__).parent / "catalog.yaml",
-            Path.cwd() / "py/features/catalog.yaml",
-            Path(__file__).parent.parent.parent / "py/features/catalog.yaml",
+            Path.cwd() / "nfl_analytics/features/catalog.yaml",
+            Path(__file__).parent.parent.parent / "nfl_analytics/features/catalog.yaml",
         ]
 
         for catalog_path in possible_paths:
@@ -164,7 +164,7 @@ def validate_feature_list(
 
         warning_msg += (
             "\nThese features have not been audited for temporal safety.\n"
-            "Add them to py/features/catalog.yaml before using in production.\n"
+            "Add them to nfl_analytics/features/catalog.yaml before using in production.\n"
         )
 
         print(warning_msg)

@@ -13,7 +13,7 @@ Key Features:
 - Integration with model registry and database logging
 
 Usage:
-    from py.utils.ab_test_monitor import ABTestMonitor
+    from nfl_analytics.utils.ab_test_monitor import ABTestMonitor
 
     monitor = ABTestMonitor()
 

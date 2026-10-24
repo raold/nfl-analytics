@@ -30,7 +30,7 @@ import pandas as pd
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.ensemble.adaptive_wls_weights_v2 import (
+from nfl_analytics.ensemble.adaptive_wls_weights_v2 import (
     AdaptiveWLSWeightsV2,
     compute_ensemble_performance_metrics,
 )

@@ -30,7 +30,7 @@ import numpy as np
 import pandas as pd
 import psycopg2
 
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)

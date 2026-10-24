@@ -13,7 +13,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from py.utils.frontend_engineering_agent import (
+from nfl_analytics.utils.frontend_engineering_agent import (
     FrontendEngineeringAgent,
     SchemaDrift,
     SchemaValidationReport,
@@ -112,7 +112,7 @@ def agent(mock_db_config, tmp_path):
 
 def test_get_database_schema_no_psycopg(agent):
     """Test schema introspection when psycopg unavailable"""
-    with patch("py.utils.frontend_engineering_agent.PSYCOPG_AVAILABLE", False):
+    with patch("nfl_analytics.utils.frontend_engineering_agent.PSYCOPG_AVAILABLE", False):
         schema = agent.get_database_schema()
 
     assert schema == {"tables": {}}
@@ -517,7 +517,7 @@ def test_detect_schema_drift_type_changes(agent, sample_schema):
 
 def test_validate_api_contract_no_requests(agent):
     """Test API validation when requests library unavailable"""
-    with patch("py.utils.frontend_engineering_agent.REQUESTS_AVAILABLE", False):
+    with patch("nfl_analytics.utils.frontend_engineering_agent.REQUESTS_AVAILABLE", False):
         report = agent.validate_api_contract()
 
     assert report.has_violations

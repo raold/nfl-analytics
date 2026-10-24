@@ -12,17 +12,17 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from py.markets.base import MarketData, OrderBook, OrderBookLevel, Side
+from nfl_analytics.markets.base import MarketData, OrderBook, OrderBookLevel, Side
 
 pytestmark = pytest.mark.anyio
-from py.trading.directional import (
+from nfl_analytics.trading.directional import (
     DirectionalConfig,
     DirectionalStrategy,
     GamePrediction,
     ParsedContract,
     parse_contract_id,
 )
-from py.trading.signal import Signal
+from nfl_analytics.trading.signal import Signal
 
 
 # ============================================================

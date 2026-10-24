@@ -26,7 +26,7 @@ from scipy import stats
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.ensemble.enhanced_ensemble_v7_production import EnhancedEnsembleV7
+from nfl_analytics.ensemble.enhanced_ensemble_v7_production import EnhancedEnsembleV7
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

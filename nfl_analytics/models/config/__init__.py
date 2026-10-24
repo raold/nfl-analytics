@@ -3,7 +3,7 @@
 Centralizes hyperparameters and configuration for ML models.
 """
 
-from py.models.config.xgboost_params import (
+from nfl_analytics.models.config.xgboost_params import (
     CLASSIFIER_XGB_PARAMS,
     CONSERVATIVE_XGB_PARAMS,
     DEFAULT_XGB_PARAMS,

@@ -105,10 +105,10 @@ docker exec docker-pg-1 psql -U dro -d devdb01 -c "SELECT COUNT(*) FROM games; S
 ### 6. Train CQL Model
 ```bash
 # Generate features
-python py/features/asof_features_enhanced.py
+python nfl_analytics/features/asof_features_enhanced.py
 
 # Train model (RTX 4090)
-python py/rl/train_cql.py \
+python nfl_analytics/rl/train_cql.py \
   --alpha 0.3 \
   --lr 0.0001 \
   --hidden_dims 128 64 32 \

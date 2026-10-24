@@ -24,7 +24,7 @@ sys.path.insert(0, str(project_root))
 import pandas as pd
 import psycopg2
 
-from py.features.possession_value import (
+from nfl_analytics.features.possession_value import (
     compute_possession_value,
     compute_possession_value_features,
     get_expected_points,

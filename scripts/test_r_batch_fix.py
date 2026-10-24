@@ -41,7 +41,7 @@ logger = logging.getLogger(__name__)
 
 def test_batched_interface():
     """Test batched R model interface."""
-    from py.ensemble.r_model_interface_batched import BatchedRModelInterface
+    from nfl_analytics.ensemble.r_model_interface_batched import BatchedRModelInterface
 
     logger.info("=" * 80)
     logger.info("R MODEL BATCH FIX VALIDATION")

@@ -242,7 +242,7 @@ sessions_df = fetch_active_sessions()
 
 if sessions_df.empty:
     st.warning("No active paper trading sessions found.")
-    st.info("Start a paper trading session using: `python py/production/paper_trader.py`")
+    st.info("Start a paper trading session using: `python nfl_analytics/production/paper_trader.py`")
 else:
     # Session selector
     session_options = sessions_df["session_id"].tolist()
@@ -475,7 +475,7 @@ with st.expander("⏳ Pending Trades (Awaiting Settlement)"):
         if not pending_df.empty:
             st.warning(f"{len(pending_df)} trades awaiting settlement")
             st.dataframe(pending_df, use_container_width=True, hide_index=True)
-            st.info("Run `python py/production/settle_paper_trades.py` to settle pending trades")
+            st.info("Run `python nfl_analytics/production/settle_paper_trades.py` to settle pending trades")
         else:
             st.success("No pending trades")
 

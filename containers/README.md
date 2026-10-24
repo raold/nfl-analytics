@@ -259,7 +259,7 @@ cd containers
 python test_redis_setup.py
 
 # Test specific components
-python -m pytest ../py/compute/test_redis_task_queue.py
+python -m pytest ../nfl_analytics/compute/test_redis_task_queue.py
 ```
 
 ### Adding New Task Types

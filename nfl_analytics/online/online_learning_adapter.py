@@ -18,7 +18,7 @@ Architecture:
 - AdaptiveRetrainer: Trigger full retraining when needed
 
 Usage:
-    from py.online.online_learning_adapter import OnlinePredictionPipeline
+    from nfl_analytics.online.online_learning_adapter import OnlinePredictionPipeline
 
     pipeline = OnlinePredictionPipeline()
     pipeline.load_batch_models("models/")
@@ -479,7 +479,7 @@ class OnlinePredictionPipeline:
         """Load pre-trained batch models (State-Space, Hierarchical, BNN, XGBoost)"""
         try:
             # Import ensemble predictor
-            from py.ensemble.enhanced_ensemble_v5_canonical import EnhancedEnsemble5Way
+            from nfl_analytics.ensemble.enhanced_ensemble_v5_canonical import EnhancedEnsemble5Way
 
             self.batch_ensemble = EnhancedEnsemble5Way()
             self.batch_ensemble._load_models()

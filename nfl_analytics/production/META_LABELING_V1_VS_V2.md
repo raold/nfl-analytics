@@ -281,7 +281,7 @@ WHERE g.home_score IS NOT NULL;
 
 ```bash
 # Run directly in Python
-python py/production/meta_labeling.py
+python nfl_analytics/production/meta_labeling.py
 
 # Outputs:
 # - models/meta_labeling_v1.joblib
@@ -298,7 +298,7 @@ python py/production/meta_labeling.py
 
 ```bash
 # CLI with full options
-python py/training/train_meta_classifier.py \
+python nfl_analytics/training/train_meta_classifier.py \
     --start-season 2020 \
     --end-season 2024 \
     --bet-type spread \

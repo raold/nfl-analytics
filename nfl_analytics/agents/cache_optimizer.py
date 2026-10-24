@@ -13,7 +13,7 @@ Purpose:
 - 50-200x speedup potential on repeated queries
 
 Usage:
-    from py.agents.cache_optimizer import CacheOptimizer
+    from nfl_analytics.agents.cache_optimizer import CacheOptimizer
 
     optimizer = CacheOptimizer()
 

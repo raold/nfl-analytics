@@ -28,10 +28,10 @@ Reward:
 
 Usage:
   # Train from offline dataset
-  python py/rl/ppo_agent.py --dataset data/rl_logged.csv --output models/ppo_model.pth --epochs 200 --device mps
+  python nfl_analytics/rl/ppo_agent.py --dataset data/rl_logged.csv --output models/ppo_model.pth --epochs 200 --device mps
 
   # Evaluate policy
-  python py/rl/ppo_agent.py --dataset data/rl_logged_test.csv --load models/ppo_model.pth --evaluate --device mps
+  python nfl_analytics/rl/ppo_agent.py --dataset data/rl_logged_test.csv --load models/ppo_model.pth --evaluate --device mps
 """
 
 from __future__ import annotations

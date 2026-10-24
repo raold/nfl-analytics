@@ -248,7 +248,7 @@ class QualityChecker:
 
         # Check if dissertation_style.py is being used
         style_imports = 0
-        for py_file in Path(PDF_PATH).parent.parent.parent.glob("py/**/*.py"):
+        for py_file in Path(PDF_PATH).parent.parent.parent.glob("nfl_analytics/**/*.py"):
             if py_file.name.startswith("."):
                 continue
             try:

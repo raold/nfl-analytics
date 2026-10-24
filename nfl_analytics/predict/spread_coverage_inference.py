@@ -6,8 +6,8 @@ Predicts point spread coverage and identifies +EV betting opportunities
 by comparing model predictions to market spreads.
 
 Usage:
-    python py/predict/spread_coverage_inference.py --season 2025 --week 5
-    python py/predict/spread_coverage_inference.py --season 2025 --week-start 5 --week-end 6
+    python nfl_analytics/predict/spread_coverage_inference.py --season 2025 --week 5
+    python nfl_analytics/predict/spread_coverage_inference.py --season 2025 --week-start 5 --week-end 6
 """
 import argparse
 import json

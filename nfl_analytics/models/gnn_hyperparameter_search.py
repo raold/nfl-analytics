@@ -6,7 +6,7 @@ Performs Bayesian optimization over GNN hyperparameters to find optimal configur
 Uses Optuna's Tree-structured Parzen Estimator (TPE) for efficient search.
 
 Usage:
-    python py/models/gnn_hyperparameter_search.py --trials 50 --device cpu
+    python nfl_analytics/models/gnn_hyperparameter_search.py --trials 50 --device cpu
 
 Search Space:
     - embedding_dim: [16, 32, 64, 96, 128]

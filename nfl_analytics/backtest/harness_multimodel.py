@@ -14,7 +14,7 @@ Usage example
 -------------
 ::
 
-  python py/backtest/harness_multimodel.py \
+  python nfl_analytics/backtest/harness_multimodel.py \
     --features-csv analysis/features/asof_team_features.csv \
     --seasons 2003-2024 \
     --threshold 0.55 \

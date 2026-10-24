@@ -81,7 +81,7 @@ services:
       - "8000:8000"
     volumes:
       - ./api:/app/api
-      - ./py:/app/py:ro  # Mount py/ directory for ensemble module (read-only)
+      - ./py:/app/py:ro  # Mount nfl_analytics/ directory for ensemble module (read-only)
       - ./models:/app/models:ro  # Mount models directory (read-only)
       - ./logs/api:/app/logs
     depends_on:
@@ -125,7 +125,7 @@ services:
     volumes:
       - ./dashboard:/app
       - ./models:/app/models:ro  # Mount models directory (read-only)
-      - ./py:/app/py:ro # Mount py/ directory for claude_cache (read-only)
+      - ./py:/app/py:ro # Mount nfl_analytics/ directory for claude_cache (read-only)
     depends_on:
       pg-1:
         condition: service_healthy

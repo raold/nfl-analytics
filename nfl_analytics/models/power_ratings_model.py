@@ -11,9 +11,9 @@ on 2025 holdout. Single highest-ROI opportunity with lowest effort."
 Spread convention (nflverse): positive = home favored, actual = home - away score.
 
 Usage:
-    python py/models/power_ratings_model.py --seasons 2020-2025
-    python py/models/power_ratings_model.py --seasons 2025 --min-edge 1.5
-    python py/models/power_ratings_model.py --seasons 2020-2025 --sweep
+    python nfl_analytics/models/power_ratings_model.py --seasons 2020-2025
+    python nfl_analytics/models/power_ratings_model.py --seasons 2025 --min-edge 1.5
+    python nfl_analytics/models/power_ratings_model.py --seasons 2020-2025 --sweep
 """
 
 import argparse

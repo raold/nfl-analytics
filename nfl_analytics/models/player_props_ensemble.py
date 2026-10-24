@@ -16,7 +16,7 @@ Weighting Strategy:
 
 Usage:
     # Initialize ensemble
-    from py.models.player_props_ensemble import PlayerPropsEnsemble
+    from nfl_analytics.models.player_props_ensemble import PlayerPropsEnsemble
 
     ensemble = PlayerPropsEnsemble(
         use_bayesian=True,
@@ -61,7 +61,7 @@ from scipy import stats
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
 # Import feature extractor
-from py.features.player_feature_extractor import PlayerFeatureExtractor
+from nfl_analytics.features.player_feature_extractor import PlayerFeatureExtractor
 
 _PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
 
@@ -173,7 +173,7 @@ class PlayerPropsEnsemble:
     def _init_cql_sizer(self):
         """Initialize CQL bet sizer for intelligent position sizing."""
         try:
-            from py.production.cql_bet_sizer import CQLBetSizer
+            from nfl_analytics.production.cql_bet_sizer import CQLBetSizer
 
             cql_model_path = self.models_dir / "cql" / "best_model.pth"
 
@@ -294,7 +294,7 @@ class PlayerPropsEnsemble:
 
                 else:
                     # Old multioutput model (fallback)
-                    from py.models.bnn_multioutput_pytorch import MultiOutputMoEBNN
+                    from nfl_analytics.models.bnn_multioutput_pytorch import MultiOutputMoEBNN
 
                     args = checkpoint.get("args", {})
                     n_experts = args.get("n_experts", 3)
@@ -350,7 +350,7 @@ class PlayerPropsEnsemble:
                 logger.info(f"  ✓ Loaded BNN Calibrated (T={self.bnn_calibrated.temperature:.2f})")
             else:
                 logger.info("  ✗ BNN Calibrated not found (requires separate training)")
-                logger.info("    To train: python py/models/train_bnn_calibrated.py")
+                logger.info("    To train: python nfl_analytics/models/train_bnn_calibrated.py")
                 self.use_bnn_calibrated = False
 
         except Exception as e:

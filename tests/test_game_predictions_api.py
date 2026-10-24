@@ -152,7 +152,7 @@ def test_predict_game_full():
 
     except requests.exceptions.ConnectionError:
         print(
-            "❌ Connection error - is the API running? (uvicorn py.api.main:app --host 0.0.0.0 --port 8000)"
+            "❌ Connection error - is the API running? (uvicorn nfl_analytics.api.main:app --host 0.0.0.0 --port 8000)"
         )
         return False
     except Exception as e:
@@ -268,7 +268,7 @@ def main():
     except Exception:
         api_running = False
         print("\n⚠️  API not running - skipping endpoint tests")
-        print("   Start API with: uvicorn py.api.main:app --host 0.0.0.0 --port 8000")
+        print("   Start API with: uvicorn nfl_analytics.api.main:app --host 0.0.0.0 --port 8000")
 
     if api_running:
         results.append(("POST /predict/game/full", test_predict_game_full()))

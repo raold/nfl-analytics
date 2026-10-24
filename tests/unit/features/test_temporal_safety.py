@@ -206,7 +206,7 @@ class TestFeatureExtractionSafety:
 
     def test_prior_features_exclude_current_game(self, team_history_data: pd.DataFrame):
         """Verify that 'prior_*' features don't include current game data."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(team_history_data)
         kc = result[result['team'] == 'KC'].sort_values(['season', 'week'])
@@ -228,7 +228,7 @@ class TestFeatureExtractionSafety:
 
     def test_rolling_windows_use_shift_one(self, team_history_data: pd.DataFrame):
         """Verify rolling window features use shift(1) to exclude current game."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(team_history_data)
         kc = result[result['team'] == 'KC'].sort_values(['season', 'week'])
@@ -247,7 +247,7 @@ class TestFeatureExtractionSafety:
 
     def test_win_percentage_excludes_current_result(self, team_history_data: pd.DataFrame):
         """Verify win percentage is computed before knowing current game result."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(team_history_data)
         kc = result[result['team'] == 'KC'].sort_values(['season', 'week'])
@@ -267,7 +267,7 @@ class TestFeatureExtractionSafety:
 
     def test_no_score_in_pregame_features(self):
         """Verify that score-related columns aren't used as prediction features."""
-        from py.features.asof_features import TEAM_FEATURE_COLUMNS
+        from nfl_analytics.features.asof_features import TEAM_FEATURE_COLUMNS
 
         leaky_columns = ['home_score', 'away_score', 'margin', 'home_margin', 'home_win', 'result']
 
@@ -287,7 +287,7 @@ class TestSeasonBoundarySafety:
 
     def test_season_features_reset_at_new_season(self, team_history_data: pd.DataFrame):
         """Verify season-specific features reset at season boundaries."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(team_history_data)
 
@@ -305,7 +305,7 @@ class TestSeasonBoundarySafety:
 
     def test_all_time_features_carry_over(self, team_history_data: pd.DataFrame):
         """Verify all-time features DO carry over across seasons."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(team_history_data)
         kc = result[result['team'] == 'KC'].sort_values(['season', 'week'])
@@ -320,7 +320,7 @@ class TestSeasonBoundarySafety:
 
     def test_cross_season_rolling_windows(self, team_history_data: pd.DataFrame):
         """Test rolling window features at season boundaries."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(team_history_data)
         kc = result[result['team'] == 'KC'].sort_values(['season', 'week'])
@@ -432,7 +432,7 @@ class TestPredictionTimeSafety:
 
     def test_no_future_game_results_in_features(self, team_history_data: pd.DataFrame):
         """Verify feature extraction doesn't use results of future games."""
-        from py.features.asof_features import compute_team_history
+        from nfl_analytics.features.asof_features import compute_team_history
 
         result = compute_team_history(team_history_data)
 
@@ -467,7 +467,7 @@ class TestLeakageDetectionUtilities:
 
     def test_validate_team_history_detects_prior_games_leakage(self, team_history_data: pd.DataFrame):
         """Verify validation catches corrupted prior_games."""
-        from py.features.asof_features import compute_team_history, validate_team_history
+        from nfl_analytics.features.asof_features import compute_team_history, validate_team_history
 
         result = compute_team_history(team_history_data)
 
@@ -479,7 +479,7 @@ class TestLeakageDetectionUtilities:
 
     def test_validate_team_history_detects_epa_inconsistency(self, team_history_data: pd.DataFrame):
         """Verify validation catches EPA calculation errors."""
-        from py.features.asof_features import compute_team_history, validate_team_history
+        from nfl_analytics.features.asof_features import compute_team_history, validate_team_history
 
         result = compute_team_history(team_history_data)
 
@@ -494,7 +494,7 @@ class TestLeakageDetectionUtilities:
 
     def test_validate_game_features_detects_duplicates(self):
         """Verify validation catches duplicate game IDs."""
-        from py.features.asof_features import validate_game_features
+        from nfl_analytics.features.asof_features import validate_game_features
 
         # Create data with duplicate game_id
         df = pd.DataFrame({
@@ -519,7 +519,7 @@ class TestFullPipelineTemporalSafety:
     def test_feature_extraction_to_prediction_pipeline(self):
         """Test temporal safety from feature extraction to prediction."""
         try:
-            from py.features.asof_features import (
+            from nfl_analytics.features.asof_features import (
                 get_connection, fetch_team_game_features,
                 compute_team_history, validate_team_history
             )
@@ -553,7 +553,7 @@ class TestFullPipelineTemporalSafety:
     def test_no_data_leakage_in_2023_predictions(self):
         """Verify 2023 predictions don't use 2023 or future data."""
         try:
-            from py.features.asof_features import (
+            from nfl_analytics.features.asof_features import (
                 get_connection, fetch_team_game_features,
                 compute_team_history, pivot_to_games
             )

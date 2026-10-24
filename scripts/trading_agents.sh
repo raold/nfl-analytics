@@ -9,7 +9,7 @@ case "${1:-help}" in
     validate)
         echo "Running signal validator..."
         uv run python -c "
-from py.agents.trading_validator import TradingValidator
+from nfl_analytics.agents.trading_validator import TradingValidator
 v = TradingValidator()
 print(v.summary())
 "
@@ -17,8 +17,8 @@ print(v.summary())
     monitor)
         echo "Running portfolio monitor..."
         uv run python -c "
-from py.agents.portfolio_monitor import PortfolioMonitor
-from py.monitoring.pnl_tracker import PnLTracker
+from nfl_analytics.agents.portfolio_monitor import PortfolioMonitor
+from nfl_analytics.monitoring.pnl_tracker import PnLTracker
 pnl = PnLTracker(initial_equity_cents=100_000)
 m = PortfolioMonitor(pnl_tracker=pnl)
 report = m.check_health()
@@ -29,8 +29,8 @@ print(report.summary())
         echo "Running execution auditor..."
         uv run python -c "
 import asyncio
-from py.agents.execution_auditor import ExecutionAuditor
-from py.markets.paper_client import PaperMarketClient
+from nfl_analytics.agents.execution_auditor import ExecutionAuditor
+from nfl_analytics.markets.paper_client import PaperMarketClient
 client = PaperMarketClient()
 auditor = ExecutionAuditor(client=client)
 report = asyncio.run(auditor.run_audit())

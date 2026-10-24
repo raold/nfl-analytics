@@ -74,8 +74,8 @@ from sklearn.model_selection import train_test_split
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from py.features.feature_loader_parallel import ParallelFeatureLoader
-from py.features.game_feature_extractor import GameFeatureExtractor
+from nfl_analytics.features.feature_loader_parallel import ParallelFeatureLoader
+from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
 # Optional: Optuna for hyperparameter tuning
 try:
@@ -438,7 +438,7 @@ class XGBoostV6AdvancedTrainer:
 
         # Data leakage validation - verify temporal separation
         try:
-            from py.utils.data_leakage_detector import DataLeakageDetector
+            from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector
 
             DataLeakageDetector()
             train_seasons = df.loc[train_mask, "season"].unique().tolist()

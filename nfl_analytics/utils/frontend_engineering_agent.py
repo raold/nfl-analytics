@@ -23,7 +23,7 @@ Context: Dashboard has 15+ hardcoded SQL queries with no validation. Breaking ch
          discovered at runtime (not compile time).
 
 Usage:
-    from py.utils.frontend_engineering_agent import FrontendEngineeringAgent
+    from nfl_analytics.utils.frontend_engineering_agent import FrontendEngineeringAgent
 
     agent = FrontendEngineeringAgent()
 

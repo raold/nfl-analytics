@@ -86,8 +86,8 @@ if (has_jsonlite) {
   json_path <- file.path("analysis", "reports", "ope_gate.json")
   dir.create(dirname(json_path), recursive = TRUE, showWarnings = FALSE)
   # Attempt to build dataset and run gate via Python scripts
-  try(system2("python", c("py/rl/dataset.py", "--output", csv_path, "--season-start", min(params$seasons), "--season-end", max(params$seasons))), silent = TRUE)
-  try(system2("python", c("py/rl/ope_gate.py", "--dataset", csv_path, "--output", json_path)), silent = TRUE)
+  try(system2("python", c("nfl_analytics/rl/dataset.py", "--output", csv_path, "--season-start", min(params$seasons), "--season-end", max(params$seasons))), silent = TRUE)
+  try(system2("python", c("nfl_analytics/rl/ope_gate.py", "--dataset", csv_path, "--output", json_path)), silent = TRUE)
   if (file.exists(json_path)) {
     res <- jsonlite::fromJSON(json_path)
     grid <- do.call(rbind, lapply(names(res$grid), function(k) data.frame(key = k, t(res$grid[[k]]))))

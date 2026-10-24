@@ -29,9 +29,9 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from py.backtests.game_outcome_backtest import GameOutcomeBacktest
-from py.ensemble.game_outcome_ensemble import GameOutcomeEnsemble, fetch_games
-from py.ensemble.game_outcome_ensemble_enhanced import EnhancedGameOutcomeEnsemble
+from nfl_analytics.backtests.game_outcome_backtest import GameOutcomeBacktest
+from nfl_analytics.ensemble.game_outcome_ensemble import GameOutcomeEnsemble, fetch_games
+from nfl_analytics.ensemble.game_outcome_ensemble_enhanced import EnhancedGameOutcomeEnsemble
 
 
 def run_comparison_backtest(

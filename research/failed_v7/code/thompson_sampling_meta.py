@@ -19,7 +19,7 @@ Advantages over Task 6 fixed voting:
 - Model-specific learning (doesn't average away each model's strengths)
 
 Usage:
-    python py/ensemble/thompson_sampling_meta.py \
+    python nfl_analytics/ensemble/thompson_sampling_meta.py \
         --xgb-model models/xgboost/v2_sweep/xgb_config18_season2024.json \
         --cql-model models/cql/sweep/cql_config4.pth \
         --iql-model models/iql/baseline_model.pth \

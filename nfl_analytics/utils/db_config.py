@@ -5,7 +5,7 @@ This module provides a single source of truth for database connection settings,
 supporting both local development (localhost:5544) and Docker (nfl-analytics-pg-1:5432).
 
 Usage:
-    from py.utils.db_config import get_db_config, get_db_url
+    from nfl_analytics.utils.db_config import get_db_config, get_db_url
 
     # Get config dict
     config = get_db_config()

@@ -14,17 +14,17 @@ Features:
 
 Usage:
     # Manual odds entry
-    python py/production/line_shopping.py \
+    python nfl_analytics/production/line_shopping.py \
         --game "KC_vs_BUF" \
         --manual-odds fanduel:-3/-110 draftkings:-3/-108 betmgm:-2.5/-115
 
     # CSV import
-    python py/production/line_shopping.py \
+    python nfl_analytics/production/line_shopping.py \
         --odds-csv data/odds/week_11_odds.csv \
         --output results/line_shopping/best_lines.json
 
     # API mode (requires API key)
-    python py/production/line_shopping.py \
+    python nfl_analytics/production/line_shopping.py \
         --api theoddsapi \
         --api-key YOUR_KEY \
         --sport americanfootball_nfl

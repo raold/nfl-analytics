@@ -200,7 +200,7 @@ class SemanticAttributionTracker:
             Tuple of (all_features, semantic_features)
         """
         try:
-            from py.features.game_feature_extractor import GameFeatureExtractor
+            from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
             extractor = GameFeatureExtractor()
             all_features = extractor.extract_game_features(
@@ -230,7 +230,7 @@ class SemanticAttributionTracker:
         Uses SemanticFeatureExtractor to get the 26 semantic features.
         """
         try:
-            from py.semantic.features.semantic_features import SemanticFeatureExtractor
+            from nfl_analytics.semantic.features.semantic_features import SemanticFeatureExtractor
 
             extractor = SemanticFeatureExtractor()
             features = extractor.extract_features(

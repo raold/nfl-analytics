@@ -8,7 +8,7 @@ Input CSV: rows with columns
 Writes a CSV matrix of shape B x N (B scenarios, N bets) suitable for CVaR LP.
 
 Usage:
-  python py/risk/generate_scenarios.py --bets data/bets.csv --output data/scenarios.csv --sims 20000
+  python nfl_analytics/risk/generate_scenarios.py --bets data/bets.csv --output data/scenarios.csv --sims 20000
 """
 
 from __future__ import annotations

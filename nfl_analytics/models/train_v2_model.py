@@ -17,13 +17,13 @@ Based on 2025 Week 6 retrospective findings addressing:
 
 Usage:
     # Train v2 model on 2020-2024 seasons
-    python py/models/train_v2_model.py \\
+    python nfl_analytics/models/train_v2_model.py \\
         --features data/processed/features/asof_team_features_v2.csv \\
         --train-seasons 2020 2021 2022 2023 2024 \\
         --output models/xgboost/v2_trained.json
 
     # Train and validate on 2025 Week 6 completed games
-    python py/models/train_v2_model.py \\
+    python nfl_analytics/models/train_v2_model.py \\
         --features data/processed/features/asof_team_features_v2.csv \\
         --train-seasons 2020 2021 2022 2023 2024 \\
         --validate-season 2025 \\

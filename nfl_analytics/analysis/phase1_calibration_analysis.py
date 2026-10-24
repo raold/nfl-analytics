@@ -310,7 +310,7 @@ def main():
 
     print("\n📋 NEXT STEPS:")
     print("  1. Wait for Phase 2.1 training to complete")
-    print("  2. Run comparison: python py/analysis/compare_phase1_phase2.py")
+    print("  2. Run comparison: python nfl_analytics/analysis/compare_phase1_phase2.py")
     print("  3. Update dissertation with results")
 
 

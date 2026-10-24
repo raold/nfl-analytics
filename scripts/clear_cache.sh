@@ -176,7 +176,7 @@ cd "$PROJECT_ROOT"
 PYTHON_CMD="python3 -c \"
 import sys
 sys.path.insert(0, '$PROJECT_ROOT')
-from py.utils.cache_invalidator import CacheInvalidator, invalidate_after_model_training, invalidate_after_data_ingestion
+from nfl_analytics.utils.cache_invalidator import CacheInvalidator, invalidate_after_model_training, invalidate_after_data_ingestion
 
 invalidator = CacheInvalidator()
 
@@ -189,7 +189,7 @@ if [ "$STATS" = true ]; then
     python3 -c "
 import sys
 sys.path.insert(0, '$PROJECT_ROOT')
-from py.utils.cache_invalidator import CacheInvalidator
+from nfl_analytics.utils.cache_invalidator import CacheInvalidator
 
 invalidator = CacheInvalidator()
 stats = invalidator.stats()
@@ -211,7 +211,7 @@ if [ -n "$PATTERN" ]; then
     python3 -c "
 import sys
 sys.path.insert(0, '$PROJECT_ROOT')
-from py.utils.cache_invalidator import CacheInvalidator
+from nfl_analytics.utils.cache_invalidator import CacheInvalidator
 
 invalidator = CacheInvalidator()
 result = invalidator.invalidate_pattern('$PATTERN', dry_run=$DRY_RUN)
@@ -235,7 +235,7 @@ if [ -n "$MODEL" ]; then
     python3 -c "
 import sys
 sys.path.insert(0, '$PROJECT_ROOT')
-from py.utils.cache_invalidator import CacheInvalidator
+from nfl_analytics.utils.cache_invalidator import CacheInvalidator
 
 invalidator = CacheInvalidator()
 result = invalidator.invalidate_model('$MODEL', '$MODEL_TYPE' if '$MODEL_TYPE' else None)
@@ -266,7 +266,7 @@ if [ -n "$PLAYER" ]; then
     python3 -c "
 import sys
 sys.path.insert(0, '$PROJECT_ROOT')
-from py.utils.cache_invalidator import CacheInvalidator
+from nfl_analytics.utils.cache_invalidator import CacheInvalidator
 
 invalidator = CacheInvalidator()
 season = int('$SEASON') if '$SEASON' else None
@@ -290,7 +290,7 @@ if [ -n "$QUERIES" ]; then
     python3 -c "
 import sys
 sys.path.insert(0, '$PROJECT_ROOT')
-from py.utils.cache_invalidator import CacheInvalidator
+from nfl_analytics.utils.cache_invalidator import CacheInvalidator
 
 invalidator = CacheInvalidator()
 query_list = '$QUERIES'.split(',')
@@ -312,7 +312,7 @@ if [ "$STREAMLIT" = true ]; then
     python3 -c "
 import sys
 sys.path.insert(0, '$PROJECT_ROOT')
-from py.utils.cache_invalidator import CacheInvalidator
+from nfl_analytics.utils.cache_invalidator import CacheInvalidator
 
 invalidator = CacheInvalidator()
 result = invalidator.invalidate_streamlit()
@@ -349,7 +349,7 @@ if [ "$ALL" = true ]; then
     python3 -c "
 import sys
 sys.path.insert(0, '$PROJECT_ROOT')
-from py.utils.cache_invalidator import CacheInvalidator
+from nfl_analytics.utils.cache_invalidator import CacheInvalidator
 
 invalidator = CacheInvalidator()
 result = invalidator.invalidate_all(confirm=True)

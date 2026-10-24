@@ -20,7 +20,7 @@ from functools import wraps
 from typing import Any
 
 try:
-    from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
+    from nfl_analytics.utils.claude_cache import ClaudeRedisCache, get_default_cache
 
     REDIS_AVAILABLE = True
 except ImportError:
@@ -192,7 +192,7 @@ class MCPCacheWrapper:
 
             # Use CacheInvalidator if available
             try:
-                from py.utils.cache_invalidator import CacheInvalidator
+                from nfl_analytics.utils.cache_invalidator import CacheInvalidator
 
                 invalidator = CacheInvalidator(self._redis_cache)
                 result = invalidator.invalidate_pattern(pattern)

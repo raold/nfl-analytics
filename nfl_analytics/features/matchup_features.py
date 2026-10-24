@@ -9,7 +9,7 @@ Computes features for specific team matchups:
 4. Conference/division indicators
 
 Usage:
-    python py/features/matchup_features.py --output data/processed/features/matchup_features.csv
+    python nfl_analytics/features/matchup_features.py --output data/processed/features/matchup_features.csv
 """
 import argparse
 import logging

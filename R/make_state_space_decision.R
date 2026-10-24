@@ -181,7 +181,7 @@ decision_doc <- glue("
 
 ## Next Steps
 
-1. Update ensemble configuration in `py/ensemble/enhanced_ensemble_v3.py`
+1. Update ensemble configuration in `nfl_analytics/ensemble/enhanced_ensemble_v3.py`
 2. Run full ensemble backtest on 2022-2024
 3. Optimize ensemble weights using inverse variance or meta-learner
 4. Deploy to production with monitoring

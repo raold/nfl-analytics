@@ -459,7 +459,7 @@ def main():
     # Benchmark Ollama
     if not args.mlx_only:
         try:
-            from py.semantic.models.ollama_client import OllamaClient
+            from nfl_analytics.semantic.models.ollama_client import OllamaClient
 
             ollama = OllamaClient(timeout=240.0)
 
@@ -484,7 +484,7 @@ def main():
     # Benchmark MLX
     if not args.ollama_only:
         try:
-            from py.semantic.models.mlx_client import MLXClient, check_mlx_available
+            from nfl_analytics.semantic.models.mlx_client import MLXClient, check_mlx_available
 
             if not check_mlx_available():
                 logger.error("MLX not available. Requires Apple Silicon Mac with macOS 14+")

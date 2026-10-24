@@ -27,7 +27,7 @@ Weight Strategy:
 - Separate weight sets for game-level vs player-level predictions
 
 Usage:
-    from py.ensemble.enhanced_ensemble_v6_2_gnn import EnhancedEnsemble6WayGNN
+    from nfl_analytics.ensemble.enhanced_ensemble_v6_2_gnn import EnhancedEnsemble6WayGNN
     import os
 
     ensemble = EnhancedEnsemble6WayGNN(
@@ -62,13 +62,13 @@ from datetime import datetime
 from dotenv import load_dotenv
 
 # Import GNN component
-from py.ensemble.components.gnn_component import GNNComponent
+from nfl_analytics.ensemble.components.gnn_component import GNNComponent
 
 # Import base ensemble
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 # Import strategy weights
-from py.ensemble.strategy.base import DEFAULT_WEIGHTS_V6_1_GNN
+from nfl_analytics.ensemble.strategy.base import DEFAULT_WEIGHTS_V6_1_GNN
 
 # Load environment variables
 load_dotenv()

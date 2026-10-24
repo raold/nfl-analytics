@@ -6,16 +6,16 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from py.agents.portfolio_monitor import (
+from nfl_analytics.agents.portfolio_monitor import (
     HealthAlert,
     HealthReport,
     MonitorConfig,
     PortfolioMonitor,
 )
-from py.markets.base import Position, Side
-from py.monitoring.alert_manager import AlertLevel, AlertManager
-from py.monitoring.pnl_tracker import PnLTracker
-from py.risk.drawdown_monitor import DrawdownMonitor
+from nfl_analytics.markets.base import Position, Side
+from nfl_analytics.monitoring.alert_manager import AlertLevel, AlertManager
+from nfl_analytics.monitoring.pnl_tracker import PnLTracker
+from nfl_analytics.risk.drawdown_monitor import DrawdownMonitor
 
 
 # ============================================================

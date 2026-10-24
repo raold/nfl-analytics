@@ -15,7 +15,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from py.registry.model_registry import ModelRegistry
+from nfl_analytics.registry.model_registry import ModelRegistry
 
 
 def register_state_space_v2(registry: ModelRegistry):

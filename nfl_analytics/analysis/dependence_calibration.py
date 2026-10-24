@@ -10,7 +10,7 @@ Validates Gaussian and t-copula assumptions by comparing:
 Generates tail_dependence_table.tex for dissertation.
 
 Usage:
-    python py/analysis/dependence_calibration.py --db-url postgresql://localhost/nfl_data
+    python nfl_analytics/analysis/dependence_calibration.py --db-url postgresql://localhost/nfl_data
 """
 
 import argparse

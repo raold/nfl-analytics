@@ -60,7 +60,7 @@ See `db/migrations/` for schema.
 ### Basic Usage
 
 ```python
-from py.causal.did_injury_analysis import InjuryShockModeler
+from nfl_analytics.causal.did_injury_analysis import InjuryShockModeler
 
 # Initialize modeler
 modeler = InjuryShockModeler()
@@ -91,14 +91,14 @@ report = modeler.generate_report(output_path='injury_report.md')
 
 ```bash
 # Run main analysis
-python py/causal/did_injury_analysis.py
+python nfl_analytics/causal/did_injury_analysis.py
 
 # Run examples
-python py/causal/examples_did_injury.py --example 1
-python py/causal/examples_did_injury.py --example all
+python nfl_analytics/causal/examples_did_injury.py --example 1
+python nfl_analytics/causal/examples_did_injury.py --example all
 
 # Run tests
-pytest py/causal/test_did_injury_analysis.py -v
+pytest nfl_analytics/causal/test_did_injury_analysis.py -v
 ```
 
 ---
@@ -118,7 +118,7 @@ pytest py/causal/test_did_injury_analysis.py -v
 
 **Example**:
 ```python
-from py.causal.did_injury_analysis import InjuryShockDatabase
+from nfl_analytics.causal.did_injury_analysis import InjuryShockDatabase
 
 db = InjuryShockDatabase()
 
@@ -155,7 +155,7 @@ panel = db.create_panel_data(
 
 **Example**:
 ```python
-from py.causal.did_injury_analysis import DifferenceInDifferencesEstimator
+from nfl_analytics.causal.did_injury_analysis import DifferenceInDifferencesEstimator
 
 estimator = DifferenceInDifferencesEstimator()
 
@@ -187,7 +187,7 @@ print(f"Parallel trends: {pt_results['parallel_trends']}")
 
 **Example**:
 ```python
-from py.causal.did_injury_analysis import InjuryShockModeler
+from nfl_analytics.causal.did_injury_analysis import InjuryShockModeler
 
 modeler = InjuryShockModeler()
 
@@ -365,7 +365,7 @@ report = modeler.generate_report(output_path='report.md')
 ### Example 1: Backup RB Performance
 
 ```bash
-python py/causal/examples_did_injury.py --example 1
+python nfl_analytics/causal/examples_did_injury.py --example 1
 ```
 
 **Output**:
@@ -388,7 +388,7 @@ Betting Implication: Consider OVER on backup RB rushing props when RB1 is out.
 ### Example 2: Heterogeneity by Injury Severity
 
 ```bash
-python py/causal/examples_did_injury.py --example 5
+python nfl_analytics/causal/examples_did_injury.py --example 5
 ```
 
 **Output**:
@@ -405,7 +405,7 @@ Strategy: Wait for final injury report before placing bets.
 ### Example 6: Methodological Comparison
 
 ```bash
-python py/causal/examples_did_injury.py --example 6
+python nfl_analytics/causal/examples_did_injury.py --example 6
 ```
 
 Compares Callaway-Sant'Anna to traditional TWFE, demonstrating why CS is preferred for staggered treatments.
@@ -417,7 +417,7 @@ Compares Callaway-Sant'Anna to traditional TWFE, demonstrating why CS is preferr
 ### Run All Tests
 
 ```bash
-pytest py/causal/test_did_injury_analysis.py -v
+pytest nfl_analytics/causal/test_did_injury_analysis.py -v
 ```
 
 ### Test Coverage
@@ -504,7 +504,7 @@ This ensures:
 ## File Structure
 
 ```
-py/causal/
+nfl_analytics/causal/
 ├── did_injury_analysis.py           # Main module (1,416 lines)
 ├── test_did_injury_analysis.py      # Unit tests (600+ lines)
 ├── examples_did_injury.py           # Usage examples (6 examples)
@@ -676,7 +676,7 @@ For robust inference when parallel trends may not hold:
 
 ```python
 # Check sensitivity to violations of parallel trends
-from py.causal.sensitivity_analysis import HonestDiD
+from nfl_analytics.causal.sensitivity_analysis import HonestDiD
 
 sensitivity = HonestDiD()
 robust_ci = sensitivity.honest_did(

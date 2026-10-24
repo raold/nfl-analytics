@@ -31,7 +31,7 @@ import pytest
 import torch
 import torch.nn as nn
 
-from py.rl.cql_agent import (
+from nfl_analytics.rl.cql_agent import (
     CQLAgent,
     QNetwork,
     ReplayBuffer,

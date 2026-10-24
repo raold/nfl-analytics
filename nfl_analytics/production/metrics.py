@@ -8,7 +8,7 @@ Exposes Prometheus metrics for:
 - Operations: Latency, throughput, errors
 
 Usage:
-    from py.production.metrics import metrics_registry
+    from nfl_analytics.production.metrics import metrics_registry
     from prometheus_client import start_http_server
 
     # Start metrics endpoint
@@ -657,7 +657,7 @@ class MetricsRegistry:
 
         Example:
             # Periodically sync cache stats (e.g., every 30 seconds)
-            from py.utils.claude_cache import get_default_cache
+            from nfl_analytics.utils.claude_cache import get_default_cache
 
             redis_cache = get_default_cache()
             metrics_registry.sync_cache_stats_from_redis(redis_cache)

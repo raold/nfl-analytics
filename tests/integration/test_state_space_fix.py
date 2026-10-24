@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
 
 def test_predictions():

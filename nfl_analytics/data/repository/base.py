@@ -43,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 # Redis caching (Phase 2 integration)
 try:
-    from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
+    from nfl_analytics.utils.claude_cache import ClaudeRedisCache, get_default_cache
 
     REDIS_AVAILABLE = True
 except ImportError:

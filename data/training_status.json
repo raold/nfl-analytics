@@ -64,8 +64,8 @@
       "Generic touchdown column with play type filter"
     ],
     "files_fixed": [
-      "py/models/train_bnn_receiving.py",
-      "py/models/train_xgboost_touchdowns.py"
+      "nfl_analytics/models/train_bnn_receiving.py",
+      "nfl_analytics/models/train_xgboost_touchdowns.py"
     ],
     "impact": "Prevents DOZENS of future SQL schema errors",
     "documented_in": "CLAUDE.md Lesson #8"

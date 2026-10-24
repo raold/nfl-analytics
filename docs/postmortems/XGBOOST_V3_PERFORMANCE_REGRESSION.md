@@ -21,12 +21,12 @@ Attempted to integrate Sagarin opponent strength features into XGBoost v3. Expec
 ## Timeline
 
 ### November 13, 2025 - Feature Development
-- **09:00**: Created `py/features/opponent_strength.py` (649 lines)
+- **09:00**: Created `nfl_analytics/features/opponent_strength.py` (649 lines)
 - **10:30**: Generated opponent strength features for 2018-2024
 - **Result**: 3,710 records, only 0.9% missing data (excellent coverage)
 
 ### November 14, 2025 - Model Integration
-- **11:00**: Created `py/models/train_xgboost_v3_with_opponent_strength.py`
+- **11:00**: Created `nfl_analytics/models/train_xgboost_v3_with_opponent_strength.py`
 - **11:15**: Modified query to join opponent strength features
 - **11:30**: Training started on 2016-2024 window (8-season)
 - **12:45**: Training completed
@@ -310,7 +310,7 @@ if missing_pct > 0.05:
 
 ### 1. Feature Generation Was Excellent ✓
 
-`py/features/opponent_strength.py` (649 lines):
+`nfl_analytics/features/opponent_strength.py` (649 lines):
 - Clean code architecture
 - Exponential weighting (halflife=4) correctly implemented
 - 3,710 records with only 0.9% missing (2018-2024)
@@ -367,7 +367,7 @@ Identified all contributing factors:
 
 ### Files Created
 
-1. **`py/models/train_xgboost_v3_1_aligned_window.py`** (733 lines)
+1. **`nfl_analytics/models/train_xgboost_v3_1_aligned_window.py`** (733 lines)
    - Training script with feature coverage audit
    - Aligned window (2018-2024 only)
    - Decision gates (coverage, performance)
@@ -448,7 +448,7 @@ Identified all contributing factors:
   - Expected: GO decision (99.1% coverage)
 
 - [ ] **Train XGBoost v3.1 with aligned window**
-  - Run: `python py/models/train_xgboost_v3_1_aligned_window.py`
+  - Run: `python nfl_analytics/models/train_xgboost_v3_1_aligned_window.py`
   - Expected time: 15-20 minutes
   - Expected coverage: 99.1% (excellent)
 
@@ -586,9 +586,9 @@ Identified all contributing factors:
 
 ## References
 
-1. **Feature Engineering**: py/features/opponent_strength.py (649 lines)
-2. **Failed Model**: py/models/train_xgboost_v3_with_opponent_strength.py (733 lines)
-3. **Fix Implementation**: py/models/train_xgboost_v3_1_aligned_window.py (733 lines)
+1. **Feature Engineering**: nfl_analytics/features/opponent_strength.py (649 lines)
+2. **Failed Model**: nfl_analytics/models/train_xgboost_v3_with_opponent_strength.py (733 lines)
+3. **Fix Implementation**: nfl_analytics/models/train_xgboost_v3_1_aligned_window.py (733 lines)
 4. **Validation Script**: scripts/validate_xgboost_v3_1.py (244 lines)
 5. **Deliverable Documentation**: docs/XGBOOST_V3_1_ALIGNED_WINDOW_DELIVERABLE.md
 6. **Execution Summary**: XGBOOST_V3_1_EXECUTION_SUMMARY.md
@@ -681,7 +681,7 @@ def get_aligned_training_window(
 **Status:** ✅ Postmortem Complete + Fix Implemented
 **Next Steps:**
 1. Validate v3.1 on small sample: `python scripts/validate_xgboost_v3_1.py`
-2. If GO, train v3.1: `python py/models/train_xgboost_v3_1_aligned_window.py`
+2. If GO, train v3.1: `python nfl_analytics/models/train_xgboost_v3_1_aligned_window.py`
 3. Evaluate performance vs v2 baseline (40.20 MAE)
 4. DEPLOY / INVESTIGATE / ABANDON decision
 

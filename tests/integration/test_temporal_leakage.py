@@ -34,12 +34,12 @@ DB_CONFIG = {
 
 # Feature engineering modules to check
 FEATURE_MODULES = [
-    "py/features/asof_features.py",
-    "py/features/asof_features_enhanced.py",
-    "py/features/vegas_line_bias_features_SAFE.py",
-    "py/features/defensive_situational_strength.py",
-    "py/features/defensive_game_script_indicators.py",
-    "py/features/environmental_contextual_features.py",
+    "nfl_analytics/features/asof_features.py",
+    "nfl_analytics/features/asof_features_enhanced.py",
+    "nfl_analytics/features/vegas_line_bias_features_SAFE.py",
+    "nfl_analytics/features/defensive_situational_strength.py",
+    "nfl_analytics/features/defensive_game_script_indicators.py",
+    "nfl_analytics/features/environmental_contextual_features.py",
 ]
 
 
@@ -421,10 +421,10 @@ def test_leakage_diagnostic_tool_exists():
     """
     Test 10: Verify leakage diagnostic tool exists and is runnable.
     """
-    diagnostic_path = Path("py/validation/leakage_diagnostic.py")
+    diagnostic_path = Path("nfl_analytics/validation/leakage_diagnostic.py")
     assert diagnostic_path.exists(), (
         "Leakage diagnostic tool not found. "
-        "Create py/validation/leakage_diagnostic.py for manual leakage detection."
+        "Create nfl_analytics/validation/leakage_diagnostic.py for manual leakage detection."
     )
 
 

@@ -58,7 +58,7 @@ MODELS_TO_AUDIT <- list(
   list(
     name = "BNN Receiving v1",
     model_path = "models/bayesian/bnn_receiving_v1.pkl",
-    training_script = "py/models/train_bnn_receiving.py",
+    training_script = "nfl_analytics/models/train_bnn_receiving.py",
     model_id = NA,
     weight_in_ensemble = 0.00
   )

@@ -71,7 +71,7 @@ case "$1" in
             exit 1
         fi
         echo -e "${YELLOW}Validating DataFrame: $2${NC}"
-        $PYTHON_CMD "$PROJECT_ROOT/py/utils/sports_analytics_validator.py" --validate-df "$2"
+        $PYTHON_CMD "$PROJECT_ROOT/nfl_analytics/utils/sports_analytics_validator.py" --validate-df "$2"
         ;;
 
     --check-query)
@@ -81,11 +81,11 @@ case "$1" in
             exit 1
         fi
         echo -e "${YELLOW}Checking SQL query: $2${NC}"
-        $PYTHON_CMD "$PROJECT_ROOT/py/utils/sports_analytics_validator.py" --check-query "$2"
+        $PYTHON_CMD "$PROJECT_ROOT/nfl_analytics/utils/sports_analytics_validator.py" --check-query "$2"
         ;;
 
     --report)
-        $PYTHON_CMD "$PROJECT_ROOT/py/utils/sports_analytics_validator.py" --report
+        $PYTHON_CMD "$PROJECT_ROOT/nfl_analytics/utils/sports_analytics_validator.py" --report
         ;;
 
     --help|-h)

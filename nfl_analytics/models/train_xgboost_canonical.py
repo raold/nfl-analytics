@@ -12,7 +12,7 @@ Expected Performance: MAE < 54 yards (baseline 13-feature model: 54.12 yards)
 Ensemble Weight: 30% (4-way ensemble)
 
 Usage:
-    python py/models/train_xgboost_canonical.py
+    python nfl_analytics/models/train_xgboost_canonical.py
 
 Output:
     - models/xgboost/passing_xgboost_v2_canonical.pkl

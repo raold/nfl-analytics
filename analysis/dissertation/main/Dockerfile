@@ -40,7 +40,7 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
     CMD python -c "import sys; sys.exit(0)"
 
 # Default command
-CMD ["python", "-m", "py.main"]
+CMD ["python", "-m", "nfl_analytics.main"]
 
 
 # ============================================
@@ -59,7 +59,7 @@ RUN pip install --no-cache-dir \
 
 USER nfl
 
-CMD ["python", "-m", "py.models.train_all"]
+CMD ["python", "-m", "nfl_analytics.models.train_all"]
 
 
 # ============================================
@@ -118,4 +118,4 @@ FROM base as backtest
 
 USER nfl
 
-CMD ["python", "-m", "py.backtests.comprehensive_ensemble_backtest"]
+CMD ["python", "-m", "nfl_analytics.backtests.comprehensive_ensemble_backtest"]

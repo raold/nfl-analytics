@@ -20,7 +20,7 @@ services:
       - REDIS_PORT=6379
       - MACHINE_ID=${MACHINE_ID:-auto}
       - HARDWARE_PROFILE=${HARDWARE_PROFILE:-auto}
-      - PYTHONPATH=/app:/app/py:/app/py/compute
+      - PYTHONPATH=/app:/app/py:/app/nfl_analytics/compute
       - NFL_ANALYTICS_ENV=${NFL_ANALYTICS_ENV:-development}
     restart: unless-stopped
     network_mode: host

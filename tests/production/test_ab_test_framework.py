@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from py.production.ab_test_router import ABTestRouter
+from nfl_analytics.production.ab_test_router import ABTestRouter
 
 
 class TestABTestRouter:
@@ -117,8 +117,8 @@ class TestABTestRouter:
             assert group == "A"
             assert version == "v5.0"
 
-    @patch("py.production.ab_test_router.EnsembleV5")
-    @patch("py.production.ab_test_router.EnsembleV5_1")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5")
+    @patch("nfl_analytics.production.ab_test_router.EnsembleV5_1")
     def test_predict_routes_to_correct_ensemble(self, mock_v5_1, mock_v5):
         """Test that predictions are routed to correct ensemble."""
         # Mock ensemble predictions
@@ -355,8 +355,8 @@ class TestIntegration:
     def test_end_to_end_workflow(self):
         """Test complete A/B test workflow (mocked)."""
         with (
-            patch("py.production.ab_test_router.EnsembleV5"),
-            patch("py.production.ab_test_router.EnsembleV5_1"),
+            patch("nfl_analytics.production.ab_test_router.EnsembleV5"),
+            patch("nfl_analytics.production.ab_test_router.EnsembleV5_1"),
             patch("psycopg2.connect"),
         ):
 

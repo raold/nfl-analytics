@@ -18,9 +18,9 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.ensemble.strategy.base import EnsembleConfig
-from py.ensemble.strategy.ensemble_predictor import UnifiedEnsemblePredictor
-from py.utils.claude_cache import get_default_cache
+from nfl_analytics.ensemble.strategy.base import EnsembleConfig
+from nfl_analytics.ensemble.strategy.ensemble_predictor import UnifiedEnsemblePredictor
+from nfl_analytics.utils.claude_cache import get_default_cache
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +109,7 @@ class CacheWarmer:
                         # Trigger model loading by accessing cache
                         # This populates Redis cache via _load_model_with_redis()
                         if path.suffix == ".pkl":
-                            from py.models.bayesian_neural_network import BayesianNeuralNetwork
+                            from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
 
                             def loader(p):
                                 return BayesianNeuralNetwork.load(p)
@@ -412,7 +412,7 @@ async def warm_cache_on_startup(
 
     ```python
     from fastapi import FastAPI
-    from py.api.cache_warmup import warm_cache_on_startup
+    from nfl_analytics.api.cache_warmup import warm_cache_on_startup
 
     app = FastAPI()
 

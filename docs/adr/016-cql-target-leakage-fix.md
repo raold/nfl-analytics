@@ -11,7 +11,7 @@
 
 ### Problem Statement
 
-The CQL (Conservative Q-Learning) evaluation pipeline in `py/rl/` had critical target leakage that produced impossible metrics in the dissertation table `rl_vs_baseline_table.tex`:
+The CQL (Conservative Q-Learning) evaluation pipeline in `nfl_analytics/rl/` had critical target leakage that produced impossible metrics in the dissertation table `rl_vs_baseline_table.tex`:
 
 - CQL (single): 93.1% win rate, +79.7% ROI
 - CQL (ensemble): **100% win rate, +91.0% ROI, infinite Sharpe, 0% max DD**
@@ -21,9 +21,9 @@ These metrics are scientifically impossible in an efficient betting market where
 ### Background
 
 The CQL pipeline was designed to:
-1. Generate a logged dataset from historical games (`py/rl/dataset.py`)
+1. Generate a logged dataset from historical games (`nfl_analytics/rl/dataset.py`)
 2. Train CQL models on this dataset (models never actually existed)
-3. Evaluate policies using `py/rl/evaluate_cql_betting.py`
+3. Evaluate policies using `nfl_analytics/rl/evaluate_cql_betting.py`
 
 However, the dataset generation included post-game outcomes (home_score, away_score) and pre-computed rewards, allowing models to "see the future."
 
@@ -49,8 +49,8 @@ Fix the CQL pipeline to prevent target leakage by:
 
 | File | Changes |
 |------|---------|
-| `py/rl/dataset.py` | Removed `home_score`, `away_score`, `r` from output columns |
-| `py/rl/evaluate_cql_betting.py` | Added `load_game_outcomes()`, season-based split, fixed cover formula |
+| `nfl_analytics/rl/dataset.py` | Removed `home_score`, `away_score`, `r` from output columns |
+| `nfl_analytics/rl/evaluate_cql_betting.py` | Added `load_game_outcomes()`, season-based split, fixed cover formula |
 | `figures/out/rl_vs_baseline_table.tex` | Updated with honest baseline metrics |
 
 **Critical Bug Found:**
@@ -160,7 +160,7 @@ The database uses positive `spread_close` for home favorites (giving points), no
 
 3. **Regenerated clean dataset:**
    ```bash
-   python py/rl/dataset.py --output data/rl/betting_features_clean.csv
+   python nfl_analytics/rl/dataset.py --output data/rl/betting_features_clean.csv
    ```
 
 4. **Updated dissertation table:**
@@ -219,8 +219,8 @@ These results confirm:
 
 ### Implementation
 
-- [py/rl/dataset.py](../../py/rl/dataset.py) - Dataset generation
-- [py/rl/evaluate_cql_betting.py](../../py/rl/evaluate_cql_betting.py) - Evaluation script
+- [nfl_analytics/rl/dataset.py](../../nfl_analytics/rl/dataset.py) - Dataset generation
+- [nfl_analytics/rl/evaluate_cql_betting.py](../../nfl_analytics/rl/evaluate_cql_betting.py) - Evaluation script
 - [figures/out/rl_vs_baseline_table.tex](../../analysis/dissertation/figures/out/rl_vs_baseline_table.tex) - Dissertation table
 
 ---
@@ -233,7 +233,7 @@ verbatim into `games.spread_close`); it is inverted only relative to sportsbook 
 - Negative `spread_close` = home is **underdog** (receiving points)
 
 *(Corrected 2026-10-24; this note previously said "inverted from standard nflverse". Use
-`py/utils/spread_convention.py` for all cover/edge math.)*
+`nfl_analytics/utils/spread_convention.py` for all cover/edge math.)*
 
 This is documented in the `load_game_outcomes()` docstring for future reference.
 

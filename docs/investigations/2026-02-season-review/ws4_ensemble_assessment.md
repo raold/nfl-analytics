@@ -11,8 +11,8 @@
 
 The NFL analytics project contains **two distinct prediction systems** that are frequently conflated:
 
-1. **Player Props Ensemble** (`py/ensemble/enhanced_ensemble_v6_production.py`) -- a 5-way ensemble predicting **passing yards per player-game**. This is the "v6 ensemble" referenced in most documentation.
-2. **Game Outcome Model** (`py/models/game_outcome_model_fixed.py`) -- a standalone XGBoost system predicting **point spreads, totals, and win probabilities** using 382 features. This is the actual game prediction pipeline.
+1. **Player Props Ensemble** (`nfl_analytics/ensemble/enhanced_ensemble_v6_production.py`) -- a 5-way ensemble predicting **passing yards per player-game**. This is the "v6 ensemble" referenced in most documentation.
+2. **Game Outcome Model** (`nfl_analytics/models/game_outcome_model_fixed.py`) -- a standalone XGBoost system predicting **point spreads, totals, and win probabilities** using 382 features. This is the actual game prediction pipeline.
 
 The v6 ensemble does NOT predict game outcomes. It predicts player-level yards. The game outcome model operates independently with its own feature extractor, training, and inference pathway.
 
@@ -406,11 +406,11 @@ Unlike game predictions (stored in `ml.game_outcome_predictions`), there is no t
 
 | File | Path | Purpose |
 |------|------|---------|
-| Props Ensemble | `/home/dro/rice/nfl-analytics/py/ensemble/enhanced_ensemble_v6_production.py` | 5-way player props ensemble |
-| Game Outcome | `/home/dro/rice/nfl-analytics/py/models/game_outcome_model_fixed.py` | XGBoost game prediction |
-| R Prediction Lookup | `/home/dro/rice/nfl-analytics/py/ensemble/r_prediction_lookup.py` | PostgreSQL R model lookup (tables missing) |
-| Dirichlet Stacking | `/home/dro/rice/nfl-analytics/py/ensemble/dirichlet_bayesian_stacking.py` | Online Bayesian weight learning |
-| Weight Optimizer | `/home/dro/rice/nfl-analytics/py/ensemble/optimized_ensemble_weights.py` | 6 weighting schemes (legacy) |
+| Props Ensemble | `/home/dro/rice/nfl-analytics/nfl_analytics/ensemble/enhanced_ensemble_v6_production.py` | 5-way player props ensemble |
+| Game Outcome | `/home/dro/rice/nfl-analytics/nfl_analytics/models/game_outcome_model_fixed.py` | XGBoost game prediction |
+| R Prediction Lookup | `/home/dro/rice/nfl-analytics/nfl_analytics/ensemble/r_prediction_lookup.py` | PostgreSQL R model lookup (tables missing) |
+| Dirichlet Stacking | `/home/dro/rice/nfl-analytics/nfl_analytics/ensemble/dirichlet_bayesian_stacking.py` | Online Bayesian weight learning |
+| Weight Optimizer | `/home/dro/rice/nfl-analytics/nfl_analytics/ensemble/optimized_ensemble_weights.py` | 6 weighting schemes (legacy) |
 | ADR-009 | `/home/dro/rice/nfl-analytics/docs/adr/009-abandon-ensemble-v7-meta-learning.md` | Dynamic weights rejection |
 | v6 Temp Scaler | `/home/dro/rice/nfl-analytics/models/calibration/temperature_scaler_v6_metadata.json` | T=0.7083, .pkl missing |
 | 4-way Temp Scaler | `/home/dro/rice/nfl-analytics/models/calibration/temperature_scaler_4way_metadata.json` | T=1.0771, .pkl missing |

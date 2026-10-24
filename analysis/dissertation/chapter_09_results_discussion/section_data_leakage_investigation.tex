@@ -22,7 +22,7 @@ Rather than accept inflated results, we conducted systematic leakage audits acro
 \subsection{Root Cause 1: Severe Post-Game EPA Contamination}
 
 \paragraph{The Problem.}
-The initial backtest (\texttt{py/backtest/full\_historical\_backtest.py}) computed team EPA features via direct aggregation from the \texttt{plays} table:
+The initial backtest (\texttt{nfl\_analytics/backtest/full\_historical\_backtest.py}) computed team EPA features via direct aggregation from the \texttt{plays} table:
 \begin{lstlisting}[language=SQL,basicstyle=\ttfamily\scriptsize]
 SELECT AVG(epa) as team_epa
 FROM plays
@@ -172,6 +172,6 @@ The contribution is not profitable NFL betting, but rather \emph{infrastructure 
   \item \textbf{Season-level features}: IDENTIFIED, not yet fixed (60.2\% $\to$ 55--57\% expected)
 \end{itemize}
 
-All code, diagnostics, and validation scripts are version-controlled (\texttt{py/backtest/\allowbreak diagnostic\_spread\_only.py}, \texttt{clean\_backtest\_FIXED.py}, \texttt{recent\_seasons\_test.py}) with comprehensive documentation in \texttt{DATA\_LEAKAGE\_ANALYSIS.md}. This transparency ensures reproducibility and enables future researchers to build on our leakage-detection methodology.
+All code, diagnostics, and validation scripts are version-controlled (\texttt{nfl\_analytics/backtest/\allowbreak diagnostic\_spread\_only.py}, \texttt{clean\_backtest\_FIXED.py}, \texttt{recent\_seasons\_test.py}) with comprehensive documentation in \texttt{DATA\_LEAKAGE\_ANALYSIS.md}. This transparency ensures reproducibility and enables future researchers to build on our leakage-detection methodology.
 
 The central finding of this dissertation---calibration without profitability---is the \emph{correct} conclusion after leakage remediation. Had we proceeded with contaminated 62\% results, the entire thesis would have been invalidated upon external replication. This investigation exemplifies the scientific integrity required for credible empirical work in computational finance and sports analytics.

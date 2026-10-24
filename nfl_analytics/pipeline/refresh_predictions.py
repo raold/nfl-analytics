@@ -7,13 +7,13 @@ Designed to run after SNF/MNF each week to keep predictions current.
 
 Usage:
     # Auto-detect completed week and refresh
-    python py/pipeline/refresh_predictions.py --auto
+    python nfl_analytics/pipeline/refresh_predictions.py --auto
 
     # Manually refresh specific week
-    python py/pipeline/refresh_predictions.py --season 2025 --week 5
+    python nfl_analytics/pipeline/refresh_predictions.py --season 2025 --week 5
 
     # Dry run (show what would be done)
-    python py/pipeline/refresh_predictions.py --auto --dry-run
+    python nfl_analytics/pipeline/refresh_predictions.py --auto --dry-run
 """
 import argparse
 import logging
@@ -187,7 +187,7 @@ class PredictionRefreshPipeline:
             "uv",
             "run",
             "python",
-            str(self.project_root / "py/predict/v3_inference_live.py"),
+            str(self.project_root / "nfl_analytics/predict/v3_inference_live.py"),
             "--season",
             str(season),
             "--week-start",
@@ -242,7 +242,7 @@ class PredictionRefreshPipeline:
             "uv",
             "run",
             "python",
-            str(self.project_root / "py/predict/spread_coverage_inference.py"),
+            str(self.project_root / "nfl_analytics/predict/spread_coverage_inference.py"),
             "--season",
             str(season),
             "--week-start",

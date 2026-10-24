@@ -11,7 +11,7 @@ Generates:
 - Feature interaction effects
 
 Usage:
-    python py/analysis/model_explainability.py --data data/processed/merged_predictions_features.csv
+    python nfl_analytics/analysis/model_explainability.py --data data/processed/merged_predictions_features.csv
 """
 
 import argparse

@@ -62,7 +62,7 @@ case $ACTION in
         fi
 
         python3 -c "
-from py.agents.architecture_enforcer import ArchitectureEnforcer
+from nfl_analytics.agents.architecture_enforcer import ArchitectureEnforcer
 
 enforcer = ArchitectureEnforcer()
 violations = enforcer.check_module_size('$FILE')
@@ -83,7 +83,7 @@ else:
         fi
 
         python3 -c "
-from py.agents.architecture_enforcer import ArchitectureEnforcer
+from nfl_analytics.agents.architecture_enforcer import ArchitectureEnforcer
 
 enforcer = ArchitectureEnforcer()
 metrics = enforcer.analyze_module('$FILE')
@@ -109,7 +109,7 @@ else:
 
     check-all)
         python3 -c "
-from py.agents.architecture_enforcer import ArchitectureEnforcer
+from nfl_analytics.agents.architecture_enforcer import ArchitectureEnforcer
 
 enforcer = ArchitectureEnforcer()
 all_metrics = enforcer.check_all_modules()
@@ -145,10 +145,10 @@ for i, metrics in enumerate(sorted_by_size[:10], 1):
 
     detect-cycles)
         python3 -c "
-from py.agents.architecture_enforcer import ArchitectureEnforcer
+from nfl_analytics.agents.architecture_enforcer import ArchitectureEnforcer
 
 enforcer = ArchitectureEnforcer()
-cycles = enforcer.detect_circular_dependencies('py/')
+cycles = enforcer.detect_circular_dependencies('nfl_analytics/')
 
 print(f'\n=== Circular Dependencies ===')
 print(f'Found {len(cycles)} circular dependency cycle(s)\n')
@@ -170,7 +170,7 @@ if not cycles:
         fi
 
         python3 -c "
-from py.agents.architecture_enforcer import ArchitectureEnforcer
+from nfl_analytics.agents.architecture_enforcer import ArchitectureEnforcer
 
 enforcer = ArchitectureEnforcer()
 plan = enforcer.generate_refactoring_plan('$FILE')
@@ -193,7 +193,7 @@ for i, extraction in enumerate(plan.extractions[:5], 1):
 
     top-violations)
         python3 -c "
-from py.agents.architecture_enforcer import ArchitectureEnforcer
+from nfl_analytics.agents.architecture_enforcer import ArchitectureEnforcer
 
 enforcer = ArchitectureEnforcer()
 violations = enforcer.get_top_violations(limit=10)

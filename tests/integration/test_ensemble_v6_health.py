@@ -51,7 +51,7 @@ def test_model_loading():
     logger.info("=" * 80)
 
     try:
-        from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
         logger.info("Initializing v6_elo ensemble...")
         start_time = time.time()

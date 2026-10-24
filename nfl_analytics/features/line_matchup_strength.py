@@ -26,10 +26,10 @@ Since we don't have individual OL player IDs, we measure at team level:
 
 Usage:
     # Generate OL-DL matchup features for 2024-2025
-    python py/features/line_matchup_strength.py --season 2024
+    python nfl_analytics/features/line_matchup_strength.py --season 2024
 
     # Historical features
-    python py/features/line_matchup_strength.py --start-season 2018 --end-season 2025
+    python nfl_analytics/features/line_matchup_strength.py --start-season 2018 --end-season 2025
 """
 
 import argparse

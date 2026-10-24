@@ -46,7 +46,7 @@ except ImportError:
 
 # Import validators (optional - they may not all exist yet)
 try:
-    from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+    from nfl_analytics.utils.sports_analytics_validator import SportsAnalyticsValidator
 
     HAS_SPORTS_VALIDATOR = True
 except (ImportError, NameError) as e:
@@ -54,7 +54,7 @@ except (ImportError, NameError) as e:
     print(f"⚠️  Sports validator not available: {e}")
 
 try:
-    from py.utils.statistical_validator import StatisticalValidator
+    from nfl_analytics.utils.statistical_validator import StatisticalValidator
 
     HAS_STATISTICAL_VALIDATOR = True
 except (ImportError, NameError) as e:
@@ -62,7 +62,7 @@ except (ImportError, NameError) as e:
     print(f"⚠️  Statistical validator not available: {e}")
 
 try:
-    from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
+    from nfl_analytics.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
     HAS_ENSEMBLE_MONITOR = True
 except (ImportError, NameError) as e:
@@ -70,7 +70,7 @@ except (ImportError, NameError) as e:
     print(f"⚠️  Ensemble monitor not available: {e}")
 
 try:
-    from py.utils.betting_validator import BettingValidator
+    from nfl_analytics.utils.betting_validator import BettingValidator
 
     HAS_BETTING_VALIDATOR = True
 except (ImportError, NameError) as e:

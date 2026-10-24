@@ -14,7 +14,7 @@ This helps us understand:
 - What to prioritize for future v3 models
 
 Usage:
-    python py/analysis/v2_feature_ablation.py \
+    python nfl_analytics/analysis/v2_feature_ablation.py \
         --features-csv data/processed/features/asof_team_features_v2.csv \
         --test-season 2024 \
         --output-dir results/ablation

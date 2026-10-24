@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import logging
 
-from py.ensemble.enhanced_ensemble_v5_1 import EnhancedEnsemble4Way
+from nfl_analytics.ensemble.enhanced_ensemble_v5_1 import EnhancedEnsemble4Way
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

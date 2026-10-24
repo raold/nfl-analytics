@@ -10,7 +10,7 @@ Strategy pattern. It consolidates 8 separate ensemble implementations
 into a single, maintainable, testable architecture.
 
 Usage:
-    python py/production/ensemble_predictor_production.py \
+    python nfl_analytics/production/ensemble_predictor_production.py \
       --player-id "00-0019596" \
       --season 2024 \
       --week 9 \
@@ -34,7 +34,7 @@ from typing import Any
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.ensemble.strategy import (
+from nfl_analytics.ensemble.strategy import (
     EnsembleConfig,
     UnifiedEnsemblePredictor,
 )
@@ -52,7 +52,7 @@ PRODUCTION_MODEL_PATHS = {
 }
 
 # Production weights (optimized via backtest on 2022-2024 data)
-# Source: py/ensemble/optimize_ensemble_weights.py
+# Source: nfl_analytics/ensemble/optimize_ensemble_weights.py
 PRODUCTION_WEIGHTS = {
     "state_space_v2": 0.30,  # Best MAE (47.77 yards)
     "hierarchical_v2": 0.25,  # Strong Bayesian priors

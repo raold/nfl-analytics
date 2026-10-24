@@ -70,8 +70,8 @@ To resume development from a new session:
    ```
 3. **Read CLAUDE.md** "Kalshi Trading System" section for architecture overview
 4. **Key entry points:**
-   - `LiveTrader` (`py/execution/live_trader.py`) — async orchestrator
-   - `DirectionalStrategy` (`py/trading/directional.py`) — NFL signal generation
-   - `RiskManager` (`py/risk/risk_manager.py`) — universal signal gate
-   - `MarketRouter` (`py/markets/market_router.py`) — multi-sport dispatch
+   - `LiveTrader` (`nfl_analytics/execution/live_trader.py`) — async orchestrator
+   - `DirectionalStrategy` (`nfl_analytics/trading/directional.py`) — NFL signal generation
+   - `RiskManager` (`nfl_analytics/risk/risk_manager.py`) — universal signal gate
+   - `MarketRouter` (`nfl_analytics/markets/market_router.py`) — multi-sport dispatch
 5. **Context systems** have detailed memories (Serena: `trading-architecture`, `trading-risk-hierarchy`, `trading-testing-patterns`)

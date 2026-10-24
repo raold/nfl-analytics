@@ -35,7 +35,7 @@ import time
 import numpy as np
 import pytest
 
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

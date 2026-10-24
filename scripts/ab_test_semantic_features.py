@@ -259,7 +259,7 @@ def run_semantic_feature_analysis():
     print("=" * 70)
 
     try:
-        from py.semantic.features.semantic_features import SemanticFeatureExtractor
+        from nfl_analytics.semantic.features.semantic_features import SemanticFeatureExtractor
 
         extractor = SemanticFeatureExtractor()
 

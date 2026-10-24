@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 # Ensemble Weight Monitor CLI wrapper
-python py/utils/ensemble_weight_monitor.py "$@"
+python nfl_analytics/utils/ensemble_weight_monitor.py "$@"

@@ -8,7 +8,7 @@ discrepancies and optionally auto-corrects minor mismatches.
 Designed to run as a scheduled task (cron 6am ET daily).
 
 Usage:
-    from py.execution.reconciliation import Reconciler
+    from nfl_analytics.execution.reconciliation import Reconciler
 
     reconciler = Reconciler(kalshi_client, local_positions, local_balance)
     report = await reconciler.run()
@@ -22,7 +22,7 @@ import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from py.markets.base import Fill, MarketClient, Position, Side
+from nfl_analytics.markets.base import Fill, MarketClient, Position, Side
 
 logger = logging.getLogger(__name__)
 

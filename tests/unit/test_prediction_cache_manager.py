@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from py.utils.prediction_cache_manager import (
+from nfl_analytics.utils.prediction_cache_manager import (
     CacheStats,
     PredictionCacheManager,
     ValidationReport,

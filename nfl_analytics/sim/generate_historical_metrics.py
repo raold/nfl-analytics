@@ -11,7 +11,7 @@ This script queries the database for completed games and computes:
 Output: analysis/results/historical_metrics.json
 
 Usage:
-    python py/sim/generate_historical_metrics.py
+    python nfl_analytics/sim/generate_historical_metrics.py
 """
 
 import json

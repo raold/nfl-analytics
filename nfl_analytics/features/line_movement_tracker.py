@@ -21,13 +21,13 @@ Early Week Betting (EWB) Strategy:
 
 Usage:
     # Track single game
-    python py/features/line_movement_tracker.py \
+    python nfl_analytics/features/line_movement_tracker.py \
         --game "KC_vs_BUF" \
         --opening-line -3 \
         --closing-line -3.5
 
     # Analyze historical line movements
-    python py/features/line_movement_tracker.py \
+    python nfl_analytics/features/line_movement_tracker.py \
         --historical-csv data/odds/historical_lines_2024.csv \
         --output results/line_movement/ewb_analysis.json
 """

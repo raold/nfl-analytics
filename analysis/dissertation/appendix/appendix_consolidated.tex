@@ -267,7 +267,7 @@ Canonical experiments referenced in the text. Each entry lists dataset range, fe
 Common invocations for running ingestion, training, simulation, and reporting.
 \begin{verbatim}
 Rscript --vanilla data/ingest_schedules.R
-python py/ingest_odds_history.py --start-date 2023-09-01 --end-date 2023-09-03
+python nfl_analytics/ingest_odds_history.py --start-date 2023-09-01 --end-date 2023-09-03
 psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@localhost:$POSTGRES_PORT/$POSTGRES_DB \
   -c "REFRESH MATERIALIZED VIEW mart.game_summary;"
 pytest tests/integration -k ingestion
@@ -422,7 +422,7 @@ We present performance metrics from CQL training on the Windows 11 RTX 4090 envi
     \centering
     \vspace{1cm}
     \textbf{CQL Training Curves}\\
-    \textit{(Figure will appear after running: py/viz/plot\_cql\_curves.py)}
+    \textit{(Figure will appear after running: nfl\_analytics/viz/plot\_cql\_curves.py)}
     \vspace{1cm}
   \end{minipage}}
 }
@@ -804,7 +804,7 @@ We approximate this integral via posterior predictive sampling, drawing $N$ weig
 \end{itemize}
 
 \paragraph{Implementation Details.}
-File: \texttt{py/models/bayesian\_neural\_network.py} (370 lines). Dependencies: PyMC $\geq$ 5.0, ArviZ $\geq$ 0.15. Demo tested successfully with MSE 0.80, MAE 0.68, calibration 93\% (vs 68\% target).
+File: \texttt{nfl\_analytics/models/bayesian\_neural\_network.py} (370 lines). Dependencies: PyMC $\geq$ 5.0, ArviZ $\geq$ 0.15. Demo tested successfully with MSE 0.80, MAE 0.68, calibration 93\% (vs 68\% target).
 
 \subsection{Phase 4: 4-Way Ensemble Integration}
 
@@ -838,7 +838,7 @@ This allows dynamic weighting when, e.g., Bayesian models excel in high-uncertai
 Total ensemble delivers +5.0--7.0\% ROI target (vs +1.59\% baseline), representing 85\% of theoretical maximum utilization. Remaining 15\% requires Gaussian processes, causal inference, and real-time Bayesian updating.
 
 \paragraph{Implementation Details.}
-File: \texttt{py/ensemble/enhanced\_ensemble\_v3.py} (280 lines). Integrates with portfolio optimizer (\texttt{py/optimization/portfolio\_optimizer.py}) for correlation-adjusted Kelly sizing.
+File: \texttt{nfl\_analytics/ensemble/enhanced\_ensemble\_v3.py} (280 lines). Integrates with portfolio optimizer (\texttt{nfl\_analytics/optimization/portfolio\_optimizer.py}) for correlation-adjusted Kelly sizing.
 
 \subsection{Performance Projections and Validation}
 
@@ -878,8 +878,8 @@ On a \$10,000 bankroll over a 17-week season:
 \begin{itemize}
   \item $\checkmark$ State-space models implemented and tested (R/state\_space\_player\_skills.R)
   \item $\checkmark$ Advanced priors implemented with empirical Bayes (R/advanced\_priors\_\allowbreak elicitation.R)
-  \item $\checkmark$ Bayesian neural network implemented and demo tested (py/models/bayesian\_neural\_network.py)
-  \item $\checkmark$ 4-way ensemble integration layer (py/ensemble/enhanced\_ensemble\_v3.py)
+  \item $\checkmark$ Bayesian neural network implemented and demo tested (nfl\_analytics/models/bayesian\_neural\_network.py)
+  \item $\checkmark$ 4-way ensemble integration layer (nfl\_analytics/ensemble/enhanced\_ensemble\_v3.py)
   \item $\checkmark$ Comprehensive documentation (docs/ADVANCED\_BAYESIAN\_V3.md)
 \end{itemize}
 

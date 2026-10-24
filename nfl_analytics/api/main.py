@@ -30,10 +30,10 @@ Usage:
     uv pip install fastapi uvicorn pydantic redis prometheus-client
 
     # Run development server
-    uvicorn py.api.main:app --host 0.0.0.0 --port 8000 --reload
+    uvicorn nfl_analytics.api.main:app --host 0.0.0.0 --port 8000 --reload
 
     # Run production server
-    gunicorn py.api.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker \
+    gunicorn nfl_analytics.api.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker \
         --bind 0.0.0.0:8000 --access-logfile - --error-logfile -
 
 Example Request:
@@ -98,9 +98,9 @@ project_root = str(Path(__file__).parent.parent.parent)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from py.api.cache_warmup import warm_cache_on_startup
-from py.api.routes import game_predictions
-from py.utils.claude_cache import ClaudeRedisCache, get_default_cache
+from nfl_analytics.api.cache_warmup import warm_cache_on_startup
+from nfl_analytics.api.routes import game_predictions
+from nfl_analytics.utils.claude_cache import ClaudeRedisCache, get_default_cache
 
 # ============================================================================
 # Logging Configuration
@@ -480,7 +480,7 @@ class ModelManager:
             True if ensemble loaded successfully, False otherwise
         """
         try:
-            from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+            from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
             self.ensemble = EnhancedEnsemble5Way(
                 db_password=os.getenv("DB_PASSWORD", "sicillionbillions")
@@ -756,7 +756,7 @@ except Exception as e:
 
 # Import and include props predictions router
 try:
-    from py.api.routes import props_predictions
+    from nfl_analytics.api.routes import props_predictions
 
     app.include_router(props_predictions.router, prefix="/api/v1", tags=["props_predictions"])
     logger.info("Props predictions router loaded successfully")

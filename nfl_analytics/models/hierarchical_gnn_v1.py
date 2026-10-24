@@ -419,7 +419,7 @@ class HierarchicalGNN(nn.Module):
 # The complete, working training implementation is in train_hierarchical_gnn.py.
 #
 # To train the GNN model:
-#   python py/models/train_hierarchical_gnn.py --device cuda --batch-size 512
+#   python nfl_analytics/models/train_hierarchical_gnn.py --device cuda --batch-size 512
 # =============================================================================
 
 

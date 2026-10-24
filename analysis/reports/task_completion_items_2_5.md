@@ -38,7 +38,7 @@
 **Status**: COMPLETE
 
 **Files Created**:
-1. `py/rl/ppo_agent.py` (656 lines)
+1. `nfl_analytics/rl/ppo_agent.py` (656 lines)
 2. `tests/unit/test_ppo_agent.py` (14 tests, all passing)
 
 **Architecture**:
@@ -71,10 +71,10 @@
 **Usage**:
 ```bash
 # Train PPO for 200 epochs
-python py/rl/ppo_agent.py --dataset data/rl_logged.csv --output models/ppo_model.pth --epochs 200 --device mps
+python nfl_analytics/rl/ppo_agent.py --dataset data/rl_logged.csv --output models/ppo_model.pth --epochs 200 --device mps
 
 # Evaluate trained policy
-python py/rl/ppo_agent.py --dataset data/rl_logged_test.csv --load models/ppo_model.pth --evaluate --device mps
+python nfl_analytics/rl/ppo_agent.py --dataset data/rl_logged_test.csv --load models/ppo_model.pth --evaluate --device mps
 ```
 
 **Next Steps**:
@@ -218,14 +218,14 @@ GROUP BY team;
 ## Files Created/Modified
 
 ### Created:
-1. `py/rl/ppo_agent.py` - PPO agent implementation (656 lines)
+1. `nfl_analytics/rl/ppo_agent.py` - PPO agent implementation (656 lines)
 2. `tests/unit/test_ppo_agent.py` - PPO unit tests (14 tests)
 3. `data/ingest_injuries.R` - Injury data ingestion script
 4. `models/dqn_model_200ep.pth` - DQN checkpoint (200 epochs)
 5. `models/dqn_training_log.json` - DQN training metrics
 
 ### Modified:
-1. `py/weather_meteostat.py` - Removed 100-game limit for full ingestion
+1. `nfl_analytics/weather_meteostat.py` - Removed 100-game limit for full ingestion
 
 ---
 

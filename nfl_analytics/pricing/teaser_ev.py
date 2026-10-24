@@ -11,7 +11,7 @@ Features
   - PNG heatmap of EV delta vs independence: analysis/dissertation/figures/out/teaser_pricing_copula_delta.png
 
 Usage
-  python py/pricing/teaser_ev.py \
+  python nfl_analytics/pricing/teaser_ev.py \
     --start 2020 --end 2024 \
     --teaser 6.0 --price -120 \
     --tex analysis/dissertation/figures/out/teaser_ev_oos_table.tex \

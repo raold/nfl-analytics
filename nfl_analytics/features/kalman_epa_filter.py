@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 # Import centralized DB config
 try:
-    from py.utils.db_config import get_db_config
+    from nfl_analytics.utils.db_config import get_db_config
 except ImportError:
     # Fallback for standalone usage
     def get_db_config():

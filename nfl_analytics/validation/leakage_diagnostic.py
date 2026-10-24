@@ -6,9 +6,9 @@ Systematically tests for temporal data leakage in NFL props betting features.
 Goal: Identify why win rate is 60.2% (impossible for spreads, realistic max ~54-55%).
 
 Usage:
-    python py/validation/leakage_diagnostic.py --test spread-only
-    python py/validation/leakage_diagnostic.py --test feature-audit
-    python py/validation/leakage_diagnostic.py --test all
+    python nfl_analytics/validation/leakage_diagnostic.py --test spread-only
+    python nfl_analytics/validation/leakage_diagnostic.py --test feature-audit
+    python nfl_analytics/validation/leakage_diagnostic.py --test all
 
 Author: Claude Code
 Date: November 2, 2025
@@ -401,7 +401,7 @@ class LeakageDiagnostic:
         # For now, document the requirement
 
         print("\nManual inspection required:")
-        print("  1. Check py/features/ for QB/coach change detection")
+        print("  1. Check nfl_analytics/features/ for QB/coach change detection")
         print("  2. Verify change is detected BEFORE the game where it occurs")
         print("  3. Ensure features don't use current game data")
 
@@ -409,9 +409,9 @@ class LeakageDiagnostic:
             "test": "event_detection",
             "status": "MANUAL_INSPECTION_REQUIRED",
             "files_to_check": [
-                "py/features/asof_features.py",
-                "py/features/asof_features_enhanced.py",
-                "py/features/bayesian_player_features.py",
+                "nfl_analytics/features/asof_features.py",
+                "nfl_analytics/features/asof_features_enhanced.py",
+                "nfl_analytics/features/bayesian_player_features.py",
             ],
         }
 

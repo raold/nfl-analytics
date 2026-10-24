@@ -368,11 +368,11 @@ def calculate_edges(
 
 # Import GameOutcomePredictor
 # Import Ensemble v6.1 for QB predictions
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
-from py.ensemble.game_outcome_predictor import GameOutcomePredictor
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from nfl_analytics.ensemble.game_outcome_predictor import GameOutcomePredictor
 
 # Import Redis cache decorator
-from py.utils.game_prediction_cache import (
+from nfl_analytics.utils.game_prediction_cache import (
     cache_game_prediction,
     get_cache_stats,
     invalidate_game_cache,

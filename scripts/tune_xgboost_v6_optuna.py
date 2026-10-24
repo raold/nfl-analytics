@@ -21,8 +21,8 @@ from sklearn.model_selection import TimeSeriesSplit
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.features.feature_loader_parallel import ParallelFeatureLoader
-from py.utils.data_leakage_detector import DataLeakageDetector
+from nfl_analytics.features.feature_loader_parallel import ParallelFeatureLoader
+from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)

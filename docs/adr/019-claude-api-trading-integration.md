@@ -154,7 +154,7 @@ Strategy -> RiskManager -> [ClaudeSignalValidator] -> TradeExecutor -> Exchange
 ### Neutral
 
 - **New dependency:** `anthropic` Python package (optional, not added to requirements)
-- **New module:** `py/trading/claude_signal_validator.py` (~150 lines)
+- **New module:** `nfl_analytics/trading/claude_signal_validator.py` (~150 lines)
 - **Configuration surface:** New `ClaudeValidatorConfig` dataclass
 
 ### Risks
@@ -173,7 +173,7 @@ Strategy -> RiskManager -> [ClaudeSignalValidator] -> TradeExecutor -> Exchange
 
 ### Approach
 
-Proof-of-concept implementation as a single module (`py/trading/claude_signal_validator.py`) with full unit test coverage. The module is self-contained with no modifications to existing files. Integration into the `LiveTrader` pipeline is a future step.
+Proof-of-concept implementation as a single module (`nfl_analytics/trading/claude_signal_validator.py`) with full unit test coverage. The module is self-contained with no modifications to existing files. Integration into the `LiveTrader` pipeline is a future step.
 
 ### Timeline
 
@@ -214,10 +214,10 @@ Track validator decisions alongside trade outcomes over a 30-day paper trading w
 
 ### Code
 
-- `py/trading/claude_signal_validator.py` — PoC implementation
-- `py/trading/signal.py` — Signal dataclass
-- `py/risk/` — Risk management hierarchy (upstream of validator)
-- `py/execution/` — Trade executor (downstream of validator)
+- `nfl_analytics/trading/claude_signal_validator.py` — PoC implementation
+- `nfl_analytics/trading/signal.py` — Signal dataclass
+- `nfl_analytics/risk/` — Risk management hierarchy (upstream of validator)
+- `nfl_analytics/execution/` — Trade executor (downstream of validator)
 
 ---
 

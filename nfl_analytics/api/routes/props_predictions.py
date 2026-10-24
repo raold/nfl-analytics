@@ -172,7 +172,7 @@ class PropsModelManager:
             return self._ensemble
 
         try:
-            from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+            from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
             self._ensemble = EnhancedEnsemble5Way(db_password=self.db_config["password"])
             self._ensemble_available = True
@@ -190,7 +190,7 @@ class PropsModelManager:
             return self._ab_router
 
         try:
-            from py.production.ab_test_dirichlet_props import DirichletABTestRouter
+            from nfl_analytics.production.ab_test_dirichlet_props import DirichletABTestRouter
 
             self._ab_router = DirichletABTestRouter(
                 split_ratio=0.5,  # 50/50 split

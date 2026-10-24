@@ -7,13 +7,13 @@ Logs metrics to database for ongoing monitoring and alerting.
 
 Usage:
     # Monitor predictions for a week
-    python py/monitor/production_monitor.py --season 2025 --week 5
+    python nfl_analytics/monitor/production_monitor.py --season 2025 --week 5
 
     # Monitor specific games
-    python py/monitor/production_monitor.py --game-ids 2025_05_KC_NO 2025_05_BUF_HOU
+    python nfl_analytics/monitor/production_monitor.py --game-ids 2025_05_KC_NO 2025_05_BUF_HOU
 
     # Weekly monitoring job (run after week completes)
-    python py/monitor/production_monitor.py --weekly-report --season 2025 --week 5
+    python nfl_analytics/monitor/production_monitor.py --weekly-report --season 2025 --week 5
 """
 import argparse
 import json

@@ -132,7 +132,7 @@ ON ml.r_model_predictions (season, week);
 **Solution:** Batch inserts with `execute_values()` (1000 inserts = <1 second)
 
 ```python
-from py.utils.prediction_cache_manager import PredictionCacheManager
+from nfl_analytics.utils.prediction_cache_manager import PredictionCacheManager
 import pandas as pd
 
 manager = PredictionCacheManager()
@@ -295,7 +295,7 @@ print(f"Backfilled {cached}/{total} predictions")
 ### Example 1: Cache New Model Predictions
 
 ```python
-from py.utils.prediction_cache_manager import PredictionCacheManager
+from nfl_analytics.utils.prediction_cache_manager import PredictionCacheManager
 import pandas as pd
 
 # Initialize manager
@@ -318,7 +318,7 @@ print(f"✅ Cached {count} predictions")
 ### Example 2: Ensemble Integration
 
 ```python
-from py.utils.prediction_cache_manager import PredictionCacheManager
+from nfl_analytics.utils.prediction_cache_manager import PredictionCacheManager
 
 class EnhancedEnsemble:
     def __init__(self):
@@ -360,7 +360,7 @@ class EnhancedEnsemble:
 ### Example 3: Model Retraining Workflow
 
 ```python
-from py.utils.prediction_cache_manager import PredictionCacheManager
+from nfl_analytics.utils.prediction_cache_manager import PredictionCacheManager
 
 # Initialize manager
 manager = PredictionCacheManager()
@@ -392,7 +392,7 @@ print("✅ Model retrained and cache updated")
 ### Example 4: Weekly Cache Maintenance
 
 ```python
-from py.utils.prediction_cache_manager import PredictionCacheManager
+from nfl_analytics.utils.prediction_cache_manager import PredictionCacheManager
 
 manager = PredictionCacheManager()
 
@@ -613,7 +613,7 @@ psql -U dro -d devdb01 -f db/migrations/047_create_r_model_predictions.sql
 ### Step 2: Backfill Existing Predictions
 
 ```python
-from py.utils.prediction_cache_manager import PredictionCacheManager
+from nfl_analytics.utils.prediction_cache_manager import PredictionCacheManager
 
 manager = PredictionCacheManager()
 
@@ -816,7 +816,7 @@ pg_isready -h localhost -p 5544 -U dro -d devdb01
 ### Before (rpy2 - Slow)
 
 ```python
-# py/ensemble/enhanced_ensemble_v5.py
+# nfl_analytics/ensemble/enhanced_ensemble_v5.py
 def get_state_space_prediction(self, player_id, season, week):
     # Slow rpy2 call (50-200ms)
     return self.r_interface.predict(player_id, season, week)
@@ -827,8 +827,8 @@ def get_state_space_prediction(self, player_id, season, week):
 ### After (PostgreSQL Cache - Fast)
 
 ```python
-# py/ensemble/enhanced_ensemble_v6.py
-from py.utils.prediction_cache_manager import PredictionCacheManager
+# nfl_analytics/ensemble/enhanced_ensemble_v6.py
+from nfl_analytics.utils.prediction_cache_manager import PredictionCacheManager
 
 class EnhancedEnsemble:
     def __init__(self):
@@ -945,10 +945,10 @@ if stats.avg_lookup_time_ms > 2.0:
 ## References
 
 - Database Migration: `db/migrations/047_create_r_model_predictions.sql`
-- Python Module: `py/utils/prediction_cache_manager.py`
+- Python Module: `nfl_analytics/utils/prediction_cache_manager.py`
 - CLI Tool: `scripts/manage_prediction_cache.sh`
 - Test Suite: `tests/unit/test_prediction_cache_manager.py`
-- Integration: `py/ensemble/r_prediction_lookup.py`
+- Integration: `nfl_analytics/ensemble/r_prediction_lookup.py`
 
 ---
 

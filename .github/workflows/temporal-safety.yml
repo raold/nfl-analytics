@@ -42,7 +42,7 @@ jobs:
         run: |
           source .venv/bin/activate
           python -c "
-          from py.utils.data_leakage_detector import DataLeakageDetector
+          from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector
           import sys
           import os
 
@@ -50,10 +50,10 @@ jobs:
 
           # Check all feature engineering modules
           feature_modules = [
-              'py/features/asof_features.py',
-              'py/features/asof_features_v2.py',
-              'py/features/asof_features_enhanced.py',
-              'py/features/player_features.py',
+              'nfl_analytics/features/asof_features.py',
+              'nfl_analytics/features/asof_features_v2.py',
+              'nfl_analytics/features/asof_features_enhanced.py',
+              'nfl_analytics/features/player_features.py',
           ]
 
           critical_issues = []

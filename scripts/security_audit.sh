@@ -38,7 +38,7 @@ python3 -c "
 import sys
 sys.path.insert(0, '.')
 
-from py.utils.security_auditor import SecurityAuditor
+from nfl_analytics.utils.security_auditor import SecurityAuditor
 
 auditor = SecurityAuditor()
 

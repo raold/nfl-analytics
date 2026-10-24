@@ -7,11 +7,11 @@ import logging
 
 import pytest
 
-from py.markets.base import Side
-from py.monitoring.trade_logger import TradeLogger, TradeLoggerConfig, _JsonFormatter
-from py.risk.kill_switch import KillSwitchEvent
-from py.risk.risk_manager import RiskCheckResult
-from py.trading.signal import Signal
+from nfl_analytics.markets.base import Side
+from nfl_analytics.monitoring.trade_logger import TradeLogger, TradeLoggerConfig, _JsonFormatter
+from nfl_analytics.risk.kill_switch import KillSwitchEvent
+from nfl_analytics.risk.risk_manager import RiskCheckResult
+from nfl_analytics.trading.signal import Signal
 
 
 def _make_signal(**kwargs) -> Signal:

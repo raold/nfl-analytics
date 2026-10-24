@@ -13,22 +13,22 @@ This script should be run daily (e.g., via cron) to generate fresh betting recom
 
 Usage:
     # Full pipeline
-    python py/production/props_production_pipeline.py --api-key YOUR_KEY
+    python nfl_analytics/production/props_production_pipeline.py --api-key YOUR_KEY
 
     # Skip data fetch (use existing lines)
-    python py/production/props_production_pipeline.py --skip-fetch
+    python nfl_analytics/production/props_production_pipeline.py --skip-fetch
 
     # Specific prop types only
-    python py/production/props_production_pipeline.py --prop-types passing_yards rushing_yards
+    python nfl_analytics/production/props_production_pipeline.py --prop-types passing_yards rushing_yards
 
     # Test mode (no database writes)
-    python py/production/props_production_pipeline.py --test-mode
+    python nfl_analytics/production/props_production_pipeline.py --test-mode
 
     # Paper trading mode (no real money, track performance)
-    python py/production/props_production_pipeline.py --paper-trade --bankroll 10000
+    python nfl_analytics/production/props_production_pipeline.py --paper-trade --bankroll 10000
 
 Schedule via cron (daily at 10am):
-    0 10 * * * cd $PROJECT_ROOT && uv run python py/production/props_production_pipeline.py --api-key $ODDS_API_KEY
+    0 10 * * * cd $PROJECT_ROOT && uv run python nfl_analytics/production/props_production_pipeline.py --api-key $ODDS_API_KEY
 """
 
 import argparse

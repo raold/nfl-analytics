@@ -104,7 +104,7 @@
       "effort_hours": 8,
       "expected_benefit": "Optimize bet sizing and game selection dynamically using RL. Current Kelly criterion is static; RL can learn temporal patterns (e.g., bet more conservatively early season, exploit late season).",
       "test_plan": [
-        "Audit RL agent code status (py/rl/)",
+        "Audit RL agent code status (nfl_analytics/rl/)",
         "Retrain agents on 2019-2024 betting outcomes",
         "Backtest RL policy vs static Kelly on 2024 season",
         "Compare Sharpe ratio, max drawdown, total ROI",

@@ -15,13 +15,13 @@ Features:
 - Alerts: Real-time alerts and warnings
 
 Usage:
-    streamlit run py/production/viz/production_dashboard.py
+    streamlit run nfl_analytics/production/viz/production_dashboard.py
 
     # Custom port
-    streamlit run py/production/viz/production_dashboard.py --server.port 8502
+    streamlit run nfl_analytics/production/viz/production_dashboard.py --server.port 8502
 
     # Auto-refresh every 30s
-    streamlit run py/production/viz/production_dashboard.py --server.runOnSave true
+    streamlit run nfl_analytics/production/viz/production_dashboard.py --server.runOnSave true
 """
 
 import sys
@@ -37,9 +37,9 @@ from scipy.stats import beta
 # Add parent directory to path for imports
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from py.production.monitor_performance import PerformanceMonitor
-from py.production.stress_test_monitor import StressTestMonitor
-from py.production.thompson_switch_logic import ThompsonSampler
+from nfl_analytics.production.monitor_performance import PerformanceMonitor
+from nfl_analytics.production.stress_test_monitor import StressTestMonitor
+from nfl_analytics.production.thompson_switch_logic import ThompsonSampler
 
 # ============================================================================
 # Configuration

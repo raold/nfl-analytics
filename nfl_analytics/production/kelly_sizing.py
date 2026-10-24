@@ -20,14 +20,14 @@ Theory:
 
 Usage:
     # Calculate optimal bet size
-    python py/production/kelly_sizing.py \
+    python nfl_analytics/production/kelly_sizing.py \
         --win-prob 0.55 \
         --odds -110 \
         --bankroll 10000 \
         --kelly-fraction 0.25
 
     # Simulate bankroll growth
-    python py/production/kelly_sizing.py \
+    python nfl_analytics/production/kelly_sizing.py \
         --simulate \
         --win-prob 0.55 \
         --odds -110 \

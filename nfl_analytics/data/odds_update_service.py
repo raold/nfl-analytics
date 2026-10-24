@@ -27,16 +27,16 @@ Environment Variables:
 
 Usage:
     # Run continuously (production mode)
-    python py/data/odds_update_service.py
+    python nfl_analytics/data/odds_update_service.py
 
     # Run once and exit (testing mode)
-    python py/data/odds_update_service.py --once
+    python nfl_analytics/data/odds_update_service.py --once
 
     # Custom poll interval
-    python py/data/odds_update_service.py --poll-interval 300
+    python nfl_analytics/data/odds_update_service.py --poll-interval 300
 
     # Dry run (no database writes)
-    python py/data/odds_update_service.py --dry-run
+    python nfl_analytics/data/odds_update_service.py --dry-run
 
 Author: Claude Code (Sonnet 4.5)
 Date: November 8, 2025

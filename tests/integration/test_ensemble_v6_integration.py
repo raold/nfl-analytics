@@ -88,7 +88,7 @@ def ensemble_v5():
     try:
         import os
 
-        from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
         return EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
     except Exception as e:
@@ -408,7 +408,7 @@ class TestComponentFailureHandling:
             try:
                 import os
 
-                from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+                from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
                 EnhancedEnsemble4Way(db_password=os.getenv("DB_PASSWORD"))
                 # Should fail gracefully with informative error
@@ -593,11 +593,11 @@ class TestRiskGateEnforcement:
 def ensemble_v6_with_mocks():
     """Create v6 ensemble with all components mocked (extracted from v7)."""
     with (
-        patch("py.ensemble.enhanced_ensemble_v6_production.RModelInterface"),
-        patch("py.ensemble.enhanced_ensemble_v6_production.HybridStaticIncrementalXGBoost"),
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v6_production.RModelInterface"),
+        patch("nfl_analytics.ensemble.enhanced_ensemble_v6_production.HybridStaticIncrementalXGBoost"),
     ):
 
-        from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
         # Create ensemble
         ensemble = EnhancedEnsemble5Way(

@@ -335,7 +335,7 @@ Figure~\ref{fig:cumulative-roi} visualizes cumulative ROI over the 8-week develo
 Despite 11 agents existing, usage was \textit{optional}---developers invoked agents manually via CLI. Result: ELO+WLS validation script (Nov 15) committed with SQL schema error, discovered only at runtime after hours of computation. Root cause: \textbf{agents not automatically invoked}.
 
 \paragraph{Solution: Enforcement Router.}
-Unified Enforcement Framework (\texttt{py/utils/enforcement\_router.py}, 500 lines) routes file changes to appropriate agents based on content patterns. Integration: git pre-commit hooks (automatic), runtime decorators (optional), CI/CD gates (pending).
+Unified Enforcement Framework (\texttt{nfl\_analytics/utils/enforcement\_router.py}, 500 lines) routes file changes to appropriate agents based on content patterns. Integration: git pre-commit hooks (automatic), runtime decorators (optional), CI/CD gates (pending).
 
 \paragraph{Seven Enforcement Rules.}
 Table~\ref{tab:enforcement-rules} enumerates validation rules with triggers and severity levels.
@@ -372,7 +372,7 @@ Enforcement framework integrates via 50-line bash script (\texttt{.git/hooks/pre
 #!/bin/bash
 # Route staged files to Enforcement Router
 STAGED_FILES=$(git diff --cached --name-only)
-python py/utils/enforcement_router.py $STAGED_FILES
+python nfl_analytics/utils/enforcement_router.py $STAGED_FILES
 
 if [ $? -ne 0 ]; then
     echo "$\times$ Validation failed - commit blocked"

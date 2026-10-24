@@ -47,7 +47,7 @@ done
 case $ACTION in
     analyze)
         python3 -c "
-from py.agents.cache_optimizer import CacheOptimizer
+from nfl_analytics.agents.cache_optimizer import CacheOptimizer
 
 optimizer = CacheOptimizer()
 report = optimizer.analyze_cache_performance()
@@ -72,7 +72,7 @@ for opp in sorted(report.opportunities, key=lambda o: o.potential_savings_ms, re
 
     suggest)
         python3 -c "
-from py.agents.cache_optimizer import CacheOptimizer
+from nfl_analytics.agents.cache_optimizer import CacheOptimizer
 
 optimizer = CacheOptimizer()
 recommendations = optimizer.suggest_cache_optimizations()
@@ -97,7 +97,7 @@ for i, rec in enumerate(recommendations[:10], 1):
 
     generate)
         python3 -c "
-from py.agents.cache_optimizer import CacheOptimizer
+from nfl_analytics.agents.cache_optimizer import CacheOptimizer
 
 optimizer = CacheOptimizer()
 output_path = 'dashboard/cache_decorators_generated.py'
@@ -117,7 +117,7 @@ for func_name, decorator in list(decorators.items())[:5]:
 
     detect-misses)
         python3 -c "
-from py.agents.cache_optimizer import CacheOptimizer
+from nfl_analytics.agents.cache_optimizer import CacheOptimizer
 
 optimizer = CacheOptimizer()
 low_hit_rate = optimizer.detect_cache_misses(threshold=0.5)
@@ -135,7 +135,7 @@ if not low_hit_rate:
 
     estimate-size)
         python3 -c "
-from py.agents.cache_optimizer import CacheOptimizer
+from nfl_analytics.agents.cache_optimizer import CacheOptimizer
 
 optimizer = CacheOptimizer()
 estimates = optimizer.estimate_cache_size()

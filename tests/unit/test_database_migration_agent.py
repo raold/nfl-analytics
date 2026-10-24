@@ -23,7 +23,7 @@ import pytest
 
 # Import agent (with conditional import for CI environments)
 try:
-    from py.utils.database_migration_agent import (
+    from nfl_analytics.utils.database_migration_agent import (
         ColumnInfo,
         DatabaseMigrationAgent,
         DriftReport,
@@ -67,7 +67,7 @@ def mock_db_config():
 @pytest.fixture
 def agent(temp_migrations_dir, mock_db_config):
     """Create DatabaseMigrationAgent instance with mocked DB."""
-    with patch("py.utils.database_migration_agent.psycopg2.connect"):
+    with patch("nfl_analytics.utils.database_migration_agent.psycopg2.connect"):
         agent = DatabaseMigrationAgent(
             db_config=mock_db_config,
             migrations_dir=temp_migrations_dir,
@@ -213,7 +213,7 @@ class TestMigrationGeneration:
 class TestMigrationValidation:
     """Test migration validation logic."""
 
-    @patch("py.utils.database_migration_agent.psycopg2.connect")
+    @patch("nfl_analytics.utils.database_migration_agent.psycopg2.connect")
     def test_validate_migration_success(self, mock_connect, agent, temp_migrations_dir):
         """Test validation of valid migration."""
         # Create test migration file
@@ -250,7 +250,7 @@ class TestMigrationValidation:
         assert len(report.errors) == 1
         assert report.errors[0].category == "file_not_found"
 
-    @patch("py.utils.database_migration_agent.psycopg2.connect")
+    @patch("nfl_analytics.utils.database_migration_agent.psycopg2.connect")
     def test_validate_migration_already_applied(self, mock_connect, agent, temp_migrations_dir):
         """Test validation warns about already-applied migration."""
         migration_file = Path(temp_migrations_dir) / "001_test_migration.sql"
@@ -272,7 +272,7 @@ class TestMigrationValidation:
         # Should have warning about already applied
         assert any(w.category == "already_applied" for w in report.warnings)
 
-    @patch("py.utils.database_migration_agent.psycopg2.connect")
+    @patch("nfl_analytics.utils.database_migration_agent.psycopg2.connect")
     def test_validate_migration_sql_syntax_error(self, mock_connect, agent, temp_migrations_dir):
         """Test validation catches SQL syntax errors."""
         # Create migration with syntax error
@@ -304,7 +304,7 @@ class TestMigrationValidation:
 class TestMigrationApplication:
     """Test migration application and rollback."""
 
-    @patch("py.utils.database_migration_agent.psycopg2.connect")
+    @patch("nfl_analytics.utils.database_migration_agent.psycopg2.connect")
     def test_apply_migration_dry_run(self, mock_connect, agent, temp_migrations_dir):
         """Test applying migration in dry-run mode."""
         # Create test migration
@@ -331,7 +331,7 @@ class TestMigrationApplication:
         # Should rollback (not commit) in dry-run
         mock_conn.rollback.assert_called()
 
-    @patch("py.utils.database_migration_agent.psycopg2.connect")
+    @patch("nfl_analytics.utils.database_migration_agent.psycopg2.connect")
     def test_apply_migration_validation_fails(self, mock_connect, agent, temp_migrations_dir):
         """Test application blocked by validation failure."""
         migration_file = Path(temp_migrations_dir) / "001_test.sql"
@@ -356,7 +356,7 @@ class TestMigrationApplication:
         assert not result.success
         assert "Validation failed" in result.error_message
 
-    @patch("py.utils.database_migration_agent.psycopg2.connect")
+    @patch("nfl_analytics.utils.database_migration_agent.psycopg2.connect")
     def test_apply_migration_already_applied(self, mock_connect, agent, temp_migrations_dir):
         """Test applying migration that was already applied."""
         migration_file = Path(temp_migrations_dir) / "001_test.sql"
@@ -382,7 +382,7 @@ class TestMigrationApplication:
 class TestSchemaIntrospection:
     """Test database schema introspection methods."""
 
-    @patch("py.utils.database_migration_agent.psycopg2.connect")
+    @patch("nfl_analytics.utils.database_migration_agent.psycopg2.connect")
     def test_get_all_tables(self, mock_connect, agent):
         """Test retrieving all tables from database."""
         # Mock database response
@@ -405,7 +405,7 @@ class TestSchemaIntrospection:
         assert ("public", "games") in tables
         assert ("ml", "model_registry") in tables
 
-    @patch("py.utils.database_migration_agent.psycopg2.connect")
+    @patch("nfl_analytics.utils.database_migration_agent.psycopg2.connect")
     def test_get_table_columns(self, mock_connect, agent):
         """Test retrieving columns for a table."""
         # Mock database response
@@ -459,7 +459,7 @@ class TestSchemaIntrospection:
 class TestBackfillManagement:
     """Test column backfill functionality."""
 
-    @patch("py.utils.database_migration_agent.psycopg2.connect")
+    @patch("nfl_analytics.utils.database_migration_agent.psycopg2.connect")
     def test_backfill_column_sequential(self, mock_connect, agent):
         """Test sequential backfill."""
         # Mock database
@@ -492,7 +492,7 @@ class TestBackfillManagement:
         assert result["rows_updated"] >= 0
         assert result["duration_seconds"] > 0
 
-    @patch("py.utils.database_migration_agent.psycopg2.connect")
+    @patch("nfl_analytics.utils.database_migration_agent.psycopg2.connect")
     def test_backfill_column_parallel(self, mock_connect, agent):
         """Test parallel backfill."""
 
@@ -533,7 +533,7 @@ class TestBackfillManagement:
 class TestSchemaDriftDetection:
     """Test schema drift detection between environments."""
 
-    @patch("py.utils.database_migration_agent.psycopg2.connect")
+    @patch("nfl_analytics.utils.database_migration_agent.psycopg2.connect")
     def test_audit_schema_drift_no_drift(self, mock_connect, agent):
         """Test drift detection when schemas match."""
 

@@ -78,9 +78,9 @@ class TestGameFeatureExtractorStructure:
 
     def test_extractor_initializes_with_default_config(self):
         """GameFeatureExtractor should initialize with default DB config."""
-        with patch("py.features.game_feature_extractor.TeamOffensiveFeatures"):
-            with patch("py.features.game_feature_extractor.TeamDefensiveFeatures"):
-                from py.features.game_feature_extractor import GameFeatureExtractor
+        with patch("nfl_analytics.features.game_feature_extractor.TeamOffensiveFeatures"):
+            with patch("nfl_analytics.features.game_feature_extractor.TeamDefensiveFeatures"):
+                from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
                 extractor = GameFeatureExtractor()
 
@@ -90,9 +90,9 @@ class TestGameFeatureExtractorStructure:
 
     def test_extractor_accepts_custom_db_config(self, mock_db_config):
         """GameFeatureExtractor should accept custom DB configuration."""
-        with patch("py.features.game_feature_extractor.TeamOffensiveFeatures"):
-            with patch("py.features.game_feature_extractor.TeamDefensiveFeatures"):
-                from py.features.game_feature_extractor import GameFeatureExtractor
+        with patch("nfl_analytics.features.game_feature_extractor.TeamOffensiveFeatures"):
+            with patch("nfl_analytics.features.game_feature_extractor.TeamDefensiveFeatures"):
+                from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
                 extractor = GameFeatureExtractor(db_config=mock_db_config)
 
@@ -101,7 +101,7 @@ class TestGameFeatureExtractorStructure:
 
     def test_cache_ttl_is_defined(self):
         """GameFeatureExtractor should have CACHE_TTL constant."""
-        from py.features.game_feature_extractor import GameFeatureExtractor
+        from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
         assert hasattr(GameFeatureExtractor, "CACHE_TTL")
         assert GameFeatureExtractor.CACHE_TTL == 300  # 5 minutes
@@ -113,8 +113,8 @@ class TestFeatureExtraction:
     @pytest.fixture
     def mock_extractor(self):
         """Create extractor with mocked dependencies."""
-        with patch("py.features.game_feature_extractor.TeamOffensiveFeatures") as mock_off:
-            with patch("py.features.game_feature_extractor.TeamDefensiveFeatures") as mock_def:
+        with patch("nfl_analytics.features.game_feature_extractor.TeamOffensiveFeatures") as mock_off:
+            with patch("nfl_analytics.features.game_feature_extractor.TeamDefensiveFeatures") as mock_def:
                 # Mock the extract_features methods
                 mock_off_instance = MagicMock()
                 mock_off_instance.extract_features.return_value = {
@@ -135,7 +135,7 @@ class TestFeatureExtraction:
                 mock_def_instance.validate_no_leakage.return_value = True
                 mock_def.return_value = mock_def_instance
 
-                from py.features.game_feature_extractor import GameFeatureExtractor
+                from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
                 extractor = GameFeatureExtractor()
 
@@ -202,10 +202,10 @@ class TestDerivedFeatureCalculations:
 
     def test_offensive_mismatch_calculation(self):
         """Test offensive_mismatch = home_off_epa - away_def_epa."""
-        from py.features.game_feature_extractor import GameFeatureExtractor
+        from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
-        with patch("py.features.game_feature_extractor.TeamOffensiveFeatures"):
-            with patch("py.features.game_feature_extractor.TeamDefensiveFeatures"):
+        with patch("nfl_analytics.features.game_feature_extractor.TeamOffensiveFeatures"):
+            with patch("nfl_analytics.features.game_feature_extractor.TeamDefensiveFeatures"):
                 extractor = GameFeatureExtractor()
 
                 home_off = {"epa_per_play": 0.15}
@@ -219,10 +219,10 @@ class TestDerivedFeatureCalculations:
 
     def test_defensive_mismatch_calculation(self):
         """Test defensive_mismatch = away_off_epa - home_def_epa."""
-        from py.features.game_feature_extractor import GameFeatureExtractor
+        from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
-        with patch("py.features.game_feature_extractor.TeamOffensiveFeatures"):
-            with patch("py.features.game_feature_extractor.TeamDefensiveFeatures"):
+        with patch("nfl_analytics.features.game_feature_extractor.TeamOffensiveFeatures"):
+            with patch("nfl_analytics.features.game_feature_extractor.TeamDefensiveFeatures"):
                 extractor = GameFeatureExtractor()
 
                 away_off = {"epa_per_play": 0.10}
@@ -234,10 +234,10 @@ class TestDerivedFeatureCalculations:
 
     def test_pace_difference_calculation(self):
         """Test pace_difference = home_plays_per_game - away_plays_per_game."""
-        from py.features.game_feature_extractor import GameFeatureExtractor
+        from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
-        with patch("py.features.game_feature_extractor.TeamOffensiveFeatures"):
-            with patch("py.features.game_feature_extractor.TeamDefensiveFeatures"):
+        with patch("nfl_analytics.features.game_feature_extractor.TeamOffensiveFeatures"):
+            with patch("nfl_analytics.features.game_feature_extractor.TeamDefensiveFeatures"):
                 extractor = GameFeatureExtractor()
 
                 home_off = {"plays_per_game": 65.0}
@@ -254,9 +254,9 @@ class TestInputValidation:
     @pytest.fixture
     def extractor(self):
         """Create extractor for validation tests."""
-        with patch("py.features.game_feature_extractor.TeamOffensiveFeatures"):
-            with patch("py.features.game_feature_extractor.TeamDefensiveFeatures"):
-                from py.features.game_feature_extractor import GameFeatureExtractor
+        with patch("nfl_analytics.features.game_feature_extractor.TeamOffensiveFeatures"):
+            with patch("nfl_analytics.features.game_feature_extractor.TeamDefensiveFeatures"):
+                from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
                 return GameFeatureExtractor()
 
     def test_validates_team_abbreviation_format(self, extractor):
@@ -295,8 +295,8 @@ class TestCacheBehavior:
     @pytest.fixture
     def extractor_with_cache(self):
         """Create extractor for cache tests."""
-        with patch("py.features.game_feature_extractor.TeamOffensiveFeatures") as mock_off:
-            with patch("py.features.game_feature_extractor.TeamDefensiveFeatures") as mock_def:
+        with patch("nfl_analytics.features.game_feature_extractor.TeamOffensiveFeatures") as mock_off:
+            with patch("nfl_analytics.features.game_feature_extractor.TeamDefensiveFeatures") as mock_def:
                 mock_off_instance = MagicMock()
                 mock_off_instance.extract_features.return_value = {"epa_per_play": 0.15}
                 mock_off_instance.validate_no_leakage.return_value = True
@@ -307,7 +307,7 @@ class TestCacheBehavior:
                 mock_def_instance.validate_no_leakage.return_value = True
                 mock_def.return_value = mock_def_instance
 
-                from py.features.game_feature_extractor import GameFeatureExtractor
+                from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
                 extractor = GameFeatureExtractor()
 
                 # Disable optional extractors
@@ -356,8 +356,8 @@ class TestTemporalSafetyValidation:
     @pytest.fixture
     def extractor_for_validation(self):
         """Create extractor for temporal safety tests."""
-        with patch("py.features.game_feature_extractor.TeamOffensiveFeatures") as mock_off:
-            with patch("py.features.game_feature_extractor.TeamDefensiveFeatures") as mock_def:
+        with patch("nfl_analytics.features.game_feature_extractor.TeamOffensiveFeatures") as mock_off:
+            with patch("nfl_analytics.features.game_feature_extractor.TeamDefensiveFeatures") as mock_def:
                 mock_off_instance = MagicMock()
                 mock_off_instance.validate_no_leakage.return_value = True
                 mock_off.return_value = mock_off_instance
@@ -366,7 +366,7 @@ class TestTemporalSafetyValidation:
                 mock_def_instance.validate_no_leakage.return_value = True
                 mock_def.return_value = mock_def_instance
 
-                from py.features.game_feature_extractor import GameFeatureExtractor
+                from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
                 extractor = GameFeatureExtractor()
 
                 yield extractor, mock_off_instance, mock_def_instance
@@ -407,8 +407,8 @@ class TestEdgeCases:
     @pytest.fixture
     def extractor(self):
         """Create extractor for edge case tests."""
-        with patch("py.features.game_feature_extractor.TeamOffensiveFeatures") as mock_off:
-            with patch("py.features.game_feature_extractor.TeamDefensiveFeatures") as mock_def:
+        with patch("nfl_analytics.features.game_feature_extractor.TeamOffensiveFeatures") as mock_off:
+            with patch("nfl_analytics.features.game_feature_extractor.TeamDefensiveFeatures") as mock_def:
                 mock_off_instance = MagicMock()
                 mock_off_instance.extract_features.return_value = {"epa_per_play": 0.15}
                 mock_off_instance.validate_no_leakage.return_value = True
@@ -419,7 +419,7 @@ class TestEdgeCases:
                 mock_def_instance.validate_no_leakage.return_value = True
                 mock_def.return_value = mock_def_instance
 
-                from py.features.game_feature_extractor import GameFeatureExtractor
+                from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
                 extractor = GameFeatureExtractor()
 
                 # Disable optional extractors
@@ -475,7 +475,7 @@ class TestFeatureConsistency:
         pytest.importorskip("psycopg2")
 
         try:
-            from py.features.game_feature_extractor import GameFeatureExtractor
+            from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
             extractor = GameFeatureExtractor()
             return extractor
         except Exception:

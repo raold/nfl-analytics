@@ -12,7 +12,7 @@ Features generated:
     - opponent_dc_continuity: Whether opponent's DC is new (for early-season adjustments)
 
 Usage:
-    from py.features.dc_features import DCFeatureGenerator
+    from nfl_analytics.features.dc_features import DCFeatureGenerator
 
     dc_gen = DCFeatureGenerator()
     features = dc_gen.get_features(team='KC', season=2024, week=3)

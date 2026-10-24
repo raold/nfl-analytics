@@ -13,7 +13,7 @@ produce Signals, the risk manager validates them, and only approved signals
 reach the trade executor.
 
 Usage:
-    from py.risk.risk_manager import RiskManager, RiskManagerConfig
+    from nfl_analytics.risk.risk_manager import RiskManager, RiskManagerConfig
 
     rm = RiskManager(bankroll_cents=100_000)
     result = rm.check_signal(signal, features, positions)
@@ -29,15 +29,15 @@ import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from py.markets.base import Position
-from py.risk.feature_health import (
+from nfl_analytics.markets.base import Position
+from nfl_analytics.risk.feature_health import (
     FeatureHealthChecker,
     HealthCheckResult,
     HealthConfig,
 )
-from py.risk.kill_switch import KillSwitch, KillSwitchConfig, KillSwitchEvent
-from py.risk.position_limits import LimitCheckResult, LimitConfig, PositionLimitChecker
-from py.trading.signal import Signal
+from nfl_analytics.risk.kill_switch import KillSwitch, KillSwitchConfig, KillSwitchEvent
+from nfl_analytics.risk.position_limits import LimitCheckResult, LimitConfig, PositionLimitChecker
+from nfl_analytics.trading.signal import Signal
 
 logger = logging.getLogger(__name__)
 

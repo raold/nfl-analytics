@@ -32,7 +32,7 @@ Target Performance:
 - <500ms inference time
 
 Usage:
-    from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble6Way
+    from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble6Way
 
     # With default weights
     ensemble = EnhancedEnsemble6Way()

@@ -66,7 +66,7 @@ When a team's starting QB is injured/benched, the module:
 
 **Integration:**
 Compatible with existing feature engineering pipeline. Call via:
-    from py.features.qbr_features import get_team_qbr_features
+    from nfl_analytics.features.qbr_features import get_team_qbr_features
     features = get_team_qbr_features(conn, team="KC", season=datetime.now().year if datetime.now().month >= 9 else datetime.now().year - 1, week=10)
 
 Author: Claude Code (Sonnet 4.5)
@@ -757,7 +757,7 @@ def get_team_qbr_features(
 
     Example:
         import psycopg2
-        from py.features.qbr_features import get_team_qbr_features
+        from nfl_analytics.features.qbr_features import get_team_qbr_features
 
         conn = psycopg2.connect(host="localhost", port=5544, dbname="devdb01",
                                 user="dro", password="your_password")

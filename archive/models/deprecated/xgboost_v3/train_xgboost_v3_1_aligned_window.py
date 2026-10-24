@@ -28,7 +28,7 @@ Key Changes from v3:
 4. Clear go/no-go decision gates
 
 Usage:
-    python py/models/train_xgboost_v3_1_aligned_window.py
+    python nfl_analytics/models/train_xgboost_v3_1_aligned_window.py
 
 Output:
     - models/xgboost/passing_xgboost_v3_1_aligned.pkl
@@ -305,7 +305,7 @@ def load_opponent_strength_features():
     if not features_path.exists():
         raise FileNotFoundError(
             f"Opponent strength features not found at {features_path}. "
-            f"Run py/features/opponent_strength.py first."
+            f"Run nfl_analytics/features/opponent_strength.py first."
         )
 
     opp_df = pd.read_csv(features_path)

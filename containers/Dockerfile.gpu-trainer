@@ -240,7 +240,7 @@ CMD ["tail", "-f", "/dev/null"]
 #   docker-compose -f docker-compose.gpu.yml up -d gpu-trainer
 #
 # Execute training job:
-#   docker exec -it nfl-analytics-gpu-trainer python py/models/bnn_multioutput_pytorch.py --device cuda
+#   docker exec -it nfl-analytics-gpu-trainer python nfl_analytics/models/bnn_multioutput_pytorch.py --device cuda
 #
 # Interactive shell:
 #   docker exec -it nfl-analytics-gpu-trainer bash

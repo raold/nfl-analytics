@@ -287,15 +287,15 @@ FROM games;
 ### Feature Engineering Modules
 All modules should reference this audit for correct column names:
 
-1. **py/features/defensive_situational_strength.py**
+1. **nfl_analytics/features/defensive_situational_strength.py**
    - ✅ Uses `yardline_100`, `game_seconds_remaining`
    - ✅ Added `third_down_converted`, `fourth_down_converted`
 
-2. **py/features/environmental_contextual_features.py**
+2. **nfl_analytics/features/environmental_contextual_features.py**
    - ✅ Uses `kickoff` (line 113)
    - ✅ Parses `temp` and `wind` as TEXT
 
-3. **py/features/feature_interactions.py**
+3. **nfl_analytics/features/feature_interactions.py**
    - ✅ Fixed to use `kickoff` instead of `game_date`
    - ✅ Fixed to use `spread_close` instead of `spread_line`
    - ✅ Parses `temp` and `wind` properly

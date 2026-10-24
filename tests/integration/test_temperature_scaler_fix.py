@@ -210,7 +210,7 @@ class TestTemperatureScalerFix:
     def test_ensemble_v5_loads_with_new_scaler(self, backtest_data):
         """Test that ensemble v5 can load and use new temperature scaler."""
         try:
-            from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+            from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
             # Initialize ensemble
             ensemble = EnhancedEnsemble4Way()

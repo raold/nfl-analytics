@@ -11,7 +11,7 @@ This script:
 6. Outputs betting recommendations
 
 Usage:
-    python py/predictions/predict_tnf.py \
+    python nfl_analytics/predictions/predict_tnf.py \
         --model models/xgboost/v2/model_2024_full.json \
         --features data/processed/features/asof_team_features_v2.csv \
         --output predictions/tnf_2025_week6.json

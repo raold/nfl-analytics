@@ -5,7 +5,7 @@ Joins across games, odds_history (<= cutoff), and weather to produce a
 clean, reproducible snapshot that can be used for modeling or RL datasets.
 
 Usage:
-  python py/features/asof_snapshot.py \
+  python nfl_analytics/features/asof_snapshot.py \
     --cutoff 2024-12-31T23:59:59Z \
     --output data/asof_snapshot.csv
 

@@ -223,7 +223,7 @@ For each model class, we compute calibration curves binning predicted probabilit
 The GLM baseline achieves the weakest Brier score (0.2515) but superior calibration error (0.008), confirming that simpler models with proper uncertainty quantification outperform complex models with miscalibration. XGBoost achieves the best Brier (0.1715) but higher calibration error (0.012), requiring isotonic recalibration before deployment. The stacked ensemble balances predictive accuracy and calibration, achieving Brier 0.1698 with calibration error 0.009.
 
 \paragraph{Reliability Panels and Diagnostic Plots.}
-Reliability diagrams and calibration curves for each model class are generated via \texttt{py/backtest/baseline\_glm.py --cal-plot}, producing binned calibration curves with bootstrap confidence intervals. These diagnostics confirm that isotonic recalibration corrects XGBoost's overconfidence while preserving GLM's native calibration.
+Reliability diagrams and calibration curves for each model class are generated via \texttt{nfl\_analytics/backtest/baseline\_glm.py --cal-plot}, producing binned calibration curves with bootstrap confidence intervals. These diagnostics confirm that isotonic recalibration corrects XGBoost's overconfidence while preserving GLM's native calibration.
 
 The key finding: all model classes fail to overcome the vigorish barrier (ROI $\in [-7.5\%, -6.8\%]$), validating that market efficiency—not model limitations—explains negative returns. The framework's value lies in its transparency: we document where models excel (calibration, CLV capture) and where they fail (economic profitability), providing a template for deployment in less efficient markets.
 

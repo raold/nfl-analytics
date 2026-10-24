@@ -231,7 +231,7 @@ result = ensemble.predict(player_id, season, week)
 **Prevention**: Use Sports Analytics Validator
 
 ```bash
-python py/utils/sports_analytics_validator.py --validate-df data.csv
+python nfl_analytics/utils/sports_analytics_validator.py --validate-df data.csv
 ```
 
 ---
@@ -296,7 +296,7 @@ formula <- bf(
 **Prevention**: Use MCMC Config Optimizer
 
 ```bash
-python py/utils/mcmc_config_optimizer.py \
+python nfl_analytics/utils/mcmc_config_optimizer.py \
   --formula "passing_yards ~ position + (1 | player_id)" \
   --data-size 10000 \
   --recommend
@@ -346,7 +346,7 @@ Rscript -e "model <- readRDS('models/bayesian/hierarchical_v2_canonical.rds'); c
 
 ```bash
 # Re-optimize ensemble weights
-python py/ensemble/optimize_weights.py \
+python nfl_analytics/ensemble/optimize_weights.py \
   --predictions predictions.pkl \
   --actuals actuals.pkl \
   --output models/ensemble_weights_v5_1.json
@@ -358,7 +358,7 @@ python py/ensemble/optimize_weights.py \
 # Always check health before expensive operations
 ./scripts/check_ensemble_health.sh
 if [ $? -eq 0 ]; then
-    python py/backtest/historical_validation_4way.py
+    python nfl_analytics/backtest/historical_validation_4way.py
 fi
 ```
 
@@ -371,7 +371,7 @@ fi
 **Diagnosis:**
 
 ```python
-from py.utils.ensemble_health_monitor import EnsembleHealthMonitor
+from nfl_analytics.utils.ensemble_health_monitor import EnsembleHealthMonitor
 
 monitor = EnsembleHealthMonitor()
 report = monitor.check_ensemble_health()
@@ -388,10 +388,10 @@ print(report.prediction_agreement)
 Rscript R/train_hierarchical_v2_canonical.R
 
 # 2. Re-validate ensemble
-python py/backtest/historical_validation_4way.py --season 2024
+python nfl_analytics/backtest/historical_validation_4way.py --season 2024
 
 # 3. Update ensemble weights if needed
-python py/ensemble/optimize_weights.py
+python nfl_analytics/ensemble/optimize_weights.py
 ```
 
 ---
@@ -440,7 +440,7 @@ time curl http://localhost:8000/predict/player \
 
 ```python
 # api/main.py
-from py.utils.feature_cache import FeatureCache
+from nfl_analytics.utils.feature_cache import FeatureCache
 
 cache = FeatureCache(redis_client)
 
@@ -464,7 +464,7 @@ async def predict_player(request: PlayerPredictionRequest):
 **Use database pooling:**
 
 ```python
-from py.utils.database_pool import DatabasePool
+from nfl_analytics.utils.database_pool import DatabasePool
 
 # Create connection pool
 pool = DatabasePool(
@@ -588,7 +588,7 @@ FROM mart.player_game_stats;
 
 ```python
 # Validate before training
-from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+from nfl_analytics.utils.sports_analytics_validator import SportsAnalyticsValidator
 
 validator = SportsAnalyticsValidator()
 report = validator.validate_dataframe(df)
@@ -615,7 +615,7 @@ ALTER TABLE mart.player_game_stats
 **Diagnosis:**
 
 ```python
-from py.utils.data_leakage_detector import DataLeakageDetector
+from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector
 
 detector = DataLeakageDetector()
 report = detector.check_dataframe(df, target_col="passing_yards")
@@ -791,7 +791,7 @@ model <- brm(formula, data = data, iter = 4000)
 **Fix**: Reduce uncertainty with temperature scaling
 
 ```python
-from py.calibration.temperature_scaling import TemperatureScaler
+from nfl_analytics.calibration.temperature_scaling import TemperatureScaler
 
 scaler = TemperatureScaler()
 scaler.fit(predictions, actuals)

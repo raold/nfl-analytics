@@ -20,8 +20,8 @@ from pydantic import BaseModel
 from datetime import datetime
 
 from api.auth import require_api_key, APIKey
-from py.config.settings import get_settings
-from py.services.game_outcome_runs import run_game_outcome_predictions
+from nfl_analytics.config.settings import get_settings
+from nfl_analytics.services.game_outcome_runs import run_game_outcome_predictions
 
 settings = get_settings()
 

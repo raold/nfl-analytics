@@ -1,6 +1,6 @@
 # Feature Engineering
 
-**Location:** `py/features/`
+**Location:** `nfl_analytics/features/`
 **Purpose:** Feature engineering modules for NFL analytics and betting models
 **Total Modules:** 30+ Python files
 
@@ -294,17 +294,17 @@ See: [docs/database/DATABASE_SCHEMA_AUDIT.md](../../docs/database/DATABASE_SCHEM
 
 ```bash
 # Test individual feature modules
-pytest py/tests/test_asof_features.py -v
+pytest nfl_analytics/tests/test_asof_features.py -v
 
 # Test all feature modules
-pytest py/tests/test_features/ -v
+pytest nfl_analytics/tests/test_features/ -v
 ```
 
 ### Integration Tests
 
 ```bash
 # Test feature engineering pipeline end-to-end
-pytest py/tests/test_feature_engineering_integration.py -v
+pytest nfl_analytics/tests/test_feature_engineering_integration.py -v
 ```
 
 ---

@@ -38,7 +38,7 @@ import pandas as pd
 from sklearn.metrics import brier_score_loss, log_loss
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from py.ensemble.game_outcome_ensemble_calibrated import CalibratedGameOutcomeEnsemble
+from nfl_analytics.ensemble.game_outcome_ensemble_calibrated import CalibratedGameOutcomeEnsemble
 
 
 class ContextualGameOutcomeEnsemble(CalibratedGameOutcomeEnsemble):
@@ -351,7 +351,7 @@ class ContextualGameOutcomeEnsemble(CalibratedGameOutcomeEnsemble):
         # Ensure team stats loaded
         for season in df["season"].unique():
             if season not in self.team_stats_cache:
-                from py.ensemble.game_outcome_ensemble import get_team_season_stats
+                from nfl_analytics.ensemble.game_outcome_ensemble import get_team_season_stats
 
                 self.team_stats_cache[season] = get_team_season_stats(season)
 

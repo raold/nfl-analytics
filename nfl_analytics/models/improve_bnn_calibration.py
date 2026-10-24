@@ -42,8 +42,8 @@ import pymc as pm
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-# Now import from py.models
-from py.models.calibration_test_harness import CalibrationEvaluator, ExperimentLogger
+# Now import from nfl_analytics.models
+from nfl_analytics.models.calibration_test_harness import CalibrationEvaluator, ExperimentLogger
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

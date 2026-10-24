@@ -1,9 +1,9 @@
 """v2 as-of team/game features with Migration 019 features.
 
 .. deprecated::
-    This module is deprecated. Use `py.features.asof_features_unified` instead:
+    This module is deprecated. Use `nfl_analytics.features.asof_features_unified` instead:
 
-        from py.features.asof_features_unified import get_asof_features
+        from nfl_analytics.features.asof_features_unified import get_asof_features
         df = get_asof_features(feature_level='v2')
 
     Note: The 'v2' level requires Migration 019 database columns.
@@ -23,7 +23,7 @@ These features address Week 6 2025 retrospective findings:
 - Tie prediction needs
 
 Example:
-  python py/features/asof_features_v2.py --output data/processed/features/asof_team_features_v2.csv \
+  python nfl_analytics/features/asof_features_v2.py --output data/processed/features/asof_team_features_v2.csv \
       --season-start 2020 --validate
 """
 
@@ -33,7 +33,7 @@ import warnings
 
 warnings.warn(
     "asof_features_v2 is deprecated. Use asof_features_unified instead: "
-    "from py.features.asof_features_unified import get_asof_features; "
+    "from nfl_analytics.features.asof_features_unified import get_asof_features; "
     "df = get_asof_features(feature_level='v2')",
     DeprecationWarning,
     stacklevel=2,
@@ -48,7 +48,7 @@ import numpy as np
 import pandas as pd
 import psycopg
 
-from py.utils.spread_convention import home_cover
+from nfl_analytics.utils.spread_convention import home_cover
 
 # Import enhanced module for shared utilities
 ROOT = Path(__file__).resolve().parents[2]
@@ -56,7 +56,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 try:
-    from py.features import asof_features_enhanced as enhanced
+    from nfl_analytics.features import asof_features_enhanced as enhanced
 except Exception:
     import importlib
 

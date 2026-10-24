@@ -33,7 +33,7 @@ PROJECT_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 PYTHON="${PYTHON:-python3}"
 
 # Agent module path
-AGENT_MODULE="py.utils.frontend_engineering_agent"
+AGENT_MODULE="nfl_analytics.utils.frontend_engineering_agent"
 
 # ============================================================================
 # Helper Functions
@@ -159,7 +159,7 @@ cmd_save_snapshot() {
     cd "${PROJECT_ROOT}"
 
     "${PYTHON}" <<EOF
-from py.utils.frontend_engineering_agent import FrontendEngineeringAgent
+from nfl_analytics.utils.frontend_engineering_agent import FrontendEngineeringAgent
 
 agent = FrontendEngineeringAgent()
 snapshot_path = agent.save_schema_snapshot()

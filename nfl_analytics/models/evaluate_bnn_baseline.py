@@ -15,8 +15,8 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 import pickle
 import numpy as np
 
-from py.models.calibration_test_harness import CalibrationEvaluator, ExperimentLogger
-from py.models.train_bnn_rushing_improved import ImprovedRushingBNN
+from nfl_analytics.models.calibration_test_harness import CalibrationEvaluator, ExperimentLogger
+from nfl_analytics.models.train_bnn_rushing_improved import ImprovedRushingBNN
 
 
 def main():

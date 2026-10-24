@@ -1,5 +1,5 @@
 """
-Unit tests for py/ingest_odds_history.py
+Unit tests for nfl_analytics/ingest_odds_history.py
 
 Tests the core parsing and transformation logic without external dependencies.
 """

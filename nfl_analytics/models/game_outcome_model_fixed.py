@@ -32,15 +32,15 @@ import shap
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, roc_auc_score
 
-from py.features.game_feature_extractor import GameFeatureExtractor
-from py.models.config.xgboost_params import DEFAULT_XGB_PARAMS
-from py.utils.team_mapping import VALID_TEAMS, normalize_team
+from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
+from nfl_analytics.models.config.xgboost_params import DEFAULT_XGB_PARAMS
+from nfl_analytics.utils.team_mapping import VALID_TEAMS, normalize_team
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-# Note: VALID_TEAMS imported from py.utils.team_mapping
+# Note: VALID_TEAMS imported from nfl_analytics.utils.team_mapping
 # Includes both canonical (LAR, LAC, LV) and database (LA, SD, OAK) abbreviations
 
 
@@ -123,7 +123,7 @@ class GameOutcomeModel:
         start = time.time()
 
         # Use centralized hyperparameters from config module
-        # See py/models/config/xgboost_params.py for parameter documentation
+        # See nfl_analytics/models/config/xgboost_params.py for parameter documentation
         if xgb_params is None:
             xgb_params = DEFAULT_XGB_PARAMS.copy()
             xgb_params["n_jobs"] = n_jobs
@@ -372,7 +372,7 @@ class GameOutcomeModel:
             raise RuntimeError("Models not trained. Call train() or load_models() first.")
 
         # Validate teams - accept both canonical (LAR) and database (LA) formats
-        # VALID_TEAMS includes both formats from py.utils.team_mapping
+        # VALID_TEAMS includes both formats from nfl_analytics.utils.team_mapping
         if home_team not in VALID_TEAMS:
             raise ValueError(f"Invalid home_team: {home_team}. Must be one of {VALID_TEAMS}")
         if away_team not in VALID_TEAMS:

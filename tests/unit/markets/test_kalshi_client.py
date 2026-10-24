@@ -7,7 +7,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import httpx
 import pytest
 
-from py.markets.base import (
+from nfl_analytics.markets.base import (
     ContractNotFoundError,
     InsufficientBalanceError,
     MarketError,
@@ -17,8 +17,8 @@ from py.markets.base import (
     RateLimitError,
     Side,
 )
-from py.markets.kalshi.auth import KalshiAuth
-from py.markets.kalshi.client import KalshiClient, KalshiClientConfig
+from nfl_analytics.markets.kalshi.auth import KalshiAuth
+from nfl_analytics.markets.kalshi.client import KalshiClient, KalshiClientConfig
 
 pytestmark = pytest.mark.anyio
 

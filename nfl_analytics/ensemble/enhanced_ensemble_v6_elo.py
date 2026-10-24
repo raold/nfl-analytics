@@ -27,7 +27,7 @@ Target Performance:
 - <500ms inference time
 
 Usage:
-    from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble6Way
+    from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble6Way
 
     # With default weights
     ensemble = EnhancedEnsemble6Way()
@@ -972,7 +972,7 @@ class EnhancedEnsemble6Way:
         Returns:
             Dictionary of optimized weights {model_name: weight}
         """
-        from py.ensemble.adaptive_wls_weights import AdaptiveWLSWeights
+        from nfl_analytics.ensemble.adaptive_wls_weights import AdaptiveWLSWeights
 
         logger.info("\n" + "=" * 70)
         logger.info("RE-OPTIMIZING ENSEMBLE WEIGHTS (Adaptive WLS)")

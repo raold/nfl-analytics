@@ -177,7 +177,7 @@ psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 -c "SELECT 1"
 git commit --no-verify
 ```
 
-**Permanent fix:** Report issue and update validation logic in `py/utils/frontend_engineering_agent.py`.
+**Permanent fix:** Report issue and update validation logic in `nfl_analytics/utils/frontend_engineering_agent.py`.
 
 ---
 

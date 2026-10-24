@@ -143,7 +143,7 @@ class ValueBetDetector:
         """Lazy-load inference client."""
         if self._inference is None and self.use_llm_explanations:
             try:
-                from py.semantic.models.inference import SemanticInferenceClient
+                from nfl_analytics.semantic.models.inference import SemanticInferenceClient
 
                 self._inference = SemanticInferenceClient()
                 logger.info("Initialized inference client for LLM explanations")

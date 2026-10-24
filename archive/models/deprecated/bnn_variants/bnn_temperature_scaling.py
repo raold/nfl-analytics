@@ -21,7 +21,7 @@ Expected Result:
 - Training time: 1-5 minutes (no model retraining required)
 
 Usage:
-    python py/models/bnn_temperature_scaling.py
+    python nfl_analytics/models/bnn_temperature_scaling.py
 """
 
 #!/usr/bin/env python3
@@ -38,7 +38,7 @@ from scipy.optimize import minimize_scalar
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.models.bayesian_neural_network import BayesianNeuralNetwork
+from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

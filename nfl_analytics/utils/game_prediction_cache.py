@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 # Import Redis cache infrastructure
 try:
-    from py.utils.claude_cache import get_default_cache
+    from nfl_analytics.utils.claude_cache import get_default_cache
 
     REDIS_AVAILABLE = True
 except ImportError:

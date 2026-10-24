@@ -23,7 +23,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.features.feature_loader_parallel import ParallelFeatureLoader
+from nfl_analytics.features.feature_loader_parallel import ParallelFeatureLoader
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)

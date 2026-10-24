@@ -17,7 +17,7 @@ Features:
 
 Usage:
     # Focused v2.1 sweep (recommended)
-    python py/models/xgboost_gpu_v2_1.py \
+    python nfl_analytics/models/xgboost_gpu_v2_1.py \
         --features-csv data/processed/features/asof_team_features_v2.csv \
         --start-season 2006 \
         --end-season 2021 \
@@ -26,7 +26,7 @@ Usage:
         --output-dir models/xgboost/v2_1_sweep
 
     # Train best model from sweep
-    python py/models/xgboost_gpu_v2_1.py \
+    python nfl_analytics/models/xgboost_gpu_v2_1.py \
         --features-csv data/processed/features/asof_team_features_v2.csv \
         --start-season 2006 \
         --end-season 2021 \

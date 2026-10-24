@@ -54,12 +54,12 @@ print("=" * 80)
 phase2_jobs = [
     {
         "name": "DQN Training (Scaled)",
-        "command": "python py/rl/train_experiment_rl.py --agent dqn --episodes 5000 --eval-freq 100 --hidden-dim 256 --batch-size 128 --learning-rate 0.0003",
+        "command": "python nfl_analytics/rl/train_experiment_rl.py --agent dqn --episodes 5000 --eval-freq 100 --hidden-dim 256 --batch-size 128 --learning-rate 0.0003",
         "log": "logs/training/dqn_scaled.log",
     },
     {
         "name": "PPO Training (Scaled)",
-        "command": "python py/rl/train_experiment_rl.py --agent ppo --episodes 3000 --eval-freq 100 --hidden-dim 256 --batch-size 256 --learning-rate 0.0003",
+        "command": "python nfl_analytics/rl/train_experiment_rl.py --agent ppo --episodes 3000 --eval-freq 100 --hidden-dim 256 --batch-size 256 --learning-rate 0.0003",
         "log": "logs/training/ppo_scaled.log",
     },
 ]

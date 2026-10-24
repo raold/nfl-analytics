@@ -110,7 +110,7 @@ Rscript --vanilla R/ingestion/ingest_pbp.R
 **Ingest historical odds** (requires `ODDS_API_KEY` in `.env`):
 ```bash
 export ODDS_API_KEY="your_key_here"
-python py/ingest_odds_history.py --start-date 2023-09-01 --end-date 2023-09-10
+python nfl_analytics/ingest_odds_history.py --start-date 2023-09-01 --end-date 2023-09-10
 ```
 
 **Refresh materialized views**:
@@ -126,7 +126,7 @@ psql postgresql://dro:sicillionbillions@localhost:5544/devdb01 \
 
 **Build as-of features** (leakage-safe, game-level):
 ```bash
-python py/features/asof_features.py \
+python nfl_analytics/features/asof_features.py \
   --output analysis/features/asof_team_features.csv \
   --season-start 1999 \
   --season-end 2024 \
@@ -135,7 +135,7 @@ python py/features/asof_features.py \
 
 **Run baseline GLM ATS backtest**:
 ```bash
-python py/backtest/baseline_glm.py \
+python nfl_analytics/backtest/baseline_glm.py \
   --start-season 2003 \
   --end-season 2024 \
   --output-csv analysis/results/glm_baseline_metrics.csv \
@@ -144,7 +144,7 @@ python py/backtest/baseline_glm.py \
 
 Optional: apply probability calibration (Platt or isotonic) and change decision thresholds:
 ```bash
-python py/backtest/baseline_glm.py \
+python nfl_analytics/backtest/baseline_glm.py \
   --start-season 2003 --end-season 2024 \
   --calibration platt --cv-folds 5 \
   --decision-threshold 0.50 \
@@ -156,7 +156,7 @@ python py/backtest/baseline_glm.py \
 
 Sweep thresholds and compare configs (harness):
 ```bash
-python py/backtest/harness.py \
+python nfl_analytics/backtest/harness.py \
   --features-csv analysis/features/asof_team_features.csv \
   --start-season 2003 --end-season 2024 \
   --thresholds 0.45,0.50,0.55 \
@@ -175,8 +175,8 @@ This writes per‑season and overall reliability CSVs/plots under `analysis/resu
 ```bash
 # Compare models with statistical testing
 python -c "
-from py.compute.statistics.statistical_tests import PermutationTest
-from py.compute.statistics.effect_size import EffectSizeCalculator
+from nfl_analytics.compute.statistics.statistical_tests import PermutationTest
+from nfl_analytics.compute.statistics.effect_size import EffectSizeCalculator
 
 # Example: Compare two model performances
 perm_test = PermutationTest(n_permutations=5000)
@@ -190,7 +190,7 @@ print('Statistical testing framework ready!')
 **Generate automated reports with statistical analysis**:
 ```bash
 # Create Quarto reports with LaTeX integration
-python py/compute/statistics/reporting/quarto_generator.py \
+python nfl_analytics/compute/statistics/reporting/quarto_generator.py \
   --title "NFL Model Performance Analysis" \
   --output analysis/reports/statistical_analysis.qmd
 ```
@@ -233,7 +233,7 @@ python run_compute.py --scoreboard
 python run_compute.py --dashboard
 
 # View hardware routing report
-python -c "from py.compute.hardware.task_router import task_router; print(task_router.get_routing_report())"
+python -c "from nfl_analytics.compute.hardware.task_router import task_router; print(task_router.get_routing_report())"
 ```
 
 #### Sync Safety Features
@@ -254,7 +254,7 @@ python -c "from py.compute.hardware.task_router import task_router; print(task_r
 ```bash
 # Check task distribution across machines
 python -c "
-from py.compute.task_queue import TaskQueue
+from nfl_analytics.compute.task_queue import TaskQueue
 queue = TaskQueue()
 stats = queue.get_queue_status()
 print('Task distribution:', stats)
@@ -262,7 +262,7 @@ print('Task distribution:', stats)
 
 # Check queue status
 python -c "
-from py.compute.task_queue import TaskQueue
+from nfl_analytics.compute.task_queue import TaskQueue
 queue = TaskQueue()
 print('Queue status:', queue.get_queue_status())
 "
@@ -294,10 +294,10 @@ Rscript R/train_informative_priors_v2_canonical.R
 Rscript R/state_space/train_state_space_v2_canonical.R
 
 # Train XGBoost (Python)
-uv run python py/models/train_xgboost_canonical.py
+uv run python nfl_analytics/models/train_xgboost_canonical.py
 
 # Generate ensemble predictions
-uv run python py/ensemble/enhanced_ensemble_v6_production.py
+uv run python nfl_analytics/ensemble/enhanced_ensemble_v6_production.py
 ```
 
 **Key Features (368 total)**:
@@ -346,22 +346,22 @@ The Semantic Stack adds AI/LLM capabilities to enhance win rate through semantic
 ```
 
 **Key Components:**
-- `py/semantic/models/` - Ollama/MLX/API inference clients
-- `py/semantic/features/` - SemanticFeatureExtractor (26 features)
-- `py/semantic/ingestion/` - News and social media ingesters
-- `py/semantic/training/` - NER/sentiment annotation and fine-tuning
-- `py/production/value_bet_detector.py` - LLM-explained value bets
+- `nfl_analytics/semantic/models/` - Ollama/MLX/API inference clients
+- `nfl_analytics/semantic/features/` - SemanticFeatureExtractor (26 features)
+- `nfl_analytics/semantic/ingestion/` - News and social media ingesters
+- `nfl_analytics/semantic/training/` - NER/sentiment annotation and fine-tuning
+- `nfl_analytics/production/value_bet_detector.py` - LLM-explained value bets
 
 **Usage:**
 ```python
 # Semantic features integrated into GameFeatureExtractor
-from py.features.game_feature_extractor import GameFeatureExtractor
+from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 extractor = GameFeatureExtractor()
 features = extractor.extract_game_features(game_id)
 # Semantic features prefixed with 'sem_': sem_home_sentiment_24h, etc.
 
 # Value bet detection with explanations
-from py.production.value_bet_detector import ValueBetDetector
+from nfl_analytics.production.value_bet_detector import ValueBetDetector
 detector = ValueBetDetector(min_edge=0.03)
 bets = detector.detect_value_bets(predictions)
 for bet in bets:
@@ -384,17 +384,17 @@ Train CQL agent for offline RL betting strategy:
 
 ```bash
 # Generate unified features (342 columns)
-.venv/Scripts/python.exe py/features/asof_features_unified.py \
+.venv/Scripts/python.exe nfl_analytics/features/asof_features_unified.py \
   --output data/processed/features/asof_team_features.csv
 
 # Create RL logged dataset (5,146 games, 2006-2024)
-.venv/Scripts/python.exe py/rl/dataset.py \
+.venv/Scripts/python.exe nfl_analytics/rl/dataset.py \
   --output data/rl_logged_2006_2024.csv \
   --season-start 2006 \
   --season-end 2024
 
 # Train CQL model (2000 epochs, CUDA acceleration)
-.venv/Scripts/python.exe py/rl/cql_agent.py \
+.venv/Scripts/python.exe nfl_analytics/rl/cql_agent.py \
   --dataset data/rl_logged_2006_2024.csv \
   --output models/cql/best_model.pth \
   --alpha 0.3 \
@@ -551,8 +551,8 @@ docker compose exec app bash -lc "Rscript --vanilla data/ingest_schedules.R"
 docker compose exec app bash -lc "quarto render notebooks/04_score_validation.qmd"
 
 # RL pipeline
-docker compose exec app bash -lc "python py/rl/dataset.py --output data/rl_logged.csv --season-start 2020 --season-end 2024"
-docker compose exec app bash -lc "python py/rl/ope_gate.py --dataset data/rl_logged.csv --output analysis/reports/ope_gate.json"
+docker compose exec app bash -lc "python nfl_analytics/rl/dataset.py --output data/rl_logged.csv --season-start 2020 --season-end 2024"
+docker compose exec app bash -lc "python nfl_analytics/rl/ope_gate.py --dataset data/rl_logged.csv --output analysis/reports/ope_gate.json"
 ```
 
 **Stop services**:
@@ -573,7 +573,7 @@ uv pip install -r requirements.txt
 
 ```
 nfl-analytics/
-├── py/                                        # Python modules (features, models, pricing)
+├── nfl_analytics/                                        # Python modules (features, models, pricing)
 │   ├── compute/                               # 🆕 Distributed compute system
 │   │   ├── statistics/                        # Statistical testing framework
 │   │   │   ├── statistical_tests.py           # Permutation & bootstrap tests
@@ -666,7 +666,7 @@ ER diagram: `docs/database/erd.md` (PNG: `docs/database/erd.png`).
 **Current Data** (as of Dec 2025):
 - Games: 7,263 rows (1999-2025)
 - Plays: 1,254,173 rows (1999-2025)
-- Odds: Integration via `py/ingest_odds_smart.py` (requires API key)
+- Odds: Integration via `nfl_analytics/ingest_odds_smart.py` (requires API key)
 
 ## Notes
 

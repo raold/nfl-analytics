@@ -25,7 +25,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.feedback.outcome_updater import WeeklyOutcomeUpdater
+from nfl_analytics.feedback.outcome_updater import WeeklyOutcomeUpdater
 
 logging.basicConfig(
     level=logging.INFO,

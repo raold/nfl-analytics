@@ -46,18 +46,18 @@ if has_python; then
   FEAT_CSV="${ROOT_DIR}/analysis/features/asof_team_features.csv"
   note "Attempting as-of feature build -> ${FEAT_CSV} (skips on DB error)"
   set +e
-  py "${ROOT_DIR}/py/features/asof_features.py" --output "$FEAT_CSV" --season-start 1999 --season-end 2024 --validate >/dev/null 2>&1
+  py "${ROOT_DIR}/nfl_analytics/features/asof_features.py" --output "$FEAT_CSV" --season-start 1999 --season-end 2024 --validate >/dev/null 2>&1
   set -e || true
   if [[ -f "$FEAT_CSV" ]]; then
     note "Running GLM baseline backtest -> ${OUT_DIR}/glm_baseline_table.tex"
-    py "${ROOT_DIR}/py/backtest/baseline_glm.py" \
+    py "${ROOT_DIR}/nfl_analytics/backtest/baseline_glm.py" \
       --features-csv "$FEAT_CSV" \
       --start-season 2003 --end-season 2024 \
       --output-csv "${ROOT_DIR}/analysis/results/glm_baseline_metrics.csv" \
       --preds-csv "${ROOT_DIR}/analysis/results/glm_baseline_preds.csv" \
       --tex "${OUT_DIR}/glm_baseline_table.tex" >/dev/null 2>&1 || note "GLM baseline skipped (error)."
     note "Running GLM harness (threshold + calibration sweep) -> ${OUT_DIR}/glm_harness_overall.tex"
-    py "${ROOT_DIR}/py/backtest/harness.py" \
+    py "${ROOT_DIR}/nfl_analytics/backtest/harness.py" \
       --features-csv "$FEAT_CSV" \
       --start-season 2003 --end-season 2024 \
       --thresholds 0.45,0.50,0.55 \
@@ -69,7 +69,7 @@ if has_python; then
       --tex-overall "${OUT_DIR}/glm_harness_overall.tex" >/dev/null 2>&1 || note "GLM harness skipped (error)."
     # Optional: Side-by-side per-season reliability (none vs Platt) at thr=0.50 for core_form
     note "Generating dual reliability panel (none vs Platt, thr=0.50)"
-    py "${ROOT_DIR}/py/backtest/harness.py" \
+    py "${ROOT_DIR}/nfl_analytics/backtest/harness.py" \
       --features-csv "$FEAT_CSV" \
       --start-season 2003 --end-season 2024 \
       --thresholds 0.50 \
@@ -93,13 +93,13 @@ if has_python; then
   if [[ ! -f "$DATASET" ]]; then
     note "rl_logged.csv not found; attempting to build minimal dataset (requires DB)."
     set +e
-    py "${ROOT_DIR}/py/rl/dataset.py" --output "$DATASET" --season-start 2020 --season-end 2024 >/dev/null 2>&1
+    py "${ROOT_DIR}/nfl_analytics/rl/dataset.py" --output "$DATASET" --season-start 2020 --season-end 2024 >/dev/null 2>&1
     set -e || true
   fi
   if [[ -f "$DATASET" ]]; then
     note "Generating OPE grid table -> ${OUT_DIR}/ope_grid_table.tex"
     : > "${ROOT_DIR}/policy.json" || true
-    py "${ROOT_DIR}/py/rl/ope_gate.py" \
+    py "${ROOT_DIR}/nfl_analytics/rl/ope_gate.py" \
       --dataset "$DATASET" \
       --policy "${ROOT_DIR}/policy.json" \
       --output "${REPORTS_DIR}/ope_gate.json" \
@@ -117,7 +117,7 @@ HIST_JSON="${REPORTS_DIR}/sim_hist.json"
 SIM_JSON="${REPORTS_DIR}/sim_run.json"
 if has_python && [[ -f "$HIST_JSON" && -f "$SIM_JSON" ]]; then
   note "Generating simulator acceptance table -> ${OUT_DIR}/sim_acceptance_table.tex"
-  py "${ROOT_DIR}/py/sim/acceptance.py" \
+  py "${ROOT_DIR}/nfl_analytics/sim/acceptance.py" \
     --hist "$HIST_JSON" --sim "$SIM_JSON" \
     --output "${REPORTS_DIR}/sim_accept.json" \
     --tex "${OUT_DIR}/sim_acceptance_table.tex" || note "Sim acceptance skipped (error)."
@@ -131,14 +131,14 @@ BET_CSV="${ROOT_DIR}/data/bets.csv"
 if has_python; then
   if [[ ! -f "$SCEN_CSV" && -f "$BET_CSV" ]]; then
     note "Generating scenarios from ${BET_CSV} -> ${SCEN_CSV}"
-    py "${ROOT_DIR}/py/risk/generate_scenarios.py" --bets "$BET_CSV" --output "$SCEN_CSV" --sims 20000 || true
+    py "${ROOT_DIR}/nfl_analytics/risk/generate_scenarios.py" --bets "$BET_CSV" --output "$SCEN_CSV" --sims 20000 || true
   fi
   if [[ -f "$SCEN_CSV" ]]; then
     note "Running CVaR LP for alpha=0.95 and 0.90"
-    py "${ROOT_DIR}/py/risk/cvar_lp.py" --scenarios "$SCEN_CSV" --alpha 0.95 --output "${REPORTS_DIR}/cvar_a95.json" || true
-    py "${ROOT_DIR}/py/risk/cvar_lp.py" --scenarios "$SCEN_CSV" --alpha 0.90 --output "${REPORTS_DIR}/cvar_a90.json" || true
+    py "${ROOT_DIR}/nfl_analytics/risk/cvar_lp.py" --scenarios "$SCEN_CSV" --alpha 0.95 --output "${REPORTS_DIR}/cvar_a95.json" || true
+    py "${ROOT_DIR}/nfl_analytics/risk/cvar_lp.py" --scenarios "$SCEN_CSV" --alpha 0.90 --output "${REPORTS_DIR}/cvar_a90.json" || true
     note "Emitting CVaR benchmark table -> ${OUT_DIR}/cvar_benchmark_table.tex"
-    py "${ROOT_DIR}/py/risk/cvar_report.py" \
+    py "${ROOT_DIR}/nfl_analytics/risk/cvar_report.py" \
       --json "${REPORTS_DIR}/cvar_a95.json" \
       --json "${REPORTS_DIR}/cvar_a90.json" \
       --tex "${OUT_DIR}/cvar_benchmark_table.tex" || note "CVaR report skipped (error)."
@@ -154,7 +154,7 @@ OOS_CSV="${ROOT_DIR}/results/oos.csv"
 if has_python && [[ -f "$OOS_CSV" ]]; then
   note "Exporting OOS rows from ${OOS_CSV}"
   ROWS_TEX="${OUT_DIR}/oos_record_rows.tex"
-  py "${ROOT_DIR}/py/registry/oos_to_tex.py" --csv "$OOS_CSV" --tex "$ROWS_TEX" || note "OOS rows export failed."
+  py "${ROOT_DIR}/nfl_analytics/registry/oos_to_tex.py" --csv "$OOS_CSV" --tex "$ROWS_TEX" || note "OOS rows export failed."
   note "Wrapping OOS table -> ${OUT_DIR}/oos_record_table.tex"
   cat > "${OUT_DIR}/oos_record_table.tex" <<'TEX'
 % Auto-generated from registry rows — do not edit manually

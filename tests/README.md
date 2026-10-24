@@ -270,7 +270,7 @@ Three workflows run automatically on push/PR:
 ### Unit Test Example
 ```python
 import pytest
-from py.ingest_odds_history import parse_iso
+from nfl_analytics.ingest_odds_history import parse_iso
 
 def test_parse_iso_with_z_suffix():
     """Test ISO timestamp parsing with Z (Zulu) timezone."""
@@ -412,10 +412,10 @@ pytest --cov=py --cov-report=term-missing:skip-covered
 ```
 Module                              Coverage
 ---------------------------------------------
-py/ensemble/enhanced_ensemble_v5.py     82%
-py/ensemble/enhanced_ensemble_v6.py     76%
-py/backtest/historical_validation.py    81%
-py/utils/data_leakage_detector.py       89%
+nfl_analytics/ensemble/enhanced_ensemble_v5.py     82%
+nfl_analytics/ensemble/enhanced_ensemble_v6.py     76%
+nfl_analytics/backtest/historical_validation.py    81%
+nfl_analytics/utils/data_leakage_detector.py       89%
 ---------------------------------------------
 Overall ensemble/backtest modules:      78%
 ```

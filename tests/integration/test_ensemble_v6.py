@@ -6,14 +6,14 @@ Quick test of EnhancedEnsemble6Way (ELO + Adaptive WLS Research Version)
 Tests the 5-way ensemble with ELO and adaptive weights.
 
 NOTE: This tests the RESEARCH version (enhanced_ensemble_v6_elo.py).
-For PRODUCTION version, see py/ensemble/enhanced_ensemble_v6.py (EnhancedEnsemble4Way).
+For PRODUCTION version, see nfl_analytics/ensemble/enhanced_ensemble_v6.py (EnhancedEnsemble4Way).
 """
 
 import sys
 
 import numpy as np
 
-from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+from nfl_analytics.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
 
 def test_ensemble_initialization():
@@ -137,7 +137,7 @@ def main():
         print("=" * 70)
         print("\nEnhanced Ensemble v6 is ready to use!")
         print("\nUsage:")
-        print("  from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble6Way")
+        print("  from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble6Way")
         print("  ensemble = EnhancedEnsemble6Way()")
         print("  result = ensemble.predict(player_id='...', season=2024, week=9)")
         print("\n")

@@ -12,7 +12,7 @@ This script:
 Output: data/sim_acceptance.csv
 
 Usage:
-    python py/sim/run_acceptance_tests.py
+    python nfl_analytics/sim/run_acceptance_tests.py
 """
 
 import json

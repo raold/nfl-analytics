@@ -24,7 +24,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.utils.agent_coordinator import (
+from nfl_analytics.utils.agent_coordinator import (
     AgentType,
     get_coordinator,
 )
@@ -246,7 +246,7 @@ def example4_training_script_integration():
     training_window = "2018-2024"
 
     task = f"Train {model_type} model with {training_window} data"
-    files = ["py/models/train_bnn_passing.py", "models/bayesian/bnn_passing_v2.pkl"]
+    files = ["nfl_analytics/models/train_bnn_passing.py", "models/bayesian/bnn_passing_v2.pkl"]
 
     print("Training Script: train_bnn_passing.py")
     print(f"Task: {task}\n")

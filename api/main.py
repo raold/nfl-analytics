@@ -39,7 +39,7 @@ from api.models import (
     PredictionResponse,
 )
 from api.prediction import EnsemblePredictor
-from py.api.routes import game_predictions
+from nfl_analytics.api.routes import game_predictions
 
 # Setup logging
 logging.basicConfig(

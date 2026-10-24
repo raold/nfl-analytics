@@ -1,11 +1,11 @@
 """
-Unit tests for py/trading/signal.py — Trade signal dataclass.
+Unit tests for nfl_analytics/trading/signal.py — Trade signal dataclass.
 """
 
 import pytest
 
-from py.markets.base import OrderType, Side
-from py.trading.signal import Signal
+from nfl_analytics.markets.base import OrderType, Side
+from nfl_analytics.trading.signal import Signal
 
 
 class TestSignal:

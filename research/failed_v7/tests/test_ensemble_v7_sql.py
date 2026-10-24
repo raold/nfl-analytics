@@ -25,7 +25,7 @@ import pytest
 # Add project root
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way
+from nfl_analytics.ensemble.enhanced_ensemble_v7 import EnhancedEnsemble5Way
 
 # ============================================================================
 # FIXTURES
@@ -276,9 +276,9 @@ class TestDatabaseConnectivity:
 
         # Simulate ensemble trying to connect
         with (
-            patch("py.ensemble.enhanced_ensemble_v7.CausalFeaturesV1"),
-            patch("py.ensemble.enhanced_ensemble_v7.RModelInterface"),
-            patch("py.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
+            patch("nfl_analytics.ensemble.enhanced_ensemble_v7.CausalFeaturesV1"),
+            patch("nfl_analytics.ensemble.enhanced_ensemble_v7.RModelInterface"),
+            patch("nfl_analytics.ensemble.enhanced_ensemble_v7.HybridStaticIncrementalXGBoost"),
         ):
 
             ensemble = EnhancedEnsemble5Way(

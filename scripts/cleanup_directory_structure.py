@@ -183,7 +183,7 @@ def execute_cleanup(dry_run=True):
     ├── etl/                      (data pipelines)
     ├── logs/                     (execution logs)
     ├── models/                   (trained models)
-    ├── py/                       (core Python codebase)
+    ├── nfl_analytics/                       (core Python codebase)
     ├── R/                        (R analysis scripts)
     ├── scripts/                  (utility scripts)
     │   ├── compute/              (distributed compute)

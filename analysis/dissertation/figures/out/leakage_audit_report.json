@@ -17,14 +17,14 @@
   "findings": {
     "feature_scripts": [
       {
-        "file": "py/features/catalog.py",
+        "file": "nfl_analytics/features/catalog.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/features/asof_snapshot.py",
+        "file": "nfl_analytics/features/asof_snapshot.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [
           {
@@ -36,7 +36,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/features/materialized_view_features.py",
+        "file": "nfl_analytics/features/materialized_view_features.py",
         "unsafe_field_refs": [
           {
             "field": "over_hit",
@@ -113,21 +113,21 @@
         "status": "WARN"
       },
       {
-        "file": "py/features/merge_advanced_features.py",
+        "file": "nfl_analytics/features/merge_advanced_features.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/features/line_movement_tracker.py",
+        "file": "nfl_analytics/features/line_movement_tracker.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/features/player_features.py",
+        "file": "nfl_analytics/features/player_features.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [
           {
@@ -143,7 +143,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/features/asof_features_v2.py",
+        "file": "nfl_analytics/features/asof_features_v2.py",
         "unsafe_field_refs": [
           {
             "field": "over_hit",
@@ -235,7 +235,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/features/asof_features.py",
+        "file": "nfl_analytics/features/asof_features.py",
         "unsafe_field_refs": [
           {
             "field": "points_for",
@@ -377,7 +377,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/features/bayesian_player_features.py",
+        "file": "nfl_analytics/features/bayesian_player_features.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [
           {
@@ -389,21 +389,21 @@
         "status": "WARN"
       },
       {
-        "file": "py/features/line_movement_enhanced.py",
+        "file": "nfl_analytics/features/line_movement_enhanced.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/features/bayesian_features.py",
+        "file": "nfl_analytics/features/bayesian_features.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/features/gnn_team_ratings.py",
+        "file": "nfl_analytics/features/gnn_team_ratings.py",
         "unsafe_field_refs": [
           {
             "field": "away_score",
@@ -451,7 +451,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/features/matchup_features.py",
+        "file": "nfl_analytics/features/matchup_features.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [
           {
@@ -471,7 +471,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/features/asof_features_enhanced.py",
+        "file": "nfl_analytics/features/asof_features_enhanced.py",
         "unsafe_field_refs": [
           {
             "field": "over_hit",
@@ -560,14 +560,14 @@
     ],
     "model_scripts": [
       {
-        "file": "py/models/bayesian_neural_network.py",
+        "file": "nfl_analytics/models/bayesian_neural_network.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/xgboost_gpu.py",
+        "file": "nfl_analytics/models/xgboost_gpu.py",
         "unsafe_field_refs": [
           {
             "field": "home_cover",
@@ -610,14 +610,14 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/calibration_test_harness.py",
+        "file": "nfl_analytics/models/calibration_test_harness.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/train_bnn_receiving.py",
+        "file": "nfl_analytics/models/train_bnn_receiving.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [
           {
@@ -629,21 +629,21 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/train_bnn_rushing_simple.py",
+        "file": "nfl_analytics/models/train_bnn_rushing_simple.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/train_bnn_prior_sensitivity.py",
+        "file": "nfl_analytics/models/train_bnn_prior_sensitivity.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/bivariate_poisson.py",
+        "file": "nfl_analytics/models/bivariate_poisson.py",
         "unsafe_field_refs": [
           {
             "field": "away_score",
@@ -706,28 +706,28 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/copulas.py",
+        "file": "nfl_analytics/models/copulas.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/bnn_mixture_experts_v2.py",
+        "file": "nfl_analytics/models/bnn_mixture_experts_v2.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/load_cql_ensemble.py",
+        "file": "nfl_analytics/models/load_cql_ensemble.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/train_bnn_rushing.py",
+        "file": "nfl_analytics/models/train_bnn_rushing.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [
           {
@@ -747,7 +747,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/spread_coverage_model.py",
+        "file": "nfl_analytics/models/spread_coverage_model.py",
         "unsafe_field_refs": [
           {
             "field": "away_score",
@@ -765,21 +765,21 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/evaluate_bnn_vegas.py",
+        "file": "nfl_analytics/models/evaluate_bnn_vegas.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/bnn_simpler_v2.py",
+        "file": "nfl_analytics/models/bnn_simpler_v2.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/xgboost_gpu_v2.py",
+        "file": "nfl_analytics/models/xgboost_gpu_v2.py",
         "unsafe_field_refs": [
           {
             "field": "home_win",
@@ -822,7 +822,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/xgboost_gpu_v3.py",
+        "file": "nfl_analytics/models/xgboost_gpu_v3.py",
         "unsafe_field_refs": [
           {
             "field": "home_win",
@@ -865,21 +865,21 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/props_predictor.py",
+        "file": "nfl_analytics/models/props_predictor.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/train_bnn_rushing_improved.py",
+        "file": "nfl_analytics/models/train_bnn_rushing_improved.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/ingame_win_probability.py",
+        "file": "nfl_analytics/models/ingame_win_probability.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [
           {
@@ -899,14 +899,14 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/evaluate_bnn_baseline.py",
+        "file": "nfl_analytics/models/evaluate_bnn_baseline.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/train_bnn_rushing_vegas.py",
+        "file": "nfl_analytics/models/train_bnn_rushing_vegas.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [
           {
@@ -926,35 +926,35 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/copula_gof.py",
+        "file": "nfl_analytics/models/copula_gof.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/score_distributions.py",
+        "file": "nfl_analytics/models/score_distributions.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/monitor_prior_sensitivity.py",
+        "file": "nfl_analytics/models/monitor_prior_sensitivity.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/autonomous_phase2_runner.py",
+        "file": "nfl_analytics/models/autonomous_phase2_runner.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/totals_model.py",
+        "file": "nfl_analytics/models/totals_model.py",
         "unsafe_field_refs": [
           {
             "field": "over_hit",
@@ -1007,7 +1007,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/xgboost_gpu_v2_1.py",
+        "file": "nfl_analytics/models/xgboost_gpu_v2_1.py",
         "unsafe_field_refs": [
           {
             "field": "home_win",
@@ -1050,7 +1050,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/train_bnn_passing.py",
+        "file": "nfl_analytics/models/train_bnn_passing.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [
           {
@@ -1062,7 +1062,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/state_space.py",
+        "file": "nfl_analytics/models/state_space.py",
         "unsafe_field_refs": [
           {
             "field": "away_score",
@@ -1100,7 +1100,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/weather_totals_model.py",
+        "file": "nfl_analytics/models/weather_totals_model.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [
           {
@@ -1112,7 +1112,7 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/train_v2_model.py",
+        "file": "nfl_analytics/models/train_v2_model.py",
         "unsafe_field_refs": [
           {
             "field": "over_hit",
@@ -1170,14 +1170,14 @@
         "status": "WARN"
       },
       {
-        "file": "py/models/bnn_deeper_v2.py",
+        "file": "nfl_analytics/models/bnn_deeper_v2.py",
         "unsafe_field_refs": [],
         "missing_cutoff": [],
         "safe_patterns": [],
         "status": "PASS"
       },
       {
-        "file": "py/models/ensemble_stacking.py",
+        "file": "nfl_analytics/models/ensemble_stacking.py",
         "unsafe_field_refs": [
           {
             "field": "away_score",

@@ -60,7 +60,7 @@ class LeakageAuditor:
 
     def __init__(self, repo_root: Path):
         self.repo_root = repo_root
-        self.catalog_path = repo_root / "py/features/catalog.yaml"
+        self.catalog_path = repo_root / "nfl_analytics/features/catalog.yaml"
         self.catalog = self._load_catalog()
         self.findings = []
 
@@ -168,7 +168,7 @@ class LeakageAuditor:
 
     def audit_feature_scripts(self) -> list[dict]:
         """Audit all feature generation scripts."""
-        feature_dir = self.repo_root / "py/features"
+        feature_dir = self.repo_root / "nfl_analytics/features"
         results = []
 
         if not feature_dir.exists():
@@ -185,7 +185,7 @@ class LeakageAuditor:
 
     def audit_model_scripts(self) -> list[dict]:
         """Audit model training scripts for feature usage."""
-        model_dir = self.repo_root / "py/models"
+        model_dir = self.repo_root / "nfl_analytics/models"
         results = []
 
         if not model_dir.exists():

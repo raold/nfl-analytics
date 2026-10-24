@@ -12,9 +12,9 @@ sys.path.insert(0, str(_PROJECT_ROOT))
 
 import logging
 import pandas as pd
-from py.ensemble.stacked_meta_learner import StackedMetaLearner
+from nfl_analytics.ensemble.stacked_meta_learner import StackedMetaLearner
 
-from py.optimization.portfolio_optimizer import BetOpportunity, CorrelatedPortfolioOptimizer
+from nfl_analytics.optimization.portfolio_optimizer import BetOpportunity, CorrelatedPortfolioOptimizer
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

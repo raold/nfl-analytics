@@ -19,7 +19,7 @@ from typing import Dict
 # INJURY IMPACT WEIGHTS
 # ==============================================================================
 # Source: Empirically validated via OLS regression (December 8, 2025)
-# Location: py/features/game_feature_extractor.py:904-914
+# Location: nfl_analytics/features/game_feature_extractor.py:904-914
 # Validation Script: analysis/validation/validate_injury_weights.py
 #
 # Validation Results (n=1,401 games, 2020-2024):

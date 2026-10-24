@@ -209,7 +209,7 @@ if __name__ == "__main__":
     import sys
 
     if len(sys.argv) < 2:
-        print("Usage: python py/utils/mcmc_config_optimizer.py <script.R>")
+        print("Usage: python nfl_analytics/utils/mcmc_config_optimizer.py <script.R>")
         sys.exit(1)
 
     optimizer = MCMCConfigOptimizer()

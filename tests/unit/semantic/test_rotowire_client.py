@@ -13,7 +13,7 @@ Integration tests (marked with @pytest.mark.integration) hit live RotoWire.
 import pytest
 from datetime import datetime
 
-from py.semantic.ingestion.rotowire_client import (
+from nfl_analytics.semantic.ingestion.rotowire_client import (
     RotoWireClient,
     RotoWireNewsItem,
     NFL_TEAM_PATTERNS,

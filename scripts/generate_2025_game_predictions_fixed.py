@@ -3,14 +3,14 @@
 Generate Game Outcome Predictions (FIXED)
 =========================================
 
-CLI wrapper around py.services.game_outcome_runs.run_game_outcome_predictions.
+CLI wrapper around nfl_analytics.services.game_outcome_runs.run_game_outcome_predictions.
 """
 
 import argparse
 import os
 from datetime import datetime
 
-from py.services.game_outcome_runs import run_game_outcome_predictions
+from nfl_analytics.services.game_outcome_runs import run_game_outcome_predictions
 
 DEFAULT_TARGET_SEASON = int(
     os.getenv("GAME_OUTCOME_TARGET_SEASON", str(datetime.now().year + 1))

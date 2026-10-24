@@ -181,7 +181,7 @@ class ELOWLSMultiSeasonValidator:
 
         elif method == "ensemble_v5":
             # Load Ensemble v5 predictions (4-way)
-            from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way as EnsembleV5
+            from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way as EnsembleV5
 
             ensemble = EnsembleV5(db_password=self.db_config["password"])
 
@@ -211,7 +211,7 @@ class ELOWLSMultiSeasonValidator:
         """
         logger.info("Generating ELO + WLS predictions (Ensemble v6)...")
 
-        from py.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v6_elo import EnhancedEnsemble6Way
 
         ensemble = EnhancedEnsemble6Way(
             db_password=self.db_config["password"],

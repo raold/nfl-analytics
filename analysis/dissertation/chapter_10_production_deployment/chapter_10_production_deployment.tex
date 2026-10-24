@@ -92,7 +92,7 @@ Claude begins by interpreting the user's natural language query in the context o
 \item \textbf{Schema documentation}: Table structures (\texttt{games}, \texttt{plays}, \texttt{odds\_history}, \texttt{mart.game\_summary}), column types, indexes, and foreign keys.
 \item \textbf{Feature catalog}: Existing features (\texttt{prior\_epa\_mean\_diff}, \texttt{rest\_diff}, \texttt{win\_pct\_last5\_diff}), definitions, and provenance.
 \item \textbf{Model inventory}: XGBoost v2 (Brier 0.1715), CQL Config 4, IQL (expectile 0.9), ensemble voting strategies.
-\item \textbf{Statistical framework}: Available tools (permutation tests, bootstrap CIs, FDR correction, power analysis) in \texttt{py/compute/statistics/}.
+\item \textbf{Statistical framework}: Available tools (permutation tests, bootstrap CIs, FDR correction, power analysis) in \texttt{nfl\_analytics/compute/statistics/}.
 \item \textbf{Code conventions}: SQL for aggregations, R for visualizations (ggplot2), Python for ML (XGBoost, SHAP), Quarto for reproducible notebooks.
 \end{itemize}
 
@@ -145,10 +145,10 @@ Other        | +3             | 412     | +0.7            | 11.2
 Claude interprets: \textit{``TNF games with +3 days rest advantage show +2.1 ATS margin vs +0.7 for non‑TNF games with the same advantage. This suggests a TNF‑specific rest interaction.''} However, sample sizes are small (n=18 for TNF +3), raising concerns about statistical power.
 
 \paragraph{Step 5: Statistical Validation.}
-To test significance, Claude generates Python code leveraging the \texttt{py/compute/statistics/} framework:
+To test significance, Claude generates Python code leveraging the \texttt{nfl\_analytics/compute/statistics/} framework:
 
 \begin{verbatim}
-from py.compute.statistics import permutation_test, effect_size
+from nfl_analytics.compute.statistics import permutation_test, effect_size
 import pandas as pd
 
 # Load data
@@ -233,8 +233,8 @@ For model training, feature importance, and hypothesis testing, Claude generates
 \item \textbf{FDR correction}: Benjamini--Hochberg procedure when testing multiple hypotheses.
 \end{itemize}
 
-\paragraph{Statistical Framework (\texttt{py/compute/statistics/}).}
-The \texttt{py/compute/statistics/} module provides production‑grade statistical tools:
+\paragraph{Statistical Framework (\texttt{nfl\_analytics/compute/statistics/}).}
+The \texttt{nfl\_analytics/compute/statistics/} module provides production‑grade statistical tools:
 \begin{itemize}
 \item \texttt{permutation\_test(x, y, n\_permutations)}: Non‑parametric two‑sample test.
 \item \texttt{effect\_size.cohens\_d(x, y)}: Standardized mean difference.
@@ -358,7 +358,7 @@ The model \textit{did not} have a TNF‑specific feature, so it could not captur
 \textit{Step 5: Statistical test for TNF home edge.}
 Run a permutation test comparing TNF home ATS margins vs non‑TNF home ATS margins:
 \begin{verbatim}
-from py.compute.statistics import permutation_test
+from nfl_analytics.compute.statistics import permutation_test
 
 tnf_ats = df[df['is_tnf']]['ats_margin']
 other_ats = df[~df['is_tnf']]['ats_margin']
@@ -409,7 +409,7 @@ For games where both teams have 7 days rest (no bye advantage), road teams avera
 Generate a binary feature \texttt{road\_off\_bye} = 1 if away\_rest >= 14 and home\_rest = 7, else 0.
 \begin{verbatim}
 import pandas as pd
-from py.models.xgboost_gpu_v2 import train_and_evaluate
+from nfl_analytics.models.xgboost_gpu_v2 import train_and_evaluate
 
 features = pd.read_csv("data/processed/features/asof_team_features_v2.csv")
 features['road_off_bye'] = ((features['away_rest'] >= 14) &
@@ -447,7 +447,7 @@ Result: Baseline Brier = 0.1715, Enhanced Brier = 0.1709, Improvement = 0.0006 (
 \textit{Step 4: Statistical significance via bootstrap.}
 Run 1000 bootstrap trials to compute 95\% CI for Brier improvement:
 \begin{verbatim}
-from py.compute.statistics import bootstrap_ci
+from nfl_analytics.compute.statistics import bootstrap_ci
 
 improvement_ci = bootstrap_ci(
     baseline_predictions,
@@ -647,7 +647,7 @@ GROUP BY 1;
 
 ## Statistical Test
 ```{python}
-from py.compute.statistics import permutation_test
+from nfl_analytics.compute.statistics import permutation_test
 p_value, _ = permutation_test(tnf_ats, other_ats, n_permutations=10000)
 print(f"p-value: {p_value:.4f}")
 ```

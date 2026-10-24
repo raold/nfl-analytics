@@ -269,11 +269,11 @@ Rejected due to excessive complexity with minimal benefits. Submodules are appro
 
 **Phase 1: Infrastructure Removal (November 14, 2025)** ✅ Complete
 1. Deleted Google Drive sync code:
-   - `py/compute/sync_manager.py` (~1,200 lines)
-   - `py/compute/sync/conflict_resolver.py` (~650 lines)
-   - `py/compute/sync/file_locks.py` (~450 lines)
-   - `py/compute/sync/machine_manager.py` (~400 lines)
-   - `py/compute/sync/__init__.py` (~20 lines)
+   - `nfl_analytics/compute/sync_manager.py` (~1,200 lines)
+   - `nfl_analytics/compute/sync/conflict_resolver.py` (~650 lines)
+   - `nfl_analytics/compute/sync/file_locks.py` (~450 lines)
+   - `nfl_analytics/compute/sync/machine_manager.py` (~400 lines)
+   - `nfl_analytics/compute/sync/__init__.py` (~20 lines)
 2. Removed environment variables from `.env.example`:
    - `GOOGLE_CREDENTIALS_PATH`
    - `GOOGLE_DRIVE_FOLDER_ID`

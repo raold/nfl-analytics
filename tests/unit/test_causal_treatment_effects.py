@@ -26,7 +26,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from py.causal.treatment_definitions import TreatmentDefiner, TreatmentEvent
+from nfl_analytics.causal.treatment_definitions import TreatmentDefiner, TreatmentEvent
 
 # ============================================================================
 # FIXTURES

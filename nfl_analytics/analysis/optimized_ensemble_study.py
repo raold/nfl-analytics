@@ -21,8 +21,8 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from py.ensemble.game_outcome_ensemble_realistic import RealisticGameOutcomeEnsemble
-from py.models.state_space import fetch_games
+from nfl_analytics.ensemble.game_outcome_ensemble_realistic import RealisticGameOutcomeEnsemble
+from nfl_analytics.models.state_space import fetch_games
 
 
 class PlattScalingCalibrator:

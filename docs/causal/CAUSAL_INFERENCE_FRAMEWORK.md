@@ -6,7 +6,7 @@ This framework implements state-of-the-art causal inference methods to move beyo
 
 **Status**: Phase 6 Complete (All modules implemented)
 **Created**: 2025-10-16
-**Location**: `py/causal/`
+**Location**: `nfl_analytics/causal/`
 
 ## Motivation
 
@@ -23,7 +23,7 @@ Causal inference addresses these by identifying and adjusting for confounding, e
 ### Module Structure
 
 ```
-py/causal/
+nfl_analytics/causal/
 ├── panel_constructor.py         # Build panel datasets
 ├── treatment_definitions.py     # Define treatment events
 ├── confounder_identification.py # Identify confounders
@@ -867,7 +867,7 @@ adjusted_pred = base_pred + trade_effect
 4. Hernán, M. A., & Robins, J. M. (2020). *Causal Inference: What If*. Chapman & Hall/CRC.
 
 **Code Implementation**:
-- All modules in `py/causal/`
+- All modules in `nfl_analytics/causal/`
 - Documentation in `docs/causal/CAUSAL_INFERENCE_FRAMEWORK.md`
 - Examples in each module's `main()` function
 

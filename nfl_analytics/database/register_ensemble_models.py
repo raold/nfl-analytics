@@ -6,7 +6,7 @@ Populates ml.model_registry with metadata from MODEL_REGISTRY.yaml.
 Handles updates for existing models and validates file paths.
 
 Usage:
-    python py/database/register_ensemble_models.py
+    python nfl_analytics/database/register_ensemble_models.py
 
 Author: NFL Analytics Research Team
 Created: November 9, 2025

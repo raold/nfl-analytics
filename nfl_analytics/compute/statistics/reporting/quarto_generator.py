@@ -422,7 +422,7 @@ opts_chunk$set(
         # Add methods code block
         methods_code = """
         # Statistical testing framework
-        from py.compute.statistics import (
+        from nfl_analytics.compute.statistics import (
             PermutationTest, BootstrapTest, EffectSizeCalculator,
             MultipleComparisonCorrection
         )

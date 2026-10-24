@@ -6,7 +6,7 @@ Generates synthetic predictions to validate optimize_ensemble_weights.py
 functionality before running on actual hold-out data.
 
 Usage:
-    python py/ensemble/test_weight_optimization.py
+    python nfl_analytics/ensemble/test_weight_optimization.py
 
 Author: NFL Analytics Research Team
 Date: November 9, 2025

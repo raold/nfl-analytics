@@ -340,7 +340,7 @@ OMP_NUM_THREADS=16
 **Command:**
 ```bash
 docker exec nfl-analytics-gpu-trainer \
-  python py/models/bnn_multioutput_pytorch.py \
+  python nfl_analytics/models/bnn_multioutput_pytorch.py \
   --device cuda \
   --epochs 500 \
   --batch-size 256 \
@@ -367,7 +367,7 @@ docker exec nfl-analytics-gpu-trainer \
 **Command:**
 ```bash
 docker exec nfl-analytics-gpu-trainer \
-  python py/models/xgboost_gpu_v3.py \
+  python nfl_analytics/models/xgboost_gpu_v3.py \
   --features-csv data/processed/features/asof_team_features_v3.csv \
   --start-season 2006 \
   --end-season 2021 \
@@ -418,7 +418,7 @@ docker exec nfl-analytics-gpu-trainer \
 **Command:**
 ```bash
 docker exec nfl-analytics-gpu-trainer \
-  python py/models/create_final_ensemble.py \
+  python nfl_analytics/models/create_final_ensemble.py \
   --bayesian models/bayesian/bnn_multioutput_v1_final.pt \
   --xgboost models/xgboost/v3_sweep/best_model.json \
   --hierarchical models/bayesian/passing_yards_hierarchical_v1.rds \
@@ -559,7 +559,7 @@ RuntimeError: CUDA out of memory
    ```bash
    # Edit training command
    docker exec nfl-analytics-gpu-trainer \
-     python py/models/bnn_multioutput_pytorch.py \
+     python nfl_analytics/models/bnn_multioutput_pytorch.py \
      --device cuda \
      --batch-size 128  # Reduced from 256
    ```
@@ -661,7 +661,7 @@ psycopg2.OperationalError: could not connect to server
 3. **Run training interactively:**
    ```bash
    docker exec -it nfl-analytics-gpu-trainer bash
-   python py/models/bnn_multioutput_pytorch.py --device cuda
+   python nfl_analytics/models/bnn_multioutput_pytorch.py --device cuda
    ```
 
 4. **Check for segfaults:**
@@ -679,7 +679,7 @@ psycopg2.OperationalError: could not connect to server
 ```bash
 docker exec -e TRAINING_BATCH_SIZE=512 \
   nfl-analytics-gpu-trainer \
-  python py/models/bnn_multioutput_pytorch.py --device cuda
+  python nfl_analytics/models/bnn_multioutput_pytorch.py --device cuda
 ```
 
 **Mount additional volumes:**
@@ -708,7 +708,7 @@ deploy:
 docker exec nfl-analytics-gpu-trainer \
   python -m torch.distributed.launch \
   --nproc_per_node=2 \
-  py/models/bnn_multioutput_pytorch.py --device cuda
+  nfl_analytics/models/bnn_multioutput_pytorch.py --device cuda
 ```
 
 ### Remote Training
@@ -739,7 +739,7 @@ docker exec nfl-analytics-gpu-trainer pip install mlflow
 # Run training with tracking
 docker exec -e MLFLOW_TRACKING_URI=http://mlflow:5000 \
   nfl-analytics-gpu-trainer \
-  python py/models/bnn_multioutput_pytorch.py --device cuda
+  python nfl_analytics/models/bnn_multioutput_pytorch.py --device cuda
 ```
 
 ### Automated Training Pipeline
@@ -852,7 +852,7 @@ nfl-analytics/
 ├── docker-compose.gpu.yml              # GPU Docker Compose config
 ├── scripts/
 │   └── docker_gpu_train.sh             # Training orchestration script
-├── py/
+├── nfl_analytics/
 │   └── models/
 │       ├── bnn_multioutput_pytorch.py  # BNN training
 │       ├── xgboost_gpu_v3.py           # XGBoost GPU training

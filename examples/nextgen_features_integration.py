@@ -29,7 +29,7 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.features.nextgen_features import NextGenStatsFeatures
+from nfl_analytics.features.nextgen_features import NextGenStatsFeatures
 
 
 def example_single_team():
@@ -112,8 +112,8 @@ def example_feature_integration():
     print("=" * 80)
 
     # Simulate integration with existing offensive/defensive features
-    from py.features.nextgen_features import NextGenStatsFeatures
-    from py.features.team_offensive_features import TeamOffensiveFeatures
+    from nfl_analytics.features.nextgen_features import NextGenStatsFeatures
+    from nfl_analytics.features.team_offensive_features import TeamOffensiveFeatures
 
     team = "BUF"
     season = datetime.now().year if datetime.now().month >= 9 else datetime.now().year - 1

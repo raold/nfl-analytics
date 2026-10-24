@@ -24,12 +24,12 @@ from sklearn.datasets import make_regression
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.utils.device_utils import (
+from nfl_analytics.utils.device_utils import (
     get_best_device,
     get_device_info,
     validate_device_support,
 )
-from py.utils.xgboost_device import (
+from nfl_analytics.utils.xgboost_device import (
     get_xgboost_params,
     validate_xgboost_gpu_support,
 )

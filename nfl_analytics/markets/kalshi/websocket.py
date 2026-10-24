@@ -10,8 +10,8 @@ The client maintains local order book state from snapshots + deltas and
 invokes callbacks when data arrives.
 
 Usage:
-    from py.markets.kalshi.websocket import KalshiWebSocket
-    from py.markets.kalshi.auth import KalshiAuth
+    from nfl_analytics.markets.kalshi.websocket import KalshiWebSocket
+    from nfl_analytics.markets.kalshi.auth import KalshiAuth
 
     auth = KalshiAuth.from_env()
     ws = KalshiWebSocket(auth=auth)
@@ -37,9 +37,9 @@ from typing import Callable
 import websockets
 import websockets.asyncio.client
 
-from py.markets.base import Fill, MarketData, OrderBook, OrderBookLevel
-from py.markets.kalshi.auth import KalshiAuth
-from py.markets.kalshi.schemas import (
+from nfl_analytics.markets.base import Fill, MarketData, OrderBook, OrderBookLevel
+from nfl_analytics.markets.kalshi.auth import KalshiAuth
+from nfl_analytics.markets.kalshi.schemas import (
     parse_fill,
     parse_orderbook_snapshot,
     parse_ticker_message,

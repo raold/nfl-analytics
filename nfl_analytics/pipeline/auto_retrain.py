@@ -11,13 +11,13 @@ Handles end-of-season retraining workflow:
 
 Usage:
     # Auto-detect and retrain
-    python py/pipeline/auto_retrain.py --auto
+    python nfl_analytics/pipeline/auto_retrain.py --auto
 
     # Manual retrain for specific season
-    python py/pipeline/auto_retrain.py --season 2024
+    python nfl_analytics/pipeline/auto_retrain.py --season 2024
 
     # Dry run
-    python py/pipeline/auto_retrain.py --auto --dry-run
+    python nfl_analytics/pipeline/auto_retrain.py --auto --dry-run
 """
 import argparse
 import json
@@ -114,7 +114,7 @@ class AutoRetrainingPipeline:
             "uv",
             "run",
             "python",
-            str(self.project_root / "py/features/materialized_view_features.py"),
+            str(self.project_root / "nfl_analytics/features/materialized_view_features.py"),
             "--output",
             str(
                 self.project_root
@@ -160,7 +160,7 @@ class AutoRetrainingPipeline:
             "uv",
             "run",
             "python",
-            str(self.project_root / "py/models/xgboost_gpu_v3.py"),
+            str(self.project_root / "nfl_analytics/models/xgboost_gpu_v3.py"),
             "--features-csv",
             features_csv,
             "--start-season",
@@ -222,7 +222,7 @@ class AutoRetrainingPipeline:
             "uv",
             "run",
             "python",
-            str(self.project_root / "py/models/spread_coverage_model.py"),
+            str(self.project_root / "nfl_analytics/models/spread_coverage_model.py"),
             "--features-csv",
             features_csv,
             "--start-season",
@@ -281,7 +281,7 @@ class AutoRetrainingPipeline:
             "uv",
             "run",
             "python",
-            str(self.project_root / "py/models/totals_model.py"),
+            str(self.project_root / "nfl_analytics/models/totals_model.py"),
             "--features-csv",
             features_csv,
             "--start-season",

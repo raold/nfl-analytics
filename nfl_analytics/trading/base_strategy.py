@@ -24,8 +24,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from py.markets.base import MarketClient, MarketData, OrderBook
-from py.trading.signal import Signal
+from nfl_analytics.markets.base import MarketClient, MarketData, OrderBook
+from nfl_analytics.trading.signal import Signal
 
 logger = logging.getLogger(__name__)
 

@@ -19,7 +19,7 @@ import logging
 import sys
 
 # Import the robust R service
-from py.utils.r_service import RServiceError, ensure_r_healthy, get_r_service
+from nfl_analytics.utils.r_service import RServiceError, ensure_r_healthy, get_r_service
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

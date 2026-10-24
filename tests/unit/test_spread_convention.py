@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from py.utils.spread_convention import (
+from nfl_analytics.utils.spread_convention import (
     assert_nflverse_convention,
     book_home_line,
     home_cover,

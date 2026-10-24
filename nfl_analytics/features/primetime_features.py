@@ -46,7 +46,7 @@ import warnings
 import pandas as pd
 import psycopg2
 
-from py.utils.spread_convention import home_cover
+from nfl_analytics.utils.spread_convention import home_cover
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

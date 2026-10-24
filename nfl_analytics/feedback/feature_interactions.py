@@ -144,7 +144,7 @@ class FeatureInteractionAnalyzer:
         Samples games from the specified season.
         """
         try:
-            from py.features.game_feature_extractor import GameFeatureExtractor
+            from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
             # Get game list
             query = """

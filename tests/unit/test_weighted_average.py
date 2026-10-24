@@ -13,8 +13,8 @@ Date: November 9, 2025
 import numpy as np
 import pytest
 
-from py.ensemble.strategy.base import ModelPrediction, ModelType
-from py.ensemble.strategy.weighted_average import WeightedAverageStrategy
+from nfl_analytics.ensemble.strategy.base import ModelPrediction, ModelType
+from nfl_analytics.ensemble.strategy.weighted_average import WeightedAverageStrategy
 
 
 class TestWeightedAverageStrategy:

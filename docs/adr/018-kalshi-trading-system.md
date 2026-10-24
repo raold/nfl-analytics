@@ -202,11 +202,11 @@ Implemented in 6 sequential phases over a single development session. Each phase
 
 ### Code
 
-- `py/trading/` — Strategy implementations
-- `py/markets/` — Market client abstractions and Kalshi integration
-- `py/risk/` — Risk management hierarchy
-- `py/execution/` — Order management and live trading
-- `py/monitoring/` — P&L, logging, and alerting
+- `nfl_analytics/trading/` — Strategy implementations
+- `nfl_analytics/markets/` — Market client abstractions and Kalshi integration
+- `nfl_analytics/risk/` — Risk management hierarchy
+- `nfl_analytics/execution/` — Order management and live trading
+- `nfl_analytics/monitoring/` — P&L, logging, and alerting
 
 ---
 

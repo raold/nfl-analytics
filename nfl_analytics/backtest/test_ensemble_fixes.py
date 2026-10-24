@@ -6,7 +6,7 @@ Tests:
 2. BNN Calibrated skips scaling (T=1.0)
 3. State-space uses CSV data (not database)
 
-Run: uv run python py/backtest/test_ensemble_fixes.py
+Run: uv run python nfl_analytics/backtest/test_ensemble_fixes.py
 """
 
 import sys
@@ -17,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import logging
 
-from py.models.player_props_ensemble import PlayerPropsEnsemble
+from nfl_analytics.models.player_props_ensemble import PlayerPropsEnsemble
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -157,7 +157,7 @@ if __name__ == "__main__":
         logger.info("✅ ALL TESTS PASSED - Ready for full backtest")
         logger.info("=" * 80)
         logger.info("\nNext step:")
-        logger.info("  uv run python py/backtest/historical_validation_5way.py \\")
+        logger.info("  uv run python nfl_analytics/backtest/historical_validation_5way.py \\")
         logger.info("    --start-season 2024 \\")
         logger.info("    --end-season 2024 \\")
         logger.info("    --end-week 17 \\")

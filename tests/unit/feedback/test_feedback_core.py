@@ -20,24 +20,24 @@ from unittest.mock import MagicMock, patch, PropertyMock
 # Module imports -- patching psycopg2.connect at the module level is
 # sufficient to prevent any real DB connection from being established.
 # ---------------------------------------------------------------------------
-from py.feedback.outcome_updater import WeeklyOutcomeUpdater, UpdateResult
-from py.feedback.retrain_trigger import (
+from nfl_analytics.feedback.outcome_updater import WeeklyOutcomeUpdater, UpdateResult
+from nfl_analytics.feedback.retrain_trigger import (
     RetrainTrigger,
     RetrainTriggerResult,
     TriggerCheck,
 )
-from py.feedback.model_error_decomposition import (
+from nfl_analytics.feedback.model_error_decomposition import (
     ModelErrorDecomposer,
     ErrorDecomposition,
     SeasonErrorReport,
     _classify_error_magnitude,
     _classify_game_context,
 )
-from py.feedback.auto_feature_selector import (
+from nfl_analytics.feedback.auto_feature_selector import (
     AutoFeatureSelector,
     FeatureSelectionResult,
 )
-from py.feedback.feature_memory import (
+from nfl_analytics.feedback.feature_memory import (
     FeaturePerformanceMemory,
     FeatureStats,
 )
@@ -93,7 +93,7 @@ SAMPLE_PREDICTION = {
 class TestWeeklyOutcomeUpdater:
     """Tests for outcome_updater.py -- updating predictions with actuals."""
 
-    @patch("py.feedback.outcome_updater.psycopg2.connect")
+    @patch("nfl_analytics.feedback.outcome_updater.psycopg2.connect")
     def test_update_result_dataclass_defaults(self, mock_connect):
         """UpdateResult initializes with zeroed counters."""
         result = UpdateResult(season=2025)
@@ -105,7 +105,7 @@ class TestWeeklyOutcomeUpdater:
         assert result.errors == []
         assert result.dry_run is False
 
-    @patch("py.feedback.outcome_updater.psycopg2.connect")
+    @patch("nfl_analytics.feedback.outcome_updater.psycopg2.connect")
     def test_validate_completeness_all_scored(self, mock_connect):
         """validate_completeness returns complete=True when all games have scores."""
         mock_conn, mock_cursor = _make_mock_connection()
@@ -122,7 +122,7 @@ class TestWeeklyOutcomeUpdater:
         assert status["total_games"] == 16
         assert status["games_with_scores"] == 16
 
-    @patch("py.feedback.outcome_updater.psycopg2.connect")
+    @patch("nfl_analytics.feedback.outcome_updater.psycopg2.connect")
     def test_validate_completeness_partial(self, mock_connect):
         """validate_completeness returns complete=False when games are missing scores."""
         mock_conn, mock_cursor = _make_mock_connection()
@@ -137,7 +137,7 @@ class TestWeeklyOutcomeUpdater:
 
         assert status["complete"] is False
 
-    @patch("py.feedback.outcome_updater.psycopg2.connect")
+    @patch("nfl_analytics.feedback.outcome_updater.psycopg2.connect")
     def test_validate_completeness_empty_week(self, mock_connect):
         """validate_completeness returns complete=False for a week with no games."""
         mock_conn, mock_cursor = _make_mock_connection()
@@ -153,7 +153,7 @@ class TestWeeklyOutcomeUpdater:
         assert status["complete"] is False
         assert status["total_games"] == 0
 
-    @patch("py.feedback.outcome_updater.psycopg2.connect")
+    @patch("nfl_analytics.feedback.outcome_updater.psycopg2.connect")
     def test_update_week_no_games(self, mock_connect):
         """update_week returns immediately when no completed games exist."""
         mock_conn, mock_cursor = _make_mock_connection()
@@ -166,7 +166,7 @@ class TestWeeklyOutcomeUpdater:
         assert result.games_with_scores == 0
         assert result.predictions_updated == 0
 
-    @patch("py.feedback.outcome_updater.psycopg2.connect")
+    @patch("nfl_analytics.feedback.outcome_updater.psycopg2.connect")
     def test_update_week_dry_run_counts_without_committing(self, mock_connect):
         """In dry_run mode, predictions are counted but not committed."""
         mock_conn, mock_cursor = _make_mock_connection()
@@ -189,7 +189,7 @@ class TestWeeklyOutcomeUpdater:
         # In dry_run, cur.execute should NOT be called for the UPDATE query
         # (only the SELECT queries are executed)
 
-    @patch("py.feedback.outcome_updater.psycopg2.connect")
+    @patch("nfl_analytics.feedback.outcome_updater.psycopg2.connect")
     def test_update_week_error_on_missing_outcome(self, mock_connect):
         """A prediction whose game_id has no matching outcome records an error."""
         mock_conn, mock_cursor = _make_mock_connection()
@@ -328,7 +328,7 @@ class TestRetrainTrigger:
 
     # -- Integration: check_triggers --
 
-    @patch("py.feedback.retrain_trigger.psycopg2.connect")
+    @patch("nfl_analytics.feedback.retrain_trigger.psycopg2.connect")
     def test_check_triggers_skips_with_insufficient_games(self, mock_connect):
         """check_triggers returns early if fewer than 10 games evaluated."""
         mock_conn, mock_cursor = _make_mock_connection()
@@ -347,7 +347,7 @@ class TestRetrainTrigger:
         assert result.retraining_recommended is False
         assert len(result.triggers_checked) == 0
 
-    @patch("py.feedback.retrain_trigger.psycopg2.connect")
+    @patch("nfl_analytics.feedback.retrain_trigger.psycopg2.connect")
     def test_check_triggers_recommends_retrain_when_fired(self, mock_connect):
         """check_triggers sets retraining_recommended=True when any trigger fires."""
         mock_conn, mock_cursor = _make_mock_connection()
@@ -776,7 +776,7 @@ class TestFeaturePerformanceMemory:
         )
         assert rec == "keep"
 
-    @patch("py.feedback.feature_memory.psycopg2.connect")
+    @patch("nfl_analytics.feedback.feature_memory.psycopg2.connect")
     def test_get_feature_stats_insufficient_data(self, mock_connect):
         """get_feature_stats returns 'insufficient_data' when samples < MIN_SAMPLES."""
         mock_conn, mock_cursor = _make_mock_connection()
@@ -794,7 +794,7 @@ class TestFeaturePerformanceMemory:
         assert stats.recommendation == "insufficient_data"
         assert stats.sample_size == 10
 
-    @patch("py.feedback.feature_memory.psycopg2.connect")
+    @patch("nfl_analytics.feedback.feature_memory.psycopg2.connect")
     def test_get_feature_stats_computes_metrics(self, mock_connect):
         """get_feature_stats correctly computes contribution, stability, and correlation."""
         mock_conn, mock_cursor = _make_mock_connection()

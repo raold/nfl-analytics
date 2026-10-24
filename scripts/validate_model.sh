@@ -23,7 +23,7 @@ if [ "$1" == "--all" ]; then
     echo ""
 
     python3 -c "
-from py.utils.statistical_validator import StatisticalValidator
+from nfl_analytics.utils.statistical_validator import StatisticalValidator
 from pathlib import Path
 import json
 
@@ -93,7 +93,7 @@ elif [ "$1" == "--quick" ]; then
     echo ""
 
     python3 -c "
-from py.utils.statistical_validator import StatisticalValidator
+from nfl_analytics.utils.statistical_validator import StatisticalValidator
 from pathlib import Path
 import pickle
 
@@ -145,7 +145,7 @@ elif [ -n "$1" ]; then
     python3 -c "
 import sys
 import json
-from py.utils.statistical_validator import StatisticalValidator
+from nfl_analytics.utils.statistical_validator import StatisticalValidator
 
 validator = StatisticalValidator()
 

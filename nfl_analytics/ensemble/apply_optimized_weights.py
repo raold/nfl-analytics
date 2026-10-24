@@ -7,13 +7,13 @@ ensemble predictions for new data.
 
 Usage:
     # Apply weights to new predictions
-    python py/ensemble/apply_optimized_weights.py \\
+    python nfl_analytics/ensemble/apply_optimized_weights.py \\
         --weights models/ensemble_weights_2025_optimized.json \\
         --predictions analysis/results/week11_predictions.csv \\
         --output analysis/results/week11_ensemble.csv
 
     # Quick check of weight configuration
-    python py/ensemble/apply_optimized_weights.py \\
+    python nfl_analytics/ensemble/apply_optimized_weights.py \\
         --weights models/ensemble_weights_2025_optimized.json \\
         --info
 
@@ -146,13 +146,13 @@ def main():
         epilog="""
 Examples:
   # Apply weights to new predictions
-  python py/ensemble/apply_optimized_weights.py \\
+  python nfl_analytics/ensemble/apply_optimized_weights.py \\
       --weights models/ensemble_weights_2025_optimized.json \\
       --predictions analysis/results/week11_predictions.csv \\
       --output analysis/results/week11_ensemble.csv
 
   # Display weights info
-  python py/ensemble/apply_optimized_weights.py \\
+  python nfl_analytics/ensemble/apply_optimized_weights.py \\
       --weights models/ensemble_weights_2025_optimized.json \\
       --info
         """,

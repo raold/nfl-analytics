@@ -15,19 +15,19 @@ This script:
 
 Usage:
     # Generate Week 6 recommendations (run Monday after lineups announced)
-    python py/production/paper_trade.py recommend --week 6
+    python nfl_analytics/production/paper_trade.py recommend --week 6
 
     # Log a paper trade bet
-    python py/production/paper_trade.py log --game-id "2025_06_KC_BUF" ...
+    python nfl_analytics/production/paper_trade.py log --game-id "2025_06_KC_BUF" ...
 
     # Update paper trade result after game
-    python py/production/paper_trade.py update --bet-id 1 --result win ...
+    python nfl_analytics/production/paper_trade.py update --bet-id 1 --result win ...
 
     # Generate paper trading report
-    python py/production/paper_trade.py report
+    python nfl_analytics/production/paper_trade.py report
 
     # View all paper trades
-    python py/production/paper_trade.py list
+    python nfl_analytics/production/paper_trade.py list
 """
 
 import argparse
@@ -91,7 +91,7 @@ def recommend_bets(week: int, season: int = 2025):
     # Run betting system with --paper-trade flag
     cmd = [
         sys.executable,
-        "py/production/majority_betting_system.py",
+        "nfl_analytics/production/majority_betting_system.py",
         "--games-csv",
         games_csv,
         "--bankroll",
@@ -113,9 +113,9 @@ def recommend_bets(week: int, season: int = 2025):
     print("\nNext steps:")
     print(f"1. Review recommendations in {output_path}")
     print("2. For each bet you want to place, run:")
-    print("   python py/production/paper_trade.py log --game-id <game> --bet-type <type> ...")
+    print("   python nfl_analytics/production/paper_trade.py log --game-id <game> --bet-type <type> ...")
     print("3. After games finish, update results with:")
-    print("   python py/production/paper_trade.py update --bet-id <id> --result <win/loss> ...")
+    print("   python nfl_analytics/production/paper_trade.py update --bet-id <id> --result <win/loss> ...")
 
 
 def log_bet(args: argparse.Namespace):
@@ -127,7 +127,7 @@ def log_bet(args: argparse.Namespace):
     """
     cmd = [
         sys.executable,
-        "py/production/monitor_performance.py",
+        "nfl_analytics/production/monitor_performance.py",
         "log",
         "--game-id",
         args.game_id,
@@ -162,7 +162,7 @@ def update_bet(args: argparse.Namespace):
     """
     cmd = [
         sys.executable,
-        "py/production/monitor_performance.py",
+        "nfl_analytics/production/monitor_performance.py",
         "update",
         "--bet-id",
         str(args.bet_id),

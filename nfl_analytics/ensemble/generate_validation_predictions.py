@@ -14,7 +14,7 @@ Output CSV format:
 - xgboost_v2_pred_mean, xgboost_v2_pred_std
 
 Usage:
-    python3 py/ensemble/generate_validation_predictions.py \
+    python3 nfl_analytics/ensemble/generate_validation_predictions.py \
         --start-season 2022 \
         --end-season 2023 \
         --output data/validation_predictions_2022_2023.csv
@@ -40,7 +40,7 @@ import psycopg2
 from tqdm import tqdm
 
 # Import existing ensemble
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -282,7 +282,7 @@ def main():
     logger.info(f"   Validation predictions saved: {args.output}")
     logger.info("   Ready for Bayesian stacking optimization")
     logger.info("\nNext step:")
-    logger.info("   python3 py/ensemble/bayesian_stacking.py \\")
+    logger.info("   python3 nfl_analytics/ensemble/bayesian_stacking.py \\")
     logger.info("     --mode optimize \\")
     logger.info(f"     --validation-data {args.output} \\")
     logger.info("     --output models/ensemble/stacking_report.md")

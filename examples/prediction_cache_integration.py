@@ -19,7 +19,7 @@ import logging
 import numpy as np
 import pandas as pd
 
-from py.utils.prediction_cache_manager import PredictionCacheManager
+from nfl_analytics.utils.prediction_cache_manager import PredictionCacheManager
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

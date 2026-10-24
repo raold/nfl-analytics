@@ -11,7 +11,7 @@ Tests:
 6. Check task status updates
 
 Usage:
-    python py/compute/test_infrastructure.py
+    python nfl_analytics/compute/test_infrastructure.py
 """
 
 import sys
@@ -216,9 +216,9 @@ def main():
         print("=" * 60)
         print("\nInfrastructure is ready for production use!")
         print("\nNext steps:")
-        print("  1. Start worker: python py/compute/worker_enhanced.py --worker-id macbook_m4")
+        print("  1. Start worker: python nfl_analytics/compute/worker_enhanced.py --worker-id macbook_m4")
         print(
-            "  2. Submit sweep: python py/compute/submit_sweep.py --model test --param epochs 10 20 30"
+            "  2. Submit sweep: python nfl_analytics/compute/submit_sweep.py --model test --param epochs 10 20 30"
         )
         print("  3. Monitor: watch -n 1 'redis-cli zrange training_queue 0 -1 withscores'")
 

@@ -18,7 +18,7 @@ from typing import Any, Optional
 
 import numpy as np
 
-from py.semantic.rag.embeddings import EmbeddingGenerator
+from nfl_analytics.semantic.rag.embeddings import EmbeddingGenerator
 
 logger = logging.getLogger(__name__)
 

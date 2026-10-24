@@ -208,7 +208,7 @@ class SemanticFeatureExtractor:
         """Lazy-load database repository."""
         if self._repository is None:
             try:
-                from py.database.semantic_repository import SemanticRepository
+                from nfl_analytics.database.semantic_repository import SemanticRepository
 
                 self._repository = SemanticRepository()
                 logger.info("Using database for semantic features")
@@ -220,7 +220,7 @@ class SemanticFeatureExtractor:
         """Lazy-load inference client."""
         if self._inference is None:
             try:
-                from py.semantic.models.inference import SemanticInferenceClient
+                from nfl_analytics.semantic.models.inference import SemanticInferenceClient
 
                 self._inference = SemanticInferenceClient(ollama_timeout=self.config.llm_timeout)
             except Exception as e:
@@ -232,7 +232,7 @@ class SemanticFeatureExtractor:
         """Lazy-load news ingester."""
         if self._news_ingester is None:
             try:
-                from py.semantic.ingestion.news_ingester import NewsIngester
+                from nfl_analytics.semantic.ingestion.news_ingester import NewsIngester
 
                 self._news_ingester = NewsIngester()
             except Exception as e:
@@ -243,7 +243,7 @@ class SemanticFeatureExtractor:
         """Lazy-load social ingester."""
         if self._social_ingester is None:
             try:
-                from py.semantic.ingestion.social_ingester import SocialIngester
+                from nfl_analytics.semantic.ingestion.social_ingester import SocialIngester
 
                 self._social_ingester = SocialIngester()
             except Exception as e:
@@ -605,7 +605,7 @@ class SemanticFeatureExtractor:
         news_ingester = self._get_news_ingester()
         if news_ingester:
             try:
-                from py.semantic.ingestion.news_ingester import NewsPriority
+                from nfl_analytics.semantic.ingestion.news_ingester import NewsPriority
 
                 news_items = news_ingester.fetch_team_news(
                     team=team,

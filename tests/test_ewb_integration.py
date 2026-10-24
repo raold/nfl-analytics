@@ -17,7 +17,7 @@ import pandas as pd
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.features.line_movement_tracker import LineMovementTracker
+from nfl_analytics.features.line_movement_tracker import LineMovementTracker
 
 
 def test_line_movement_tracker():
@@ -272,7 +272,7 @@ def run_all_tests():
         print("\nSystem Status: PRODUCTION READY ✅")
         print("Next Steps:")
         print("  1. Set ODDS_API_KEY environment variable")
-        print("  2. Run: python py/production/ewb_deployment.py --season 2024 --week 7 --dry-run")
+        print("  2. Run: python nfl_analytics/production/ewb_deployment.py --season 2024 --week 7 --dry-run")
         print("  3. Validate output, then remove --dry-run flag for live deployment")
         print("=" * 80)
 

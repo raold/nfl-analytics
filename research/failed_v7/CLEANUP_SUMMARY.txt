@@ -10,13 +10,13 @@ FILES ARCHIVED AND DELETED
 =============================================================================
 
 CODE (7 files, 3,981 lines):
-✅ py/ensemble/enhanced_ensemble_v7_production.py
-✅ py/ensemble/enhanced_ensemble_v7.py
-✅ py/ensemble/enhanced_ensemble_v7_base.py
-✅ py/ensemble/meta_learning_weight_predictor.py
-✅ py/features/meta_learning_context.py
-✅ py/ensemble/stacked_meta_learner.py
-✅ py/ensemble/thompson_sampling_meta.py
+✅ nfl_analytics/ensemble/enhanced_ensemble_v7_production.py
+✅ nfl_analytics/ensemble/enhanced_ensemble_v7.py
+✅ nfl_analytics/ensemble/enhanced_ensemble_v7_base.py
+✅ nfl_analytics/ensemble/meta_learning_weight_predictor.py
+✅ nfl_analytics/features/meta_learning_context.py
+✅ nfl_analytics/ensemble/stacked_meta_learner.py
+✅ nfl_analytics/ensemble/thompson_sampling_meta.py
 
 SCRIPTS (10 files):
 ✅ scripts/backtest_ensemble_v7_multi_season.py
@@ -67,8 +67,8 @@ DOCUMENTATION (13 files):
 ✅ ENSEMBLE_V7_TEST_SUMMARY.md
 
 PYCACHE:
-✅ py/ensemble/__pycache__/enhanced_ensemble_v7*.pyc
-✅ py/features/__pycache__/meta_learning_context*.pyc
+✅ nfl_analytics/ensemble/__pycache__/enhanced_ensemble_v7*.pyc
+✅ nfl_analytics/features/__pycache__/meta_learning_context*.pyc
 ✅ scripts/__pycache__/backtest_ensemble_v7*.pyc
 
 TOTAL: 62 files, ~9.6 MB archived (all files backed up in research/failed_v7/)
@@ -78,16 +78,16 @@ FILES RETAINED (REUSABLE COMPONENTS)
 =============================================================================
 
 WLS COMPONENTS (2 files):
-✅ py/ensemble/adaptive_wls_weights.py - WLS v1 (ELO blending)
-✅ py/ensemble/adaptive_wls_weights_v2.py - WLS v2 (grid search)
+✅ nfl_analytics/ensemble/adaptive_wls_weights.py - WLS v1 (ELO blending)
+✅ nfl_analytics/ensemble/adaptive_wls_weights_v2.py - WLS v2 (grid search)
 
 CONTEXT FEATURES (3 files):
-✅ py/features/qb_experience_features.py - QB career stages
-✅ py/features/roster_stability_features.py - Roster turnover
-✅ py/features/market_dispersion_features.py - Betting market uncertainty
+✅ nfl_analytics/features/qb_experience_features.py - QB career stages
+✅ nfl_analytics/features/roster_stability_features.py - Roster turnover
+✅ nfl_analytics/features/market_dispersion_features.py - Betting market uncertainty
 
 R INTERFACE (1 file):
-✅ py/ensemble/r_model_interface.py - R↔Python bridge (shared by v6.0+)
+✅ nfl_analytics/ensemble/r_model_interface.py - R↔Python bridge (shared by v6.0+)
 
 TEST INFRASTRUCTURE (3 files):
 ✅ tests/integration/test_ensemble_integration.py - Generic harness

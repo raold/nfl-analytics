@@ -21,7 +21,7 @@ import numpy as np
 import pandas as pd
 import psycopg2
 
-from py.production.ab_test_controller import ABTestController, ModelVersion
+from nfl_analytics.production.ab_test_controller import ABTestController, ModelVersion
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

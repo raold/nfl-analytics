@@ -6,7 +6,7 @@ Compares the best GNN configuration from ablation study against baseline models
 (XGBoost v3, BNN) across multiple metrics and generates comprehensive LaTeX tables.
 
 Usage:
-    python py/analysis/compare_gnn_baselines.py
+    python nfl_analytics/analysis/compare_gnn_baselines.py
 
 Outputs:
     - analysis/dissertation/figures/out/baseline_model_comparison_table.tex

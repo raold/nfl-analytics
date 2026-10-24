@@ -58,8 +58,8 @@ except ImportError:
     logger.warning("matplotlib not available - calibration plots will be skipped")
 
 # Import ensemble and temperature scaling
-from py.calibration.temperature_scaling import TemperatureScaler
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from nfl_analytics.calibration.temperature_scaling import TemperatureScaler
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
 
 
 class TemperatureScalerTrainerV6:

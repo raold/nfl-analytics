@@ -38,7 +38,7 @@ def generate_reliability_for_season(
     # Build command
     cmd = [
         "python3",
-        "py/backtest/baseline_glm.py",
+        "nfl_analytics/backtest/baseline_glm.py",
         "--features-csv",
         features_csv,
         "--start-season",

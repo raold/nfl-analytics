@@ -3,7 +3,7 @@
 **Created:** November 27, 2025
 **Author:** Claude Code (Sonnet 4.5)
 **Status:** Production-Ready (Initial Release)
-**Module:** `py/models/game_outcome_model.py`
+**Module:** `nfl_analytics/models/game_outcome_model.py`
 
 ---
 
@@ -59,7 +59,7 @@ pip install xgboost shap scikit-learn
 ### Basic Usage
 
 ```python
-from py.models.game_outcome_model import GameOutcomeModel
+from nfl_analytics.models.game_outcome_model import GameOutcomeModel
 
 # Initialize model
 model = GameOutcomeModel()
@@ -425,8 +425,8 @@ GameOutcomeModel complements Ensemble v6.1 for holistic NFL analytics:
 ### Combined Workflow
 
 ```python
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
-from py.models.game_outcome_model import GameOutcomeModel
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from nfl_analytics.models.game_outcome_model import GameOutcomeModel
 
 # Initialize both models
 ensemble = EnhancedEnsemble5Way()
@@ -520,7 +520,7 @@ architecture                   ✅ PASSED
 ```bash
 # Train and validate (5-10 min)
 python -c "
-from py.models.game_outcome_model import GameOutcomeModel
+from nfl_analytics.models.game_outcome_model import GameOutcomeModel
 model = GameOutcomeModel()
 metrics = model.train(seasons=[2023, 2024], validation_split=0.2)
 print(f'Spread MAE: {metrics[\"spread_mae\"]:.2f}')

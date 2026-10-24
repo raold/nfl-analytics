@@ -55,7 +55,7 @@ done
 case $ACTION in
     query-builder)
         python3 -c "
-from py.agents.dashboard_feature_generator import DashboardFeatureGenerator
+from nfl_analytics.agents.dashboard_feature_generator import DashboardFeatureGenerator
 
 generator = DashboardFeatureGenerator()
 
@@ -71,7 +71,7 @@ print(f'\nTo use: Add to dashboard sidebar and navigate to page')
 
     schema-browser)
         python3 -c "
-from py.agents.dashboard_feature_generator import DashboardFeatureGenerator
+from nfl_analytics.agents.dashboard_feature_generator import DashboardFeatureGenerator
 
 generator = DashboardFeatureGenerator()
 
@@ -86,7 +86,7 @@ print(f'✅ Schema browser generated: {output_path}')
 
     training-form)
         python3 -c "
-from py.agents.dashboard_feature_generator import DashboardFeatureGenerator
+from nfl_analytics.agents.dashboard_feature_generator import DashboardFeatureGenerator
 
 generator = DashboardFeatureGenerator()
 
@@ -106,7 +106,7 @@ print(f'✅ Training form generated: {output_path}')
         fi
 
         python3 -c "
-from py.agents.dashboard_feature_generator import DashboardFeatureGenerator
+from nfl_analytics.agents.dashboard_feature_generator import DashboardFeatureGenerator
 from pathlib import Path
 
 generator = DashboardFeatureGenerator()

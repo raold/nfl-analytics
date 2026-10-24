@@ -8,7 +8,7 @@ Tests the NEW ensemble predictor on a small sample to validate:
 3. Output format is correct
 
 Usage:
-    python py/ensemble/test_ensemble_v5.py
+    python nfl_analytics/ensemble/test_ensemble_v5.py
 """
 
 import os

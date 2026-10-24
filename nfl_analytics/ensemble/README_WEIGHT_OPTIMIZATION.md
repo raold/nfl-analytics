@@ -42,12 +42,12 @@ First, generate predictions from all 5 models on 2025 hold-out data:
 
 ```bash
 # Generate predictions for each model
-Rscript py/models/generate_state_space_predictions.py \
+Rscript nfl_analytics/models/generate_state_space_predictions.py \
   --model models/state_space/passing_state_space_v2_canonical.rds \
   --output analysis/results/state_space_predictions_2025.csv
 
 # Combine all predictions into ensemble format
-python py/ensemble/combine_predictions.py \
+python nfl_analytics/ensemble/combine_predictions.py \
   --output analysis/results/ensemble_predictions_2025_holdout.csv
 ```
 
@@ -62,7 +62,7 @@ game_id,player_id,actual_yards,pred_state_space,pred_bnn,pred_hierarchical,pred_
 ### 2. Optimize Weights
 
 ```bash
-python py/ensemble/optimize_ensemble_weights.py \
+python nfl_analytics/ensemble/optimize_ensemble_weights.py \
   --predictions analysis/results/ensemble_predictions_2025_holdout.csv \
   --output models/ensemble_weights_2025_optimized.json \
   --target-mae 45.2 \
@@ -105,7 +105,7 @@ python py/ensemble/optimize_ensemble_weights.py \
 Test the optimization pipeline with synthetic data:
 
 ```bash
-python py/ensemble/test_weight_optimization.py
+python nfl_analytics/ensemble/test_weight_optimization.py
 ```
 
 **Expected Output:**
@@ -220,12 +220,12 @@ Based on MODEL_REGISTRY.yaml targets:
 
 ```bash
 # Generate predictions on 2025 hold-out (148 games)
-python py/ensemble/generate_ensemble_predictions.py \
+python nfl_analytics/ensemble/generate_ensemble_predictions.py \
   --holdout 2025 \
   --output analysis/results/ensemble_predictions_2025_holdout.csv
 
 # Optimize weights
-python py/ensemble/optimize_ensemble_weights.py \
+python nfl_analytics/ensemble/optimize_ensemble_weights.py \
   --predictions analysis/results/ensemble_predictions_2025_holdout.csv \
   --output models/ensemble_weights_2025_optimized.json
 ```
@@ -234,7 +234,7 @@ python py/ensemble/optimize_ensemble_weights.py \
 
 ```bash
 # Apply optimized weights to 2022-2024 backtest
-python py/ensemble/backtest_ensemble.py \
+python nfl_analytics/ensemble/backtest_ensemble.py \
   --weights models/ensemble_weights_2025_optimized.json \
   --period 2022-2024 \
   --output analysis/results/ensemble_backtest_2022_2024.csv
@@ -244,7 +244,7 @@ python py/ensemble/backtest_ensemble.py \
 
 ```bash
 # Use optimized weights for live predictions
-python py/production/generate_prop_predictions.py \
+python nfl_analytics/production/generate_prop_predictions.py \
   --weights models/ensemble_weights_2025_optimized.json \
   --week 11 \
   --season 2025
@@ -279,7 +279,7 @@ python py/production/generate_prop_predictions.py \
 ## Files
 
 ```
-py/ensemble/
+nfl_analytics/ensemble/
 ├── optimize_ensemble_weights.py       # Main optimization script (650 lines)
 ├── test_weight_optimization.py        # Test with synthetic data (175 lines)
 └── README_WEIGHT_OPTIMIZATION.md      # This file

@@ -17,8 +17,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from py.ensemble.game_outcome_ensemble import fetch_games
-from py.ensemble.game_outcome_ensemble_enhanced import EnhancedGameOutcomeEnsemble
+from nfl_analytics.ensemble.game_outcome_ensemble import fetch_games
+from nfl_analytics.ensemble.game_outcome_ensemble_enhanced import EnhancedGameOutcomeEnsemble
 
 
 def analyze_feature_importance(train_seasons: list[int], output_dir: Path):

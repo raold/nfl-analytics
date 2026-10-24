@@ -19,37 +19,37 @@ logger = logging.getLogger(__name__)
 EXPERIMENTS = [
     {
         "name": "Experiment 1: cVAE + Environment BNN Ensemble",
-        "script": "py/experiments/cvae_exp1_environment_bnn_ensemble.py",
+        "script": "nfl_analytics/experiments/cvae_exp1_environment_bnn_ensemble.py",
         "description": "Test if trajectory features improve Environment BNN predictions",
     },
     {
         "name": "Experiment 2: Same-Game Parlay Pricing",
-        "script": "py/experiments/cvae_exp2_same_game_parlay.py",
+        "script": "nfl_analytics/experiments/cvae_exp2_same_game_parlay.py",
         "description": "Price complex parlays and validate with BNN calibration",
     },
     {
         "name": "Experiment 3: Causal Counterfactual Generation",
-        "script": "py/experiments/cvae_exp3_causal_counterfactuals.py",
+        "script": "nfl_analytics/experiments/cvae_exp3_causal_counterfactuals.py",
         "description": "Generate counterfactual trajectories for causal questions",
     },
     {
         "name": "Experiment 4: Live In-Game Trajectory Updates",
-        "script": "py/experiments/cvae_exp4_live_trajectories.py",
+        "script": "nfl_analytics/experiments/cvae_exp4_live_trajectories.py",
         "description": "Generate remainder-of-game trajectories from current state",
     },
     {
         "name": "Experiment 5: Key Number Distribution Validation",
-        "script": "py/experiments/cvae_exp5_key_numbers.py",
+        "script": "nfl_analytics/experiments/cvae_exp5_key_numbers.py",
         "description": "Validate cVAE learns NFL key number patterns",
     },
     {
         "name": "Experiment 6: GNN-Enhanced Trajectory Conditioning",
-        "script": "py/experiments/cvae_exp6_gnn_enhanced.py",
+        "script": "nfl_analytics/experiments/cvae_exp6_gnn_enhanced.py",
         "description": "Add GNN embeddings to cVAE conditioning",
     },
     {
         "name": "Experiment 7: Hierarchical Player-Game Trajectories",
-        "script": "py/experiments/cvae_exp7_hierarchical_player.py",
+        "script": "nfl_analytics/experiments/cvae_exp7_hierarchical_player.py",
         "description": "Combine cVAE with hierarchical BNN player models",
     },
 ]

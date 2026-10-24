@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from py.risk.feature_health import (
+from nfl_analytics.risk.feature_health import (
     FEATURE_GROUPS,
     FeatureGroupStatus,
     FeatureHealthChecker,

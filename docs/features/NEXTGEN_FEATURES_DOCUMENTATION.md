@@ -3,7 +3,7 @@
 **Status:** ✅ Production-Ready
 **Created:** November 27, 2025
 **Author:** Claude Code (Sonnet 4.5)
-**Module:** `py/features/nextgen_features.py`
+**Module:** `nfl_analytics/features/nextgen_features.py`
 
 ---
 
@@ -246,7 +246,7 @@ WHERE r.team = 'KC'
 ### 1. Single Team Extraction
 
 ```python
-from py.features.nextgen_features import NextGenStatsFeatures
+from nfl_analytics.features.nextgen_features import NextGenStatsFeatures
 
 engine = NextGenStatsFeatures()
 
@@ -272,8 +272,8 @@ Separation: 3.93 yds
 ### 2. Integration with Existing Features
 
 ```python
-from py.features.team_offensive_features import TeamOffensiveFeatures
-from py.features.nextgen_features import NextGenStatsFeatures
+from nfl_analytics.features.team_offensive_features import TeamOffensiveFeatures
+from nfl_analytics.features.nextgen_features import NextGenStatsFeatures
 
 # Traditional offensive features (27 features)
 off_engine = TeamOffensiveFeatures()
@@ -422,7 +422,7 @@ else:
 
 **Temporal Safety:**
 ```bash
-python py/features/nextgen_features.py --team BUF --season 2024 --week 5
+python nfl_analytics/features/nextgen_features.py --team BUF --season 2024 --week 5
 # Output: ✓ PASSED: All weeks are BEFORE target week
 ```
 

@@ -37,8 +37,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY py/data/odds_update_service.py py/data/odds_update_service.py
-COPY py/data/fetch_prop_odds.py py/data/fetch_prop_odds.py
+COPY nfl_analytics/data/odds_update_service.py nfl_analytics/data/odds_update_service.py
+COPY nfl_analytics/data/fetch_prop_odds.py nfl_analytics/data/fetch_prop_odds.py
 
 # Create logs directory
 RUN mkdir -p /app/logs/odds
@@ -55,4 +55,4 @@ HEALTHCHECK --interval=5m --timeout=10s --start-period=30s --retries=3 \
         test $(find /app/logs/odds/odds_service_$(date +%Y%m%d).log -mmin -10 | wc -l) -gt 0 || exit 1
 
 # Run service
-CMD ["python", "py/data/odds_update_service.py"]
+CMD ["python", "nfl_analytics/data/odds_update_service.py"]

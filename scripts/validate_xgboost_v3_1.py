@@ -106,7 +106,7 @@ def check_feature_coverage(sample_size: int = 100) -> dict:
     if not features_path.exists():
         print("✗ FAILED: Opponent strength features not found")
         print(f"  Path: {features_path}")
-        print("  Run: python py/features/opponent_strength.py")
+        print("  Run: python nfl_analytics/features/opponent_strength.py")
         return {"status": "FAILED", "reason": "Missing opponent features file"}
 
     opp_df = pd.read_csv(features_path)
@@ -175,7 +175,7 @@ def check_feature_coverage(sample_size: int = 100) -> dict:
         print(f"  All features meet {COVERAGE_THRESHOLD:.0%} threshold")
         print("  Expected to replicate on full 2018-2024 dataset")
         print("\nNext step:")
-        print("  python py/models/train_xgboost_v3_1_aligned_window.py")
+        print("  python nfl_analytics/models/train_xgboost_v3_1_aligned_window.py")
         decision = "GO"
     else:
         print("✗ NO-GO - DO NOT TRAIN")
@@ -183,7 +183,7 @@ def check_feature_coverage(sample_size: int = 100) -> dict:
         print("  Training would fail coverage audit")
         print("\nOptions:")
         print("  1. Investigate missing data causes")
-        print("  2. Regenerate opponent features (py/features/opponent_strength.py)")
+        print("  2. Regenerate opponent features (nfl_analytics/features/opponent_strength.py)")
         print("  3. Adjust training window further")
         decision = "NO_GO"
 

@@ -126,7 +126,7 @@ echo "✅ OPTIMIZATION COMPLETE!"
 echo "====================================="
 echo
 echo "Next steps:"
-echo "  1. Run smart fetcher for upcoming games: python py/ingest_odds_smart.py"
+echo "  1. Run smart fetcher for upcoming games: python nfl_analytics/ingest_odds_smart.py"
 echo "  2. Check specific game coverage: SELECT * FROM mart.odds_coverage WHERE game_id = '...';"
 echo "  3. Monitor API usage: SELECT * FROM api_usage_tracker;"
 echo "  4. Set up cron job for automated smart fetching"

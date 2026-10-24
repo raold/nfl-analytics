@@ -6,8 +6,8 @@ Fetches correct kickoff times from ESPN API and updates the database.
 This fixes the issue where nflverse data has incorrect kickoff times.
 
 Usage:
-    python py/data/fix_kickoff_times.py --season 2025 --start-week 6 --end-week 18
-    python py/data/fix_kickoff_times.py --season 2025 --week 6  # Single week
+    python nfl_analytics/data/fix_kickoff_times.py --season 2025 --start-week 6 --end-week 18
+    python nfl_analytics/data/fix_kickoff_times.py --season 2025 --week 6  # Single week
 """
 
 import argparse

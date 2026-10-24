@@ -10,7 +10,7 @@ This script demonstrates Phase 1 optimizations:
 Expected improvement: 45-65 minutes → 24-44 minutes (1.5-2.7x speedup)
 
 Usage:
-    # Copy the patterns below into py/backtest/historical_validation_5way.py
+    # Copy the patterns below into nfl_analytics/backtest/historical_validation_5way.py
     python scripts/optimize_ensemble_backtest.py --analyze
 
     # Or run the test backtest with optimizations

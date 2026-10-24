@@ -22,10 +22,10 @@ import pickle
 import numpy as np
 import pandas as pd
 import psycopg2
-from py.models.bnn_mixture_experts_v2 import MixtureExpertsBNN
+from nfl_analytics.models.bnn_mixture_experts_v2 import MixtureExpertsBNN
 
 # Import BNN model classes
-from py.models.bnn_simpler_v2 import SimplerBNNv2
+from nfl_analytics.models.bnn_simpler_v2 import SimplerBNNv2
 from sklearn.metrics import (
     mean_absolute_error,
     mean_squared_error,

@@ -8,8 +8,8 @@ This model identifies betting value by predicting how well teams will cover
 the point spread. Positive predictions indicate home team covering.
 
 Usage:
-    python py/models/spread_coverage_model.py --train --output-dir models/spread_coverage/v1
-    python py/models/spread_coverage_model.py --sweep --output-dir models/spread_coverage/sweep
+    python nfl_analytics/models/spread_coverage_model.py --train --output-dir models/spread_coverage/v1
+    python nfl_analytics/models/spread_coverage_model.py --sweep --output-dir models/spread_coverage/sweep
 """
 import argparse
 import ast

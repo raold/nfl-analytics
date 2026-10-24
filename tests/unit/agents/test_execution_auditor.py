@@ -6,10 +6,10 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from py.agents.execution_auditor import AuditorConfig, AuditResult, ExecutionAuditor
-from py.execution.reconciliation import ReconciliationReport
-from py.markets.base import Fill, MarketClient, Position, Side
-from py.monitoring.alert_manager import AlertManager
+from nfl_analytics.agents.execution_auditor import AuditorConfig, AuditResult, ExecutionAuditor
+from nfl_analytics.execution.reconciliation import ReconciliationReport
+from nfl_analytics.markets.base import Fill, MarketClient, Position, Side
+from nfl_analytics.monitoring.alert_manager import AlertManager
 
 pytestmark = pytest.mark.anyio
 
@@ -224,7 +224,7 @@ class TestAuditResultProperties:
 
     def test_dirty_result(self):
         """Report with discrepancies → has_discrepancies True."""
-        from py.execution.reconciliation import Discrepancy
+        from nfl_analytics.execution.reconciliation import Discrepancy
 
         report = ReconciliationReport()
         report.discrepancies = [

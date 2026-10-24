@@ -13,8 +13,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.semantic.ingestion.espn_api import ESPNApiClient, ESPN_TEAM_IDS
-from py.database.semantic_repository import SemanticRepository
+from nfl_analytics.semantic.ingestion.espn_api import ESPNApiClient, ESPN_TEAM_IDS
+from nfl_analytics.database.semantic_repository import SemanticRepository
 
 logging.basicConfig(
     level=logging.INFO,

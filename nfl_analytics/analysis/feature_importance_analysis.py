@@ -11,7 +11,7 @@ Analyzes v3 model feature importance using multiple methods:
 Recommends features for pruning and tests performance impact.
 
 Usage:
-    python py/analysis/feature_importance_analysis.py --model-path models/xgboost/v3_production/model.json
+    python nfl_analytics/analysis/feature_importance_analysis.py --model-path models/xgboost/v3_production/model.json
 """
 import argparse
 import json

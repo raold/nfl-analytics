@@ -217,12 +217,12 @@ volumes:
 # Run training job:
 #   # BNN Multi-Output
 #   docker exec -it nfl-analytics-gpu-trainer \
-#     python py/models/bnn_multioutput_pytorch.py \
+#     python nfl_analytics/models/bnn_multioutput_pytorch.py \
 #     --device cuda --epochs 500 --batch-size 256
 #
 #   # XGBoost GPU
 #   docker exec -it nfl-analytics-gpu-trainer \
-#     python py/models/xgboost_gpu_v3.py \
+#     python nfl_analytics/models/xgboost_gpu_v3.py \
 #     --device cuda --sweep
 #
 #   # Run full orchestration script

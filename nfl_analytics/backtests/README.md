@@ -1,6 +1,6 @@
 # Backtesting Framework
 
-**Location:** `py/backtests/`
+**Location:** `nfl_analytics/backtests/`
 **Purpose:** Historical validation and performance testing of betting models
 **Total Modules:** 12 Python files
 
@@ -29,12 +29,12 @@ Compare performance across different model versions.
 **Usage:**
 ```bash
 # Compare v1.0 vs v2.5
-uv run python py/backtests/compare_v1_v2_5.py \
+uv run python nfl_analytics/backtests/compare_v1_v2_5.py \
   --start-season 2022 \
   --end-season 2024
 
 # Comprehensive comparison
-uv run python py/backtests/comprehensive_model_comparison.py \
+uv run python nfl_analytics/backtests/comprehensive_model_comparison.py \
   --output analysis/results/model_comparison.csv
 ```
 
@@ -61,10 +61,10 @@ Validate Bayesian hierarchical models for player props.
 **Usage:**
 ```bash
 # Backtest 2024 season
-uv run python py/backtests/bayesian_props_backtest_2024.py
+uv run python nfl_analytics/backtests/bayesian_props_backtest_2024.py
 
 # Multi-year walk-forward
-uv run python py/backtests/bayesian_props_multiyear_backtest.py \
+uv run python nfl_analytics/backtests/bayesian_props_multiyear_backtest.py \
   --start-year 2020 \
   --end-year 2024 \
   --retrain-frequency weekly
@@ -92,7 +92,7 @@ Test spread, total, and moneyline predictions.
 
 **Usage:**
 ```bash
-uv run python py/backtests/game_outcome_backtest.py \
+uv run python nfl_analytics/backtests/game_outcome_backtest.py \
   --seasons 2020 2021 2022 2023 2024 \
   --min-edge 0.03 \
   --kelly-fraction 0.25
@@ -114,7 +114,7 @@ Validate ensemble methods.
 
 **Usage:**
 ```bash
-uv run python py/backtests/comprehensive_ensemble_backtest.py \
+uv run python nfl_analytics/backtests/comprehensive_ensemble_backtest.py \
   --methods average weighted stacked thompson \
   --output analysis/results/ensemble_comparison.csv
 ```
@@ -141,7 +141,7 @@ Recent experimental backtests (Oct 2025).
 
 ```bash
 # Backtest Bayesian props model (2024)
-uv run python py/backtests/bayesian_props_backtest_2024.py
+uv run python nfl_analytics/backtests/bayesian_props_backtest_2024.py
 
 # View results
 cat analysis/results/bayesian_props_2024_metrics.csv
@@ -151,7 +151,7 @@ cat analysis/results/bayesian_props_2024_metrics.csv
 
 ```bash
 # Compare v1.0 vs v2.5 vs v3.0
-uv run python py/backtests/comprehensive_model_comparison.py \
+uv run python nfl_analytics/backtests/comprehensive_model_comparison.py \
   --start-season 2022 \
   --end-season 2024 \
   --output analysis/results/version_comparison.csv
@@ -404,8 +404,8 @@ print(f"p-value: {p_val:.4f}")  # <0.05 = significant
 
 - **[PROJECT_STATUS.md](../../PROJECT_STATUS.md)** - Current backtest status
 - **[docs/ADVANCED_BAYESIAN_V3.md](../../docs/ADVANCED_BAYESIAN_V3.md)** - Bayesian validation results
-- **[py/models/README.md](../models/README.md)** - Model training
-- **[py/ensemble/README.md](../ensemble/README.md)** - Ensemble validation
+- **[nfl_analytics/models/README.md](../models/README.md)** - Model training
+- **[nfl_analytics/ensemble/README.md](../ensemble/README.md)** - Ensemble validation
 
 ---
 

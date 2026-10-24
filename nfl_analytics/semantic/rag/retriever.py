@@ -14,9 +14,9 @@ import logging
 from pathlib import Path
 from typing import Any, Optional
 
-from py.semantic.rag.embeddings import EmbeddingGenerator
-from py.semantic.rag.game_context import GameContext, GameContextBuilder
-from py.semantic.rag.vector_store import SearchResult, VectorStore
+from nfl_analytics.semantic.rag.embeddings import EmbeddingGenerator
+from nfl_analytics.semantic.rag.game_context import GameContext, GameContextBuilder
+from nfl_analytics.semantic.rag.vector_store import SearchResult, VectorStore
 
 logger = logging.getLogger(__name__)
 

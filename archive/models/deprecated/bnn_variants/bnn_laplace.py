@@ -30,7 +30,7 @@ Expected Performance:
 - Training: 5-15 minutes per architecture
 
 Usage:
-    python py/models/bnn_laplace.py
+    python nfl_analytics/models/bnn_laplace.py
 """
 
 import logging

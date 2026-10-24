@@ -11,7 +11,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 import pandas as pd
 import psycopg2
 
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way
 
 
 def main():

@@ -30,13 +30,13 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from py.backtests.game_outcome_backtest import (
+from nfl_analytics.backtests.game_outcome_backtest import (
     GameOutcomeBacktest,
     american_to_decimal,
     get_implied_prob,
 )
-from py.ensemble.game_outcome_ensemble import fetch_games
-from py.ensemble.game_outcome_ensemble_realistic import RealisticGameOutcomeEnsemble
+from nfl_analytics.ensemble.game_outcome_ensemble import fetch_games
+from nfl_analytics.ensemble.game_outcome_ensemble_realistic import RealisticGameOutcomeEnsemble
 
 
 class RealisticBacktest(GameOutcomeBacktest):

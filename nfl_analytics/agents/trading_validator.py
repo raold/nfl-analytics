@@ -6,7 +6,7 @@ advisory layer — it logs warnings and can optionally block signals,
 but is NOT part of the RiskManager's check_signal() hierarchy.
 
 Usage:
-    from py.agents.trading_validator import TradingValidator, ValidatorConfig
+    from nfl_analytics.agents.trading_validator import TradingValidator, ValidatorConfig
 
     validator = TradingValidator()
     result = validator.validate(signal, features)
@@ -19,8 +19,8 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass, field
 
-from py.risk.risk_manager import RiskManager
-from py.trading.signal import Signal
+from nfl_analytics.risk.risk_manager import RiskManager
+from nfl_analytics.trading.signal import Signal
 
 logger = logging.getLogger(__name__)
 

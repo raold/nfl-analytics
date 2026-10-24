@@ -19,7 +19,7 @@ YoY correlation are more predictive and receive higher weights.
 This module downweights unstable features to improve props predictions.
 
 **Usage:**
-    from py.ensemble.props_stability_weights import (
+    from nfl_analytics.ensemble.props_stability_weights import (
         apply_stability_weights,
         get_feature_stability,
         PropsStabilityWeighter

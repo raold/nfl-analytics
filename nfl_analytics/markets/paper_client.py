@@ -10,7 +10,7 @@ Simulates a prediction market order book with realistic fill logic:
 Design principle: if it works in paper, it works live.
 
 Usage:
-    from py.markets.paper_client import PaperMarketClient
+    from nfl_analytics.markets.paper_client import PaperMarketClient
 
     client = PaperMarketClient(initial_balance_cents=100_000)  # $1,000
 
@@ -33,7 +33,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from py.markets.base import (
+from nfl_analytics.markets.base import (
     Contract,
     ContractNotFoundError,
     ContractType,

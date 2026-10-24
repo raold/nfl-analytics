@@ -28,7 +28,7 @@ import sys
 from pathlib import Path
 
 # Add to path for imports
-sys.path.insert(0, "py/compute")
+sys.path.insert(0, "nfl_analytics/compute")
 
 from task_queue import TaskPriority, TaskQueue, load_standard_tasks
 from worker import ComputeWorker
@@ -327,8 +327,8 @@ def show_status_redis(redis_mode: bool = True):
 
 def show_performance_scoreboard():
     """Show performance scoreboard."""
-    from py.compute.adaptive_scheduler import AdaptiveScheduler
-    from py.compute.performance_tracker import PerformanceTracker
+    from nfl_analytics.compute.adaptive_scheduler import AdaptiveScheduler
+    from nfl_analytics.compute.performance_tracker import PerformanceTracker
 
     tracker = PerformanceTracker()
     scheduler = AdaptiveScheduler()
@@ -447,7 +447,7 @@ def show_status():
 def run_dashboard():
     """Run performance dashboard for monitoring."""
     try:
-        from py.compute.dashboard import PerformanceDashboard
+        from nfl_analytics.compute.dashboard import PerformanceDashboard
     except ImportError:
         print("Dashboard dependencies not installed. Run: pip install flask")
         return
@@ -505,7 +505,7 @@ def main():
     elif args.scoreboard:
         show_performance_scoreboard()
     elif args.rebalance:
-        from py.compute.adaptive_scheduler import AdaptiveScheduler
+        from nfl_analytics.compute.adaptive_scheduler import AdaptiveScheduler
 
         scheduler = AdaptiveScheduler()
         scheduler.rebalance_queue()

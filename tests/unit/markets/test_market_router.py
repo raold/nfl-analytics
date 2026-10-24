@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import pytest
 
-from py.markets.market_router import MarketRouter, SportConfig
-from py.trading.base_strategy import TradingStrategy, StrategyConfig
-from py.markets.base import MarketData, OrderBook
-from py.trading.signal import Signal
+from nfl_analytics.markets.market_router import MarketRouter, SportConfig
+from nfl_analytics.trading.base_strategy import TradingStrategy, StrategyConfig
+from nfl_analytics.markets.base import MarketData, OrderBook
+from nfl_analytics.trading.signal import Signal
 
 
 class _DummyStrategy(TradingStrategy):

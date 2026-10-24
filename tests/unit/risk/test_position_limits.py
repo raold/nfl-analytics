@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from py.markets.base import Position, Side
-from py.risk.position_limits import LimitCheckResult, LimitConfig, PositionLimitChecker
-from py.trading.signal import Signal
+from nfl_analytics.markets.base import Position, Side
+from nfl_analytics.risk.position_limits import LimitCheckResult, LimitConfig, PositionLimitChecker
+from nfl_analytics.trading.signal import Signal
 
 
 def _signal(

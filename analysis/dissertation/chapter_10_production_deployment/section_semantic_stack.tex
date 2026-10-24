@@ -89,7 +89,7 @@ The Semantic Stack implements a four-layer architecture, from data ingestion thr
 \subsection{Layer 1: Data Ingestion Pipeline}
 
 \paragraph{News Sources.}
-The \texttt{NewsIngester} module (\texttt{py/semantic/\allowbreak ingestion/\allowbreak news\_ingester.py}) aggregates content from:
+The \texttt{NewsIngester} module (\texttt{nfl\_analytics/semantic/\allowbreak ingestion/\allowbreak news\_ingester.py}) aggregates content from:
 
 \begin{itemize}[itemsep=2pt,parsep=0pt]
     \item \textbf{ESPN API:} Official news, injury reports, game previews (primary source)
@@ -100,7 +100,7 @@ The \texttt{NewsIngester} module (\texttt{py/semantic/\allowbreak ingestion/\all
 Each article is classified by type (injury, trade, game preview, general) using keyword matching with word-boundary enforcement to prevent false positives (e.g., ``linebacker'' falsely matching ``back'' injury keyword).
 
 \paragraph{Social Media Integration.}
-The \texttt{SocialIngester} module (\texttt{py/semantic/\allowbreak ingestion/\allowbreak social\_ingester.py}) implements tiered source credibility:
+The \texttt{SocialIngester} module (\texttt{nfl\_analytics/semantic/\allowbreak ingestion/\allowbreak social\_ingester.py}) implements tiered source credibility:
 
 \begin{table}[htbp]
 \centering
@@ -119,7 +119,7 @@ Tier 3 & Beat reporters & 0.5 & Team-specific journalists \\
 \end{table}
 
 \paragraph{Historical Training Data.}
-The \texttt{AnnotationPipeline} module (\texttt{py/semantic/\allowbreak training/\allowbreak annotation\_pipeline.py}) generates training data from 84,000+ historical injury records (2009--2025). Key statistics:
+The \texttt{AnnotationPipeline} module (\texttt{nfl\_analytics/semantic/\allowbreak training/\allowbreak annotation\_pipeline.py}) generates training data from 84,000+ historical injury records (2009--2025). Key statistics:
 
 \begin{itemize}[itemsep=2pt,parsep=0pt]
     \item \textbf{NER training:} 5,000 samples (4,500 train / 500 validation)
@@ -133,7 +133,7 @@ The \texttt{AnnotationPipeline} module (\texttt{py/semantic/\allowbreak training
 Given a \$50--100/month API budget constraint and available local GPU resources (RTX 4090 on Windows, M4 on Mac), the inference architecture prioritizes self-hosted models with API fallback for reliability.
 
 \paragraph{Fallback Chain.}
-The \texttt{SemanticInferenceClient} (\texttt{py/semantic/\allowbreak models/\allowbreak inference.py}) implements automatic failover:
+The \texttt{SemanticInferenceClient} (\texttt{nfl\_analytics/semantic/\allowbreak models/\allowbreak inference.py}) implements automatic failover:
 
 \begin{enumerate}[itemsep=2pt,parsep=0pt]
     \item \textbf{MLX (Apple Silicon):} Qwen2.5-7B-Instruct-4bit, fastest on M4
@@ -167,7 +167,7 @@ claude-3-sonnet & API & REST & 60 \\
 
 \subsection{Layer 3: Semantic Feature Engineering}
 
-The \texttt{SemanticFeatureExtractor} (\texttt{py/semantic/\allowbreak features/\allowbreak semantic\_features.py}) generates 26 features organized into per-team (11 each) and matchup-level (4) categories.
+The \texttt{SemanticFeatureExtractor} (\texttt{nfl\_analytics/semantic/\allowbreak features/\allowbreak semantic\_features.py}) generates 26 features organized into per-team (11 each) and matchup-level (4) categories.
 
 \paragraph{Per-Team Features (11 per team, 22 total).}
 Each team receives:
@@ -208,7 +208,7 @@ This prefix convention enables easy identification and ablation of semantic feat
 \subsection{Layer 4: Decision Support Interface}
 
 \paragraph{ValueBetDetector.}
-The \texttt{ValueBetDetector} (\filepath{py/production/value\_bet\_detector.py}) identifies value bets where model probability exceeds market-implied probability by a configurable threshold (default: 3\%).
+The \texttt{ValueBetDetector} (\filepath{nfl\_analytics/production/value\_bet\_detector.py}) identifies value bets where model probability exceeds market-implied probability by a configurable threshold (default: 3\%).
 
 Key capabilities:
 

@@ -60,7 +60,7 @@ case $ACTION in
             exit 1
         fi
         python3 -c "
-from py.agents.nfl_domain_expert import NFLDomainExpert
+from nfl_analytics.agents.nfl_domain_expert import NFLDomainExpert
 import json
 
 expert = NFLDomainExpert()
@@ -86,7 +86,7 @@ print(f'Historical recovery: {report.historical_recovery_days} days')
             exit 1
         fi
         python3 -c "
-from py.agents.nfl_domain_expert import NFLDomainExpert
+from nfl_analytics.agents.nfl_domain_expert import NFLDomainExpert
 
 expert = NFLDomainExpert()
 profile = expert.get_coaching_tendencies('${ARGS[0]}')
@@ -112,7 +112,7 @@ for pattern in profile.strategic_patterns:
             exit 1
         fi
         python3 -c "
-from py.agents.nfl_domain_expert import NFLDomainExpert
+from nfl_analytics.agents.nfl_domain_expert import NFLDomainExpert
 
 expert = NFLDomainExpert()
 chemistry = expert.assess_player_chemistry('${ARGS[0]}', '${ARGS[1]}')
@@ -128,7 +128,7 @@ print(f'Trend: {chemistry.trend}')
 
     context-features)
         python3 -c "
-from py.agents.nfl_domain_expert import NFLDomainExpert
+from nfl_analytics.agents.nfl_domain_expert import NFLDomainExpert
 
 expert = NFLDomainExpert()
 features = expert.suggest_context_features()

@@ -41,7 +41,7 @@ import pandas as pd
 import psycopg2
 import seaborn as sns
 
-from py.online.online_learning_adapter import (
+from nfl_analytics.online.online_learning_adapter import (
     OnlinePredictionPipeline,
     calculate_adaptation_speed,
     detect_known_drift_events,

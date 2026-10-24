@@ -1554,7 +1554,7 @@ LEFT JOIN games g ON
 
 **Validate query before running:**
 ```python
-from py.utils.sql_validator import validate_query
+from nfl_analytics.utils.sql_validator import validate_query
 
 errors = validate_query("YOUR SQL QUERY HERE")
 if errors:
@@ -1587,7 +1587,7 @@ if errors:
 
 ```python
 import joblib
-from py.utils.model_registry import ModelRegistry
+from nfl_analytics.utils.model_registry import ModelRegistry
 
 # Load model metadata
 registry = ModelRegistry()
@@ -1715,7 +1715,7 @@ if (validate_convergence(model, "Hierarchical v2")) {
 
 ### Integration
 
-- [ ] Model loaded successfully in ensemble (`py/ensemble/enhanced_ensemble_v5.py`)
+- [ ] Model loaded successfully in ensemble (`nfl_analytics/ensemble/enhanced_ensemble_v5.py`)
 - [ ] rpy2 integration working (Python ↔ R communication)
 - [ ] Predictions match expected format (mean, std)
 - [ ] Ensemble weights configured correctly

@@ -1,5 +1,5 @@
 """
-Unit tests for py/markets/base.py — core dataclasses and enums.
+Unit tests for nfl_analytics/markets/base.py — core dataclasses and enums.
 
 Tests cover:
 - Order construction and validation
@@ -12,7 +12,7 @@ Tests cover:
 
 import pytest
 
-from py.markets.base import (
+from nfl_analytics.markets.base import (
     Contract,
     ContractNotFoundError,
     ContractType,

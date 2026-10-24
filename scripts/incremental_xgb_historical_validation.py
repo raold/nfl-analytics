@@ -42,7 +42,7 @@ import psycopg2
 import seaborn as sns
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-from py.online.incremental_xgboost import IncrementalXGBoost
+from nfl_analytics.online.incremental_xgboost import IncrementalXGBoost
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

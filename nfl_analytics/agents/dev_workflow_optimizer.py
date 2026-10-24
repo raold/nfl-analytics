@@ -13,7 +13,7 @@ Purpose:
 - Formalize docker-compose.dev.yml best practices
 
 Usage:
-    from py.agents.dev_workflow_optimizer import DevWorkflowOptimizer
+    from nfl_analytics.agents.dev_workflow_optimizer import DevWorkflowOptimizer
 
     optimizer = DevWorkflowOptimizer()
 

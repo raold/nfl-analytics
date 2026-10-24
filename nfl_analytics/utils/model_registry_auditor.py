@@ -26,22 +26,22 @@ Validation Gates (Production Deployment):
 
 Usage:
     # Scan for pending models
-    python py/utils/model_registry_auditor.py --scan
+    python nfl_analytics/utils/model_registry_auditor.py --scan
 
     # Auto-register pending models (dry-run)
-    python py/utils/model_registry_auditor.py --register --dry-run
+    python nfl_analytics/utils/model_registry_auditor.py --register --dry-run
 
     # Full audit report
-    python py/utils/model_registry_auditor.py --audit
+    python nfl_analytics/utils/model_registry_auditor.py --audit
 
     # Check convergence for all Bayesian models
-    python py/utils/model_registry_auditor.py --convergence
+    python nfl_analytics/utils/model_registry_auditor.py --convergence
 
     # Database sync validation
-    python py/utils/model_registry_auditor.py --sync-check
+    python nfl_analytics/utils/model_registry_auditor.py --sync-check
 
 Python API:
-    from py.utils.model_registry_auditor import ModelRegistryAuditor
+    from nfl_analytics.utils.model_registry_auditor import ModelRegistryAuditor
 
     auditor = ModelRegistryAuditor()
 
@@ -1313,6 +1313,6 @@ if __name__ == "__main__":
         print("Error: click library required for CLI")
         print("Install with: pip install click")
         print("\nPython API is still available. Example:")
-        print("  from py.utils.model_registry_auditor import ModelRegistryAuditor")
+        print("  from nfl_analytics.utils.model_registry_auditor import ModelRegistryAuditor")
         print("  auditor = ModelRegistryAuditor()")
         print("  report = auditor.audit_full()")

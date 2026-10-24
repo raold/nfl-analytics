@@ -15,7 +15,7 @@ dataset to prevent target leakage. Use load_game_outcomes() at evaluation time
 to compute metrics from actual results. See ADR-016 for rationale.
 
 Usage:
-  python py/rl/dataset.py --output data/rl_logged.csv --season-start 2019 --season-end 2024
+  python nfl_analytics/rl/dataset.py --output data/rl_logged.csv --season-start 2019 --season-end 2024
 """
 
 from __future__ import annotations

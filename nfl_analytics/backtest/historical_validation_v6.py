@@ -33,10 +33,10 @@ Statistical Testing:
 
 Usage:
     # Dry run to test setup (5 games only)
-    python py/backtest/historical_validation_v6.py --dry-run
+    python nfl_analytics/backtest/historical_validation_v6.py --dry-run
 
     # Full backtest (overnight, ~18 hours for 148 games)
-    nohup python py/backtest/historical_validation_v6.py \
+    nohup python nfl_analytics/backtest/historical_validation_v6.py \
         --start-season 2022 \
         --end-season 2024 \
         --output results/ensemble_v6_backtest_2022_2024.csv \
@@ -88,8 +88,8 @@ except ImportError:
     logger.warning("tqdm not available - progress bar disabled")
 
 # Import ensemble v6.0 and v5.1 for comparison
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way as EnsembleV5
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way as EnsembleV6
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way as EnsembleV5
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way as EnsembleV6
 
 
 class HistoricalValidatorV6:
@@ -779,13 +779,13 @@ def main():
         epilog="""
 Examples:
   # Dry run (5 games only)
-  python py/backtest/historical_validation_v6.py --dry-run
+  python nfl_analytics/backtest/historical_validation_v6.py --dry-run
 
   # Full backtest
-  python py/backtest/historical_validation_v6.py --start-season 2022 --end-season 2024
+  python nfl_analytics/backtest/historical_validation_v6.py --start-season 2022 --end-season 2024
 
   # Resume from checkpoint
-  python py/backtest/historical_validation_v6.py --checkpoint /tmp/backtest_checkpoint.pkl
+  python nfl_analytics/backtest/historical_validation_v6.py --checkpoint /tmp/backtest_checkpoint.pkl
         """,
     )
     parser.add_argument(

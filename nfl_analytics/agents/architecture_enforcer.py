@@ -13,7 +13,7 @@ Purpose:
 - Auto-generate component breakdown plans
 
 Usage:
-    from py.agents.architecture_enforcer import ArchitectureEnforcer
+    from nfl_analytics.agents.architecture_enforcer import ArchitectureEnforcer
 
     enforcer = ArchitectureEnforcer()
 
@@ -540,7 +540,7 @@ if __name__ == "__main__":
         print(f"Priority: {plan.priority}")
 
     # Detect circular dependencies
-    cycles = enforcer.detect_circular_dependencies("py/")
+    cycles = enforcer.detect_circular_dependencies("nfl_analytics/")
 
     if cycles:
         print("\n⚠️  Circular Dependencies:")

@@ -5,7 +5,7 @@ This script trains the Kalman filter-based Glickman-Stern dynamic rating system
 and evaluates it as a candidate for the 5th ensemble component.
 
 Usage:
-    python py/models/train_state_space.py --train-seasons 2019,2020,2021,2022,2023 --val-season 2024 --test-season 2025
+    python nfl_analytics/models/train_state_space.py --train-seasons 2019,2020,2021,2022,2023 --val-season 2024 --test-season 2025
 """
 
 import argparse
@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pandas as pd
 
-# Add py/ to path for imports
+# Add nfl_analytics/ to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from models.state_space import StateSpaceRatings, evaluate_model, fetch_games

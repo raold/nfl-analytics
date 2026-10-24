@@ -1,9 +1,9 @@
 """Enhanced as-of team/game features incorporating new backfilled columns.
 
 .. deprecated::
-    This module is deprecated. Use `py.features.asof_features_unified` instead:
+    This module is deprecated. Use `nfl_analytics.features.asof_features_unified` instead:
 
-        from py.features.asof_features_unified import get_asof_features
+        from nfl_analytics.features.asof_features_unified import get_asof_features
         df = get_asof_features(feature_level='enhanced')
 
 This extends asof_features.py to include:
@@ -12,7 +12,7 @@ This extends asof_features.py to include:
 - QB and coaching stability metrics
 
 Example:
-  python py/features/asof_features_enhanced.py --output analysis/features/asof_team_features_enhanced.csv \
+  python nfl_analytics/features/asof_features_enhanced.py --output analysis/features/asof_team_features_enhanced.csv \
       --season-start 2003 --validate
 """
 
@@ -22,7 +22,7 @@ import warnings
 
 warnings.warn(
     "asof_features_enhanced is deprecated. Use asof_features_unified instead: "
-    "from py.features.asof_features_unified import get_asof_features; "
+    "from nfl_analytics.features.asof_features_unified import get_asof_features; "
     "df = get_asof_features(feature_level='enhanced')",
     DeprecationWarning,
     stacklevel=2,
@@ -37,7 +37,7 @@ import numpy as np
 import pandas as pd
 import psycopg
 
-from py.utils.spread_convention import home_cover
+from nfl_analytics.utils.spread_convention import home_cover
 
 # Import base module for shared utilities
 ROOT = Path(__file__).resolve().parents[2]
@@ -45,7 +45,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 try:
-    from py.features import asof_features as base
+    from nfl_analytics.features import asof_features as base
 except Exception:
     import importlib
 

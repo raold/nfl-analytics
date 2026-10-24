@@ -12,12 +12,12 @@ the NFL analytics betting system, with emphasis on:
 6. Code quality (type hints, docstrings, conventions)
 
 Usage:
-    from py.utils.code_reviewer import CodeReviewer
+    from nfl_analytics.utils.code_reviewer import CodeReviewer
 
     reviewer = CodeReviewer()
 
     # Review Python file
-    issues = reviewer.review_file("py/models/train_bnn_passing.py")
+    issues = reviewer.review_file("nfl_analytics/models/train_bnn_passing.py")
 
     # Review all changed files
     issues = reviewer.review_changes(git_diff=True)
@@ -874,7 +874,7 @@ if __name__ == "__main__":
     reviewer = CodeReviewer()
 
     # Review a specific file
-    test_file = "py/models/train_bnn_passing.py"
+    test_file = "nfl_analytics/models/train_bnn_passing.py"
     if Path(test_file).exists():
         issues = reviewer.review_file(test_file)
         print(f"\nReviewed {test_file}: {len(issues)} issues found")

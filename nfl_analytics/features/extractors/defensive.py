@@ -14,11 +14,11 @@ from typing import Optional
 
 import psycopg2
 
-from py.features.extractors.base import (
+from nfl_analytics.features.extractors.base import (
     FeatureExtractorStrategy,
     FeaturePriority,
 )
-from py.features.team_defensive_features import TeamDefensiveFeatures
+from nfl_analytics.features.team_defensive_features import TeamDefensiveFeatures
 
 
 class DefensiveFeatureExtractor(FeatureExtractorStrategy):

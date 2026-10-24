@@ -27,8 +27,8 @@ import os
 import pandas as pd
 from dotenv import load_dotenv
 
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
-from py.ensemble.r_model_interface import RModelInterface
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from nfl_analytics.ensemble.r_model_interface import RModelInterface
 
 # Load environment
 load_dotenv()

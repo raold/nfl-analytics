@@ -16,14 +16,14 @@ Target: Did home team win?
 
 Usage:
     # Train model
-    python py/models/ingame_win_probability.py \
+    python nfl_analytics/models/ingame_win_probability.py \
         --start-season 2006 \
         --end-season 2021 \
         --test-seasons 2024 \
         --output-dir models/ingame_wp/v1
 
     # Batch inference on a specific game
-    python py/models/ingame_win_probability.py \
+    python nfl_analytics/models/ingame_win_probability.py \
         --mode inference \
         --game-id 2024_10_CIN_BAL \
         --model-dir models/ingame_wp/v1

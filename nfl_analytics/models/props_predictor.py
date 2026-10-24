@@ -18,7 +18,7 @@ Uses XGBoost regression models trained on player-level features:
 
 Usage:
     # Train model
-    python py/models/props_predictor.py \
+    python nfl_analytics/models/props_predictor.py \
         --features data/processed/features/player_features.csv \
         --train-seasons 2010-2023 \
         --test-season 2024 \
@@ -26,7 +26,7 @@ Usage:
         --output models/props/passing_yards_model.json
 
     # Predict single player (loads features from database)
-    python py/models/props_predictor.py \
+    python nfl_analytics/models/props_predictor.py \
         --model models/props/passing_yards_model.json \
         --predict \
         --player-id "00-0036355" \
@@ -36,7 +36,7 @@ Usage:
         --line 275.5
 
     # Backtest all props
-    python py/models/props_predictor.py \
+    python nfl_analytics/models/props_predictor.py \
         --features data/processed/features/player_features.csv \
         --backtest \
         --season 2024
@@ -66,7 +66,7 @@ logger = logging.getLogger(__name__)
 
 # Redis cache for feature loading
 try:
-    from py.utils.claude_cache import get_default_cache
+    from nfl_analytics.utils.claude_cache import get_default_cache
 
     REDIS_AVAILABLE = True
 except ImportError:

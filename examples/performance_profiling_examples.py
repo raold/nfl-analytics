@@ -25,7 +25,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from py.utils.performance_profiling_agent import (
+from nfl_analytics.utils.performance_profiling_agent import (
     BottleneckSeverity,
     PerformanceProfilingAgent,
 )
@@ -99,7 +99,7 @@ def example_2_python_profiling():
     print(f"  Peak Memory: {report.peak_memory_mb:.2f}MB")
 
     # Profile entire file
-    ensemble_file = project_root / "py/ensemble/enhanced_ensemble_v5.py"
+    ensemble_file = project_root / "nfl_analytics/ensemble/enhanced_ensemble_v5.py"
     if ensemble_file.exists():
         print(f"\nProfiling {ensemble_file.name}...")
         report = agent.profile_python_code(str(ensemble_file), track_memory=True)

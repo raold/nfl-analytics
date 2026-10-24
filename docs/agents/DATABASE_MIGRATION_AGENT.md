@@ -299,7 +299,7 @@ No additional installation required - included in project dependencies.
 ### Basic Usage
 
 ```python
-from py.utils.database_migration_agent import DatabaseMigrationAgent
+from nfl_analytics.utils.database_migration_agent import DatabaseMigrationAgent
 
 # Initialize agent
 agent = DatabaseMigrationAgent(
@@ -353,7 +353,7 @@ agent.close()
 ### Context Manager
 
 ```python
-from py.utils.database_migration_agent import DatabaseMigrationAgent
+from nfl_analytics.utils.database_migration_agent import DatabaseMigrationAgent
 
 with DatabaseMigrationAgent() as agent:
     # Auto-closes connection on exit
@@ -967,7 +967,7 @@ agent.backfill_column(..., parallel=True, num_workers=8)
 
 **Python Script (backfill_predictions.py):**
 ```python
-from py.utils.database_migration_agent import DatabaseMigrationAgent
+from nfl_analytics.utils.database_migration_agent import DatabaseMigrationAgent
 
 agent = DatabaseMigrationAgent()
 
@@ -997,7 +997,7 @@ python backfill_predictions.py
 
 **Python Script (sync_to_production.py):**
 ```python
-from py.utils.database_migration_agent import DatabaseMigrationAgent
+from nfl_analytics.utils.database_migration_agent import DatabaseMigrationAgent
 
 # Initialize agent
 agent = DatabaseMigrationAgent()
@@ -1074,8 +1074,8 @@ agent.close()
 ### 1. SQL Validator
 
 ```python
-from py.utils.sql_validator import validate_query
-from py.utils.database_migration_agent import DatabaseMigrationAgent
+from nfl_analytics.utils.sql_validator import validate_query
+from nfl_analytics.utils.database_migration_agent import DatabaseMigrationAgent
 
 # Validate query before adding to migration
 query = "SELECT pgs.game_id FROM mart.player_game_stats pgs"
@@ -1121,7 +1121,7 @@ git commit -m "Add ensemble tracking table"
 ## Files Created
 
 **Core Module (1 file, 1,522 lines):**
-- `py/utils/database_migration_agent.py` - Complete migration agent implementation
+- `nfl_analytics/utils/database_migration_agent.py` - Complete migration agent implementation
 
 **CLI Wrapper (1 file, 207 lines):**
 - `scripts/manage_migrations.sh` - Command-line interface
@@ -1156,7 +1156,7 @@ The Database Migration Agent provides:
 
 **Documentation:**
 - This guide: `docs/agents/DATABASE_MIGRATION_AGENT.md`
-- Python module: `py/utils/database_migration_agent.py` (inline docstrings)
+- Python module: `nfl_analytics/utils/database_migration_agent.py` (inline docstrings)
 - Tests: `tests/unit/test_database_migration_agent.py`
 
 **Support:** See TROUBLESHOOTING section or consult CLAUDE.md

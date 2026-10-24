@@ -39,7 +39,7 @@ if [ "$1" == "--stress" ]; then
     python3 -c "
 import sys
 import pickle
-from py.utils.betting_validator import BettingValidator
+from nfl_analytics.utils.betting_validator import BettingValidator
 
 validator = BettingValidator()
 
@@ -138,7 +138,7 @@ elif [ -n "$1" ]; then
 import sys
 import pickle
 import numpy as np
-from py.utils.betting_validator import BettingValidator
+from nfl_analytics.utils.betting_validator import BettingValidator
 
 validator = BettingValidator()
 

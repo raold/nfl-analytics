@@ -78,7 +78,7 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 from sklearn.preprocessing import StandardScaler
 
 # Import statistical tests
-from py.analysis.statistical_tests import DieboldMarianoTest
+from nfl_analytics.analysis.statistical_tests import DieboldMarianoTest
 
 # Load environment variables
 load_dotenv()

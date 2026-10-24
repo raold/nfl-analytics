@@ -185,7 +185,7 @@ These are JSON format (cross-platform compatible). They are checked into git.
 ### Database Networking
 - Host machine: `localhost:5544`
 - From Docker containers: `host.docker.internal:5544`
-- Config: `py/config/settings.py` reads `DB_HOST` env var (defaults to `localhost`)
+- Config: `nfl_analytics/config/settings.py` reads `DB_HOST` env var (defaults to `localhost`)
 
 ### Path Conventions
 - All paths in docs/scripts have been normalized to `/home/dro/` (Linux)

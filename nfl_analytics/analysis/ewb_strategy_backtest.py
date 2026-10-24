@@ -18,13 +18,13 @@ Expected Results:
 
 Usage:
     # Backtest EWB vs CL
-    python py/analysis/ewb_strategy_backtest.py \
+    python nfl_analytics/analysis/ewb_strategy_backtest.py \
         --lines-csv data/odds/historical_lines_2024.csv \
         --results-csv data/results/games_2024.csv \
         --output results/ewb_backtest_2024.json
 
     # Compare strategies
-    python py/analysis/ewb_strategy_backtest.py \
+    python nfl_analytics/analysis/ewb_strategy_backtest.py \
         --lines-csv data/odds/historical_lines_2024.csv \
         --results-csv data/results/games_2024.csv \
         --strategies ewb cl adaptive

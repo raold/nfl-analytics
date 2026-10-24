@@ -122,10 +122,10 @@ fi
 # Check 5: Backtest script
 echo ""
 echo "Checking backtest script..."
-if [ -f "py/backtest/historical_validation_v6.py" ]; then
+if [ -f "nfl_analytics/backtest/historical_validation_v6.py" ]; then
     check_pass "Backtest script found"
 else
-    check_fail "Backtest script missing" "Script should be at py/backtest/historical_validation_v6.py"
+    check_fail "Backtest script missing" "Script should be at nfl_analytics/backtest/historical_validation_v6.py"
 fi
 
 # Check 6: Output directory
@@ -143,7 +143,7 @@ echo ""
 echo "Running dry run test (5 games)..."
 echo "This may take 30-60 seconds..."
 
-if timeout 120 python py/backtest/historical_validation_v6.py --dry-run &>/tmp/backtest_dryrun_test.log; then
+if timeout 120 python nfl_analytics/backtest/historical_validation_v6.py --dry-run &>/tmp/backtest_dryrun_test.log; then
     if grep -q "DRY RUN COMPLETE" /tmp/backtest_dryrun_test.log; then
         V6_PREDS=$(grep "v6.0 predictions:" /tmp/backtest_dryrun_test.log | awk '{print $4}')
         V5_PREDS=$(grep "v5.1 predictions:" /tmp/backtest_dryrun_test.log | awk '{print $4}')

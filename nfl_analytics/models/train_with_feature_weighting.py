@@ -20,8 +20,8 @@ import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.features.feature_weighting import FeatureWeighter, BayesianFeatureShrinker
-from py.models.game_outcome_model_fixed import GameOutcomeModel
+from nfl_analytics.features.feature_weighting import FeatureWeighter, BayesianFeatureShrinker
+from nfl_analytics.models.game_outcome_model_fixed import GameOutcomeModel
 
 
 # XGBoost parameters

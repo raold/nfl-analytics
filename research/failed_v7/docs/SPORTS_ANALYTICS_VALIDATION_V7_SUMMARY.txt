@@ -47,7 +47,7 @@ RECOMMENDATIONS
 ---------------
 1. Phase 2A/B/C: ✅ Proceed with deployment (no blockers)
 2. Phase 3: Replace hardcoded credentials with environment variables
-3. Optional: Run py/utils/sql_validator.py for extra verification
+3. Optional: Run nfl_analytics/utils/sql_validator.py for extra verification
 
 APPROVAL
 --------

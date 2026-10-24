@@ -18,7 +18,7 @@ Evaluation metrics:
 - Action distribution
 
 Usage:
-    python py/rl/cql_sweep.py \
+    python nfl_analytics/rl/cql_sweep.py \
         --dataset data/rl_logged_2006_2024.csv \
         --output-dir models/cql/sweep \
         --epochs 500 \

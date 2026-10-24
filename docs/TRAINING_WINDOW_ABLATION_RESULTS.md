@@ -298,7 +298,7 @@ Retrain all player performance models using canonical window:
    - Expected training time: 14 minutes (already tested in ablation)
    - Can use Scenario B trained model directly
 
-4. **Bayesian Neural Network** (`py/models/train_bnn_passing.py`) - OPTIONAL
+4. **Bayesian Neural Network** (`nfl_analytics/models/train_bnn_passing.py`) - OPTIONAL
    - Current: v1 trained on 2020-2023 (2,163 games)
    - Target: v2 with 2018-2024 + H=4 decay on 2015-2017
    - Expected training time: 30-40 minutes (if retraining desired)

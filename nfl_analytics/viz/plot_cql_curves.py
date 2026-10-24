@@ -2,7 +2,7 @@
 Generate CQL training curves visualization.
 
 Usage:
-    python py/viz/plot_cql_curves.py \
+    python nfl_analytics/viz/plot_cql_curves.py \
       --input models/cql/cql_training_log.json \
       --output analysis/dissertation/figures/out/cql_training_curves.png
 """

@@ -1,7 +1,7 @@
 """
 The Odds API extractor.
 
-Migrated from py/ingest_odds_history.py with enhancements:
+Migrated from nfl_analytics/ingest_odds_history.py with enhancements:
 - Extends BaseExtractor for retry/rate-limit logic
 - Uses schemas.yaml for validation
 - Better error handling and logging

@@ -5,7 +5,7 @@ Provides a mechanism to enable/disable feature groups without code changes.
 Features with weight=0.0 are excluded from extraction and training.
 
 Usage:
-    from py.config.feature_weights import get_feature_weight, is_feature_enabled
+    from nfl_analytics.config.feature_weights import get_feature_weight, is_feature_enabled
 
     if is_feature_enabled("kalman_epa"):
         # Extract Kalman features

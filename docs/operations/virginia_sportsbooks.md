@@ -290,7 +290,7 @@ boosted_ev = (0.55 * 1.0) - (0.45 * 1) = 0.55 - 0.45 = +0.10 (+10%)
 
 ### Automated Line Shopping (Future - Task 7)
 ```python
-# py/production/line_shopping.py (to be implemented)
+# nfl_analytics/production/line_shopping.py (to be implemented)
 odds_aggregator = OddsAggregator(
     books=['fanduel', 'draftkings', 'betmgm', 'caesars'],
     api_keys={...},

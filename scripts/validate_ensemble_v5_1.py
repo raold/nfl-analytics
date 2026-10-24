@@ -38,7 +38,7 @@ def validate_ensemble_v5_1():
     # Test 1: Import and initialization
     logger.info("\n[TEST 1] Importing ensemble v5.1...")
     try:
-        from py.ensemble.enhanced_ensemble_v5_1 import EnhancedEnsemble4Way
+        from nfl_analytics.ensemble.enhanced_ensemble_v5_1 import EnhancedEnsemble4Way
 
         logger.info("✅ Import successful")
     except Exception as e:

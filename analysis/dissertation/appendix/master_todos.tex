@@ -78,7 +78,7 @@
 \block{Evaluation \& Datasets}
 \begin{itemize}
   \item \prio{P0} \textbf{Pre-registered metrics}. Define primary/secondary metrics and promotion thresholds. \emph{Where:} Ch.~\texttt{5} (OPE gate) + Ch.~\texttt{8}. \done\ (Brier, CLV bp, ROI\%, Max DD defined in Ch.~5 \S OPE; Ch.~8 uses these)
-  \item \prio{P0} \textbf{Leakage audit}. Document and enforce as-of lineage; add automated check listing any post-decision fields. \emph{Where:} Ch.~\texttt{3} + appendix script snapshot. \done\ (Feature catalog: py/features/catalog.yaml; Audit script: scripts/audit\_leakage.py; Validator: py/features/catalog\_validator.py; Appendix: Appendix~\ref{app:leakage_audit})
+  \item \prio{P0} \textbf{Leakage audit}. Document and enforce as-of lineage; add automated check listing any post-decision fields. \emph{Where:} Ch.~\texttt{3} + appendix script snapshot. \done\ (Feature catalog: nfl\_analytics/features/catalog.yaml; Audit script: scripts/audit\_leakage.py; Validator: nfl\_analytics/features/catalog\_validator.py; Appendix: Appendix~\ref{app:leakage_audit})
 \end{itemize}
 
 \block{Modeling Specifics}
@@ -148,9 +148,9 @@
 \milestone{Baseline Models (Classical)}
 \block{Implementations}
 \begin{itemize}
-  \item \prio{P0} \textbf{GLM}: spread $\to$ win prob (logit), home-field fixed effect; injury/weather interactions. \done\ (py/backtest/baseline\_glm.py)
+  \item \prio{P0} \textbf{GLM}: spread $\to$ win prob (logit), home-field fixed effect; injury/weather interactions. \done\ (nfl\_analytics/backtest/baseline\_glm.py)
   \item \prio{P0} \textbf{Stern (1991)} normal mapping sanity checks; calibrate $\sigma$ seasonally. \done\ (referenced in score\_distributions.py)
-  \item \prio{P0} \textbf{State-space ratings} (Glickman--Stern): weekly $\theta$ for team strength via Kalman/Stan; posteriors. \done\ (py/models/state\_space.py with eval mode)
+  \item \prio{P0} \textbf{State-space ratings} (Glickman--Stern): weekly $\theta$ for team strength via Kalman/Stan; posteriors. \done\ (nfl\_analytics/models/state\_space.py with eval mode)
   \item \prio{P0} \textbf{Bivariate Poisson / Skellam} (Dixon--Coles; Karlis--Ntzoufras): score distribution, low-score dependence tweak; dynamic intensities (Koopman et al.). \textbf{[DEFERRED]} (Skellam done; Dixon-Coles full EM Phase 2 on roadmap)
   \begin{itemize}
     \item \textbf{Phase 1 (DONE)}: Skellam-based spread/total predictions using independent Poisson
@@ -245,7 +245,7 @@
 
 \block{Week 1: Critical Models \& Documentation}
 \begin{itemize}
-  \item \textbf{Days 1-2}: Implement Dixon-Coles bivariate Poisson (py/models/bivariate\_poisson.py; \textasciitilde300 LOC)
+  \item \textbf{Days 1-2}: Implement Dixon-Coles bivariate Poisson (nfl\_analytics/models/bivariate\_poisson.py; \textasciitilde300 LOC)
   \item \textbf{Days 3-4}: Generate score distribution tables, integrate with harness, validation
   \item \textbf{Day 5}: Complete notation glossary appendix (notation\_glossary.tex)
   \item \textbf{Weekend}: Fix multiply-defined labels; add contributions echo box in Ch.~9
@@ -253,7 +253,7 @@
 
 \block{Week 2: Analysis \& Explainability}
 \begin{itemize}
-  \item \textbf{Days 1-2}: Dependence calibration study (py/analysis/dependence\_calibration.py)
+  \item \textbf{Days 1-2}: Dependence calibration study (nfl\_analytics/analysis/dependence\_calibration.py)
   \item \textbf{Days 3-4}: SHAP/LIME explainability implementation and figures
   \item \textbf{Day 5}: Expand Monte Carlo convergence metrics (Gelman-Rubin, ESS, trace plots)
   \item \textbf{Weekend}: Leakage audit documentation (appendix/leakage\_audit.tex)
@@ -389,7 +389,7 @@
 
 \begin{itemize}
   \item \done\ \textbf{Model}: \texttt{models/xgboost\_v2.json} (24.3 MB, 500 trees, max\_depth=8)
-  \item \done\ \textbf{Training Script}: \texttt{py/models/xgboost\_v2\_trainer.py} (643 LOC)
+  \item \done\ \textbf{Training Script}: \texttt{nfl\_analytics/models/xgboost\_v2\_trainer.py} (643 LOC)
   \item \done\ \textbf{Performance Metrics}:
   \begin{itemize}
     \item Brier Score: 0.1641 (baseline: 0.2515, -35\% improvement)
@@ -612,7 +612,7 @@
 \end{itemize}
 
 \block{Phase 2.1: EM Algorithm Implementation (4 hours)}
-\textbf{File}: \texttt{py/models/dixon\_coles\_em.py}
+\textbf{File}: \texttt{nfl\_analytics/models/dixon\_coles\_em.py}
 
 \begin{itemize}
   \item \prio{P0} \textbf{E-Step}: Compute expected low-score adjustment $\tau$ for each game
@@ -677,9 +677,9 @@
 
 \block{Implementation Checklist}
 \begin{itemize}
-  \item \prio{P0} Create \texttt{py/models/dixon\_coles\_em.py} (300-400 LOC)
+  \item \prio{P0} Create \texttt{nfl\_analytics/models/dixon\_coles\_em.py} (300-400 LOC)
   \item \prio{P0} Unit tests for EM convergence (\texttt{tests/test\_dixon\_coles.py})
-  \item \prio{P0} Backtest script: \texttt{py/backtest/dixon\_coles\_backtest.py}
+  \item \prio{P0} Backtest script: \texttt{nfl\_analytics/backtest/dixon\_coles\_backtest.py}
   \item \prio{P0} LaTeX table generators: \texttt{R/analysis/dixon\_coles\_tables.R}
   \item \prio{P1} Add Chapter 4 subsection: "Dixon-Coles Bivariate Poisson Model"
   \item \prio{P1} Compare to Dixon \& Coles (1997) original paper results
@@ -722,8 +722,8 @@
   \begin{itemize}
     \item \texttt{R/features/nfl4th\_features.R} (4th down coaching metrics)
     \item \texttt{R/features/injury\_load\_features.R} (position-weighted injury quantification)
-    \item \texttt{py/features/merge\_advanced\_features.py} (feature integration pipeline)
-    \item \texttt{py/predictions/predict\_tnf.py} (live prediction generator)
+    \item \texttt{nfl\_analytics/features/merge\_advanced\_features.py} (feature integration pipeline)
+    \item \texttt{nfl\_analytics/predictions/predict\_tnf.py} (live prediction generator)
     \item \texttt{predictions/TNF\_2025\_Week6\_Analysis.md} (comprehensive betting analysis)
   \end{itemize}
 \end{itemize}
@@ -739,28 +739,28 @@
 \block{Phase 0: Distributed Compute Infrastructure (Week 1)}
 \begin{itemize}
   \item \prio{P0} Setup Redis task queue (network-accessible, persistent)
-  \item \prio{P0} Enhance \texttt{py/compute/worker\_enhanced.py} with device auto-detection (CUDA/MPS/CPU)
-  \item \prio{P0} Create \texttt{py/compute/model\_registry.py} for checkpoint sharing (S3 or NFS)
-  \item \prio{P0} Implement \texttt{py/compute/tasks/training\_task.py} with min GPU memory checks
+  \item \prio{P0} Enhance \texttt{nfl\_analytics/compute/worker\_enhanced.py} with device auto-detection (CUDA/MPS/CPU)
+  \item \prio{P0} Create \texttt{nfl\_analytics/compute/model\_registry.py} for checkpoint sharing (S3 or NFS)
+  \item \prio{P0} Implement \texttt{nfl\_analytics/compute/tasks/training\_task.py} with min GPU memory checks
   \item \prio{P0} Test heterogeneous workflow: M4 submit $\to$ RTX execute $\to$ checkpoint sync
-  \item \prio{P1} Create \texttt{py/compute/submit\_sweep.py} for hyperparameter grid submission
-  \item \prio{P1} Dashboard for real-time queue monitoring (\texttt{py/compute/dashboard.py})
+  \item \prio{P1} Create \texttt{nfl\_analytics/compute/submit\_sweep.py} for hyperparameter grid submission
+  \item \prio{P1} Dashboard for real-time queue monitoring (\texttt{nfl\_analytics/compute/dashboard.py})
 \end{itemize}
 
 \block{Phase 1: Advanced Offline RL (Weeks 2-4, Priority P0)}
 \textbf{Goal}: Improve win rate 51.0\% $\to$ 52.5\%+ via superior policy learning
 
 \begin{itemize}
-  \item \prio{P0} Implement CQL agent (\texttt{py/rl/cql\_agent.py}; $\sim$800 LOC)
+  \item \prio{P0} Implement CQL agent (\texttt{nfl\_analytics/rl/cql\_agent.py}; $\sim$800 LOC)
   \begin{itemize}
     \item Conservative penalty: $\alpha \times (Q_{\max} - Q_{\text{logged}})$
     \item 4-6 hidden layers, 256-512 units, batch norm + dropout
     \item Train on full 5,529 game dataset + augmented scenarios
   \end{itemize}
   \item \prio{P0} CQL hyperparameter sweep (135 configs): $\alpha$ [0.1, 0.5, 1.0, 2.0, 5.0], lr [1e-5, 5e-5, 1e-4], layers [4, 5, 6]
-  \item \prio{P0} Implement IQL agent (\texttt{py/rl/iql\_agent.py}; $\sim$700 LOC) with expectile regression ($\tau=0.7$)
+  \item \prio{P0} Implement IQL agent (\texttt{nfl\_analytics/rl/iql\_agent.py}; $\sim$700 LOC) with expectile regression ($\tau=0.7$)
   \item \prio{P0} IQL hyperparameter sweep (90 configs): parallel with CQL
-  \item \prio{P1} Ensemble meta-policy (\texttt{py/rl/meta\_policy.py}): Thompson sampling over DQN/PPO/CQL/IQL
+  \item \prio{P1} Ensemble meta-policy (\texttt{nfl\_analytics/rl/meta\_policy.py}): Thompson sampling over DQN/PPO/CQL/IQL
   \item \prio{P0} \textbf{Validation}: Win rate $\ge$ 52.0\% on held-out test set (2022-2024)
   \item \textbf{Compute}: 900 RTX GPU-hours + 100 M4 GPU-hours
 \end{itemize}
@@ -769,13 +769,13 @@
 \textbf{Goal}: Filter low-confidence bets to boost win rate on deployed capital
 
 \begin{itemize}
-  \item \prio{P0} Ensemble prediction uncertainty (\texttt{py/models/ensemble\_uncertainty.py}; $\sim$500 LOC)
+  \item \prio{P0} Ensemble prediction uncertainty (\texttt{nfl\_analytics/models/ensemble\_uncertainty.py}; $\sim$500 LOC)
   \begin{itemize}
     \item Train 10-20 diverse models: 5$\times$ GLM (M4), 5$\times$ XGBoost (RTX), 5$\times$ Deep NN (RTX), GNN, Transformer
     \item Uncertainty metric: prediction variance across ensemble
     \item Gating rule: bet IFF edge $>$ 0 AND ensemble std $<$ 0.08 AND 70\%+ models agree
   \end{itemize}
-  \item \prio{P0} Bayesian Neural Network (\texttt{py/models/bnn\_predictor.py}; $\sim$400 LOC) with MC Dropout (50 passes)
+  \item \prio{P0} Bayesian Neural Network (\texttt{nfl\_analytics/models/bnn\_predictor.py}; $\sim$400 LOC) with MC Dropout (50 passes)
   \item \prio{P1} Stake sizing integration: Kelly $\times$ (1 - normalized uncertainty)
   \item \prio{P0} \textbf{Validation}: 30-50\% bet volume reduction, 1.5-2.5\% win rate improvement on remaining bets
   \item \textbf{Compute}: 200 RTX GPU-hours (mostly deep models)
@@ -785,7 +785,7 @@
 \textbf{Goal}: Validate policies under extreme scenarios before deployment
 
 \begin{itemize}
-  \item \prio{P1} Transformer game outcome generator (\texttt{py/simulation/neural\_simulator.py}; $\sim$900 LOC)
+  \item \prio{P1} Transformer game outcome generator (\texttt{nfl\_analytics/simulation/neural\_simulator.py}; $\sim$900 LOC)
   \begin{itemize}
     \item GPT-style decoder: small (6L/384D, M4) and large (12L/768D, RTX)
     \item Conditional on: week, teams, spread, total, weather
@@ -801,7 +801,7 @@
 \textbf{Result}: Implemented but NEGATIVE VALUE - GNN features hurt performance
 
 \begin{itemize}
-  \item \done\ GNN architecture (\texttt{py/features/gnn\_team\_ratings.py}; 580 LOC)
+  \item \done\ GNN architecture (\texttt{nfl\_analytics/features/gnn\_team\_ratings.py}; 580 LOC)
   \begin{itemize}
     \item Teams: 35 teams, 4,861 games (2010-2024)
     \item Architecture: 32-dim embeddings, 3 message passing rounds, MLP prediction head
@@ -823,7 +823,7 @@
   \end{itemize}
   \item \done\ Deliverables:
   \begin{itemize}
-    \item \texttt{py/features/gnn\_team\_ratings.py} (full PyTorch implementation)
+    \item \texttt{nfl\_analytics/features/gnn\_team\_ratings.py} (full PyTorch implementation)
     \item \texttt{models/gnn/team\_ratings.pth} (trained model)
     \item \texttt{data/processed/features/gnn\_features.csv} (extracted features)
     \item \texttt{results/gnn/evaluation.json} (performance metrics)
@@ -836,7 +836,7 @@
 \textbf{Result}: Implemented and validated - skip for production, valuable for research
 
 \begin{itemize}
-  \item \done\ Gaussian copula implementation (\texttt{py/pricing/copula\_parlays.py}; 370 LOC)
+  \item \done\ Gaussian copula implementation (\texttt{nfl\_analytics/pricing/copula\_parlays.py}; 370 LOC)
   \begin{itemize}
     \item Probability integral transform for correlation estimation
     \item Monte Carlo simulation (10,000 trials per parlay)
@@ -865,7 +865,7 @@
   \end{itemize}
   \item \done\ Deliverables:
   \begin{itemize}
-    \item \texttt{py/pricing/copula\_parlays.py} (full implementation)
+    \item \texttt{nfl\_analytics/pricing/copula\_parlays.py} (full implementation)
     \item \texttt{results/copula/task10\_summary.md} (comprehensive analysis)
   \end{itemize}
   \item \textbf{Research Value}: Advanced statistical modeling, novel application to sports betting
@@ -899,7 +899,7 @@
 \textbf{Target}: Week 1 deployment, \$10,000 starting bankroll
 
 \begin{itemize}
-  \item \prio{P0} Create \texttt{py/production/majority\_betting\_system.py} (production-ready ensemble predictor)
+  \item \prio{P0} Create \texttt{nfl\_analytics/production/majority\_betting\_system.py} (production-ready ensemble predictor)
   \begin{itemize}
     \item Load XGBoost v2 (Config 18, Brier 0.1715), CQL (Config 4), IQL baseline
     \item Majority vote with uncertainty filtering (threshold 0.9)
@@ -919,7 +919,7 @@
 \textbf{Starting Bankroll}: \$10,000
 
 \begin{itemize}
-  \item \prio{P0} Create \texttt{py/production/kelly\_sizing.py} - Fractional Kelly calculator
+  \item \prio{P0} Create \texttt{nfl\_analytics/production/kelly\_sizing.py} - Fractional Kelly calculator
   \begin{itemize}
     \item Formula: $f^* = \text{fraction} \times \frac{p \times b - q}{b}$ where $p$=win prob, $b$=odds-1, $q$=1-$p$
     \item Default: \textbf{1/4 Kelly} (conservative, reduces variance)
@@ -942,7 +942,7 @@
     \item \textbf{Tier 3 (Recreational)}: ESPN Bet, WynnBET, Unibet, FOX Bet, Hard Rock, Borgata
   \end{itemize}
   \item \prio{P0} Create accounts at all 15 books, verify Virginia legal status
-  \item \prio{P0} Create \texttt{py/production/line\_shopping.py} - Multi-book odds aggregator
+  \item \prio{P0} Create \texttt{nfl\_analytics/production/line\_shopping.py} - Multi-book odds aggregator
   \begin{itemize}
     \item Manual CSV input initially: game\_id, book, spread, juice
     \item Future: API integration (DraftKings, FanDuel have public APIs)
@@ -982,8 +982,8 @@
   \end{itemize}
   \item \prio{P0} Implementation:
   \begin{itemize}
-    \item Create \texttt{py/features/line\_movement\_tracker.py} - Track opening to closing moves
-    \item Create \texttt{py/analysis/ewb\_strategy\_backtest.py} - Compare Tuesday vs Sunday bet timing
+    \item Create \texttt{nfl\_analytics/features/line\_movement\_tracker.py} - Track opening to closing moves
+    \item Create \texttt{nfl\_analytics/analysis/ewb\_strategy\_backtest.py} - Compare Tuesday vs Sunday bet timing
     \item Create \texttt{R/analysis/line\_movement\_analysis.R} - Visualization (ggplot2)
   \end{itemize}
   \item \prio{P1} \textbf{CLV Analysis}: Validate with Closing Line Value (bets move in our favor → good sign)
@@ -1003,8 +1003,8 @@
   \end{itemize}
   \item \prio{P1} Implementation:
   \begin{itemize}
-    \item Create \texttt{py/models/props\_predictor.py} - Player-level XGBoost model
-    \item Create \texttt{py/features/player\_features.py} - Target share, snap count, opponent defense
+    \item Create \texttt{nfl\_analytics/models/props\_predictor.py} - Player-level XGBoost model
+    \item Create \texttt{nfl\_analytics/features/player\_features.py} - Target share, snap count, opponent defense
     \item Create \texttt{R/models/props\_xgboost.R} - Alternative R implementation
   \end{itemize}
   \item \prio{P1} \textbf{Expected performance}: 53-55\% win rate (vs 52.4\% breakeven at -115), 100-200 props/season
@@ -1015,25 +1015,25 @@
 \textbf{Goal}: Automated performance tracking with Thompson switch threshold
 
 \begin{itemize}
-  \item \prio{P0} Create \texttt{py/production/monitor\_performance.py} - Track live betting performance
+  \item \prio{P0} Create \texttt{nfl\_analytics/production/monitor\_performance.py} - Track live betting performance
   \begin{itemize}
     \item Input: Bet log CSV (date, game, bet, odds, outcome, profit)
     \item Metrics: Rolling 10-bet, 25-bet win rate, ROI, Sharpe
     \item \textbf{Alerts}: Win rate <55\% over 20 bets → WARNING; <53\% over 25 bets → SWITCH
   \end{itemize}
-  \item \prio{P0} Create \texttt{py/production/stress\_test\_monitor.py} - Weekly bootstrap checks
+  \item \prio{P0} Create \texttt{nfl\_analytics/production/stress\_test\_monitor.py} - Weekly bootstrap checks
   \begin{itemize}
     \item Run every Sunday after week completes
     \item Resample season-to-date outcomes (1000 MC trials)
     \item \textbf{Alert}: If CVaR(95\%) <-0.5\% → REDUCE BET SIZES
   \end{itemize}
-  \item \prio{P0} Create \texttt{py/production/thompson\_switch\_logic.py} - Adaptive ensemble switching
+  \item \prio{P0} Create \texttt{nfl\_analytics/production/thompson\_switch\_logic.py} - Adaptive ensemble switching
   \begin{itemize}
     \item \textbf{Start}: Majority Voting (71.4\% win rate, conservative)
     \item \textbf{Switch to Thompson}: If win rate >60\% after 25 bets
     \item \textbf{Revert to Majority}: If Thompson win rate <55\% after 20 bets
   \end{itemize}
-  \item \prio{P1} Create \texttt{py/viz/production\_dashboard.py} - Streamlit monitoring dashboard
+  \item \prio{P1} Create \texttt{nfl\_analytics/viz/production\_dashboard.py} - Streamlit monitoring dashboard
   \begin{itemize}
     \item Bankroll trajectory, rolling win rate, bet size distribution
     \item Upcoming bets table (model recommendations for next week)
@@ -1076,13 +1076,13 @@
 \textbf{Goal}: Model temporal dynamics and multi-game bankroll optimization
 
 \begin{itemize}
-  \item \prio{P1} Temporal feature transformer (\texttt{py/models/temporal\_transformer.py}; $\sim$600 LOC)
+  \item \prio{P1} Temporal feature transformer (\texttt{nfl\_analytics/models/temporal\_transformer.py}; $\sim$600 LOC)
   \begin{itemize}
     \item Input: last 5-10 games per team (EPA, margin, rest, injuries, opponent)
     \item Output: 256-dim team state embedding
     \item Architectures: small (4L/256D, M4) and large (8L/512D, RTX)
   \end{itemize}
-  \item \prio{P1} Multi-game policy transformer (\texttt{py/rl/transformer\_policy.py}; $\sim$600 LOC)
+  \item \prio{P1} Multi-game policy transformer (\texttt{nfl\_analytics/rl/transformer\_policy.py}; $\sim$600 LOC)
   \begin{itemize}
     \item Allocate bankroll across 12-16 games/week jointly via self-attention
     \item Learn game correlations (e.g., avoid both sides of division matchups)
@@ -1095,12 +1095,12 @@
 \textbf{Goal}: Maintain edge as market adapts; deploy live system
 
 \begin{itemize}
-  \item \prio{P0} Automated retraining pipeline (\texttt{py/pipeline/continuous\_learning.py}; $\sim$400 LOC)
+  \item \prio{P0} Automated retraining pipeline (\texttt{nfl\_analytics/pipeline/continuous\_learning.py}; $\sim$400 LOC)
   \begin{itemize}
     \item Trigger: every 4 weeks during season
     \item Workflow: fetch data $\to$ update features $\to$ retrain (light on M4, heavy on RTX) $\to$ OPE $\to$ deploy
   \end{itemize}
-  \item \prio{P0} Drift detection \& alerting (\texttt{py/monitoring/drift\_detector.py}; $\sim$300 LOC)
+  \item \prio{P0} Drift detection \& alerting (\texttt{nfl\_analytics/monitoring/drift\_detector.py}; $\sim$300 LOC)
   \begin{itemize}
     \item Monitor: feature KL divergence, weekly Brier, CLV degradation
     \item Alert (Slack/PagerDuty): if Brier $>$ 0.26, CLV $<$ 0, feature drift $>$ 2$\sigma$
@@ -1121,7 +1121,7 @@
     \item Expected ROI: +1.5\% to +2.5\%
     \item Action: 4-week paper trading $\to$ deploy 10-20\% bankroll
   \end{itemize}
-  \item \prio{P1} Player props modeling (\texttt{py/models/prop\_predictor.py}; $\sim$500 LOC)
+  \item \prio{P1} Player props modeling (\texttt{nfl\_analytics/models/prop\_predictor.py}; $\sim$500 LOC)
   \begin{itemize}
     \item Passing yards: RNN on QB sequences (RTX, 10h)
     \item Rushing yards: XGBoost on RB usage (M4, 2h)
@@ -1270,8 +1270,8 @@
 \begin{itemize}
   \item \done\ \texttt{R/models/bayesian\_hierarchical.R} (brms model training, 350 LOC)
   \item \done\ \texttt{R/bayesian\_ev\_analysis.R} (EV analysis on 2024 test set, 300 LOC)
-  \item \done\ \texttt{py/features/bayesian\_features.py} (feature integration module, 266 LOC)
-  \item \done\ \texttt{py/production/ensemble\_bayesian\_xgb.py} (ensemble voting system, 484 LOC)
+  \item \done\ \texttt{nfl\_analytics/features/bayesian\_features.py} (feature integration module, 266 LOC)
+  \item \done\ \texttt{nfl\_analytics/production/ensemble\_bayesian\_xgb.py} (ensemble voting system, 484 LOC)
   \item \done\ \texttt{analysis/bayesian\_ev\_findings.md} (comprehensive findings report, 267 lines)
   \item \done\ \texttt{analysis/bayesian\_integration\_summary.md} (implementation guide, 200+ lines)
   \item \done\ \texttt{models/bayesian/time\_varying\_ratings.rds} (trained Stan model with posteriors)
@@ -1356,7 +1356,7 @@
     \item Press conferences: NFL.com transcripts, post-game interviews
     \item Reddit r/nfl: Game threads, team subreddits (community sentiment)
   \end{itemize}
-  \item \prio{P0} \textbf{NLP Architecture} (\texttt{py/features/sentiment\_pipeline.py}; $\sim$600 LOC):
+  \item \prio{P0} \textbf{NLP Architecture} (\texttt{nfl\_analytics/features/sentiment\_pipeline.py}; $\sim$600 LOC):
   \begin{itemize}
     \item \textbf{Transformer Model}: Fine-tune BERT or RoBERTa on sports sentiment corpus
     \item \textbf{Entity Extraction}: spaCy NER for teams, players, coaches
@@ -1386,7 +1386,7 @@
     \item Coaching trees: Wikipedia, FiveThirtyEight coaching database
     \item Staff turnover: Track coordinator changes, position coach departures
   \end{itemize}
-  \item \prio{P0} \textbf{Graph Construction} (\texttt{py/features/coaching\_graph.py}; $\sim$400 LOC):
+  \item \prio{P0} \textbf{Graph Construction} (\texttt{nfl\_analytics/features/coaching\_graph.py}; $\sim$400 LOC):
   \begin{itemize}
     \item \textbf{Nodes}: Coaches (current and historical), teams
     \item \textbf{Edges}: Mentor-mentee relationships, previous employment, offensive/defensive philosophies
@@ -1410,7 +1410,7 @@
 \textbf{Goal}: Quantify team cohesion, morale, internal conflict through indirect metrics
 
 \begin{itemize}
-  \item \prio{P0} \textbf{Proxy Metrics} (\texttt{py/features/locker\_room\_proxies.py}; $\sim$300 LOC):
+  \item \prio{P0} \textbf{Proxy Metrics} (\texttt{nfl\_analytics/features/locker\_room\_proxies.py}; $\sim$300 LOC):
   \begin{itemize}
     \item \textbf{Contract disputes}: Track holdouts, franchise tag grievances (public sources)
     \item \textbf{Player discipline}: Suspensions, fines, arrests (NFL.com reports)
@@ -1461,7 +1461,7 @@
 \textbf{Goal}: Use Bayesian posteriors as informative priors for GNN node embeddings
 
 \begin{itemize}
-  \item \prio{P0} \textbf{Architecture} (\texttt{py/models/bayesian\_gnn\_hybrid.py}; $\sim$700 LOC):
+  \item \prio{P0} \textbf{Architecture} (\texttt{nfl\_analytics/models/bayesian\_gnn\_hybrid.py}; $\sim$700 LOC):
   \begin{itemize}
     \item \textbf{Node Initialization}: Bayesian rating\_mean as node features (32-dim)
     \item \textbf{Uncertainty-Weighted Message Passing}: Edge weights = 1 / (1 + combined\_sd)
@@ -1483,7 +1483,7 @@
 \textbf{Goal}: Generate synthetic game outcomes conditioned on Bayesian context for robust training
 
 \begin{itemize}
-  \item \prio{P0} \textbf{Architecture} (\texttt{py/models/bayesian\_gan.py}; $\sim$800 LOC):
+  \item \prio{P0} \textbf{Architecture} (\texttt{nfl\_analytics/models/bayesian\_gan.py}; $\sim$800 LOC):
   \begin{itemize}
     \item \textbf{Generator}: Conditional GAN taking Bayesian rating\_diff + context (weather, rest, injuries)
     \item Output: Synthetic game margins + play-by-play sequences
@@ -1505,7 +1505,7 @@
 \textbf{Goal}: Use Bayesian posteriors to guide RL exploration-exploitation balance
 
 \begin{itemize}
-  \item \prio{P0} \textbf{Architecture} (\texttt{py/rl/bayesian\_thompson\_rl.py}; $\sim$600 LOC):
+  \item \prio{P0} \textbf{Architecture} (\texttt{nfl\_analytics/rl/bayesian\_thompson\_rl.py}; $\sim$600 LOC):
   \begin{itemize}
     \item \textbf{Thompson Sampling}: Sample from Bayesian posterior distributions for Q-value uncertainty
     \item \textbf{Action Space}: [no\_bet, bet\_small, bet\_medium, bet\_large] (4 actions)
@@ -1527,7 +1527,7 @@
 \textbf{Goal}: Stack all models (Bayesian, XGBoost, GNN, GAN-augmented, Deep RL) into super-ensemble
 
 \begin{itemize}
-  \item \prio{P0} \textbf{Architecture} (\texttt{py/models/meta\_learner.py}; $\sim$500 LOC):
+  \item \prio{P0} \textbf{Architecture} (\texttt{nfl\_analytics/models/meta\_learner.py}; $\sim$500 LOC):
   \begin{itemize}
     \item \textbf{Level 0 (Base Models)}: 5 models generate predictions
     \begin{enumerate}

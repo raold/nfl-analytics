@@ -13,7 +13,7 @@ Key Features:
 - GPU-accelerated conformal calibration
 
 Usage:
-    from py.models.bnn_conformal import BNNConformalPredictor
+    from nfl_analytics.models.bnn_conformal import BNNConformalPredictor
 
     # Initialize with trained BNN
     conformal = BNNConformalPredictor(
@@ -348,7 +348,7 @@ def main():
     logger.info(
         """
     # 1. Load trained BNN
-    from py.models.bnn_multioutput_pytorch import MultiOutputBNN
+    from nfl_analytics.models.bnn_multioutput_pytorch import MultiOutputBNN
     bnn = torch.load('models/bayesian/bnn_multioutput_v1_final.pt')
 
     # 2. Initialize conformal predictor

@@ -8945,25 +8945,25 @@ Generated: 2025-10-04 11:52:00
 ## SUGGESTED REORGANIZATION
 
 ### src/python/ingestion/
-  - py/ingest_odds_history.py
-  - py/ingest_odds_smart.py
+  - nfl_analytics/ingest_odds_history.py
+  - nfl_analytics/ingest_odds_smart.py
 
 ### src/python/features/
-  - py/features/asof_features.py
-  - py/features/asof_features_enhanced.py
+  - nfl_analytics/features/asof_features.py
+  - nfl_analytics/features/asof_features_enhanced.py
 
 ### src/python/models/
-  - py/backtest/harness_multimodel.py
-  - py/execution/fill_model.py
-  - py/execution/latency_model.py
-  - py/execution/depth_model.py
+  - nfl_analytics/backtest/harness_multimodel.py
+  - nfl_analytics/execution/fill_model.py
+  - nfl_analytics/execution/latency_model.py
+  - nfl_analytics/execution/depth_model.py
 
 ### src/python/utils/
-  - py/__init__.py
-  - py/monte_carlo.py
-  - py/weather_meteostat.py
-  - py/analysis/rl_vs_baseline_estimates.py
-  - py/analysis/wind_impact_totals.py
+  - nfl_analytics/__init__.py
+  - nfl_analytics/monte_carlo.py
+  - nfl_analytics/weather_meteostat.py
+  - nfl_analytics/analysis/rl_vs_baseline_estimates.py
+  - nfl_analytics/analysis/wind_impact_totals.py
   ... and 30 more
 
 ### src/R/ingestion/

@@ -55,7 +55,7 @@ done
 case $ACTION in
     monitor)
         python3 -c "
-from py.agents.backend_frontend_sync import BackendFrontendSync
+from nfl_analytics.agents.backend_frontend_sync import BackendFrontendSync
 
 sync = BackendFrontendSync(api_url='$API_URL')
 
@@ -80,7 +80,7 @@ else:
 
     generate-types)
         python3 -c "
-from py.agents.backend_frontend_sync import BackendFrontendSync
+from nfl_analytics.agents.backend_frontend_sync import BackendFrontendSync
 
 sync = BackendFrontendSync(api_url='$API_URL')
 
@@ -96,7 +96,7 @@ print(f'  from dashboard.utils.api_types_generated import GamePrediction')
 
     contract-tests)
         python3 -c "
-from py.agents.backend_frontend_sync import BackendFrontendSync
+from nfl_analytics.agents.backend_frontend_sync import BackendFrontendSync
 
 sync = BackendFrontendSync(api_url='$API_URL')
 
@@ -123,7 +123,7 @@ else:
 
     discover-endpoints)
         python3 -c "
-from py.agents.backend_frontend_sync import BackendFrontendSync
+from nfl_analytics.agents.backend_frontend_sync import BackendFrontendSync
 
 sync = BackendFrontendSync(api_url='$API_URL')
 
@@ -147,7 +147,7 @@ else:
 
     invalidate-cache)
         python3 -c "
-from py.agents.backend_frontend_sync import BackendFrontendSync
+from nfl_analytics.agents.backend_frontend_sync import BackendFrontendSync
 
 sync = BackendFrontendSync(api_url='$API_URL')
 

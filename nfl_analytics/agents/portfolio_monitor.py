@@ -4,7 +4,7 @@ Polls PnLTracker and DrawdownMonitor to detect concerning portfolio
 states and trigger AlertManager warnings at configurable thresholds.
 
 Usage:
-    from py.agents.portfolio_monitor import PortfolioMonitor, MonitorConfig
+    from nfl_analytics.agents.portfolio_monitor import PortfolioMonitor, MonitorConfig
 
     monitor = PortfolioMonitor(pnl_tracker=pnl, drawdown_monitor=dd)
     report = monitor.check_health()
@@ -19,10 +19,10 @@ import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from py.markets.base import Position
-from py.monitoring.alert_manager import AlertLevel, AlertManager
-from py.monitoring.pnl_tracker import PnLTracker
-from py.risk.drawdown_monitor import DrawdownMonitor
+from nfl_analytics.markets.base import Position
+from nfl_analytics.monitoring.alert_manager import AlertLevel, AlertManager
+from nfl_analytics.monitoring.pnl_tracker import PnLTracker
+from nfl_analytics.risk.drawdown_monitor import DrawdownMonitor
 
 logger = logging.getLogger(__name__)
 

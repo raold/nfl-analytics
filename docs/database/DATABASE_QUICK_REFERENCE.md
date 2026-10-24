@@ -46,7 +46,7 @@ WHERE pgs.player_id = '00-0019596';
 
 **Automated Validation:**
 ```python
-from py.utils.sql_validator import validate_query
+from nfl_analytics.utils.sql_validator import validate_query
 
 errors = validate_query("SELECT pgs.game_id FROM mart.player_game_stats pgs")
 # Returns: ["ERROR: Column 'game_id' does not exist in 'mart.player_game_stats'..."]

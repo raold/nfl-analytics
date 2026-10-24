@@ -10,7 +10,7 @@ computes pseudo-observations via empirical CDF, fits Gaussian and t copulas, and
 - Tail dependence estimates (empirical) with bootstrap 95% CIs for upper/lower tails.
 
 Example:
-  python py/models/copula_gof.py \
+  python nfl_analytics/models/copula_gof.py \
     --csv analysis/features/asof_team_features.csv \
     --start 2020 --end 2024 \
     --tex-gof analysis/dissertation/figures/out/copula_gof_table.tex \

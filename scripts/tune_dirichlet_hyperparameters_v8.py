@@ -53,7 +53,7 @@ from tqdm import tqdm
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStacking
+from nfl_analytics.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStacking
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

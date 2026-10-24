@@ -26,7 +26,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
+from nfl_analytics.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
 
 # =============================================================================
 # Fixtures

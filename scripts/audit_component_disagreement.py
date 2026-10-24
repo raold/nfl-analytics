@@ -41,9 +41,9 @@ from scipy import stats
 from tqdm import tqdm
 
 # Import ensemble and feature extractors
-from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
-from py.features.qb_experience_features import QBExperienceFeatures
-from py.features.roster_stability_features import RosterStabilityFeatures
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+from nfl_analytics.features.qb_experience_features import QBExperienceFeatures
+from nfl_analytics.features.roster_stability_features import RosterStabilityFeatures
 
 # ==============================================================================
 # Configuration

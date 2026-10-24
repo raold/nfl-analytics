@@ -26,7 +26,7 @@ from datetime import datetime, timedelta
 import pytz
 import requests
 
-from py.config.settings import get_settings
+from nfl_analytics.config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 settings = get_settings()

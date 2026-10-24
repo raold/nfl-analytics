@@ -12,7 +12,7 @@ Key Insight:
 - Current model: 51% win rate → PROFITABLE on exchanges!
 
 Usage:
-    python py/backtest/exchange_simulation.py \
+    python nfl_analytics/backtest/exchange_simulation.py \
         --predictions predictions/tnf_2025_week6.json \
         --test-seasons 2024 \
         --output results/exchange_simulation_2024.json

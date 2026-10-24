@@ -24,10 +24,10 @@ Since we don't have NextGen Stats time-to-throw:
 
 Usage:
     # Generate QB pressure features for 2024-2025
-    python py/features/qb_pressure_matchups.py --season 2024
+    python nfl_analytics/features/qb_pressure_matchups.py --season 2024
 
     # Historical features
-    python py/features/qb_pressure_matchups.py --start-season 2018 --end-season 2025
+    python nfl_analytics/features/qb_pressure_matchups.py --start-season 2018 --end-season 2025
 """
 
 import argparse

@@ -26,7 +26,7 @@ Integration:
 - Auto-generate style guide documentation
 
 Usage:
-    from py.agents.uiux_design_engineer import UIUXDesignEngineer
+    from nfl_analytics.agents.uiux_design_engineer import UIUXDesignEngineer
 
     designer = UIUXDesignEngineer()
 

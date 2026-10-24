@@ -38,7 +38,7 @@ Usage:
 ------
 Weekly workflow (Tuesday after games complete):
 
-    from py.feedback import WeeklyFeedbackOrchestrator
+    from nfl_analytics.feedback import WeeklyFeedbackOrchestrator
 
     orchestrator = WeeklyFeedbackOrchestrator()
     result = orchestrator.run(season=2025, week=16)
@@ -48,7 +48,7 @@ Weekly workflow (Tuesday after games complete):
 
 A/B Testing:
 
-    from py.feedback import SemanticABTest
+    from nfl_analytics.feedback import SemanticABTest
 
     test = SemanticABTest()
     test_id = test.setup_test(season=2025, start_week=1)
@@ -57,7 +57,7 @@ A/B Testing:
 
 Meta-Learning:
 
-    from py.feedback import SemanticMetaLearner
+    from nfl_analytics.feedback import SemanticMetaLearner
 
     learner = SemanticMetaLearner()
     result = learner.update_from_outcomes(season=2025, week=16)
@@ -67,25 +67,25 @@ Meta-Learning:
 """
 
 # Phase 6: Weekly Feedback Loop
-from py.feedback.outcome_updater import WeeklyOutcomeUpdater
-from py.feedback.semantic_attribution import SemanticAttributionTracker
-from py.feedback.ensemble_weight_adjuster import EnsembleWeightAdjuster
-from py.feedback.retrain_trigger import RetrainTrigger
-from py.feedback.annotation_generator import AnnotationGenerator
+from nfl_analytics.feedback.outcome_updater import WeeklyOutcomeUpdater
+from nfl_analytics.feedback.semantic_attribution import SemanticAttributionTracker
+from nfl_analytics.feedback.ensemble_weight_adjuster import EnsembleWeightAdjuster
+from nfl_analytics.feedback.retrain_trigger import RetrainTrigger
+from nfl_analytics.feedback.annotation_generator import AnnotationGenerator
 
 # Phase 7: Meta-Learning
-from py.feedback.meta_learner import SemanticMetaLearner
-from py.feedback.feature_memory import FeaturePerformanceMemory
-from py.feedback.auto_feature_selector import AutoFeatureSelector
-from py.feedback.prompt_evolver import PromptEvolver
+from nfl_analytics.feedback.meta_learner import SemanticMetaLearner
+from nfl_analytics.feedback.feature_memory import FeaturePerformanceMemory
+from nfl_analytics.feedback.auto_feature_selector import AutoFeatureSelector
+from nfl_analytics.feedback.prompt_evolver import PromptEvolver
 
 # Phase 8: A/B Testing
-from py.feedback.semantic_ab_test import SemanticABTest
+from nfl_analytics.feedback.semantic_ab_test import SemanticABTest
 
 # Phase 9: WHY System (Dec 28, 2025)
-from py.feedback.model_error_decomposition import ModelErrorDecomposer
-from py.feedback.temporal_causality import TemporalCausalityTracker
-from py.feedback.feature_interactions import FeatureInteractionAnalyzer
+from nfl_analytics.feedback.model_error_decomposition import ModelErrorDecomposer
+from nfl_analytics.feedback.temporal_causality import TemporalCausalityTracker
+from nfl_analytics.feedback.feature_interactions import FeatureInteractionAnalyzer
 
 __all__ = [
     # Phase 6

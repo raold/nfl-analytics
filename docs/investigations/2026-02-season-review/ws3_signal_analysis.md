@@ -229,7 +229,7 @@ explainer = shap.TreeExplainer(model)
 |------|---------|
 | `docs/investigations/2026-02-season-review/ws3_signal_analysis.md` | This report |
 | `docs/investigations/2026-02-season-review/ws3_model_performance.md` | Error decomposition + power ratings |
-| `py/config/feature_weights.yaml` | Feature enable/disable config |
+| `nfl_analytics/config/feature_weights.yaml` | Feature enable/disable config |
 
 ---
 

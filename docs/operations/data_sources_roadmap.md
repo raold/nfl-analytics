@@ -114,7 +114,7 @@ This roadmap provides a tiered approach to data sources for NFL betting analytic
   - Automated line shopping (Task 7: line_shopping.py)
   - Best odds identification
   - Historical line movement analysis
-- **Integration**: `py/production/line_shopping.py` (API client implemented)
+- **Integration**: `nfl_analytics/production/line_shopping.py` (API client implemented)
 - **Limitations**: 10,000 requests/month (adequate for 100 bets/week)
 
 **Tier 2 Total Cost**: $340/year

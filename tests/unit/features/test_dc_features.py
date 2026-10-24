@@ -29,7 +29,7 @@ from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent))
 
-from py.features.dc_features import DCFeatureGenerator
+from nfl_analytics.features.dc_features import DCFeatureGenerator
 
 
 class TestExponentialDecayAdjustment(unittest.TestCase):
@@ -123,7 +123,7 @@ class TestDCContinuityLogic(unittest.TestCase):
         """Initialize generator with mocked database."""
         self.generator = DCFeatureGenerator()
 
-    @patch("py.features.dc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.dc_features.psycopg2.connect")
     def test_continuity_same_dc(self, mock_connect):
         """Same DC as last season should return continuity=1."""
         mock_cursor = MagicMock()
@@ -141,7 +141,7 @@ class TestDCContinuityLogic(unittest.TestCase):
         self.assertEqual(current_dc, "Steve Spagnuolo")
         self.assertEqual(prior_dc, "Steve Spagnuolo")
 
-    @patch("py.features.dc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.dc_features.psycopg2.connect")
     def test_continuity_new_dc(self, mock_connect):
         """Different DC from last season should return continuity=0."""
         mock_cursor = MagicMock()
@@ -159,7 +159,7 @@ class TestDCContinuityLogic(unittest.TestCase):
         self.assertEqual(current_dc, "Bobby Babich")
         self.assertEqual(prior_dc, "Sean McDermott")
 
-    @patch("py.features.dc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.dc_features.psycopg2.connect")
     def test_continuity_no_prior_dc_data(self, mock_connect):
         """Missing prior DC data should return continuity=0."""
         mock_cursor = MagicMock()
@@ -184,7 +184,7 @@ class TestDCTenureCalculation(unittest.TestCase):
         """Initialize generator with mocked database."""
         self.generator = DCFeatureGenerator()
 
-    @patch("py.features.dc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.dc_features.psycopg2.connect")
     def test_tenure_long_serving_dc(self, mock_connect):
         """Long-serving DC should return high tenure count."""
         mock_cursor = MagicMock()
@@ -201,7 +201,7 @@ class TestDCTenureCalculation(unittest.TestCase):
 
         self.assertEqual(tenure, 6, "Long-serving DC should have 6-year tenure")
 
-    @patch("py.features.dc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.dc_features.psycopg2.connect")
     def test_tenure_new_dc(self, mock_connect):
         """New DC should return tenure=1."""
         mock_cursor = MagicMock()
@@ -217,7 +217,7 @@ class TestDCTenureCalculation(unittest.TestCase):
 
         self.assertEqual(tenure, 1, "New DC should have tenure=1")
 
-    @patch("py.features.dc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.dc_features.psycopg2.connect")
     def test_tenure_no_data_returns_1(self, mock_connect):
         """Missing tenure data should default to 1."""
         mock_cursor = MagicMock()
@@ -327,7 +327,7 @@ class TestEdgeCases(unittest.TestCase):
         """Initialize generator."""
         self.generator = DCFeatureGenerator()
 
-    @patch("py.features.dc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.dc_features.psycopg2.connect")
     def test_no_dc_data_returns_defaults(self, mock_connect):
         """Missing DC data should return continuity=0, Unknown DC names."""
         mock_cursor = MagicMock()
@@ -391,7 +391,7 @@ class TestCacheBehavior(unittest.TestCase):
         """Initialize generator."""
         self.generator = DCFeatureGenerator()
 
-    @patch("py.features.dc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.dc_features.psycopg2.connect")
     def test_continuity_cache_hit(self, mock_connect):
         """Second call with same args should hit cache (no DB query)."""
         mock_cursor = MagicMock()
@@ -416,7 +416,7 @@ class TestCacheBehavior(unittest.TestCase):
         # Note: cursor.execute is called once per query
         self.assertEqual(mock_cursor.execute.call_count, 1, "Second call should hit cache, not DB")
 
-    @patch("py.features.dc_features.psycopg2.connect")
+    @patch("nfl_analytics.features.dc_features.psycopg2.connect")
     def test_tenure_cache_hit(self, mock_connect):
         """Second tenure call with same args should hit cache."""
         mock_cursor = MagicMock()

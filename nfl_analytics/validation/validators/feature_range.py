@@ -17,7 +17,7 @@ from typing import Any, Optional
 import numpy as np
 import pandas as pd
 
-from py.validation.validators.base import (
+from nfl_analytics.validation.validators.base import (
     DataFrameValidator,
     ValidationCategory,
     ValidationIssue,

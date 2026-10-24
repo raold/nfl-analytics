@@ -150,7 +150,7 @@ Features are partitioned into four categories:
   \item \textbf{Roster Context (27 features):} QB/RB/WR availability projections, positional depth adjustments, rest differentials, travel load (miles, time zones), and injury impact estimates.
 \end{itemize}
 
-Metadata for each feature is tracked in a YAML manifest (\texttt{py/features/catalog.yaml}) documenting:
+Metadata for each feature is tracked in a YAML manifest (\texttt{nfl\_analytics/features/catalog.yaml}) documenting:
 \begin{lstlisting}[basicstyle=\ttfamily\scriptsize]
 features:
   rolling_epa_off:
@@ -325,7 +325,7 @@ A longstanding piece of betting wisdom holds that high winds reduce NFL scoring,
 \paragraph{Interpretation and decision.}
 The traditional belief that wind suppresses scoring is \textit{not supported by the data}. Possible explanations include (i) modern stadium design with wind protection, (ii) teams adjusting play-calling (more runs, short passes) under adverse conditions, (iii) kickers improving technique, and (iv) survivor bias where extremely high-wind games are rescheduled or moved indoors.
 
-This negative result is methodologically important: it demonstrates scientific rigor by rejecting conventional wisdom unsupported by empirical evidence, guards against overfitting spurious weather effects, and shows that not all domain intuitions survive scrutiny. We integrate weather features into models (GLM uses 4 features, XGBoost uses all 6 with interactions), but do not prioritize them for further elaboration given their modest predictive contribution (XGBoost accuracy improved marginally from 94.9\% to 95.3\%, +0.4\%). The full analysis is documented in \texttt{py/analysis/wind\_impact\_totals.py}.
+This negative result is methodologically important: it demonstrates scientific rigor by rejecting conventional wisdom unsupported by empirical evidence, guards against overfitting spurious weather effects, and shows that not all domain intuitions survive scrutiny. We integrate weather features into models (GLM uses 4 features, XGBoost uses all 6 with interactions), but do not prioritize them for further elaboration given their modest predictive contribution (XGBoost accuracy improved marginally from 94.9\% to 95.3\%, +0.4\%). The full analysis is documented in \texttt{nfl\_analytics/analysis/wind\_impact\_totals.py}.
 
 \subsection{Leakage Prevention Architecture}
 \label{subsec:leakage-arch}
@@ -419,7 +419,7 @@ Comprehensive code audit (November 2025) identified three critical temporal leak
 \toprule
 \textbf{Location} & \textbf{Leakage Type} & \textbf{Mitigation} \\
 \midrule
-\texttt{py/data/feature\_engineering.py:\allowbreak L142} & Missing \texttt{asof} join (weather data) & Add \texttt{<=} constraint \\
+\texttt{nfl\_analytics/data/feature\_engineering.py:\allowbreak L142} & Missing \texttt{asof} join (weather data) & Add \texttt{<=} constraint \\
 \texttt{R/generate\_predictions.R:\allowbreak L89} & Future injury status in lag window & Filter \texttt{kickoff < prediction\_date} \\
 \texttt{db/queries/player\_stats.sql:\allowbreak L34} & Season aggregates include current game & Exclude \texttt{game\_id} from window \\
 \bottomrule

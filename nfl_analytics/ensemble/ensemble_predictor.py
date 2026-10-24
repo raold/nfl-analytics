@@ -19,7 +19,7 @@ Uncertainty Filtering:
 - Only bet when uncertainty < threshold
 
 Usage:
-    python py/ensemble/ensemble_predictor.py \
+    python nfl_analytics/ensemble/ensemble_predictor.py \
         --xgb-model models/xgboost/v2_sweep/xgb_config18_season2024.json \
         --cql-model models/cql/sweep/cql_config4.pth \
         --iql-model models/iql/baseline_model.pth \

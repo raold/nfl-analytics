@@ -24,7 +24,7 @@ from typing import Optional
 
 import psycopg2
 
-from py.features.extractors.base import (
+from nfl_analytics.features.extractors.base import (
     ExtractionLevel,
     FeatureExtractionError,
     FeatureExtractionResult,
@@ -435,11 +435,11 @@ def create_default_registry(
         print(f"Extracted {summary.total_features} features")
     """
     # Import here to avoid circular imports
-    from py.features.extractors.offensive import OffensiveFeatureExtractor
-    from py.features.extractors.defensive import DefensiveFeatureExtractor
-    from py.features.extractors.nextgen import NextGenFeatureExtractor
-    from py.features.extractors.qbr import QBRFeatureExtractor
-    from py.features.extractors.opponent_adjusted import OpponentAdjustedFeatureExtractor
+    from nfl_analytics.features.extractors.offensive import OffensiveFeatureExtractor
+    from nfl_analytics.features.extractors.defensive import DefensiveFeatureExtractor
+    from nfl_analytics.features.extractors.nextgen import NextGenFeatureExtractor
+    from nfl_analytics.features.extractors.qbr import QBRFeatureExtractor
+    from nfl_analytics.features.extractors.opponent_adjusted import OpponentAdjustedFeatureExtractor
 
     registry = FeatureRegistry(db_config=db_config, parallel=parallel)
 

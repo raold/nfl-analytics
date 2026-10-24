@@ -26,7 +26,7 @@ from datetime import datetime
 import numpy as np
 import pandas as pd
 
-from py.online.online_learning_adapter import (
+from nfl_analytics.online.online_learning_adapter import (
     AdaptiveRetrainer,
     DriftDetector,
     DriftEvent,

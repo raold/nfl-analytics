@@ -99,7 +99,7 @@ python scripts/validate_conformal_bnn.py --help
 
 **Detailed Guide:** `scripts/README_validate_conformal_bnn.md`
 **Implementation Summary:** `CONFORMAL_BNN_VALIDATION_SUMMARY.md`
-**Conformal Wrapper:** `py/models/bnn_conformal.py`
+**Conformal Wrapper:** `nfl_analytics/models/bnn_conformal.py`
 
 ---
 

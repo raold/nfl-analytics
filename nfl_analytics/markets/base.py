@@ -13,7 +13,7 @@ Kalshi contract pricing:
     - Edge = model_prob_cents - contract_price_cents
 
 Usage:
-    from py.markets.base import MarketClient, Order, Side, OrderStatus
+    from nfl_analytics.markets.base import MarketClient, Order, Side, OrderStatus
 
     class KalshiClient(MarketClient):
         async def place_order(self, order: Order) -> Order:

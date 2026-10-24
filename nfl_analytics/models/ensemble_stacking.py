@@ -8,7 +8,7 @@ Instead of fixed 70/30 weights, learn optimal ensemble weights using:
 3. Weighted average with learned weights
 
 Usage:
-    python py/models/ensemble_stacking.py --v2-model models/xgboost/v2_1/model.json \
+    python nfl_analytics/models/ensemble_stacking.py --v2-model models/xgboost/v2_1/model.json \
                                           --v3-model models/xgboost/v3_production/model.json
 """
 import argparse

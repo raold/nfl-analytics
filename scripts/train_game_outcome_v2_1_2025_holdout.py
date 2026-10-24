@@ -33,9 +33,9 @@ project_root = str(Path(__file__).parent.parent)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from py.features.game_feature_extractor import GameFeatureExtractor
-from py.features.player_aggregation_features import aggregate_player_projections
-from py.utils.psycopg_pool import get_connection_pool
+from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
+from nfl_analytics.features.player_aggregation_features import aggregate_player_projections
+from nfl_analytics.utils.psycopg_pool import get_connection_pool
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

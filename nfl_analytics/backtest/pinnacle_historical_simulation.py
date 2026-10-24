@@ -18,7 +18,7 @@ Date: November 6, 2025
 Version: 1.0
 
 Usage:
-    python py/backtest/pinnacle_historical_simulation.py \
+    python nfl_analytics/backtest/pinnacle_historical_simulation.py \
         --start-season 2022 \
         --end-season 2024 \
         --baseline-roi -0.075 \

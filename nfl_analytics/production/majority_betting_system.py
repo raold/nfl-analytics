@@ -18,14 +18,14 @@ Features:
 
 Usage:
     # Get today's recommended bets
-    python py/production/majority_betting_system.py \
+    python nfl_analytics/production/majority_betting_system.py \
         --games-csv data/upcoming_games.csv \
         --bankroll 10000 \
         --kelly-fraction 0.25 \
         --output bets/2025_week_11.json
 
     # Backtest on historical data
-    python py/production/majority_betting_system.py \
+    python nfl_analytics/production/majority_betting_system.py \
         --games-csv data/processed/features/asof_team_features_v2.csv \
         --season 2024 \
         --bankroll 10000 \

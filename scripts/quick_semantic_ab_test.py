@@ -56,7 +56,7 @@ def get_completed_2025_games(start_week: int = 1, end_week: int = 16) -> list[di
 
 def generate_predictions_with_semantic(game: dict) -> dict:
     """Generate prediction WITH semantic features."""
-    from py.features.game_feature_extractor import GameFeatureExtractor
+    from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
     extractor = GameFeatureExtractor()
     features = extractor.extract_game_features(
@@ -109,7 +109,7 @@ def generate_predictions_with_semantic(game: dict) -> dict:
 
 def generate_predictions_without_semantic(game: dict) -> dict:
     """Generate prediction WITHOUT semantic features."""
-    from py.features.game_feature_extractor import GameFeatureExtractor
+    from nfl_analytics.features.game_feature_extractor import GameFeatureExtractor
 
     extractor = GameFeatureExtractor()
     features = extractor.extract_game_features(

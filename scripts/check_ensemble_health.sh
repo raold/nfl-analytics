@@ -14,7 +14,7 @@
 #   ./scripts/check_ensemble_health.sh
 #   if [ $? -eq 0 ]; then
 #       echo "Safe to run backtest"
-#       python py/backtest/historical_validation_4way.py
+#       python nfl_analytics/backtest/historical_validation_4way.py
 #   else
 #       echo "DO NOT run backtest - fix issues first"
 #       exit 1
@@ -82,7 +82,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 # Build command
-CMD="python py/utils/ensemble_health_monitor.py $MODE"
+CMD="python nfl_analytics/utils/ensemble_health_monitor.py $MODE"
 
 if [ -n "$OUTPUT" ]; then
     CMD="$CMD --output $OUTPUT"

@@ -23,7 +23,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from py.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStacking
+from nfl_analytics.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStacking
 
 
 class TestInitialization:

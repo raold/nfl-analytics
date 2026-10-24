@@ -23,7 +23,7 @@ import psycopg2
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.models.game_outcome_model_fixed import GameOutcomeModel
+from nfl_analytics.models.game_outcome_model_fixed import GameOutcomeModel
 
 # Database config
 DB_CONFIG = {

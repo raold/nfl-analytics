@@ -6,8 +6,8 @@ Loads the v3 production model and generates win probability predictions
 for upcoming NFL games using features from materialized views.
 
 Usage:
-    python py/predict/v3_inference.py --season 2025 --week 5
-    python py/predict/v3_inference.py --game-ids 2025_05_KC_NO 2025_05_BUF_HOU
+    python nfl_analytics/predict/v3_inference.py --season 2025 --week 5
+    python nfl_analytics/predict/v3_inference.py --game-ids 2025_05_KC_NO 2025_05_BUF_HOU
 """
 import argparse
 import json
@@ -85,7 +85,7 @@ class V3Predictor:
             raise ValueError("Must provide either game_ids or (season, week)")
 
         # Query to extract features from materialized views
-        # This matches the feature extraction in py/features/materialized_view_features.py
+        # This matches the feature extraction in nfl_analytics/features/materialized_view_features.py
         query = f"""
         WITH game_features AS (
             SELECT

@@ -18,7 +18,7 @@ from unittest.mock import Mock, patch
 import numpy as np
 import pytest
 
-from py.ensemble.strategy.base import ModelType
+from nfl_analytics.ensemble.strategy.base import ModelType
 
 
 class TestBNNModelLoading:
@@ -40,8 +40,8 @@ class TestBNNModelLoading:
     def predictor(self):
         """EnsemblePredictor instance."""
         # Import here to avoid circular dependencies
-        from py.ensemble.strategy.ensemble_predictor import EnsemblePredictor
-        from py.ensemble.strategy.weighted_average import WeightedAverageStrategy
+        from nfl_analytics.ensemble.strategy.ensemble_predictor import EnsemblePredictor
+        from nfl_analytics.ensemble.strategy.weighted_average import WeightedAverageStrategy
 
         strategy = WeightedAverageStrategy()
         return EnsemblePredictor(strategy=strategy)
@@ -51,7 +51,7 @@ class TestBNNModelLoading:
         model_path = Path("models/bayesian/bnn_passing_v1.pkl")
 
         with patch(
-            "py.models.bayesian_neural_network.BayesianNeuralNetwork.load",
+            "nfl_analytics.models.bayesian_neural_network.BayesianNeuralNetwork.load",
             return_value=mock_bnn_model,
         ):
             # First prediction
@@ -79,7 +79,7 @@ class TestBNNModelLoading:
         model_path = Path("models/bayesian/bnn_passing_v1.pkl")
 
         with patch(
-            "py.models.bayesian_neural_network.BayesianNeuralNetwork.load",
+            "nfl_analytics.models.bayesian_neural_network.BayesianNeuralNetwork.load",
             return_value=mock_bnn_model,
         ):
             result = predictor._predict_bnn_model(
@@ -117,7 +117,7 @@ class TestBNNModelLoading:
             np.array([40.0]),  # High std
         )
 
-        with patch("py.models.bayesian_neural_network.BayesianNeuralNetwork.load") as mock_load:
+        with patch("nfl_analytics.models.bayesian_neural_network.BayesianNeuralNetwork.load") as mock_load:
             # Low uncertainty prediction
             mock_load.return_value = mock_model_low_std
             result_low = predictor._predict_bnn_model(
@@ -145,7 +145,7 @@ class TestBNNModelLoading:
         model_path = Path("models/bayesian/bnn_passing_v1.pkl")
 
         # Mock BayesianNeuralNetwork as None (not installed)
-        with patch("py.ensemble.strategy.ensemble_predictor.BayesianNeuralNetwork", None):
+        with patch("nfl_analytics.ensemble.strategy.ensemble_predictor.BayesianNeuralNetwork", None):
             result = predictor._predict_bnn_model(
                 model_name="bnn_v1",
                 path=model_path,
@@ -169,8 +169,8 @@ class TestXGBoostModelLoading:
     @pytest.fixture
     def predictor(self):
         """EnsemblePredictor instance."""
-        from py.ensemble.strategy.ensemble_predictor import EnsemblePredictor
-        from py.ensemble.strategy.weighted_average import WeightedAverageStrategy
+        from nfl_analytics.ensemble.strategy.ensemble_predictor import EnsemblePredictor
+        from nfl_analytics.ensemble.strategy.weighted_average import WeightedAverageStrategy
 
         strategy = WeightedAverageStrategy()
         return EnsemblePredictor(strategy=strategy)
@@ -255,7 +255,7 @@ class TestXGBoostModelLoading:
         """Test graceful degradation when XGBoost not installed."""
         model_path = Path("models/xgboost/player_props_v1.json")
 
-        with patch("py.ensemble.strategy.ensemble_predictor.xgb", None):
+        with patch("nfl_analytics.ensemble.strategy.ensemble_predictor.xgb", None):
             result = predictor._predict_xgboost_model(
                 model_name="xgb_v1",
                 path=model_path,
@@ -291,8 +291,8 @@ class TestRModelLoading:
     @pytest.fixture
     def predictor(self):
         """EnsemblePredictor instance."""
-        from py.ensemble.strategy.ensemble_predictor import EnsemblePredictor
-        from py.ensemble.strategy.weighted_average import WeightedAverageStrategy
+        from nfl_analytics.ensemble.strategy.ensemble_predictor import EnsemblePredictor
+        from nfl_analytics.ensemble.strategy.weighted_average import WeightedAverageStrategy
 
         strategy = WeightedAverageStrategy()
         return EnsemblePredictor(strategy=strategy)
@@ -302,7 +302,7 @@ class TestRModelLoading:
         model_path = Path("models/bayesian/passing_yards_hierarchical_v2.rds")
 
         with patch(
-            "py.ensemble.strategy.ensemble_predictor.get_r_service",
+            "nfl_analytics.ensemble.strategy.ensemble_predictor.get_r_service",
             return_value=mock_r_service,
         ):
             result = predictor._predict_r_model(
@@ -328,7 +328,7 @@ class TestRModelLoading:
         mock_service.health_check.return_value = health
 
         with patch(
-            "py.ensemble.strategy.ensemble_predictor.get_r_service",
+            "nfl_analytics.ensemble.strategy.ensemble_predictor.get_r_service",
             return_value=mock_service,
         ):
             result = predictor._predict_r_model(
@@ -346,7 +346,7 @@ class TestRModelLoading:
         model_path = Path("models/bayesian/passing_yards_state_space_v2.rds")
 
         with patch(
-            "py.ensemble.strategy.ensemble_predictor.get_r_service",
+            "nfl_analytics.ensemble.strategy.ensemble_predictor.get_r_service",
             return_value=mock_r_service,
         ):
             result = predictor._predict_r_model(
@@ -365,7 +365,7 @@ class TestRModelLoading:
         model_path = Path("models/bayesian/passing_yards_hierarchical_v2.rds")
 
         with patch(
-            "py.ensemble.strategy.ensemble_predictor.get_r_service",
+            "nfl_analytics.ensemble.strategy.ensemble_predictor.get_r_service",
             return_value=mock_r_service,
         ):
             predictor._predict_r_model(
@@ -385,7 +385,7 @@ class TestRModelLoading:
         """Test graceful degradation when R service not available."""
         model_path = Path("models/bayesian/passing_yards_hierarchical_v2.rds")
 
-        with patch("py.ensemble.strategy.ensemble_predictor.get_r_service", None):
+        with patch("nfl_analytics.ensemble.strategy.ensemble_predictor.get_r_service", None):
             result = predictor._predict_r_model(
                 model_name="hierarchical_v2",
                 path=model_path,
@@ -403,8 +403,8 @@ class TestFeatureConversion:
     @pytest.fixture
     def predictor(self):
         """EnsemblePredictor instance."""
-        from py.ensemble.strategy.ensemble_predictor import EnsemblePredictor
-        from py.ensemble.strategy.weighted_average import WeightedAverageStrategy
+        from nfl_analytics.ensemble.strategy.ensemble_predictor import EnsemblePredictor
+        from nfl_analytics.ensemble.strategy.weighted_average import WeightedAverageStrategy
 
         strategy = WeightedAverageStrategy()
         return EnsemblePredictor(strategy=strategy)
@@ -451,8 +451,8 @@ class TestModelLoadingIntegration:
     @pytest.fixture
     def predictor(self):
         """EnsemblePredictor with weighted average strategy."""
-        from py.ensemble.strategy.ensemble_predictor import EnsemblePredictor
-        from py.ensemble.strategy.weighted_average import WeightedAverageStrategy
+        from nfl_analytics.ensemble.strategy.ensemble_predictor import EnsemblePredictor
+        from nfl_analytics.ensemble.strategy.weighted_average import WeightedAverageStrategy
 
         weights = {
             "state_space_v2": 0.30,
@@ -477,7 +477,7 @@ class TestModelLoadingIntegration:
         model_path = Path("models/bayesian/bnn_passing_v1.pkl")
 
         with patch(
-            "py.models.bayesian_neural_network.BayesianNeuralNetwork.load",
+            "nfl_analytics.models.bayesian_neural_network.BayesianNeuralNetwork.load",
             return_value=mock_model,
         ) as mock_load:
             # First prediction

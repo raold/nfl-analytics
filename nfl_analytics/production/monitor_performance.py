@@ -12,7 +12,7 @@ Tracks betting performance in real-time:
 
 Usage:
     # Log a bet
-    python py/production/monitor_performance.py log \
+    python nfl_analytics/production/monitor_performance.py log \
         --game-id "2024_10_KC_SF" \
         --bet-type spread \
         --side home \
@@ -22,20 +22,20 @@ Usage:
         --prediction 0.58
 
     # Update bet result
-    python py/production/monitor_performance.py update \
+    python nfl_analytics/production/monitor_performance.py update \
         --bet-id 123 \
         --result win \
         --home-score 28 \
         --away-score 24
 
     # Generate daily report
-    python py/production/monitor_performance.py report daily
+    python nfl_analytics/production/monitor_performance.py report daily
 
     # Generate weekly report
-    python py/production/monitor_performance.py report weekly
+    python nfl_analytics/production/monitor_performance.py report weekly
 
     # Check for alerts
-    python py/production/monitor_performance.py alert
+    python nfl_analytics/production/monitor_performance.py alert
 """
 
 import argparse

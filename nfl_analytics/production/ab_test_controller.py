@@ -22,7 +22,7 @@ import numpy as np
 import pandas as pd
 import psycopg2
 
-from py.compute.statistics.experimental_design.ab_testing import (
+from nfl_analytics.compute.statistics.experimental_design.ab_testing import (
     ABTest,
     AllocationMethod,
     TestStatus,

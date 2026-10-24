@@ -33,8 +33,8 @@ import torch
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.rl.cql_agent import CQLAgent
-from py.rl.fourth_down_mdp import (
+from nfl_analytics.rl.cql_agent import CQLAgent
+from nfl_analytics.rl.fourth_down_mdp import (
     ACTION_DIM,
     ACTION_FIELD_GOAL,
     ACTION_GO,

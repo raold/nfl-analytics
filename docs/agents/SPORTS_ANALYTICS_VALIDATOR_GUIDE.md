@@ -59,7 +59,7 @@ The Sports Analytics Validator enforces NFL domain-specific rules to prevent log
 The validator is already included in the project. No installation needed.
 
 **Files:**
-- `py/utils/sports_analytics_validator.py` (891 lines)
+- `nfl_analytics/utils/sports_analytics_validator.py` (891 lines)
 - `scripts/validate_sports_analytics.sh` (CLI wrapper)
 - `tests/unit/test_sports_analytics_validator.py` (comprehensive tests)
 
@@ -67,7 +67,7 @@ The validator is already included in the project. No installation needed.
 
 **Python API:**
 ```python
-from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+from nfl_analytics.utils.sports_analytics_validator import SportsAnalyticsValidator
 import pandas as pd
 
 # Create validator
@@ -259,7 +259,7 @@ df = pd.DataFrame([{'home_score': 80, 'away_score': 75}])
 **ALWAYS validate data before model training:**
 
 ```python
-from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+from nfl_analytics.utils.sports_analytics_validator import SportsAnalyticsValidator
 import pandas as pd
 
 # Load feature data
@@ -297,7 +297,7 @@ model.fit(X_train, y_train)
 **Check queries before execution:**
 
 ```python
-from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+from nfl_analytics.utils.sports_analytics_validator import SportsAnalyticsValidator
 
 # Load SQL query
 with open('queries/player_stats.sql', 'r') as f:
@@ -328,8 +328,8 @@ df = pd.read_sql(query, conn)
 **Validate features after generation:**
 
 ```python
-from py.utils.sports_analytics_validator import SportsAnalyticsValidator
-from py.data.feature_engineering import generate_player_features
+from nfl_analytics.utils.sports_analytics_validator import SportsAnalyticsValidator
+from nfl_analytics.data.feature_engineering import generate_player_features
 
 # Generate features
 features_df = generate_player_features(
@@ -374,7 +374,7 @@ jobs:
       - name: Validate feature files
         run: |
           for file in data/features/*.csv; do
-            python py/utils/sports_analytics_validator.py --validate-df "$file"
+            python nfl_analytics/utils/sports_analytics_validator.py --validate-df "$file"
             if [ $? -ne 0 ]; then
               echo "Validation failed for $file"
               exit 1
@@ -384,7 +384,7 @@ jobs:
       - name: Check SQL queries
         run: |
           for file in queries/*.sql; do
-            python py/utils/sports_analytics_validator.py --check-query "$file"
+            python nfl_analytics/utils/sports_analytics_validator.py --check-query "$file"
           done
 ```
 
@@ -398,7 +398,7 @@ jobs:
 
 ```python
 from functools import wraps
-from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+from nfl_analytics.utils.sports_analytics_validator import SportsAnalyticsValidator
 
 def validate_output(validator=None):
     """Decorator to validate DataFrame outputs"""
@@ -444,7 +444,7 @@ stats = get_player_stats('00-0019596', 2024)
 # Validate all staged SQL files
 for file in $(git diff --cached --name-only --diff-filter=ACM | grep '.sql$'); do
     echo "Validating SQL file: $file"
-    python py/utils/sports_analytics_validator.py --check-query "$file"
+    python nfl_analytics/utils/sports_analytics_validator.py --check-query "$file"
 
     if [ $? -ne 0 ]; then
         echo "⛔ SQL validation failed for $file"
@@ -461,7 +461,7 @@ echo "✅ SQL validation passed"
 **Validate at each pipeline stage:**
 
 ```python
-from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+from nfl_analytics.utils.sports_analytics_validator import SportsAnalyticsValidator
 
 class DataPipeline:
     def __init__(self):
@@ -563,7 +563,7 @@ TEAM_RELOCATIONS = {
 
 ### SportsAnalyticsValidator
 
-**Class:** `py.utils.sports_analytics_validator.SportsAnalyticsValidator`
+**Class:** `nfl_analytics.utils.sports_analytics_validator.SportsAnalyticsValidator`
 
 #### Methods
 
@@ -623,7 +623,7 @@ issues = validator.validate_query_file(Path('query.sql'))
 
 ### ValidationReport
 
-**Class:** `py.utils.sports_analytics_validator.ValidationReport`
+**Class:** `nfl_analytics.utils.sports_analytics_validator.ValidationReport`
 
 #### Attributes
 
@@ -647,7 +647,7 @@ issues = validator.validate_query_file(Path('query.sql'))
 
 ### ValidationIssue
 
-**Class:** `py.utils.sports_analytics_validator.ValidationIssue`
+**Class:** `nfl_analytics.utils.sports_analytics_validator.ValidationIssue`
 
 #### Attributes
 
@@ -750,7 +750,7 @@ df[df['home_team'].isin(['LAR', 'LAC'])]
 df[df['stat_yards'] > 600]
 
 # Check for leakage (future data, target contamination)
-from py.utils.data_leakage_detector import DataLeakageDetector
+from nfl_analytics.utils.data_leakage_detector import DataLeakageDetector
 detector = DataLeakageDetector()
 detector.validate_split(train_df, test_df, date_col='kickoff')
 ```
@@ -778,7 +778,7 @@ SELECT * FROM games WHERE week BETWEEN 1 AND 22
 import logging
 logging.basicConfig(level=logging.DEBUG)
 
-from py.utils.sports_analytics_validator import SportsAnalyticsValidator
+from nfl_analytics.utils.sports_analytics_validator import SportsAnalyticsValidator
 validator = SportsAnalyticsValidator()
 ```
 

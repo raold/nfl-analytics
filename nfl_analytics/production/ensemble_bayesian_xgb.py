@@ -12,7 +12,7 @@ Key findings from analysis:
 - Recommended weight: 15-25% Bayesian, 75-85% XGBoost
 
 Usage:
-    python py/production/ensemble_bayesian_xgb.py --games data/processed/features/asof_team_features_v3_bayesian.csv \
+    python nfl_analytics/production/ensemble_bayesian_xgb.py --games data/processed/features/asof_team_features_v3_bayesian.csv \
                                                     --xgb-model models/xgboost/v3_best.json \
                                                     --test-season 2024 \
                                                     --output analysis/ensemble/bayesian_xgb_2024.json

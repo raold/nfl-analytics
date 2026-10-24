@@ -8,13 +8,13 @@ Supports multiple fine-tuning approaches:
 
 Usage:
     # Option 1: Create Ollama custom model (no actual fine-tuning, just system prompt)
-    python -m py.semantic.training.fine_tune --method ollama --data data/semantic_training
+    python -m nfl_analytics.semantic.training.fine_tune --method ollama --data data/semantic_training
 
     # Option 2: MLX LoRA fine-tuning (requires Apple Silicon)
-    python -m py.semantic.training.fine_tune --method mlx --data data/semantic_training
+    python -m nfl_analytics.semantic.training.fine_tune --method mlx --data data/semantic_training
 
     # Option 3: Validate fine-tuned model
-    python -m py.semantic.training.fine_tune --validate --model nfl-ner
+    python -m nfl_analytics.semantic.training.fine_tune --validate --model nfl-ner
 """
 
 import argparse
@@ -207,7 +207,7 @@ def validate_model(
 
     if use_ollama:
         try:
-            from py.semantic.models.ollama_client import OllamaClient
+            from nfl_analytics.semantic.models.ollama_client import OllamaClient
 
             client = OllamaClient(timeout=120.0, default_model=model_name)
 

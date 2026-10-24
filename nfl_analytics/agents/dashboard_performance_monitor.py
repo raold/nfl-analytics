@@ -16,7 +16,7 @@ Key Features:
 - Automated alerts on performance degradation
 
 Usage:
-    from py.agents.dashboard_performance_monitor import DashboardPerformanceMonitor
+    from nfl_analytics.agents.dashboard_performance_monitor import DashboardPerformanceMonitor
 
     monitor = DashboardPerformanceMonitor()
 

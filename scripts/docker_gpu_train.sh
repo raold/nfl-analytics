@@ -94,7 +94,7 @@ run_bnn_multioutput() {
     local log_file="$LOG_DIR/bnn_multioutput_$(date +%Y%m%d_%H%M%S).log"
 
     if docker exec nfl-analytics-gpu-trainer \
-        python py/models/bnn_multioutput_pytorch.py \
+        python nfl_analytics/models/bnn_multioutput_pytorch.py \
         --device cuda \
         --epochs 500 \
         --batch-size 256 \
@@ -136,7 +136,7 @@ run_xgboost_gpu() {
     local log_file="$LOG_DIR/xgboost_gpu_$(date +%Y%m%d_%H%M%S).log"
 
     if docker exec nfl-analytics-gpu-trainer \
-        python py/models/xgboost_gpu_v3.py \
+        python nfl_analytics/models/xgboost_gpu_v3.py \
         --features-csv data/processed/features/asof_team_features_v3.csv \
         --start-season 2006 \
         --end-season 2021 \
@@ -211,7 +211,7 @@ run_ensemble_creation() {
     local log_file="$LOG_DIR/ensemble_creation_$(date +%Y%m%d_%H%M%S).log"
 
     if docker exec nfl-analytics-gpu-trainer \
-        python py/models/create_final_ensemble.py \
+        python nfl_analytics/models/create_final_ensemble.py \
         --bayesian models/bayesian/bnn_multioutput_v1_final.pt \
         --xgboost models/xgboost/v3_sweep/best_model.json \
         --hierarchical models/bayesian/passing_yards_hierarchical_v1.rds \

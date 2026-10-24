@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Import connection pool for psycopg3
 try:
-    from py.utils.psycopg_pool import get_connection_pool
+    from nfl_analytics.utils.psycopg_pool import get_connection_pool
 
     POOL_AVAILABLE = True
 except ImportError:

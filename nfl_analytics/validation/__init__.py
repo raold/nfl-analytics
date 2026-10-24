@@ -10,7 +10,7 @@ Validators check for issues like:
 Created: December 13, 2025
 """
 
-from py.validation.validators import (
+from nfl_analytics.validation.validators import (
     ValidationCategory,
     ValidationResult,
     ValidationSeverity,

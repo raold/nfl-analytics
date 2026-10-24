@@ -4,7 +4,7 @@ Dissertation Plotting Style - Publication-Quality Figures
 Implements all 31 visual improvements for consistent, professional figures
 
 Usage:
-    from py.viz.dissertation_style import (
+    from nfl_analytics.viz.dissertation_style import (
         setup_plot_style, COLORS, SIZES, save_figure,
         plot_with_confidence, plot_calibration_enhanced, etc.
     )

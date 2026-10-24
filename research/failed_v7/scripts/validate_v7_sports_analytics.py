@@ -328,12 +328,12 @@ def main():
     """Run validation on v7.0 files."""
 
     v7_files = [
-        "py/ensemble/enhanced_ensemble_v7_production.py",
-        "py/features/meta_learning_context.py",
-        "py/features/qb_experience_features.py",
-        "py/features/roster_stability_features.py",
-        "py/features/market_dispersion_features.py",
-        "py/ensemble/adaptive_wls_weights_v2.py",
+        "nfl_analytics/ensemble/enhanced_ensemble_v7_production.py",
+        "nfl_analytics/features/meta_learning_context.py",
+        "nfl_analytics/features/qb_experience_features.py",
+        "nfl_analytics/features/roster_stability_features.py",
+        "nfl_analytics/features/market_dispersion_features.py",
+        "nfl_analytics/ensemble/adaptive_wls_weights_v2.py",
     ]
 
     base_path = _PROJECT_ROOT

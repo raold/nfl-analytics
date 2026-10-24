@@ -18,7 +18,7 @@ A/B Test Design:
 - Statistical analysis after minimum 100 games per group
 
 Usage:
-    from py.production.ab_test_router import ABTestRouter
+    from nfl_analytics.production.ab_test_router import ABTestRouter
 
     router = ABTestRouter(split_ratio=0.5)
     result = router.predict(
@@ -50,9 +50,9 @@ import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
-from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way as EnsembleV6
+from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way as EnsembleV6
 
-from py.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way as EnsembleV5
+from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way as EnsembleV5
 
 # Load environment variables
 load_dotenv()

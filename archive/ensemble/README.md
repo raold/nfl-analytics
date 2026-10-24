@@ -24,7 +24,7 @@ These files were archived during API consolidation cleanup to resolve `EnhancedE
 
 ## Canonical Version
 
-**File:** `py/ensemble/enhanced_ensemble_v6.py`
+**File:** `nfl_analytics/ensemble/enhanced_ensemble_v6.py`
 **Class:** `EnhancedEnsemble4Way` (production name)
 **Architecture:** 4-way ensemble with XGBoost v4 Ridge Residuals
 - State-Space v2: 30%
@@ -34,14 +34,14 @@ These files were archived during API consolidation cleanup to resolve `EnhancedE
 
 **Production Import:**
 ```python
-from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
 ```
 
 ---
 
 ## Research Code
 
-**File:** `py/ensemble/enhanced_ensemble_v6_elo.py` (NOT archived)
+**File:** `nfl_analytics/ensemble/enhanced_ensemble_v6_elo.py` (NOT archived)
 **Class:** `EnhancedEnsemble6Way`
 **Architecture:** 5-way ensemble with ELO + Adaptive WLS
 **Status:** Active research, kept separate from production
@@ -54,13 +54,13 @@ If you have code importing deprecated versions:
 
 ### Before:
 ```python
-from py.ensemble.enhanced_ensemble_v6_DEPRECATED_BAK import EnhancedEnsemble6Way
+from nfl_analytics.ensemble.enhanced_ensemble_v6_DEPRECATED_BAK import EnhancedEnsemble6Way
 ensemble = EnhancedEnsemble6Way()
 ```
 
 ### After:
 ```python
-from py.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
+from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way
 ensemble = EnhancedEnsemble4Way()
 ```
 
@@ -69,5 +69,5 @@ ensemble = EnhancedEnsemble4Way()
 ## See Also
 
 - `docs/API_CONSOLIDATION_ANALYSIS.md` - Full analysis of consolidation
-- `py/ensemble/enhanced_ensemble_v6.py` - Canonical version
-- `py/ensemble/enhanced_ensemble_v6_elo.py` - ELO research version
+- `nfl_analytics/ensemble/enhanced_ensemble_v6.py` - Canonical version
+- `nfl_analytics/ensemble/enhanced_ensemble_v6_elo.py` - ELO research version

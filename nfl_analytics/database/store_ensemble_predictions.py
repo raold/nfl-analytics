@@ -13,7 +13,7 @@ Handles:
 - Progress reporting
 
 Usage:
-    python py/database/store_ensemble_predictions.py
+    python nfl_analytics/database/store_ensemble_predictions.py
 
 Author: NFL Analytics Research Team
 Created: November 9, 2025

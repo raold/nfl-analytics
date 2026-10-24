@@ -17,7 +17,7 @@ Expected Performance: MAE < 53.5 yards (baseline v2: ~54 yards)
 Ensemble Weight: 30% (4-way ensemble)
 
 Usage:
-    python py/models/train_xgboost_v3_with_opponent_strength.py
+    python nfl_analytics/models/train_xgboost_v3_with_opponent_strength.py
 
 Output:
     - models/xgboost/passing_xgboost_v3_with_opponent_strength.pkl
@@ -198,7 +198,7 @@ def load_opponent_strength_features():
     if not features_path.exists():
         raise FileNotFoundError(
             f"Opponent strength features not found at {features_path}. "
-            f"Run py/features/opponent_strength.py first."
+            f"Run nfl_analytics/features/opponent_strength.py first."
         )
 
     opp_df = pd.read_csv(features_path)

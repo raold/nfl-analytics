@@ -19,7 +19,7 @@ import redis
 from redis.exceptions import ConnectionError
 
 # Import existing enums for compatibility
-from py.compute.task_queue import TaskPriority, TaskStatus
+from nfl_analytics.compute.task_queue import TaskPriority, TaskStatus
 
 logger = logging.getLogger(__name__)
 

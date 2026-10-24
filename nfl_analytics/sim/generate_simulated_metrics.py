@@ -10,7 +10,7 @@ This script:
 Output: analysis/results/simulated_metrics.json
 
 Usage:
-    python py/sim/generate_simulated_metrics.py
+    python nfl_analytics/sim/generate_simulated_metrics.py
 """
 
 import json

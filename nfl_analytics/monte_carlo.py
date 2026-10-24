@@ -1,4 +1,4 @@
-# py/monte_carlo.py
+# nfl_analytics/monte_carlo.py
 import numpy as np
 import pandas as pd
 from sklearn.ensemble import GradientBoostingRegressor

@@ -19,19 +19,19 @@ This pipeline:
 
 Usage:
     # Full pipeline for upcoming week
-    python py/production/bnn_moe_production_pipeline.py \
+    python nfl_analytics/production/bnn_moe_production_pipeline.py \
         --week 11 \
         --season 2025 \
         --bankroll 10000
 
     # Backtest on historical data
-    python py/production/bnn_moe_production_pipeline.py \
+    python nfl_analytics/production/bnn_moe_production_pipeline.py \
         --backtest \
         --season 2024 \
         --weeks 7-17
 
     # Paper trading mode (no real money)
-    python py/production/bnn_moe_production_pipeline.py \
+    python nfl_analytics/production/bnn_moe_production_pipeline.py \
         --paper-trade \
         --week 11
 """

@@ -9,7 +9,7 @@ Supports:
 - Export predictions to CSV/JSON
 
 Usage:
-    from py.models.load_cql_ensemble import CQLEnsemble
+    from nfl_analytics.models.load_cql_ensemble import CQLEnsemble
 
     # Load ensemble
     ensemble = CQLEnsemble(models_dir="models/cql")

@@ -501,7 +501,7 @@ safe_db_operation(
 
     log_message("=== Advanced Metrics Backfill Complete ===", level = "INFO")
     log_message("Next steps:", level = "INFO")
-    log_message("  1. Integrate metrics into py/features/asof_features_enhanced.py", level = "INFO")
+    log_message("  1. Integrate metrics into nfl_analytics/features/asof_features_enhanced.py", level = "INFO")
     log_message("  2. Create team-level aggregates (avg QBR, pressure rates, etc.)", level = "INFO")
     log_message("  3. Retrain models with enhanced features", level = "INFO")
   })

@@ -44,7 +44,7 @@ Created PostgreSQL materialized view joining games with weather data and adding 
 ## Task 2: Weather Features in Models
 
 ### Implementation
-Modified `py/backtest/harness_multimodel.py` to integrate weather features.
+Modified `nfl_analytics/backtest/harness_multimodel.py` to integrate weather features.
 
 ### GLM Model (6 features)
 **Original features:**
@@ -99,7 +99,7 @@ Weather features provided **minimal improvement** (+0.4% for XGBoost). EPA and s
 **"High wind reduces scoring in NFL games, creating value in betting unders."**
 
 ### Implementation
-Created statistical analysis script: `py/analysis/wind_impact_totals.py`
+Created statistical analysis script: `nfl_analytics/analysis/wind_impact_totals.py`
 
 ### Dataset
 - **Outdoor games:** 1,017 (2020-present)
@@ -145,7 +145,7 @@ Created statistical analysis script: `py/analysis/wind_impact_totals.py`
 ### Implementation
 Trained PPO agent for 400 epochs on logged dataset (`data/rl_logged.csv`, 1,408 samples).
 
-**File:** `py/rl/ppo_agent.py`
+**File:** `nfl_analytics/rl/ppo_agent.py`
 
 ### Training Configuration
 - **Epochs:** 400
@@ -279,14 +279,14 @@ Trained PPO agent for 400 epochs on logged dataset (`data/rl_logged.csv`, 1,408 
 
 ### New Files
 1. `db/003_mart_game_weather.sql` (39 lines)
-2. `py/analysis/wind_impact_totals.py` (170 lines)
-3. `py/analysis/rl_agent_comparison.py` (266 lines)
+2. `nfl_analytics/analysis/wind_impact_totals.py` (170 lines)
+3. `nfl_analytics/analysis/rl_agent_comparison.py` (266 lines)
 4. `analysis/results/rl_agent_comparison.json`
 5. `analysis/dissertation/figures/out/rl_agent_comparison_table.tex`
 
 ### Modified Files
-1. `py/backtest/harness_multimodel.py` (added weather features)
-2. `py/rl/ppo_agent.py` (fixed dataset loading)
+1. `nfl_analytics/backtest/harness_multimodel.py` (added weather features)
+2. `nfl_analytics/rl/ppo_agent.py` (fixed dataset loading)
 
 ### Generated Data
 1. `models/ppo_model_400ep.pth` (trained model)

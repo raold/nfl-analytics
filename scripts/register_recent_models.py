@@ -17,7 +17,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from py.registry.model_registry import ModelRegistry
+from nfl_analytics.registry.model_registry import ModelRegistry
 
 
 def register_xgboost_v5_integrated(registry: ModelRegistry):
@@ -69,7 +69,7 @@ def register_dc_features(registry: ModelRegistry):
             "coverage": 1.0,  # All games have DC features
         },
         artifacts={
-            "module": "py/features/dc_features.py",
+            "module": "nfl_analytics/features/dc_features.py",
             "integration_example": "scripts/train_xgboost_player_agg_v5.py",
         },
         tags=["features", "coaching", "defensive", "continuity"],
@@ -95,7 +95,7 @@ def register_oc_features_update(registry: ModelRegistry):
             "coverage": 1.0,
         },
         artifacts={
-            "module": "py/features/oc_features.py",
+            "module": "nfl_analytics/features/oc_features.py",
             "integration_example": "scripts/train_xgboost_player_agg_v5.py",
         },
         parent_version="v1.0.0",
@@ -123,8 +123,8 @@ def register_ensemble_v6_updates(registry: ModelRegistry):
             "expected_roi": 0.065,  # 6.5%
         },
         artifacts={
-            "ensemble": "py/ensemble/enhanced_ensemble_v6_production.py",
-            "strategy": "py/ensemble/strategy/base.py",
+            "ensemble": "nfl_analytics/ensemble/enhanced_ensemble_v6_production.py",
+            "strategy": "nfl_analytics/ensemble/strategy/base.py",
             "weights_doc": "docs/adr/009-abandon-ensemble-v7-meta-learning.md",
         },
         parent_version="v6.0.0",
@@ -180,7 +180,7 @@ def register_feature_modules(registry: ModelRegistry):
             "avg_computation_time_ms": 120,
         },
         artifacts={
-            "module": "py/features/game_feature_extractor.py",
+            "module": "nfl_analytics/features/game_feature_extractor.py",
         },
         tags=["features", "game-level", "aggregation", "bayesian"],
     )
@@ -202,7 +202,7 @@ def register_feature_modules(registry: ModelRegistry):
             "coverage": 1.0,
         },
         artifacts={
-            "module": "py/features/team_defensive_features.py",
+            "module": "nfl_analytics/features/team_defensive_features.py",
         },
         tags=["features", "defense", "team-level", "efficiency"],
     )
@@ -224,7 +224,7 @@ def register_feature_modules(registry: ModelRegistry):
             "coverage": 1.0,
         },
         artifacts={
-            "module": "py/features/team_offensive_features.py",
+            "module": "nfl_analytics/features/team_offensive_features.py",
         },
         tags=["features", "offense", "team-level", "efficiency"],
     )

@@ -17,7 +17,7 @@ from unittest.mock import Mock, patch
 import psycopg2
 import pytest
 
-from py.data.repository.base import (
+from nfl_analytics.data.repository.base import (
     BaseRepository,
     ConnectionPoolError,
     DatabaseConfig,

@@ -13,7 +13,7 @@ is injected). The poll loop iterates contracts, feeds market data to
 the strategy, and submits approved signals.
 
 Usage:
-    from py.execution.live_trader import LiveTrader, LiveTraderConfig
+    from nfl_analytics.execution.live_trader import LiveTrader, LiveTraderConfig
 
     trader = LiveTrader(
         config=LiveTraderConfig(mode="paper"),
@@ -34,15 +34,15 @@ import asyncio
 import logging
 from dataclasses import dataclass, field
 
-from py.execution.trade_executor import TradeExecutor
-from py.markets.base import MarketClient, MarketData, MarketError, Order, OrderBook
-from py.monitoring.alert_manager import AlertLevel, AlertManager
-from py.monitoring.pnl_tracker import PnLTracker
-from py.monitoring.trade_logger import TradeLogger
-from py.risk.drawdown_monitor import DrawdownMonitor
-from py.risk.risk_manager import RiskManager
-from py.trading.base_strategy import TradingStrategy
-from py.trading.signal import Signal
+from nfl_analytics.execution.trade_executor import TradeExecutor
+from nfl_analytics.markets.base import MarketClient, MarketData, MarketError, Order, OrderBook
+from nfl_analytics.monitoring.alert_manager import AlertLevel, AlertManager
+from nfl_analytics.monitoring.pnl_tracker import PnLTracker
+from nfl_analytics.monitoring.trade_logger import TradeLogger
+from nfl_analytics.risk.drawdown_monitor import DrawdownMonitor
+from nfl_analytics.risk.risk_manager import RiskManager
+from nfl_analytics.trading.base_strategy import TradingStrategy
+from nfl_analytics.trading.signal import Signal
 
 logger = logging.getLogger(__name__)
 

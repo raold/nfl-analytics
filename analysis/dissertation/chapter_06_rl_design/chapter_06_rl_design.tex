@@ -106,7 +106,7 @@ We implement two baseline agents for NFL betting: a Deep Q-Network (DQN) with di
 
 \paragraph{Device compatibility.} DQN successfully uses GPU acceleration (5-minute training for 400 epochs), while PPO requires CPU due to \texttt{torch.distributions.Beta} sampling limitations on certain GPU backends (12-minute training). This hardware consideration favors DQN for rapid iteration but does not affect final performance.
 
-\paragraph{Recommendation.} For deployment, we prefer PPO due to its superior stability (3.8$\times$ lower variance) and continuous action space, despite the 16.2\% reward trade-off. In risk-sensitive betting, consistent performance is more valuable than occasional peaks, and PPO's lower variance reduces the risk of catastrophic drawdowns. The comparison is documented in \texttt{py/analysis/rl\_agent\_comparison.py} and \texttt{models/\{dqn,ppo\}\_training\_log.json}.
+\paragraph{Recommendation.} For deployment, we prefer PPO due to its superior stability (3.8$\times$ lower variance) and continuous action space, despite the 16.2\% reward trade-off. In risk-sensitive betting, consistent performance is more valuable than occasional peaks, and PPO's lower variance reduces the risk of catastrophic drawdowns. The comparison is documented in \texttt{nfl\_analytics/analysis/rl\_agent\_comparison.py} and \texttt{models/\{dqn,ppo\}\_training\_log.json}.
 
 % Include the comparison table if it exists
 \IfFileExists{../figures/out/rl_agent_comparison_table.tex}{\input{../figures/out/rl_agent_comparison_table.tex}}{}
@@ -444,7 +444,7 @@ For temporal robustness, we employ expanding-window walk-forward validation with
 All features enforce as-of semantics (Chapter~\ref{chap:data}, \S\ref{subsec:leakage-arch}; Appendix~\ref{app:leakage_audit}). Feature generation uses strict cutoff timestamps $t_{\text{cutoff}} = \text{kickoff} - 1\text{ second}$ to ensure no post-game information leaks into pre-game predictions. The automated leakage audit (Appendix~\ref{app:leakage_audit}) validates that all 162 features marked \texttt{asof\_safe:true} respect temporal boundaries, with 100\% compliance across 15 unit tests.
 
 \paragraph{Coverage and Temporal Distribution.}
-Dataset diagnostics from the feature catalog (\texttt{py/features/catalog.yaml}) show:
+Dataset diagnostics from the feature catalog (\texttt{nfl\_analytics/features/catalog.yaml}) show:
 \begin{itemize}
   \item \textbf{Action space coverage}: All stake buckets (skip, small, medium, large) represented in $>$5\% of logged episodes.
   \item \textbf{Market coverage}: Spreads available for 98.2\% of games; totals for 97.8\%; moneylines for 99.1\%.

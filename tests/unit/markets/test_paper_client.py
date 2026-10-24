@@ -1,5 +1,5 @@
 """
-Unit tests for py/markets/paper_client.py — Paper trading client.
+Unit tests for nfl_analytics/markets/paper_client.py — Paper trading client.
 
 Tests cover:
 - Contract registration
@@ -14,7 +14,7 @@ Tests cover:
 
 import pytest
 
-from py.markets.base import (
+from nfl_analytics.markets.base import (
     ContractNotFoundError,
     InsufficientBalanceError,
     Order,
@@ -22,7 +22,7 @@ from py.markets.base import (
     OrderStatus,
     Side,
 )
-from py.markets.paper_client import PaperMarketClient
+from nfl_analytics.markets.paper_client import PaperMarketClient
 
 
 @pytest.fixture

@@ -94,7 +94,7 @@ class XGBoostSpreadPredictor:
     def parallel_loader(self):
         """Lazy-load ParallelFeatureLoader."""
         if self._parallel_loader is None:
-            from py.features.feature_loader_parallel import ParallelFeatureLoader
+            from nfl_analytics.features.feature_loader_parallel import ParallelFeatureLoader
 
             self._parallel_loader = ParallelFeatureLoader(
                 db_config=self.db_config, use_redis=True, n_workers=4

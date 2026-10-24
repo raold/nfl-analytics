@@ -30,7 +30,7 @@ import pandas as pd
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.ensemble.meta_learning_weight_predictor import (
+from nfl_analytics.ensemble.meta_learning_weight_predictor import (
     MetaLearningWeightPredictor,
     analyze_weight_predictions,
     compare_static_vs_adaptive_weights,

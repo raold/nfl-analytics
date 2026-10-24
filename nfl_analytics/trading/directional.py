@@ -27,7 +27,7 @@ Signal flow:
         → Emit Signal for risk layer
 
 Usage:
-    from py.trading.directional import DirectionalStrategy, DirectionalConfig
+    from nfl_analytics.trading.directional import DirectionalStrategy, DirectionalConfig
 
     strategy = DirectionalStrategy(
         model_dir="models/production/game_outcome_v2",
@@ -47,9 +47,9 @@ import re
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from py.markets.base import MarketData, OrderBook, Side
-from py.trading.base_strategy import StrategyConfig, TradingStrategy
-from py.trading.signal import Signal
+from nfl_analytics.markets.base import MarketData, OrderBook, Side
+from nfl_analytics.trading.base_strategy import StrategyConfig, TradingStrategy
+from nfl_analytics.trading.signal import Signal
 
 logger = logging.getLogger(__name__)
 
@@ -383,7 +383,7 @@ class DirectionalStrategy(TradingStrategy):
             return
 
         try:
-            from py.models.game_outcome_model_fixed import GameOutcomeModel
+            from nfl_analytics.models.game_outcome_model_fixed import GameOutcomeModel
 
             self._model = GameOutcomeModel(model_dir=self._config.model_dir)
             self._model.load_models()

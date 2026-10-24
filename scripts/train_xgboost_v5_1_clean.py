@@ -30,10 +30,10 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 # Add project root to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from py.features.causal_features_v1 import CausalFeaturesV1
-from py.features.enhanced_travel_features import EnhancedTravelFeatures
-from py.features.oc_features import OCFeatureGenerator
-from py.features.player_aggregation_features import aggregate_player_projections_multi_season
+from nfl_analytics.features.causal_features_v1 import CausalFeaturesV1
+from nfl_analytics.features.enhanced_travel_features import EnhancedTravelFeatures
+from nfl_analytics.features.oc_features import OCFeatureGenerator
+from nfl_analytics.features.player_aggregation_features import aggregate_player_projections_multi_season
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

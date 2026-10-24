@@ -16,7 +16,7 @@ Every trade signal must pass a feature health check. If the pipeline is
 degraded, NO trades are placed until data is restored.
 
 Usage:
-    from py.risk.feature_health import FeatureHealthChecker, HealthConfig
+    from nfl_analytics.risk.feature_health import FeatureHealthChecker, HealthConfig
 
     checker = FeatureHealthChecker()
     result = checker.check_features(features_dict, season=2026, week=5)

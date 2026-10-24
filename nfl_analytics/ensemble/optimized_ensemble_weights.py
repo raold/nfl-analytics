@@ -11,7 +11,7 @@ Implements 6 weighting schemes for 4-way ensemble:
 6. Bayesian Model Averaging (BMA)
 
 Usage:
-    from py.ensemble.optimized_ensemble_weights import OptimizedEnsemble
+    from nfl_analytics.ensemble.optimized_ensemble_weights import OptimizedEnsemble
 
     ensemble = OptimizedEnsemble(weighting_scheme="sharpe")
     prediction = ensemble.predict(
@@ -131,7 +131,7 @@ class EnsembleWeighter:
         if not self.config.meta_learner_path.exists():
             logger.warning(
                 f"Meta-learner not found: {self.config.meta_learner_path}\n"
-                f"  Train with: python py/ensemble/train_meta_learner.py"
+                f"  Train with: python nfl_analytics/ensemble/train_meta_learner.py"
             )
             if self.config.fallback_to_static:
                 logger.info("  Falling back to static Sharpe weighting")

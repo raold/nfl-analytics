@@ -455,8 +455,8 @@ git check-attr filter models/new_model.pkl
 **Status:** ✅ COMPLETE (November 14, 2025)
 
 **What Was Removed:**
-- `py/compute/sync_manager.py` - Google Drive sync manager
-- `py/compute/sync/` - Sync modules (conflict resolution, file locks, machine manager)
+- `nfl_analytics/compute/sync_manager.py` - Google Drive sync manager
+- `nfl_analytics/compute/sync/` - Sync modules (conflict resolution, file locks, machine manager)
 - `.env` variables: `GOOGLE_CREDENTIALS_PATH`, `GOOGLE_DRIVE_FOLDER_ID`
 
 **What Replaced It:**

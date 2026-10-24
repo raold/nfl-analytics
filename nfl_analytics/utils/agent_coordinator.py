@@ -14,7 +14,7 @@ Components Managed:
 6. Documentation - GitHub management, documentation updates, status tracking
 
 Usage:
-    from py.utils.agent_coordinator import AgentCoordinator
+    from nfl_analytics.utils.agent_coordinator import AgentCoordinator
 
     coordinator = AgentCoordinator()
 
@@ -203,16 +203,16 @@ class AgentCoordinator:
                     "Block deployment if validation fails",
                 ],
                 file_patterns=[
-                    "py/models/",
+                    "nfl_analytics/models/",
                     "R/train_",
                     "models/",
                     ".pkl",
                     ".rds",
                     ".pt",
                     "_metadata.json",
-                    "py/utils/performance_optimizer.py",
-                    "py/utils/test_generator.py",
-                    "py/utils/statistical_validator.py",
+                    "nfl_analytics/utils/performance_optimizer.py",
+                    "nfl_analytics/utils/test_generator.py",
+                    "nfl_analytics/utils/statistical_validator.py",
                     "tests/",
                 ],
                 keywords={
@@ -355,9 +355,9 @@ class AgentCoordinator:
                     "queries/",
                     "migrations/",
                     "ingest_",
-                    "py/utils/data_leakage_detector.py",
-                    "py/utils/performance_optimizer.py",
-                    "py/utils/data_layer_analyzer.py",
+                    "nfl_analytics/utils/data_leakage_detector.py",
+                    "nfl_analytics/utils/performance_optimizer.py",
+                    "nfl_analytics/utils/data_layer_analyzer.py",
                     "scripts/analyze_data_layer.sh",
                 ],
                 keywords={
@@ -447,14 +447,14 @@ class AgentCoordinator:
                     "Implement caching strategies",
                 ],
                 file_patterns=[
-                    "py/ensemble/",
-                    "py/backtest/",
-                    "py/production/",
-                    "py/api/",
-                    "py/utils/ensemble_orchestrator.py",
-                    "py/utils/betting_validator.py",
-                    "py/utils/performance_optimizer.py",
-                    "py/rl/",
+                    "nfl_analytics/ensemble/",
+                    "nfl_analytics/backtest/",
+                    "nfl_analytics/production/",
+                    "nfl_analytics/api/",
+                    "nfl_analytics/utils/ensemble_orchestrator.py",
+                    "nfl_analytics/utils/betting_validator.py",
+                    "nfl_analytics/utils/performance_optimizer.py",
+                    "nfl_analytics/rl/",
                 ],
                 keywords={
                     "ensemble",
@@ -535,8 +535,8 @@ class AgentCoordinator:
                     "CLAUDE.md",
                     "PROJECT_STATUS.md",
                     ".md",
-                    "py/utils/code_reviewer.py",
-                    "py/utils/security_auditor.py",
+                    "nfl_analytics/utils/code_reviewer.py",
+                    "nfl_analytics/utils/security_auditor.py",
                 ],
                 keywords={
                     "documentation",

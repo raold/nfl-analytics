@@ -8,7 +8,7 @@ Run with:
 
 import pytest
 
-from py.utils.sql_validator import SQLValidator, validate_query
+from nfl_analytics.utils.sql_validator import SQLValidator, validate_query
 
 
 @pytest.fixture

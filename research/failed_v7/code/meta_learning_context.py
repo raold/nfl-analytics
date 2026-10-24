@@ -31,9 +31,9 @@ import numpy as np
 import pandas as pd
 import psycopg2
 
-from py.features.market_dispersion_features import MarketDispersionFeatures
-from py.features.qb_experience_features import QBExperienceFeatures
-from py.features.roster_stability_features import RosterStabilityFeatures
+from nfl_analytics.features.market_dispersion_features import MarketDispersionFeatures
+from nfl_analytics.features.qb_experience_features import QBExperienceFeatures
+from nfl_analytics.features.roster_stability_features import RosterStabilityFeatures
 
 logger = logging.getLogger(__name__)
 

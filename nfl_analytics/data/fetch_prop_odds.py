@@ -15,13 +15,13 @@ API Documentation: https://the-odds-api.com/liveapi/guides/v4/#overview
 
 Usage:
     # Fetch all prop markets for upcoming games
-    python py/data/fetch_prop_odds.py --api-key YOUR_KEY
+    python nfl_analytics/data/fetch_prop_odds.py --api-key YOUR_KEY
 
     # Fetch specific prop types
-    python py/data/fetch_prop_odds.py --api-key YOUR_KEY --prop-types player_pass_yds player_rush_yds
+    python nfl_analytics/data/fetch_prop_odds.py --api-key YOUR_KEY --prop-types player_pass_yds player_rush_yds
 
     # Backfill historical data (if available)
-    python py/data/fetch_prop_odds.py --api-key YOUR_KEY --backfill --date 2024-09-08
+    python nfl_analytics/data/fetch_prop_odds.py --api-key YOUR_KEY --backfill --date 2024-09-08
 
 Environment:
     ODDS_API_KEY - API key from https://the-odds-api.com

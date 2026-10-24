@@ -14,7 +14,7 @@ import pytest
 from datetime import datetime
 from unittest.mock import Mock, patch, MagicMock
 
-from py.semantic.ingestion.espn_api import (
+from nfl_analytics.semantic.ingestion.espn_api import (
     ESPNApiClient,
     ESPNNewsItem,
     ESPNInjuryItem,

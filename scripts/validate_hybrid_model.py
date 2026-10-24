@@ -41,8 +41,8 @@ import seaborn as sns
 import xgboost as xgb
 from sklearn.preprocessing import StandardScaler
 
-from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
-from py.online.incremental_xgboost import IncrementalXGBoost
+from nfl_analytics.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
+from nfl_analytics.online.incremental_xgboost import IncrementalXGBoost
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"

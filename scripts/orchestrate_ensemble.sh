@@ -34,7 +34,7 @@ if [ "$1" == "--train" ]; then
     echo ""
 
     python3 -c "
-from py.utils.ensemble_orchestrator import EnsembleOrchestrator
+from nfl_analytics.utils.ensemble_orchestrator import EnsembleOrchestrator
 
 orchestrator = EnsembleOrchestrator()
 
@@ -79,7 +79,7 @@ elif [ "$1" == "--optimize" ]; then
         echo "Usage: ./scripts/orchestrate_ensemble.sh --optimize PREDICTIONS.pkl ACTUALS.pkl"
         echo ""
         echo "Or use validation data:"
-        echo "  python3 -c 'from py.utils.ensemble_orchestrator import EnsembleOrchestrator; ...'"
+        echo "  python3 -c 'from nfl_analytics.utils.ensemble_orchestrator import EnsembleOrchestrator; ...'"
         exit 1
     fi
 
@@ -88,7 +88,7 @@ elif [ "$1" == "--optimize" ]; then
 
     python3 -c "
 import pickle
-from py.utils.ensemble_orchestrator import EnsembleOrchestrator
+from nfl_analytics.utils.ensemble_orchestrator import EnsembleOrchestrator
 
 orchestrator = EnsembleOrchestrator()
 
@@ -123,7 +123,7 @@ elif [ "$1" == "--status" ]; then
 
     python3 -c "
 import json
-from py.utils.ensemble_orchestrator import EnsembleOrchestrator
+from nfl_analytics.utils.ensemble_orchestrator import EnsembleOrchestrator
 
 orchestrator = EnsembleOrchestrator()
 
@@ -172,7 +172,7 @@ elif [ "$1" == "--predict" ]; then
 
     python3 -c "
 import json
-from py.utils.ensemble_orchestrator import EnsembleOrchestrator
+from nfl_analytics.utils.ensemble_orchestrator import EnsembleOrchestrator
 
 orchestrator = EnsembleOrchestrator()
 

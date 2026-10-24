@@ -60,7 +60,7 @@ def run_unoptimized_backtest(
     logger.info("RUNNING UNOPTIMIZED BACKTEST (BASELINE)")
     logger.info("=" * 80)
 
-    from py.backtest.historical_validation_5way import HistoricalValidator
+    from nfl_analytics.backtest.historical_validation_5way import HistoricalValidator
 
     start_time = time.time()
 
@@ -114,7 +114,7 @@ def run_optimized_backtest(
     logger.info("RUNNING OPTIMIZED BACKTEST")
     logger.info("=" * 80)
 
-    from py.backtest.historical_validation_4way_optimized import OptimizedHistoricalValidator
+    from nfl_analytics.backtest.historical_validation_4way_optimized import OptimizedHistoricalValidator
 
     start_time = time.time()
 

@@ -25,7 +25,7 @@ import pytest
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from py.utils.enforcement_router import EnforcementRouter, ValidationStatus
+from nfl_analytics.utils.enforcement_router import EnforcementRouter, ValidationStatus
 
 
 @pytest.fixture
@@ -454,7 +454,7 @@ class TestRule20Decorator:
 
     def test_decorator_blocks_underpowered_training(self, router):
         """Decorator should block function execution if data insufficient."""
-        from py.utils.enforcement_router import enforce_data_sufficiency
+        from nfl_analytics.utils.enforcement_router import enforce_data_sufficiency
 
         @enforce_data_sufficiency
         def train_meta_model(X, y):

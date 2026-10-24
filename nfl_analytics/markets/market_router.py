@@ -8,7 +8,7 @@ function that creates the strategy instance on demand.
 Longest-prefix-first matching ensures the most specific route wins.
 
 Usage:
-    from py.markets.market_router import MarketRouter, SportConfig
+    from nfl_analytics.markets.market_router import MarketRouter, SportConfig
 
     router = MarketRouter()
     router.register_sport(SportConfig(
@@ -25,7 +25,7 @@ import logging
 from dataclasses import dataclass, field
 from typing import Callable
 
-from py.trading.base_strategy import TradingStrategy
+from nfl_analytics.trading.base_strategy import TradingStrategy
 
 logger = logging.getLogger(__name__)
 

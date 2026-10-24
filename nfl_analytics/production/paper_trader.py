@@ -17,7 +17,7 @@ Date: November 6, 2025
 Version: 1.0
 
 Usage:
-    from py.production.paper_trader import PaperTradingEngine
+    from nfl_analytics.production.paper_trader import PaperTradingEngine
 
     engine = PaperTradingEngine(initial_bankroll=10000)
 

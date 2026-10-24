@@ -31,7 +31,7 @@ from sklearn.calibration import IsotonicRegression
 from sklearn.metrics import brier_score_loss, log_loss
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from py.ensemble.game_outcome_ensemble_optimized import OptimizedGameOutcomeEnsemble
+from nfl_analytics.ensemble.game_outcome_ensemble_optimized import OptimizedGameOutcomeEnsemble
 
 
 class CalibratedGameOutcomeEnsemble(OptimizedGameOutcomeEnsemble):
@@ -246,7 +246,7 @@ if __name__ == "__main__":
     print("This module provides a calibrated version of the optimized ensemble.")
     print("\nUsage:")
     print(
-        "  from py.ensemble.game_outcome_ensemble_calibrated import CalibratedGameOutcomeEnsemble"
+        "  from nfl_analytics.ensemble.game_outcome_ensemble_calibrated import CalibratedGameOutcomeEnsemble"
     )
     print("")
     print("  ensemble = CalibratedGameOutcomeEnsemble()")

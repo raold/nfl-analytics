@@ -13,13 +13,13 @@ Expected ROI: +8-12% from timing edge alone
 
 Usage:
     # Dry run (no real bets)
-    python py/production/ewb_deployment.py --week 7 --season 2024 --dry-run
+    python nfl_analytics/production/ewb_deployment.py --week 7 --season 2024 --dry-run
 
     # Live mode (requires API keys)
-    python py/production/ewb_deployment.py --week 7 --season 2024 --min-edge 0.03
+    python nfl_analytics/production/ewb_deployment.py --week 7 --season 2024 --min-edge 0.03
 
     # Backtest historical weeks
-    python py/production/ewb_deployment.py --backtest --start-week 1 --end-week 6 --season 2024
+    python nfl_analytics/production/ewb_deployment.py --backtest --start-week 1 --end-week 6 --season 2024
 """
 
 import argparse
@@ -38,7 +38,7 @@ from sqlalchemy import create_engine
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from py.features.line_movement_tracker import LineMovementTracker
+from nfl_analytics.features.line_movement_tracker import LineMovementTracker
 
 logging.basicConfig(
     level=logging.INFO,

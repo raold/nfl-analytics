@@ -22,7 +22,7 @@ Hyperparameters:
 
 Usage:
   # Train CQL agent
-  python py/rl/cql_agent.py \\
+  python nfl_analytics/rl/cql_agent.py \\
       --dataset data/rl_logged.csv \\
       --output models/cql_model.pth \\
       --alpha 1.0 \\
@@ -31,7 +31,7 @@ Usage:
       --device mps
 
   # Evaluate policy
-  python py/rl/cql_agent.py \\
+  python nfl_analytics/rl/cql_agent.py \\
       --dataset data/rl_logged_test.csv \\
       --load models/cql_model.pth \\
       --evaluate

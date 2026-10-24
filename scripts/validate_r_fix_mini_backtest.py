@@ -86,7 +86,7 @@ def fetch_test_games(n_games=10):
 
 def run_mini_backtest():
     """Run mini backtest with batched R interface."""
-    from py.ensemble.r_model_interface_batched import BatchedRModelInterface
+    from nfl_analytics.ensemble.r_model_interface_batched import BatchedRModelInterface
 
     logger.info("=" * 80)
     logger.info("R MODEL FIX VALIDATION - MINI BACKTEST (10 GAMES)")

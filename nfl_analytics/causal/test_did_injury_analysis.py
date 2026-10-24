@@ -4,7 +4,7 @@ Unit Tests for Difference-in-Differences Injury Analysis Module
 Tests for data preparation, estimation, and visualization components.
 
 Run with:
-    pytest py/causal/test_did_injury_analysis.py -v
+    pytest nfl_analytics/causal/test_did_injury_analysis.py -v
 """
 
 import matplotlib.pyplot as plt

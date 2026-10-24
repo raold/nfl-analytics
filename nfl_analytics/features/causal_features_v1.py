@@ -12,7 +12,7 @@ Features Implemented:
 3. PSM Weather (null finding): -2.24 yards effect (not significant)
 
 Usage:
-    from py.features.causal_features_v1 import CausalFeaturesV1
+    from nfl_analytics.features.causal_features_v1 import CausalFeaturesV1
 
     cf = CausalFeaturesV1(db_config)
     features = cf.calculate_features(

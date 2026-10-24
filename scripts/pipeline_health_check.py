@@ -591,7 +591,7 @@ def print_report(report: HealthReport, verbose: bool = False):
             elif "Play-by-play" in check.name:
                 print("    - Ingest PBP: Rscript R/ingestion/ingest_current_season.R")
             elif "model files" in check.name:
-                print("    - Retrain model: python py/models/game_outcome_model_fixed.py")
+                print("    - Retrain model: python nfl_analytics/models/game_outcome_model_fixed.py")
 
     print("=" * 72)
     return report.is_healthy

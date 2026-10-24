@@ -15,7 +15,7 @@ Author: Claude Code (Sonnet 4.5)
 Created: November 20, 2025
 
 Usage:
-    from py.ensemble.r_prediction_lookup import RModelPredictionLookup
+    from nfl_analytics.ensemble.r_prediction_lookup import RModelPredictionLookup
 
     lookup = RModelPredictionLookup()
 
@@ -488,17 +488,17 @@ class RPredictionLookup:
     """
     Drop-in replacement for RModelInterface (rpy2 version).
 
-    Provides identical API to py.ensemble.r_model_interface.RModelInterface
+    Provides identical API to nfl_analytics.ensemble.r_model_interface.RModelInterface
     but uses PostgreSQL lookup instead of rpy2 runtime calls.
 
     Migration:
         # OLD (rpy2, slow):
-        from py.ensemble.r_model_interface import RModelInterface
+        from nfl_analytics.ensemble.r_model_interface import RModelInterface
         interface = RModelInterface(db_config)
         mean, std = interface.predict_hierarchical(player_id, season, week, model_path)
 
         # NEW (PostgreSQL, fast):
-        from py.ensemble.r_prediction_lookup import RPredictionLookup
+        from nfl_analytics.ensemble.r_prediction_lookup import RPredictionLookup
         lookup = RPredictionLookup(db_config)
         mean, std = lookup.predict_hierarchical(player_id, season, week, model_path)
 

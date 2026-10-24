@@ -1323,7 +1323,7 @@
 \contentsline {paragraph}{Database Access (TimescaleDB + PostgreSQL).}{409}{section*.2681}%
 \contentsline {paragraph}{R Ecosystem (ggplot2, dplyr, nflfastR).}{409}{section*.2682}%
 \contentsline {paragraph}{Python ML Stack (XGBoost, SHAP, Statistical Tests).}{409}{section*.2683}%
-\contentsline {paragraph}{Statistical Framework (\texttt {py/compute/statistics/}).}{410}{section*.2684}%
+\contentsline {paragraph}{Statistical Framework (\texttt {nfl_analytics/compute/statistics/}).}{410}{section*.2684}%
 \contentsline {paragraph}{Quarto Notebooks (Reproducibility).}{410}{section*.2685}%
 \contentsline {subsection}{\numberline {10.1.4}Use Case 1: Post‑Game Upset Analysis}{411}{subsection.2686}%
 \contentsline {paragraph}{Scenario.}{411}{section*.2687}%

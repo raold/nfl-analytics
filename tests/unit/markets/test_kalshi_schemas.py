@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from py.markets.base import OrderStatus, Side
-from py.markets.kalshi.schemas import (
+from nfl_analytics.markets.base import OrderStatus, Side
+from nfl_analytics.markets.kalshi.schemas import (
     build_create_order_body,
     build_batch_create_body,
     build_batch_cancel_body,
@@ -420,7 +420,7 @@ class TestRequestBodyBuilders:
 
     def test_create_order_yes(self):
         """YES buy order body."""
-        from py.markets.base import Order, Side
+        from nfl_analytics.markets.base import Order, Side
 
         order = Order(
             order_id="my-order-1",
@@ -441,7 +441,7 @@ class TestRequestBodyBuilders:
 
     def test_create_order_no(self):
         """NO buy order body."""
-        from py.markets.base import Order, Side
+        from nfl_analytics.markets.base import Order, Side
 
         order = Order(
             order_id="my-order-2",
@@ -458,7 +458,7 @@ class TestRequestBodyBuilders:
 
     def test_batch_create_body(self):
         """Batch create includes all orders."""
-        from py.markets.base import Order, Side
+        from nfl_analytics.markets.base import Order, Side
 
         orders = [
             Order(order_id=f"o-{i}", contract_id=f"C-{i}", side=Side.YES, price_cents=50, quantity=1)

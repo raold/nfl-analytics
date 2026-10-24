@@ -37,7 +37,7 @@ from typing import Any
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from py.semantic.models.ollama_client import OllamaClient
+from nfl_analytics.semantic.models.ollama_client import OllamaClient
 
 logger = logging.getLogger(__name__)
 

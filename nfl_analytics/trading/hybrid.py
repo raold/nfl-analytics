@@ -17,7 +17,7 @@ The hybrid owns the model interaction and injects fair values into the
 internal MarketMaker. This keeps the MM focused on quoting mechanics.
 
 Usage:
-    from py.trading.hybrid import HybridStrategy, HybridConfig
+    from nfl_analytics.trading.hybrid import HybridStrategy, HybridConfig
 
     strategy = HybridStrategy(
         config=HybridConfig(directional_edge_cents=5),
@@ -32,16 +32,16 @@ import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from py.markets.base import MarketData, OrderBook, Side
-from py.trading.base_strategy import StrategyConfig, TradingStrategy
-from py.trading.directional import (
+from nfl_analytics.markets.base import MarketData, OrderBook, Side
+from nfl_analytics.trading.base_strategy import StrategyConfig, TradingStrategy
+from nfl_analytics.trading.directional import (
     DirectionalConfig,
     GamePrediction,
     ParsedContract,
     parse_contract_id,
 )
-from py.trading.market_maker import MarketMaker, MarketMakerConfig
-from py.trading.signal import Signal
+from nfl_analytics.trading.market_maker import MarketMaker, MarketMakerConfig
+from nfl_analytics.trading.signal import Signal
 
 logger = logging.getLogger(__name__)
 
@@ -310,7 +310,7 @@ class HybridStrategy(TradingStrategy):
             return
 
         try:
-            from py.models.game_outcome_model_fixed import GameOutcomeModel
+            from nfl_analytics.models.game_outcome_model_fixed import GameOutcomeModel
 
             self._model = GameOutcomeModel(model_dir=self._config.model_dir)
             self._model.load_models()

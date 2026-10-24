@@ -28,7 +28,7 @@ Signal output:
     - YES ask as NO bid: Signal(side=NO, price=100-ask_price)
 
 Usage:
-    from py.trading.market_maker import MarketMaker, MarketMakerConfig
+    from nfl_analytics.trading.market_maker import MarketMaker, MarketMakerConfig
 
     mm = MarketMaker(config=MarketMakerConfig(base_spread_cents=2))
     mm.set_fair_value("KXNFL-26-WIN-KC", 62.0, confidence=0.8)
@@ -41,9 +41,9 @@ import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from py.markets.base import MarketData, OrderBook, Side
-from py.trading.base_strategy import StrategyConfig, TradingStrategy
-from py.trading.signal import Signal
+from nfl_analytics.markets.base import MarketData, OrderBook, Side
+from nfl_analytics.trading.base_strategy import StrategyConfig, TradingStrategy
+from nfl_analytics.trading.signal import Signal
 
 logger = logging.getLogger(__name__)
 

@@ -8,7 +8,7 @@ Writes lines suitable for the Chapter 8 table:
   2023 & Ensemble & +12 & 0.217 & 0.029 & +1.9 & 0.48 & -10.2 & 1150 \\
 
 Usage:
-  python py/registry/oos_to_tex.py --csv results/oos.csv \
+  python nfl_analytics/registry/oos_to_tex.py --csv results/oos.csv \
       --tex analysis/dissertation/results/oos_record_rows.tex
 """
 

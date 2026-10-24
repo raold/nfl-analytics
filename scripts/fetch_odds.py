@@ -28,7 +28,7 @@ from pathlib import Path
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from py.odds.odds_fetcher import OddsAPIRateLimitError, OddsFetcher
+from nfl_analytics.odds.odds_fetcher import OddsAPIRateLimitError, OddsFetcher
 
 # Configure logging
 logging.basicConfig(

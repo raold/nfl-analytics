@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-from py.ensemble.game_outcome_ensemble import GameOutcomeEnsemble, fetch_games
+from nfl_analytics.ensemble.game_outcome_ensemble import GameOutcomeEnsemble, fetch_games
 
 
 def kelly_fraction(

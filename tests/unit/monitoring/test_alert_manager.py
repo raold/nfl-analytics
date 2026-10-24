@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from py.monitoring.alert_manager import Alert, AlertConfig, AlertLevel, AlertManager
+from nfl_analytics.monitoring.alert_manager import Alert, AlertConfig, AlertLevel, AlertManager
 
 
 # ============================================================
@@ -129,7 +129,7 @@ class TestWebhook:
     def test_no_url_no_call(self):
         """No webhook URL → no HTTP call."""
         mgr = AlertManager(AlertConfig(webhook_url=None))
-        with patch("py.monitoring.alert_manager.httpx", create=True) as mock_httpx:
+        with patch("nfl_analytics.monitoring.alert_manager.httpx", create=True) as mock_httpx:
             mgr.alert(AlertLevel.INFO, "Test", "hello")
             mock_httpx.Client.assert_not_called()
 

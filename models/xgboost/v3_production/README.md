@@ -114,7 +114,7 @@ models/xgboost/v3_production/
 ### 1. Inference (Single Prediction)
 
 ```python
-from py.predict.v3_inference import V3Predictor
+from nfl_analytics.predict.v3_inference import V3Predictor
 
 # Initialize predictor
 predictor = V3Predictor()
@@ -136,7 +136,7 @@ predictor.predict_and_save(
 ### 2. Ensemble Predictions (v3 + v2.1)
 
 ```python
-from py.predict.ensemble import EnsemblePredictor
+from nfl_analytics.predict.ensemble import EnsemblePredictor
 
 # Weighted ensemble (v3: 70%, v2.1: 30%)
 predictor = EnsemblePredictor(method='weighted')
@@ -151,13 +151,13 @@ results = predictor.predict(season=2025, week=5)
 
 ```bash
 # Generate v3 predictions
-uv run python py/predict/v3_inference.py --season 2025 --week 5 --output predictions.csv
+uv run python nfl_analytics/predict/v3_inference.py --season 2025 --week 5 --output predictions.csv
 
 # Generate ensemble predictions
-uv run python py/predict/ensemble.py --season 2025 --week 5 --method weighted
+uv run python nfl_analytics/predict/ensemble.py --season 2025 --week 5 --method weighted
 
 # Monitor production performance
-uv run python py/monitor/production_monitor.py --predictions-file predictions.csv --season 2025 --week 5
+uv run python nfl_analytics/monitor/production_monitor.py --predictions-file predictions.csv --season 2025 --week 5
 ```
 
 ## Production Monitoring
@@ -189,20 +189,20 @@ The model includes comprehensive production monitoring:
 
 ```bash
 # 1. Initialize monitoring tables (one-time)
-uv run python py/monitor/production_monitor.py --init-tables
+uv run python nfl_analytics/monitor/production_monitor.py --init-tables
 
 # 2. Generate predictions for upcoming week
-uv run python py/predict/v3_inference.py --season 2025 --week 5 --output week5_predictions.csv
+uv run python nfl_analytics/predict/v3_inference.py --season 2025 --week 5 --output week5_predictions.csv
 
 # 3. After week completes, evaluate performance
-uv run python py/monitor/production_monitor.py \
+uv run python nfl_analytics/monitor/production_monitor.py \
     --predictions-file week5_predictions.csv \
     --season 2025 \
     --week 5 \
     --model-version v3.0.0
 
 # 4. Generate weekly report
-uv run python py/monitor/production_monitor.py --weekly-report --season 2025 --week 5
+uv run python nfl_analytics/monitor/production_monitor.py --weekly-report --season 2025 --week 5
 ```
 
 ## Model Retraining Guidelines
@@ -228,12 +228,12 @@ Retrain the model if any of the following conditions are met:
 
 ```bash
 # 1. Update feature data with latest games
-uv run python py/features/materialized_view_features.py \
+uv run python nfl_analytics/features/materialized_view_features.py \
     --output data/processed/features/asof_team_features_v3.csv \
     --games-only
 
 # 2. Run hyperparameter sweep (if exploring new configurations)
-uv run python py/models/xgboost_gpu_v3.py \
+uv run python nfl_analytics/models/xgboost_gpu_v3.py \
     --features-csv data/processed/features/asof_team_features_v3.csv \
     --sweep \
     --output-dir models/xgboost/v3_sweep_YYYYMMDD
@@ -301,8 +301,8 @@ Features are computed **as-of** each game, ensuring no data leakage.
 For questions or issues:
 - Review monitoring dashboard: `monitoring.model_metrics`
 - Check logs: `data/logs/`
-- Model training code: `py/models/xgboost_gpu_v3.py`
-- Inference code: `py/predict/v3_inference.py`
+- Model training code: `nfl_analytics/models/xgboost_gpu_v3.py`
+- Inference code: `nfl_analytics/predict/v3_inference.py`
 
 ---
 

@@ -5,7 +5,7 @@ Production wrapper for GameOutcomeModel predictions.
 
 import argparse
 
-from py.services.game_outcome_runs import run_game_outcome_predictions
+from nfl_analytics.services.game_outcome_runs import run_game_outcome_predictions
 
 
 def main():

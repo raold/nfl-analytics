@@ -7,8 +7,8 @@ layer to the risk layer (for validation) to the execution layer (for submission)
 Pipeline: MarketData → Strategy → Signal → RiskCheck → Execution → Order
 
 Usage:
-    from py.trading.signal import Signal
-    from py.markets.base import Side
+    from nfl_analytics.trading.signal import Signal
+    from nfl_analytics.markets.base import Side
 
     signal = Signal(
         contract_id="KXNFL-26-AFC-KC",
@@ -30,7 +30,7 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
-from py.markets.base import Order, OrderType, Side
+from nfl_analytics.markets.base import Order, OrderType, Side
 
 
 @dataclass

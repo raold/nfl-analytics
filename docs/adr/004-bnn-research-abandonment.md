@@ -229,8 +229,8 @@ Success measured by:
 
 ### Code
 
-- Retained: `py/models/train_bnn_rushing.py` (v3.1 Rushing)
-- Archived: `py/models/train_bnn_*.py` (all other variants)
+- Retained: `nfl_analytics/models/train_bnn_rushing.py` (v3.1 Rushing)
+- Archived: `nfl_analytics/models/train_bnn_*.py` (all other variants)
 - Archived: `models/bayesian/bnn_*.pkl` (model artifacts)
 
 ### External Resources

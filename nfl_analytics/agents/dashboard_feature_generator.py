@@ -33,7 +33,7 @@ Code Generation Patterns:
    - Error handling → st.error() messages
 
 Usage:
-    from py.agents.dashboard_feature_generator import DashboardFeatureGenerator
+    from nfl_analytics.agents.dashboard_feature_generator import DashboardFeatureGenerator
 
     generator = DashboardFeatureGenerator()
 

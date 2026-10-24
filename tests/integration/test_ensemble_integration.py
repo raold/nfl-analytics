@@ -28,7 +28,7 @@ import pandas as pd
 import psycopg2
 import pytest
 
-from py.ensemble.enhanced_ensemble_v3 import EnhancedEnsembleV3
+from nfl_analytics.ensemble.enhanced_ensemble_v3 import EnhancedEnsembleV3
 
 # ============================================================================
 # FIXTURES
@@ -436,7 +436,7 @@ def test_load_bnn_model_with_metadata(ensemble_no_stacking, tmp_path):
     # Mock BayesianNeuralNetwork.load
     mock_bnn = Mock()
     with patch(
-        "py.ensemble.enhanced_ensemble_v3.BayesianNeuralNetwork.load", return_value=mock_bnn
+        "nfl_analytics.ensemble.enhanced_ensemble_v3.BayesianNeuralNetwork.load", return_value=mock_bnn
     ):
         with patch("pathlib.Path.exists", return_value=True):
             result = ensemble_no_stacking.load_bnn_model(

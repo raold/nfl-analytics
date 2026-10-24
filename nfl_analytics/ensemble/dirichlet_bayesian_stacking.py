@@ -25,7 +25,7 @@ XGBoost improves mid-season).
 - Proven in production: CDC FluSight 2023-24 winner (+12% over static weights)
 
 **Usage Example**:
-    from py.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStacking
+    from nfl_analytics.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStacking
 
     # Initialize with v6.0 prior weights
     stacker = DirichletBayesianStacking(
@@ -484,7 +484,7 @@ class DirichletBayesianStackingByStatType:
     - Game outcomes (spread/total) need different weights than player props
 
     Usage:
-        from py.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStackingByStatType
+        from nfl_analytics.ensemble.dirichlet_bayesian_stacking import DirichletBayesianStackingByStatType
 
         stacker = DirichletBayesianStackingByStatType()
         weights = stacker.get_weights('passing_yards')

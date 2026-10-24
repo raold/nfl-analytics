@@ -39,7 +39,7 @@ Target Performance:
 - <500ms inference time
 
 Usage:
-    from py.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
+    from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way
     import os
 
     ensemble = EnhancedEnsemble5Way(db_password=os.getenv("DB_PASSWORD"))
@@ -75,10 +75,10 @@ import xgboost as xgb
 from dotenv import load_dotenv
 
 # v6.1: PostgreSQL lookup (200-400x faster than rpy2)
-from py.ensemble.r_prediction_lookup import RPredictionLookup
+from nfl_analytics.ensemble.r_prediction_lookup import RPredictionLookup
 
 # Import hybrid model
-from py.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
+from nfl_analytics.online.hybrid_static_incremental import HybridStaticIncrementalXGBoost
 
 # Load environment variables
 load_dotenv()
@@ -104,7 +104,7 @@ class EnhancedEnsemble5Way:
     This is an INFERENCE class that loads pre-trained models. Data sufficiency
     checks (assert len(X) >= n_features * 10) are enforced in the training scripts:
     - XGBoost: scripts/train_xgboost_v6_advanced_features.py
-    - Hybrid: py/online/hybrid_static_incremental.py
+    - Hybrid: nfl_analytics/online/hybrid_static_incremental.py
     - R models: R/train_*.R (validated via MCMC convergence)
 
     Weights (sum to 1.00):

@@ -13,7 +13,7 @@ Performance Impact:
 - Automatic connection health checks and recycling
 
 Usage:
-    from py.utils.database_pool import DatabasePoolManager
+    from nfl_analytics.utils.database_pool import DatabasePoolManager
 
     pool = DatabasePoolManager(
         host="localhost",
@@ -271,7 +271,7 @@ def get_default_pool() -> DatabasePoolManager:
         DatabasePoolManager instance
 
     Example:
-        from py.utils.database_pool import get_default_pool
+        from nfl_analytics.utils.database_pool import get_default_pool
 
         pool = get_default_pool()
         with pool.get_connection() as conn:

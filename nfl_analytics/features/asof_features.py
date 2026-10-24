@@ -6,7 +6,7 @@ to kickoff. It emits a wide, game-level dataset with home and away features as
 well as helpful differentials for modeling and backtests.
 
 Example:
-  python py/features/asof_features.py --output analysis/features/asof_team_features.csv \
+  python nfl_analytics/features/asof_features.py --output analysis/features/asof_team_features.csv \
       --write-table mart.asof_team_features --season-start 2003 --validate
 """
 

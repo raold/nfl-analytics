@@ -11,7 +11,7 @@
 ### 1. Generate Validation Predictions
 
 ```bash
-python3 py/ensemble/generate_validation_predictions.py \
+python3 nfl_analytics/ensemble/generate_validation_predictions.py \
   --start-season 2022 \
   --end-season 2023 \
   --output data/validation_predictions_2022_2023.csv
@@ -22,7 +22,7 @@ python3 py/ensemble/generate_validation_predictions.py \
 ### 2. Optimize Stacking Weights
 
 ```bash
-python3 py/ensemble/bayesian_stacking.py \
+python3 nfl_analytics/ensemble/bayesian_stacking.py \
   --mode optimize \
   --validation-data data/validation_predictions_2022_2023.csv \
   --output models/ensemble/stacking_report.md
@@ -69,7 +69,7 @@ cat models/ensemble/stacking_report.md
 ### Basic Usage
 
 ```python
-from py.ensemble.bayesian_stacking import BayesianStacker
+from nfl_analytics.ensemble.bayesian_stacking import BayesianStacker
 import pandas as pd
 
 # 1. Initialize
@@ -136,7 +136,7 @@ print(f"Stacked: {ensemble_mean:.1f} ± {ensemble_std:.1f} yards")
 ## Documentation
 
 - **Quick Reference:** `/docs/research/STACKING_QUICK_REFERENCE.md`
-- **Integration Guide:** `/py/ensemble/BAYESIAN_STACKING_INTEGRATION.md`
+- **Integration Guide:** `/nfl_analytics/ensemble/BAYESIAN_STACKING_INTEGRATION.md`
 - **Implementation Summary:** `/docs/research/BAYESIAN_STACKING_IMPLEMENTATION_COMPLETE.md`
 - **Example Usage:** `/examples/bayesian_stacking_example.py`
 

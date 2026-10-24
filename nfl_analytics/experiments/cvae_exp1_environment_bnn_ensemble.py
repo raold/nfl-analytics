@@ -24,7 +24,7 @@ import psycopg2
 import torch
 from sklearn.preprocessing import StandardScaler
 
-from py.models.game_trajectory_cvae import ConditionalVAE
+from nfl_analytics.models.game_trajectory_cvae import ConditionalVAE
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

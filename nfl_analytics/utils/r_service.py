@@ -26,7 +26,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 try:
-    from py.utils.claude_cache import get_default_cache
+    from nfl_analytics.utils.claude_cache import get_default_cache
 
     CACHE_AVAILABLE = True
 except ImportError:

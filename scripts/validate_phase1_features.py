@@ -153,7 +153,7 @@ class Phase1Validator:
 
         if not Path(csv_path).exists():
             logger.warning(f"Opponent strength features not found: {csv_path}")
-            logger.warning("Run: python py/features/opponent_strength.py")
+            logger.warning("Run: python nfl_analytics/features/opponent_strength.py")
             return pd.DataFrame()
 
         df = pd.read_csv(csv_path)

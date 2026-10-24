@@ -320,7 +320,7 @@ ls -lh models/bayesian/bnn_multioutput_passing_v1_canonical.pt
 
 ```bash
 # Test Python models load quickly
-python py/models/test_all_models_loading.py
+python nfl_analytics/models/test_all_models_loading.py
 
 # Expected output:
 # Loaded: State-Space (0.45s)
@@ -334,7 +334,7 @@ python py/models/test_all_models_loading.py
 
 ```bash
 # Test end-to-end prediction latency
-time python py/ensemble/enhanced_ensemble_v5_canonical.py \
+time python nfl_analytics/ensemble/enhanced_ensemble_v5_canonical.py \
   --player-id "00-0019596" \
   --season 2025 \
   --week 12 \
@@ -352,7 +352,7 @@ time python py/ensemble/enhanced_ensemble_v5_canonical.py \
 
 ```bash
 # Check calibration on last N predictions
-python py/validation/check_recent_calibration.py --window 100
+python nfl_analytics/validation/check_recent_calibration.py --window 100
 
 # Expected output:
 # Last 100 predictions:
@@ -417,7 +417,7 @@ EOF
 
 ```bash
 # Test all 4 risk gates
-python py/production/test_risk_gates.py
+python nfl_analytics/production/test_risk_gates.py
 
 # Expected output:
 # Gate 1 (Edge): ✓ Functional (100 tests)

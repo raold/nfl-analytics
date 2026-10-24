@@ -4,12 +4,12 @@ from __future__ import annotations
 
 import pytest
 
-from py.markets.base import Position, Side
-from py.risk.feature_health import FEATURE_GROUPS, HealthConfig
-from py.risk.kill_switch import KillSwitchConfig
-from py.risk.position_limits import LimitConfig
-from py.risk.risk_manager import RiskCheckResult, RiskManager, RiskManagerConfig
-from py.trading.signal import Signal
+from nfl_analytics.markets.base import Position, Side
+from nfl_analytics.risk.feature_health import FEATURE_GROUPS, HealthConfig
+from nfl_analytics.risk.kill_switch import KillSwitchConfig
+from nfl_analytics.risk.position_limits import LimitConfig
+from nfl_analytics.risk.risk_manager import RiskCheckResult, RiskManager, RiskManagerConfig
+from nfl_analytics.trading.signal import Signal
 
 
 def _signal(
