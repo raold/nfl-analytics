@@ -29,6 +29,8 @@ import pandas as pd
 import psycopg
 from psycopg import Connection
 
+from py.utils.spread_convention import home_cover, home_cover_margin
+
 # Add project root to path
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -344,12 +346,12 @@ def add_target_variables(df: pd.DataFrame) -> pd.DataFrame:
 
     # Binary outcomes
     df["home_win"] = (df["home_margin"] > 0).astype(float)
-    df["home_cover"] = (df["home_margin"] + df["spread_close"] > 0).astype(float)
+    df["home_cover"] = home_cover(df["home_margin"], df["spread_close"])
     df["over_hit"] = ((df["home_score"] + df["away_score"]) > df["total_close"]).astype(float)
 
     # Continuous outcomes
     df["actual_total"] = df["home_score"] + df["away_score"]
-    df["cover_margin"] = df["home_margin"] + df["spread_close"]
+    df["cover_margin"] = home_cover_margin(df["home_margin"], df["spread_close"])
     df["total_vs_line"] = df["actual_total"] - df["total_close"]
 
     return df

@@ -97,7 +97,17 @@ Implement the following improvements organized into three tiers by expected impa
 - Remove custom `AVG(boolean)` aggregate (use `AVG(col::int)` instead)
 - Test all feature extractors against the updated schema
 
-### 2.4 Deploy Power Ratings Model
+### 2.4 Deploy Power Ratings Model — WITHDRAWN (2026-10-24)
+
+> **Correction:** The +43% ROI / 74.9% ATS result was produced by a spread sign error, not by
+> the model. `games.spread_close` is nflverse convention (positive = home favored), but the
+> experiment graded covers with the sportsbook rule `margin + spread_close > 0` and computed edge
+> as `pred + spread_close`. That combination scores ~74% for any model that agrees with the
+> favorite. Graded correctly, prior-season point differential + 2.5 HFA is 49.4% ATS on 1,392
+> bets (2019–2024, `tests/unit/test_spread_convention.py`), consistent with the 51.8% walk-forward
+> result in `docs/investigation/ws3_model_performance.md`. See `docs/POSTMORTEMS.md` §4.
+> The original text is kept below for the record.
+
 **Problem:** Simple 2024 point differential + 2.5 HFA model achieved +43% ROI on 2025 holdout in experiments. Not integrated into production.
 
 **Actions:**

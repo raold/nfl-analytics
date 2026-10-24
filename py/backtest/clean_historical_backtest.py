@@ -15,6 +15,8 @@ import xgboost as xgb
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import StandardScaler
 
+from py.utils.spread_convention import implied_home_win_prob
+
 warnings.filterwarnings("ignore")
 
 print("=" * 70)
@@ -114,9 +116,7 @@ def simulate_betting(predictions, actuals, spreads, min_edge=0.02, kelly_fractio
             continue
 
         # Calculate edge
-        market_prob = (
-            1 / (1 + np.exp(spread / 7.0)) if spread < 0 else 1 - 1 / (1 + np.exp(-spread / 7.0))
-        )
+        market_prob = float(implied_home_win_prob(spread))
         edge = pred - market_prob
 
         # Only bet if we have an edge

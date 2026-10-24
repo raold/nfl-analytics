@@ -14,6 +14,8 @@ import pandas as pd
 import psycopg2
 import xgboost as xgb
 
+from py.utils.spread_convention import implied_home_win_prob
+
 warnings.filterwarnings("ignore")
 
 print("=" * 70)
@@ -40,12 +42,10 @@ WITH game_features AS (
         g.spread_close,
         g.total_close,
         CASE WHEN g.home_score > g.away_score THEN 1 ELSE 0 END as home_win,
-        CASE WHEN g.home_score + g.spread_close > g.away_score THEN 1 ELSE 0 END as home_cover,
+        CASE WHEN g.home_score - g.spread_close > g.away_score THEN 1 ELSE 0 END as home_cover,
         -- Calculate implied probability from spread (using standard -110 odds)
-        CASE
-            WHEN g.spread_close < 0 THEN 1 / (1 + EXP(g.spread_close / 7.0))
-            ELSE 1 - 1 / (1 + EXP(-g.spread_close / 7.0))
-        END as market_prob
+        -- spread_close is nflverse convention (positive = home favored)
+        1 / (1 + EXP(-g.spread_close / 7.0)) as market_prob
     FROM games g
     WHERE g.season >= 2006
     AND g.home_score IS NOT NULL
@@ -156,9 +156,7 @@ def simulate_betting(predictions, actuals, spreads, min_edge=0.02, kelly_fractio
             continue
 
         # Calculate edge
-        market_prob = (
-            1 / (1 + np.exp(spread / 7.0)) if spread < 0 else 1 - 1 / (1 + np.exp(-spread / 7.0))
-        )
+        market_prob = float(implied_home_win_prob(spread))
         edge = pred - market_prob
 
         # Only bet if we have an edge

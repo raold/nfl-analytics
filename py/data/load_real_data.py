@@ -19,6 +19,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from py.utils.spread_convention import home_cover
+
 
 def load_predictions(predictions_path: Path) -> pd.DataFrame:
     """
@@ -68,7 +70,7 @@ def load_features(features_path: Path) -> pd.DataFrame:
 
     # Ensure cover column exists (home covered spread?)
     if "home_cover" not in df.columns and "spread_close" in df.columns:
-        df["home_cover"] = (df["home_margin"] + df["spread_close"]) > 0
+        df["home_cover"] = home_cover(df["home_margin"], df["spread_close"])
 
     return df
 

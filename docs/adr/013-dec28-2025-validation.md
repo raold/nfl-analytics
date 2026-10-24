@@ -1,7 +1,14 @@
 # ADR-013: December 28, 2025 Changes Validation
 
-**Status:** VALIDATED
+**Status:** VALIDATED — Test 1 (rest differential) INVALIDATED 2026-10-24
 **Date:** 2025-12-28
+
+> **Correction (2026-10-24):** Test 1's cover rates come from `scripts/validate_dec28_changes.py`,
+> which graded covers as `actual_margin + spread_close > 0`. `spread_close` is nflverse convention
+> (positive = home favored), so the correct rule is `actual_margin - spread_close > 0`. The rest
+> correlation and the 25-point swing below are not valid evidence and must be re-run with the
+> fixed script before rest features are credited with ATS signal. Cells of 8–26 games would not
+> support the conclusion even with correct labels. See `docs/POSTMORTEMS.md` §4.
 **Decision Makers:** dro, Claude Code
 
 ## Context

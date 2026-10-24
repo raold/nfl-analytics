@@ -48,7 +48,7 @@ def load_2025_holdout_data() -> pd.DataFrame:
             g.away_score,
             g.spread_close,
             CASE
-                WHEN (g.home_score - g.away_score) + g.spread_close > 0 THEN 1
+                WHEN (g.home_score - g.away_score) - g.spread_close > 0 THEN 1
                 ELSE 0
             END as home_covered
         FROM games g

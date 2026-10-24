@@ -344,10 +344,10 @@ def train_outcome_model(
     # Outcomes
     y_win = (train_df["home_score"] > train_df["away_score"]).astype(float).values
 
-    # Spread cover (home team covers if home_score + spread > away_score)
+    # Spread cover (nflverse spread: home covers if home_score - spread_close > away_score)
     if "spread_close" in train_df.columns:
         y_cover = (
-            ((train_df["home_score"] + train_df["spread_close"]) > train_df["away_score"])
+            ((train_df["home_score"] - train_df["spread_close"]) > train_df["away_score"])
             .astype(float)
             .values
         )

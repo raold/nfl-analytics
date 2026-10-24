@@ -37,6 +37,8 @@ import numpy as np
 import pandas as pd
 import psycopg
 
+from py.utils.spread_convention import home_cover
+
 # Import base module for shared utilities
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -404,7 +406,7 @@ def pivot_to_games_enhanced(df: pd.DataFrame) -> pd.DataFrame:
     # Add betting outcomes
     merged["home_margin"] = merged["home_score"] - merged["away_score"]
     merged["home_win"] = (merged["home_margin"] > 0).astype(float)
-    merged["home_cover"] = (merged["home_margin"] + merged["spread_close"] > 0).astype(float)
+    merged["home_cover"] = home_cover(merged["home_margin"], merged["spread_close"])
     merged["over_hit"] = (
         (merged["home_score"] + merged["away_score"]) > merged["total_close"]
     ).astype(float)

@@ -479,7 +479,7 @@ class Dec28Validator:
                 away_team,
                 actual_margin,
                 spread_close,
-                actual_margin + spread_close AS ats_result,
+                actual_margin - spread_close AS ats_result,  -- nflverse: positive spread = home favored
                 home_rest
             FROM game_rest
             WHERE home_rest IS NOT NULL
@@ -501,7 +501,7 @@ class Dec28Validator:
                 )
 
             # Compute correlation
-            # ATS cover = 1 if actual_margin + spread_close > 0
+            # ATS cover = 1 if actual_margin - spread_close > 0 (pushes counted as no-cover)
             df["home_covered"] = (df["ats_result"] > 0).astype(int)
 
             # Simple correlation with home_rest

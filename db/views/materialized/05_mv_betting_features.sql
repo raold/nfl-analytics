@@ -20,11 +20,11 @@ WITH betting_base AS (
     g.spread_close,
     g.total_close,
 
-    -- Betting outcomes
-    (g.home_score - g.away_score) + g.spread_close as home_cover_margin,
+    -- Betting outcomes (spread_close is nflverse convention: positive = home favored)
+    (g.home_score - g.away_score) - g.spread_close as home_cover_margin,
     CASE
-      WHEN (g.home_score - g.away_score) + g.spread_close > 0 THEN 1
-      WHEN (g.home_score - g.away_score) + g.spread_close < 0 THEN 0
+      WHEN (g.home_score - g.away_score) - g.spread_close > 0 THEN 1
+      WHEN (g.home_score - g.away_score) - g.spread_close < 0 THEN 0
       ELSE NULL  -- Push
     END as home_covered,
 

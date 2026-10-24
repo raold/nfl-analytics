@@ -227,9 +227,13 @@ These results confirm:
 
 ## Notes
 
-The spread sign convention in this database is **inverted** from standard nflverse:
+The spread sign convention in this database **is** the nflverse convention (`spread_line` is copied
+verbatim into `games.spread_close`); it is inverted only relative to sportsbook notation:
 - Positive `spread_close` = home is **favorite** (giving points)
 - Negative `spread_close` = home is **underdog** (receiving points)
+
+*(Corrected 2026-10-24; this note previously said "inverted from standard nflverse". Use
+`py/utils/spread_convention.py` for all cover/edge math.)*
 
 This is documented in the `load_game_outcomes()` docstring for future reference.
 

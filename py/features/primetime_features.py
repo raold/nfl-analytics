@@ -46,6 +46,8 @@ import warnings
 import pandas as pd
 import psycopg2
 
+from py.utils.spread_convention import home_cover
+
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
@@ -294,7 +296,7 @@ class PrimetimeFeaturesEngine:
 
         # Calculate ATS results
         df["margin"] = df["home_score"] - df["away_score"]
-        df["home_covered"] = df["margin"] + df["spread_close"] > 0
+        df["home_covered"] = home_cover(df["margin"], df["spread_close"])
 
         # Group by game slot
         results = (

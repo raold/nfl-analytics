@@ -154,7 +154,7 @@ class LeakageDiagnostic:
             auc = roc_auc_score(y_test, y_pred_proba)
 
             # Baseline (always pick favorite)
-            baseline_pred = (test_df["spread_close"] < 0).values
+            baseline_pred = (test_df["spread_close"] > 0).values
             baseline_accuracy = accuracy_score(y_test, baseline_pred)
 
             result = {

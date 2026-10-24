@@ -12,7 +12,7 @@ dbDisconnect(con)
 games <- games |>
   mutate(
     margin = home_score - away_score,
-    spread_target = if_else(!is.na(spread_close), as.integer(margin + spread_close > 0), NA_integer_)
+    spread_target = if_else(!is.na(spread_close), as.integer(margin - spread_close > 0), NA_integer_)
   ) |>
   dplyr::filter(!is.na(spread_target), !is.na(spread_close))
 

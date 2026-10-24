@@ -601,7 +601,76 @@ verify_and_extract <- function(draws_obj, param_name) {
 
 ---
 
-**Last Updated:** November 19, 2025
+## 4. Spread Sign Convention (found October 24, 2026)
+
+### Summary
+
+**What Happened**: `games.spread_close` is copied verbatim from nflverse `spread_line`
+(`R/ingestion/ingest_schedules.R:62`), where a **positive** value means the **home team is
+favored** (2018_01_BUF_BAL = 7.5: BAL -7.5). About 20 code paths graded covers with the
+sportsbook rule `margin + spread_close > 0`, which is only correct when home favorites are
+negative. That rule grades the favorite as if it were *receiving* the points.
+
+**Impact**:
+- The Dec 9, 2025 "power ratings: 74.9% ATS, +43% ROI, p < 10⁻⁶⁸" result (README,
+  PROJECT_STATUS, ADR-017 §2.4). Reproduced from `data/historical_weather_2018_2024.csv`: the
+  buggy edge+grading gives 74.1% ATS on 1,477 bets (every season 72–77%); graded correctly the
+  same model is 49.4% on 1,392 bets.
+- ADR-013's rest-differential "25 point swing" (labels from `scripts/validate_dec28_changes.py`).
+- Training labels in `asof_features_unified/_v2/_enhanced`, `materialized_view_features`,
+  `mart.game_summary`, `mv_betting_features` (and its rolling team cover-rate features).
+- The meta-labeling trade gate (`py/production/meta_labeling*.py`) used by the Kalshi strategies.
+- Backtests `full_historical_backtest.py` / `clean_historical_backtest.py` (also an inverted
+  spread→probability mapping).
+- This is the **third** occurrence: Nov 2025 leakage diagnostic (80% accuracy) and the CQL
+  reward (ADR-016) had the same root cause and were fixed locally without a shared helper.
+
+**Why it kept recurring**: no single definition of the convention, no test pinned to a known
+game, and the healthy-looking results (high but "plausible" ATS) were never compared against the
+pooled home cover rate (~49% correct vs ~56% with the bug).
+
+### Fix (October 24, 2026)
+
+- `py/utils/spread_convention.py`: `home_cover`, `home_cover_margin`, `model_edge`,
+  `book_home_line`, `implied_home_win_prob`, `assert_nflverse_convention`.
+- `tests/unit/test_spread_convention.py`: pins BUF@BAL 2018, GB@CHI 2019, CLE@NO 2018 (favorite
+  wins 21-18 as a 10-point favorite: no cover), the pooled cover rate, and the ~50% ATS of prior-
+  season power ratings.
+- All label/evaluation sites now call the helper; `db/migrations/104_fix_spread_cover_sign.sql`
+  recreates the two views.
+- Pre-commit hook `spread-sign-convention` rejects `margin/score + spread_close|spread_line|vegas_spread`.
+- Meta-labeling models now carry `label_convention`; `load_model()` refuses older models.
+- Deleted `scripts/backfill_sportsbook_lines.py`, which wrote EPA-derived placeholder lines into
+  `games.spread_close` for 94 games (2025 weeks 12–18, Nov 21, 2025) and mapped them to inverted
+  moneylines. The weekly ingest re-inserts the current season from nflverse, so later ingests
+  should have replaced them — verify before trusting 2025 market comparisons.
+
+### Left as-is (fix on next retrain)
+
+These **features** encode the sign inverted, but training and inference share the same code, so
+stored models are internally consistent. Flipping them without retraining would break inference:
+
+- `home_is_favorite` in `py/features/feature_loader.py` / `feature_loader_parallel.py` and
+  `is_favorite` in `py/features/feature_interactions.py` (both actually mean "home underdog").
+- Player `is_favored` (`CASE WHEN g.spread_close < 0`) in the R props models
+  (`R/train_hierarchical_v2_canonical.R`, `R/train_informative_priors_v2_canonical.R`,
+  `R/bayesian_receiving_with_qb_chemistry*.R`, `R/generate_2025_predictions_all_v2.R`) and their
+  Python mirrors (`py/ensemble/enhanced_ensemble_v5*.py`, `v6_elo.py`, `r_model_interface*.py`,
+  `py/backtest/historical_validation_4way_optimized.py`).
+- `implied_home_total` / `implied_away_total` in `py/features/player_features.py` (swapped).
+- `home_favorite` in the `scripts/validate_*` and `scripts/*incremental_xgb*` experiments.
+
+### Lessons
+
+1. **Pin conventions with known real games**, not synthetic examples.
+2. **Compute the population base rate** (pooled home cover ≈ 49%) before trusting any ATS number.
+3. **A stable edge across seasons is a bug signal**: real edges are noisy; 72–77% every year is
+   arithmetic, not skill.
+4. **Fix the class, not the instance**: the two earlier local fixes left ~20 copies behind.
+
+---
+
+**Last Updated:** October 24, 2026
 **Author:** NFL Analytics Research Team
 **Reviewers:** Claude Code (Sonnet 4.5)
 **Next Review:** After major incident or quarterly

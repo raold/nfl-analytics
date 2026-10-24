@@ -79,6 +79,18 @@ repos:
         exclude: ^(tests/|examples/|docs/)
         description: Detect hardcoded season/year values
 
+      - id: spread-sign-convention
+        name: Reject sportsbook-style spread cover math on nflverse spreads
+        # games.spread_close / spread_line are nflverse (positive = home favored): the home
+        # team covers when margin - spread_close > 0. Use py/utils/spread_convention.py.
+        language: pygrep
+        entry: '(margin|_score|_diff)\W*\s*\+\s*\S*(spread_close|spread_line|vegas_spread)\b'
+        files: \.(py|R|sql)$
+        # Historical migrations (superseded by 104), the regression test that asserts the
+        # old rule is wrong, and dependence_calibration.py (queries a non-existent `odds`
+        # table of unknown sign convention)
+        exclude: ^(archive/|research/|docs/|db/migrations/(005|006|100)_|tests/unit/test_spread_convention\.py$|py/analysis/dependence_calibration\.py$)
+
       - id: check-convergence-template
         name: Check MCMC convergence checks present
         entry: bash -c 'if grep -q "brm(" "$@" && ! grep -q "max_rhat" "$@"; then echo "❌ Missing convergence checks"; exit 1; fi' --

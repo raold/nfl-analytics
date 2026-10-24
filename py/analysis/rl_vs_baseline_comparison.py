@@ -114,7 +114,7 @@ def kelly_lcb_baseline(conn, season_start=2020, season_end=2024, threshold=0.55,
     # Simple edge estimation: compare to closing line (mock for now)
     # In reality, this would use GLM/XGBoost predictions
     df["home_win"] = (df["home_score"] > df["away_score"]).astype(int)
-    df["cover_spread"] = ((df["home_score"] + df["spread_line"]) > df["away_score"]).astype(int)
+    df["cover_spread"] = ((df["home_score"] - df["spread_line"]) > df["away_score"]).astype(int)
     df["goes_over"] = ((df["home_score"] + df["away_score"]) > df["total_line"]).astype(int)
 
     # Mock probability estimates (in reality, from models)

@@ -22,6 +22,8 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import create_engine
 
+from py.utils.spread_convention import book_home_line, home_cover_margin
+
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -108,15 +110,16 @@ class VegasLineBiasEngine:
         # Final margin (positive = home won)
         df["final_margin"] = df["home_score"] - df["away_score"]
 
-        # Spread is from home team perspective (negative = home favored)
-        # Home covers if: final_margin + spread_close > 0
-        # Example: Home -7 (spread_close = -7), Home wins by 10 (final_margin = 10)
-        #          10 + (-7) = 3 > 0, so home covered
-        df["home_covered"] = (df["final_margin"] + df["spread_close"]) > 0
-        df["away_covered"] = ~df["home_covered"]
+        # spread_close is nflverse convention: expected home margin (positive = home favored)
+        # Home covers if: final_margin - spread_close > 0
+        # Example: Home -7 (spread_close = 7), Home wins by 10 (final_margin = 10)
+        #          10 - 7 = 3 > 0, so home covered
+        cover_margin = home_cover_margin(df["final_margin"], df["spread_close"])
+        df["home_covered"] = cover_margin > 0
+        df["away_covered"] = cover_margin < 0
 
         # Push (tie against spread)
-        df["spread_push"] = (df["final_margin"] + df["spread_close"]) == 0
+        df["spread_push"] = cover_margin == 0
 
         # Total
         df["actual_total"] = df["home_score"] + df["away_score"]
@@ -125,7 +128,7 @@ class VegasLineBiasEngine:
         df["total_push"] = df["actual_total"] == df["total_close"]
 
         # Margin vs expectation
-        df["margin_vs_spread"] = df["final_margin"] - (-df["spread_close"])
+        df["margin_vs_spread"] = home_cover_margin(df["final_margin"], df["spread_close"])
         df["total_vs_line"] = df["actual_total"] - df["total_close"]
 
     def _add_implied_probabilities(self, df: pd.DataFrame) -> None:
@@ -194,8 +197,8 @@ class VegasLineBiasEngine:
                 "team": row["home_team"],
                 "opponent": row["away_team"],
                 "location": "home",
-                "is_favorite": row["spread_close"] < 0,
-                "spread_line": row["spread_close"],
+                "is_favorite": row["spread_close"] > 0,
+                "spread_line": book_home_line(row["spread_close"]),  # sportsbook: favorite negative
                 "covered_spread": row["home_covered"],
                 "margin_vs_spread": row["margin_vs_spread"],
                 "total_line": row["total_close"],
@@ -214,8 +217,8 @@ class VegasLineBiasEngine:
                 "team": row["away_team"],
                 "opponent": row["home_team"],
                 "location": "away",
-                "is_favorite": row["spread_close"] > 0,
-                "spread_line": -row["spread_close"],  # Flip for away team perspective
+                "is_favorite": row["spread_close"] < 0,
+                "spread_line": row["spread_close"],  # Away line is the flip of the home line
                 "covered_spread": row["away_covered"],
                 "margin_vs_spread": -row["margin_vs_spread"],  # Flip
                 "total_line": row["total_close"],
@@ -345,9 +348,13 @@ class VegasLineBiasEngine:
             if len(key_games) == 0:
                 continue
 
-            # Favorites (negative spread) vs underdogs on this key number
-            fav_ats = key_games[key_games["spread_close"] == -key_num]["home_covered"].mean()
-            dog_ats = key_games[key_games["spread_close"] == key_num]["away_covered"].mean()
+            # Favorite vs underdog ATS on this key number (pushes excluded).
+            # spread_close == +k: home favored by k; spread_close == -k: away favored by k.
+            key_games = key_games[~key_games["spread_push"]]
+            home_fav = key_games[key_games["spread_close"] == key_num]
+            away_fav = key_games[key_games["spread_close"] == -key_num]
+            fav_ats = pd.concat([home_fav["home_covered"], away_fav["away_covered"]]).mean()
+            dog_ats = pd.concat([home_fav["away_covered"], away_fav["home_covered"]]).mean()
 
             metrics = {
                 "key_number": key_num,

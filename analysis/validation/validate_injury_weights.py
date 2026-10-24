@@ -99,9 +99,9 @@ def load_injury_game_data(conn: psycopg.Connection) -> pd.DataFrame:
         g.away_team,
         g.spread_close,
         g.home_score - g.away_score as home_margin,
-        (g.home_score - g.away_score) + g.spread_close as home_ats_margin,
-        CASE WHEN (g.home_score - g.away_score) + g.spread_close > 0 THEN 1
-             WHEN (g.home_score - g.away_score) + g.spread_close < 0 THEN 0
+        (g.home_score - g.away_score) - g.spread_close as home_ats_margin,
+        CASE WHEN (g.home_score - g.away_score) - g.spread_close > 0 THEN 1
+             WHEN (g.home_score - g.away_score) - g.spread_close < 0 THEN 0
              ELSE 0.5 END as home_covered,
         -- Home team injury data
         COALESCE(h_inj.qb_out::int, 0) as home_qb_out,

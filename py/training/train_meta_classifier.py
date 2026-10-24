@@ -48,6 +48,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 sys.path.insert(0, project_root)
 
 from py.production.meta_labeling_v2 import MetaLabelingClassifier
+from py.utils.spread_convention import home_cover
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -124,8 +125,11 @@ def prepare_training_data(
 
     # Compute bet outcomes
     if bet_type == "spread":
-        # Home team covers if margin + spread > 0
-        df["bet_won"] = (df["margin"] + df["vegas_spread"] > 0).astype(int)
+        # Home team covers if margin - spread_close > 0 (nflverse: positive = home favored);
+        # pushes are dropped rather than counted as losses
+        df["bet_won"] = home_cover(df["margin"], df["vegas_spread"])
+        df = df[df["bet_won"].notna()].copy()
+        df["bet_won"] = df["bet_won"].astype(int)
     elif bet_type == "total":
         df["bet_won"] = (df["total_points"] > df["total_close"]).astype(int)
     else:

@@ -69,10 +69,15 @@ from sklearn.metrics import (
 )
 from sklearn.model_selection import TimeSeriesSplit
 
+from py.utils.spread_convention import home_cover
+
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+# Bumped when the training-label definition changes; checked in load_model()
+LABEL_CONVENTION = "nflverse-spread-v1"
 warnings.filterwarnings("ignore")
 
 
@@ -227,8 +232,11 @@ class MetaLabelingClassifier:
 
         # Compute outcomes
         if bet_type == "spread":
-            # Home team covers if margin + spread > 0
-            df["bet_won"] = (df["margin"] + df["spread_close"] > 0).astype(int)
+            # Home team covers if margin - spread_close > 0 (nflverse: positive = home favored);
+            # pushes are dropped rather than counted as losses
+            df["bet_won"] = home_cover(df["margin"], df["spread_close"])
+            df = df[df["bet_won"].notna()].copy()
+            df["bet_won"] = df["bet_won"].astype(int)
         elif bet_type == "total":
             # Over wins if total_points > total_close
             df["bet_won"] = (df["total_points"] > df["total_close"]).astype(int)
@@ -525,13 +533,24 @@ class MetaLabelingClassifier:
             "base_model": self.base_model,
             "calibrated_model": self.calibrated_model,
             "training_metadata": self.training_metadata,
+            "label_convention": LABEL_CONVENTION,
         }
         joblib.dump(model_data, path)
         logger.info(f"Saved meta-labeling model to {path}")
 
-    def load_model(self, path: str):
-        """Load trained model from disk."""
+    def load_model(self, path: str, allow_legacy_labels: bool = False):
+        """Load trained model from disk.
+
+        Models saved before the spread sign fix (no ``label_convention``) were trained on
+        ``margin + spread`` (sportsbook-rule) labels, which are wrong for nflverse spreads. They are
+        refused unless ``allow_legacy_labels=True`` (only safe for total/moneyline models).
+        """
         model_data = joblib.load(path)
+        if model_data.get("label_convention") != LABEL_CONVENTION and not allow_legacy_labels:
+            raise ValueError(
+                f"{path} was trained with the pre-fix spread cover labels; retrain it "
+                "(py/training/train_meta_classifier.py) or pass allow_legacy_labels=True"
+            )
         self.base_model = model_data["base_model"]
         self.calibrated_model = model_data["calibrated_model"]
         self.training_metadata = model_data["training_metadata"]

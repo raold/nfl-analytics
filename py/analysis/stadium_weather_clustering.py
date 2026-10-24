@@ -96,7 +96,7 @@ def main():
 
     # Compute home advantage metrics
     df_outdoor["home_won"] = (df_outdoor["home_score"] > df_outdoor["away_score"]).astype(int)
-    df_outdoor["home_ats"] = (df_outdoor["home_margin"] + df_outdoor["spread_close"] > 0).astype(
+    df_outdoor["home_ats"] = (df_outdoor["home_margin"] - df_outdoor["spread_close"] > 0).astype(
         int
     )
 
