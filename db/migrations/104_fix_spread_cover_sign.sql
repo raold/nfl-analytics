@@ -8,7 +8,9 @@
 -- DROP without CASCADE on purpose: if other views depend on these, this migration fails
 -- instead of silently dropping them.
 --
--- Usage: python scripts/run_migrations.py  (or psql "$DATABASE_URL" -f this file)
+-- Usage: psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f db/migrations/104_fix_spread_cover_sign.sql
+-- (scripts/run_migrations.py does not list this file). Safe to re-run; it records
+-- itself in schema_migrations. Applied to devdb01 on 2026-10-24.
 
 BEGIN;
 
@@ -124,14 +126,14 @@ team_betting_history AS (
     -- Rolling cover rates (last 10 games)
     AVG(bb.home_covered::numeric) OVER (
       PARTITION BY bb.home_team, bb.season
-      ORDER BY bb.kickoff
+      ORDER BY bb.week
       ROWS BETWEEN 10 PRECEDING AND 1 PRECEDING
     ) as cover_rate_l10,
 
     -- Rolling over rates (last 10 games)
     AVG(bb.over_hit::numeric) OVER (
       PARTITION BY bb.home_team, bb.season
-      ORDER BY bb.kickoff
+      ORDER BY bb.week
       ROWS BETWEEN 10 PRECEDING AND 1 PRECEDING
     ) as over_rate_l10
 
@@ -151,13 +153,13 @@ team_betting_history AS (
 
     AVG((1 - bb.home_covered)::numeric) OVER (
       PARTITION BY bb.away_team, bb.season
-      ORDER BY bb.kickoff
+      ORDER BY bb.week
       ROWS BETWEEN 10 PRECEDING AND 1 PRECEDING
     ) as cover_rate_l10,
 
     AVG(bb.over_hit::numeric) OVER (
       PARTITION BY bb.away_team, bb.season
-      ORDER BY bb.kickoff
+      ORDER BY bb.week
       ROWS BETWEEN 10 PRECEDING AND 1 PRECEDING
     ) as over_rate_l10
 
@@ -195,8 +197,14 @@ ON mv_betting_features (kickoff);
 
 -- Add comment
 COMMENT ON MATERIALIZED VIEW mv_betting_features IS
-'Betting lines, movements, and team cover/over trends.
-Includes implied probabilities, line movement analysis, and rolling betting performance.
-Critical for spread and over/under prediction models.';
+'Completed games only: closing spread/total (nflverse sign, positive = home favored),
+ATS and over/under outcomes, and each team''s cover/over rate over its previous
+(up to 10) games at the same venue within the season. No line movement or implied
+probabilities. Week 1 rates are NULL.';
+
+INSERT INTO schema_migrations (version, description, applied_at)
+VALUES ('104_fix_spread_cover_sign',
+        'Spread cover sign in mart.game_summary and mv_betting_features', now())
+ON CONFLICT (version) DO NOTHING;
 
 COMMIT;
