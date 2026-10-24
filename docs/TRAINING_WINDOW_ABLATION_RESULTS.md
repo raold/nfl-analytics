@@ -320,7 +320,7 @@ Retrain all player performance models using canonical window:
 
 - Update `CLAUDE.md` with canonical window
 - Update dissertation Chapter 3 (justify 2018 boundary)
-- Create `docs/CANONICAL_TRAINING_WINDOW.md`
+- Create `docs/adr/007-canonical-training-window.md`
 - Update model registry (`ml.models` table)
 
 ---

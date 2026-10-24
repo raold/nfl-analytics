@@ -223,7 +223,7 @@ Success measured by:
 
 ### Documentation
 
-- [BNN Investigation Postmortem](../fixes/BNN_INVESTIGATION_POSTMORTEM_NOV9.md)
+- BNN Investigation Postmortem (no longer in the repo; see [HISTORY](../HISTORY.md))
 - [Dissertation Chapter 4](../../analysis/dissertation/chapter_4_model_architecture/)
 - [Archive Branch](https://github.com/raold/nfl-analytics/tree/bnn-archive)
 

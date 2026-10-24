@@ -320,9 +320,9 @@ Rejected. The 37 features are small enough to validate together. NFL season timi
 
 ### Documentation
 
-- [Synthetic Features Implementation Complete](../milestones/SYNTHETIC_FEATURES_COMPLETE_DEC9.md) - Detailed implementation log
-- [2025 Holdout Validation](../milestones/2025_HOLDOUT_VALIDATION_COMPLETE_DEC9.md) - Baseline performance for comparison
-- [Feature Engineering Pattern Analysis](../FEATURE_ENGINEERING_PATTERN_ANALYSIS.md) - Feature design patterns
+- Synthetic Features Implementation Complete (no longer in the repo; see [HISTORY](../HISTORY.md)) - Detailed implementation log
+- 2025 Holdout Validation (no longer in the repo; see [HISTORY](../HISTORY.md)) - Baseline performance for comparison
+- Feature Engineering Pattern Analysis (no longer in the repo; see [HISTORY](../HISTORY.md)) - Feature design patterns
 
 ### Code
 

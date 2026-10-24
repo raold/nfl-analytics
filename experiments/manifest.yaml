@@ -652,7 +652,7 @@ experiments:
 
     outputs:
       code: py/causal/*.py
-      documentation: docs/CAUSAL_INFERENCE_FRAMEWORK.md
+      documentation: docs/causal/CAUSAL_INFERENCE_FRAMEWORK.md
 
     dissertation_chapters: [8, 12]
     dissertation_section: Section 8.X - Causal Inference Results

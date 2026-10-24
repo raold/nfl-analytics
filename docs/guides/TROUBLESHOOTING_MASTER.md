@@ -807,8 +807,8 @@ calibrated_pred = scaler.transform(prediction, temperature=0.55)
 ### Documentation
 
 **Guides:**
-- [QUICK_START_GUIDE.md](QUICK_START_GUIDE.md) - Setup instructions
-- [PRODUCTION_DEPLOYMENT.md](PRODUCTION_DEPLOYMENT.md) - Deployment guide
+- QUICK_START_GUIDE.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Setup instructions
+- PRODUCTION_DEPLOYMENT.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Deployment guide
 - [DEVELOPER_WORKFLOW.md](DEVELOPER_WORKFLOW.md) - Development process
 - [COMMON_TASKS_REFERENCE.md](COMMON_TASKS_REFERENCE.md) - Task examples
 
@@ -818,8 +818,8 @@ calibrated_pred = scaler.transform(prediction, temperature=0.55)
 
 **Specialized:**
 - [R_MODEL_INTERFACE_GUIDE.md](R_MODEL_INTERFACE_GUIDE.md) - R model usage
-- [TEMPERATURE_SCALER_V6_USAGE.md](TEMPERATURE_SCALER_V6_USAGE.md) - Calibration
-- [TASK_TOOL_INTEGRATION.md](TASK_TOOL_INTEGRATION.md) - Agent tools
+- TEMPERATURE_SCALER_V6_USAGE.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Calibration
+- TASK_TOOL_INTEGRATION.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Agent tools
 
 ### Support Channels
 
@@ -836,7 +836,7 @@ calibrated_pred = scaler.transform(prediction, temperature=0.55)
 ### Escalation Path
 
 **P0 Critical (Production Down):**
-1. Check [EMERGENCY_DATABASE_RECOVERY.md](../../EMERGENCY_DATABASE_RECOVERY.md)
+1. Check [EMERGENCY_DATABASE_RECOVERY.md](../operations/EMERGENCY_DATABASE_RECOVERY.md)
 2. Restore from backup immediately
 3. Document in postmortem
 

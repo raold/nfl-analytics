@@ -1980,23 +1980,23 @@ See `docs/guides/R_MODEL_INTERFACE_GUIDE.md` for complete Python ↔ R integrati
 ### Project-Specific Documentation
 
 **Architecture:**
-- [CLAUDE.md](CLAUDE.md) - Complete project documentation
-- [docs/ARCHITECTURE_REFERENCE.md](docs/ARCHITECTURE_REFERENCE.md) - Architecture deep dive
-- [docs/COMPONENT_DEEP_DIVES.md](docs/COMPONENT_DEEP_DIVES.md) - Component details
+- [CLAUDE.md](../../CLAUDE.md) - Complete project documentation
+- [docs/architecture/ARCHITECTURE_REFERENCE.md](../architecture/ARCHITECTURE_REFERENCE.md) - Architecture deep dive
+- [docs/architecture/COMPONENT_DEEP_DIVES.md](../architecture/COMPONENT_DEEP_DIVES.md) - Component details
 
 **Database:**
-- [docs/database/DATABASE_QUICK_REFERENCE.md](docs/database/DATABASE_QUICK_REFERENCE.md) - Schema reference
-- [docs/database/SQL_PATTERNS.md](docs/database/SQL_PATTERNS.md) - Common query patterns
+- [docs/database/DATABASE_QUICK_REFERENCE.md](../database/DATABASE_QUICK_REFERENCE.md) - Schema reference
+- [docs/database/SQL_PATTERNS.md](../database/SQL_PATTERNS.md) - Common query patterns
 
 **Guides:**
-- [docs/guides/R_MODEL_INTERFACE_GUIDE.md](docs/guides/R_MODEL_INTERFACE_GUIDE.md) - Python ↔ R integration
-- [docs/guides/GIT_LFS_WORKFLOW.md](docs/guides/GIT_LFS_WORKFLOW.md) - Large model file management
-- [docs/guides/PRODUCTION_DEPLOYMENT.md](docs/guides/PRODUCTION_DEPLOYMENT.md) - Deployment checklist
+- [docs/guides/R_MODEL_INTERFACE_GUIDE.md](R_MODEL_INTERFACE_GUIDE.md) - Python ↔ R integration
+- [docs/guides/GIT_LFS_WORKFLOW.md](GIT_LFS_WORKFLOW.md) - Large model file management
+- docs/guides/PRODUCTION_DEPLOYMENT.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Deployment checklist
 
 **Milestones:**
-- [docs/archive/2025_nov/STATE_SPACE_VALIDATION_REPORT.md](docs/archive/2025_nov/STATE_SPACE_VALIDATION_REPORT.md) - State-Space v2 validation
-- [docs/milestones/HIERARCHICAL_V2_VERIFICATION_COMPLETE.md](docs/milestones/HIERARCHICAL_V2_VERIFICATION_COMPLETE.md) - Hierarchical v2 verification
-- [docs/ADVANCED_BAYESIAN_V3.md](docs/ADVANCED_BAYESIAN_V3.md) - Advanced Bayesian enhancements
+- docs/archive/2025_nov/STATE_SPACE_VALIDATION_REPORT.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - State-Space v2 validation
+- docs/milestones/HIERARCHICAL_V2_VERIFICATION_COMPLETE.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Hierarchical v2 verification
+- [docs/ADVANCED_BAYESIAN_V3.md](../ADVANCED_BAYESIAN_V3.md) - Advanced Bayesian enhancements
 
 ### Community Resources
 
@@ -2075,4 +2075,4 @@ See `R/train_hierarchical_v2_production.R` for complete production script (241 l
 **Version:** 1.0
 **Last Updated:** November 16, 2025
 **Maintainer:** Claude Code (Sonnet 4.5)
-**Questions?** See [docs/guides/TROUBLESHOOTING_MASTER.md](docs/guides/TROUBLESHOOTING_MASTER.md)
+**Questions?** See [docs/guides/TROUBLESHOOTING_MASTER.md](TROUBLESHOOTING_MASTER.md)

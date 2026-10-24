@@ -221,7 +221,7 @@ Success measured by:
 
 ### Documentation
 
-- [Temperature Fix Postmortem](../fixes/TEMPERATURE_FIX_AND_DISSERTATION_DISCREPANCY_NOV23.md)
+- Temperature Fix Postmortem (no longer in the repo; see [HISTORY](../HISTORY.md))
 - [Ensemble v6 Production Code](../../py/ensemble/enhanced_ensemble_v6_production.py)
 
 ### Code

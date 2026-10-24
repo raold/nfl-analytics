@@ -34,7 +34,7 @@ The TimescaleDB instance exposes three logical layers:
   \item[Core:] conformed tables such as \texttt{games}, \texttt{plays}, \texttt{teams}, and \texttt{odds\_history} with enforced keys and foreign key constraints.
   \item[Mart:] denormalized analytical views (e.g.\ \texttt{mart.team\_epa}, \texttt{mart.game\_summary})\\ optimized for modeling and reporting.
 \end{description}
-Schema migrations are version-controlled under \texttt{db/}, and every change includes smoke tests that confirm ingest scripts remain idempotent.\footnote{Comprehensive database schema audit completed October 30, 2025 documenting 56 tables across 5 schemas, team abbreviation standards, and feature engineering integration patterns. See \texttt{docs/DATABASE\_SCHEMA\_AUDIT.md} for complete table inventory, data quality findings, and column naming conventions.}
+Schema migrations are version-controlled under \texttt{db/}, and every change includes smoke tests that confirm ingest scripts remain idempotent.\footnote{Comprehensive database schema audit completed October 30, 2025 documenting 56 tables across 5 schemas, team abbreviation standards, and feature engineering integration patterns. See \texttt{docs/database/DATABASE\_SCHEMA\_AUDIT.md} for complete table inventory, data quality findings, and column naming conventions.}
 
 The complete database schema with all core tables, materialized views, and relationships is shown in \Cref{fig:database-erd}. The \texttt{games} table serves as the central hub, with foreign key relationships connecting play-by-play data, weather conditions, injury reports, rosters, and time-series odds history.
 

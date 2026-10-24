@@ -276,7 +276,7 @@ class FrontendAuditor:
         self,
         dashboard_path: str = "dashboard",
         db_config: dict | None = None,
-        output_dir: str = "docs/audits",
+        output_dir: str = "results/audits",
     ):
         """
         Initialize frontend auditor.

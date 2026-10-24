@@ -293,7 +293,7 @@ CLAIM DOCUMENTATION REQUIREMENTS:
 
 **Created:**
 - `docs/POSTMORTEMS.md` (this file)
-- `docs/decisions/ADR-008-hybrid-static-incremental.md`
+- `docs/adr/008-hybrid-static-incremental.md`
 - `docs/milestones/INCREMENTAL_XGB_CORRECTED_FINDINGS.md`
 - `py/online/hybrid_static_incremental.py` (corrected implementation)
 - `scripts/validate_hybrid_model.py` (multi-season validation)

@@ -504,7 +504,7 @@ python examples/nextgen_features_integration.py
 **Owner:** Data Layer Agent
 **Last Updated:** November 27, 2025
 **Review Frequency:** Quarterly (or after NGS schema changes)
-**Contact:** See `docs/AGENT_INFRASTRUCTURE.md` for agent routing
+**Contact:** See `docs/agents/AGENT_INFRASTRUCTURE.md` for agent routing
 
 **Changelog:**
 - 2025-11-27: Initial production release (23 features, 3 NGS tables integrated)

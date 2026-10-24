@@ -189,7 +189,7 @@ register_model \
   "models/bayesian/passing_yards_hierarchical_v2.rds" \
   "production" \
   "Hierarchical Bayesian Passing v2 - PRODUCTION (retrained Nov 13, 2025)" \
-  "Multi-level model: Player → Team → League. Partial pooling for player effects. Retrained with 6000 iterations for excellent convergence. Rhat 1.0092 (73% improvement from 2000 iter), ESS 8394, 42 divergences (<1%). Calibration: 87.2%. MAE 52.34 yards. Training window: 2018-2024 + H=4 decay. Ensemble weight: 30%. See ADR-002 for convergence threshold relaxation."
+  "Multi-level model: Player → Team → League. Partial pooling for player effects. Retrained with 6000 iterations for excellent convergence. Rhat 1.0092 (73% improvement from 2000 iter), ESS 8394, 42 divergences (<1%). Calibration: 87.2%. MAE 52.34 yards. Training window: 2018-2024 + H=4 decay. Ensemble weight: 30%. See ADR-020 for convergence threshold relaxation."
 
 ##############################################################################
 # Model 3: Informative Priors v2
@@ -205,7 +205,7 @@ register_model \
   "models/bayesian/passing_informative_priors_v2.rds" \
   "production" \
   "Bayesian Informative Priors v2 - PRODUCTION (retrained Nov 13, 2025)" \
-  "Enhanced version with stronger domain priors based on expert knowledge. Retrained with 6000 iterations for excellent convergence. Rhat 1.0177 (84% improvement from 2000 iter), ESS 8490, 177 divergences (<3%). Calibration: 86.8%. MAE 53.12 yards. Training window: 2018-2024 + H=4 decay. Ensemble weight: 15%. See ADR-002."
+  "Enhanced version with stronger domain priors based on expert knowledge. Retrained with 6000 iterations for excellent convergence. Rhat 1.0177 (84% improvement from 2000 iter), ESS 8490, 177 divergences (<3%). Calibration: 86.8%. MAE 53.12 yards. Training window: 2018-2024 + H=4 decay. Ensemble weight: 15%. See ADR-020."
 
 ##############################################################################
 # Model 4: Hybrid XGBoost v1

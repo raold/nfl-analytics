@@ -1087,7 +1087,7 @@ nfl-analytics/
 
 ### Related Documentation
 
-- `docs/DATABASE_SCHEMA_AUDIT.md` - Full database schema documentation
+- `docs/database/DATABASE_SCHEMA_AUDIT.md` - Full database schema documentation
 - `docs/ADVANCED_BAYESIAN_V3.md` - Model integration with odds data
 - `CLAUDE.md` - Project overview and architecture
 

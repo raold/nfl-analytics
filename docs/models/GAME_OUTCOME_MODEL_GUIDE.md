@@ -531,9 +531,9 @@ print(f'Spread MAE: {metrics[\"spread_mae\"]:.2f}')
 
 ## References
 
-- **Feature Engineering:** [GameFeatureExtractor](../features/GAME_FEATURE_EXTRACTOR_GUIDE.md)
+- **Feature Engineering:** GameFeatureExtractor (no longer in the repo; see [HISTORY](../HISTORY.md))
 - **Database Schema:** [DATABASE_QUICK_REFERENCE.md](../database/DATABASE_QUICK_REFERENCE.md)
-- **Ensemble v6.1:** [ENSEMBLE_V6_BACKTEST_GUIDE.md](../ENSEMBLE_V6_BACKTEST_GUIDE.md)
+- **Ensemble v6.1:** ENSEMBLE_V6_BACKTEST_GUIDE.md (no longer in the repo; see [HISTORY](../HISTORY.md))
 - **XGBoost Docs:** https://xgboost.readthedocs.io/
 - **SHAP Docs:** https://shap.readthedocs.io/
 
@@ -569,4 +569,4 @@ print(f'Spread MAE: {metrics[\"spread_mae\"]:.2f}')
 
 ---
 
-**Questions or Issues?** See [TROUBLESHOOTING.md](../TROUBLESHOOTING.md) or check logs in `models/game_outcome/`.
+**Questions or Issues?** See TROUBLESHOOTING.md (no longer in the repo; see [HISTORY](../HISTORY.md)) or check logs in `models/game_outcome/`.

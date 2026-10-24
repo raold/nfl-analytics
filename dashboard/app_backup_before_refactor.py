@@ -1748,7 +1748,7 @@ def render_data_summary_page():
         - Use `spread_close` and `total_close` (not `spread_line`, `total_line`)
         - Team abbreviations: LA Rams = `LAR` (not `LA`)
         - Weather stored as TEXT, requires parsing
-        - See `docs/DATABASE_SCHEMA_AUDIT.md` for details
+        - See `docs/database/DATABASE_SCHEMA_AUDIT.md` for details
         """
         )
 

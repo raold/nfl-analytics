@@ -774,17 +774,17 @@ services:
 ## Related Documentation
 
 **Container-Specific Documentation:**
-- [c4_level2_api_container.md](c4_level2_api_container.md) - FastAPI internal structure
-- [c4_level2_data_container.md](c4_level2_data_container.md) - PostgreSQL database structure
-- [c4_level2_monitoring_container.md](c4_level2_monitoring_container.md) - Prometheus/Grafana stack
+- c4_level2_api_container.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - FastAPI internal structure
+- c4_level2_data_container.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - PostgreSQL database structure
+- c4_level2_monitoring_container.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Prometheus/Grafana stack
 
 **Context Documentation:**
 - [c4_level1_system_context.md](c4_level1_system_context.md) - System boundaries
-- [c4_level1_deployment_context.md](c4_level1_deployment_context.md) - Deployment architecture
+- c4_level1_deployment_context.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Deployment architecture
 
 **Component Documentation:**
-- [c4_component_data_ingestion.md](c4_component_data_ingestion.md) - Data ingestion pipeline
-- [c4_component_training_pipeline.md](c4_component_training_pipeline.md) - Model training workflow
+- c4_component_data_ingestion.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Data ingestion pipeline
+- c4_component_training_pipeline.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Model training workflow
 
 **Infrastructure Documentation:**
 - [docker-compose.yml](../../docker-compose.yml) - Container orchestration config

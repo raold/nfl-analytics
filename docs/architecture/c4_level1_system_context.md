@@ -512,18 +512,18 @@ System Administrator
 
 **Architecture Documentation:**
 - [c4_level2_container_overview.md](c4_level2_container_overview.md) - Container architecture (6 Docker services)
-- [c4_level2_api_container.md](c4_level2_api_container.md) - FastAPI internal structure
-- [c4_level2_data_container.md](c4_level2_data_container.md) - PostgreSQL database structure
-- [c4_level2_monitoring_container.md](c4_level2_monitoring_container.md) - Prometheus/Grafana stack
+- c4_level2_api_container.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - FastAPI internal structure
+- c4_level2_data_container.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - PostgreSQL database structure
+- c4_level2_monitoring_container.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Prometheus/Grafana stack
 
 **Component Documentation:**
-- [c4_component_data_ingestion.md](c4_component_data_ingestion.md) - Data ingestion pipeline
-- [c4_component_training_pipeline.md](c4_component_training_pipeline.md) - Model training workflow
-- [c4_component_backtest_flow.md](c4_component_backtest_flow.md) - Backtest validation
+- c4_component_data_ingestion.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Data ingestion pipeline
+- c4_component_training_pipeline.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Model training workflow
+- c4_component_backtest_flow.md (no longer in the repo; see [HISTORY](../HISTORY.md)) - Backtest validation
 
 **Project Documentation:**
 - [CLAUDE.md](../../CLAUDE.md) - Project overview and agent guide
-- [ARCHITECTURE_REFERENCE.md](../ARCHITECTURE_REFERENCE.md) - High-level architecture
+- [ARCHITECTURE_REFERENCE.md](ARCHITECTURE_REFERENCE.md) - High-level architecture
 - [DATABASE_QUICK_REFERENCE.md](../database/DATABASE_QUICK_REFERENCE.md) - Schema guide
 
 ---

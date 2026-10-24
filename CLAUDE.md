@@ -19,7 +19,7 @@
 
 **Critical Files:** `py/ensemble/enhanced_ensemble_v6_production.py`, `py/ensemble/strategy/base.py`, `py/features/game_feature_extractor.py`, `py/feedback/`
 
-**Quick Links:** [DATABASE_QUICK_REFERENCE](docs/database/DATABASE_QUICK_REFERENCE.md) | [SQL_PATTERNS](docs/database/SQL_PATTERNS.md) | [ARCHITECTURE](docs/ARCHITECTURE_REFERENCE.md)
+**Quick Links:** [DATABASE_QUICK_REFERENCE](docs/database/DATABASE_QUICK_REFERENCE.md) | [SQL_PATTERNS](docs/database/SQL_PATTERNS.md) | [ARCHITECTURE](docs/architecture/ARCHITECTURE_REFERENCE.md)
 
 ---
 
@@ -226,7 +226,7 @@ git worktree prune
 
 ## Agent Infrastructure
 
-**19 specialized agents across 5 phases.** See [docs/AGENT_INFRASTRUCTURE.md](docs/AGENT_INFRASTRUCTURE.md)
+**19 specialized agents across 5 phases.** See [docs/agents/AGENT_INFRASTRUCTURE.md](docs/agents/AGENT_INFRASTRUCTURE.md)
 
 | Phase | Purpose | Key Agents |
 |-------|---------|------------|
@@ -553,7 +553,7 @@ NEW FEATURE
 
 **Usage:** Automatic via pre-commit hooks. Manual: `python py/utils/enforcement_router.py <file>`
 
-See [docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md](docs/ENFORCEMENT_FRAMEWORK_COMPLETE.md)
+See [docs/agents/ENFORCEMENT_FRAMEWORK.md](docs/agents/ENFORCEMENT_FRAMEWORK.md)
 
 ---
 
@@ -910,7 +910,7 @@ evince /tmp/section.pdf
 |----------|----------|
 | Quick Start | README.md, SETUP.md, CONTRIBUTING.md |
 | Database | [DATABASE_QUICK_REFERENCE](docs/database/DATABASE_QUICK_REFERENCE.md), [SQL_PATTERNS](docs/database/SQL_PATTERNS.md) |
-| Architecture | [ARCHITECTURE_REFERENCE](docs/ARCHITECTURE_REFERENCE.md), [COMPONENT_DEEP_DIVES](docs/COMPONENT_DEEP_DIVES.md) |
+| Architecture | [ARCHITECTURE_REFERENCE](docs/architecture/ARCHITECTURE_REFERENCE.md), [COMPONENT_DEEP_DIVES](docs/architecture/COMPONENT_DEEP_DIVES.md) |
 | Milestones | [RECENT_WORK_HISTORY](docs/milestones/RECENT_WORK_HISTORY.md), [docs/milestones/](docs/milestones/) |
 | Synthesis | [DIRICHLET_OPTIMIZATION](docs/synthesis/DIRICHLET_WEIGHT_OPTIMIZATION_SYNTHESIS_NOV27.md) |
 | ADRs | [docs/adr/](docs/adr/) (009: Dynamic weights, 011: Feature optimization, 012: Feedback loop, 015: Kalman/GP disabled, 016: CQL target leakage, 017: 2026 season roadmap) |

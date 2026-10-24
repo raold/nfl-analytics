@@ -300,7 +300,7 @@ Rejected because Stan's posterior sampling doesn't map cleanly to ONNX, and we'd
 
 ### Documentation
 
-- [R Model Integration Complete](../milestones/R_MODEL_INTEGRATION_COMPLETE.md)
+- R Model Integration Complete (no longer in the repo; see [HISTORY](../HISTORY.md))
 - [Database Quick Reference](../database/DATABASE_QUICK_REFERENCE.md)
 
 ### Code

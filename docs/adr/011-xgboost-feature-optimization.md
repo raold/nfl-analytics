@@ -198,9 +198,9 @@ Primary metric: Spread MAE on held-out validation set (2024 season games)
 
 ### Documentation
 
-- [Experiment results](../../data/feature_optimization_results.csv)
+- Experiment results (no longer in the repo; see [HISTORY](../HISTORY.md))
 - [Experiment script](../../py/models/feature_optimization_experiment.py)
-- [Best config](../../data/best_xgb_config.json)
+- Best config (no longer in the repo; see [HISTORY](../HISTORY.md))
 
 ### External Resources
 

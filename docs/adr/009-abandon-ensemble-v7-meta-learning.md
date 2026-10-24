@@ -6,7 +6,7 @@
 **Deciders**: Claude Code (Analysis), User (Approval)
 
 **Tags**: #ensemble #meta-learning #wls #architecture #negative-result
-**Related ADRs**: ADR-001 (Canonical Training Window), ADR-008 (Hybrid Static-Incremental)
+**Related ADRs**: ADR-007 (Canonical Training Window), ADR-008 (Hybrid Static-Incremental)
 **Related Documents**:
 - Knowledge Synthesis: `docs/knowledge/ENSEMBLE_V7_SESSION_NOV18_SYNTHESIS.md`
 - Postmortem: `docs/milestones/postmortems/2025_11_18_ensemble_v7_validation_failure.md`
@@ -367,11 +367,11 @@ Performance: 34.00 yards MAE (2022-2024), 90% calibration, proven production sta
 
 ## Related Decisions
 
-### ADR-001: Canonical Training Window (November 8, 2025)
+### ADR-007: Canonical Training Window (November 8, 2025)
 
 **Decision**: 2018-2024 with H=4 halflife decay
 
-**Relationship**: v7.0 used same training window, consistent with ADR-001
+**Relationship**: v7.0 used same training window, consistent with ADR-007
 
 **Impact**: None (v7.0 abandoned)
 

@@ -813,7 +813,7 @@ Check results in `.github/workflows/test.yml`
 - **CLAUDE.md**: Complete project documentation
 - **PROJECT_STATUS.md**: Current status and recent work
 - **tests/README.md**: Detailed testing guide
-- **docs/DATABASE_SCHEMA_AUDIT.md**: Database schema reference
+- **docs/database/DATABASE_SCHEMA_AUDIT.md**: Database schema reference
 - **PHASE_PLAN.md**: Development roadmap
 
 ---

@@ -83,7 +83,7 @@ production_models:
   # 3. Hierarchical Bayesian v2 - PRODUCTION (relaxed threshold)
   hierarchical_v2:
     name: "Hierarchical Bayesian Passing v2"
-    status: "production"  # PROMOTED Nov 9, 2025 (ADR-002: relaxed threshold to Rhat < 1.02)
+    status: "production"  # PROMOTED Nov 9, 2025 (ADR-020: relaxed threshold to Rhat < 1.02)
     approved_date: "2025-11-09"
     retrained_date: "2025-12-08"
     model_type: "hierarchical_bayesian"
@@ -96,7 +96,7 @@ production_models:
       ess_min: 8394
       divergences: 42
       status: "CONVERGED"
-      notes: "Retrained Dec 8, 2025 with 117K historical odds data. See ADR-002."
+      notes: "Retrained Dec 8, 2025 with 117K historical odds data. See ADR-020."
     performance:
       mae_yards: 52.34
       rmse_yards: 68.91
@@ -113,12 +113,12 @@ production_models:
       Partial pooling for player effects.
       Informative priors based on domain knowledge.
       Trained with 6000 iterations (Nov 13, 2025) for excellent convergence.
-      See ADR-002 for convergence threshold relaxation justification.
+      See ADR-020 for convergence threshold relaxation justification.
 
   # 4. Informative Priors v2 - PRODUCTION (relaxed threshold)
   informative_priors_v2:
     name: "Bayesian Informative Priors v2"
-    status: "production"  # PROMOTED Nov 9, 2025 (ADR-002: relaxed threshold to Rhat < 1.02)
+    status: "production"  # PROMOTED Nov 9, 2025 (ADR-020: relaxed threshold to Rhat < 1.02)
     approved_date: "2025-11-09"
     retrained_date: "2025-12-08"
     model_type: "hierarchical_bayesian"
@@ -131,7 +131,7 @@ production_models:
       ess_min: 8490
       divergences: 177
       status: "CONVERGED"
-      notes: "Retrained Dec 8, 2025 with 117K historical odds data. See ADR-002."
+      notes: "Retrained Dec 8, 2025 with 117K historical odds data. See ADR-020."
     performance:
       mae_yards: 53.12
       rmse_yards: 69.45
@@ -146,7 +146,7 @@ production_models:
       ✅ APPROVED FOR PRODUCTION (Nov 9, 2025): Rhat 1.0277 < 1.02 relaxed threshold.
       Enhanced version with stronger domain priors based on expert knowledge.
       Trained with 6000 iterations (Nov 13, 2025) for excellent convergence.
-      See ADR-002 for convergence threshold relaxation justification.
+      See ADR-020 for convergence threshold relaxation justification.
 
   # 5. XGBoost v2 - ARCHIVED (replaced by Hybrid v1, then v4)
   xgboost_v2:
@@ -318,7 +318,7 @@ production_models:
       - Error: Baseline was mean predictor, not XGBoost
       - Corrected: Pure incremental -13.7% vs proper static XGBoost (39.76 MAE)
       - Solution: Hybrid 70/30 achieves +4.2% improvement
-      - See: docs/POSTMORTEMS.md, docs/decisions/ADR-008-hybrid-static-incremental.md
+      - See: docs/POSTMORTEMS.md, docs/adr/008-hybrid-static-incremental.md
 
 
       ✅ APPROVED FOR PRODUCTION (Nov 12, 2025).
@@ -576,7 +576,7 @@ lineage:
 # Training Window Rationale
 training_window_decision:
   date_established: "2025-11-08"
-  decision_document: "docs/milestones/TRAINING_WINDOW_ABLATION_RESULTS.md"
+  decision_document: "docs/TRAINING_WINDOW_ABLATION_RESULTS.md"
   method: "4-scenario ablation study (148 test games)"
   scenarios_tested:
     1: "2015-2024 (no decay)"
@@ -671,13 +671,13 @@ metadata:
       - "Updated expected ensemble performance: ROI +5.5-7.5%, MAE 37-39 yards"
     "2025-11-09 (v4.2)":
       - "✅ CONVERGENCE RESOLVED: Both models retrained with 4000 iterations (doubled from 2000)"
-      - "✅ ADR-002 IMPLEMENTED: Relaxed convergence threshold from Rhat < 1.01 to Rhat < 1.02"
+      - "✅ ADR-020 IMPLEMENTED: Relaxed convergence threshold from Rhat < 1.01 to Rhat < 1.02"
       - "✅ PROMOTED hierarchical_v2 to production (Rhat 1.0141 < 1.02, 57% improvement)"
       - "✅ PROMOTED informative_priors_v2 to production (Rhat 1.0277 < 1.02, 72% improvement)"
       - "✅ RESTORED 4-way ensemble: state_space_v2 (0.30) + hierarchical_v2 (0.25) + bnn_v3_1 (0.25) + informative_priors_v2 (0.15) + xgboost_v2 (0.30)"
       - "✅ UPDATED expected performance: ROI +5-7%, MAE 47-49 yards (improved from 3-way)"
       - "✅ XGBoost v2 weight reduced from 0.45 → 0.30 (redistributed to hierarchical + informative priors)"
-      - "Created docs/decisions/ADR-002-relaxed-convergence-threshold.md"
+      - "Created docs/adr/020-relaxed-convergence-threshold.md"
     "2025-11-09 (v4.1)":
       - "CRITICAL: Discovered 2 models with failed convergence (hierarchical_v2, informative_priors_v2)"
       - "Updated hierarchical_v2 status: production → staging (Rhat 1.0337 > 1.01)"

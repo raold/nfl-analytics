@@ -19,7 +19,7 @@ Critical Context:
     - Schema: ml.model_registry (25 models registered, 37 latest ID)
 
 Validation Gates (Production Deployment):
-    1. Bayesian convergence: Rhat < 1.02 (relaxed threshold, ADR-002)
+    1. Bayesian convergence: Rhat < 1.02 (relaxed threshold, ADR-020)
     2. Calibration: Coverage > 85% (target 90%)
     3. Training window: 2018-2024 + H=4 decay
     4. File integrity: readable, size > 10 KB, valid timestamp
@@ -131,7 +131,7 @@ CANONICAL_WINDOW = {
     "decay_parameter": "H=4",
 }
 
-# Validation thresholds (ADR-002: relaxed from 1.01 to 1.02)
+# Validation thresholds (ADR-020: relaxed from 1.01 to 1.02)
 CONVERGENCE_THRESHOLDS = {
     "rhat_max": 1.02,
     "ess_min": 400,
@@ -724,7 +724,7 @@ class ModelRegistryAuditor:
             warnings = []
             converged = True
 
-            # Check Rhat (ADR-002: relaxed to 1.02)
+            # Check Rhat (ADR-020: relaxed to 1.02)
             if rhat_max is not None:
                 if rhat_max > CONVERGENCE_THRESHOLDS["rhat_max"]:
                     issues.append(

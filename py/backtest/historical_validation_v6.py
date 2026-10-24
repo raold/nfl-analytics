@@ -909,7 +909,7 @@ Examples:
 
             # Generate milestone documentation if approved
             if all(gates.values()):
-                milestone_path = Path("docs/milestones/ENSEMBLE_V6_BACKTEST_COMPLETE.md")
+                milestone_path = Path("results/milestones/ENSEMBLE_V6_BACKTEST_COMPLETE.md")
                 milestone_path.parent.mkdir(parents=True, exist_ok=True)
 
                 with open(milestone_path, "w") as f:

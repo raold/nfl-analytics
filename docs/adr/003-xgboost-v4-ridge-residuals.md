@@ -1,8 +1,12 @@
 # ADR-003: XGBoost v4 Ridge Residuals Feature Engineering
 
-**Status:** Accepted
+**Status:** Superseded — result was target leakage (status corrected 2026-10-24)
 **Date:** 2025-11-14
 **Deciders:** Project Team
+
+> **Correction:** The 40.20 → 4.70 MAE improvement below did not survive. The Dec 23, 2025 final
+> validation found the v4 residual features leaked the target: the honest MAE was 59.14 (47% worse
+> than baseline) and v4 was permanently disabled. Kept for the record; do not cite the numbers below.
 **Tags:** ml-model, feature-engineering, xgboost, prediction-accuracy
 
 ---
@@ -369,9 +373,9 @@ Rejected due to data fragmentation. The two-stage Ridge + XGBoost approach handl
 
 ### Documentation
 
-- [Multi-Season Validation Results](../../XGBOOST_V4_VALIDATION_COMPLETE.md) - Complete validation report
-- [Phase 1+2 Critical Fixes](../../PHASE_1_2_CRITICAL_FIXES_COMPLETE.md) - Security and architecture fixes
-- [Incremental XGBoost Postmortem](../fixes/INCREMENTAL_XGB_BASELINE_ERROR_POSTMORTEM.md) - Alternative approach analysis
+- Multi-Season Validation Results (no longer in the repo; see [HISTORY](../HISTORY.md)) - Complete validation report
+- Phase 1+2 Critical Fixes (no longer in the repo; see [HISTORY](../HISTORY.md)) - Security and architecture fixes
+- Incremental XGBoost Postmortem (no longer in the repo; see [HISTORY](../HISTORY.md)) - Alternative approach analysis
 
 ### Code
 

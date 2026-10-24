@@ -1547,7 +1547,7 @@ class EnforcementRouter:
                         "required_samples": 5000,
                         "suggestion": 'Add: assert len(training_data) >= 5000, "Insufficient data for meta-learning"',
                         "reference": "v7.0 failure: 1,701 games insufficient (needed 5,000-10,000)",
-                        "postmortem": "docs/postmortems/ENSEMBLE_V7_VALIDATION_FAILURE_NOV18.md",
+                        "postmortem": "docs/POSTMORTEMS.md (section 1: Ensemble v7.0 Validation Failure)",
                     }
                 )
 

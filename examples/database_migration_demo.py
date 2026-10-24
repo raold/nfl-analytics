@@ -257,7 +257,7 @@ def main():
     print("=" * 70)
 
     print("\n📚 Next Steps:")
-    print("  1. Review docs/tools/DATABASE_MIGRATION_AGENT.md")
+    print("  1. Review docs/agents/DATABASE_MIGRATION_AGENT.md")
     print("  2. Try CLI: ./scripts/manage_migrations.sh --help")
     print("  3. Generate first migration: ./scripts/manage_migrations.sh generate schema.json")
     print("  4. Validate: ./scripts/manage_migrations.sh validate db/migrations/050_test.sql")

@@ -25,7 +25,7 @@ Production-grade NFL analytics platform featuring a 5-way Bayesian ensemble, 342
 
 **Key Documentation:**
 - **[Database Reference](docs/database/DATABASE_QUICK_REFERENCE.md)**: Schema, conventions, SQL patterns
-- **[Architecture Reference](docs/ARCHITECTURE_REFERENCE.md)**: System design and components
+- **[Architecture Reference](docs/architecture/ARCHITECTURE_REFERENCE.md)**: System design and components
 - **[Milestones](docs/milestones/)**: 122+ project completion summaries
   - [2025 Holdout Validation](PROJECT_STATUS.md) (Dec 9, 2025)
   - [GNN v2 Integration](docs/milestones/GNN_V2_INTEGRATION_DEC7.md) (Dec 7, 2025)
@@ -45,7 +45,7 @@ Below is a minimal local bootstrap.
 - Git for version control
 - **Git LFS** (for model binaries): `brew install git-lfs && git lfs install`
   - Required to download Python (.pkl) and R (.rds) model files
-  - See **[docs/GIT_LFS_GUIDE.md](docs/GIT_LFS_GUIDE.md)** for comprehensive guide
+  - See **[docs/guides/GIT_LFS_WORKFLOW.md](docs/guides/GIT_LFS_WORKFLOW.md)** for comprehensive guide
 
 ### Git Worktrees (Parallel Development)
 
@@ -490,7 +490,7 @@ hybrid_pred = 0.7 * static_xgb.predict(X) + 0.3 * incremental_xgb.predict_one(x)
 **See:**
 - **[POSTMORTEMS.md](docs/POSTMORTEMS.md)** - Comprehensive error analysis
 - **[Corrected Findings](docs/milestones/INCREMENTAL_XGB_CORRECTED_FINDINGS.md)** - Full investigation details
-- **[ADR-008](docs/decisions/ADR-008-hybrid-static-incremental.md)** - Production decision record
+- **[ADR-008](docs/adr/008-hybrid-static-incremental.md)** - Production decision record
 
 ---
 
@@ -634,7 +634,7 @@ The database uses a **5-schema design** for clean separation of concerns:
 4. **`reference`** - Lookup tables (teams, stadiums, abbreviations)
 5. **`monitoring`** - Observability (model metrics, feature drift, alerts)
 
-**📋 Comprehensive Schema Audit**: See **[DATABASE_SCHEMA_AUDIT.md](docs/DATABASE_SCHEMA_AUDIT.md)** for complete documentation including:
+**📋 Comprehensive Schema Audit**: See **[DATABASE_SCHEMA_AUDIT.md](docs/database/DATABASE_SCHEMA_AUDIT.md)** for complete documentation including:
 - Full table inventory with sizes and row counts
 - **Critical schema standards**:
   - Use `kickoff` (not `game_date` or `gameday`) for temporal queries

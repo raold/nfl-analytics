@@ -317,6 +317,6 @@ if __name__ == "__main__":
     print("DEMONSTRATION COMPLETE")
     print("=" * 80)
     print("\nFor more information, see:")
-    print("  - docs/SPORTS_ANALYTICS_VALIDATOR_GUIDE.md")
+    print("  - docs/agents/SPORTS_ANALYTICS_VALIDATOR_GUIDE.md")
     print("  - tests/unit/test_sports_analytics_validator.py")
     print("=" * 80)

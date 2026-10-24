@@ -64,6 +64,14 @@ brew install git-lfs
 git lfs install
 ```
 
+### Linux
+
+```bash
+sudo pacman -S git-lfs        # Arch
+sudo apt install git-lfs      # Debian/Ubuntu
+git lfs install
+```
+
 ### Windows (RTX 4090)
 
 ```powershell
@@ -508,7 +516,7 @@ git lfs migrate import --include="*.pkl"  # Migrate to LFS
 
 **Internal Resources:**
 - Model Registry: `scripts/model_registry.py`
-- Architecture Docs: `docs/ARCHITECTURE_REFERENCE.md`
+- Architecture Docs: `docs/architecture/ARCHITECTURE_REFERENCE.md`
 
 **Questions:** See `CLAUDE.md` for project context and conventions.
 

@@ -15,7 +15,7 @@ This directory contains feature engineering modules that transform raw NFL data 
 ## 🎯 Key Principles
 
 1. **No Data Leakage:** All features use as-of-date logic (no future information)
-2. **Database Schema Standards:** Follow [DATABASE_SCHEMA_AUDIT.md](../../docs/DATABASE_SCHEMA_AUDIT.md)
+2. **Database Schema Standards:** Follow [DATABASE_SCHEMA_AUDIT.md](../../docs/database/DATABASE_SCHEMA_AUDIT.md)
    - Use `kickoff` not `game_date`
    - Use `spread_close` not `spread_line`
 3. **Modular Design:** Each module focuses on a specific feature category
@@ -284,7 +284,7 @@ conn = psycopg2.connect(
 - Weather stored as TEXT, requires parsing
 - Team abbreviations: LAR (Rams), LAC (Chargers), not LA
 
-See: [docs/DATABASE_SCHEMA_AUDIT.md](../../docs/DATABASE_SCHEMA_AUDIT.md)
+See: [docs/database/DATABASE_SCHEMA_AUDIT.md](../../docs/database/DATABASE_SCHEMA_AUDIT.md)
 
 ---
 
@@ -370,7 +370,7 @@ print(importance.head(20))
 
 ## 📚 Related Documentation
 
-- **[docs/DATABASE_SCHEMA_AUDIT.md](../../docs/DATABASE_SCHEMA_AUDIT.md)** - Schema standards
+- **[docs/database/DATABASE_SCHEMA_AUDIT.md](../../docs/database/DATABASE_SCHEMA_AUDIT.md)** - Schema standards
 - **[analysis/DATA_LEAKAGE_AUDIT_REPORT_UPDATED.md](../../analysis/DATA_LEAKAGE_AUDIT_REPORT_UPDATED.md)** - Data leakage findings
 - **[PHASE_5_COMPLETION_SUMMARY.md](../../PHASE_5_COMPLETION_SUMMARY.md)** - Phase 5 feature engineering summary
 - **[CLAUDE.md](../../CLAUDE.md)** - Complete project documentation

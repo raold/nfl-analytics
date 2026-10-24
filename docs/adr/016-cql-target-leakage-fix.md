@@ -214,7 +214,7 @@ These results confirm:
 
 ### Documentation
 
-- [Plan file](/home/dro/.claude/plans/snazzy-tinkering-plum.md)
+- Plan file (no longer in the repo; see [HISTORY](../HISTORY.md))
 - [CLAUDE.md](../../CLAUDE.md) - Project documentation
 
 ### Implementation

@@ -10,7 +10,7 @@
 #
 # Author: Claude Code (Sonnet 4.5)
 # Date: November 22, 2025
-# Output: docs/audits/round2_mcmc_convergence_YYYYMMDD_HHMMSS.md
+# Output: results/audits/round2_mcmc_convergence_YYYYMMDD_HHMMSS.md
 
 library(tidyverse)
 library(DBI)
@@ -1052,10 +1052,10 @@ main <- function() {
 
   # Generate output file path
   timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-  output_path <- glue("docs/audits/round2_mcmc_convergence_{timestamp}.md")
+  output_path <- glue("results/audits/round2_mcmc_convergence_{timestamp}.md")
 
   # Ensure output directory exists
-  dir.create("docs/audits", showWarnings = FALSE, recursive = TRUE)
+  dir.create("results/audits", showWarnings = FALSE, recursive = TRUE)
 
   # Generate report
   generate_markdown_report(audit_results, output_path)

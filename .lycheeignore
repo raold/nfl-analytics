@@ -1,0 +1,11 @@
+# Local services and connection strings
+^https?://(localhost|127\.0\.0\.1|0\.0\.0\.0|host\.docker\.internal)
+^postgres(ql)?://
+^redis://
+# Install scripts and package indexes (not browsable pages)
+^https://astral\.sh/uv/install\.sh
+^https://download\.pytorch\.org/whl
+^https://packagecloud\.io/install
+# Authenticated APIs
+^https://(api\.elections\.kalshi\.com|trading-api\.kalshi\.com|demo-api\.kalshi\.co)
+^https://api\.the-odds-api\.com

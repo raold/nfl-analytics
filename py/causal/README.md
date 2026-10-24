@@ -133,7 +133,7 @@ psycopg2-binary>=2.9.0
 
 ## Documentation
 
-See full documentation: `docs/CAUSAL_INFERENCE_FRAMEWORK.md`
+See full documentation: `docs/causal/CAUSAL_INFERENCE_FRAMEWORK.md`
 
 ## Architecture
 

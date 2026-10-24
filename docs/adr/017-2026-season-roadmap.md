@@ -105,7 +105,7 @@ Implement the following improvements organized into three tiers by expected impa
 > as `pred + spread_close`. That combination scores ~74% for any model that agrees with the
 > favorite. Graded correctly, prior-season point differential + 2.5 HFA is 49.4% ATS on 1,392
 > bets (2019–2024, `tests/unit/test_spread_convention.py`), consistent with the 51.8% walk-forward
-> result in `docs/investigation/ws3_model_performance.md`. See `docs/POSTMORTEMS.md` §4.
+> result in `docs/investigations/2026-02-season-review/ws3_model_performance.md`. See `docs/POSTMORTEMS.md` §4.
 > The original text is kept below for the record.
 
 **Problem:** Simple 2024 point differential + 2.5 HFA model achieved +43% ROI on 2025 holdout in experiments. Not integrated into production.
