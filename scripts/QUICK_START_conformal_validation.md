@@ -117,7 +117,7 @@ docker compose up -d pg
 ### Dependencies Missing
 
 ```bash
-# All dependencies in requirements.txt
+# All dependencies are declared in pyproject.toml (uv sync)
 source .venv/bin/activate
 # Should work without additional installation
 ```

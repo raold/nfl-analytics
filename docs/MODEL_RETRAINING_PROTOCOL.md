@@ -405,7 +405,7 @@ psycopg: 3.1+
 cd nfl-analytics
 uv venv
 source .venv/bin/activate
-uv pip install -r requirements.txt
+uv sync --extra dev
 
 # R packages
 Rscript -e "install.packages(c('brms', 'cmdstanr', 'tidyverse', 'arrow'))"

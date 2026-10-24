@@ -24,7 +24,7 @@ This script validates the BNN Conformal Prediction wrapper (`nfl_analytics/model
 
 ### Dependencies
 
-All dependencies are in `requirements.txt`:
+All dependencies are declared in `pyproject.toml`:
 
 ```bash
 # Core dependencies

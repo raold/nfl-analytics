@@ -1,6 +1,6 @@
 # NFL Analytics - Setup Guide
 
-Complete setup instructions for Windows 11 and Mac M4 environments.
+Setup for Linux, Windows 11 and Mac M4. Python dependencies are managed with uv from `pyproject.toml` and `uv.lock`.
 
 ---
 
@@ -23,7 +23,7 @@ Complete setup instructions for Windows 11 and Mac M4 environments.
 
 | Component | Version | Notes |
 |-----------|---------|-------|
-| **Python** | 3.10.x | Use system Python or pyenv |
+| **Python** | ≥ 3.11 | Managed by [uv](https://docs.astral.sh/uv/) |
 | **R** | 4.5.1 | Installed via winget (Windows) or Homebrew (Mac) |
 | **PostgreSQL** | 16.10 | Via Docker (timescale/timescaledb) |
 | **TimescaleDB** | 2.22.1 | Included in Docker image |
@@ -43,25 +43,20 @@ cd nfl-analytics
 
 ### 2. Set Up Python Environment
 ```bash
-# Create virtual environment
-python -m venv .venv
+# Core dependencies + test tooling, exactly as locked in uv.lock (creates .venv)
+uv sync --extra dev
 
-# Activate (Windows)
-.venv\Scripts\activate
+# Add optional subsystems as needed, e.g. PyTorch and the Bayesian stack:
+uv sync --extra dev --extra torch --extra bayes
+# Extras: api, trading, online, torch, rl, bayes, causal, semantic, r, dashboard, compute, research
 
-# Activate (Mac/Linux)
-source .venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Install PyTorch
-# Windows (RTX 4090 - CUDA 12.9):
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu129
-
-# Mac (M4 - MPS):
-pip install torch torchvision torchaudio
+# GPU builds of PyTorch (the default wheel from PyPI is fine for CPU):
+#   Windows/Linux CUDA: uv pip install torch torchvision --index-url https://download.pytorch.org/whl/cu129
+#   Mac M4 uses MPS with the default wheel
 ```
+
+Run anything with `uv run ...` (for example `uv run pytest -m "not integration"`), or activate
+`.venv` directly.
 
 ### 3. Install R Packages
 ```r

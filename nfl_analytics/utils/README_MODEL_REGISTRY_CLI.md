@@ -604,9 +604,7 @@ psql postgresql://dro:sicillionbillions@localhost:5544/postgres -c "\l"
 # Install all dependencies
 uv pip install tabulate click psycopg2-binary
 
-# Or add to requirements.txt
-echo "tabulate>=0.9.0" >> requirements.txt
-echo "click>=8.0.0" >> requirements.txt
+# tabulate and click are base dependencies in pyproject.toml (uv sync)
 ```
 
 ### Query Performance

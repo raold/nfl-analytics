@@ -62,8 +62,7 @@ pip install arviz
 # Or using uv (recommended)
 uv pip install arviz
 
-# Add to requirements.txt
-echo "arviz>=0.18.0" >> requirements.txt
+# arviz is in the bayes extra: uv sync --extra bayes
 ```
 
 ### 2. Verify Installation

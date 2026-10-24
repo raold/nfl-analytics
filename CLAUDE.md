@@ -1,20 +1,21 @@
 # CLAUDE.md - NFL Analytics Project Documentation
 
-**Last Updated:** February 13, 2026 | **Version:** 8.0 | **Status:** Production Ready (2025 Season Complete + Kalshi Trading)
+**Last Updated:** October 24, 2026 | **Version:** 9.0 | **Status:** Research platform; models do not beat the closing line. Trading moved to the Sibyl repo
 
 ## Quick Status
 
 | Component | State | Key Metric |
 |-----------|-------|------------|
-| Ensemble | v6.2 + equal-weight props | 54.5% spread (games), 44.25 MAE (props) |
+| Ensemble | v6.2 + equal-weight props | 44.25 MAE (props); no ATS edge (see 2025 Season) |
 | Features | 386 active (Kalman/GP disabled) | Base 305 + 37 synthetic + 38 semantic + 6 rest |
 | Semantic Stack | Complete (Dec 21) | Ollama/MLX inference, 38 LLM features (17/team + 4 matchup) |
 | **Game Outcome Model** | **v2 PRODUCTION (Dec 23)** | **382 features, 11.05 spread MAE (full 2025), 56.5% win prob** |
 | **Feedback Loop** | **NEW (Dec 22)** | **Weekly learning system, 10 modules** |
 | Database | 50 tables, 1.25M plays | PostgreSQL + Redis (custom AVG/SUM boolean aggregates) |
-| **Dissertation** | **Updated (Feb 12)** | **753 pages, postseason validation added, 0 undefined refs** |
+| **Dissertation** | **Updated (Feb 12)** | **722 pages; chapters using pre-fix ATS labels need review** |
 | **2025 Season** | **COMPLETE (Feb 2026)** | **285 games evaluated, -3.2% ATS ROI, market efficiency confirmed** |
-| **Kalshi Trading System** | **Complete (Feb 13)** | **6 phases, 437 tests, 37 files** |
+| Kalshi Trading System | Superseded (Sibyl repo) | Kept here for reference |
+| **Spread sign convention** | **Fixed (Oct 24, 2026)** | **`spread_close` > 0 = home favored; see Critical Rules** |
 | Infrastructure | 8/9 Docker services | ~105ms inference |
 
 **Critical Files:** `nfl_analytics/ensemble/enhanced_ensemble_v6_production.py`, `nfl_analytics/ensemble/strategy/base.py`, `nfl_analytics/features/game_feature_extractor.py`, `nfl_analytics/feedback/`
@@ -27,8 +28,8 @@
 
 ### Ensemble Weights
 
-**v6.0 (Games):** State-Space 27%, Hierarchical 27%, XGBoost 23%, Informative Priors 13%, Hybrid 10%
-- Use: Spreads, totals, win probabilities | Performance: 54.5% cover, +4.0% ROI
+**v6.0 (Games):** State-Space 35%, Hierarchical 35%, Informative Priors 15%, Hybrid 15%, XGBoost v4 0% (target leakage, ADR-003)
+- Use: Spreads, totals, win probabilities | Performance: no ATS edge (2025: −3.2% ROI on 208 bets; the old "54.5% cover, +4.0% ROI" predates the leakage fixes)
 
 **v8.0 (Props):** Hierarchical 39.6%, Informative Priors 39.5%, Hybrid 10.1%, State-Space 8.2%, XGBoost 2.6%
 - Use: Player props (yards, TDs, receptions) | Performance: 31.5% MAE improvement
@@ -58,12 +59,13 @@
 ### Python Environment (uv)
 
 ```bash
-uv sync                    # Install all dependencies from pyproject.toml
-uv pip install <pkg>       # Add package
-uv pip list               # List installed packages (79+ packages)
+uv sync --extra dev                       # core + test tooling, exactly as locked
+uv sync --extra dev --extra torch --extra bayes   # add optional subsystems
+uv add <pkg>                              # add a dependency (updates pyproject + uv.lock)
 ```
 
-**Key:** pyproject.toml manages dependencies, uv.lock pins versions.
+**Key:** pyproject.toml declares dependencies (base + extras: api, trading, online, torch, rl,
+bayes, causal, semantic, r, dashboard, compute, research); uv.lock pins them and is committed.
 
 ---
 
@@ -74,9 +76,9 @@ uv pip list               # List installed packages (79+ packages)
 **Key Directories:**
 - `nfl_analytics/` - Python ML modules (causal, ensemble, RL, features)
 - `R/` - Statistical models (brms, Stan, state-space)
-- `analysis/dissertation/` - 693-page LaTeX dissertation
+- `analysis/dissertation/` - 722-page LaTeX dissertation
 - `models/` - Trained artifacts (~60 files)
-- `docs/` - 400+ documentation files
+- `docs/` - ~95 reference docs; dated session logs archived in git tag `docs-archive-2026-10` (docs/HISTORY.md)
 
 **Features (386 active, Kalman/GP disabled):**
 
@@ -133,6 +135,14 @@ uv pip list               # List installed packages (79+ packages)
 | `nextgen_passing` | 25,677 | `player_id`, `season`, `week` | Tracking data (2016+) |
 | `participation` | 433,805 | `game_id`, `play_id`, `player_id` | Player-play mapping |
 
+### CRITICAL: Spread Sign Convention
+
+`games.spread_close` is nflverse `spread_line`: the expected HOME margin, **positive when home is
+favored** (2018_01_BUF_BAL = 7.5, BAL -7.5). Home covers when `home_margin - spread_close > 0`;
+model edge is `pred_home_margin - spread_close`. The sportsbook rule `margin + spread > 0` is
+WRONG here and produced the retracted "74.9% ATS" claim. Use `nfl_analytics/utils/spread_convention.py`;
+a pre-commit hook rejects `margin + spread_close`. Sanity check: pooled home cover rate ≈ 49%.
+
 ### Column Naming Conventions
 
 | Correct | WRONG | Notes |
@@ -183,44 +193,23 @@ WHERE table_name = 'plays' AND column_name = 'epa');
 
 ```bash
 # Setup
-uv venv .venv && uv pip install -r requirements.txt
-Rscript -e 'renv::restore()'
-bash scripts/dev/init_dev.sh
+uv sync --extra dev
+docker compose up -d pg-1 redis && bash scripts/dev/init_dev.sh
+Rscript R/setup_packages.R
 
 # Testing
-pytest tests/unit -m unit
-pytest tests/integration -m integration
+uv run pytest -m "not integration"          # offline; what CI runs
+uv run pytest -m integration                # needs the Docker database
 
-# Pre-commit (enforced)
-pre-commit install
+# Benchmark any predictions against the closing market (refuses implausible results)
+uv run python -m nfl_analytics.evaluation.market_benchmark --help
+
+# Pre-commit (optional locally; CI enforces the same lint subset and black)
+uvx pre-commit install
 ```
 
-**Conventions:** Never commit secrets, test before commit, follow conventional commits, main branch: `main`
-
-### Git Worktrees
-
-The project uses git worktrees for parallel development workflows:
-
-| Worktree | Directory | Branch | Purpose |
-|----------|-----------|--------|---------|
-| Main | `nfl-analytics/` | `main` | Primary development |
-| Experiments | `../nfl-experiments/` | `experiments` | Model experiments, XGBoost tuning |
-| Dissertation | `../nfl-dissertation/` | `dissertation` | Isolated LaTeX compilation |
-| Hotfix | `../nfl-hotfix/` | `hotfix` | Quick production fixes |
-| Backtest | `../nfl-backtest/` | `backtest` | Long-running backtests |
-
-```bash
-# List all worktrees
-git worktree list
-
-# Remove a worktree when done
-git worktree remove ../nfl-hotfix
-
-# Prune stale references
-git worktree prune
-```
-
-**Note:** Each worktree needs its own `.venv` for Python dependencies.
+**Conventions:** Never commit secrets, test before commit, plain commit messages, main branch: `main`.
+Tests under `tests/{integration,infrastructure,e2e}` are auto-marked `integration`.
 
 ---
 
@@ -236,11 +225,12 @@ git worktree prune
 | 4: Infrastructure | Pre-backtest validation | Ensemble Health Monitor, Model Registry Auditor |
 | 5: Production Infra | Schema migrations, caching | Database Migration, Prediction Cache, A/B Test Monitor |
 
-**ROI:** $90k-165k estimated annual value, 100+ hours saved
 
 ---
 
-## Kalshi Trading System (Feb 2026)
+## Kalshi Trading System (Feb 2026, superseded by the Sibyl repo)
+
+> Development continues in the separate Sibyl repository. The meta-labeling gate here was trained on wrong spread labels; `load_model()` now refuses models saved before 2026-10-24.
 
 **Status:** All 6 phases complete, 437 unit tests passing, ~9,200 LOC across 37 files
 
@@ -567,7 +557,7 @@ See [docs/guides/DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.m
 
 ## LaTeX Tooling & Workflow
 
-**Location:** `analysis/dissertation/main/main.tex` (753 pages)
+**Location:** `analysis/dissertation/main/main.tex` (722 pages)
 
 ### Workflow Scripts (`~/.local/bin/diss-*`)
 
@@ -652,7 +642,7 @@ pdfpg                           # pdfinfo (shows page count)
 
 ## Dissertation Structure & File Map
 
-**Root:** `analysis/dissertation/` (753 pages, 62 figures, 313 tables)
+**Root:** `analysis/dissertation/` (722 pages)
 **Main Entry:** `analysis/dissertation/main/main.tex`
 
 ### Directory Structure
@@ -665,7 +655,7 @@ analysis/dissertation/
 │   ├── main.log                    # Compilation log (check for overfull boxes)
 │   ├── main.bbl                    # Compiled bibliography
 │   └── references.bib              # Bibliography database
-├── chapter_01_introduction/        # Ch1: Introduction (8 pages, 0 figures)
+├── chapter_01_intro/               # Ch1: Introduction (8 pages, 0 figures)
 ├── chapter_02_literature_review/   # Ch2: Literature Review (38 pages, 3 figures)
 ├── chapter_03_data_foundation/     # Ch3: Data Foundation (42 pages, 3 figures, 17 tables)
 ├── chapter_04_baseline_modeling/   # Ch4: Baseline Models (43 pages, 11 figures, 25 tables)
@@ -765,142 +755,21 @@ evince /tmp/section.pdf
 
 ---
 
-## Current Status (February 12, 2026)
+## Current Status (October 24, 2026)
 
-**Completed:**
-- **2025 FULL SEASON ANALYSIS COMPLETE (Feb 12, 2026):** All 285 games (272 REG + 13 playoff) evaluated
-  - Spread MAE: 11.05 (vs Vegas 9.67) — model underperforms market by 1.38 points
-  - ATS ROI: -3.2% on 208 qualified bets — below 52.4% breakeven (market efficiency confirmed)
-  - Win Prob Accuracy: 56.5% — better than coin flip but not exploitable
-  - Playoffs: 8.43 spread MAE (better than regular season), 70% ATS on 10 bets
-  - Super Bowl LIX: SEA 29, NE 13 — model predicted NE +1.4 (17.4pt error)
-  - Critical finding: Feature pipeline incompleteness (missing QBR, partial NextGen, no semantic data)
-  - Dissertation updated: new postseason validation section, Ch 9 + Ch 12 updated (753 pages)
-  - ADR-017 created: 2026 Season Improvement Roadmap (3 tiers)
-  - Database: Created `ml.game_outcome_predictions` table, custom `AVG(boolean)` / `SUM(boolean)` aggregates
-  - Code: Fixed DEFAULT_MODEL_DIR to v2, extended inference to Week 22 (playoffs)
-- **Code Review Remediation (Feb 12, 2026):** 8-chunk systematic review of entire Python codebase
-  - Fixed hardcoded credentials → env var fallbacks
-  - Tightened exception handling across API/ETL/production
-  - SQL identifier quoting, mutable default fixes
-  - Eliminated shell=True, os.system/eval usage
-  - Added MCMC convergence checks and TRUNCATE safeguards
-- **Path Normalization (Feb 12, 2026):** Replaced /Users/dro → /home/dro across 300+ files (macOS → Linux migration)
-- **Kalman/GP Features DISABLED (Dec 31):** ADR-015 documents decision to disable negative-signal features
-  - Created `nfl_analytics/config/feature_weights.yaml` for feature group enable/disable via config
-  - Kalman EPA (18 features): -10.2pp accuracy drop in A/B test
-  - GP Injury (17 features): GP never trained, used fake estimated data
-  - Code preserved with weight=0.0 for potential future iteration
-- **Possession Value Schema Fix (Dec 31):** `fixed_drive` column doesn't exist in nflverse schema
-  - Returns league averages instead of failing with SQL errors
-  - TODO: Implement drive inference from play sequences if feature needed
-- **Docker Networking Fix (Dec 31):** Fixed hardcoded localhost:5544 in feature extractors
-  - SemanticRepository, KalmanEPAFilter now use `get_db_config()` with env vars
-  - v2.1 training went from 22% → 71.6% non-zero features after fix
-- **True SHAP Implementation (Dec 28, H2):** Replaced heuristic attribution with TreeExplainer
-  - `semantic_attribution.py` now uses `shap.TreeExplainer` on production XGBoost models
-  - Computes real Shapley values for 38 semantic features (`sem_*` prefix)
-  - Graceful fallback to heuristic when SHAP unavailable
-  - Enables accurate feature importance measurement for semantic pipeline
-- **NER STATUS Extraction Fix (Dec 28, H4):** Fixed train-test mismatch in NER system prompt
-  - Root cause: Training data had STATUS labels but inference prompt didn't list STATUS category
-  - Added STATUS to system prompt with valid values: out, doubtful, questionable, probable
-  - **Validation: 0%→100% STATUS extraction** (exceeds 70% target)
-  - File: `nfl_analytics/semantic/models/inference.py:56-60`
-- **Rest Differential & BTB Detection (Dec 28):** Fixed `rest_differential=0` placeholder in game_feature_extractor.py
-  - 7 new features: rest_differential, home/away_days_rest, is_home/away_short_week, is_home/away_long_week
-  - **Strong 2025 signal**: Home +3 days rest = 69.2% cover, Away +3 days = 44.4% (25 point swing!)
-  - r=0.146 correlation with ATS outcome (meaningful for sports betting)
-  - Total features now 348 (305 base + 37 synthetic + 6 rest/BTB)
-- **S1.1: Kalman EPA Filter (Dec 28):** `nfl_analytics/features/kalman_epa_filter.py` - Team EPA regime detection
-  - Local Level (Random Walk + Noise) state-space model
-  - CUSUM on standardized innovations for regime change detection
-  - Noise parameters: σ_v²=0.025 (observation), σ_w²=0.001 (process) calibrated for NFL EPA
-  - Features: kalman_epa, kalman_epa_uncertainty, kalman_cusum_up/down, kalman_regime_change
-- **S1.2: GP Injury Recovery (Dec 28):** `nfl_analytics/features/gp_injury_recovery.py` - Uncertainty-aware recovery curves
-  - Kernel: Matern 5/2 + Constant + White Noise (Gemini consultation)
-  - Logit transform for bounded [0, 100%] performance output
-  - Hierarchical per injury category: muscle, structural, concussion, other
-  - Features: gp_recovery_pct, gp_recovery_lower_95, gp_recovery_upper_95, injury_days_since_return
-- **S2: WHY System Complete (Dec 28):** 3 new modules in `nfl_analytics/feedback/` for prediction explainability
-  - `model_error_decomposition.py`: C_i = w_i × (Y - Ŷ_i) signed contribution per model
-  - `temporal_causality.py`: Trace News→Sentiment→Feature→Prediction→Outcome chain
-  - `feature_interactions.py`: SHAP interaction_values for semantic × base synergies
-  - New tables: ml.model_error_decomposition, ml.causal_chains, ml.feature_interactions
-  - Gemini MCP consultation for mathematical formulations
-- 2025 Holdout Validation: 74.9% spread accuracy, 44.25 MAE props (Dec 9)
-- Phase 2 Advanced Stats: 120 new features
-- Dirichlet Optimization: Equal weights outperform v8.0 on holdout
-- **MLX vs Ollama Benchmark (Dec 23):** MLX 12x faster (2.4s vs 28.6s median), 23x faster for sentiment
-- **NER Model Evaluation (Dec 23):** 76% weighted accuracy, status extraction is weak point (40%)
-- **Semantic A/B Test (Dec 23):** 195 games tested, INCONCLUSIVE (p=0.21), v2 did not outperform v1
-- **XGBoost v4 Ridge Final Validation (Dec 23):** 59.14 MAE (47% WORSE than baseline), permanently DISABLED
-- **Synthetic Features (Dec 9):** 37 new features across 3 modules
-- **Props Stability Weighting (Dec 9):** SumerSports YoY correlation research integrated
-- **Code Quality Remediation (Dec 13):** 6-phase systematic fix (90+ issues)
-  - Phase 1: Foundation tests (85 unit tests added)
-  - Phase 2: Strategy pattern for feature extractors (FeatureExtractorStrategy interface)
-  - Phase 3: Unified asof features (consolidated 3 modules into `asof_features_unified.py`)
-  - Phase 4: Connection pool verification (infrastructure already existed)
-  - Phase 5: Critical bug fixes (temporal split, connection leak, uncertainty estimation)
-  - Phase 6: Documentation (XGBoost hyperparams, team_mapping, CLAUDE.md)
-- **Git Worktrees (Dec 20):** 4 parallel development worktrees (experiments, dissertation, hotfix, backtest)
-- **Semantic Stack Phase 1 (Dec 21):** LLM-powered feature engineering
-  - 26 semantic features integrated into GameFeatureExtractor (prefix: `sem_`)
-  - Ollama (qwen3:8b) + MLX + Gemini/Claude fallback chain
-  - News/social ingestion, NER/sentiment training data (5K + 2K samples)
-  - ValueBetDetector with LLM-generated explanations
-  - Fine-tuning utilities for Ollama Modelfile and MLX LoRA
-- **Weekly Feedback Loop (Dec 22):** Complete bidirectional learning system
-  - 10 modules across 3 phases (Phase 6: Feedback, Phase 7: Meta-Learning, Phase 8: A/B Testing)
-  - 8 new database tables for tracking (ml.feedback_runs, ml.feature_performance, etc.)
-  - Automatic feature selection: probation → active → disabled lifecycle
-  - LLM prompt evolution based on prediction outcomes
-  - McNemar test for A/B significance on 2025 holdout
-  - Weekly orchestrator: `scripts/run_weekly_feedback.py`
-- **Game Outcome Model v2 PROMOTED TO PRODUCTION (Dec 23):** Semantic-enhanced XGBoost models
-  - 382 features (344 base + 38 semantic LLM-derived features)
-  - Spread MAE: 10.45, Total MAE: 10.08, Win Prob AUC: 0.691
-  - A/B test: +4.6% win accuracy improvement vs v1 (non-semantic baseline)
-  - SHAP analysis: sem_away_media_buzz_volume in top 50 features
-  - Production artifacts: `models/production/game_outcome_v2/`
+- **No edge over the market.** 2025 full season: spread MAE 11.05 vs closing line 9.67; −3.2%
+  ATS ROI on 208 bets (95% CI ≈ ±13 pts). Walk-forward power ratings and Elo are ~50% ATS on
+  2019–2024 (`market_benchmark`).
+- **Retracted:** "74.9% ATS / +43% ROI" power ratings (spread sign bug); ADR-013 rest result;
+  ADR-003 XGBoost v4 (target leakage). See docs/POSTMORTEMS.md §4 and docs/adr/README.md.
+- **Repair (Oct 24, 2026):** spread convention fixed project-wide; `py/` → `nfl_analytics/`;
+  dependencies + uv.lock; CI green offline (1,511 tests); docs pruned; market benchmark added.
+- **Open items** (DB checks, ADR re-tests, retrains): PROJECT_STATUS.md.
+- **History:** docs/HISTORY.md (timeline; archived docs in tag `docs-archive-2026-10`).
 
-**Key Findings (Dec 13-28):**
-- Season-based temporal split prevents data leakage (train on seasons < max, validate on max)
-- RMSE is correct uncertainty estimate (not MAE * 0.5)
-- Context managers prevent connection leaks in high-load scenarios
-- **Feature weighting has NO effect on XGBoost** - tree models are scale-invariant (Dec 14)
-- **Feature pruning trade-off discovered** (Dec 14): More features = better spread MAE, fewer = better win AUC
-- **Best XGBoost config**: reg_alpha=1.0, reg_lambda=2.0 (only 0.09% improvement over baseline)
-- **qwen3:8b requires chat endpoint** (Dec 21): generate endpoint returns empty, use chat with 240s timeout
-- **Bidirectional meta-learning** (Dec 22): Model performance informs semantic features, semantic patterns suggest new features
-- **MLX is production-ready** (Dec 23): 12x faster than Ollama on Apple Silicon, use as primary with Ollama fallback
-- **Semantic features need validation** (Dec 23): A/B test inconclusive (p=0.21), don't enable until statistical significance achieved
-- **Target leakage inflates metrics by 14x** (Dec 23): XGBoost v4 went from 4.27 MAE (leaked) to 59.14 MAE (real)
-- **Kalman filter noise ratio** (Dec 28): σ_w²/σ_v² = 4% optimal for NFL EPA (slow underlying, noisy observations)
-- **GP injury recovery** (Dec 28): Matern 5/2 preferred for once-differentiable recovery curves, logit transform bounds output
-- **Gemini MCP for research** (Dec 28): Effective for mathematical consultation (kernel design, state-space parameters)
-- **Error decomposition formula** (Dec 28): C_i = w_i × (Y - Ŷ_i) enables per-model attribution
-- **SHAP interactions** (Dec 28): O(M² × N × T) complexity - subsample to ~2000 for tractability
-
-**In Progress (2026 Season Preparation — ADR-017):**
-- Tier 1: Fix feature pipeline health checks (QBR, NextGen, semantic data staleness alerts)
-- Tier 1: Register Game Outcome v2 in model registry + populate ml.model_metrics
-- Tier 1: Unified weekly pipeline (`make weekly-pipeline SEASON=2026 WEEK=N`)
-- Tier 1: Restore 4 missing production model files (state-space v2, GNN, temp scaler, v1 staging)
-- Tier 2: Add playoff-specific features (game_type, seed_differential, bye_week_advantage)
-- Tier 2: Retrain on 2022-2025 window (25% more training data)
-- Tier 2: Boolean/integer schema cleanup (proper migration, remove custom aggregates)
-
-**Strategic Decisions:**
-- BNN research abandoned (Nov 9) - 84 hours, 6 approaches, only BNN v3.1 Rushing remains
-- Dynamic meta-learning rejected (Nov 18) - static weights outperform, see ADR-009
-- Dual-weight strategy adopted (Nov 27) - different domains need different weights
-- ValidatorRegistry pattern adopted (Dec 13) - Strategy pattern for validation
-- **Feature optimization tested, baseline retained (Dec 14)** - see ADR-011
-- **Feedback loop with automatic feature selection (Dec 22)** - see ADR-012
-
-**Recent Work:** [docs/milestones/RECENT_WORK_HISTORY.md](docs/milestones/RECENT_WORK_HISTORY.md)
+**Strategic decisions still standing:** BNN research abandoned (ADR-004); static ensemble
+weights over meta-learning (ADR-009); feedback loop with automatic feature selection (ADR-012);
+Kalman/GP features disabled (ADR-015).
 
 ---
 
@@ -911,8 +780,8 @@ evince /tmp/section.pdf
 | Quick Start | README.md, SETUP.md, CONTRIBUTING.md |
 | Database | [DATABASE_QUICK_REFERENCE](docs/database/DATABASE_QUICK_REFERENCE.md), [SQL_PATTERNS](docs/database/SQL_PATTERNS.md) |
 | Architecture | [ARCHITECTURE_REFERENCE](docs/architecture/ARCHITECTURE_REFERENCE.md), [COMPONENT_DEEP_DIVES](docs/architecture/COMPONENT_DEEP_DIVES.md) |
-| Milestones | [RECENT_WORK_HISTORY](docs/milestones/RECENT_WORK_HISTORY.md), [docs/milestones/](docs/milestones/) |
-| Synthesis | [DIRICHLET_OPTIMIZATION](docs/synthesis/DIRICHLET_WEIGHT_OPTIMIZATION_SYNTHESIS_NOV27.md) |
+| History | [HISTORY](docs/HISTORY.md), [POSTMORTEMS](docs/POSTMORTEMS.md), [PROJECT_STATUS](PROJECT_STATUS.md) |
+| Evaluation | [market_benchmark](nfl_analytics/evaluation/market_benchmark/), [2025 season review](docs/investigations/2026-02-season-review/) |
 | ADRs | [docs/adr/](docs/adr/) (009: Dynamic weights, 011: Feature optimization, 012: Feedback loop, 015: Kalman/GP disabled, 016: CQL target leakage, 017: 2026 season roadmap) |
 
 ---
@@ -967,7 +836,9 @@ evince /tmp/section.pdf
 23. **Playoffs behave differently** - 8.43 playoff MAE vs 11.14 regular season. Late-season team quality differentials are more informative. Dedicated playoff features merit investigation.
 24. **Custom PostgreSQL aggregates are fragile** - `AVG(boolean)` doesn't exist natively; creating custom aggregates works but adds schema complexity across machines. Prefer explicit `::int` casts.
 25. **Model registry hygiene matters** - Production v2 not registered in ml.model_registry caused deployment confusion and audit gaps (ADR-017 Tier 1.2).
-26. **Market efficiency is real** - -3.2% ATS ROI on 208 bets confirms semi-strong EMH for NFL spreads with public data. The 4.5% vig is insurmountable.
+26. **Market efficiency is real** - -3.2% ATS ROI on 208 bets is consistent with no edge over NFL closing lines (the 95% CI is wide; judge models by log-loss and CLV against the market, not ROI).
+27. **Pin conventions with real games** - the spread sign bug recurred three times (Nov 2025, CQL, Dec 2025) because every script re-derived the cover formula. One helper, one test on BUF@BAL 2018, one pre-commit guard.
+28. **Too good to be true is a bug report** - 74% ATS that is steady across six seasons is arithmetic, not skill. The market benchmark refuses >60% ATS / >15% ROI on 100+ bets.
 
 ### LaTeX/Dissertation Lessons (Jan 2026)
 
@@ -984,7 +855,7 @@ evince /tmp/section.pdf
 
 ---
 
-**Version:** 7.0 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
+**Version:** 9.0 | **Maintainer:** Claude Code | **Repository:** github.com/raold/nfl-analytics
 
 **Project Rules:**
 - Never take shortcuts, never use synthetic data

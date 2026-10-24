@@ -1257,7 +1257,7 @@ cd nfl-analytics
 
 # Python environment
 uv venv .venv && source .venv/bin/activate
-uv pip install -r requirements.txt
+uv sync --extra dev
 
 # Initialize compute system
 python run_compute.py --init

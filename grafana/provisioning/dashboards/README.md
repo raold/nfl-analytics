@@ -246,9 +246,9 @@ docker compose restart grafana
 
 ## Related Documentation
 
-- [Prometheus Configuration](../../prometheus/prometheus.yml)
+- Prometheus Configuration (no longer in the repo; see [HISTORY](../../../docs/HISTORY.md))
 - [Docker Compose Stack](../../../docker-compose.yml)
-- [Production Deployment Plan](../../../PRODUCTION_DEPLOYMENT_PLAN.md)
+- Production Deployment Plan (no longer in the repo; see [HISTORY](../../../docs/HISTORY.md))
 - [CLAUDE.md](../../../CLAUDE.md)
 
 ## Maintenance

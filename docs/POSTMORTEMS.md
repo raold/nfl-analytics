@@ -645,6 +645,24 @@ pooled home cover rate (~49% correct vs ~56% with the bug).
   moneylines. The weekly ingest re-inserts the current season from nflverse, so later ingests
   should have replaced them — verify before trusting 2025 market comparisons.
 
+### Verification once the database is up
+
+```sql
+-- 1. Convention: home moneyline favorites should almost always have spread_close > 0
+SELECT AVG((spread_close > 0)::int) FILTER (WHERE home_moneyline < 0) AS pos_when_home_fav,
+       corr(spread_close, home_moneyline)                             AS corr_expect_negative
+FROM games WHERE season >= 2015 AND spread_close <> 0;
+
+-- 2. Pooled home cover rate: correct ~0.49, the old rule ~0.56
+SELECT AVG(((home_score - away_score) > spread_close)::int)     AS correct,
+       AVG(((home_score - away_score) + spread_close > 0)::int) AS old_rule
+FROM games WHERE season BETWEEN 2020 AND 2025 AND home_score IS NOT NULL
+  AND spread_close IS NOT NULL AND (home_score - away_score) <> spread_close;
+```
+
+The retraction itself reproduces offline:
+`uv run python -m nfl_analytics.evaluation.market_benchmark --baseline power_ratings --market-csv data/historical_weather_2018_2024.csv --seasons 2019-2024`.
+
 ### Left as-is (fix on next retrain)
 
 These **features** encode the sign inverted, but training and inference share the same code, so

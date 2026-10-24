@@ -365,7 +365,7 @@ psql $DATABASE_URL -f tests/sql/test_data_quality.sql
 ### "Import error: No module named 'py'"
 - Ensure you're in the project root
 - Activate virtual environment: `source .venv/bin/activate`
-- Install dependencies: `pip install -r requirements-dev.txt`
+- Install dependencies: `uv sync --extra dev`
 
 ### "Connection refused" (database tests)
 - Start Docker: `docker compose up -d pg`

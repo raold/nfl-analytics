@@ -86,7 +86,7 @@
   - Feature engineering fully specified
 - ✅ **Computational environment documented**
   - R version and package versions (`renv`)
-  - Python environment (`requirements.txt` or `uv`)
+  - Python environment (`pyproject.toml` + `uv.lock`)
   - Hardware specifications for long-running jobs
   - Execution times reported for benchmarks
 

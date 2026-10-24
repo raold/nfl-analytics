@@ -13,6 +13,7 @@ see [HISTORY.md](HISTORY.md) for the timeline and how to restore them.
 ## Evaluation and results
 
 - [investigations/2026-02-season-review/](investigations/2026-02-season-review/) — full 2025 season review (WS1–WS7)
+- [investigations/2026-10-market-benchmark.md](investigations/2026-10-market-benchmark.md) — baselines vs the closing line; reproduces the 74.9% retraction
 - [TRAINING_WINDOW_ABLATION_RESULTS.md](TRAINING_WINDOW_ABLATION_RESULTS.md)
 - [STATE_SPACE_FINAL_DECISION.md](STATE_SPACE_FINAL_DECISION.md) — written by `R/make_state_space_decision.R`
 - [TEMPORAL_LEAKAGE_PROTECTION.md](TEMPORAL_LEAKAGE_PROTECTION.md), [TEMPORAL_SAFETY_TESTING_FRAMEWORK.md](TEMPORAL_SAFETY_TESTING_FRAMEWORK.md)

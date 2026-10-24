@@ -331,7 +331,7 @@ docker rm odds-fetcher
 
 ```bash
 # Install dependencies
-pip install -r requirements.txt
+uv sync --extra dev
 
 # Run continuously
 python nfl_analytics/data/odds_update_service.py

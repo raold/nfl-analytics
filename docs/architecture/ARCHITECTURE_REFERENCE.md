@@ -201,7 +201,7 @@ nfl-analytics/
 ├── docker-compose.yml                    # Docker services (Phase 1)
 ├── docker-compose.dev.yml                # Dev services (Phase 2)
 ├── docker-compose.gpu.yml                # GPU services (Phase 3)
-├── requirements.txt                      # Python dependencies
+├── pyproject.toml                      # Python dependencies (+ uv.lock)
 ├── renv.lock                             # R package versions
 ├── pytest.ini                            # Test configuration
 ├── .pre-commit-config.yaml               # Pre-commit hooks

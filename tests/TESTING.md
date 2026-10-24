@@ -104,7 +104,7 @@ tests/
 
 ## 🐍 Python Testing Setup
 
-### Dependencies (`requirements-dev.txt`)
+### Dependencies (`dev` extra in `pyproject.toml`)
 ```txt
 # Testing
 pytest>=7.4.0
@@ -361,8 +361,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
+          uv sync --frozen --extra dev
       
       - name: Run unit tests
         run: pytest tests/unit -m unit --cov=nfl_analytics --cov-report=xml
@@ -402,8 +401,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install -r requirements-dev.txt
+          uv sync --frozen --extra dev
       
       - name: Apply database schema
         env:
@@ -646,7 +644,6 @@ jobs:
 
 ### Week 1: Foundation
 - [ ] Create `tests/` directory structure
-- [ ] Add `requirements-dev.txt`
 - [ ] Configure `pytest.ini`
 - [ ] Write 3-5 unit tests for `ingest_odds_history.py`
 - [ ] Set up GitHub Actions basic workflow

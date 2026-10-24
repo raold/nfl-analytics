@@ -371,8 +371,8 @@ print(importance.head(20))
 ## 📚 Related Documentation
 
 - **[docs/database/DATABASE_SCHEMA_AUDIT.md](../../docs/database/DATABASE_SCHEMA_AUDIT.md)** - Schema standards
-- **[analysis/DATA_LEAKAGE_AUDIT_REPORT_UPDATED.md](../../analysis/DATA_LEAKAGE_AUDIT_REPORT_UPDATED.md)** - Data leakage findings
-- **[PHASE_5_COMPLETION_SUMMARY.md](../../PHASE_5_COMPLETION_SUMMARY.md)** - Phase 5 feature engineering summary
+- **analysis/DATA_LEAKAGE_AUDIT_REPORT_UPDATED.md (no longer in the repo; see [HISTORY](../../docs/HISTORY.md))** - Data leakage findings
+- **PHASE_5_COMPLETION_SUMMARY.md (no longer in the repo; see [HISTORY](../../docs/HISTORY.md))** - Phase 5 feature engineering summary
 - **[CLAUDE.md](../../CLAUDE.md)** - Complete project documentation
 
 ---

@@ -44,8 +44,7 @@ uv venv .venv
 source .venv/bin/activate  # macOS/Linux
 
 # 5. Install dependencies
-uv pip install -r requirements.txt
-uv pip install -r requirements-dev.txt
+uv sync --extra dev
 
 # 6. Install R packages
 Rscript -e 'renv::restore()'

@@ -258,7 +258,7 @@ See issue #123 for details."
 
 ## Related Documentation
 
-- [FRONTEND_ENGINEERING_AGENT.md](../docs/FRONTEND_ENGINEERING_AGENT.md) - Complete guide
+- FRONTEND_ENGINEERING_AGENT.md (no longer in the repo; see [HISTORY](../docs/HISTORY.md)) - Complete guide
 - [SQL_PATTERNS.md](../docs/database/SQL_PATTERNS.md) - Correct SQL patterns
 - [DATABASE_QUICK_REFERENCE.md](../docs/database/DATABASE_QUICK_REFERENCE.md) - Schema reference
 
