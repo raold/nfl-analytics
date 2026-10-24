@@ -8,6 +8,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 # Load data
 csv_file = _PROJECT_ROOT / "analysis/results/historical_validation_4way_EMERGENCY_FIX.csv"
 df = pd.read_csv(csv_file)

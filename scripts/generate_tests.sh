@@ -35,7 +35,7 @@ print('\\n✅ Full test suite generated')
 print('\\nNext steps:')
 print('  1. Review generated tests in tests/unit/')
 print('  2. Run: pytest tests/unit')
-print('  3. Check coverage: pytest --cov=py --cov-report=html')
+print('  3. Check coverage: pytest --cov=nfl_analytics --cov-report=html')
 print('  4. Open: htmlcov/index.html')
 "
 
@@ -44,7 +44,7 @@ elif [ "$1" == "--coverage" ]; then
     echo ""
 
     if command -v pytest &> /dev/null; then
-        pytest --cov=py --cov-report=term-missing --cov-report=html -q || true
+        pytest --cov=nfl_analytics --cov-report=term-missing --cov-report=html -q || true
         echo ""
         echo "Detailed coverage report: htmlcov/index.html"
     else

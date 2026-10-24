@@ -4,6 +4,7 @@ Deduplication tool for NFL Analytics database.
 Safely removes duplicates while preserving data integrity.
 """
 
+import os
 import subprocess
 
 import click

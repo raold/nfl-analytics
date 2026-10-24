@@ -58,7 +58,7 @@ else
     read -p "Install missing dependencies? (y/n) " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        pip install -r requirements.txt
+        uv sync --extra dev
     fi
 fi
 

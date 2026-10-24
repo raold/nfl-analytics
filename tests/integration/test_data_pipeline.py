@@ -11,7 +11,7 @@ import psycopg
 import pytest
 
 # Add nfl_analytics/ to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "py"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / "nfl_analytics"))
 
 
 @pytest.fixture(scope="module")

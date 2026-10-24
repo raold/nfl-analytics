@@ -77,7 +77,7 @@ class AutonomousPhase2Runner:
         logger.info("Starting Phase 2.2: Mixture-of-Experts BNN")
         logger.info("=" * 80)
 
-        script_path = self.base_dir / "py" / "models" / "bnn_mixture_experts_v2.py"
+        script_path = self.base_dir / "nfl_analytics" / "models" / "bnn_mixture_experts_v2.py"
 
         logger.info(f"Running: {script_path}")
         result = subprocess.run(

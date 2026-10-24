@@ -28,7 +28,7 @@ from unittest.mock import patch
 import numpy as np
 import pandas as pd
 import pytest
-import torch
+torch = pytest.importorskip("torch")  # optional: uv sync --extra torch
 import torch.nn as nn
 
 from nfl_analytics.rl.cql_agent import (

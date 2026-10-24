@@ -371,7 +371,7 @@ if [[ -z "$SPECIFIC_CHECK" || "$SPECIFIC_CHECK" == "betting_math" ]]; then
   run_check
   if python3 -c "
 import sys
-sys.path.insert(0, 'py')
+sys.path.insert(0, 'nfl_analytics')
 from production.kelly_sizing import kelly_criterion, american_to_decimal_odds
 
 # Test case: 55% win prob, -110 odds
@@ -396,7 +396,7 @@ else:
   run_check
   if python3 -c "
 import sys
-sys.path.insert(0, 'py')
+sys.path.insert(0, 'nfl_analytics')
 from production.kelly_sizing import american_to_decimal_odds
 
 # Test: -110 → 0.909, +150 → 1.5

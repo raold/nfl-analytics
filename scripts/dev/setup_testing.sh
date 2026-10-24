@@ -7,7 +7,7 @@ echo "🔧 Setting up testing environment..."
 
 # Check if Python virtual environment exists
 if [ ! -d ".venv" ]; then
-    echo "❌ Virtual environment not found. Please run 'python -m venv .venv' first."
+    echo "❌ Virtual environment not found. Run 'uv sync --extra dev' first."
     exit 1
 fi
 
@@ -16,8 +16,7 @@ source .venv/bin/activate
 
 # Install development dependencies
 echo "📦 Installing development dependencies..."
-pip install -q --upgrade pip
-pip install -q -r requirements-dev.txt
+uv sync --extra dev
 
 # Install pre-commit hooks
 echo "🪝 Installing pre-commit hooks..."
@@ -43,7 +42,7 @@ echo "Available commands:"
 echo "  pytest tests/unit              # Run unit tests"
 echo "  pytest tests/integration       # Run integration tests (requires DB)"
 echo "  pytest -m unit                 # Run only unit tests"
-echo "  pytest --cov=py                # Run with coverage report"
+echo "  pytest --cov=nfl_analytics                # Run with coverage report"
 echo "  pre-commit run --all-files     # Run all pre-commit hooks"
 echo "  black nfl_analytics/                      # Format Python code"
 echo "  ruff check nfl_analytics/                 # Lint Python code"

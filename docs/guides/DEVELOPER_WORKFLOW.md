@@ -394,7 +394,7 @@ pytest tests/unit/test_feature_engineering.py -v
 pytest tests/unit/test_feature_engineering.py::test_rolling_average_basic -v
 
 # Run with coverage
-pytest tests/unit --cov=py --cov-report=html
+pytest tests/unit --cov=nfl_analytics --cov-report=html
 open htmlcov/index.html
 ```
 

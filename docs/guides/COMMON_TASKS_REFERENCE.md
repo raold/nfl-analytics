@@ -671,7 +671,7 @@ pytest tests/unit -v
 Run with coverage:
 
 ```bash
-pytest tests/unit --cov=py --cov-report=html
+pytest tests/unit --cov=nfl_analytics --cov-report=html
 open htmlcov/index.html
 ```
 
@@ -773,7 +773,7 @@ pytest tests/unit
 pytest tests/integration
 
 # All tests with coverage
-pytest tests/ --cov=py --cov-report=html
+pytest tests/ --cov=nfl_analytics --cov-report=html
 
 # Tests with specific marker
 pytest tests/ -m unit

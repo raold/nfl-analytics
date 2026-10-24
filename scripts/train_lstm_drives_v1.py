@@ -35,7 +35,7 @@ sys.path.insert(0, str(project_root))
 import importlib.util
 
 spec = importlib.util.spec_from_file_location(
-    "lstm_drive_prediction", project_root / "py" / "models" / "lstm_drive_prediction.py"
+    "lstm_drive_prediction", project_root / "nfl_analytics" / "models" / "lstm_drive_prediction.py"
 )
 lstm_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(lstm_module)

@@ -18,14 +18,12 @@ PGPASSWORD="${POSTGRES_PASSWORD}" psql "${PG_URI}" -v ON_ERROR_STOP=1 -f db/001_
 PGPASSWORD="${POSTGRES_PASSWORD}" psql "${PG_URI}" -v ON_ERROR_STOP=1 -f db/002_timescale.sql
 
 echo "[dev-setup] Python deps (install into /opt/venv)"
-if [ -x /opt/venv/bin/pip ]; then
-  /opt/venv/bin/pip install -r requirements.txt
+if command -v uv >/dev/null 2>&1; then
+  uv sync --frozen --extra dev
+elif [ -x /opt/venv/bin/pip ]; then
+  /opt/venv/bin/pip install -e ".[dev]"
 else
-  if command -v uv >/dev/null 2>&1; then
-    uv pip --python /usr/local/bin/python install -r requirements.txt
-  else
-    pip install -r requirements.txt
-  fi
+  pip install -e ".[dev]"
 fi
 
 echo "[dev-setup] R deps"

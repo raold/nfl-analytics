@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 # Add compute modules to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "py" / "compute"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "nfl_analytics" / "compute"))
 
 try:
     import redis

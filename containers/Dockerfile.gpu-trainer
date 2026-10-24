@@ -74,9 +74,6 @@ WORKDIR /tmp
 # Install uv for fast Python package management
 RUN pip install --no-cache-dir uv
 
-# Copy requirements files
-COPY requirements.txt /tmp/
-
 # Install PyTorch with CUDA 12.2 support (from official PyTorch index)
 RUN uv pip install --system --no-cache \
     torch==2.5.1 \
@@ -86,7 +83,7 @@ RUN uv pip install --system --no-cache \
 
 # Install core ML and data science packages
 RUN uv pip install --system --no-cache \
-    # Core requirements from requirements.txt
+    # Core requirements (mirrors pyproject.toml base dependencies)
     pandas>=2.0.0 \
     polars>=0.19.0 \
     pyarrow>=14.0.0 \

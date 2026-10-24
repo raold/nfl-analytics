@@ -26,7 +26,12 @@ import logging
 import numpy as np
 import pandas as pd
 
-from nfl_analytics.ensemble.stacked_meta_learner import StackedMetaLearner
+# StackedMetaLearner was archived to research/failed_v7/ with the abandoned v7 meta-learning
+# work (ADR-009); stacking is unavailable but the rest of v3 still works.
+try:
+    from nfl_analytics.ensemble.stacked_meta_learner import StackedMetaLearner
+except ImportError:
+    StackedMetaLearner = None
 from nfl_analytics.models.bayesian_neural_network import BayesianNeuralNetwork
 from nfl_analytics.optimization.portfolio_optimizer import CorrelatedPortfolioOptimizer
 
@@ -53,7 +58,7 @@ class EnhancedEnsembleV3:
     def __init__(
         self,
         use_bnn: bool = True,
-        use_stacking: bool = True,
+        use_stacking: bool = False,  # StackedMetaLearner archived (ADR-009)
         use_portfolio_opt: bool = True,
         kelly_fraction: float = 0.25,
         min_edge: float = 0.02,
@@ -76,6 +81,11 @@ class EnhancedEnsembleV3:
             pass
 
         if use_stacking:
+            if StackedMetaLearner is None:
+                raise ImportError(
+                    "use_stacking=True needs StackedMetaLearner, archived to research/failed_v7/ "
+                    "(ADR-009); construct EnhancedEnsembleV3 with use_stacking=False"
+                )
             self.meta_learner = StackedMetaLearner(meta_model_type="gbm")
 
         if use_portfolio_opt:

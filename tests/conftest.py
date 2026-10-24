@@ -8,26 +8,10 @@ This file is automatically loaded by pytest and provides:
 - Environment setup
 """
 
-import sys
-from pathlib import Path
-
-# Ensure project root is first in sys.path so local nfl_analytics/ package imports work
-# This prevents conflicts with pytest's legacy 'py' package dependency
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-
-# Remove pytest's 'py' package from sys.modules to allow our local 'py' package
-# to be imported. Store it temporarily so pytest can still use it if needed.
-_pytest_py = sys.modules.get("py")
-if _pytest_py is not None:
-    # Save pytest's py module under a different name
-    sys.modules["_pytest_py_original"] = _pytest_py
-    # Remove the 'py' module so our local package takes precedence
-    del sys.modules["py"]
-
 import datetime as dt
 import os
 from collections.abc import Generator
+from pathlib import Path
 
 import psycopg
 import pytest
@@ -182,8 +166,37 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "benchmark: marks tests as performance benchmarks")
 
 
+# Directories whose tests need live services (Postgres, Redis, Docker, the API).
+# Everything in them is marked `integration` so `-m "not integration"` runs offline.
+_INTEGRATION_DIRS = ("integration", "infrastructure", "e2e")
+
+
+def pytest_ignore_collect(collection_path, config):
+    """With -m "not integration", don't import service-dependent test modules at all.
+
+    Several of them connect to Postgres or need heavy extras at import time, which would
+    turn an offline run into collection errors before marker deselection applies.
+    """
+    if "not integration" not in (config.getoption("markexpr") or ""):
+        return None
+    try:
+        top = collection_path.relative_to(Path(__file__).parent).parts[0]
+    except (ValueError, IndexError):
+        return None
+    return True if top in _INTEGRATION_DIRS else None
+
+
 def pytest_collection_modifyitems(config, items):
-    """Modify test collection based on command-line options."""
+    """Auto-mark service-dependent tests; skip slow tests unless --runslow."""
+    tests_root = Path(__file__).parent
+    for item in items:
+        try:
+            top = item.path.relative_to(tests_root).parts[0]
+        except ValueError:
+            continue
+        if top in _INTEGRATION_DIRS:
+            item.add_marker(pytest.mark.integration)
+
     if config.getoption("--runslow"):
         # --runslow given in cli: do not skip slow tests
         return

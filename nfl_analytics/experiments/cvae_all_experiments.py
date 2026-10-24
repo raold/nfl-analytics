@@ -9,6 +9,9 @@ Causal framework, GNN embeddings, Hierarchical models).
 
 import os
 import sys
+from pathlib import Path
+
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
 
 # Add project root to path
 project_root = str(_PROJECT_ROOT)
@@ -18,7 +21,6 @@ if project_root not in sys.path:
 import json
 import logging
 import pickle
-from pathlib import Path
 
 import numpy as np
 import torch

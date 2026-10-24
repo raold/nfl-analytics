@@ -19,7 +19,7 @@ import sys
 
 import numpy as np
 import pytest
-import torch
+torch = pytest.importorskip("torch")  # optional: uv sync --extra torch
 from sklearn.datasets import make_regression
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))

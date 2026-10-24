@@ -25,9 +25,11 @@ RUN useradd -m -u 1000 nfl && \
 
 WORKDIR /app
 
-# Copy requirements and install Python dependencies
-COPY --chown=nfl:nfl requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Install the locked dependency set (pyproject.toml + uv.lock)
+COPY --chown=nfl:nfl pyproject.toml uv.lock ./
+RUN pip install --no-cache-dir uv==0.13.5 && \
+    uv export --frozen --no-hashes --no-emit-project -o /tmp/requirements.lock && \
+    uv pip install --system --no-cache -r /tmp/requirements.lock
 
 # Copy application code
 COPY --chown=nfl:nfl . .

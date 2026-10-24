@@ -16,7 +16,7 @@ docker compose up -d pg
 pytest tests/integration -m integration
 
 # 4. Run all tests with coverage
-pytest --cov=py --cov-report=html
+pytest --cov=nfl_analytics --cov-report=html
 open htmlcov/index.html
 ```
 
@@ -92,7 +92,7 @@ pytest tests/unit/test_data_leakage_prevention.py -m critical
 pytest tests/unit/test_data_leakage_prevention.py \
        tests/integration/test_ensemble_v6_integration.py \
        tests/integration/test_backtest_framework.py \
-       -v --cov=py --cov-report=html
+       -v --cov=nfl_analytics --cov-report=html
 
 # Parallel execution (~28 seconds, 3.4x speedup)
 pytest tests/unit/test_data_leakage_prevention.py \
@@ -163,14 +163,14 @@ pytest tests/unit/test_odds_parsing.py::TestFlattenEvents::test_flatten_events_s
 ### With Coverage
 ```bash
 # Generate coverage report
-pytest --cov=py --cov-report=term-missing
+pytest --cov=nfl_analytics --cov-report=term-missing
 
 # HTML coverage report
-pytest --cov=py --cov-report=html
+pytest --cov=nfl_analytics --cov-report=html
 open htmlcov/index.html
 
 # XML for CI/CD
-pytest --cov=py --cov-report=xml
+pytest --cov=nfl_analytics --cov-report=xml
 ```
 
 ### Other Options
@@ -397,14 +397,14 @@ After running tests with `--cov`, view coverage:
 
 ```bash
 # Terminal report
-pytest --cov=py --cov-report=term-missing
+pytest --cov=nfl_analytics --cov-report=term-missing
 
 # HTML report (interactive)
-pytest --cov=py --cov-report=html
+pytest --cov=nfl_analytics --cov-report=html
 open htmlcov/index.html
 
 # Show only uncovered lines
-pytest --cov=py --cov-report=term-missing:skip-covered
+pytest --cov=nfl_analytics --cov-report=term-missing:skip-covered
 ```
 
 ### Current Coverage (with P0 tests)

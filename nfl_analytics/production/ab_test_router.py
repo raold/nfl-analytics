@@ -50,7 +50,7 @@ import pandas as pd
 import psycopg2
 from dotenv import load_dotenv
 from psycopg2.extras import RealDictCursor
-from nfl_analytics.ensemble.enhanced_ensemble_v6 import EnhancedEnsemble4Way as EnsembleV6
+from nfl_analytics.ensemble.enhanced_ensemble_v6_production import EnhancedEnsemble5Way as EnsembleV6
 
 from nfl_analytics.ensemble.enhanced_ensemble_v5 import EnhancedEnsemble4Way as EnsembleV5
 
@@ -258,7 +258,7 @@ class ABTestRouter:
             )
         else:
             result = self.ensemble_v6.predict(
-                player_id=player_id, season=season, week=week, return_individual=return_individual
+                player_id=player_id, season=season, week=week, return_components=return_individual
             )
 
         # Add A/B test metadata

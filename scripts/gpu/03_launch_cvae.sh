@@ -48,7 +48,7 @@ if [ $? -eq 0 ]; then
 import torch
 from pathlib import Path
 import sys
-sys.path.append('py')
+sys.path.append('nfl_analytics')
 
 if Path('models/cvae/cvae_best.pt').exists():
     print('Model saved successfully')

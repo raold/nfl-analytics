@@ -13,51 +13,11 @@ RUN apt-get update && \
 # Set working directory
 WORKDIR /app
 
-# Copy requirements and check/install Python dependencies
-COPY requirements.txt .
-
-# Smart dependency installation - only install what's missing
-RUN python -c "
-import subprocess
-import sys
-
-def check_and_install_packages():
-    required_packages = []
-
-    # Check each package before installing
-    packages_to_check = [
-        ('redis', 'redis>=4.5.0'),
-        ('psutil', 'psutil>=5.9.0'),
-        ('numpy', 'numpy'),
-        ('pandas', 'pandas'),
-        ('scipy', 'scipy'),
-        ('sklearn', 'scikit-learn')
-    ]
-
-    for import_name, package_spec in packages_to_check:
-        try:
-            __import__(import_name)
-            print(f'✅ {import_name} already installed')
-        except ImportError:
-            print(f'📦 Need to install {package_spec}')
-            required_packages.append(package_spec)
-
-    # Install requirements.txt packages
-    try:
-        subprocess.run([sys.executable, '-m', 'pip', 'install', '--no-cache-dir', '-r', 'requirements.txt'], check=True)
-        print('✅ requirements.txt installed')
-    except subprocess.CalledProcessError:
-        print('⚠️ Some requirements.txt packages may have failed')
-
-    # Install any additional missing packages
-    if required_packages:
-        subprocess.run([sys.executable, '-m', 'pip', 'install', '--no-cache-dir'] + required_packages, check=True)
-        print(f'✅ Installed missing packages: {required_packages}')
-    else:
-        print('✅ All additional packages already present')
-
-check_and_install_packages()
-"
+# Install the locked dependency set (pyproject.toml + uv.lock) plus extras: --extra compute
+COPY pyproject.toml uv.lock ./
+RUN pip install --no-cache-dir uv==0.13.5 && \
+    uv export --frozen --no-hashes --no-emit-project --extra compute -o /tmp/requirements.lock && \
+    uv pip install --system --no-cache -r /tmp/requirements.lock
 
 FROM base as worker
 
@@ -73,7 +33,7 @@ COPY containers/config/ ./config/
 RUN mkdir -p /data/redis /data/results /data/checkpoints /data/logs
 
 # Set environment variables
-ENV PYTHONPATH="/app:/app/py:/app/nfl_analytics/compute"
+ENV PYTHONPATH="/app:/app/nfl_analytics:/app/nfl_analytics/compute"
 ENV REDIS_HOST="localhost"
 ENV REDIS_PORT="6379"
 ENV MACHINE_ID=""

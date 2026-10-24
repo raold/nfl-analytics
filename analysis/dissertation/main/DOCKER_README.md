@@ -440,7 +440,7 @@ services:
   dashboard:
     volumes:
       - ../../../dashboard:/app/dashboard
-      - ../../../py:/app/py
+      - ../../../nfl_analytics:/app/nfl_analytics
 ```
 
 Dashboard will auto-reload on code changes.

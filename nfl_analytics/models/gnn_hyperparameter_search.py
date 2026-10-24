@@ -31,7 +31,7 @@ from optuna.samplers import TPESampler
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(PROJECT_ROOT / "py" / "models"))
+sys.path.insert(0, str(PROJECT_ROOT / "nfl_analytics" / "models"))
 
 from train_hierarchical_gnn import train_gnn_single_config
 

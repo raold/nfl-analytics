@@ -17,6 +17,8 @@ from pathlib import Path
 
 import psycopg2
 
+_PROJECT_ROOT = next(p for p in Path(__file__).resolve().parents if (p / "pyproject.toml").exists())
+
 # Add project root to path
 project_root = str(_PROJECT_ROOT)
 if project_root not in sys.path:

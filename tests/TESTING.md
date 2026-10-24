@@ -137,7 +137,7 @@ python_functions = test_*
 addopts = 
     --verbose
     --strict-markers
-    --cov=py
+    --cov=nfl_analytics
     --cov-report=term-missing
     --cov-report=html
     --cov-report=xml
@@ -365,7 +365,7 @@ jobs:
           pip install -r requirements-dev.txt
       
       - name: Run unit tests
-        run: pytest tests/unit -m unit --cov=py --cov-report=xml
+        run: pytest tests/unit -m unit --cov=nfl_analytics --cov-report=xml
       
       - name: Upload coverage
         uses: codecov/codecov-action@v3
@@ -425,7 +425,7 @@ jobs:
           POSTGRES_DB: testdb
           POSTGRES_USER: testuser
           POSTGRES_PASSWORD: testpass
-        run: pytest tests/integration -m integration --cov=py --cov-report=xml
+        run: pytest tests/integration -m integration --cov=nfl_analytics --cov-report=xml
       
       - name: Upload coverage
         uses: codecov/codecov-action@v3

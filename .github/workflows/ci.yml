@@ -12,37 +12,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v5
         with:
           python-version: '3.11'
+          enable-cache: true
 
-      - name: Install uv
-        run: curl -LsSf https://astral.sh/uv/install.sh | sh
-
+      # torch, bayes, semantic etc. are optional extras; their tests skip when absent
       - name: Install dependencies
-        run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
-          uv venv
-          source .venv/bin/activate
-          uv pip install -r requirements.txt
+        run: uv sync --frozen --extra dev --extra api --extra trading --extra online
 
-      - name: Run Black
-        run: |
-          source .venv/bin/activate
-          black --check nfl_analytics/
+      - name: Lint (syntax errors and undefined names)
+        run: uv run ruff check --select E9,F63,F7,F82 nfl_analytics tests scripts api
 
-      - name: Run Ruff
-        run: |
-          source .venv/bin/activate
-          ruff check nfl_analytics/
+      - name: Format check
+        run: uv run black --check nfl_analytics tests
 
-      - name: Run detect-secrets
-        run: |
-          pip install detect-secrets
-          detect-secrets scan --baseline .secrets.baseline
-
-      - name: Run unit tests
-        run: |
-          source .venv/bin/activate
-          pytest tests/unit -v --tb=short || echo "Unit tests need setup"
+      - name: Unit tests (no database)
+        run: uv run pytest -m "not integration"

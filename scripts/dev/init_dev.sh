@@ -61,7 +61,7 @@ else
 fi
 
 echo "[init] Done. Next steps:"
-echo "  - (Optional) Install Python deps: pip install -r requirements.txt"
+echo "  - (Optional) Install Python deps: uv sync --extra dev"
 echo "  - (Optional) Install R deps: Rscript -e 'renv::restore()' or Rscript setup_packages.R"
 echo "  - Load schedules: Rscript --vanilla data/ingest_schedules.R"
 echo "  - (Optional) Ingest odds: export ODDS_API_KEY=...; python nfl_analytics/ingest_odds_history.py --start-date 2023-09-01 --end-date 2023-09-03"

@@ -93,7 +93,6 @@ analysis/results/*_tmp.csv
 venv/
 env/
 .direnv/
-uv.lock
 
 # LaTeX build artifacts
 *.aux

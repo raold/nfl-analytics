@@ -16,7 +16,7 @@ import responses
 
 # Load the module directly from file path to avoid conflicts with pytest's 'py' package
 project_root = Path(__file__).parent.parent.parent
-ingest_odds_path = project_root / "py" / "ingest_odds_history.py"
+ingest_odds_path = project_root / "nfl_analytics" / "ingest_odds_history.py"
 
 spec = importlib.util.spec_from_file_location("ingest_odds_history", ingest_odds_path)
 ingest_odds = importlib.util.module_from_spec(spec)

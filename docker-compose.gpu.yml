@@ -79,7 +79,7 @@ services:
       - ./logs:/app/logs:rw
 
       # Source code (for development/debugging)
-      - ./py:/app/py:ro
+      - ./nfl_analytics:/app/nfl_analytics:ro
       - ./R:/app/R:ro
       - ./scripts:/app/scripts:ro
 

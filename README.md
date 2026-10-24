@@ -511,7 +511,7 @@ docker compose up -d pg
 pytest tests/integration -m integration
 
 # Run all tests with coverage
-pytest --cov=py --cov-report=html
+pytest --cov=nfl_analytics --cov-report=html
 open htmlcov/index.html
 ```
 

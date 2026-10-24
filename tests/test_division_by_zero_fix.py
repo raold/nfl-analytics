@@ -12,24 +12,13 @@ instead of crashing with division by zero.
 """
 
 import sys
-from pathlib import Path
 
 import numpy as np
+import pytest
 
-# Add project root to path
-PROJECT_ROOT = Path(__file__).parent.parent
-sys.path.insert(0, str(PROJECT_ROOT))
+pytest.importorskip("torch")  # player_props_ensemble imports torch; uv sync --extra torch
 
-# Now import from absolute path
-import importlib.util
-
-spec = importlib.util.spec_from_file_location(
-    "player_props_ensemble", PROJECT_ROOT / "py" / "models" / "player_props_ensemble.py"
-)
-player_props_ensemble = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(player_props_ensemble)
-
-PlayerPropsEnsemble = player_props_ensemble.PlayerPropsEnsemble
+from nfl_analytics.models.player_props_ensemble import PlayerPropsEnsemble  # noqa: E402
 
 
 def test_zero_std_handling():
