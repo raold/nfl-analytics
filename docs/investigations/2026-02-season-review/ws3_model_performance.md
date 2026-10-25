@@ -2,7 +2,8 @@
 
 > **Read with [README.md](README.md) (2026-10-25):** "correct side 52.1%" is straight-up side
 > accuracy (v2's ATS record is 139-145-1, 48.9%), and the rest-differential result is the spread
-> sign bug (retraction ledger C15, C26).
+> sign bug (retraction ledger C15, C26). The -3.2% ATS ROI holds only at |edge| > 2; on every game
+> v2 went 139-145-1, ROI -6.6% (C02). The +43% ROI was the spread sign bug, not overfitting (C01).
 
 **Date:** 2026-02-12
 **Investigator:** Claude Code (Systematic Investigation)

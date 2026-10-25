@@ -10,8 +10,9 @@
 > never measured against betting lines: the database holds no prop lines (C10). The two models this
 > ADR admitted (Hierarchical v2, Informative Priors v2) take each game's own pass attempts as an
 > input, so their accuracy is not a forecast (C09, C13). The R-hat < 1.02 rule itself is a
-> convergence judgment and is unaffected. The R models were removed in the 2026-10 prune (tag
-> `archive/pre-prune-2026-10`).
+> convergence judgment and is unaffected, but Informative Priors v2 does not meet it: its R-hat of
+> 1.0277 is above 1.02, so the "PASS" and "comfortable margin" below are wrong for that model. The
+> R models were removed in the 2026-10 prune (tag `archive/pre-prune-2026-10`).
 **Decision Makers:** Research Team + Production Deployment
 **Supersedes:** Original Rhat < 1.01 criterion
 

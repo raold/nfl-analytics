@@ -20,7 +20,7 @@ with no uncertainty estimate; *invalid* means the evidence was retracted.
 | ADR | Decision | Status | Evidence |
 |-----|----------|--------|----------|
 | [001](001-docker-compose-infrastructure.md) | Docker Compose for the service stack | Superseded: compose reduced to the database service (2026-10) | — |
-| [002](002-git-lfs-migration.md) | Git LFS for model artifacts | Accepted; LFS now holds only the three database dumps in `backups/` | — |
+| [002](002-git-lfs-migration.md) | Git LFS for model artifacts | Accepted; LFS now holds only the two 2025-12-07 database dumps in `backups/` (no odds rows) | — |
 | [003](003-xgboost-v4-ridge-residuals.md) | XGBoost v4 ridge-residual features | **Superseded** (target leakage; honest MAE 59.14) | invalid (C44) |
 | [004](004-bnn-research-abandonment.md) | Abandon BNN research | Accepted (tag `archive/bnn-2025-11`) | — |
 | [005](005-temperature-scaling-resolution.md) | Temperature scaling resolution | Superseded: the v6 ensemble was removed (2026-10) | — |

@@ -513,9 +513,11 @@ The closing line is as accurate in the playoffs as in the regular season:
 
 So the 2025 lesson "Playoffs behave differently - 8.43 playoff MAE vs 11.14 regular season"
 ([CLAUDE.md](../../../CLAUDE.md) lesson 23, as of 2026-10-24), and the playoff-feature
-rationale built on it in [ADR-017](../../adr/017-2026-season-roadmap.md), describe 13 games
-that the market also forecast unusually well. They are not a property of the model. No 2026 playoff games have
-been played. Results by season and phase are in
+rationale built on it in [ADR-017](../../adr/017-2026-season-roadmap.md), describe the 12 playoff
+games before the Super Bowl, on which the line was also unusually accurate (MAE 8.33 against the
+model's 8.425; [final evaluation](../2026-10-final-evaluation/results/game_outcome_v2_2025.md)).
+They are not a property of the model. No 2026 playoff games have been played. Results by season
+and phase are in
 [results/08_mae_by_season_phase.csv](results/08_mae_by_season_phase.csv).
 
 ## Tests and the Holm correction

@@ -31,10 +31,18 @@ not `qtr`.
 
 ### 3. Team codes
 
-The database uses nflverse codes. The Rams are `LA` (and `STL` before 2016); `LAR` never appears,
-so `WHERE home_team = 'LAR'` silently returns nothing. The Chargers are `LAC` (`SD` before 2017),
-the Raiders `LV` (`OAK` before 2020). `nfl_analytics.utils.team_mapping.normalize_team()` converts
-to and from other code sets.
+`games`, `plays` and the other nflverse tables use nflverse codes. The Rams are `LA` (and `STL`
+before 2016) and never `LAR` there, so `WHERE home_team = 'LAR'` silently returns nothing. The
+Chargers are `LAC` (`SD` before 2017), the Raiders `LV` (`OAK` before 2020).
+
+Two tables use other code sets (checked 2026-10-25): `public.draft_picks.team` has
+Pro-Football-Reference codes (`LAR` 89 rows, `LVR` 48, and `GNB`, `KAN`, `NOR`, `NWE`, `SFO`,
+`TAM`, `SDG`, `RAI`, `RAM`, `PHO` for other franchises and eras), and `public.espn_qbr.team_abb`
+has ESPN codes (`LAR` 186 rows, `WSH` 324). One `public.international_games` row
+(`2019_08_CIN_LA`) has `home_team = 'LAR'`. Map these to nflverse codes before joining.
+`nfl_analytics.utils.team_mapping.normalize_team(code, to_canonical=False)` turns `LAR` into `LA`,
+but it knows only the Rams, Chargers and Raiders codes (`LA`, `LAR`, `STL`, `SD`, `OAK`) and
+returns `LVR`, the other PFR codes and `WSH` unchanged.
 
 ### 4. Joining a player to games through `current_team`
 

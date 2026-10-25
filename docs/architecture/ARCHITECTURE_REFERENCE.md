@@ -24,7 +24,7 @@ nflverse release files (`--nflverse-csv`).
 | `utils/spread_convention.py` | the sign convention: `home_cover`, `home_cover_margin`, `model_edge`, `book_home_line`, `implied_home_win_prob`, `assert_nflverse_convention` | live; unit-tested |
 | `utils/db_config.py` | connection settings from `DB_*` variables | live |
 | `utils/sql_validator.py` | schema-aware query checker (`python -m nfl_analytics.utils.sql_validator "<query>"`) | live (needs the database) |
-| `utils/team_mapping.py` | team code conversions (`LA` ↔ `LAR` and franchise history) | live |
+| `utils/team_mapping.py` | team code conversions (`LA` ↔ `LAR`, `STL`, `SD`, `OAK` and franchise history; not the PFR codes in `draft_picks` or ESPN's `WSH`) | live |
 | `utils/data_leakage_detector.py` | DataFrame and code-pattern leakage checks used by the temporal-safety tests | live; misses the leaks found later ([TEMPORAL_SAFETY_TESTING_FRAMEWORK.md](../TEMPORAL_SAFETY_TESTING_FRAMEWORK.md)) |
 | `utils/calibration.py`, `utils/psycopg_pool.py` | reliability curves and Brier/log-loss helpers; a psycopg 3 pool | imported by kept code |
 | `analysis/statistical_tests.py` | Diebold-Mariano, Holm step-down and other tests used by `market_benchmark` | live; unit-tested |
@@ -48,11 +48,12 @@ nflverse release files (`--nflverse-csv`).
 | `odds_history_panel.py` | re-timed private odds panel and the aggregate line-movement results |
 | `market_facts.py` | market facts from nflverse schedules |
 | `backfill_historical_odds.py` | the December 2025 Odds API backfill (provenance; its matcher has the bugs in POSTMORTEMS §7) |
-| `train_game_outcome_model.py`, `generate_2025_game_predictions_fixed.py` | how v2 was trained and how its 2025 run was made (provenance; v2 is frozen) |
+| `train_game_outcome_model.py` | an earlier trainer (November 2025, `GameOutcomeModelTrainer`: 232 extractor features plus player aggregation, fit on 2020-2023, tested on 2024, saves `models/game_outcome/*_<timestamp>.json`); it did **not** produce v2 and does not run as committed (it needs `psycopg_pool`, which `uv.lock` does not contain). v2 came from `GameOutcomeModel.train(seasons=[2022, 2023, 2024])` in `nfl_analytics/models/game_outcome_model_fixed.py` on 2025-12-23: its file names and `metadata.json` keys are the ones that class's `save_models()` writes, and `b050dd7` promoted them; the call itself was never committed ([model README](../../models/production/game_outcome_v2/README.md)) |
+| `generate_2025_game_predictions_fixed.py` | CLI around `nfl_analytics/services/game_outcome_runs.py`, the code that writes runs to `ml.game_outcome_predictions` (v2's 2025 run 509a9a28, model version 2.0.0) (provenance; v2 is frozen) |
 | `build_travel_distance_matrix.py`, `calculate_travel_features.py`, `extract_international_games.py`, `extract_weather_features.py`, `load_coaching_data.py`, `scrape_coaching_*.py` | provenance of the tables in `data/` and of `coaching_staff` |
 | `refresh_marts.py`, `pipeline_health_check.py` | refresh the matviews; a pre-prediction data check (it still suggests the removed R ingest scripts) |
 | `audit_leakage.py` | static leakage audit over `features/catalog.yaml` |
-| `analysis/run_reports.sh`, `chapter_management/`, `utils/` (bibliography and LaTeX helpers), `generate_*_figure*.py`, `generate_mcmc_traces_figure.R`, `validate_conformal_bnn.py`, `validate_evidential.py` | dissertation tooling; `generate_gnn_calibration_plot.py` draws its figure from random noise (ERRATA P46) |
+| `chapter_management/`, `utils/` (bibliography and LaTeX helpers), `generate_*_figure*.py`, `generate_mcmc_traces_figure.R`, `validate_conformal_bnn.py`, `validate_evidential.py` | dissertation tooling. Five figure generators make their numbers up and carry a warning header: `generate_gnn_calibration_plot.py` (ERRATA P46), `generate_alpha_sensitivity_figure.py` (P01), `generate_bnn_improvement_figures.py` (P14, P15), and outside `scripts/` `R/dissertation_figures.R` and `analysis/dissertation/figures/R/gnn_optimization_figures.R` (PROJECT_STATUS, known issues). `generate_mcmc_traces_figure.R` stops unless a fitted model is present. `validate_conformal_bnn.py` imports a module the prune removed |
 | `dev/init_dev.sh`, `dev/check_spread_sign_hook.py`, `maintenance/backup.sh`, `maintenance/restore.sh` | database bootstrap (schema snapshot into an empty devdb01), the sign guard's self-test, backup and restore ([../../db/README.md](../../db/README.md), Makefile) |
 
 ## Other directories
@@ -65,8 +66,8 @@ nflverse release files (`--nflverse-csv`).
 | `analysis/results/` | inputs of the 2004-2024 walk-forward regrade (`multimodel_predictions.csv`, `glm_baseline_preds.csv`, ...) |
 | `analysis/dissertation/` | LaTeX source, `ERRATA.md`, `ERRATA_audit.csv`; `analysis/foundation/` holds the owner's earlier essays |
 | `analysis/validation/validate_injury_weights.py` | injury-weight check |
-| `R/dissertation_figures.R` | the one R file left: dissertation figures |
+| `R/dissertation_figures.R` | dissertation figures from typed or simulated numbers (one of three R scripts left, with `analysis/dissertation/figures/R/gnn_optimization_figures.R` and `scripts/generate_mcmc_traces_figure.R`) |
 | `db/` | schema snapshot (`db/schema/`), migrations (history), materialized-view SQL, audit and optimization reports from 2025 |
-| `backups/` | three December 2025 dumps in Git LFS (pre-repair, contain licensed odds); `backups/local/` is private and gitignored |
+| `backups/` | two 2025-12-07 dumps in Git LFS (pre-repair; `odds_history` empty); `backups/local/` is private and gitignored, and holds the 2025-12-08 dump with the licensed odds rows (untracked 2026-10-25) |
 | `tests/` | [../../tests/README.md](../../tests/README.md) |
 | `docs/` | [../README.md](../README.md) |

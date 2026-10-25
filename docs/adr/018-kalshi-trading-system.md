@@ -4,12 +4,12 @@
 **Date:** 2026-02-13
 
 > **Note (2026-10-24), [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md)
-> row C03.** The "mature prediction capabilities" below did not exist: Game Outcome v2's 56.5%
-> win-probability accuracy is 162 of 284 decided games (57.0%), against 65.8% for the closing
-> favorite, and its log-loss is worse than the market's (0.6871 against 0.6070). No model in this
-> project beats the closing line, and v2 is frozen (DO NOT DEPLOY). The meta-labeling gate was
-> trained on wrong-sign labels. `nfl_analytics/{trading,markets,risk,execution,monitoring}/` are at
-> tag `archive/pre-prune-2026-10`.
+> row C03.** The "mature prediction capabilities" below did not exist. The claimed 56.5%
+> win-probability accuracy of Game Outcome v2 does not reproduce: it picked 162 of 284 decided
+> games (57.0%), against 65.8% for the closing favorite, and its log-loss is worse than the
+> market's (0.6871 against 0.6070). No model in this project beats the closing line, and v2 is
+> frozen (DO NOT DEPLOY). The meta-labeling gate was trained on wrong-sign labels.
+> `nfl_analytics/{trading,markets,risk,execution,monitoring}/` are at tag `archive/pre-prune-2026-10`.
 **Deciders:** User, Claude Code
 **Tags:** architecture, trading, kalshi, prediction-markets
 

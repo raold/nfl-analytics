@@ -53,8 +53,9 @@ than 0.2 s (308 calls per label at any threshold from 0.05 s to 0.5 s). Each cal
 first scheduled request at or after its newest `last_update`, because the API returns the latest
 snapshot at or before the requested time. The schedule is recomputed from the pre-repair kickoffs
 (`backups/local/games_before_repair_20261024.csv`). For all 1,408 games of 2020-2024 these are
-identical to `games` in `backups/local/nfl_analytics_20251208_odds_complete.dump`, taken right after the
-backfill, so they are the values the backfill read.
+identical to `games` in `backups/local/nfl_analytics_20251208_odds_complete.dump` (private; it
+was untracked from `backups/` on 2026-10-25), taken right after the backfill, so they are the
+values the backfill read.
 
 | check | `closing` | `opening` |
 |---|---|---|

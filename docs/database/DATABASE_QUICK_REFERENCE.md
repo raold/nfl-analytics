@@ -27,7 +27,7 @@ The `dro` role is a superuser and its password is public: keep the database on l
 | `odds_history.home_spread` | sportsbook sign: negative = home favored (corr -0.957 with `spread_close`) | negate before comparing with `spread_close` |
 | `odds_history.market_type` | the name of the backfill request: 'closing' was 4.5-5.5 h before the day's first kickoff, 'opening' 14:00 UTC; neither is the open or the close | use `games.spread_close` as the close; timing in [the line-movement write-up](../investigations/2026-10-line-movement/README.md) |
 | `ml.game_outcome_predictions.kickoff` | the game date at midnight Eastern written as UTC, not the kickoff | join `games` for the kickoff |
-| `games.home_team`, `away_team` | nflverse codes: Rams `LA` (`STL` before 2016), Chargers `LAC` (`SD` before 2017), Raiders `LV` (`OAK` before 2020), Washington `WAS`; there is no `LAR` | `nfl_analytics.utils.team_mapping.normalize_team()` converts |
+| `games.home_team`, `away_team` | nflverse codes: Rams `LA` (`STL` before 2016), Chargers `LAC` (`SD` before 2017), Raiders `LV` (`OAK` before 2020), Washington `WAS`; there is no `LAR` in `games` | `nfl_analytics.utils.team_mapping.normalize_team()` converts these; `draft_picks` and `espn_qbr` use other code sets ([SQL_PATTERNS.md](SQL_PATTERNS.md) §3) |
 
 Other conventions: `kickoff` not `game_date`, `spread_close` not `spread_line`, `total_close` not
 `total_line`, `quarter` not `qtr`, `posteam`/`defteam` not `team`/`opponent`. `plays` has both

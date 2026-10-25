@@ -11,11 +11,14 @@ public nflverse schedule file.
 | Python | ≥ 3.11 (CI uses 3.11) | managed by [uv](https://docs.astral.sh/uv/); dependencies locked in `uv.lock` |
 | Docker | any recent | only for the database |
 | PostgreSQL + TimescaleDB | 17 + 2.24 | image `timescale/timescaledb:latest-pg17` (devdb01 runs 17.7 with TimescaleDB 2.24.0) |
-| Git LFS | any | only for the December 2025 database dumps in `backups/` |
+| Git LFS | any | only for the two December 2025 database dumps in `backups/` |
 | TeX Live with `latexmk` | any recent | only for the dissertation |
 
-R is no longer needed: one R script is left, `R/dissertation_figures.R`, and it only redraws
-dissertation figures (it needs ggplot2 and friends).
+R is no longer needed. Three R scripts are left, all dissertation figure tooling:
+`R/dissertation_figures.R`, `analysis/dissertation/figures/R/gnn_optimization_figures.R` and
+`scripts/generate_mcmc_traces_figure.R` (they need ggplot2 and friends). The first two type their
+numbers in or simulate them (see the known issues in [PROJECT_STATUS.md](PROJECT_STATUS.md));
+do not regenerate figures from them.
 
 ## Python environment
 
@@ -49,9 +52,9 @@ A fresh `pgdata/` gives an empty `devdb01`, and `init_dev.sh` gives it the schem
   `db/migrations/` are history: applied in order they do not rebuild today's schema.
 - **Schema and data** from a dump, with `scripts/maintenance/restore.sh` (`make restore`). The full
   dumps of the repaired database are private (`backups/local/`; they contain licensed odds data).
-  The three public dumps in `backups/` (Git LFS) are from December 2025: they predate the
-  2026-10-24 repair (old kickoffs, mislabelled playoff games, the wrong-sign cover views) and lack
-  several later tables, including `ml.game_outcome_predictions`.
+  The two public dumps in `backups/` (Git LFS) are from 2025-12-07: they predate the 2026-10-24
+  repair (old kickoffs, mislabelled playoff games, the wrong-sign cover views), lack several later
+  tables, including `ml.game_outcome_predictions`, and hold `odds_history` empty.
 
 Rules for any write: back up first (`make backup`), never `DELETE FROM games` (plays and
 participation cascade), and derive local times with `kickoff AT TIME ZONE 'America/New_York'`
@@ -60,8 +63,9 @@ participation cascade), and derive local times with `kickoff AT TIME ZONE 'Ameri
 There is no ingestion pipeline any more. For new games, use nflverse's schedule file directly:
 
 ```bash
-curl -sSfL -o games.csv https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv
-uv run python -m nfl_analytics.evaluation.market_benchmark --baseline elo --nflverse-csv games.csv --seasons 2026
+T=$(mktemp -d)                       # keep the download out of the repo
+curl -sSfL -o $T/games.csv https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv
+uv run python -m nfl_analytics.evaluation.market_benchmark --baseline elo --nflverse-csv $T/games.csv --seasons 2026
 ```
 
 ## Pre-commit

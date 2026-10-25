@@ -5,7 +5,10 @@
 
 > **Note (2026-10-25):** the BNN code and models were removed from the tree; tag
 > `archive/bnn-2025-11` marks where the research stopped, and `archive/pre-prune-2026-10` has the
-> files cited below.
+> files cited below. The "XGBoost v4 (4.70 MAE) ... production-ready" alternative under Decision
+> Drivers was target leakage: its honest MAE was 59.14, and v4 was disabled
+> ([ADR-003](003-xgboost-v4-ridge-residuals.md);
+> [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md) row C44).
 **Deciders:** Project Team
 **Tags:** ml-model, research, bayesian-neural-network, strategic-decision
 

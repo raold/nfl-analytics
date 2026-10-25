@@ -789,7 +789,8 @@ Folded in from `docs/postmortems/XGBOOST_V3_PERFORMANCE_REGRESSION.md` (full tex
 
 **What happened.** XGBoost v3 for passing yards added opponent-strength features (Sagarin-style
 defensive ratings) to v2 and got worse: validation MAE 42.86 against 40.20 for v2 (+6.6%); the
-three new features ranked last of 16 in importance. It was not deployed.
+three new features ranked in the bottom six of 16 (0.5-0.8% importance each). It was not
+deployed.
 
 **Root cause.** The opponent-strength features had been generated for 2018-2024 only, but the
 model trained on 2016-2024, so 35% of the training rows were missing them and were filled with
@@ -871,9 +872,9 @@ snapshot by when it was taken, not by what it was meant to be.
 
 **What happened.** The full audit in
 [ERRATA.md](../analysis/dissertation/ERRATA.md#full-audit-of-tables-and-figures-2026-10-24) traced
-every table and data figure in the dissertation build: 176 of the 290 table units and 30 of the 51
-figure entries have made-up numbers, 11 more tables have made-up cells, and 63 tables are computed
-from real data with a bug.
+every table and data figure in the dissertation build: 176 of the 290 table units (170 printed
+tables) and 30 of the 51 figure entries (28 figures) have made-up numbers, 11 more tables have
+made-up cells, and 63 table units are computed from real data with a bug.
 
 **How.** Generators that read no data (`scripts/utils/generate_missing_tables.py`, "synthetic but
 realistic data"; a zero-bet-weeks generator that produced "plausible" statistics; 29 of the "40
@@ -884,9 +885,14 @@ were copied between chapters, and no number had to pass a plausibility check. ER
 full account.
 
 **Now.** The chapters are unchanged; ERRATA.md and `ERRATA_audit.csv` list every unit with its
-verdict and evidence. Most generators that made numbers up were removed in the prune;
-`scripts/generate_gnn_calibration_plot.py`, which draws its figure from random noise, is still in
-the tree as dissertation tooling (ERRATA P46).
+verdict and evidence. Most generators that made numbers up were removed in the prune. Five that
+drew figures are still in the tree as dissertation tooling, each marked with a warning header:
+`scripts/generate_gnn_calibration_plot.py` (random noise; ERRATA P46),
+`scripts/generate_alpha_sensitivity_figure.py` (a mock placeholder; P01),
+`scripts/generate_bnn_improvement_figures.py` (typed coverage and improvement values; P14, P15),
+`R/dissertation_figures.R` (typed or simulated values; P02, P07, P09, P28, P29/P51) and
+`analysis/dissertation/figures/R/gnn_optimization_figures.R` (literal tables; P10-P12, T125,
+T259, X02). Do not regenerate figures from them.
 
 **Lessons.** Every table comes from a committed script that reads committed data and names its
 generator, inputs and commit in the file header; simulations and projections say so in the

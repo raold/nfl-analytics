@@ -2,8 +2,9 @@
 
 > **Read with [README.md](README.md) (2026-10-25):** the v6 ensemble predicts player passing
 > yards, not games (the paragraph after the list below has it backwards); the XGBoost props v1
-> MAE uses the predicted game's own data (retraction ledger C37). The props code and models cited
-> below were removed in the 2026-10 prune (tag `archive/pre-prune-2026-10`).
+> MAE uses the predicted game's own data (retraction ledger C37). The games' -3.2% ATS ROI quoted
+> below holds only at |edge| > 2; on every game v2 went 139-145-1, ROI -6.6% (C02). The props code
+> and models cited below were removed in the 2026-10 prune (tag `archive/pre-prune-2026-10`).
 
 **Date:** February 12, 2026
 **Investigator:** Claude Code (Opus 4.6)

@@ -1,12 +1,15 @@
 # ADR-002: Git LFS for Model Artifact Storage
 
-**Status:** Accepted; since the 2026-10 prune LFS holds only the three database dumps in `backups/`
+**Status:** Accepted; LFS now holds only the two 2025-12-07 database dumps in `backups/`
 **Date:** 2025-11-14
 
 > **Note (2026-10-25):** the model artifacts this ADR moved to LFS (`.rds`, `.pkl`) were removed
-> in the 2026-10 prune; the patterns remain in `.gitattributes`. The three dumps left in LFS
-> contain the licensed `odds_history` table, so whether they stay public is an owner decision
-> (PROJECT_STATUS). `docs/guides/GIT_LFS_WORKFLOW.md`, cited below, is at tag
+> in the 2026-10 prune; the patterns remain in `.gitattributes`. Two dumps are left in LFS, both
+> from 2025-12-07, and their `odds_history` table is empty. The 2025-12-08 dump, the only one with
+> the licensed `odds_history` rows (117,266), was untracked on 2026-10-25 and moved to the private
+> `backups/local/`; it stays in history and in GitHub's LFS storage until purged, which is an owner
+> decision ([PROJECT_STATUS](../../PROJECT_STATUS.md), item 4). `analysis/dissertation/main/main.pdf`
+> is an ordinary git file, not LFS. `docs/guides/GIT_LFS_WORKFLOW.md`, cited below, is at tag
 > `archive/pre-prune-2026-10`; [CONTRIBUTING.md](../../CONTRIBUTING.md) has the current LFS rules.
 **Deciders:** Project Team
 **Tags:** infrastructure, version-control, ml-model, storage

@@ -28,7 +28,7 @@ retroactive; [model README](models/production/game_outcome_v2/README.md)):
 | ATS, a bet on every game at -110 | 139-145-1, 48.9%, ROI -6.6% (95% CI -15.2% to +1.6%) | |
 | ATS, only \|edge\| > 2 points (the old "-3.2% on 208 bets" headline) | 105-102-1, 50.7%, ROI -3.2% | |
 | ATS, regular season, \|edge\| ≥ 1 at listed prices (`market_benchmark` default) | 117-124-1, 48.5%, ROI -7.1% (-19.2% to +3.4%) | |
-| Coefficient on prediction - line when the margin is regressed on both | -0.49 (95% CI -1.36 to +0.37) | |
+| Coefficient on prediction - line when the margin is regressed on both | -0.49 (95% CI -1.41 to +0.43) | |
 
 Break-even at -110 is 52.38%. The win-rate and ROI intervals are wide enough to hide a small
 edge; MAE and log-loss are not, and both favor the market.
@@ -46,19 +46,20 @@ over 2004-2024 won 51.0% of 3,826 bets (ROI -2.6% at -110). On the 94 completed 
 35-30-4, too few to mean anything.
 
 **Retracted.** The December 2025 "74.9% ATS / +43% ROI" power-ratings result was a spread sign
-error; every other edge claim traced to the sign bug, leakage, in-sample tuning, or simulated or
-hard-coded numbers. The [retraction ledger](docs/investigations/2026-10-final-evaluation/retraction_ledger.md)
+error; every other edge claim that could be traced came from the sign bug, leakage, in-sample
+tuning, simulated or hard-coded numbers, mislabeled metrics or a wrong payoff, and three could not
+be traced at all. The [retraction ledger](docs/investigations/2026-10-final-evaluation/retraction_ledger.md)
 lists all 44 headline numbers and their corrected values, and
 [docs/POSTMORTEMS.md](docs/POSTMORTEMS.md) explains the failures. The dissertation text was not
 changed: [analysis/dissertation/ERRATA.md](analysis/dissertation/ERRATA.md) records its errors,
-including an audit that found the numbers in 176 of its 290 table units and 30 of its 51 figures
-made up.
+including an audit that found the numbers made up in 176 of its 290 table units (170 printed
+tables) and 30 of its 51 figure entries (28 figures).
 
 ## Setup
 
 Requirements: Python ≥ 3.11 with [uv](https://docs.astral.sh/uv/). The database is optional:
 the benchmark and the v2 grade run from CSV files. For the database: Docker, and Git LFS only if
-you want the December 2025 dumps in `backups/`.
+you want the two December 2025 dumps in `backups/`.
 
 ```bash
 uv sync --extra dev                      # core + test tooling, from uv.lock
@@ -80,16 +81,17 @@ uv run pytest -m integration             # needs the database and DB_PASSWORD (s
 uv run python -m nfl_analytics.evaluation.market_benchmark --baseline power_ratings \
     --market-csv data/historical_weather_2018_2024.csv --seasons 2019-2024
 
-# The current season straight from nflverse
-curl -sSfL -o games.csv https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv
+# The current season straight from nflverse (into a temporary directory, not the repo)
+T=$(mktemp -d)
+curl -sSfL -o $T/games.csv https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv
 uv run python -m nfl_analytics.evaluation.market_benchmark --baseline elo \
-    --nflverse-csv games.csv --seasons 2026
+    --nflverse-csv $T/games.csv --seasons 2026
 
 # Prospective predictions for a week not yet played, then grade them after the games
 uv run python -m nfl_analytics.evaluation.market_benchmark predict --baseline elo \
-    --nflverse-csv games.csv --season 2026 --week 9 --out preds_2026_w09_elo.csv
+    --nflverse-csv $T/games.csv --season 2026 --week 9 --out $T/preds_2026_w09_elo.csv
 uv run python -m nfl_analytics.evaluation.market_benchmark \
-    --predictions-csv preds_2026_w09_elo.csv --nflverse-csv games.csv --seasons 2026
+    --predictions-csv $T/preds_2026_w09_elo.csv --nflverse-csv $T/games.csv --seasons 2026
 
 # Game Outcome v2's 2025 grade, without the database
 uv run python scripts/final_evaluation/grade_game_outcome_v2_2025.py --out-dir /tmp/v2_grade

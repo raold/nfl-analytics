@@ -3,9 +3,9 @@
 The project is a wound-down research archive; [../README.md](../README.md) has the results and
 [../PROJECT_STATUS.md](../PROJECT_STATUS.md) what is left to decide. Docs, code and data removed
 in October 2026 are in local git tags ([HISTORY.md](HISTORY.md)): `docs-archive-2026-10` for the
-~920 session logs pruned on 2026-10-24, `archive/pre-prune-2026-10` for everything the salvage
-prune removed. A path cited in a doc that no longer exists in the tree is almost always in one of
-the two (`git show archive/pre-prune-2026-10:<path>`).
+~850 docs files (session logs and reports) pruned on 2026-10-24, `archive/pre-prune-2026-10` for
+everything the salvage prune removed. A path cited in a doc that no longer exists in the tree is
+almost always in one of the two (`git show archive/pre-prune-2026-10:<path>`).
 
 ## Start here
 
@@ -20,8 +20,12 @@ the two (`git show archive/pre-prune-2026-10:<path>`).
 - [investigations/2026-10-final-evaluation/](investigations/2026-10-final-evaluation/README.md):
   the final grade against the closing line (Game Outcome v2 on 2025, walk-forward baselines, the
   Kalman state-space model, prospective 2026 predictions), with its
-  [retraction ledger](investigations/2026-10-final-evaluation/retraction_ledger.md) and the
+  [retraction ledger](investigations/2026-10-final-evaluation/retraction_ledger.md), the
   [2004-2024 walk-forward regrade](investigations/2026-10-final-evaluation/walkforward_2004_2024.md)
+  and the [negative-result evidence](investigations/2026-10-final-evaluation/evidence/README.md)
+  kept from November 2025 (a market blend that put all its weight on the line, XGBoost v6 losing
+  to the line every season with the line as an input, GNN configurations all worse than a coin
+  flip on Brier)
 - [investigations/2026-10-market-benchmark.md](investigations/2026-10-market-benchmark.md): the
   grading tool, its options and guardrails
 - [investigations/2026-10-line-movement/](investigations/2026-10-line-movement/README.md): line

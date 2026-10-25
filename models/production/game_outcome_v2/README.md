@@ -66,7 +66,12 @@ points against 6.18 for the line. The full evaluation is in
    Sunday slate the "closing" pull (12:30 UTC) came before the "opening" one (14:00 UTC);
    neither is the opening or the closing line. `odds_history` has opening/closing rows for
    2020-2024 only (one `game_lines` row in 2025, none in 2026), so for every 2025 and 2026
-   game these inputs sit at their defaults.
+   game these inputs sit at their defaults. Filling them does not rescue the model: with the
+   2025 features the salvage leakage survey re-extracted read-only (before the 2026-10-24 games
+   repair), setting the two consensus inputs to the closing line (and the book count and
+   dispersions to typical values) gives a spread MAE of 10.62 on the 285 games, against 9.67 for
+   the line itself (re-run 2026-10-25 from the saved features; the script and features are in the
+   private `backups/local/salvage_session_2026-10-24/survey/leakage-sweep/`).
 2. **Semantic inputs were computed as of `datetime.now()`, not kickoff.** The extractor never
    passed a game time, so the 38 `sem_*` training values reflect whatever news was available
    when the features were extracted (December 2025, at training time), applied to 2022-2024

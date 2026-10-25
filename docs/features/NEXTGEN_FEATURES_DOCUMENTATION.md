@@ -221,6 +221,11 @@ WHERE r.team = 'KC'
 
 ### Team Abbreviations
 
+> **Correction (2026-10-25):** the advice below is wrong for this database. The module joins
+> through `rosters`, whose `team` column uses nflverse codes: 902 rows have `LA` for the Rams and
+> none has `LAR`, so pass `LA`, as `games` does. See
+> [SQL_PATTERNS.md](../database/SQL_PATTERNS.md) §3.
+
 **Critical:** Use `LAR` and `LAC` (not `LA`) for Los Angeles teams.
 
 **Complete list:** BUF, MIA, NE, NYJ, BAL, CIN, CLE, PIT, HOU, IND, JAX, TEN, DEN, KC, LV, LAC, DAL, NYG, PHI, WAS, CHI, DET, GB, MIN, ATL, CAR, NO, TB, ARI, LAR, SF, SEA

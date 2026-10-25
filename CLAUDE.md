@@ -65,7 +65,7 @@ Python ≥ 3.11 with [uv](https://docs.astral.sh/uv/); CI uses 3.11. The depende
 
 ```bash
 uv sync --extra dev                          # core + test and lint tools
-uv run pytest -m "not integration"           # offline suite, what CI runs (218 passed, 1 skipped on 2026-10-25)
+uv run pytest -m "not integration"           # offline suite, what CI runs (218 passed, 1 skipped at 43104ea)
 uv run pytest -m integration                 # 133 tests; need devdb01 and DB_PASSWORD (tests/integration: 66 pass, 28 fail or error)
 uv run ruff check --select E9,F63,F7,F82 nfl_analytics tests scripts
 uv run black --check nfl_analytics tests     # black 26.10.1, line length 100
@@ -75,12 +75,13 @@ uvx pre-commit@4.7.0 run --all-files         # local hooks, including spread-sig
 uv run python -m nfl_analytics.evaluation.market_benchmark --baseline power_ratings \
     --market-csv data/historical_weather_2018_2024.csv --seasons 2019-2024
 # The current season from nflverse; predictions for a future week; grading them later
-curl -sSfL -o games.csv https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv
-uv run python -m nfl_analytics.evaluation.market_benchmark --baseline elo --nflverse-csv games.csv --seasons 2026
+T=$(mktemp -d)                               # keep downloads and outputs out of the repo
+curl -sSfL -o $T/games.csv https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv
+uv run python -m nfl_analytics.evaluation.market_benchmark --baseline elo --nflverse-csv $T/games.csv --seasons 2026
 uv run python -m nfl_analytics.evaluation.market_benchmark predict --baseline elo \
-    --nflverse-csv games.csv --season 2026 --week 9 --out preds_2026_w09_elo.csv
-uv run python -m nfl_analytics.evaluation.market_benchmark --predictions-csv preds_2026_w09_elo.csv \
-    --nflverse-csv games.csv --seasons 2026
+    --nflverse-csv $T/games.csv --season 2026 --week 9 --out $T/preds_2026_w09_elo.csv
+uv run python -m nfl_analytics.evaluation.market_benchmark --predictions-csv $T/preds_2026_w09_elo.csv \
+    --nflverse-csv $T/games.csv --seasons 2026
 # Any model: a CSV with game_id and the expected home margin, against devdb01
 uv run python -m nfl_analytics.evaluation.market_benchmark --predictions-csv preds.csv \
     --pred-col pred_home_margin --db --seasons 2025
@@ -119,11 +120,15 @@ Schemas: `public` 46 tables (13 `mlb_*`/`nhl_*` belong to Sibyl) and 1 view, `ma
 matviews, `ml` 12 tables and 8 views, `metadata` 1, `salvage` 1 (`nflverse_games`, the 2026-10-24
 nflverse download used for the repair). `public.mv_betting_features` is the other matview.
 Conventions: use `kickoff`, `spread_close`, `total_close`, `quarter`, `posteam`/`defteam` (not
-`game_date`, `spread_line`, `total_line`, `qtr`). Team codes are nflverse: the Rams are `LA`
-(`STL` before 2016) and there is no `LAR` in the database; `OAK`→`LV` in 2020, `SD`→`LAC` in 2017.
-`nfl_analytics.utils.team_mapping.normalize_team()` converts. `odds_history.market_type`
-'opening'/'closing' are mislabelled request times, not the open and close
-([line-movement write-up](docs/investigations/2026-10-line-movement/README.md)).
+`game_date`, `spread_line`, `total_line`, `qtr`). Team codes: `games`, `plays` and the other
+nflverse tables use nflverse codes, so the Rams are `LA` (`STL` before 2016) and never `LAR`;
+`OAK`→`LV` in 2020, `SD`→`LAC` in 2017. Two tables use other code sets: `public.draft_picks` has
+PFR codes (`LAR`, `LVR`, `GNB`, `KAN`, `NWE`, `SFO`, ...) and `public.espn_qbr.team_abb` ESPN codes
+(`LAR`, `WSH`); one `public.international_games` row has `LAR`. Map codes to the nflverse form
+before joining. `nfl_analytics.utils.team_mapping.normalize_team()` maps only `LA`↔`LAR`, `STL`,
+`SD` and `OAK`, and passes `LVR`, the other PFR codes and `WSH` through unchanged.
+`odds_history.market_type` 'opening'/'closing' are mislabelled request times, not the open and
+close ([line-movement write-up](docs/investigations/2026-10-line-movement/README.md)).
 `ml.model_registry` still lists v2 (model_id 17) as `production`; ignore that. More:
 [DATABASE_QUICK_REFERENCE.md](docs/database/DATABASE_QUICK_REFERENCE.md),
 [SQL_PATTERNS.md](docs/database/SQL_PATTERNS.md).
@@ -133,15 +138,15 @@ from the nflverse release files, read directly with `--nflverse-csv`.
 
 ## What was removed and where it is
 
-The 2026-10-24 prune took the tree from 3,562 to 771 tracked files: the Kalshi trading stack, the
-API, dashboards, MCP server, ETL and monitoring, the semantic (LLM) stack, the feedback loop, the
-props ensembles, the R pipeline, the RL code, notebooks, one-off scripts, model artifacts and most
-docs. Everything is recoverable from local tags:
+The October 2026 prune (committed 2026-10-25 00:05 EDT) took the tree from 3,562 to 771 tracked
+files: the Kalshi trading stack, the API, dashboards, MCP server, ETL and monitoring, the semantic
+(LLM) stack, the feedback loop, the props ensembles, the R pipeline, the RL code, notebooks,
+one-off scripts, model artifacts and most docs. Everything is recoverable from local tags:
 
 | Tag | What it holds |
 |---|---|
-| `archive/pre-prune-2026-10` | the last commit before the prune (`c01e10b`): every deleted file |
-| `docs-archive-2026-10` | ~920 session logs and reports removed from `docs/` on 2026-10-24 ([HISTORY](docs/HISTORY.md)) |
+| `archive/pre-prune-2026-10` | `c01e10b`, the tree just before the prune: every deleted file (the one commit in between, `6ffd370`, only added the errata audit) |
+| `docs-archive-2026-10` | the ~850 docs files removed by the docs prune of 2026-10-24 (924 files in all, counting the dissertation, `archive/`, `research/` and other notes outside `docs/`; [HISTORY](docs/HISTORY.md)) |
 | `archive/dissertation-visual-redesign-2026-02` | an orphaned dissertation styling branch (pre-retraction claims; do not merge) |
 | `archive/bnn-2025-11` | where the BNN research stopped (ADR-004) |
 
@@ -157,10 +162,12 @@ logs, `docs-archive-2026-10`. Module map:
 
 Source `analysis/dissertation/main/main.tex`; build with
 `cd analysis/dissertation/main && latexmk -pdf -interaction=nonstopmode main.tex` (a clean copy
-built on 2026-10-25: exit 0, 721 pages; the tracked `main.pdf` from 2026-02-12 has 722). The text
-was not corrected: [ERRATA.md](analysis/dissertation/ERRATA.md) records what is wrong, including the
-full audit of every table and figure (176 of 290 table units and 30 of 51 figures made up, 63
-tables computed from real data with a bug). Check a number there before citing it.
+built on 2026-10-25: exit 0, 721 pages; the tracked `main.pdf` from 2026-02-12 has 722, and a build
+in place overwrites it; `main.toc`, `main.lof` and `main.lot` are untracked since 2026-10-25). The
+text was not corrected: [ERRATA.md](analysis/dissertation/ERRATA.md) records what is wrong,
+including the full audit of every table and figure (176 of 290 table units (170 printed tables)
+and 30 of 51 figure entries (28 figures) made up, 63 table units computed from real data with a
+bug). Check a number there before citing it.
 
 Helpers outside the repo, in `~/.local/bin`: `diss-watch`, `diss-stats`, `diss-diff`,
 `diss-compress`, `diss-clean`, `diss-lint` (they use `DISS_DIR=.../analysis/dissertation/main`,
@@ -173,7 +180,7 @@ Standards: [DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.md).
 ## Conventions
 
 - Python: black and the CI ruff subset must pass; type hints; Google-style docstrings; 100 columns.
-  SQL: uppercase keywords. R (one file left): tidyverse style.
+  SQL: uppercase keywords. R (three dissertation figure scripts left): tidyverse style.
 - Tests: `tests/{integration,infrastructure,e2e}` are auto-marked `integration`; pin conventions
   with real games, not synthetic examples.
 - Git: main branch `main`; plain commit messages, no co-author or AI attribution; never
@@ -214,7 +221,7 @@ Standards: [DISSERTATION_STANDARDS.md](docs/guides/DISSERTATION_STANDARDS.md).
 11. **Store true instants.** Eastern wall-clock times labelled UTC (2000-2024) made the odds
     backfill's "closing" request 4.5-5.5 hours before the first kickoff, and date-only 2025
     kickoffs zeroed every 2025 primetime flag.
-12. **Match keys explicitly.** The odds backfill mapped the Rams to `LAR` (the DB has `LA`) and
+12. **Match keys explicitly.** The odds backfill mapped the Rams to `LAR` (`games` has `LA`) and
     matched UTC dates to Eastern ones, so it dropped every Rams game and nearly every night game.
 13. **Season-based splits only**; percentage splits leak across train and test.
 14. **Same-game inputs are leakage.** The props models used the game's own pass attempts; a

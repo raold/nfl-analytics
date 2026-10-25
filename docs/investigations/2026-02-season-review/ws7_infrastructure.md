@@ -1,8 +1,9 @@
 # WS7: Infrastructure Automation & Test Coverage
 
 > **Read with [README.md](README.md) (2026-10-25):** "ats_win_pct 52.1%" is straight-up side
-> accuracy (retraction ledger C26). The Makefile pipeline and the tests added here were removed
-> in the 2026-10 prune with the modules they covered (tag `archive/pre-prune-2026-10`).
+> accuracy (retraction ledger C26). The -3.2% ATS ROI quoted below holds only at |edge| > 2; on
+> every game v2 went 139-145-1, ROI -6.6% (C02). The Makefile pipeline and the tests added here
+> were removed in the 2026-10 prune with the modules they covered (tag `archive/pre-prune-2026-10`).
 
 **Date:** 2026-02-12
 **Investigator:** Claude Code (Systematic Investigation)
