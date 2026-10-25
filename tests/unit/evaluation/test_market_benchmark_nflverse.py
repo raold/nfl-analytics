@@ -16,6 +16,7 @@ from nfl_analytics.evaluation.market_benchmark import (
     baseline_params,
     baseline_predictions,
     check_market_sanity,
+    load_market_from_csv,
     load_market_from_nflverse,
     market_sanity,
     predict_week,
@@ -26,7 +27,8 @@ from nfl_analytics.evaluation.market_benchmark import (
 )
 from nfl_analytics.evaluation.market_benchmark import __main__ as cli
 from nfl_analytics.evaluation.market_benchmark import predict as predict_mod
-from nfl_analytics.evaluation.market_benchmark.metrics import closing_line_value
+from nfl_analytics.evaluation.market_benchmark.market import MARKET_COLUMNS
+from nfl_analytics.evaluation.market_benchmark.metrics import closing_line_value, win_prob_skill
 from nfl_analytics.evaluation.market_benchmark.predict import OUTPUT_COLUMNS
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures" / "nflverse"
@@ -85,6 +87,44 @@ class TestAdapter:
             read_nflverse_games(export)
 
 
+@pytest.fixture(scope="module")
+def export(games, tmp_path_factory) -> Path:
+    """The fixture's rows as a CSV export of the games table, game_type included (devdb01's
+    game_type, scores and lines were repaired from this nflverse file)."""
+    path = tmp_path_factory.mktemp("export") / "games.csv"
+    games[MARKET_COLUMNS + ["game_type"]].to_csv(path, index=False)
+    return path
+
+
+class TestCsvExport:
+    def test_regular_season_only_by_default(self, export):
+        assert len(load_market_from_csv(export, [2025])) == 272
+        everything = load_market_from_csv(export, [2025], game_types=None)
+        assert len(everything) == 285
+        assert set(everything["game_type"]) == {"REG", "WC", "DIV", "CON", "SB"}
+
+    def test_an_export_grades_like_the_nflverse_file(self, export, capsys):
+        # The export used to keep every game type, so the 2025 playoffs fed the Elo warm-up for
+        # 2026 from an export but not from nflverse or devdb01: 87 of the 94 predictions differed
+        reg = load_market_from_csv(export, [2025, 2026])
+        allg = load_market_from_csv(export, [2025, 2026], game_types=None)
+        pred = {
+            k: m.join(baseline_predictions("elo", m)).set_index("game_id")["pred_home_margin"]
+            for k, m in (("reg", reg), ("all", allg))
+        }
+        ids = reg.loc[reg["season"] == 2026, "game_id"]
+        assert len(ids) == 94 and int((pred["reg"][ids] != pred["all"][ids]).sum()) == 87
+        argv = ["--baseline", "elo", "--seasons", "2026"]
+        assert cli.main(argv + ["--market-csv", str(export)]) == 0
+        from_export = capsys.readouterr().out
+        assert cli.main(argv + ["--nflverse-csv", str(GAMES)]) == 0
+        assert from_export == capsys.readouterr().out
+        # --game-types applies to an export that has a game_type column
+        argv = ["--baseline", "elo", "--market-csv", str(export), "--seasons", "2025", "--json"]
+        assert cli.main(argv + ["--game-types", "REG,WC,DIV,CON,SB"]) == 0
+        assert json.loads(capsys.readouterr().out)["games"] == 285
+
+
 class TestHoldoutGuardrails:
     def test_2026_holdout_passes(self, holdout):
         s = check_market_sanity(holdout)
@@ -117,7 +157,7 @@ class TestHoldoutGuardrails:
         argv = ["--baseline", "elo", "--nflverse-csv", str(GAMES), "--seasons", "2026"]
         assert cli.main(argv) == 0
         out = capsys.readouterr().out
-        assert "Seasons 2026-2026, 94 games" in out
+        assert "Season 2026, 94 games" in out
         assert "| Pooled home cover rate | 45.5% | 40/88, binomial p = 0.524 vs 49% |" in out
         assert "| Log-loss: model / market |" in out  # Elo's win probability vs the moneyline
         assert cli.main(argv + ["--json"]) == 0
@@ -261,3 +301,44 @@ class TestClosingLineValue:
         argv = ["--predictions-csv", str(path), "--nflverse-csv", str(GAMES), "--seasons", "2026"]
         with pytest.raises(ValueError, match="more than one prediction"):
             cli.main(argv)
+
+
+class TestSmallSamples:
+    """Prospective files are graded a week, or a game, at a time."""
+
+    def test_one_week_has_no_log_loss_interval(self, games, tmp_path, capsys):
+        # One week resampled by week blocks is always itself: this printed the zero-width
+        # interval "diff -0.0304 to -0.0304", which excludes 0
+        as_of = _first_kickoff(games, 2026, 5) - pd.Timedelta(minutes=1)
+        path = tmp_path / "w05.csv"
+        write_predictions(predict_week(games, "elo", 2026, 5, as_of=as_of), path, _sha256(GAMES))
+        argv = ["--predictions-csv", str(path), "--nflverse-csv", str(GAMES), "--seasons", "2026"]
+        assert cli.main(argv + ["--json"]) == 0
+        wp = json.loads(capsys.readouterr().out)["win_prob_skill"]
+        # 15 games, less the 27-27 tie 2026_05_NYG_WAS
+        assert wp["games"] == 14 and wp["log_loss_diff_ci95"] == [None, None]
+        assert cli.main(argv) == 0
+        out = capsys.readouterr().out
+        assert "| Log-loss: model / market | 0.6198 / 0.6502 | n/a (one week) |" in out
+
+    def test_holdout_log_loss_interval_is_unchanged(self):
+        # 7 weeks: the same week-block bootstrap as before, the figures in the final evaluation
+        market = load_market_from_nflverse(GAMES, seasons=[2025, 2026])
+        graded = market.join(baseline_predictions("elo", market))
+        wp = win_prob_skill(graded[graded["season"] == 2026])
+        lo, hi = wp["log_loss_diff_ci95"]
+        assert lo < wp["model_log_loss"] - wp["market_log_loss"] < hi
+        assert (round(lo, 4), round(hi, 4)) == (-0.0328, 0.0386)
+
+    def test_one_game_has_no_diebold_mariano_test(self, games, tmp_path, capsys):
+        # A week graded after its first final game: one loss difference has no variance, so
+        # there is no test. This printed "DM p = 0.000" next to "ATS record 1-0-0".
+        as_of = _first_kickoff(games, 2026, 6) - pd.Timedelta(minutes=1)
+        preds = predict_week(games, "elo", 2026, 6, as_of=as_of)
+        path = tmp_path / "one.csv"
+        write_predictions(preds[preds["game_id"] == "2026_06_SEA_DEN"], path, _sha256(GAMES))
+        argv = ["--predictions-csv", str(path), "--nflverse-csv", str(GAMES), "--seasons", "2026"]
+        assert cli.main(argv) == 0
+        out = capsys.readouterr().out
+        assert "| ATS record | 1-0-0 | |" in out
+        assert "| Spread MAE: model / market | 3.13 / 5.50 | DM p = n/a |" in out

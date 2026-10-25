@@ -1,6 +1,6 @@
 ## market vs closing market
 
-Seasons 2026-2026, 94 games, bets at |edge| >= 1.0 pts.
+Season 2026, 94 games, bets at |edge| >= 1.0 pts.
 
 | Metric | Value | 95% CI |
 |---|---|---|

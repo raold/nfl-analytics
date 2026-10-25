@@ -1,6 +1,6 @@
 ## market vs closing market
 
-Seasons 2025-2025, 272 games, bets at |edge| >= 1.0 pts.
+Season 2025, 272 games, bets at |edge| >= 1.0 pts.
 
 | Metric | Value | 95% CI |
 |---|---|---|

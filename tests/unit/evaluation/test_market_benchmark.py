@@ -8,9 +8,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+from scipy import stats
 
 from nfl_analytics.evaluation.market_benchmark import (
     ImplausibleResultError,
+    baseline_predictions,
     check_home_cover_rate,
     check_market_sanity,
     check_plausibility,
@@ -30,8 +32,10 @@ from nfl_analytics.evaluation.market_benchmark.metrics import (
     closing_line_value,
     grade_ats,
     information_regression,
+    spread_accuracy,
     wilson_interval,
 )
+from nfl_analytics.evaluation.market_benchmark.report import season_span
 from nfl_analytics.evaluation.market_benchmark.odds import (
     american_to_decimal,
     breakeven_win_rate,
@@ -103,12 +107,47 @@ class TestStatistics:
         # Backing home at 3 that closes at 4 gained a point; backing away at 3 lost one
         assert list(closing_line_value(bets)) == [1.0, -1.0]
 
+    def test_diebold_mariano_needs_variance(self, market, evaluated):
+        # The line against itself: the same error in every game, nothing to test
+        same = market.assign(pred_home_margin=market["spread_close"])
+        assert spread_accuracy(same)["dm_p_value_two_sided"] == 1.0
+        # One game (MIN 28-12 ATL, line 3.5, power ratings 3.67) has no variance to test
+        # against; this used to report p = 0.0
+        one = evaluated[evaluated["game_id"] == "2019_01_ATL_MIN"]
+        assert spread_accuracy(one)["model_mae"] != spread_accuracy(one)["market_mae"]
+        assert np.isnan(spread_accuracy(one)["dm_p_value_two_sided"])
+        # Line + 0.5 on the 2024 games the home team won by more than the line + 0.5: the
+        # prediction is exactly half a point closer in all of them, a constant difference (p = 0.0
+        # before, "maximal significance" for a differential with no variance)
+        won = market[
+            (market["season"] == 2024) & (market["home_margin"] - market["spread_close"] > 0.5)
+        ]
+        s = spread_accuracy(won.assign(pred_home_margin=won["spread_close"] + 0.5))
+        assert s["games"] == 127 and s["market_mae"] - s["model_mae"] == pytest.approx(0.5)
+        assert np.isnan(s["dm_p_value_two_sided"])
+        # Rendered as n/a, not as p = 0.000
+        assert "| Spread MAE: model / market | 12.33 / 12.50 | DM p = n/a |" in to_markdown(
+            run_benchmark(one, "power_ratings, one game")
+        )
+
 
 class TestInformationRegression:
     def test_power_ratings_have_a_finite_interval(self, evaluated):
         reg = information_regression(evaluated)
         assert reg["note"] is None
         assert reg["model_gap_ci95"][1] - reg["model_gap_ci95"][0] < 1
+
+    def test_interval_uses_the_t_reference_of_its_p_value(self, evaluated):
+        # 2019 weeks 1-4 are 4 week clusters: the p-value uses t(3), so the interval must too.
+        # With +/-1.96 SE it was [-0.528, -0.070], excluding 0 next to p = 0.083.
+        early = evaluated[(evaluated["season"] == 2019) & (evaluated["week"] <= 4)]
+        reg = information_regression(early)
+        lo, hi = reg["model_gap_ci95"]
+        assert reg["clusters"] == 4
+        assert (hi - lo) / 2 == pytest.approx(stats.t.ppf(0.975, 3) * reg["model_gap_se"])
+        assert reg["model_gap_p_value"] == pytest.approx(0.083, abs=1e-3)
+        assert lo < 0 < hi
+        assert (round(lo, 3), round(hi, 3)) == (-0.671, 0.073)
 
     def test_the_line_itself_is_not_identified(self, market):
         reg = information_regression(market.assign(pred_home_margin=market_baseline(market)))
@@ -222,6 +261,12 @@ class TestReport:
         extremes = {"inf": float("inf"), "neg": np.float64("-inf"), "n": np.int64(3)}
         assert _strict_json(to_json(extremes)) == {"inf": None, "neg": None, "n": 3}
 
+    def test_season_span(self):
+        assert season_span(range(2019, 2025)) == "2019-2024"
+        assert season_span([2025]) == "2025"
+        assert season_span([2024, 2019]) == "2019, 2024"
+        assert season_span([2019, 2021, 2022, 2023]) == "2019, 2021-2023"
+
     def test_readme_baseline_rows_reproduce(self, capsys):
         if not DATA.exists():
             pytest.skip(f"{DATA} not available")
@@ -270,11 +315,39 @@ class TestCli:
         )
         assert cli.main(["--predictions-csv", str(path), "--db", "--seasons", "2024"]) == 0
         assert requested[-1] == [2024]
-        assert "Seasons 2024-2024, 272 games" in capsys.readouterr().out
+        assert "Season 2024, 272 games" in capsys.readouterr().out
 
-    def test_sources_are_mutually_exclusive(self):
+        # Seasons with a gap: the baseline still runs through the seasons in between
+        assert cli.main(["--baseline", "elo", "--db", "--seasons", "2019,2024"]) == 0
+        assert requested[-1] == list(range(2018, 2025))
+        capsys.readouterr()
+
+    def test_baselines_run_through_a_gap_in_the_seasons(self, capsys):
+        # --seasons 2019,2024 grades those two seasons, with 2020-2023 feeding the ratings in
+        # between. Before, only 2018, 2019 and 2024 were loaded: all 272 Elo predictions for
+        # 2024 differed (by up to 13.1 points) and the header read "Seasons 2019-2024".
+        argv = ["--baseline", "elo", "--market-csv", str(DATA), "--seasons", "2019,2024"]
+        assert cli.main(argv + ["--json"]) == 0
+        got = _strict_json(capsys.readouterr().out)
+        full = load_market_from_csv(DATA, range(2018, 2025))
+        full = full.join(baseline_predictions("elo", full))
+        want = run_benchmark(full[full["season"].isin([2019, 2024])], "elo")
+        assert got["seasons"] == [2019, 2024] and got["games"] == want["games"] == 528
+        for key in ("wins", "losses", "pushes"):
+            assert got["ats"][key] == want["ats"][key]
+        assert got["spread_accuracy"]["model_mae"] == pytest.approx(
+            want["spread_accuracy"]["model_mae"], abs=1e-12
+        )
+        assert cli.main(argv) == 0
+        assert "Seasons 2019, 2024, 528 games" in capsys.readouterr().out
+
+    def test_sources_are_mutually_exclusive(self, capsys):
         with pytest.raises(SystemExit):
             cli.main(["--baseline", "elo", "--db", "--market-csv", str(DATA), "--seasons", "2024"])
-        with pytest.raises(SystemExit):  # --game-types belongs to --nflverse-csv
+        with pytest.raises(SystemExit):  # devdb01 grades the regular season only
+            cli.main(["--baseline", "elo", "--db", "--seasons", "2024", "--game-types", "REG,WC"])
+        capsys.readouterr()
+        with pytest.raises(SystemExit):  # the bundled export has no game_type column
             argv = ["--baseline", "elo", "--market-csv", str(DATA), "--seasons", "2024"]
             cli.main(argv + ["--game-types", "REG,WC"])
+        assert "needs a game_type column" in capsys.readouterr().err

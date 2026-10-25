@@ -119,7 +119,9 @@ Implement the following improvements organized into three tiers by expected impa
 > experiment graded covers with the sportsbook rule `margin + spread_close > 0` and computed edge
 > as `pred + spread_close`. That combination scores ~74% for any model that agrees with the
 > favorite. Graded correctly, prior-season point differential + 2.5 HFA is 49.4% ATS on 1,392
-> bets (2019–2024, `tests/unit/test_spread_convention.py`), consistent with the 51.8% walk-forward
+> bets (688-704-37, 2019–2024; under the old rule the same predictions win 74.1%,
+> 1095-382-20; check_claims C01 in
+> `docs/investigations/2026-10-final-evaluation/results/claims_checks.csv`), consistent with the 51.8% walk-forward
 > result in `docs/investigations/2026-02-season-review/ws3_model_performance.md`. See `docs/POSTMORTEMS.md` §4.
 > The original text is kept below for the record.
 

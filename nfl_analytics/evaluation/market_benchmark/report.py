@@ -133,16 +133,28 @@ def _fmt(x, pct: bool = False, signed: bool = False) -> str:
     return f"{x:.3f}"
 
 
+def season_span(seasons) -> str:
+    """The seasons as written in a report: '2019-2024', '2025', or '2019, 2022-2024' with gaps."""
+    runs: list[list[int]] = []
+    for s in sorted({int(s) for s in seasons}):
+        if runs and s == runs[-1][1] + 1:
+            runs[-1][1] = s
+        else:
+            runs.append([s, s])
+    return ", ".join(f"{a}-{b}" if b > a else f"{a}" for a, b in runs)
+
+
 def to_markdown(result: dict) -> str:
     """Human-readable summary of run_benchmark output."""
     a, s, m = result["ats"], result["spread_accuracy"], result["market_sanity"]
     corr = m["line_margin_corr"]
     corr_txt = "n/a" if corr is None or math.isnan(corr) else f"{corr:+.2f}"
+    seasons = result["seasons"]
     lines = [
         f"## {result['name']} vs closing market",
         "",
-        f"Seasons {result['seasons'][0]}-{result['seasons'][-1]}, {result['games']} games, "
-        f"bets at |edge| >= {result['min_edge']} pts.",
+        f"{'Season' if len(seasons) == 1 else 'Seasons'} {season_span(seasons)}, "
+        f"{result['games']} games, bets at |edge| >= {result['min_edge']} pts.",
         "",
         "| Metric | Value | 95% CI |",
         "|---|---|---|",
@@ -172,9 +184,11 @@ def to_markdown(result: dict) -> str:
         )
     wp = result["win_prob_skill"]
     if wp:
+        lo, hi = wp["log_loss_diff_ci95"]
+        ci = "n/a (one week)" if math.isnan(lo) else f"diff {lo:+.4f} to {hi:+.4f}"
         lines.append(
             f"| Log-loss: model / market | {wp['model_log_loss']:.4f} / {wp['market_log_loss']:.4f} | "
-            f"diff {wp['log_loss_diff_ci95'][0]:+.4f} to {wp['log_loss_diff_ci95'][1]:+.4f} |"
+            f"{ci} |"
         )
     clv = result["closing_line_value"]
     if clv and clv["bets"]:

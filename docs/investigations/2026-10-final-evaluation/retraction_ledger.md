@@ -13,7 +13,7 @@ wrong payoff. Three claims cannot be traced: the Nov-2025 backtests (C31), the w
 (C32) and the semantic A/B (C25). Their inputs or generators are gone, and the parts that can be
 re-run show no edge. The numbers that do hold up all say the same thing:
 
-- Game Outcome v2 on 2025: MAE 11.05 vs the line's 9.67, and ATS 48.9% (C02-C04).
+- Game Outcome v2 on 2025: MAE 11.05 vs the line's 9.67, and ATS 48.9% (C02, C04).
 - The README baselines: 50.0% and 49.4% ATS (C05).
 - The 2004-2024 GLM walk-forward: 51.0%, ROI -2.6% (C06; see `walkforward_2004_2024.md`).
 - Power ratings: 51.8% over 2020-2025 (C42).
@@ -32,7 +32,9 @@ re-run show no edge. The numbers that do hold up all say the same thing:
     keyword heuristic.
   - The table lists where the number is still **asserted**. The CSV holds the rest.
   - This is a snapshot of the tree at about 19:45 EDT on 2026-10-24, while other salvage tasks
-    were still editing docs and writing `ERRATA.md`. Re-run the script to refresh it.
+    were still editing docs and writing `ERRATA.md`. The script reproduces it from a worktree of
+    tag `archive/pre-prune-2026-10` (see [Reproduce](#reproduce)). At HEAD, where the prune
+    removed the files its checks read, it stops without writing.
 - **"(not built)"** marks a dissertation file that `main.tex` never reaches through `\input` or
   `\include`. The script finds 111 built `.tex` files.
 - **Short paths:**
@@ -62,7 +64,7 @@ re-run show no edge. The numbers that do hold up all say the same thing:
 |---|---|---|---|---|---|
 | C01 | Power ratings (2024 point differential + 2.5 HFA): **74.9% ATS, +43% ROI** on 179 bets of the 2025 holdout; 75.3% over 2020-25, p < 1e-68 (Dec 9, 2025) | main.tex:411 (abstract: "74.9% spread prediction accuracy"); ch09:88,102,116,120; ch12:19,179; ch03/section_3_5_phase2_advanced_stats:349; ch03/subsection_phase5_exhaustive_features:238; app/o_model_specifications:794,816,825 and app/n_orthogonalization:1118 (relabelled "straight-up accuracy"); ADR-017:111,117; ws3_model_performance:54. Flagged in 20 lines, including README.md:32, PROJECT_STATUS.md:10, CLAUDE.md:143,763 | **sign bug** | Same method graded correctly: 2025 weeks 1-14 **43.0%** (89-118-1), 2020-2025 48.5% (765-813-33). The old rule reproduces the claim on its own: 74.0-77.7% in 2025 at every edge threshold 0-3, and 71-74% in every season 2019-2025. It is also not a straight-up rate: v2 picks winners 57.0% of the time, the closing favorite 65.8% | check_claims C01, C03 |
 | C02 | Game Outcome v2, 2025: **-3.2% ATS ROI on 208 bets** (stored by hand in `ml.model_metrics` run 17) | README.md:20; PROJECT_STATUS.md:8; CLAUDE.md:16,760,761,839; ch09/section_postseason_validation:56,64; ch09/subsection_5way_ensemble_validation:111,146; ch12:21; ADR-017:12; ws2_prediction_compression:137; +3 files | **correct, but only at a strict \|edge\| > 2** | \|edge\| > 2: 105-102-1, 50.7% [44.0%, 57.5%], -3.2%. All games: **139-145-1, 48.9%** [43.2%, 54.7%], ROI -6.6%. \|edge\| >= 2: -4.1%. Regular season, \|edge\| >= 1: 117-124-1, -7.3%. The same predictions graded with the old rule show 75.4% | check_claims C02 |
-| C03 | Game Outcome v2, 2025: **56.5% win-probability accuracy** (given with no comparison) | README.md:21; CLAUDE.md:12; ch09/section_postseason_validation:25; ADR-017:13; ADR-018:14 | **correct count, below the market** | 162/285 = 56.8% (57.0% excluding the tie). The closing-spread favorite won **65.8%** (187/284). Log-loss 0.6871 vs 0.6070 for the de-vigged moneyline; Brier 0.2467 vs 0.2109 | check_claims C03 |
+| C03 | Game Outcome v2, 2025: **56.5% win-probability accuracy** (given with no comparison) | README.md:21; CLAUDE.md:12; ch09/section_postseason_validation:25; ADR-017:13; ADR-018:14 | **does not reproduce**, and below the market | The stored run picks 162 winners: 162/285 = **56.8%**, 57.0% (162/284) without the tie. The closing-spread favorite won **65.8%** (187/284). Log-loss 0.6871 vs 0.6070 for the de-vigged moneyline; Brier 0.2467 vs 0.2109 | check_claims C03 |
 | C04 | Game Outcome v2, 2025: spread MAE **11.05 vs 9.67** for the closing line | README.md:19; PROJECT_STATUS.md:7; CLAUDE.md:12,760; ch09/section_postseason_validation:34; ADR-017:11; ws2/ws3/ws4 | **correct** | 11.05 vs 9.67 (285 games, one run, `vegas_spread` = `spread_close` for 285 of 285); regular season 11.14 vs 9.72. All predictions were created in one run on 2026-02-12, after the season. CLAUDE.md:835's "Week 16 showed 10.45" mislabels the 2024 validation MAE (C17) | check_claims C04 |
 | C05 | README baselines, 2019-2024: power ratings 609-608-31 (50.0%, -4.5%); Elo 581-596-31 (49.4%, -5.8%) | README.md:29,30 | **correct** | Reproduced exactly from `data/historical_weather_2018_2024.csv`: 609-608-31, 50.0% [47.2%, 52.8%]; 581-596-31, 49.4% [46.5%, 52.2%] | check_claims C05 |
 | C19 | 2019-2025 game-outcome ensemble predictions: **~71% ATS**, 81-84% straight-up. Dissertation "5-Component Ensemble 8.3 MAE, AUC 0.715"; PROJECT_STATUS item 4 says to benchmark it | PROJECT_STATUS.md:38; ch04/section_game_outcome_model:285; ch04/section_player_to_game:234; ch04/section_unified_baseline_comparison:30,59; models/ensemble/game_outcome/val_metrics.json:3; fig/baseline_comparison_table:15 (not built) | **same-season data**: full-season stats of the season being predicted (c43e449, per survey 16) | Straight-up 81.5% (2019-23) and 77.2% (2024), vs 65.5% and 70.5% for the closing favorite, which is impossible without leakage. ATS via margin = 13.5 x Phi^-1(p): 71.3% and 65.5%. The 2025 part, with partial-season stats, is 58.5% straight-up (favorite 68.9%) and 48.1% ATS. Do not benchmark it | check_claims C19 |
@@ -120,7 +122,8 @@ Counts are by primary verdict. Several rows have more than one cause.
 | wrong payoff | C06 |
 | wrong baseline | C43 (already retracted) |
 | not reproducible or no valid test | C25, C31, C32 (accuracy) |
-| correct | C02 (threshold-specific), C03 (below the market), C04, C05, C29 (numbers only), C30, C42 |
+| does not reproduce from the stored run | C03 (162/285 = 56.8%, not 56.5%; below the market's 65.8%) |
+| correct | C02 (threshold-specific), C04, C05, C29 (numbers only), C30, C42 |
 
 ## Notes
 
@@ -146,7 +149,9 @@ Counts are by primary verdict. Several rows have more than one cause.
   numbers in ws5 ("69.2% for home +3 days") match the old rule applied to nflverse rest
   differences (69.0%, n = 29).
 - **Locations are a snapshot.** Line numbers will move as other salvage tasks edit these
-  files. Run `check_claims.py` again before using them for edits.
+  files. Before using them for edits, list the current lines with
+  `check_claims.py --allow-missing --out-dir <scratch dir>` on the tree as it is: the checks whose
+  inputs were pruned then record "check raised", and the committed results are not touched.
 
 ## Not re-run, and why
 
@@ -160,14 +165,21 @@ Counts are by primary verdict. Several rows have more than one cause.
 
 ## Reproduce
 
+From the repository root. The checks read files that the 2026-10 prune removed, so
+`check_claims.py` runs from a worktree of the tag taken just before the prune; at HEAD it exits
+with status 2 and writes nothing. From the worktree, `claims_checks.csv` and
+`claims_checks_nflverse.csv` reproduce byte for byte, and the two location files up to one moved
+line number.
+
 ```bash
-cd /home/dro/rice/nfl-analytics
-uv run --no-sync python scripts/final_evaluation/check_claims.py      # under 20 s
-uv run --no-sync python -I scripts/final_evaluation/check_claims.py --nflverse-games <games.csv>
+git worktree add ../nfl-analytics-pre-prune archive/pre-prune-2026-10
+uv run --no-sync python -I ../nfl-analytics-pre-prune/scripts/final_evaluation/check_claims.py \
+    --out-dir /tmp/claims_check --nflverse-games <games.csv>      # under 20 s
+git worktree remove ../nfl-analytics-pre-prune
 uv run --no-sync python scripts/final_evaluation/regrade_walkforward_2004_2024.py
 ```
 
-The second command adds the 1999-2025 wind rows from nflverse schedules
+`--nflverse-games` adds the 1999-2025 wind rows from nflverse schedules
 (`github.com/nflverse/nflverse-data/releases/download/schedules/games.csv`; the copy used here
 was downloaded on 2026-10-24 at 16:54 EDT). Both scripts connect through the `DB_*` environment
 variables, with the defaults in `nfl_analytics/utils/db_config.py`, and force a read-only

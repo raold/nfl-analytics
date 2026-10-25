@@ -20,12 +20,16 @@ the database or an nflverse schedule file (both sections further down).
 | `--market-csv PATH` | CSV export of `games` (the bundled file above) |
 | `--db` | devdb01 `games` (DB_* environment variables) |
 | `--nflverse-csv PATH` | nflverse `games.csv` from the [schedules release](https://github.com/nflverse/nflverse-data/releases/tag/schedules); `spread_line` becomes `spread_close`, `total_line` `total_close`, kickoff = `gameday` + `gametime` read as America/New_York and converted to UTC (NaT without `gametime`, i.e. 1999) |
-| `--game-types REG,WC,...` | with `--nflverse-csv` only; default `REG`. Only completed games with a line are graded |
+| `--game-types REG,WC,...` | with `--nflverse-csv`, or `--market-csv` when the export has a `game_type` column; default `REG`, as `--db` always is. An export without the column (the bundled file) is taken whole. Only completed games with a line are graded |
 | `--predictions-csv PATH` | `game_id` plus `--pred-col` (expected home margin); optional `pred_home_win_prob`, `prediction_timestamp`, `spread_at_prediction`. More than one row per game is refused |
 | `predict ...` | subcommand, see [Predict mode](#predict-mode) |
 
 The three market sources are mutually exclusive. `--baseline` loads the season before the first
 graded one for its preseason ratings from every source; until this change `--db` cold-started.
+It also loads every season in between: `--seasons 2019,2024` grades 2019 and 2024 with 2020-2023
+feeding the ratings (until 2026-10-25 it loaded only 2018, 2019 and 2024, which changed all 272
+of the 2024 Elo predictions, and the header read 2019-2024). The report header lists the seasons
+graded ("Seasons 2019, 2024", "Season 2025").
 The Elo baseline now also carries its win probability (the Elo expectation
 `1 / (1 + 10^(-diff/400))`), so Elo is graded on log-loss whenever the source has moneylines. The
 nflverse kickoff conversion agrees with devdb01 `games.kickoff` (repaired today from the same
@@ -33,10 +37,12 @@ nflverse fields) on all 7,017 games of 2000-2025 that have a kickoff.
 
 ## 2019-2024 baselines (bundled CSV)
 
-The ATS, ROI, MAE, placebo and information rows are byte-identical to the output before these
-changes, and so are both README rows (`609-608-31, 50.0%, -4.5% (-8.9% to 0.0%)` and
-`581-596-31, 49.4%, -5.8% (-11.5% to -0.4%)`). Only the guardrail rows are new: the fixed
-"sanity: 46-53%" band became the binomial test and the sign check described below. A unit test
+The ATS, ROI, MAE and placebo rows are byte-identical to the output before these changes, and
+so are both README rows (`609-608-31, 50.0%, -4.5% (-8.9% to 0.0%)` and
+`581-596-31, 49.4%, -5.8% (-11.5% to -0.4%)`). The guardrail rows are new: the fixed
+"sanity: 46-53%" band became the binomial test and the sign check described below. The
+information interval is 1.2% wider than before (106 weeks: t with 105 degrees of freedom,
+1.983, instead of 1.96; see Prediction checks). A unit test
 (`test_readme_baseline_rows_reproduce`) now pins the README rows through the CLI.
 
 ### market vs closing market
@@ -71,7 +77,7 @@ Seasons 2019-2024, 1599 games, bets at |edge| >= 1.0 pts.
 | Placebo win rate (shuffled) | 50.7% | should be ~50% |
 | Pooled home cover rate | 48.6% | 756/1557, binomial p = 0.742 vs 49% |
 | Line vs home margin correlation | +0.45 | sign check: must be > 0 from 30 games |
-| Model info beyond the line (coef on pred - line) | +0.079 | -0.076 to +0.233 |
+| Model info beyond the line (coef on pred - line) | +0.079 | -0.078 to +0.235 |
 
 ### elo vs closing market
 
@@ -88,7 +94,7 @@ Seasons 2019-2024, 1599 games, bets at |edge| >= 1.0 pts.
 | Placebo win rate (shuffled) | 50.5% | should be ~50% |
 | Pooled home cover rate | 48.6% | 756/1557, binomial p = 0.742 vs 49% |
 | Line vs home margin correlation | +0.45 | sign check: must be > 0 from 30 games |
-| Model info beyond the line (coef on pred - line) | +0.100 | -0.121 to +0.322 |
+| Model info beyond the line (coef on pred - line) | +0.100 | -0.124 to +0.324 |
 
 ## Guardrails
 
@@ -150,9 +156,21 @@ ROI ceilings), because every number graded against a broken market is wrong.
   constant) or an exact linear function of the line (a constant prediction such as "home by
   2.5"), the regression is rank deficient; its coefficients are NaN and a note says why. Before,
   home by 2.5 on 2019-2024 produced a coefficient interval of ±6.1 million (SE 3.1 million).
-  Fewer than 2 weeks is also reported as not estimable.
-- **Intervals.** Week-block bootstrap intervals (ROI, closing-line value) need at least two
-  weeks; with one week they are n/a rather than a zero-width interval.
+  Fewer than 2 weeks is also reported as not estimable. The 95% interval uses the same t
+  distribution with (weeks - 1) degrees of freedom as the p-value. Until 2026-10-25 it was
+  ±1.96 SE, too narrow with few weeks: on 2019 weeks 1-4 the power ratings' interval was -0.528
+  to -0.070, excluding zero next to p = 0.083; with t(3) it is -0.671 to +0.073.
+- **Intervals.** Week-block bootstrap intervals (ROI, closing-line value, and the log-loss
+  difference against the market) need at least two weeks; with one week they are n/a rather
+  than a zero-width interval. A one-week prediction file used to show a log-loss interval such
+  as "-0.0304 to -0.0304" (2026 week 5, Elo).
+- **Diebold-Mariano p.** n/a when the loss difference has no variance (one game, or the same
+  nonzero difference in every game), where it used to print p = 0.000; 1.000 only when the
+  model's error equals the line's in every game.
+- **Game types.** A `--market-csv` export with a `game_type` column is graded on the regular
+  season by default, like `--db` and `--nflverse-csv`. It used to keep every game type, so an
+  export's playoffs fed the warm-up: for 2026, 87 of 94 Elo predictions differed from the
+  nflverse run.
 - **JSON.** `--json` output is strict JSON: NaN and infinities are `null`.
 
 ## Warm start for `--db` (2025)
@@ -267,8 +285,11 @@ points per bet, every bet positive (`test_report_gives_clv_for_bets_chosen_at_th
 - **Power ratings** (the model behind the retracted claim) go 609-608-31. The 95% interval on
   the win rate (47.2%-52.8%) is centred on 50% and only just reaches the 52.4% breakeven at its
   upper edge; the coefficient on (prediction − line) has an interval spanning zero, so the
-  ratings carry no information the line lacks. Graded with the old sign error the same predictions
-  "win" 74.1% (tests/unit/test_spread_convention.py).
+  ratings carry no information the line lacks. Graded with the old sign error (edge = pred +
+  line, home cover when margin + line > 0, bets at |edge| >= 1), these power ratings would "win"
+  77.0% (1152-345-21), and the Dec-9 prior-season point-differential model behind the retracted
+  claim wins 74.1% (1095-382-20; 688-704-37, 49.4%, graded correctly; check_claims C01 in
+  [results/claims_checks.csv](2026-10-final-evaluation/results/claims_checks.csv)).
 - **Elo** is no better (49.4%).
 - At ~1,200 bets the ROI interval is still about ±4.5 points wide; at 208 bets (the 2025
   season) it is about ±13, and on the 65-75 bets of the 2026 holdout ±25 to ±29. ROI alone

@@ -4,8 +4,9 @@ Closing-market data for benchmarking.
 All spreads follow the nflverse convention used in ``games.spread_close``: the expected HOME
 margin, positive when home is favored (see nfl_analytics/utils/spread_convention.py).
 
-Three sources give the same frame: devdb01 ``games`` (load_market_from_db), a CSV export of
-that table (load_market_from_csv), and an nflverse schedule file, games.csv from
+Three sources give the same frame of completed regular-season games by default: devdb01
+``games`` (load_market_from_db), a CSV export of that table (load_market_from_csv), and an
+nflverse schedule file, games.csv from
 https://github.com/nflverse/nflverse-data/releases/tag/schedules (load_market_from_nflverse),
 which carries the current season up to the latest download.
 """
@@ -59,11 +60,22 @@ def load_market_from_db(seasons: Iterable[int], conn) -> pd.DataFrame:
     return prepare_market(df)
 
 
-def load_market_from_csv(path: str | Path, seasons: Iterable[int] | None = None) -> pd.DataFrame:
-    """Same as load_market_from_db, from a CSV export with the games columns."""
+def load_market_from_csv(
+    path: str | Path,
+    seasons: Iterable[int] | None = None,
+    game_types: Iterable[str] | None = ("REG",),
+) -> pd.DataFrame:
+    """Same as load_market_from_db, from a CSV export with the games columns.
+
+    Regular season only by default, as from the database, when the export has a ``game_type``
+    column; ``game_types=None`` keeps every game type. An export without the column (such as
+    data/historical_weather_2018_2024.csv, which holds regular-season games only) is kept whole.
+    """
     df = pd.read_csv(path)
     if seasons is not None:
         df = df[df["season"].isin(list(seasons))]
+    if game_types is not None and "game_type" in df.columns:
+        df = df[df["game_type"].isin(list(game_types))]
     df = df.dropna(subset=["home_score", "away_score", "spread_close"])
     return prepare_market(df)
 

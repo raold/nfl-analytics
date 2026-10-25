@@ -156,9 +156,11 @@ Each report gives the ATS record and ROI at |pred - closing line| >= 1, MAE agai
 line, log-loss against the de-vigged moneyline (Elo only), closing-line value for bets chosen at
 `spread_at_prediction`, and whether every prediction preceded kickoff. Games not yet final are
 left out. If none is final the grader says so and exits with status 1. With 13-14 games per file,
-the line-sign check (it needs 30 games) is skipped with a warning, and every interval is very
-wide. One week of a baseline says nothing about skill; the record matters only as the first
-entries of a longer prospective series.
+the line-sign check (it needs 30 games) is skipped with a warning, and the win-rate interval is
+very wide. The intervals that resample weeks (ROI, log-loss difference, closing-line value) and
+the information regression need two weeks, so a one-week file shows them as n/a; with a single
+final game the Diebold-Mariano p is n/a too. One week of a baseline says nothing about skill;
+the record matters only as the first entries of a longer prospective series.
 
 To grade both weeks of one baseline together:
 

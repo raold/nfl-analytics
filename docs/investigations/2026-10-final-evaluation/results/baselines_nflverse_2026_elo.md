@@ -1,6 +1,6 @@
 ## elo vs closing market
 
-Seasons 2026-2026, 94 games, bets at |edge| >= 1.0 pts.
+Season 2026, 94 games, bets at |edge| >= 1.0 pts.
 
 | Metric | Value | 95% CI |
 |---|---|---|
@@ -13,6 +13,6 @@ Seasons 2026-2026, 94 games, bets at |edge| >= 1.0 pts.
 | Placebo win rate (shuffled) | 48.6% | should be ~50% |
 | Pooled home cover rate | 45.5% | 40/88, binomial p = 0.524 vs 49% |
 | Line vs home margin correlation | +0.33 | sign check: must be > 0 from 30 games |
-| Model info beyond the line (coef on pred - line) | +0.174 | -0.683 to +1.031 |
+| Model info beyond the line (coef on pred - line) | +0.174 | -0.896 to +1.243 |
 | Log-loss: model / market | 0.6615 / 0.6601 | diff -0.0328 to +0.0386 |
 

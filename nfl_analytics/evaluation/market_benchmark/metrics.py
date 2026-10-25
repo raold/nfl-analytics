@@ -150,7 +150,12 @@ def edge_threshold_sweep(
 
 
 def spread_accuracy(df: pd.DataFrame, pred_col: str = "pred_home_margin") -> dict:
-    """Model vs closing-line MAE on the home margin, with a Diebold-Mariano test."""
+    """Model vs closing-line MAE on the home margin, with a Diebold-Mariano test.
+
+    The DM p-value is 1.0 when the model's error equals the line's in every game (nothing to
+    test) and NaN when there is no variance to test against: fewer than 2 games, or the same
+    nonzero difference in every game.
+    """
     d = df.dropna(subset=[pred_col])
     actual = d["home_margin"].to_numpy(float)
     model = d[pred_col].to_numpy(float)
@@ -158,8 +163,10 @@ def spread_accuracy(df: pd.DataFrame, pred_col: str = "pred_home_margin") -> dic
     model_mae = float(np.mean(np.abs(actual - model)))
     market_mae = float(np.mean(np.abs(actual - market)))
     loss_diff = np.abs(actual - model) - np.abs(actual - market)
-    if np.allclose(loss_diff, loss_diff[0]):  # zero variance: DM statistic undefined
-        p_two = 1.0 if np.isclose(loss_diff[0], 0) else 0.0
+    if len(d) and np.all(loss_diff == 0):
+        p_two = 1.0
+    elif len(d) < 2 or np.allclose(loss_diff, loss_diff[0]):  # DM statistic undefined
+        p_two = math.nan
     else:
         p_two = float(
             DieboldMarianoTest(loss_fn="absolute").test(actual, model, market)["p_value_two_sided"]
@@ -203,7 +210,8 @@ def information_regression(df: pd.DataFrame, pred_col: str = "pred_home_margin")
     """OLS: home_margin = a + b * line + c * (pred - line), week-clustered standard errors.
 
     c is what the model knows that the line does not. If its interval covers 0, the model
-    adds nothing to the market. When the design is rank deficient (pred - line constant, as
+    adds nothing to the market. The interval and the p-value both use a t distribution with
+    (weeks - 1) degrees of freedom. When the design is rank deficient (pred - line constant, as
     for the line itself, or collinear with the line, as for a constant prediction) or there
     are fewer than 2 weeks, the coefficients are NaN and ``note`` says why; otherwise ``note``
     is None.
@@ -235,11 +243,12 @@ def information_regression(df: pd.DataFrame, pred_col: str = "pred_home_margin")
     meat *= g / (g - 1) * (len(d) - 1) / (len(d) - 3)  # small-sample correction
     se = np.sqrt(np.diag(xtx_inv @ meat @ xtx_inv))
     t = beta[2] / se[2]
+    half = float(stats.t.ppf(0.975, df=g - 1)) * se[2]  # same reference as the p-value
     return {
         "line_coef": float(beta[1]),
         "model_gap_coef": float(beta[2]),
         "model_gap_se": float(se[2]),
-        "model_gap_ci95": (float(beta[2] - 1.96 * se[2]), float(beta[2] + 1.96 * se[2])),
+        "model_gap_ci95": (float(beta[2] - half), float(beta[2] + half)),
         "model_gap_p_value": float(2 * stats.t.sf(abs(t), df=g - 1)),
         "clusters": g,
         "note": None,
@@ -253,7 +262,11 @@ def win_prob_skill(
     n_boot: int = 2000,
     seed: int = 0,
 ) -> dict | None:
-    """Log-loss and Brier of the model vs the de-vigged closing moneyline (ties excluded)."""
+    """Log-loss and Brier of the model vs the de-vigged closing moneyline (ties excluded).
+
+    The interval on the mean per-game log-loss difference resamples whole weeks; it is NaN
+    with fewer than 2 weeks.
+    """
     if prob_col not in df or market_col not in df:
         return None
     d = df.dropna(subset=[prob_col, market_col])
@@ -267,17 +280,15 @@ def win_prob_skill(
         y * np.log(np.clip(p, eps, 1 - eps)) + (1 - y) * np.log(np.clip(1 - p, eps, 1 - eps))
     )  # noqa: E731
     diff = ll(pm) - ll(pk)  # per-game log-loss difference (negative = model better)
-    blocks = d.assign(_diff=diff).groupby(BLOCK)["_diff"].agg(["sum", "count"]).to_numpy()
-    rng = np.random.default_rng(seed)
-    draws = rng.integers(0, len(blocks), size=(n_boot, len(blocks)))
-    boot = blocks[draws, 0].sum(axis=1) / blocks[draws, 1].sum(axis=1)
     return {
         "games": len(d),
         "model_log_loss": log_loss(y, pm),
         "market_log_loss": log_loss(y, pk),
         "model_brier": brier_score(y, pm),
         "market_brier": brier_score(y, pk),
-        "log_loss_diff_ci95": (float(np.percentile(boot, 2.5)), float(np.percentile(boot, 97.5))),
+        "log_loss_diff_ci95": _block_bootstrap_mean(
+            d.assign(_diff=diff), "_diff", n_boot=n_boot, seed=seed
+        ),
     }
 
 

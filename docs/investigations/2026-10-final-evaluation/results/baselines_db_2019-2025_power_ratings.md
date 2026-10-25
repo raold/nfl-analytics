@@ -13,5 +13,5 @@ Seasons 2019-2025, 1871 games, bets at |edge| >= 1.0 pts.
 | Placebo win rate (shuffled) | 50.4% | should be ~50% |
 | Pooled home cover rate | 48.7% | 891/1828, binomial p = 0.833 vs 49% |
 | Line vs home margin correlation | +0.46 | sign check: must be > 0 from 30 games |
-| Model info beyond the line (coef on pred - line) | +0.038 | -0.106 to +0.183 |
+| Model info beyond the line (coef on pred - line) | +0.038 | -0.107 to +0.184 |
 

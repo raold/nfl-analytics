@@ -31,9 +31,9 @@ line (the coefficient on prediction - line when the final margin is regressed on
   listed closing prices, with intervals that exclude zero. The 2004-2024 walk-forward GLM won
   51.0% of 3,826 bets for an ROI of -2.6% ([walkforward_2004_2024.md](walkforward_2004_2024.md)).
 - **Where a model disagrees with the line, the line is right.** Every information-regression
-  coefficient on prediction - line has an interval that includes zero (v2: -0.49, -1.36 to
-  +0.37), except the state-space model on 2025 weeks 1-7, whose coefficient is negative
-  (-0.67, -1.28 to -0.07).
+  coefficient on prediction - line has an interval that includes zero (v2: -0.49, -1.41 to
+  +0.43). The most negative, the state-space model on 2025 weeks 1-7 (7 weeks), is -0.67
+  (-1.43 to +0.08, p = 0.07).
 
 **What "no edge" means given the intervals.** It is a measurement, not a proof that no edge
 exists. ATS records are noisy: one season of v2 (284 settled bets) has a win-rate interval of
@@ -110,7 +110,7 @@ prediction as made after kickoff.
 | Log-loss, model / market (Shin) | 0.6871 / 0.6070 (0.6068) | 0.6868 / 0.6094 (0.6094) | 0.6934 / 0.5571 (0.5530) |
 | Log-loss difference [95% CI] | +0.0801 [+0.0505, +0.1089] | +0.0774 [+0.0463, +0.1082] | +0.1363 [+0.0412, +0.2498] |
 | Brier, model / market (Shin) | 0.2467 / 0.2109 (0.2110) | 0.2465 / 0.2121 (0.2124) | 0.2515 / 0.1852 (0.1835) |
-| Information: coefficient on pred - line [95% CI] (week clusters) | -0.492 [-1.358, +0.374] (22) | -0.572 [-1.494, +0.350] (18) | not estimated |
+| Information: coefficient on pred - line [95% CI] (week clusters) | -0.492 [-1.411, +0.427] (22) | -0.572 [-1.565, +0.420] (18) | not estimated |
 
 The de-vigged moneyline favorite picks the same winners as the spread favorite (one game priced
 at -110 both ways gets no pick). The sign of v2's predicted margin picks 148 of 284 winners
@@ -131,14 +131,14 @@ and `results/baselines_*.{md,json}`.
 
 | Seasons (source) | Baseline | Games | ATS W-L-P | Win rate [95% CI] | ROI [95% CI] | MAE model / line (DM p) | Log-loss model / market | Info coef [95% CI] |
 |---|---|---|---|---|---|---|---|---|
-| 2019-2024 (devdb01) | Elo | 1599 | 584-593-31 | 49.6% [46.8%, 52.5%] | -4.2% [-10.1%, +1.3%] | 10.23 / 9.84 (0.000) | 0.6386 / 0.6082 | +0.098 [-0.123, +0.320] |
-| 2019-2024 (devdb01) | Power ratings | 1599 | 609-607-31 | 50.1% [47.3%, 52.9%] | -3.2% [-7.6%, +1.3%] | 10.42 / 9.84 (0.000) | | +0.079 [-0.076, +0.234] |
-| 2025 (devdb01) | Elo | 272 | 91-105-1 | 46.4% [39.6%, 53.4%] | -11.3% [-20.2%, -2.1%] | 10.20 / 9.72 (0.006) | 0.6368 / 0.6094 | -0.344 [-1.009, +0.321] |
-| 2025 (devdb01) | Power ratings | 272 | 96-110-1 | 46.6% [39.9%, 53.4%] | -10.7% [-21.7%, +1.0%] | 10.40 / 9.72 (0.002) | | -0.206 [-0.620, +0.207] |
-| 2019-2025 (devdb01) | Elo | 1871 | 670-695-32 | 49.1% [46.4%, 51.7%] | -5.3% [-10.5%, -0.3%] | 10.23 / 9.83 (0.000) | 0.6385 / 0.6084 | +0.045 [-0.169, +0.258] |
-| 2019-2025 (devdb01) | Power ratings | 1871 | 705-717-32 | 49.6% [47.0%, 52.2%] | -4.3% [-8.7%, -0.2%] | 10.41 / 9.83 (0.000) | | +0.038 [-0.106, +0.183] |
-| 2026 holdout (nflverse) | Elo | 94 | 35-30-4 | 53.8% [41.9%, 65.4%] | +3.0% [-23.7%, +27.4%] | 9.42 / 9.24 (0.574) | 0.6615 / 0.6601 | +0.174 [-0.683, +1.031] |
-| 2026 holdout (nflverse) | Power ratings | 94 | 30-45-4 | 40.0% [29.7%, 51.3%] | -23.8% [-53.4%, +5.0%] | 10.27 / 9.24 (0.008) | | -0.229 [-0.940, +0.483] |
+| 2019-2024 (devdb01) | Elo | 1599 | 584-593-31 | 49.6% [46.8%, 52.5%] | -4.2% [-10.1%, +1.3%] | 10.23 / 9.84 (0.000) | 0.6386 / 0.6082 | +0.098 [-0.126, +0.322] |
+| 2019-2024 (devdb01) | Power ratings | 1599 | 609-607-31 | 50.1% [47.3%, 52.9%] | -3.2% [-7.6%, +1.3%] | 10.42 / 9.84 (0.000) | | +0.079 [-0.077, +0.235] |
+| 2025 (devdb01) | Elo | 272 | 91-105-1 | 46.4% [39.6%, 53.4%] | -11.3% [-20.2%, -2.1%] | 10.20 / 9.72 (0.006) | 0.6368 / 0.6094 | -0.344 [-1.059, +0.372] |
+| 2025 (devdb01) | Power ratings | 272 | 96-110-1 | 46.6% [39.9%, 53.4%] | -10.7% [-21.7%, +1.0%] | 10.40 / 9.72 (0.002) | | -0.206 [-0.651, +0.239] |
+| 2019-2025 (devdb01) | Elo | 1871 | 670-695-32 | 49.1% [46.4%, 51.7%] | -5.3% [-10.5%, -0.3%] | 10.23 / 9.83 (0.000) | 0.6385 / 0.6084 | +0.045 [-0.171, +0.260] |
+| 2019-2025 (devdb01) | Power ratings | 1871 | 705-717-32 | 49.6% [47.0%, 52.2%] | -4.3% [-8.7%, -0.2%] | 10.41 / 9.83 (0.000) | | +0.038 [-0.107, +0.184] |
+| 2026 holdout (nflverse) | Elo | 94 | 35-30-4 | 53.8% [41.9%, 65.4%] | +3.0% [-23.7%, +27.4%] | 9.42 / 9.24 (0.574) | 0.6615 / 0.6601 | +0.174 [-0.896, +1.243] |
+| 2026 holdout (nflverse) | Power ratings | 94 | 30-45-4 | 40.0% [29.7%, 51.3%] | -23.8% [-53.4%, +5.0%] | 10.27 / 9.24 (0.008) | | -0.229 [-1.117, +0.660] |
 
 The `market` baseline (the line itself) places no bets and equals its own MAE in every window
 (9.84, 9.72, 9.83, 9.24), as a correct grader must. The Elo log-loss differences have intervals
@@ -187,12 +187,13 @@ after the tuning. Regular-season games, bets at |edge| >= 1, ROI at listed price
 
 | Seasons | Games | ATS W-L-P | Win rate [95% CI] | ROI [95% CI] | MAE model / line (DM p) | Log-loss model / market [diff CI] | Info coef [95% CI] |
 |---|---|---|---|---|---|---|---|
-| 2019-2024 | 1599 | 633-653-31 | 49.2% [46.5%, 52.0%] | -4.7% [-8.9%, -0.4%] | 10.66 / 9.84 (8e-14) | 0.6437 / 0.6082 [+0.0254, +0.0455] | +0.024 [-0.107, +0.155] |
-| 2025, weeks 1-7 | 107 | 39-42-0 | 48.1% [37.6%, 58.9%] | -7.6% [-23.8%, +7.7%] | 10.23 / 9.44 (0.063) | 0.6325 / 0.6104 [-0.0039, +0.0476] | -0.671 [-1.275, -0.066] |
-| 2019-2025 | 1706 | 672-695-31 | 49.2% [46.5%, 51.8%] | -4.9% [-9.2%, -0.4%] | 10.63 / 9.82 (1e-14) | 0.6430 / 0.6084 [+0.0255, +0.0445] | -0.004 [-0.135, +0.127] |
+| 2019-2024 | 1599 | 633-653-31 | 49.2% [46.5%, 52.0%] | -4.7% [-8.9%, -0.4%] | 10.66 / 9.84 (8e-14) | 0.6437 / 0.6082 [+0.0254, +0.0455] | +0.024 [-0.109, +0.157] |
+| 2025, weeks 1-7 | 107 | 39-42-0 | 48.1% [37.6%, 58.9%] | -7.6% [-23.8%, +7.7%] | 10.23 / 9.44 (0.063) | 0.6325 / 0.6104 [-0.0039, +0.0476] | -0.671 [-1.426, +0.084] |
+| 2019-2025 | 1706 | 672-695-31 | 49.2% [46.5%, 51.8%] | -4.9% [-9.2%, -0.4%] | 10.63 / 9.82 (1e-14) | 0.6430 / 0.6084 [+0.0255, +0.0445] | -0.004 [-0.136, +0.128] |
 
-These are not the numbers in `models/state_space/test_metrics.json` (MAE 10.58 on 107 games of
-2025, "ATS 74.7%"), which come from a different evaluation of the model with the old cover rule;
+These are not the numbers in `models/state_space/test_metrics.json` (at tag
+`archive/pre-prune-2026-10`; MAE 10.58 on 107 games of 2025, "ATS 74.7%"), which come from a
+different evaluation of the model with the old cover rule;
 [retraction_ledger.md](retraction_ledger.md) row C18 has its corrected values.
 
 ## 2004-2024 walk-forward and the retraction ledger
@@ -232,13 +233,18 @@ time.
   not survive a Holm correction as profitable bets (Holm p 0.056 and 0.138 or more).
 - [Market benchmark](../2026-10-market-benchmark.md): the grading tool, its guardrails and its
   options.
+- [Negative-result evidence](evidence/README.md): three Nov-2025 artifacts moved here from
+  `models/`. The XGBoost v6 blend search put weight 1.0 on the closing line and 0 on the model;
+  the v6 walk-forward missed the margin by 10.08 points against the line's 9.42 over 2022-2024
+  although the line was one of its inputs; and all 9 hierarchical GNN configurations scored a
+  test Brier of 0.2746-0.2849, worse than a constant 50% forecast (0.25).
 
 ## Earlier numbers that do not match
 
-- **"56.5% win-probability accuracy"** (README, CLAUDE.md, ADR-017/018, dissertation) does not
-  reproduce from the stored run: the model picks 162 winners, 57.0% of 284 decided games (56.8%
-  of 285 if the tie counts as a miss, the figure in ledger C03), against 65.8% (187/284) for the
-  closing favorite. (`models/production/game_outcome_v2/README.md` first gave 66.0% for the
+- **"56.5% win-probability accuracy"** (the pre-salvage README and CLAUDE.md, ADR-017/018,
+  dissertation) does not reproduce from the stored run: the model picks 162 winners, 57.0% of
+  284 decided games (56.8% of 285 if the tie counts as a miss, the figure in ledger C03), against
+  65.8% (187/284) for the closing favorite. (`models/production/game_outcome_v2/README.md` first gave 66.0% for the
   favorite; it now uses these figures.) Nor do the dissertation's
   57.0% (regular season) and 58.3% (playoffs before the Super Bowl): here 156/271 = 57.6% and
   5/12 = 41.7%. Its ATS rates 48.2%, 66.7% and 48.8% do reproduce, with the push counted as a
@@ -251,13 +257,19 @@ time.
   settled bet it is -6.6%), and its 65.9% for the closing favorite is 187/284 = 65.85%, here
   65.8%. Its 2025 baseline figures (power ratings 47.9%, Elo 50.0%) bet every game of every
   week with no edge threshold, so they are not the market_benchmark grade above.
-- **"8.43 playoff MAE vs 11.14 regular season"** (CLAUDE.md lesson 23, dissertation) is the 12
-  playoff games before the Super Bowl (8.425 exactly). The line was also better than usual on
-  those games (8.33, against 9.72 in the regular season) and still ahead of v2, and 12 games say
-  little: a random 13-game subset of the 2025 regular season gives the line an MAE at least as
+- **"8.43 playoff MAE vs 11.14 regular season"** (the pre-salvage CLAUDE.md lesson 23,
+  dissertation) is the 12 playoff games before the Super Bowl (8.425 exactly). The line was also
+  better than usual on those games (8.33, against 9.72 in the regular season) and still ahead of
+  v2, and 12 games say little: a random 13-game subset of the 2025 regular season gives the line an MAE at least as
   low as its playoff 8.58 29.7% of the time ([market facts](../2026-10-market-facts/README.md)
   section 8). With the Super Bowl the playoffs are 9.12 for v2 and 8.58 for the line.
 - **README baseline rows vs devdb01**: the Raiders' team code and the -110 pricing, above.
+- **Information-regression intervals before 2026-10-25** were ±1.96 standard errors while the
+  p-value used a t distribution with (weeks - 1) degrees of freedom, so with few weeks they were
+  too narrow and could contradict their own p-value: the state-space 2025 interval (7 weeks) was
+  -1.275 to -0.066, excluding zero, next to p = 0.073. market_benchmark now uses t(weeks - 1)
+  for both, and every interval on this page was regenerated with it (about 1% wider at 100 or
+  more weeks, 7.6% at 18, 25% at 7).
 
 ## Limitations
 
@@ -268,17 +280,14 @@ time.
 - market_benchmark's baselines key ratings by team code, so a relocation (OAK to LV in 2020)
   restarts a team when the source uses nflverse codes. The effect on 2019-2025 is shown above; it
   does not touch 2025-2026. Mapping franchise codes in `baselines.py` would remove it.
-- market_benchmark's information-regression interval is ±1.96 standard errors while its p-value
-  uses a t distribution with (weeks - 1) degrees of freedom. With few weeks they disagree: the
-  state-space 2025 interval (7 weeks) excludes zero, yet p = 0.073.
 - The 2026 holdout is one nflverse download. nflverse replaces the file in place, so a later
   download can revise these rows; the sha256 above identifies the version graded.
 
 ## Reproduce
 
-From a clean shell at the repository root (`cd /home/dro/rice/nfl-analytics`). The scripts that
-read devdb01 take the `DB_*` variables (defaults in `nfl_analytics/utils/db_config.py`) and force a
-read-only session. `games.csv` is
+From the repository root, in a clean shell. The scripts that read devdb01 take the `DB_*`
+variables (defaults in `nfl_analytics/utils/db_config.py`) and force a read-only session.
+`games.csv` is
 <https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv>; the numbers
 above use the download with sha256 `07b41111...b2`.
 
@@ -298,9 +307,16 @@ uv run --no-sync python scripts/final_evaluation/grade_baselines.py --nflverse-c
 # Kalman state-space walk-forward (devdb01)
 uv run --no-sync python scripts/final_evaluation/grade_state_space_walkforward.py
 
-# 2004-2024 walk-forward and the retraction ledger
+# 2004-2024 walk-forward
 uv run --no-sync python scripts/final_evaluation/regrade_walkforward_2004_2024.py
-uv run --no-sync python scripts/final_evaluation/check_claims.py
+
+# retraction ledger: its checks read files the 2026-10 prune removed, so run the script in a
+# worktree of the tag taken just before the prune (at HEAD it stops without writing, exit 2);
+# claims_checks*.csv reproduce byte for byte, the location files up to moved line numbers
+git worktree add ../nfl-analytics-pre-prune archive/pre-prune-2026-10
+uv run --no-sync python ../nfl-analytics-pre-prune/scripts/final_evaluation/check_claims.py \
+    --out-dir /tmp/claims_check --nflverse-games games.csv
+git worktree remove ../nfl-analytics-pre-prune
 
 # check the prospective files (do not rerun predict mode into prospective/)
 (cd docs/investigations/2026-10-final-evaluation/prospective && sha256sum -c SHA256SUMS)

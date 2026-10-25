@@ -1,6 +1,6 @@
 ## power_ratings vs closing market
 
-Seasons 2026-2026, 94 games, bets at |edge| >= 1.0 pts.
+Season 2026, 94 games, bets at |edge| >= 1.0 pts.
 
 | Metric | Value | 95% CI |
 |---|---|---|
@@ -13,5 +13,5 @@ Seasons 2026-2026, 94 games, bets at |edge| >= 1.0 pts.
 | Placebo win rate (shuffled) | 56.2% | should be ~50% |
 | Pooled home cover rate | 45.5% | 40/88, binomial p = 0.524 vs 49% |
 | Line vs home margin correlation | +0.33 | sign check: must be > 0 from 30 games |
-| Model info beyond the line (coef on pred - line) | -0.229 | -0.940 to +0.483 |
+| Model info beyond the line (coef on pred - line) | -0.229 | -1.117 to +0.660 |
 

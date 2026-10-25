@@ -64,8 +64,8 @@ OLS margin = a + b * line + c * (pred - line), errors clustered by week.
 
 | Games | n | c (95% CI) | p | b (line) | Weeks |
 |---|---|---|---|---|---|
-| All games | 285 | -0.492 [-1.358, +0.374] | 0.28 | 0.732 | 22 |
-| Regular season | 272 | -0.572 [-1.494, +0.350] | 0.24 | 0.645 | 18 |
+| All games | 285 | -0.492 [-1.411, +0.427] | 0.28 | 0.732 | 22 |
+| Regular season | 272 | -0.572 [-1.565, +0.420] | 0.24 | 0.645 | 18 |
 
 ## market_benchmark report, regular season, |edge| >= 1
 
@@ -73,7 +73,7 @@ Saved as `game_outcome_v2_2025_market_benchmark_reg.md` / `.json`:
 
 ## Game Outcome v2, 2025 regular season vs closing market
 
-Seasons 2025-2025, 272 games, bets at |edge| >= 1.0 pts.
+Season 2025, 272 games, bets at |edge| >= 1.0 pts.
 
 | Metric | Value | 95% CI |
 |---|---|---|
@@ -86,7 +86,7 @@ Seasons 2025-2025, 272 games, bets at |edge| >= 1.0 pts.
 | Placebo win rate (shuffled) | 49.4% | should be ~50% |
 | Pooled home cover rate | 49.8% | 135/271, binomial p = 0.808 vs 49% |
 | Line vs home margin correlation | +0.50 | sign check: must be > 0 from 30 games |
-| Model info beyond the line (coef on pred - line) | -0.572 | -1.494 to +0.350 |
+| Model info beyond the line (coef on pred - line) | -0.572 | -1.565 to +0.420 |
 | Log-loss: model / market | 0.6868 / 0.6094 | diff +0.0463 to +0.1082 |
 
 **100% of predictions were made at or after kickoff (retroactive); this is not a prospective test.**

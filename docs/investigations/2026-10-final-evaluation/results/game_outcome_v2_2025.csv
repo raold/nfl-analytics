@@ -183,10 +183,10 @@ probability,Playoffs,13,log-loss model - market (Shin),0.140469,0.0412294,0.2585
 probability,Playoffs,13,model Brier,0.251454,,,
 probability,Playoffs,13,market Brier (Shin),0.183502,,,
 probability,Playoffs,13,Brier model - market (Shin),0.0679513,0.0213981,0.123923,
-information,All games,285,coef on (pred - line),-0.492345,-1.35839,0.373699,22 week clusters
+information,All games,285,coef on (pred - line),-0.492345,-1.41124,0.426551,22 week clusters
 information,All games,285,"p-value, coef on (pred - line)",0.277759,,,
 information,All games,285,coef on line,0.732044,,,
-information,Regular season,272,coef on (pred - line),-0.572307,-1.49448,0.349863,18 week clusters
+information,Regular season,272,coef on (pred - line),-0.572307,-1.56496,0.42035,18 week clusters
 information,Regular season,272,"p-value, coef on (pred - line)",0.240455,,,
 information,Regular season,272,coef on line,0.645454,,,
 market_benchmark,"regular season, |edge| >= 1",241,wins,117,,,

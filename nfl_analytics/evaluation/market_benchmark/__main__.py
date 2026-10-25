@@ -16,7 +16,9 @@ Grading (the default command; "grade" may be given explicitly):
         --nflverse-csv games.csv --seasons 2026
 
 Baselines are walk-forward and start from the season before the first one graded (warm-up),
-whichever the source. Prospective predictions for one week (games not started yet):
+whichever the source; they run through every season up to the last one graded, so with
+--seasons 2019,2024 the 2020-2023 games still feed the ratings (only 2019 and 2024 are graded).
+Prospective predictions for one week (games not started yet):
 
     python -m nfl_analytics.evaluation.market_benchmark predict --baseline elo \\
         --nflverse-csv games.csv --season 2026 --week 8 --out preds_2026_w08.csv
@@ -51,6 +53,7 @@ from nfl_analytics.evaluation.market_benchmark.predict import (
 from nfl_analytics.evaluation.market_benchmark.report import (
     LINE_AT_PREDICTION,
     run_benchmark,
+    season_span,
     to_json,
     to_markdown,
 )
@@ -76,7 +79,7 @@ def _load_market(args, seasons: list[int]) -> pd.DataFrame:
             conn.close()
     if args.nflverse_csv:
         return load_market_from_nflverse(args.nflverse_csv, seasons, args.game_types or ["REG"])
-    return load_market_from_csv(args.market_csv, seasons)
+    return load_market_from_csv(args.market_csv, seasons, args.game_types or ["REG"])
 
 
 def grade_main(argv: list[str]) -> int:
@@ -94,18 +97,25 @@ def grade_main(argv: list[str]) -> int:
     ap.add_argument(
         "--game-types",
         type=lambda s: s.split(","),
-        help="with --nflverse-csv: game types to grade, e.g. REG,WC,DIV,CON,SB (default REG)",
+        help="with --nflverse-csv or --market-csv: game types to grade, e.g. REG,WC,DIV,CON,SB "
+        "(default REG; --db grades REG only)",
     )
     ap.add_argument("--seasons", required=True, type=_seasons, help="e.g. 2019-2024 or 2023,2024")
     ap.add_argument("--min-edge", type=float, default=1.0)
     ap.add_argument("--json", action="store_true", help="print JSON instead of Markdown")
     ap.add_argument("--allow-implausible", action="store_true")
     args = ap.parse_args(argv)
-    if args.game_types and not args.nflverse_csv:
-        ap.error("--game-types applies only to --nflverse-csv")
+    if args.game_types and args.db:
+        ap.error("--game-types applies only to --nflverse-csv and --market-csv (--db grades REG)")
+    if args.game_types and args.market_csv:
+        if "game_type" not in pd.read_csv(args.market_csv, nrows=0).columns:
+            ap.error(f"--game-types needs a game_type column in {args.market_csv}")
 
-    # Baselines need the prior season for their preseason ratings, whatever the source
-    seasons = [min(args.seasons) - 1, *args.seasons] if args.baseline else args.seasons
+    # Baselines need the prior season for their preseason ratings, and every season up to the
+    # last one graded (a gap would skip those games), whatever the source
+    seasons = args.seasons
+    if args.baseline:
+        seasons = list(range(min(args.seasons) - 1, max(args.seasons) + 1))
     market = _load_market(args, seasons)
 
     if args.baseline:
@@ -136,7 +146,7 @@ def grade_main(argv: list[str]) -> int:
         if market.empty:
             print(
                 f"None of the {len(preds)} games in {args.predictions_csv} is a completed game "
-                f"of {args.seasons[0]}-{args.seasons[-1]} with a closing line in this source yet",
+                f"of {season_span(args.seasons)} with a closing line in this source yet",
                 file=sys.stderr,
             )
             return 1
