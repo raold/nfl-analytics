@@ -222,7 +222,7 @@ Success measured by:
 ### Documentation
 
 - Temperature Fix Postmortem (no longer in the repo; see [HISTORY](../HISTORY.md))
-- [Ensemble v6 Production Code](../../nfl_analytics/ensemble/enhanced_ensemble_v6_production.py)
+- Ensemble v6 Production Code (`nfl_analytics/ensemble/enhanced_ensemble_v6_production.py`, removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`)
 
 ### Code
 

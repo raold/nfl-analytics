@@ -13,7 +13,7 @@ repos:
     hooks:
       - id: ruff
         args: [--select, "E9,F63,F7,F82"]
-        files: ^(nfl_analytics|tests|scripts|api)/
+        files: ^(nfl_analytics|tests|scripts)/
 
   # Python type checking
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -98,39 +98,6 @@ repos:
         language: system
         files: ^R/train_.*\.R$
         description: Validate R training scripts have convergence diagnostics
-
-      # Phase 3 Enforcement Rules (Nov 15, 2025)
-      - id: validate-api-contracts
-        name: API Contract Validation
-        entry: python nfl_analytics/utils/enforcement_router.py
-        language: system
-        files: \.(py)$
-        pass_filenames: true
-        description: Catch deprecated ensemble parameters and missing db_password
-
-      - id: validate-sql-results
-        name: SQL Result Validation
-        entry: python nfl_analytics/utils/enforcement_router.py
-        language: system
-        files: \.(py)$
-        pass_filenames: true
-        description: Ensure SQL results checked before .iloc[0] access
-
-      - id: validate-r-predictions
-        name: R Prediction Validation
-        entry: python nfl_analytics/utils/enforcement_router.py
-        language: system
-        files: \.(py)$
-        pass_filenames: true
-        description: Validate R predictions checked for NaN
-
-      - id: validate-ensemble-components
-        name: Ensemble Component Validation
-        entry: python nfl_analytics/utils/enforcement_router.py
-        language: system
-        files: \.(py)$
-        pass_filenames: true
-        description: Ensure ensemble has minimum component checks
 
 # Global settings
 default_language_version:

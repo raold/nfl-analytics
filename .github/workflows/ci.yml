@@ -17,12 +17,12 @@ jobs:
           python-version: '3.11'
           enable-cache: true
 
-      # torch, bayes, semantic etc. are optional extras; their tests skip when absent
+      # torch and causal (shap, mapie) are optional extras; their tests skip when absent
       - name: Install dependencies
-        run: uv sync --frozen --extra dev --extra api --extra trading --extra online
+        run: uv sync --frozen --extra dev
 
       - name: Lint (syntax errors and undefined names)
-        run: uv run ruff check --select E9,F63,F7,F82 nfl_analytics tests scripts api
+        run: uv run ruff check --select E9,F63,F7,F82 nfl_analytics tests scripts
 
       - name: Format check
         run: uv run black --check nfl_analytics tests

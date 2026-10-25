@@ -219,8 +219,8 @@ These results confirm:
 
 ### Implementation
 
-- [nfl_analytics/rl/dataset.py](../../nfl_analytics/rl/dataset.py) - Dataset generation
-- [nfl_analytics/rl/evaluate_cql_betting.py](../../nfl_analytics/rl/evaluate_cql_betting.py) - Evaluation script
+- `nfl_analytics/rl/dataset.py` (removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`) - Dataset generation
+- `nfl_analytics/rl/evaluate_cql_betting.py` (removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`) - Evaluation script
 - [figures/out/rl_vs_baseline_table.tex](../../analysis/dissertation/figures/out/rl_vs_baseline_table.tex) - Dissertation table
 
 ---

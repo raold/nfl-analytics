@@ -261,11 +261,13 @@ class TestFeatureExtractionSafety:
             row = kc.iloc[i]
             games_before = kc.iloc[:i]
 
-            # Count wins (margin > 0) in prior games
-            prior_wins = (games_before["margin"] > 0).sum()
+            # Count wins (margin > 0) in prior games; a tie (margin = 0) counts as 0.5,
+            # as in compute_team_history
+            prior_wins = (games_before["margin"] > 0).sum() + 0.5 * (
+                games_before["margin"] == 0
+            ).sum()
             expected_win_pct = prior_wins / i if i > 0 else np.nan
 
-            # Allow for ties (margin = 0 counts as 0.5)
             assert abs(row["prior_win_pct"] - expected_win_pct) < 0.1 or pd.isna(
                 row["prior_win_pct"]
             ), f"Game {i}: win_pct includes current result (leakage)"

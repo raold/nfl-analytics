@@ -32,14 +32,9 @@ DB_CONFIG = {
     "password": "sicillionbillions",
 }
 
-# Feature engineering modules to check
+# Feature engineering modules to check (the others were removed in the 2026-10 prune)
 FEATURE_MODULES = [
     "nfl_analytics/features/asof_features.py",
-    "nfl_analytics/features/asof_features_enhanced.py",
-    "nfl_analytics/features/vegas_line_bias_features_SAFE.py",
-    "nfl_analytics/features/defensive_situational_strength.py",
-    "nfl_analytics/features/defensive_game_script_indicators.py",
-    "nfl_analytics/features/environmental_contextual_features.py",
 ]
 
 
@@ -415,17 +410,6 @@ class TestFeatureIntegrity:
             f"Home cover rate is {cover_pct:.1%}, which is outside expected range (40-60%). "
             f"This suggests incorrect spread convention or data quality issue."
         )
-
-
-def test_leakage_diagnostic_tool_exists():
-    """
-    Test 10: Verify leakage diagnostic tool exists and is runnable.
-    """
-    diagnostic_path = Path("nfl_analytics/validation/leakage_diagnostic.py")
-    assert diagnostic_path.exists(), (
-        "Leakage diagnostic tool not found. "
-        "Create nfl_analytics/validation/leakage_diagnostic.py for manual leakage detection."
-    )
 
 
 if __name__ == "__main__":

@@ -199,7 +199,7 @@ Primary metric: Spread MAE on held-out validation set (2024 season games)
 ### Documentation
 
 - Experiment results (no longer in the repo; see [HISTORY](../HISTORY.md))
-- [Experiment script](../../nfl_analytics/models/feature_optimization_experiment.py)
+- Experiment script (`nfl_analytics/models/feature_optimization_experiment.py`, removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`)
 - Best config (no longer in the repo; see [HISTORY](../HISTORY.md))
 
 ### External Resources
