@@ -363,23 +363,32 @@ def apply_holm_bonferroni(
     results_df: pd.DataFrame,
     alpha: float = 0.05,
 ) -> pd.DataFrame:
-    """Apply Holm-Bonferroni multiple testing correction.
+    """Apply the Holm-Bonferroni step-down correction.
+
+    Sorted p-values p_(1) <= ... <= p_(m) are compared with alpha / (m - i + 1) in order,
+    and testing stops at the first one that fails: every hypothesis after it is retained,
+    even if its own p-value is below its threshold.
 
     Args:
-        results_df: DataFrame with p-values
+        results_df: DataFrame with a p_value_one_sided column
         alpha: Family-wise error rate
 
     Returns:
-        DataFrame with corrected significance flags
+        DataFrame sorted by p-value with holm_threshold, p_holm (adjusted p-value)
+        and significant_holm columns
     """
     n_tests = len(results_df)
 
-    # Sort by p-value
     results_df = results_df.sort_values("p_value_one_sided").reset_index(drop=True)
+    p = results_df["p_value_one_sided"].to_numpy(dtype=float)
 
-    # Holm-Bonferroni correction
     results_df["holm_threshold"] = alpha / (n_tests - np.arange(n_tests))
-    results_df["significant_holm"] = results_df["p_value_one_sided"] < results_df["holm_threshold"]
+    # Step-down: reject while p_(i) < threshold_(i); the first failure ends the procedure
+    passes = p < results_df["holm_threshold"].to_numpy()
+    results_df["significant_holm"] = np.cumprod(passes).astype(bool)
+    results_df["p_holm"] = np.minimum(
+        np.maximum.accumulate((n_tests - np.arange(n_tests)) * p), 1.0
+    )
 
     return results_df
 
