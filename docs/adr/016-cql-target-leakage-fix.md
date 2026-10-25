@@ -1,7 +1,13 @@
 # ADR-016: CQL Target Leakage Fix
 
-**Status:** Accepted
+**Status:** Accepted; the RL code was removed in the 2026-10 prune
 **Date:** 2026-01-02
+
+> **Note (2026-10-25):** the 100%-win-rate CQL result stays retracted (retraction ledger C39). The
+> rewards in `data/rl_logged.csv` were also graded with the old spread sign rule, and its `p_hat`
+> uses the same game's data (C41), so the other RL tables built on it are invalid too. The files
+> cited below (`nfl_analytics/rl/`, `data/rl/betting_features_clean.csv`) are at tag
+> `archive/pre-prune-2026-10`.
 **Deciders:** Claude Code, User
 **Tags:** ml-model, data, rl
 

@@ -9,6 +9,14 @@
 > correlation and the 25-point swing below are not valid evidence and must be re-run with the
 > fixed script before rest features are credited with ATS signal. Cells of 8–26 games would not
 > support the conclusion even with correct labels. See `docs/POSTMORTEMS.md` §4.
+>
+> **Re-run (2026-10-24), [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md)
+> row C15.** With nflverse rest days and the correct rule, 2025 home teams with 3 or more extra
+> days of rest covered 41.4% (n = 29); the old rule gives 69.0%. Over 2006-2024 the same group
+> covered 49.0% (n = 512), and corr(rest difference, ATS margin) is +0.009 (n = 5,011). This
+> ADR's own query does not reproduce its table on the repaired database (126 games, not 139);
+> graded correctly it gives r = +0.137 with no monotone pattern. Rest has no ATS signal here. The
+> Kalman and GP results below are handled in ADR-014 and ADR-015.
 **Decision Makers:** dro, Claude Code
 
 ## Context

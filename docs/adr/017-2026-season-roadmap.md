@@ -1,12 +1,27 @@
 # ADR-017: 2026 Season Improvement Roadmap
 
-**Status:** Proposed
+**Status:** Not implemented: the project was wound down in October 2026 (§2.4 withdrawn)
 **Date:** 2026-02-12
 **Deciders:** User, Claude Code
 
+> **Corrections (2026-10-24), [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md)
+> rows C01-C04, C29 and C30.** Graded with the correct cover rule, Game Outcome v2's 2025 record
+> is: spread MAE 11.05 against 9.67 for the closing line (correct, C04); ATS 139-145-1 (48.9%) on
+> every game, while the "-3.2% on 208 bets" holds only for |edge| strictly above 2 points (C02);
+> winners picked 162 of 284 (57.0%) against 187 of 284 (65.8%) for the closing favorite, with
+> log-loss 0.6871 against 0.6070 for the market (C03). The 8.43 playoff MAE is the 12 games before
+> the Super Bowl, where the line also improved, to 8.33 (C29); "70% ATS on 10 bets" is 7-3, one-
+> sided p = 0.17 (C30). The prediction compression has a different cause than the one given
+> below: none of v2's trees splits on its NextGen or QBR inputs, while the line-movement inputs
+> it does use sat at their defaults for every 2025 game (POSTMORTEMS §7). The predictions were
+> made in one run after the season, so they are retroactive. Of the tiers, only pieces were built
+> (`scripts/pipeline_health_check.py`, the v2 entry in `ml.model_registry`, a weekly Makefile
+> target since retired, `power_ratings_model.py`). The canonical evaluation is
+> [docs/investigations/2026-10-final-evaluation/](../investigations/2026-10-final-evaluation/README.md).
+
 ## Context
 
-The 2025 NFL season is complete (Super Bowl LIX: SEA 29, NE 13). The Game Outcome Model v2 was evaluated across all 285 games (272 regular season + 13 postseason). Key findings from the full-season evaluation:
+The 2025 NFL season is complete (Super Bowl LX: SEA 29, NE 13). The Game Outcome Model v2 was evaluated across all 285 games (272 regular season + 13 postseason). Key findings from the full-season evaluation:
 
 - **Spread MAE:** 11.05 (vs Vegas 9.67) — model underperforms market by 1.38 points
 - **ATS ROI:** -3.2% on 208 qualified bets — below 52.4% breakeven

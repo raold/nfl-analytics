@@ -1,7 +1,11 @@
 # ADR-019: Claude API Integration for Trading Signal Validation
 
-**Status:** Proposed
+**Status:** Superseded by the separate Sibyl repository; code removed in the 2026-10 prune
 **Date:** 2026-02-13
+
+> **Note (2026-10-25):** the signals this would have validated came from Game Outcome v2, which
+> does not beat the closing line (ADR-018). `nfl_analytics/trading/claude_signal_validator.py`
+> and the trading stack it plugged into are at tag `archive/pre-prune-2026-10`.
 **Deciders:** User, Claude Code
 **Tags:** architecture, claude-api, trading, ai-integration
 

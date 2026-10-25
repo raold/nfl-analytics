@@ -1,5 +1,9 @@
 # WS2: Prediction Compression Root Cause Analysis
 
+> **Read with [README.md](README.md) (2026-10-25):** the compression is real, but missing QBR and
+> NextGen data cannot explain it (v2 never splits on those inputs); the ROI projections are
+> speculation.
+
 **Date:** 2026-02-12
 **Investigator:** Claude Code (Systematic Investigation)
 **Status:** COMPLETE — Root cause identified, fix proposed

@@ -2,8 +2,16 @@
 
 > Renumbered 2026-10-24: formerly `docs/decisions/ADR-003`. Existing `docs/adr/` numbers were kept because the dissertation cites them.
 
-**Status**: 🚧 In Progress
+**Status**: Abandoned (projections only; never deployed)
 **Date**: November 10, 2025
+
+> **Note (2026-10-24), [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md)
+> rows C13 and C36.** Every ROI, win-rate, Sharpe and dollar figure below is a target or a
+> projection ("proj."), never a measurement: no prop lines exist in the database, and the props
+> backtests that reported +5.6% to +6.2% ROI simulated their lines from the outcomes (C36). The
+> State-Space v2 "47.77 yards on 2025 holdout" uses each game's own pass attempts and was picked
+> on those weeks (C13). The ensemble and the scripts cited below were removed in the 2026-10 prune
+> (tag `archive/pre-prune-2026-10`).
 **Decision Makers**: NFL Analytics Research Team
 **Supersedes**: N/A
 **Related ADRs**:

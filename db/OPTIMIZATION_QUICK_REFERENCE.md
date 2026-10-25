@@ -1,5 +1,8 @@
 # Database Optimization - Quick Reference Card
 
+> **Historical (November 2025), and not true of today's devdb01:** none of the indexes it reports
+> exists there (checked 2026-10-25). See [DATABASE_OPTIMIZATION_DEPLOYMENT_REPORT.md](DATABASE_OPTIMIZATION_DEPLOYMENT_REPORT.md).
+
 **Date:** November 13, 2025 | **Status:** ✅ COMPLETE
 
 ---

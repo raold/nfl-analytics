@@ -2,8 +2,17 @@
 
 > Renumbered 2026-10-24: formerly `docs/decisions/ADR-001`. Existing `docs/adr/` numbers were kept because the dissertation cites them.
 
-**Status**: ✅ Accepted
+**Status**: Accepted; its evidence is retracted (2026-10-24)
 **Date**: November 8, 2025
+
+> **Retracted evidence (2026-10-24), [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md)
+> row C13.** The 47.77-yard "best window" MAE comes from props models that take each game's own
+> pass attempts as an input, and the window was picked on the same 2025 weeks 1-5 it is reported
+> on. A no-skill formula, the game's attempts × 2024 league yards per attempt, scores 48.44 on those
+> weeks (n = 155); a pre-game player mean scores 56.82. The ROI figures below are projections from
+> yards MAE, never measured against betting lines (no prop lines exist in the database, C10). The
+> decay was never applied in the ablation (scenarios B and D are the same fit; ERRATA T278). The
+> models and scripts cited below are at tag `archive/pre-prune-2026-10`.
 **Decision Makers**: Claude Code (Sonnet 4.5), NFL Analytics Research Team
 **Supersedes**: N/A (first ADR)
 **Related ADRs**: ADR-020 (State-Space v2 Production Approval - to be created)

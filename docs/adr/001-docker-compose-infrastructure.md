@@ -1,7 +1,12 @@
 # ADR-001: Docker Compose for Production Stack
 
-**Status:** Accepted
+**Status:** Superseded (2026-10): `docker-compose.yml` now runs only the database
 **Date:** 2025-11-08
+
+> **Note (2026-10-25):** the stack below was never operated as a production system. The
+> API, dashboard, Redis, Prometheus, Grafana and exporter services and their code were removed
+> in the 2026-10 prune (tag `archive/pre-prune-2026-10`); compose keeps the PostgreSQL +
+> TimescaleDB service `pg-1`, bound to 127.0.0.1:5544.
 **Deciders:** Project Team
 **Tags:** infrastructure, deployment, docker, orchestration
 

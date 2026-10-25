@@ -1,5 +1,9 @@
 # WS1: Data Layer Health Audit
 
+> **Read with [README.md](README.md) (2026-10-25):** the root cause given here does not hold: v2's
+> trees never split on its QBR or NextGen inputs, so those gaps did not compress its predictions.
+> Paths cited below are at tag `archive/pre-prune-2026-10`.
+
 **Date:** 2026-02-12
 **Investigator:** Claude Code (Systematic Investigation)
 **Status:** COMPLETE — Critical findings

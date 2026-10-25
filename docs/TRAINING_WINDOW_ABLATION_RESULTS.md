@@ -1,5 +1,16 @@
 # Training Window Ablation Study: Final Results
 
+> **Retracted (2026-10-24), [retraction ledger](investigations/2026-10-final-evaluation/retraction_ledger.md)
+> row C13.** These are not forecasts. The models take each game's own pass attempts as an input,
+> so a no-skill formula (the game's attempts × 2024 league yards per attempt) scores 48.44 on the
+> same 2025 weeks 1-5 (n = 155), close to the 47.77 below; a pre-game player mean scores 56.82.
+> The window was then chosen on those same weeks, the exponential decay was never applied
+> (scenarios B and D are the same fit), and the "Brier" column is a normalized squared error
+> ([ERRATA](../analysis/dissertation/ERRATA.md) T278, T279, D2). The file is kept because
+> `R/dissertation_figures.R` cites it for the training-window figure, whose bars are typed into
+> that script and do not match this table (ERRATA P29). The scripts and models named below are at
+> tag `archive/pre-prune-2026-10`.
+
 **Date**: November 8, 2025
 **Purpose**: Empirically determine the canonical training window for all player performance models
 **Test Set**: 2025 weeks 1-6 (148 games, 37 QBs, completely unseen)

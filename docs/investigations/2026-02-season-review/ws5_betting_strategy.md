@@ -1,5 +1,10 @@
 # WS5: Betting Strategy Optimization
 
+> **Read with [README.md](README.md) (2026-10-25):** the threshold table reproduces; the
+> "pockets of genuine signal" are post-hoc subgroups of 20-65 bets, and the rest result is the
+> spread sign bug (retraction ledger C15, C27). Paths cited below are at tag
+> `archive/pre-prune-2026-10`.
+
 **Date:** 2026-02-12
 **Investigator:** Claude Code (Systematic Investigation)
 **Status:** COMPLETE

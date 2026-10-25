@@ -2,6 +2,12 @@
 
 **Status:** Accepted
 **Date:** 2025-12-14
+
+> **Note (2026-10-25):** a point estimate on one 272-game validation season (2024), which was
+> also each variant's early-stopping set (`eval_set`), as for Game Outcome v2 (retraction ledger
+> C17); the small differences below say little either way, and keeping the baseline is unaffected. The model is Game Outcome v2, frozen
+> (`models/production/game_outcome_v2/README.md`); `nfl_analytics/models/feature_optimization_experiment.py`
+> is at tag `archive/pre-prune-2026-10`.
 **Deciders:** Research Team
 **Tags:** ml-model, feature-engineering, optimization
 

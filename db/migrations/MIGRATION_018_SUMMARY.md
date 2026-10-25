@@ -1,5 +1,10 @@
 # Migration 018 - Database Consistency Fixes
 
+> **Historical (October 2025).** `schema_migrations` in today's devdb01 lists 018 as applied, but
+> the objects described below (`reference.team_abbreviations`, `normalize_team_abbr()`,
+> `lookup_player_ids()`) do not exist there (checked 2026-10-25). Team codes are converted in
+> Python instead (`nfl_analytics/utils/team_mapping.py`).
+
 **Date:** October 12, 2025
 **Status:** COMPLETED
 **Migration File:** `018_critical_fixes_v3.sql`

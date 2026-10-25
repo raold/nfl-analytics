@@ -2,8 +2,17 @@
 
 > Renumbered 2026-10-24: formerly `docs/decisions/ADR-008`. Existing `docs/adr/` numbers were kept because the dissertation cites them.
 
-**Status**: Approved
+**Status**: Approved, never deployed; code removed in the 2026-10 prune
 **Date**: November 12, 2025
+
+> **Note (2026-10-24), [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md)
+> row C43.** The "+21% vs static baseline" claim (a mean predictor) was already retracted
+> (POSTMORTEMS §2). The 38.03 vs 39.66 MAE that replaced it is an optimistic point estimate: the
+> 70/30 mix was picked among eight approaches on the same 2022-2024 test seasons, and
+> `scripts/validate_hybrid_model.py` kept only quarterbacks with at least 100 passing yards in the
+> game (`HAVING SUM(p.passing_yards) >= 100`), a filter on the outcome. "Current ensemble ROI:
+> +5-7%" and the other ROI figures are projections from yards MAE, never measured against betting
+> lines. The code cited below is at tag `archive/pre-prune-2026-10`.
 **Decision Makers**: NFL Analytics Research Team, Claude Code (Sonnet 4.5)
 **Supersedes**: N/A
 **Related ADRs**: ADR-007 (Canonical Training Window), ADR-021 (Ensemble Calibration)

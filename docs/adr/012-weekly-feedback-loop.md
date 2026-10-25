@@ -1,8 +1,16 @@
 # ADR-012: Weekly Feedback Loop System
 
 **Date:** December 22, 2025
-**Status:** Accepted
+**Status:** Abandoned (2026-10): none of its tables exists in devdb01, and the code was removed
 **Context:** Semantic Stack Phase 1 Complete, 2025 Holdout Testing Ongoing
+
+> **Note (2026-10-25), [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md)
+> rows C24 and C25.** The feedback tables listed below were never created in devdb01, so the loop
+> has no recorded run there. The validation it relied on did not exist either: the semantic A/B
+> (`scripts/ab_test_semantic_2025.py`) compared a prediction with itself, and the semantic inputs
+> were read as of extraction time, not kickoff (POSTMORTEMS §9-§10). `nfl_analytics/feedback/`,
+> `nfl_analytics/semantic/` and the scripts below were removed in the 2026-10 prune (tag
+> `archive/pre-prune-2026-10`).
 
 ## Decision
 

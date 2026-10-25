@@ -1,5 +1,9 @@
 # WS3.3-3.4: Signal Analysis & Playoff Features
 
+> **Read with [README.md](README.md) (2026-10-25):** the "sweet spots" and playoff findings are
+> post-hoc subgroups of one season, not evidence of an edge (retraction ledger C27, C29); the
+> semantic A/B figure has no artifact behind it (C25).
+
 **Date:** 2026-02-12
 **Investigator:** Claude Code (Systematic Investigation)
 **Status:** COMPLETE

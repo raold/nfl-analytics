@@ -1,5 +1,9 @@
 # DATABASE OPTIMIZATION DEPLOYMENT REPORT
 
+> **Historical (November 2025), and not true of today's devdb01:** none of the ten indexes this
+> report lists as created exists there (checked 2026-10-25). Existing indexes:
+> [SQL_PATTERNS.md](../docs/database/SQL_PATTERNS.md#indexes-that-exist).
+
 **Date:** November 13, 2025
 **Status:** ✅ COMPLETE
 **Deployment Window:** 21:31 - 22:15 UTC (45 minutes)

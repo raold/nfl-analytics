@@ -1,7 +1,13 @@
 # ADR-006: PostgreSQL R Model Lookup Architecture
 
-**Status:** Accepted
+**Status:** Superseded (2026-10): the lookup code and the R models were removed
 **Date:** 2025-11-20
+
+> **Note (2026-10-25):** the batch script that filled the lookup table,
+> `R/batch_generate_r_predictions.R` (tag `archive/pre-prune-2026-10`), wrote "synthetic posterior
+> samples for testing", `rnorm(N_DRAWS, mean = 250, sd = 50)`, rather than model posteriors.
+> Whether those rows were ever read cannot be checked: `ml.r_model_predictions` does not exist in
+> devdb01. `nfl_analytics/ensemble/r_prediction_lookup.py`, cited below, is in the same tag.
 **Deciders:** Project Team
 **Tags:** architecture, performance, r-integration, database
 

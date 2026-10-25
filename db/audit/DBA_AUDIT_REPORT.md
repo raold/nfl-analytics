@@ -1,5 +1,9 @@
 # NFL Analytics Database - Comprehensive DBA Audit Report
 
+> **Historical (October 2025).** devdb01 has changed a great deal since this audit. The current
+> schema is the snapshot in `db/schema/` ([db/README.md](../README.md)); current tables and counts
+> are in [docs/database/DATABASE_QUICK_REFERENCE.md](../../docs/database/DATABASE_QUICK_REFERENCE.md).
+
 **Date:** October 12, 2025
 **Auditor:** Database Architecture Team
 **Database:** devdb01

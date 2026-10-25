@@ -1,5 +1,13 @@
 # Next Gen Stats Feature Extraction Module
 
+> **Status (2026-10-25):** reference for `nfl_analytics/features/nextgen_features.py`, which the
+> game feature extractor still calls. Game Outcome v2 has 46 `ngs_` inputs (23 per team), but none
+> of its three boosters' trees splits on any of them, so they had no effect on its predictions. The
+> "signal strength" correlations below were not reproduced in the salvage. The NGS tables also
+> hold week-0 season totals; this module is safe from them only because it joins through
+> `rosters`, which has no week 0. The example script and the agent doc cited below are at tag
+> `archive/pre-prune-2026-10`; `docs/features/TEAM_OFFENSIVE_FEATURES.md` was never committed.
+
 **Status:** ✅ Production-Ready
 **Created:** November 27, 2025
 **Author:** Claude Code (Sonnet 4.5)

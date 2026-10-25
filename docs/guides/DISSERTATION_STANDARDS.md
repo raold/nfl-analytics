@@ -1,5 +1,10 @@
 # Dissertation Quality Standards - NON-NEGOTIABLE ⚠️
 
+> **Note (2026-10-25):** the dissertation as built does not meet these standards: its
+> [errata](../../analysis/dissertation/ERRATA.md) list retracted headline claims and an audit that
+> found 176 of 290 table units and 30 of 51 figures made up. ADR-020 also relaxed the R-hat bound
+> below to 1.02 for two models. The standards are kept as the bar a corrected build should meet.
+
 **CRITICAL:** `analysis/dissertation/main/main.tex` represents the **GOLD STANDARD** for this project. This is bedrock. This is granite. NO exceptions, NO shortcuts, NO "good enough for now." Every addition must be publication-quality with full rigor and beauty.
 
 ## Bedrock Requirements

@@ -1,5 +1,8 @@
 # Database Migration Consolidation Plan
 
+> **Historical (December 2025): never carried out.** `db/migrations/` is now history and the
+> schema snapshot in `db/schema/` is the bootstrap ([db/README.md](README.md)).
+
 **Date:** December 10, 2025
 **Analyst:** Legacy System Modernization Expert (Claude Sonnet 4.5)
 **Current State:** 70 migration files

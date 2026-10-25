@@ -1,5 +1,9 @@
 # WS4: Ensemble Weight Sensitivity and Bayesian Model Assessment
 
+> **Read with [README.md](README.md) (2026-10-25):** the system map here is right; v2's
+> "validation" numbers are scores on its early-stopping season (retraction ledger C17). Paths
+> cited below are at tag `archive/pre-prune-2026-10`.
+
 **Date:** February 12, 2026
 **Investigator:** Claude Code (Opus 4.6)
 **Status:** COMPLETE

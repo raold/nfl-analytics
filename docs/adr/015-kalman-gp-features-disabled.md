@@ -1,8 +1,15 @@
 # ADR-015: Kalman EPA and GP Injury Features Disabled
 
-**Status:** ACCEPTED
+**Status:** ACCEPTED (on engineering grounds; the performance comparison is invalid)
 **Date:** 2025-12-31
 **Decision Makers:** dro, Claude Code
+
+> **Note (2026-10-24), [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md)
+> rows C16 and C17.** The "negative value" below rests on ADR-014's comparison, which set a
+> test-tuned v2.1 score on 2025 against v2's 2024 early-stopping score; on the same 162 games of
+> 2025 the stored v2 scores 11.09 and the line 10.00. The decision stands on engineering grounds
+> (the GP never trains, see below), not because the features were shown to hurt. Both modules
+> were removed from the tree in the 2026-10 prune; the `feature_weights.yaml` switch remains.
 
 ## Context
 

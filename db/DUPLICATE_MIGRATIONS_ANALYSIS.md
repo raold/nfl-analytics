@@ -1,5 +1,8 @@
 # Duplicate Migration Prefix Analysis
 
+> **Historical (December 2025).** The consolidation it prepared was never done. `db/migrations/`
+> is now history and the schema snapshot in `db/schema/` is the bootstrap ([db/README.md](README.md)).
+
 **Date:** December 10, 2025
 **Purpose:** Detailed analysis of duplicate migration prefixes
 **Status:** Technical deep-dive for consolidation decisions

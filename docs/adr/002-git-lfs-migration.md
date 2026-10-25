@@ -1,7 +1,13 @@
 # ADR-002: Git LFS for Model Artifact Storage
 
-**Status:** Accepted
+**Status:** Accepted; since the 2026-10 prune LFS holds only the three database dumps in `backups/`
 **Date:** 2025-11-14
+
+> **Note (2026-10-25):** the model artifacts this ADR moved to LFS (`.rds`, `.pkl`) were removed
+> in the 2026-10 prune; the patterns remain in `.gitattributes`. The three dumps left in LFS
+> contain the licensed `odds_history` table, so whether they stay public is an owner decision
+> (PROJECT_STATUS). `docs/guides/GIT_LFS_WORKFLOW.md`, cited below, is at tag
+> `archive/pre-prune-2026-10`; [CONTRIBUTING.md](../../CONTRIBUTING.md) has the current LFS rules.
 **Deciders:** Project Team
 **Tags:** infrastructure, version-control, ml-model, storage
 
@@ -346,7 +352,7 @@ Rejected due to excessive complexity with minimal benefits. Submodules are appro
 
 - Git LFS Workflow Guide (`docs/guides/GIT_LFS_WORKFLOW.md`, removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`) - 425-line comprehensive guide
 - Session Summary (no longer in the repo; see [HISTORY](../HISTORY.md)) - Implementation details
-- [CLAUDE.md Infrastructure Section](../../CLAUDE.md#architecture) - Updated infrastructure description
+- [CONTRIBUTING.md](../../CONTRIBUTING.md#data-and-large-files) - current LFS rules (the CLAUDE.md infrastructure section this cited was rewritten in 2026-10)
 
 ### External Resources
 

@@ -6,7 +6,8 @@
 
 > **Correction:** The 40.20 → 4.70 MAE improvement below did not survive. The Dec 23, 2025 final
 > validation found the v4 residual features leaked the target: the honest MAE was 59.14 (47% worse
-> than baseline) and v4 was permanently disabled. Kept for the record; do not cite the numbers below.
+> than baseline) and v4 was permanently disabled. Kept for the record; do not cite the numbers below
+> (retraction ledger C44). The v4 code and models were removed in the 2026-10 prune.
 **Tags:** ml-model, feature-engineering, xgboost, prediction-accuracy
 
 ---

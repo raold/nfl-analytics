@@ -2,8 +2,16 @@
 
 > Renumbered 2026-10-24: formerly `docs/decisions/ADR-002`. Existing `docs/adr/` numbers were kept because the dissertation cites them.
 
-**Status:** ✅ ACCEPTED
+**Status:** ACCEPTED; its ROI figures are projections
 **Date:** November 9, 2025
+
+> **Note (2026-10-24), [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md)
+> rows C09, C10 and C13.** The "+1-1.5% ROI" and "Sharpe ≥ 2.3" figures below are projections,
+> never measured against betting lines: the database holds no prop lines (C10). The two models this
+> ADR admitted (Hierarchical v2, Informative Priors v2) take each game's own pass attempts as an
+> input, so their accuracy is not a forecast (C09, C13). The R-hat < 1.02 rule itself is a
+> convergence judgment and is unaffected. The R models were removed in the 2026-10 prune (tag
+> `archive/pre-prune-2026-10`).
 **Decision Makers:** Research Team + Production Deployment
 **Supersedes:** Original Rhat < 1.01 criterion
 

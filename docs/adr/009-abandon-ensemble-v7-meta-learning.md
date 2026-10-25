@@ -1,7 +1,14 @@
 # ADR-009: Abandon Ensemble v7.0 Meta-Learning Architecture
 
-**Status**: ACCEPTED
+**Status**: ACCEPTED (the decision stands; its baseline numbers do not)
 **Date**: 2025-11-18
+
+> **Note (2026-10-24), [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md)
+> row C14.** The v6 baseline's "34.00 yards MAE (2022-2024), proven production" is in sample: its
+> components were trained on 2018-2024 (ADR-007's window), and its props components take each
+> game's own pass attempts as an input (C09, C13). Both the v6 and v7 code were removed in the
+> 2026-10 prune (v7: `research/failed_v7/` at tag `archive/pre-prune-2026-10`). Rejecting v7 for
+> showing no improvement is unaffected.
 **Decision Maker**: ML Team
 **Deciders**: Claude Code (Analysis), User (Approval)
 

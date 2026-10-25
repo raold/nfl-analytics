@@ -2,6 +2,10 @@
 
 **Status:** Accepted
 **Date:** 2025-11-09
+
+> **Note (2026-10-25):** the BNN code and models were removed from the tree; tag
+> `archive/bnn-2025-11` marks where the research stopped, and `archive/pre-prune-2026-10` has the
+> files cited below.
 **Deciders:** Project Team
 **Tags:** ml-model, research, bayesian-neural-network, strategic-decision
 

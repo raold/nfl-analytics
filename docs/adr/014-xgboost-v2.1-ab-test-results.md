@@ -1,8 +1,17 @@
 # ADR-014: XGBoost v2.1 A/B Test Results (Kalman EPA + GP Injury)
 
-**Status:** COMPLETED - v2.1 REJECTED (but Docker fix validated)
+**Status:** COMPLETED - v2.1 REJECTED (but Docker fix validated); the comparison is invalid
 **Date:** 2025-12-28 (updated: 2025-12-31)
 **Decision Makers:** dro, Claude Code
+
+> **Retracted comparison (2026-10-24), [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md)
+> rows C16 and C17.** "v2.1 10.70 vs v2 10.45" compares different seasons and tuned models on the
+> test set. v2.1 was early-stopped on its 2025 test games, so 10.70 is not a holdout score; 10.45
+> is v2's early-stopping score on 2024 (its booster's `best_score` is 10.449868), not a 2025
+> result. On the same 2025 games (weeks 3-13, n = 162) the stored v2 predictions score 11.09 and
+> the closing line 10.00. Nothing here shows the Kalman/GP features hurt or help; disabling them
+> (ADR-015) rests on engineering grounds. The rest correlation cited below (r = 0.1698) is the
+> sign bug (C15). The training scripts are at tag `archive/pre-prune-2026-10`.
 
 ## Context
 

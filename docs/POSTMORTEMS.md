@@ -2,6 +2,24 @@
 
 This document tracks significant errors, their root causes, and lessons learned. Honest documentation of failures prevents repeat mistakes and improves project quality.
 
+| § | Failure | Found |
+|---|---|---|
+| 1 | Ensemble v7.0 validation failure | 2025-11-18 |
+| 2 | Incremental XGBoost compared against a mean predictor | 2025-11-12 |
+| 3 | State-space v2 model loading bug | 2025-11-13 |
+| 4 | Spread sign convention | 2026-10-24 |
+| 5 | XGBoost v3 performance regression | 2025-11-14 |
+| 6 | Kickoff times stored as Eastern wall clock labelled UTC | 2026-10-24 |
+| 7 | Odds backfill: mistimed requests and two matcher bugs | 2026-10-24 |
+| 8 | Dissertation tables and figures with no source | 2026-10-24 |
+| 9 | Semantic features read with look-ahead | 2026-10-24 |
+| 10 | A simulated semantic A/B committed as a result | 2026-10-24 |
+
+Sections 1-3 are kept as written in November 2025, with notes where later findings changed their
+conclusions. Files they cite that are no longer in the tree are at tag `archive/pre-prune-2026-10`
+or `docs-archive-2026-10` (see [HISTORY.md](HISTORY.md)); a few were never committed. The project's overall result: no model beats the closing line
+([final evaluation](investigations/2026-10-final-evaluation/README.md)).
+
 ---
 
 ## 1. Ensemble v7.0 Validation Failure (November 18-19, 2025)
@@ -55,9 +73,17 @@ This document tracks significant errors, their root causes, and lessons learned.
 
 ### Full Postmortem
 
-See: `docs/postmortems/ENSEMBLE_V7_VALIDATION_FAILURE_NOV18.md` (14,000+ lines)
+See: `docs/postmortems/ENSEMBLE_V7_VALIDATION_FAILURE_NOV18.md` (14,000+ lines). That file was
+never committed; the session notes are `docs/archive/2025_nov/SESSION_NOV18_V7_VALIDATION_COMPLETE.md`
+in tag `docs-archive-2026-10`, and the v7 code and docs are `research/failed_v7/` in tag
+`archive/pre-prune-2026-10`.
 
 **Status**: ✅ CLOSED - v7.0 terminated, v6.0 approved for production
+
+> **Later finding (2026-10-24):** the v6.0 baseline this compared against was itself evaluated in
+> sample (its components were trained on 2018-2024), and the props models condition on each
+> game's own pass attempts (retraction ledger C09, C13, C14). The v7 decision stands; the v6.0 MAE
+> figures do not. The v6 props ensemble was removed in the 2026-10 prune.
 
 ---
 
@@ -331,6 +357,14 @@ CLAIM DOCUMENTATION REQUIREMENTS:
 **Hybrid Model Status:** Production-ready pending A/B test
 **Expected Deployment:** Week 2-3 (after 50-game validation)
 
+> **Later finding (2026-10-24):** the hybrid's 38.03 vs 39.66 MAE is an optimistic point
+> estimate: the 70/30 mix was picked among eight approaches on the same 2022-2024 test seasons, and
+> `scripts/validate_hybrid_model.py` kept only quarterbacks with at least 100 passing yards in the
+> game (`HAVING SUM(p.passing_yards) >= 100`), a filter on the outcome. The p-values in ADR-008
+> were computed on the seasons used to pick the mix, so they overstate the evidence. The hybrid
+> was never deployed, and its code was removed in the 2026-10 prune. The +21% retraction above
+> stands (ledger C43).
+
 ---
 
 ## 3. State-Space v2 Model Loading Bug (November 13, 2025)
@@ -599,6 +633,10 @@ verify_and_extract <- function(draws_obj, param_name) {
 4. Update ensemble integration plan
 5. Begin A/B testing with 2025 season data
 
+> **Later finding (2026-10-24):** the loading fix stands. The MAEs above (42.30, 42.24, 48.09)
+> come from models that use the predicted game's own pass attempts, so they are not forecasts
+> (ledger C09, C13). The R models were removed in the 2026-10 prune.
+
 ---
 
 ## 4. Spread Sign Convention (found October 24, 2026)
@@ -639,13 +677,15 @@ pooled home cover rate (~49% correct vs ~56% with the bug).
 - All label/evaluation sites now call the helper; `db/migrations/104_fix_spread_cover_sign.sql`
   recreates the two views.
 - Pre-commit hook `spread-sign-convention` rejects `margin/score + spread_close|spread_line|vegas_spread`.
-- Meta-labeling models now carry `label_convention`; `load_model()` refuses older models.
+  (Widened on 2026-10-25 and run in CI; see "Sites found after the first fix" below.)
+- Meta-labeling models now carry `label_convention`; `load_model()` refuses older models. (The
+  meta-labeling code was removed in the 2026-10 prune.)
 - Deleted `scripts/backfill_sportsbook_lines.py`, which wrote EPA-derived placeholder lines into
   `games.spread_close` for 94 games (2025 weeks 12–18, Nov 21, 2025) and mapped them to inverted
   moneylines. The weekly ingest re-inserts the current season from nflverse, so later ingests
-  should have replaced them — verify before trusting 2025 market comparisons.
+  should have replaced them. (Verified: see below.)
 
-### Verification once the database is up
+### Verification queries
 
 ```sql
 -- 1. Convention: home moneyline favorites should almost always have spread_close > 0
@@ -663,7 +703,59 @@ FROM games WHERE season BETWEEN 2020 AND 2025 AND home_score IS NOT NULL
 The retraction itself reproduces offline:
 `uv run python -m nfl_analytics.evaluation.market_benchmark --baseline power_ratings --market-csv data/historical_weather_2018_2024.csv --seasons 2019-2024`.
 
+### Verified on the database (2026-10-25, read-only)
+
+| Check | Result |
+|---|---|
+| Query 1: share of home moneyline favorites (2015+, nonzero line) with `spread_close` > 0 | 0.972 (1,886 of 1,940; the 54 exceptions are all within 1.5 points), corr = -0.953 |
+| Query 2: pooled home cover 2020-2025 | 0.4994 correct, 0.5572 under the old rule (n = 1,660 decided games) |
+| Pooled home cover 1999-2025 | 3,473 of 7,081 decided games = 0.4905 (195 pushes); `mart.game_summary` gives the same 0.4905 since migration 104 was applied on 2026-10-24 (22:41 UTC) |
+| The Nov 2025 placeholder lines | gone: `spread_close` equals nflverse `spread_line` for all 285 games of 2025, and for all 7,276 games of 1999-2025 |
+
+### Sites found after the first fix
+
+The salvage sweep of 2026-10-24 found the old rule in places the first fix had not reached,
+mostly where the expression was aliased (`margin = ...; spread = ...; margin + spread > 0`) and so
+passed the hook:
+
+- **State-space model.** `StateSpaceRatings.predict_prob_ats` (`nfl_analytics/models/state_space.py`)
+  returned Φ((μ + spread)/σ), and `evaluate_model` graded with margin + spread. It produced the
+  `state` column of `analysis/results/multimodel_predictions.csv`, and with it every State and
+  State-ensemble row of the dissertation's 2004-2024 multimodel and betting tables, plus the
+  state-space "84.6% / 74.7% ATS" (ledger C18). The published column correlates +0.795 with
+  `spread_close`, where a cover probability should be nearly uncorrelated with the line. Fixed on
+  2026-10-24 to Φ((μ − spread)/σ) through `model_edge`, pushes excluded, with pinned-game tests
+  (`tests/unit/test_state_space_sign.py`); the regrade is in
+  [walkforward_2004_2024.md](investigations/2026-10-final-evaluation/walkforward_2004_2024.md)
+  (state alone: Brier 0.3197 → 0.2749, ATS 49.8% → 50.6%).
+- **The live views.** `mart.game_summary` and `mv_betting_features` kept the old rule until
+  migration 104 was applied on 2026-10-24.
+- **Backtests.** `nfl_analytics/backtests/realistic_backtest.py` and `game_outcome_backtest.py`
+  graded `(margin + spread) > 0` through aliases. The stored outcomes of
+  `models/ensemble/backtest` ("76.8%" on 910 trades) and `models/ensemble/realistic_backtest`
+  ("63.2%" on 796) follow the old rule; regraded they are 62.5% (still impossible: the predictions
+  use same-season data) and 49.5% (ledger C20, C21).
+- **Elsewhere:** the reinforcement-learning rewards in `data/rl_logged.csv` (ledger C41), the
+  teaser modules and notebook (C40), Quarto notebooks the hook did not scan (for example
+  `notebooks/10_model_spread_xgb.qmd`: `if_else(margin + spread_close > 0, 1, 0)`), and the
+  triggers of migration 048 (`actual_spread + sportsbook_spread`, fixed in the file on 2026-10-25;
+  the table they serve does not exist in devdb01). Sibyl's NFL backtest, in its own repository,
+  copies the old rule (`backups/local/SIBYL_HANDOFF_2026-10-24.md`).
+- **As-of features.** `prev_spread_close` in `asof_features.py` was the home line for both teams;
+  it is now taken from each team's side (+line at home, −line away).
+
+Apart from the state-space model, the as-of builder and the migration files, all of the code
+above was removed in the 2026-10 prune (tag `archive/pre-prune-2026-10`). The hook was widened on
+2026-10-25 to the aliased
+`margin + spread` forms, `margin > -spread_close`, favorites taken from `spread_close < 0` and
+`total/2 - spread/2` home means, over `.py`, `.R`, `.sql`, `.qmd` and `.Rmd` files. It runs in CI
+(the temporal-safety job), and a line that reproduces the old rule on purpose carries
+`# sign-ok: <reason>`.
+
 ### Left as-is (fix on next retrain)
+
+*Status 2026-10-24: every item below was removed in the prune together with the models that used
+it; none remains in the tree.*
 
 These **features** encode the sign inverted, but training and inference share the same code, so
 stored models are internally consistent. Flipping them without retraining would break inference:
@@ -685,10 +777,161 @@ stored models are internally consistent. Flipping them without retraining would 
 3. **A stable edge across seasons is a bug signal**: real edges are noisy; 72–77% every year is
    arithmetic, not skill.
 4. **Fix the class, not the instance**: the two earlier local fixes left ~20 copies behind.
+5. **Make the guard match the bug, and run it in CI**: the first hook matched only the literal
+   expression, and it ran only on machines that had installed pre-commit.
 
 ---
 
-**Last Updated:** October 24, 2026
+## 5. XGBoost v3 Performance Regression (November 14, 2025)
+
+Folded in from `docs/postmortems/XGBOOST_V3_PERFORMANCE_REGRESSION.md` (full text at tag
+`archive/pre-prune-2026-10`).
+
+**What happened.** XGBoost v3 for passing yards added opponent-strength features (Sagarin-style
+defensive ratings) to v2 and got worse: validation MAE 42.86 against 40.20 for v2 (+6.6%); the
+three new features ranked last of 16 in importance. It was not deployed.
+
+**Root cause.** The opponent-strength features had been generated for 2018-2024 only, but the
+model trained on 2016-2024, so 35% of the training rows were missing them and were filled with
+the median. The postmortem blamed EPA being unavailable before 2018; that part is wrong: `plays`
+has EPA for 98.9% of the 2016-2017 plays (checked 2026-10-25). The feature file simply had not
+been built for those seasons.
+
+**Fix then.** v3.1 trained on 2018-2024 only, behind a coverage audit that blocks training when a
+feature is non-missing in less than 80% of rows.
+
+**Lessons.** Audit feature coverage after the join and before training; align the training
+window with the features' availability; median-filling a feature that is missing by design adds
+noise, not signal.
+
+---
+
+## 6. Kickoff Times Stored as Eastern Wall Clock Labelled UTC (found October 24, 2026)
+
+**What happened.** `games.kickoff` is a `timestamptz`, but the ingest wrote the nflverse Eastern
+wall-clock time into it as if it were UTC. For 2000-2024 every kickoff was 4-5 hours early as an
+instant (`2018_01_BUF_BAL`: stored `13:00+00`, true `17:00` UTC, 1 pm EDT); 2025 rows held only the
+date, at midnight Eastern (`2025_01_DAL_PHI`: stored `2025-09-04 04:00+00`, true `2025-09-05
+00:20` UTC); 1999 had no time (nflverse has none).
+
+**Impact.** Code that read hours, weekdays or dates as UTC from these values happened to get the
+Eastern wall clock for 2000-2024, so most features were right by accident; 2025 had no hours at
+all, so every 2025 primetime flag was 0. Anything that compared instants was wrong: the odds
+backfill timed its requests from these values (§7).
+
+**Repair (2026-10-24).** `kickoff` was rebuilt for 2000-2025 (7,017 games) from nflverse `gameday`
+and `gametime` read as America/New_York; it now matches nflverse for every game, and read back in
+Eastern time it equals the old stored value for all 6,732 games of 2000-2024 (both checked
+2026-10-25). Code derives hours, weekdays, dates and rest days with
+`kickoff AT TIME ZONE 'America/New_York'` or `nfl_analytics/features/kickoff_time.py`. The
+before-image is `backups/local/games_before_repair_20261024.csv`; it is needed to reconstruct the
+odds request times. Left as published upstream: 102 games of 2000-2005 (97 on Mondays) are listed
+by nflverse at 09:00 ET and are almost certainly 21:00 ET.
+
+**Lessons.** Store true instants and derive local time explicitly; check a few famous kickoffs
+(a Super Bowl is 18:30 ET) after any load; a feature that is right only because two errors cancel
+breaks as soon as one of them is fixed.
+
+---
+
+## 7. Odds Backfill: Mistimed Requests and Two Matcher Bugs (December 2025; found October 24, 2026)
+
+**What happened.** `scripts/backfill_historical_odds.py` filled `public.odds_history` from The Odds
+API's historical endpoint in one run (2025-12-07/08) for 2020-2024. It made two requests per game
+date and stored their names as `market_type`: "closing" 30 minutes before the day's earliest
+stored kickoff, and "opening" at 14:00 UTC. With the kickoffs of §6, "closing" fell 4.5 (EDT) or
+5.5 (EST) hours before the first kickoff, and for a 1 pm ET slate it came before "opening".
+Neither label is an opening or a closing line.
+
+Matching the API's events to `games` then lost two groups of games. The script mapped "Los
+Angeles Rams" to `LAR` while `games` uses `LA`, and it compared the API's UTC commence date with
+the stored Eastern date, so games that start on the next UTC date (20:00 EDT / 19:00 EST or
+later) failed to match. In 2020-2024: Rams games 0 of 93 matched, other next-UTC-date games 10 of
+264, all other games 1,051 of 1,051 (query run 2026-10-25). The API had returned these games; the
+matcher discarded them.
+
+**Impact.** Game Outcome v2's line-movement inputs, its leading features by total gain, are
+averages of these mistimed snapshots; they are missing for Rams and night games, and the table
+has no 2025 or 2026 snapshots, so for every 2025 game they sat at their defaults
+([model README](../models/production/game_outcome_v2/README.md)).
+
+**Repair (2026-10-24).** Without new API calls, the request times were reconstructed from the
+script's logic and the pre-repair kickoffs, and the rows were cleaned into a private panel
+(`backups/local/odds_history_panel/`, licensed). The aggregate results are in
+[investigations/2026-10-line-movement/](investigations/2026-10-line-movement/README.md). Refilling
+the missing games would need paid quota and a fixed matcher.
+
+**Lessons.** Map keys through the target table's own codes (`team_mapping`), compare instants
+rather than dates, and count matched and unmatched rows per group after every backfill. Name a
+snapshot by when it was taken, not by what it was meant to be.
+
+---
+
+## 8. Dissertation Tables and Figures with No Source (found October 24, 2026)
+
+**What happened.** The full audit in
+[ERRATA.md](../analysis/dissertation/ERRATA.md#full-audit-of-tables-and-figures-2026-10-24) traced
+every table and data figure in the dissertation build: 176 of the 290 table units and 30 of the 51
+figure entries have made-up numbers, 11 more tables have made-up cells, and 63 tables are computed
+from real data with a bug.
+
+**How.** Generators that read no data (`scripts/utils/generate_missing_tables.py`, "synthetic but
+realistic data"; a zero-bet-weeks generator that produced "plausible" statistics; 29 of the "40
+experiments" returning literal metrics; ledger C33-C35), numbers typed straight into `.tex`,
+simulated or noise-expanded inputs, mock placeholders that were never replaced, and targets
+written up as results. Nothing recorded which script, input and commit made each table, numbers
+were copied between chapters, and no number had to pass a plausibility check. ERRATA §1 has the
+full account.
+
+**Now.** The chapters are unchanged; ERRATA.md and `ERRATA_audit.csv` list every unit with its
+verdict and evidence. Most generators that made numbers up were removed in the prune;
+`scripts/generate_gnn_calibration_plot.py`, which draws its figure from random noise, is still in
+the tree as dissertation tooling (ERRATA P46).
+
+**Lessons.** Every table comes from a committed script that reads committed data and names its
+generator, inputs and commit in the file header; simulations and projections say so in the
+caption; a number that would be a headline gets graded by `market_benchmark` first.
+
+---
+
+## 9. Semantic Features Read with Look-Ahead (December 2025; found October 24, 2026)
+
+**What happened.** `GameFeatureExtractor` called the semantic (LLM news) extractor without a
+prediction time, so the extractor used `datetime.now()`. The 38 `sem_*` values of any past game
+reflected the news available when the features were extracted: for Game Outcome v2's 2022-2024
+training rows, December 2025. The A/B result that promoted v2 ("+4.6% win accuracy") used those
+inputs (retraction ledger C24). Separately, `public.semantic_news` holds 66 ESPN items published
+2026-02-10 to 2026-02-14 (some about Super Bowl LX) stamped season 2024, week 1: the same pattern,
+consistent with Sibyl's news ingest, which stamps current articles with whatever season and week
+it is given.
+
+**Now.** The semantic group was removed from the extractor on 2026-10-24 and
+`nfl_analytics/semantic/` in the prune; v2 zero-fills those inputs and cannot be retrained (no
+point-in-time news history exists).
+
+**Lessons.** Every feature query takes the prediction time as a parameter, and a test checks a
+game whose outcome is known only after that time; "as of now" is never a default.
+
+---
+
+## 10. A Simulated Semantic A/B Committed as a Result (December 21, 2025; found October 24, 2026)
+
+**What happened.** `scripts/ab_test_semantic_features.py` built its "baseline predictions" by
+copying each game's true cover label and flipping each one with probability 0.251, to hit the
+retracted 74.9% "baseline accuracy", and its "semantic" arm reset a random subset of games to the
+true label. Its output, `data/semantic_ab_test_results.json` (75.4% vs 75.9%, +43.9% ROI,
+p = 3.4e-11), was committed as a result in 63c53a8. The other semantic A/B numbers are no better:
+`scripts/ab_test_semantic_2025.py` compared a prediction with itself, the quick A/B's control was
+a constant +2.5, and the dissertation's 58.5% → 51.8% (p = 0.21) has no artifact behind it
+(ledger C23, C25).
+
+**Now.** Both files were removed in the prune (tag `archive/pre-prune-2026-10`). No valid test of
+the semantic features exists.
+
+**Lessons.** A simulation's file name and output say that it is a simulation; simulated output
+never goes under `data/` or into a results table.
+
+---
+
+**Last Updated:** October 25, 2026
 **Author:** NFL Analytics Research Team
-**Reviewers:** Claude Code (Sonnet 4.5)
-**Next Review:** After major incident or quarterly

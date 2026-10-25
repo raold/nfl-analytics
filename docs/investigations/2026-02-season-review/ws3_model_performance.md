@@ -1,5 +1,9 @@
 # WS3: Model Performance Deep Dive
 
+> **Read with [README.md](README.md) (2026-10-25):** "correct side 52.1%" is straight-up side
+> accuracy (v2's ATS record is 139-145-1, 48.9%), and the rest-differential result is the spread
+> sign bug (retraction ledger C15, C26).
+
 **Date:** 2026-02-12
 **Investigator:** Claude Code (Systematic Investigation)
 **Status:** COMPLETE

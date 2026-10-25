@@ -1,5 +1,10 @@
 # WS6: Props Pipeline Viability Assessment
 
+> **Read with [README.md](README.md) (2026-10-25):** the v6 ensemble predicts player passing
+> yards, not games (the paragraph after the list below has it backwards); the XGBoost props v1
+> MAE uses the predicted game's own data (retraction ledger C37). The props code and models cited
+> below were removed in the 2026-10 prune (tag `archive/pre-prune-2026-10`).
+
 **Date:** February 12, 2026
 **Investigator:** Claude Code (Opus 4.6)
 **Status:** PIPELINE NOT VIABLE -- Requires significant rebuild

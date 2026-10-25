@@ -1,5 +1,11 @@
 # Database Optimization Quick Reference
 
+> **Historical (November 2025).** The "critical indexes" below do not exist in today's devdb01
+> (checked 2026-10-25), and `docs/DATABASE_OPTIMIZATION_COMPLETE.md` is in tag
+> `docs-archive-2026-10`. The read-only SQL files it runs (`db/health_check.sql`,
+> `db/monitoring_queries_performance.sql`) are still here. For maintenance now see
+> [db/README.md](README.md).
+
 **Date:** November 13, 2025
 
 ---

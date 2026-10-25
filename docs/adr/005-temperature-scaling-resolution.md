@@ -1,7 +1,11 @@
 # ADR-005: Temperature Scaling Resolution
 
-**Status:** Accepted
+**Status:** Superseded (2026-10): the v6 props ensemble and its calibration files were removed
 **Date:** 2025-11-23
+
+> **Note (2026-10-25):** the v6 ensemble this calibrated predicted passing yards with components
+> that take each game's own pass attempts as an input (retraction ledger C09, C13), so its
+> calibration says nothing about forecasts. Its code is at tag `archive/pre-prune-2026-10`.
 **Deciders:** Project Team
 **Tags:** ml-model, calibration, production, infrastructure
 

@@ -1,7 +1,15 @@
 # ADR-010: Synthetic Features Addition (December 9, 2025)
 
-**Status:** Accepted
+**Status:** Accepted; the numbers that motivated it are retracted
 **Date:** 2025-12-09
+
+> **Retracted numbers (2026-10-24), [retraction ledger](../investigations/2026-10-final-evaluation/retraction_ledger.md)
+> rows C12 and C09.** "54.5% spread accuracy" (with +4.0% ROI) was an in-sample figure with no
+> generating script, credited to a v6 ensemble that predicts passing yards, not spreads (C12). The
+> 44.25 props MAE uses each game's own pass attempts (C09). The expected gains in "Consequences"
+> are projections. The game model that carries the synthetic features, Game Outcome v2, lost to
+> the closing line in 2025: MAE 11.05 against 9.67, ATS 48.9% (C02-C04), and its 12 `syn_*`
+> inputs are now zero-filled because their query fails (`models/production/game_outcome_v2/README.md`).
 **Deciders:** Project Team
 **Tags:** feature-engineering, research-driven, ml-model, ensemble-enhancement
 
