@@ -61,9 +61,9 @@ off-machine backup (item 5).
    `46a9645`, which public `origin/main` contains) and so in GitHub's LFS storage. Taking it out of
    public reach needs a history rewrite (`git filter-repo`, re-created tags, a force-push) and
    GitHub Support to delete the LFS object, or a private repository.
-   `analysis/dissertation/main/main.pdf` is an ordinary git file, not LFS, and carries the
-   retracted and made-up claims: replace it with a corrected build, untrack it, or keep it next to
-   the errata. Its old versions stay in history unless that is rewritten too.
+   `analysis/dissertation/main/main.pdf`, an ordinary git file that carries the retracted and
+   made-up claims, was untracked on 2026-10-25; its old versions stay in history unless that is
+   rewritten too.
 5. **Owner housekeeping.** `backups/local/` (gitignored) holds the only dumps of the repaired
    database, the before-image of the repair, the 2025-12-08 odds dump and the salvage-session
    evidence. The off-machine backup of that directory, disk and container clean-up, and the raw

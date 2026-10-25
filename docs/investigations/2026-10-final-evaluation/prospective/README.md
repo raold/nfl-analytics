@@ -132,9 +132,15 @@ any time. A git commit date is also set locally and proves nothing. The record b
 by a third party only once the files, or their digests, are published somewhere that records when
 it received them, before the games kick off. Pushing a commit with this directory to GitHub would
 do it, since GitHub logs when each push arrives (the repository's Activity view). Posting the
-`SHA256SUMS` digests publicly would also work. Whether to publish before the next kickoff,
-2026-10-25 09:30 ET, is the owner's decision. A game that kicks off before publication still has
-a prediction on file, but it does not count as prospective evidence for anyone else.
+`SHA256SUMS` digests publicly would also work.
+
+**Published 2026-10-25 07:37:53 UTC**, 5 h 52 min before the first of these games kicked off.
+That is when GitHub recorded the creation of branch `repair/2026-10` in the public repository
+(repository Activity view; `gh api repos/raold/nfl-analytics/events` while the event is still
+listed). The branch contained this directory as committed in `c01e10b`; the four CSV files and
+`SHA256SUMS` have not changed since. Pull request #24 for that branch was opened at 07:38:50 UTC
+and merged into `main` at 07:47:16 UTC. Every game in the four files therefore counts as
+prospective.
 
 ## Grading after the games
 

@@ -215,10 +215,10 @@ games of 2026 weeks 7 and 8 that had not kicked off, made with market_benchmark'
 before the first of them (`2026_07_PIT_NO`, 13:30 UTC). `prospective/SHA256SUMS` pins the four
 files. Rerunning predict mode on the same input into another directory reproduces every column
 except `prediction_timestamp` (checked on 2026-10-25 at about 02:00 UTC). They are baselines
-with no claimed edge, and they only become third-party evidence once the files or their digests
-are published before kickoff. [`prospective/README.md`](prospective/README.md) lists the
-predictions and how to grade them, including closing-line value against the line at prediction
-time.
+with no claimed edge. They were published on GitHub at 2026-10-25 07:37:53 UTC, before any of
+the games kicked off, so all 27 count as prospective. [`prospective/README.md`](prospective/README.md)
+lists the predictions and how to grade them, including closing-line value against the line at
+prediction time.
 
 ## Related write-ups
 

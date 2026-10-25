@@ -8,9 +8,10 @@
 > from 2025-12-07, and their `odds_history` table is empty. The 2025-12-08 dump, the only one with
 > the licensed `odds_history` rows (117,266), was untracked on 2026-10-25 and moved to the private
 > `backups/local/`; it stays in history and in GitHub's LFS storage until purged, which is an owner
-> decision ([PROJECT_STATUS](../../PROJECT_STATUS.md), item 4). `analysis/dissertation/main/main.pdf`
-> is an ordinary git file, not LFS. `docs/guides/GIT_LFS_WORKFLOW.md`, cited below, is at tag
-> `archive/pre-prune-2026-10`; [CONTRIBUTING.md](../../CONTRIBUTING.md) has the current LFS rules.
+> decision ([PROJECT_STATUS](../../PROJECT_STATUS.md)). `analysis/dissertation/main/main.pdf` was
+> an ordinary git file, not LFS; it is untracked since 2026-10-25. `docs/guides/GIT_LFS_WORKFLOW.md`,
+> cited below, is at tag `archive/pre-prune-2026-10`; [CONTRIBUTING.md](../../CONTRIBUTING.md) has
+> the current LFS rules.
 **Deciders:** Project Team
 **Tags:** infrastructure, version-control, ml-model, storage
 

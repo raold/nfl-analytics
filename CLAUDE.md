@@ -162,8 +162,8 @@ logs, `docs-archive-2026-10`. Module map:
 
 Source `analysis/dissertation/main/main.tex`; build with
 `cd analysis/dissertation/main && latexmk -pdf -interaction=nonstopmode main.tex` (a clean copy
-built on 2026-10-25: exit 0, 721 pages; the tracked `main.pdf` from 2026-02-12 has 722, and a build
-in place overwrites it; `main.toc`, `main.lof` and `main.lot` are untracked since 2026-10-25). The
+built on 2026-10-25: exit 0, 721 pages; `main.pdf`, `main.toc`, `main.lof` and `main.lot` are build
+outputs, untracked since 2026-10-25; the last committed PDF, from 2026-02-12, is in history). The
 text was not corrected: [ERRATA.md](analysis/dissertation/ERRATA.md) records what is wrong,
 including the full audit of every table and figure (176 of 290 table units (170 printed tables)
 and 30 of 51 figure entries (28 figures) made up, 63 table units computed from real data with a

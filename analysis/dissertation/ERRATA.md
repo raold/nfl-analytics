@@ -14,7 +14,8 @@ No chapter has been edited. This file records what is wrong in the dissertation 
   progress in the working tree when this was written). The October 2026 prune removes most of
   these scripts from the tree; they remain at tag `archive/pre-prune-2026-10` (`c01e10b`, which
   contains `5c597af`), and the full audit below cites them there.
-- **The PDF.** `main/main.pdf` (tracked, 6.6 MB, built at `412be16`) contains every error below.
+- **The PDF.** `main/main.pdf` (6.6 MB, built at `412be16`) contains every error below. It was
+  untracked on 2026-10-25, so the public tip no longer serves it; its old versions stay in history.
 - **Numbers.** Values in the "Corrected" column were recomputed for this file on 2026-10-24,
   from tracked files or from the dev database after that day's repair of `games.game_type` and
   `games.kickoff` (scores and lines were not touched and match nflverse for all 7,276 games
@@ -709,7 +710,7 @@ Nothing below has been done. The order is roughly by impact.
 **Build**
 
 - [ ] Fix the overfull boxes the codemod introduced (a scratch build of the current sources logs 100 overfull `\hbox` warnings against 87 in the February log; use `\path{}` or `\allowbreak` for long `\texttt` paths).
-- [ ] Decide what to do with `main/main.pdf`: replace it with a corrected build that carries this errata, or untrack it and publish builds as release assets. (The generated `main/main.toc`, `main/main.lof` and `main/main.lot` were untracked on 2026-10-25.)
+- [x] Decide what to do with `main/main.pdf`: untracked on 2026-10-25 with `main.toc`, `main.lof` and `main.lot` (build outputs). A corrected build could later be published as a release asset.
 - [ ] Optionally add a CI job that runs `latexmk` (no workflow builds the dissertation today).
 - [ ] Remove `fig:evidential_uncertainty` (flagged above), or at least seed its 30 random TikZ points: `figures/evidential_uncertainty_decomposition.tex:74-75` calls `rand` with no `\pgfmathsetseed`, so every build draws different points and no two builds give byte-identical PDFs.
 - [ ] Remove the five `\IfFileExists` guards whose files were never committed (`chapter_04_baseline_modeling.tex:29`, `:40`, `:51`, `:66`; `chapter_07_uncertainty_risk_betting.tex:203`), or generate their files, so that missing content is visible.

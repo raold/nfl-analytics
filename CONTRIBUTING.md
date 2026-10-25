@@ -32,8 +32,8 @@ kickoff time zone and the database rules there apply to every change.
 
 - Git LFS (`.gitattributes`) tracks `backups/*.dump`, `models/**/*.rds` and `models/**/*.pkl`;
   at present it holds only the two 2025-12-07 database dumps in `backups/` (their `odds_history`
-  table is empty). Other binaries, `analysis/dissertation/main/main.pdf` among them, are regular
-  git blobs; keep them small.
+  table is empty). Other binaries are regular git blobs; keep them small. The dissertation PDF
+  is a build output and is not tracked (since 2026-10-25); build it with `latexmk`.
 - Do not commit generated outputs, database dumps or row-level odds. `public.odds_history` is
   licensed from The Odds API and must not be redistributed: private exports go to
   `backups/local/` (gitignored).
