@@ -5,6 +5,7 @@ uses only games from earlier weeks, so these are honest yardsticks for any model
 
 from __future__ import annotations
 
+import inspect
 import math
 from collections import defaultdict
 
@@ -63,21 +64,36 @@ def elo_walkforward(
     hfa_elo: float = 48.0,
     revert: float = 1 / 3,
     points_per_elo: float = 1 / 25,
+    mean_rating: float = 1505.0,
 ) -> pd.Series:
     """Elo with a margin-of-victory multiplier and preseason reversion to the mean."""
+    return _elo_walkforward(market, k, hfa_elo, revert, points_per_elo, mean_rating)[0]
+
+
+def _elo_walkforward(
+    market: pd.DataFrame,
+    k: float,
+    hfa_elo: float,
+    revert: float,
+    points_per_elo: float,
+    mean_rating: float,
+) -> tuple[pd.Series, pd.Series]:
+    """Expected home margin and home win probability (the Elo expectation) for every row."""
     df = market.sort_values(["season", "week", "game_id"])
-    elo: dict[str, float] = defaultdict(lambda: 1505.0)
+    elo: dict[str, float] = defaultdict(lambda: mean_rating)
     preds = pd.Series(np.nan, index=df.index, name="pred_home_margin")
+    probs = pd.Series(np.nan, index=df.index, name="pred_home_win_prob")
     current_season = None
 
     for (season, _week), wk in df.groupby(["season", "week"], sort=True):
         if season != current_season:
             for team in list(elo):
-                elo[team] = elo[team] * (1 - revert) + 1505.0 * revert
+                elo[team] = elo[team] * (1 - revert) + mean_rating * revert
             current_season = season
         for idx, g in wk.iterrows():
             diff = elo[g["home_team"]] + hfa_elo - elo[g["away_team"]]
             preds[idx] = diff * points_per_elo
+            probs[idx] = 1 / (1 + 10 ** (-diff / 400))
         for _, g in wk.iterrows():
             diff = elo[g["home_team"]] + hfa_elo - elo[g["away_team"]]
             expected = 1 / (1 + 10 ** (-diff / 400))
@@ -89,7 +105,7 @@ def elo_walkforward(
             elo[g["home_team"]] += shift
             elo[g["away_team"]] -= shift
 
-    return preds.reindex(market.index)
+    return preds.reindex(market.index), probs.reindex(market.index)
 
 
 BASELINES = {
@@ -97,3 +113,18 @@ BASELINES = {
     "power_ratings": power_ratings_walkforward,
     "elo": elo_walkforward,
 }
+
+
+def baseline_params(name: str) -> dict:
+    """The constants a baseline runs with (its keyword defaults), for provenance records."""
+    params = list(inspect.signature(BASELINES[name]).parameters.values())[1:]
+    return {p.name: p.default for p in params}
+
+
+def baseline_predictions(name: str, market: pd.DataFrame) -> pd.DataFrame:
+    """``pred_home_margin`` for every row of ``market``, plus ``pred_home_win_prob`` when the
+    baseline has one (Elo: the rating expectation 1 / (1 + 10 ** (-diff / 400)))."""
+    if name == "elo":
+        margin, prob = _elo_walkforward(market, **baseline_params("elo"))
+        return pd.DataFrame({"pred_home_margin": margin, "pred_home_win_prob": prob})
+    return BASELINES[name](market).rename("pred_home_margin").to_frame()

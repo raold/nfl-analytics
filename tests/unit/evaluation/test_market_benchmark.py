@@ -2,6 +2,7 @@
 Market benchmark tests on real games (data/historical_weather_2018_2024.csv, nflverse lines).
 """
 
+import json
 from pathlib import Path
 
 import numpy as np
@@ -11,14 +12,19 @@ import pytest
 from nfl_analytics.evaluation.market_benchmark import (
     ImplausibleResultError,
     check_home_cover_rate,
+    check_market_sanity,
     check_plausibility,
     elo_walkforward,
     load_market_from_csv,
     market_baseline,
+    market_sanity,
     power_ratings_walkforward,
     run_benchmark,
+    to_json,
     to_markdown,
 )
+from nfl_analytics.evaluation.market_benchmark import __main__ as cli
+from nfl_analytics.evaluation.market_benchmark.baselines import HFA_POINTS
 from nfl_analytics.evaluation.market_benchmark.metrics import (
     block_bootstrap_roi,
     closing_line_value,
@@ -34,6 +40,15 @@ from nfl_analytics.evaluation.market_benchmark.odds import (
 )
 
 DATA = Path(__file__).resolve().parents[3] / "data" / "historical_weather_2018_2024.csv"
+
+
+def _strict_json(text: str):
+    """json.loads that fails on NaN / Infinity tokens instead of accepting them."""
+
+    def reject(token):
+        raise ValueError(f"non-standard JSON token {token}")
+
+    return json.loads(text, parse_constant=reject)
 
 
 @pytest.fixture(scope="module")
@@ -89,11 +104,36 @@ class TestStatistics:
         assert list(closing_line_value(bets)) == [1.0, -1.0]
 
 
+class TestInformationRegression:
+    def test_power_ratings_have_a_finite_interval(self, evaluated):
+        reg = information_regression(evaluated)
+        assert reg["note"] is None
+        assert reg["model_gap_ci95"][1] - reg["model_gap_ci95"][0] < 1
+
+    def test_the_line_itself_is_not_identified(self, market):
+        reg = information_regression(market.assign(pred_home_margin=market_baseline(market)))
+        assert np.isnan(reg["model_gap_coef"]) and np.isnan(reg["model_gap_ci95"][0])
+        assert "constant" in reg["note"]
+        shifted = market.assign(pred_home_margin=market["spread_close"] + 1)  # line + 1 point
+        assert "constant" in information_regression(shifted)["note"]
+
+    def test_constant_prediction_is_rank_deficient_not_exploding(self, evaluated):
+        # Home by HFA_POINTS in every game: pred - line = 2.5 - line is collinear with the line.
+        # Before the rank check this returned a CI of +/-6.1e6 (SE 3.1e6) on these games.
+        flat = evaluated.assign(pred_home_margin=HFA_POINTS)
+        reg = information_regression(flat)
+        assert np.isnan(reg["model_gap_coef"]) and np.isnan(reg["model_gap_se"])
+        assert "linear function of the line" in reg["note"]
+        result = run_benchmark(flat, "home by 2.5")
+        assert any("constant" in w for w in result["warnings"])
+        assert "not identified" in to_markdown(result)
+
+
 class TestBaselines:
     def test_market_baseline_finds_no_edge(self, market):
         df = market.assign(pred_home_margin=market_baseline(market))
         assert grade_ats(df, min_edge=0.5).empty
-        assert information_regression(df) is None
+        assert "not identified" in information_regression(df)["note"]
 
     def test_power_ratings_have_no_edge(self, evaluated):
         result = run_benchmark(evaluated, "power_ratings")
@@ -130,8 +170,111 @@ class TestGuardrails:
         with pytest.raises(ValueError, match="sportsbook sign"):
             run_benchmark(flipped, "flipped")
 
+    def test_weak_but_correctly_signed_model_gets_a_warning_not_a_refusal(self, market):
+        # A rest-advantage model: home by HFA_POINTS plus a point per extra day of rest
+        # (real home_rest / away_rest). It correlates only +0.04 with the closing line.
+        raw = pd.read_csv(DATA).set_index("game_id")
+        rest = market["game_id"].map(raw["home_rest"] - raw["away_rest"])
+        df = market.assign(pred_home_margin=HFA_POINTS + rest)
+        df = df[df["season"] >= 2019]
+        result = run_benchmark(df, "rest advantage")
+        assert 0 < result["pred_line_corr"] < 0.2
+        assert any("correlates only" in w for w in result["warnings"])
+        assert "Warnings:" in to_markdown(result)
+
+    def test_the_bundled_market_passes_the_market_checks(self, market):
+        s = check_market_sanity(market[market["season"] >= 2019])
+        assert (s["home_covers"], s["decided_games"]) == (756, 1557)  # 48.6%
+        assert s["home_cover_p_value"] > 0.5 and s["line_margin_corr"] > 0.4
+        assert check_home_cover_rate(market) == pytest.approx(875 / 1804)  # 2018-2024
+
     def test_buggy_cover_grading_fails_the_base_rate_check(self, market):
-        # Simulate a market frame whose lines were stored in sportsbook sign
+        # Derived from the real rows: spread_close negated, i.e. the same lines in sportsbook
+        # sign (grading them with the nflverse rule is the old margin-plus-line bug)
         flipped = market.assign(spread_close=-market["spread_close"])
-        with pytest.raises((ImplausibleResultError, ValueError)):
+        with pytest.raises(ImplausibleResultError) as err:
             check_home_cover_rate(flipped)
+        assert "sportsbook sign" in str(err.value)  # line sign check
+        assert "binomial p" in str(err.value)  # 1042/1828 home covers, p ~ 1e-11
+
+    def test_correct_sign_wrong_covers_is_refused_by_the_binomial_test(self, market):
+        # Derived from the real rows: home-field advantage added a second time to lines that
+        # already include it. The sign is still right, so only the cover base rate catches it.
+        doubled = market.assign(spread_close=market["spread_close"] + HFA_POINTS)
+        s = market_sanity(doubled)
+        assert s["line_margin_corr"] > 0.4 and s["home_cover_rate"] < 0.45
+        with pytest.raises(ImplausibleResultError, match="binomial p") as err:
+            check_market_sanity(doubled)
+        assert "correlates" not in str(err.value)  # the line-sign check passed
+
+
+class TestReport:
+    def test_json_is_strict(self, market):
+        # The line against itself places no bets: win rate, ROI and the regression are NaN
+        df = market.assign(pred_home_margin=market_baseline(market))
+        result = run_benchmark(df, "market")
+        text = to_json(result)
+        assert "NaN" not in text and "Infinity" not in text
+        parsed = _strict_json(text)
+        assert parsed["ats"]["win_rate"] is None
+        assert parsed["information_regression"]["model_gap_coef"] is None
+        assert parsed["market_sanity"]["decided_games"] == 1804
+        extremes = {"inf": float("inf"), "neg": np.float64("-inf"), "n": np.int64(3)}
+        assert _strict_json(to_json(extremes)) == {"inf": None, "neg": None, "n": 3}
+
+    def test_readme_baseline_rows_reproduce(self, capsys):
+        if not DATA.exists():
+            pytest.skip(f"{DATA} not available")
+        # README.md "Results, honestly": the two baseline rows, through the documented CLI
+        expected = {
+            "power_ratings": ["| ATS record | 609-608-31 |", "| ROI | -4.5% | -8.9% to +0.0% |"],
+            "elo": ["| ATS record | 581-596-31 |", "| ROI | -5.8% | -11.5% to -0.4% |"],
+        }
+        rates = {"power_ratings": "| Win rate | 50.0% |", "elo": "| Win rate | 49.4% |"}
+        for name, rows in expected.items():
+            argv = ["--baseline", name, "--market-csv", str(DATA), "--seasons", "2019-2024"]
+            assert cli.main(argv) == 0
+            out = capsys.readouterr().out
+            for row in rows + [rates[name]]:
+                assert row in out, (name, row)
+
+
+class TestCli:
+    def test_db_baselines_warm_up_on_the_prior_season(
+        self, evaluated, monkeypatch, capsys, tmp_path
+    ):
+        requested = []
+
+        class _Conn:
+            def close(self):
+                pass
+
+        def fake_db(seasons, conn):  # the real games, as devdb01 would return them
+            requested.append(list(seasons))
+            return load_market_from_csv(DATA, seasons)
+
+        monkeypatch.setattr(cli, "load_market_from_db", fake_db)
+        monkeypatch.setattr("nfl_analytics.utils.db_config.get_connection", lambda: _Conn())
+        assert cli.main(["--baseline", "elo", "--db", "--seasons", "2019-2024"]) == 0
+        db_out = capsys.readouterr().out
+        assert requested == [list(range(2018, 2025))]  # 2018 seeds the ratings
+        csv_args = ["--baseline", "elo", "--market-csv", str(DATA), "--seasons", "2019-2024"]
+        assert cli.main(csv_args) == 0
+        assert capsys.readouterr().out == db_out
+        assert "| ATS record | 581-596-31 |" in db_out
+
+        # A model's predictions need no warm-up: only the requested season is loaded
+        path = tmp_path / "power_2024.csv"
+        evaluated.loc[evaluated["season"] == 2024, ["game_id", "pred_home_margin"]].to_csv(
+            path, index=False
+        )
+        assert cli.main(["--predictions-csv", str(path), "--db", "--seasons", "2024"]) == 0
+        assert requested[-1] == [2024]
+        assert "Seasons 2024-2024, 272 games" in capsys.readouterr().out
+
+    def test_sources_are_mutually_exclusive(self):
+        with pytest.raises(SystemExit):
+            cli.main(["--baseline", "elo", "--db", "--market-csv", str(DATA), "--seasons", "2024"])
+        with pytest.raises(SystemExit):  # --game-types belongs to --nflverse-csv
+            argv = ["--baseline", "elo", "--market-csv", str(DATA), "--seasons", "2024"]
+            cli.main(argv + ["--game-types", "REG,WC"])
