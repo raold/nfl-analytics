@@ -49,8 +49,8 @@ bet at -110.
 | Regular season | 272 | 11.14 | 9.72 | 131-140-1 | 48.3% | -7.7% |
 | Playoffs (n=13, noise) | 13 | 9.12 | 8.58 | 8-5-0 | 61.5% | +17.5% |
 
-Its home-win probability picked the winner in 56.8% of games; the closing-line favourite won
-66.0%. Predictions correlate 0.36 with the closing line, with a standard deviation of 2.30
+Its home-win probability picked the winner in 162 of 284 decided games (57.0%); the closing-line
+favourite won 187 (65.8%). Predictions correlate 0.36 with the closing line, with a standard deviation of 2.30
 points against 6.18 for the line. The full evaluation is in
 `docs/investigations/2026-10-final-evaluation/`.
 

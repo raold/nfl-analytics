@@ -1,0 +1,111 @@
+{
+  "name": "market",
+  "games": 1871,
+  "seasons": [
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "min_edge": 1.0,
+  "ats": {
+    "bets": 0,
+    "wins": 0,
+    "losses": 0,
+    "pushes": 0,
+    "win_rate": null,
+    "win_rate_ci95": [
+      null,
+      null
+    ],
+    "breakeven_win_rate": 0.5238095238095238,
+    "p_value_beats_breakeven": null,
+    "roi": null,
+    "roi_ci95": [
+      null,
+      null
+    ]
+  },
+  "plausibility_problems": [],
+  "home_cover_rate": 0.48741794310722103,
+  "market_sanity": {
+    "home_cover_rate": 0.48741794310722103,
+    "home_covers": 891,
+    "decided_games": 1828,
+    "home_cover_p0": 0.49,
+    "home_cover_p_value": 0.8332659665098521,
+    "line_margin_corr": 0.45785247832731163,
+    "corr_games": 1871,
+    "sign_checked": true
+  },
+  "pred_line_corr": null,
+  "placebo_win_rate": 0.4974391805377721,
+  "spread_accuracy": {
+    "games": 1871,
+    "model_mae": 9.825494388027792,
+    "market_mae": 9.825494388027792,
+    "mae_skill": 0.0,
+    "dm_p_value_two_sided": 1.0
+  },
+  "information_regression": {
+    "line_coef": null,
+    "model_gap_coef": null,
+    "model_gap_se": null,
+    "model_gap_ci95": [
+      null,
+      null
+    ],
+    "model_gap_p_value": null,
+    "clusters": 124,
+    "note": "not identified: pred - line is constant (the prediction is the line plus a constant), so it carries no information beyond the line"
+  },
+  "win_prob_skill": null,
+  "edge_threshold_sweep": [
+    {
+      "min_edge": 0.5,
+      "bets": 0,
+      "win_rate": null,
+      "roi": null,
+      "p_value_one_sided": null,
+      "significant_holm": false
+    },
+    {
+      "min_edge": 1.0,
+      "bets": 0,
+      "win_rate": null,
+      "roi": null,
+      "p_value_one_sided": null,
+      "significant_holm": false
+    },
+    {
+      "min_edge": 2.0,
+      "bets": 0,
+      "win_rate": null,
+      "roi": null,
+      "p_value_one_sided": null,
+      "significant_holm": false
+    },
+    {
+      "min_edge": 3.0,
+      "bets": 0,
+      "win_rate": null,
+      "roi": null,
+      "p_value_one_sided": null,
+      "significant_holm": false
+    },
+    {
+      "min_edge": 4.0,
+      "bets": 0,
+      "win_rate": null,
+      "roi": null,
+      "p_value_one_sided": null,
+      "significant_holm": false
+    }
+  ],
+  "retroactive_share": null,
+  "closing_line_value": null,
+  "warnings": []
+}

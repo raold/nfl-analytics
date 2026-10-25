@@ -1,0 +1,4 @@
+input,detail
+"devdb01 games, REG 2018-2025 with score and line","2127 games, sha256 of graded columns abda086792143038c3dc3e0e30bb4b64d89df25d3033cfc7671cbfa19ccca9ca"
+nflverse games.csv,"2186477 bytes, sha256 07b41111a46458065937e402656f0636743a53513bade967789709395c16a1b2; 94 completed 2026 REG games with a line (weeks 1-7), last kickoff 2026-10-23 00:15 UTC"
+data/historical_weather_2018_2024.csv,sha256 09b7420ce9c1e5170edc07f2fb0b00ed489b11f6871bb7767ef62f4dff143d21

@@ -1,0 +1,9 @@
+baseline,market_frame,record,win_rate,roi,breakeven,model_mae,market_mae
+elo,bundled CSV (README rows),581-596-31,0.493628,-0.0576195,0.52381,10.2368,9.84303
+elo,devdb01,584-593-31,0.496177,-0.0418283,0.517762,10.2341,9.84303
+elo,"devdb01, Raiders as LV in 2018-2019",581-596-31,0.493628,-0.0468919,0.51782,10.2368,9.84303
+elo,"devdb01, Raiders as LV, every bet at -110",581-596-31,0.493628,-0.0576195,0.52381,10.2368,9.84303
+power_ratings,bundled CSV (README rows),609-608-31,0.500411,-0.0446702,0.52381,10.4182,9.84303
+power_ratings,devdb01,609-607-31,0.500822,-0.0319047,0.516516,10.4154,9.84303
+power_ratings,"devdb01, Raiders as LV in 2018-2019",609-608-31,0.500411,-0.0326658,0.516532,10.4182,9.84303
+power_ratings,"devdb01, Raiders as LV, every bet at -110",609-608-31,0.500411,-0.0446702,0.52381,10.4182,9.84303

@@ -1,0 +1,105 @@
+{
+  "name": "power_ratings",
+  "games": 94,
+  "seasons": [
+    2026
+  ],
+  "min_edge": 1.0,
+  "ats": {
+    "bets": 75,
+    "wins": 30,
+    "losses": 45,
+    "pushes": 4,
+    "win_rate": 0.4,
+    "win_rate_ci95": [
+      0.29662343078170594,
+      0.5131216783992341
+    ],
+    "breakeven_win_rate": 0.5234453243538197,
+    "p_value_beats_breakeven": 0.9880577032952491,
+    "roi": -0.23825845547337882,
+    "roi_ci95": [
+      -0.5344588745024859,
+      0.05008995210484122
+    ]
+  },
+  "plausibility_problems": [],
+  "home_cover_rate": 0.45454545454545453,
+  "market_sanity": {
+    "home_cover_rate": 0.45454545454545453,
+    "home_covers": 40,
+    "decided_games": 88,
+    "home_cover_p0": 0.49,
+    "home_cover_p_value": 0.5240054823004436,
+    "line_margin_corr": 0.325190327019537,
+    "corr_games": 94,
+    "sign_checked": true
+  },
+  "pred_line_corr": 0.785496427902292,
+  "placebo_win_rate": 0.5625,
+  "spread_accuracy": {
+    "games": 94,
+    "model_mae": 10.267793902430949,
+    "market_mae": 9.23936170212766,
+    "mae_skill": -0.11130987545021198,
+    "dm_p_value_two_sided": 0.008072991428136334
+  },
+  "information_regression": {
+    "line_coef": 0.7980721561221358,
+    "model_gap_coef": -0.22868607187396245,
+    "model_gap_se": 0.3631571869125899,
+    "model_gap_ci95": [
+      -0.9404741582226386,
+      0.48310201447471374
+    ],
+    "model_gap_p_value": 0.5520893401586843,
+    "clusters": 7,
+    "note": null
+  },
+  "win_prob_skill": null,
+  "edge_threshold_sweep": [
+    {
+      "min_edge": 0.5,
+      "bets": 80,
+      "win_rate": 0.4,
+      "roi": -0.2373884660274567,
+      "p_value_one_sided": 0.9899990427245642,
+      "significant_holm": false
+    },
+    {
+      "min_edge": 1.0,
+      "bets": 75,
+      "win_rate": 0.4,
+      "roi": -0.23825845547337882,
+      "p_value_one_sided": 0.9880577032952491,
+      "significant_holm": false
+    },
+    {
+      "min_edge": 2.0,
+      "bets": 54,
+      "win_rate": 0.42592592592592593,
+      "roi": -0.18996148656208736,
+      "p_value_one_sided": 0.9417508117017972,
+      "significant_holm": false
+    },
+    {
+      "min_edge": 3.0,
+      "bets": 40,
+      "win_rate": 0.45,
+      "roi": -0.14717842269665063,
+      "p_value_one_sided": 0.8659452736820158,
+      "significant_holm": false
+    },
+    {
+      "min_edge": 4.0,
+      "bets": 29,
+      "win_rate": 0.4827586206896552,
+      "roi": -0.08240944958931927,
+      "p_value_one_sided": 0.7386120053245857,
+      "significant_holm": false
+    }
+  ],
+  "retroactive_share": null,
+  "closing_line_value": null,
+  "warnings": []
+}
