@@ -55,7 +55,7 @@ post-repair dump restored in about 20 s with 7,276 games, 1,279,628 plays, 117,2
 The two dumps directly in `backups/` (Git LFS, public on GitHub) are from 2025-12-07 and predate
 the 2026-10-24 repair; their `odds_history` table is empty. The 2025-12-08 dump, which holds the
 licensed `odds_history` rows, was untracked on 2026-10-25 and is in `backups/local/` (it is still
-in git history; see PROJECT_STATUS, item 4).
+in git history and GitHub's LFS storage; see PROJECT_STATUS, decided on 2026-10-25, item 4).
 
 ## db/migrations is history
 

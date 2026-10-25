@@ -2,15 +2,9 @@
 
 **Updated:** 2026-10-25 · **State:** wound down. A research archive with an honest negative result:
 no model in this project beats the NFL closing line ([README](README.md#results),
-[final evaluation](docs/investigations/2026-10-final-evaluation/README.md)). The salvage work is
-on branch `repair/2026-10`, which is not pushed; it fast-forwards `origin/main` (0 commits behind).
-
-**Do first, in this order.** (1) Push `repair/2026-10` before 2026-10-25 09:30 ET (13:30 UTC),
-when `2026_07_PIT_NO`, the first game in the week-7 prospective files, kicks off, or post the
-digests in `prospective/SHA256SUMS` somewhere public by then; week 8's first game is on
-2026-10-29 at 20:15 ET (item 2). (2) Rotate The Odds API key, whatever happens with the
-push, and push the tags only after that (items 1 and 3). (3) Get `backups/local/` into an
-off-machine backup (item 5).
+[final evaluation](docs/investigations/2026-10-final-evaluation/README.md)). The salvage was
+merged into `main` on 2026-10-25 (pull request #24, a fast-forward) and CI is green there. What
+is left for the owner is [at the end](#open-for-the-owner).
 
 ## Done in the October 2026 salvage
 
@@ -31,63 +25,84 @@ off-machine backup (item 5).
 | Dissertation errata | Every error found, with corrected values; a full audit of all 290 table units and 51 figure entries (176 table units, 170 printed tables, and 30 figure entries, 28 figures, made up; 11 more tables with made-up cells; 63 table units computed with a bug); chapters unchanged | [ERRATA.md](analysis/dissertation/ERRATA.md), `ERRATA_audit.csv` |
 | Prune | 3,562 tracked files down to 771 (committed 2026-10-25 00:05 EDT): trading stack, API, dashboards, ETL, semantic stack, feedback loop, R pipeline, notebooks, artifacts, most docs. Removed as hazards: fabricated and simulated result files and most of their generators, two scripts that wrote DB dumps into the repo, a Sci-Hub fetcher. Five figure generators that make their numbers up were kept as dissertation tooling, marked with a warning header (known issues below) | tag `archive/pre-prune-2026-10` holds everything removed ([HISTORY](docs/HISTORY.md)) |
 | Tooling | Local pre-commit cut to hooks that pass; compose reduced to the database; Makefile reduced to working targets; schema snapshot as the DB bootstrap (`scripts/dev/init_dev.sh`); the infrastructure test that could stop the database removed, and the restore test limited to a test database | `.pre-commit-config.yaml`, `docker-compose.yml`, `Makefile`, [db/README.md](db/README.md), [tests/README.md](tests/README.md) |
-| Docs | README, CLAUDE.md, this file, SETUP, the docs index, ADR statuses and banners, postmortems and database references rewritten to match the tree and the database | this commit |
+| Docs | README, CLAUDE.md, this file, SETUP, the docs index, ADR statuses and banners, postmortems and database references rewritten to match the tree and the database | `289ea5d` and the docs commits after it |
+| Publication | `repair/2026-10` pushed at 2026-10-25 07:37:53 UTC and fast-forwarded into `main` (PR #24, merged 07:47:16 UTC). The week 7-8 prospective files were public 5 h 52 min before the first predicted kickoff, so all 27 games count as prospective | [prospective README](docs/investigations/2026-10-final-evaluation/prospective/README.md#when-the-timestamp-becomes-verifiable); on `main`, lint-and-test, temporal safety, secret scan and local links pass |
+| Credentials | All three keys for The Odds API found in history (the one in five old docs files, which Sibyl's `.env` also holds, and the two committed in `.env` in `f2b9c7b` and `b90e9d6`) were tested on 2026-10-25 against the API's quota-free `/v4/sports` endpoint. The docs-file key, the one in Sibyl's `.env`, answered "API key is not valid"; of the two `.env` keys, the one from `f2b9c7b` answered "not valid" and the one from `b90e9d6` "deactivated". GitHub secret scanning and push protection are on | tested without printing the keys; repository security settings |
 
-## Open: decisions for the owner
+## Decided on 2026-10-25
 
-1. **Rotate The Odds API key.** The live key is in 5 docs files at the tip of public `main`
-   (removed on this branch), on the remote branches `bnn-archive`, `rovodev_arch` and
-   `feature/code-quality-remediation`, in GitHub's pull-request refs 3-7, and in Sibyl's `.env`.
-   Pushing this branch takes it off `main`'s tip only, so rotation is the real fix. Also confirm
-   that the two keys committed in `.env` in October 2025 are revoked: they stay at the tips of
-   GitHub's `refs/pull/1/head` and `refs/pull/2/head`, which only GitHub Support can remove. Turn on
-   GitHub secret scanning and push protection.
-2. **Push `repair/2026-10` and open the PR.** It fast-forwards `main` and removes the live key from
-   the public tip. Pushing also timestamps the prospective predictions in
-   `docs/investigations/2026-10-final-evaluation/prospective/`: a game counts as prospective
-   evidence only if the files are public before it kicks off (the first predicted week-7 game on
-   2026-10-25 at 09:30 ET, week 8 from 2026-10-29 at 20:15 ET).
-3. **Push the tags.** All four are local only. `archive/pre-prune-2026-10` is the only easy way
-   back to the deleted files and holds no copy of the key. `docs-archive-2026-10`,
-   `archive/dissertation-visual-redesign-2026-02` and `archive/bnn-2025-11` each contain the live
-   key in 5 files (they predate its removal): rotate it before pushing them, or re-tag with those
-   files redacted. Push the branch alone (no `--tags` or `--follow-tags`) until then.
-4. **Public dumps and the PDF.** Two dumps stay tracked in `backups/` through Git LFS, which is
-   public on GitHub: `nfl_analytics_20251207_154232_pg17.dump` and
-   `nfl_analytics_20251207_201922.dump`. Their `odds_history` table is empty, but they predate the
-   2026-10-24 repair. The 2025-12-08 dump, the only one with the licensed `odds_history` rows
-   (117,266; The Odds API terms forbid redistributing the data as a standalone product), was
-   untracked on 2026-10-25 and moved to `backups/local/`. It is still in history (added in
-   `46a9645`, which public `origin/main` contains) and so in GitHub's LFS storage. Taking it out of
-   public reach needs a history rewrite (`git filter-repo`, re-created tags, a force-push) and
-   GitHub Support to delete the LFS object, or a private repository.
-   `analysis/dissertation/main/main.pdf`, an ordinary git file that carries the retracted and
-   made-up claims, was untracked on 2026-10-25; its old versions stay in history unless that is
-   rewritten too.
-5. **Owner housekeeping.** `backups/local/` (gitignored) holds the only dumps of the repaired
-   database, the before-image of the repair, the 2025-12-08 odds dump and the salvage-session
-   evidence. The off-machine backup of that directory, disk and container clean-up, and the raw
-   licensed odds copies outside the repository: see the private note in `backups/local/`.
-6. **Sibyl handoff.** `backups/local/SIBYL_HANDOFF_2026-10-24.md`: keep Sibyl's `[domains.nfl]`
-   disabled and do not deploy its copy of Game Outcome v2 (byte-identical to this one). Sibyl's NFL
-   backtest still grades covers with the old rule, and its news ingest stamps current articles
-   onto past seasons.
-7. **The database v2 was trained on.** v2 was trained on another machine, against a database
-   that devdb01 does not reproduce: devdb01 has no `semantic` schema and no feedback-loop tables,
-   no 2025 odds snapshots (one `game_lines` row) and no 2025 injuries (queries of 2026-10-25). If
-   that database still exists, export it; otherwise record it as lost, which leaves v2's training
-   permanently unreproducible.
-8. **Missing odds.** Whether to re-fetch The Odds API snapshots for the 357 games of 2020-2024
-   that have no game-day snapshot: 93 Rams games and 264 games that start on the next UTC date,
-   which the backfill's matcher dropped (10 of the 264 kept early snapshots only). It needs paid
-   quota and a fixed matcher (POSTMORTEMS §7,
+The ten owner decisions listed here before the push, and what came of them:
+
+1. **The Odds API keys.** None of the keys in history works (above), so there is nothing left to
+   rotate for this repository; the copy in Sibyl's `.env` is dead too. A new key, if Sibyl needs
+   one, belongs only in Sibyl's environment.
+2. **Push and pull request.** Done: PR #24, merged as a fast-forward, so every commit keeps its
+   hash.
+3. **Tags.** `archive/pre-prune-2026-10` is pushed. `docs-archive-2026-10`,
+   `archive/dissertation-visual-redesign-2026-02` and `archive/bnn-2025-11` are not pushed yet;
+   the key in their five old docs files is dead (open item 1).
+4. **Public dumps and the PDF.** No history rewrite. On its own it would take nothing out of
+   public reach: GitHub keeps every pull request's head ref (`refs/pull/1/head` to
+   `refs/pull/24/head`), `refs/pull/24/head` alone reaches the whole history, and only GitHub
+   Support can remove those refs and stored LFS objects. A rewrite would also change the hash of
+   every commit after `46a9645` (2025-12-08), among them `c01e10b`, which the published
+   prospective record cites. So the 2025-12-08 dump with the licensed `odds_history` rows, added
+   in `46a9645`, stays reachable through history and GitHub's LFS storage (open item 3). The two
+   2025-12-07 dumps stay tracked; their `odds_history` table is empty.
+   `analysis/dissertation/main/main.pdf`, which carried the retracted and made-up claims, was
+   untracked (`0bccf47`); `latexmk` rebuilds it, ERRATA.md records the errors, and its old
+   versions stay in history.
+5. **Owner housekeeping.** The off-machine backup of `backups/local/` was taken and verified, and
+   the container volumes of the removed services were deleted. The old sync-daemon copies of the
+   repository and its database (25 GiB) were audited: apart from 76 KB of unique files, now copied
+   into `backups/local/`, everything in them is in the repository, its git objects or the live
+   database. Deleting them is left to the owner (open item 7). Details are in the private note in
+   `backups/local/`.
+6. **Sibyl handoff.** Implemented in the private Sibyl repository on branch
+   `claude/nfl-sign-convention-2026-10-25`, for a draft pull request. It grades spreads through a
+   ported convention helper, guarded by a lint and by a runtime check, stops filing news under
+   weeks it postdates, and marks Sibyl's bundled v2 do-not-deploy. Each head was panel-reviewed
+   before publication. Merging and deploying are the Sibyl operator's decisions. Sibyl's
+   `[domains.nfl]` stays disabled and its copy of Game Outcome v2 is not deployed.
+7. **The database v2 was trained on.** Not checked: the machine it was most likely on is not
+   reachable from this one (open item 5). devdb01 does not reproduce it: no `semantic` schema, no
+   feedback-loop tables, no 2025 odds snapshots (one `game_lines` row) and no 2025 injuries.
+8. **Missing odds: not re-fetched.** The 357 games of 2020-2024 without a game-day snapshot (93
+   Rams games and 264 that start on the next UTC date, which the backfill's matcher dropped; 10 of
+   the 264 kept early snapshots only) stay missing: there is no working key, the quota is paid,
+   and nothing left in this project would use them (POSTMORTEMS §7,
    [line-movement coverage](docs/investigations/2026-10-line-movement/results.md)).
-9. **Branch cleanup.** Local: `backtest`, `experiments`, `hotfix`, `rovodev_arch`, the four
-   `feature/*` branches, nine `tmp*` branches and the `refs/ai*` refs. Remote: `bnn-archive`,
-   `rovodev_arch`, `feature/code-quality-remediation`. The salvage survey found all of them
-   contained in `main` history or worthless.
-10. **Dev database password.** It is public (`docker-compose.yml`). Never reuse it, keep the
-    database on 127.0.0.1, and rotate it if the database is ever reachable off-host.
+9. **Branch cleanup.** The local branches (`backtest`, `experiments`, `hotfix`, `rovodev_arch`,
+   four `feature/*`, nine `tmp*`), the `refs/ai*` refs and two stashes are deleted; the salvage
+   survey found all of them contained in `main` history or worthless. The remote branches
+   `bnn-archive`, `rovodev_arch` and `feature/code-quality-remediation` remain (open item 2).
+10. **Dev database password: unchanged.** It is public (`docker-compose.yml`), the database
+    listens on 127.0.0.1 only, and it is never reused. Rotate it if the database is ever
+    reachable off-host.
+
+## Open: for the owner
+
+1. Push the remaining tags:
+   `git push origin refs/tags/docs-archive-2026-10 refs/tags/archive/dissertation-visual-redesign-2026-02 refs/tags/archive/bnn-2025-11`
+2. Delete the old remote branches:
+   `git push origin --delete bnn-archive rovodev_arch feature/code-quality-remediation`
+3. Decide whether the licensed odds rows reachable through history matter enough to act: keep the
+   repository public as it is, make it private, or rewrite history and ask GitHub Support to remove
+   the pull-request refs and the LFS object.
+4. GitGuardian's app check failed on PR #24 over four old incidents: the public
+   development-database password and placeholder values, not live credentials. Resolve them as
+   false positives in the GitGuardian dashboard, or remove the app; it is not a required check.
+5. Export the database v2 was trained on, or record it as lost (private note, item 7).
+6. Review the Sibyl pull request from `claude/nfl-sign-convention-2026-10-25`, starting with its
+   "Production effect" section (the news timer and the weekly NFL train unit on gmk), and merge it
+   or not. The NFL items it leaves open are in Sibyl's TODOS.
+7. The machine-specific chores in the private note in `backups/local/`, chiefly deleting the
+   audited sync-daemon copies (one `sudo rm` command there).
+8. Optional, once week 8 is final (Monday 2026-11-02): grade the prospective week 7-8
+   predictions with the recipe in
+   [prospective/README.md](docs/investigations/2026-10-final-evaluation/prospective/README.md#grading-after-the-games).
+   They are baselines with no claimed edge; 27 games settle nothing, but they are the project's
+   only prospective record.
 
 ## Open: known technical issues (not planned)
 

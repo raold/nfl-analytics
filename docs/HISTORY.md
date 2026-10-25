@@ -13,9 +13,9 @@ Two clean-ups removed most of the tree in October 2026. Nothing was lost; it is 
 | `archive/dissertation-visual-redesign-2026-02` | `57113a1` | an orphaned dissertation styling branch from 2026-02-13, never merged (it restates retracted claims) |
 | `archive/bnn-2025-11` | `61e5cd2` | where the BNN research stopped (ADR-004) |
 
-The tags have not been pushed (PROJECT_STATUS, owner decisions), so they exist only in the
-owner's clone. All but `archive/pre-prune-2026-10` contain a live API key in five old docs files;
-rotate the key before pushing them.
+`archive/pre-prune-2026-10` was pushed on 2026-10-25. The other three exist only in the owner's
+clone for now: each contains an Odds API key in five old docs files. That key no longer works
+(tested 2026-10-25), so they can be pushed (PROJECT_STATUS, open items).
 
 ```bash
 git show archive/pre-prune-2026-10:nfl_analytics/rl/dataset.py | less     # read one removed file

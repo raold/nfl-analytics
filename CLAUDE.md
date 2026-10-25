@@ -150,8 +150,8 @@ one-off scripts, model artifacts and most docs. Everything is recoverable from l
 | `archive/dissertation-visual-redesign-2026-02` | an orphaned dissertation styling branch (pre-retraction claims; do not merge) |
 | `archive/bnn-2025-11` | where the BNN research stopped (ADR-004) |
 
-The last three contain a live Odds API key in five old docs files: do not push them before the key
-is rotated (PROJECT_STATUS).
+Only `archive/pre-prune-2026-10` is pushed. The other three contain an Odds API key in five old docs
+files; the key is dead (tested 2026-10-25), and pushing them is an open owner item (PROJECT_STATUS).
 
 Paths cited by older docs, ADRs and the 2026-10 write-ups that no longer exist are almost always
 in `archive/pre-prune-2026-10` (`git show archive/pre-prune-2026-10:<path>`) or, for session
