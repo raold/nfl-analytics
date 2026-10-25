@@ -7,8 +7,9 @@ addition.
 
 `GameOutcomeModel.load_models()` refuses any directory whose README says DO NOT DEPLOY unless
 it is called with `allow_frozen_reference=True` (and `run_game_outcome_predictions` passes
-that only when asked), so the Kalshi strategies' lazy loader, the prediction service and the
-API cannot pick this model up by default. Load it explicitly for evaluation or postmortems.
+that only when asked), so the prediction service cannot pick this model up by default. (The
+Kalshi strategies and the API that also loaded it were removed in the 2026-10 prune.) Load it
+explicitly for evaluation or postmortems.
 
 ## What it is
 

@@ -1,631 +1,219 @@
-# Canonical SQL Patterns for NFL Analytics
+# SQL Patterns for devdb01
 
-**Last Updated:** November 14, 2025
-**Purpose:** Document correct SQL patterns to prevent recurring schema errors
-**Background:** Schema errors have occurred "DOZENS of times" - this document prevents future mistakes
+**Updated:** 2026-10-25. Every query on this page except the two marked WRONG was run (EXPLAIN or
+executed) in a read-only session against devdb01 that day. Table facts and counts:
+[DATABASE_QUICK_REFERENCE.md](DATABASE_QUICK_REFERENCE.md).
 
----
+## Common mistakes
 
-## Table of Contents
+### 1. `game_id` in `mart.player_game_stats`
 
-1. [Critical Schema Facts](#critical-schema-facts)
-2. [Common Mistakes](#common-mistakes)
-3. [Pattern Library](#pattern-library)
-4. [Index Usage Guide](#index-usage-guide)
-5. [Performance Notes](#performance-notes)
-
----
-
-## Critical Schema Facts
-
-### mart.player_game_stats Schema
-
-**⚠️ DOES NOT HAVE `game_id` COLUMN**
+The view has no `game_id`, and this error recurred dozens of times.
 
 ```sql
--- Key columns in mart.player_game_stats:
-player_id      TEXT          -- NFL player ID (e.g., '00-0019596')
-season         INTEGER       -- NFL season year (e.g., 2024)
-week           INTEGER       -- Week number (1-18 for regular season)
-stat_category  TEXT          -- 'passing', 'rushing', 'receiving'
-stat_yards     INTEGER       -- Total yards for stat_category
-stat_attempts  INTEGER       -- Total attempts (passes, rushes, targets)
--- ... (15+ other columns, see \d mart.player_game_stats for full list)
-```
-
-**Primary Key:** `(player_id, season, week, stat_category)`
-**IMPORTANT:** Composite key `(season, week)` is used to join to `games` table
-
-### games Schema
-
-**✅ HAS `game_id` COLUMN (Primary Key)**
-
-```sql
--- Key columns in public.games:
-game_id        TEXT PRIMARY KEY  -- Unique game identifier (e.g., '2024_01_LAC_MIA')
-season         INTEGER           -- NFL season year
-week           INTEGER           -- Week number
-home_team      TEXT              -- 3-letter team abbreviation
-away_team      TEXT              -- 3-letter team abbreviation
-kickoff        TIMESTAMPTZ       -- Game start time (NOT game_date)
-spread_close   REAL              -- Closing point spread (NOT spread_line)
-total_close    REAL              -- Closing total (NOT total_line)
--- ... (50+ other columns)
-```
-
-**Composite Index:** `(season, week)` for joining to player stats
-
-### mart.player_hierarchy Schema
-
-**⚠️ DOES NOT HAVE `game_id` COLUMN**
-
-```sql
--- Key columns in mart.player_hierarchy:
-player_id               TEXT UNIQUE   -- NFL player ID (primary key)
-player_name             TEXT          -- Display name
-position                TEXT          -- Detailed position (QB, RB, WR, etc.)
-position_group          VARCHAR(10)   -- Coarse grouping (QB, RB, WR, TE, etc.)
-current_team            TEXT          -- Most recent team (3-letter abbrev)
-years_exp               INTEGER       -- Years of experience
-hierarchy_position      TEXT          -- Composite: position_team
-hierarchy_team_position TEXT          -- Composite: team_position
--- ... (14 total columns)
-```
-
----
-
-## Common Mistakes
-
-### ❌ MISTAKE #1: Assuming game_id in mart.player_game_stats
-
-**WRONG CODE:**
-```sql
--- This will fail with "column pgs.game_id does not exist"
+-- WRONG: ERROR: column pgs.game_id does not exist
 SELECT pgs.*, g.spread_close
 FROM mart.player_game_stats pgs
-JOIN games g ON g.game_id = pgs.game_id  -- ❌ pgs.game_id does not exist
-WHERE pgs.player_id = '00-0019596';
+JOIN games g ON g.game_id = pgs.game_id;
 ```
 
-**ERROR MESSAGE:**
-```
-ERROR:  column pgs.game_id does not exist
-LINE 3: JOIN games g ON g.game_id = pgs.game_id
-```
+Join on `(season, week)` and the player's team that week (pattern 1).
 
-**WHY IT'S WRONG:**
-- `mart.player_game_stats` is a materialized view aggregating player stats
-- Multiple players can play in the same game → no single `game_id` column
-- Must join via composite key `(season, week)` + team matching
-
----
-
-### ✅ CORRECT PATTERN: Join via (season, week) composite key
-
-**CORRECT CODE:**
-```sql
--- Join via (season, week) composite key
-SELECT
-    pgs.player_id,
-    pgs.season,
-    pgs.week,
-    pgs.stat_yards,
-    pgs.stat_attempts,
-    g.game_id,
-    g.spread_close,
-    g.total_close,
-    g.kickoff
-FROM mart.player_game_stats pgs
-JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
-LEFT JOIN games g ON
-    g.season = pgs.season
-    AND g.week = pgs.week
-    AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
-WHERE pgs.player_id = '00-0019596'
-    AND pgs.stat_category = 'passing';
-```
-
-**KEY POINTS:**
-1. Join `games` via `(season, week)` composite key
-2. Filter game to player's team: `(home_team = current_team OR away_team = current_team)`
-3. Use `player_hierarchy` to get `current_team` for filtering
-4. Use `LEFT JOIN` (some games may not have betting lines)
-
----
-
-### ❌ MISTAKE #2: Using wrong column names
-
-**WRONG CODE:**
-```sql
-SELECT
-    g.game_date,        -- ❌ Column doesn't exist (use g.kickoff)
-    g.spread_line,      -- ❌ Column doesn't exist (use g.spread_close)
-    g.total_line        -- ❌ Column doesn't exist (use g.total_close)
-FROM games g;
-```
-
-**✅ CORRECT CODE:**
-```sql
-SELECT
-    g.kickoff,          -- ✅ TIMESTAMPTZ game start time
-    g.spread_close,     -- ✅ Closing point spread
-    g.total_close       -- ✅ Closing total
-FROM games g;
-```
-
-**Reference:** See [DATABASE_QUICK_REFERENCE.md](DATABASE_QUICK_REFERENCE.md#critical-conventions)
-
----
-
-### ❌ MISTAKE #3: Team abbreviation errors
-
-**WRONG CODE:**
-```sql
--- ❌ LA is ambiguous (Rams or Chargers?)
-SELECT * FROM games WHERE home_team = 'LA';
-```
-
-**✅ CORRECT CODE:**
-```sql
--- ✅ Use LAR (Rams) or LAC (Chargers)
-SELECT * FROM games WHERE home_team IN ('LAR', 'LAC');
-```
-
----
-
-## Pattern Library
-
-### Pattern 1: Player Stats → Games Join (CANONICAL)
-
-**Use Case:** Get player stats with game context (spread, total, weather)
-
-**Production Example:** From `R/train_hierarchical_v2_production.R` (lines 47-94)
+### 2. Wrong column names
 
 ```sql
-SELECT
-    pgs.player_id,
-    pgs.season,
-    pgs.week,
-    pgs.stat_yards as yards,
-    pgs.stat_attempts as attempts,
-
-    -- Game context
-    g.home_team,
-    g.away_team,
-    ph.current_team as team,
-    CASE WHEN ph.current_team = g.home_team THEN 1 ELSE 0 END as is_home,
-
-    -- Betting lines
-    CASE
-        WHEN ph.current_team = g.home_team
-        THEN CASE WHEN g.spread_close < 0 THEN 1 ELSE 0 END
-        ELSE CASE WHEN g.spread_close > 0 THEN 1 ELSE 0 END
-    END as is_favored,
-    ABS(g.spread_close) as spread_abs,
-    g.total_close,
-
-    -- Weather
-    COALESCE(g.roof, 'unknown') as roof,
-    CASE
-        WHEN g.roof IN ('outdoors', 'open')
-        AND CAST(g.temp AS NUMERIC) < 40
-        THEN 1 ELSE 0
-    END as is_bad_weather,
-    CASE WHEN g.roof = 'dome' THEN 1 ELSE 0 END as is_dome,
-
-    -- Player info
-    ph.years_exp,
-    CASE
-        WHEN ph.current_team = g.home_team THEN g.away_team
-        ELSE g.home_team
-    END as opponent
-
-FROM mart.player_game_stats pgs
-JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
-LEFT JOIN games g ON
-    g.season = pgs.season
-    AND g.week = pgs.week
-    AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
-
-WHERE pgs.stat_category = 'passing'
-    AND pgs.stat_yards IS NOT NULL
-    AND pgs.stat_attempts IS NOT NULL
-    AND pgs.stat_attempts >= 10  -- Minimum attempts
-    AND pgs.season BETWEEN 2015 AND 2025
-    AND ph.position_group = 'QB'
-
-ORDER BY pgs.season, pgs.week, pgs.player_id;
+-- WRONG: none of these columns exists
+SELECT g.game_date, g.spread_line, g.total_line FROM games g;
 ```
 
-**Performance:**
-- Uses index `idx_player_game_stats_lookup (player_id, season, week)`
-- Uses index `games_season_week_idx (season, week)`
-- Typical execution: 50-200ms for single player, 5-20s for all QBs
+Use `g.kickoff` (a `timestamptz`), `g.spread_close` and `g.total_close`. `plays` uses `quarter`,
+not `qtr`.
 
----
+### 3. Team codes
 
-### Pattern 2: Single Player-Game Lookup
+The database uses nflverse codes. The Rams are `LA` (and `STL` before 2016); `LAR` never appears,
+so `WHERE home_team = 'LAR'` silently returns nothing. The Chargers are `LAC` (`SD` before 2017),
+the Raiders `LV` (`OAK` before 2020). `nfl_analytics.utils.team_mapping.normalize_team()` converts
+to and from other code sets.
 
-**Use Case:** Get stats for a specific player in a specific game (common in prediction pipeline)
+### 4. Joining a player to games through `current_team`
 
-**Production Example:** From `docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md` (lines 369-384)
+`mart.player_hierarchy.current_team` (also copied into `mart.player_game_stats`) is the player's
+latest team. Joining games on it attaches the wrong game, or none, to every week the player spent
+elsewhere. For the 5,275 passing player-weeks of 2016-2025 that appear in `plays`, `current_team`
+differs from the team the player actually passed for in 2,803 (53%). The older version of this
+page, and the props models built from it, used that join. Take the team from `plays` instead.
+
+### 5. Week 0
+
+`mart.player_game_stats` (2,130 rows) and the `nextgen_*` tables hold season totals as week 0.
+A filter such as `week < W` without `week >= 1` pulls in the whole season.
+
+## Patterns
+
+### Pattern 1: player stats with that week's game and line
 
 ```sql
-SELECT
-    pgs.stat_yards,
-    pgs.stat_attempts,
-    pgs.stat_touchdowns,
-    ph.current_team,
-    g.spread_close,
-    g.total_close,
-    g.game_id
-
-FROM mart.player_game_stats pgs
-LEFT JOIN mart.player_hierarchy ph USING(player_id)
-LEFT JOIN games g ON
-    g.season = pgs.season
-    AND g.week = pgs.week
-    AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
-
-WHERE pgs.player_id = %s           -- Parameterized query
-    AND pgs.season = %s
-    AND pgs.week = %s
-    AND pgs.stat_category = 'passing'
-
-LIMIT 1;
-```
-
-**Performance:**
-- Uses unique index `idx_player_game_stats_unique (player_id, season, week, stat_category)`
-- Execution: 10-50ms (index seek)
-
-**Usage in Python:**
-```python
-import psycopg2
-import pandas as pd
-
-conn = psycopg2.connect(
-    host="localhost", port=5544, database="devdb01",
-    user="dro", password="sicillionbillions"
+WITH passer_games AS (
+    SELECT DISTINCT p.game_id, p.passer_player_id AS player_id, p.posteam AS team
+    FROM plays p
+    WHERE p.passer_player_id IS NOT NULL
 )
-
-query = """
-SELECT pgs.stat_yards, pgs.stat_attempts, g.spread_close
+SELECT
+    pgs.player_id, pgs.season, pgs.week,
+    pgs.stat_yards, pgs.stat_attempts,
+    pg.team,
+    g.game_id,
+    (pg.team = g.home_team)::int AS is_home,
+    -- favored: home iff spread_close > 0, away iff spread_close < 0 (pick'em: neither)
+    CASE WHEN pg.team = g.home_team THEN (g.spread_close > 0)::int
+         ELSE (g.spread_close < 0)::int END AS is_favored,
+    abs(g.spread_close) AS spread_abs,
+    g.total_close,
+    w.temp, w.wind,
+    g.roof
 FROM mart.player_game_stats pgs
-LEFT JOIN mart.player_hierarchy ph USING(player_id)
-LEFT JOIN games g ON
-    g.season = pgs.season
-    AND g.week = pgs.week
-    AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
-WHERE pgs.player_id = %s
-    AND pgs.season = %s
-    AND pgs.week = %s
-    AND pgs.stat_category = %s
-LIMIT 1;
+JOIN games g ON g.season = pgs.season AND g.week = pgs.week
+JOIN passer_games pg ON pg.game_id = g.game_id AND pg.player_id = pgs.player_id
+LEFT JOIN weather w ON w.game_id = g.game_id
+WHERE pgs.stat_category = 'passing'
+  AND pgs.week >= 1
+  AND pgs.season BETWEEN 2016 AND 2025;
+```
+
+For rushing or receiving stats use `rusher_player_id` or `receiver_player_id`. The older version of
+this pattern computed `is_favored` with the signs reversed (it marked home underdogs as favored)
+and took `temp` from `games`, which has no such column. `weather.wind` has a unit problem (ERRATA
+E5); nflverse `wind` is the safer source.
+
+### Pattern 2: one player-game, parameterized
+
+```python
+import pandas as pd
+import psycopg2
+
+from nfl_analytics.utils.db_config import get_db_config   # DB_* environment variables
+
+QUERY = """
+SELECT pgs.stat_yards, pgs.stat_attempts, g.game_id, g.spread_close, g.total_close
+FROM mart.player_game_stats pgs
+JOIN games g ON g.season = pgs.season AND g.week = pgs.week
+JOIN (SELECT DISTINCT game_id, passer_player_id AS player_id FROM plays
+      WHERE passer_player_id = %(player_id)s) pg
+  ON pg.game_id = g.game_id AND pg.player_id = pgs.player_id
+WHERE pgs.player_id = %(player_id)s AND pgs.season = %(season)s AND pgs.week = %(week)s
+  AND pgs.stat_category = 'passing'
 """
 
-df = pd.read_sql_query(
-    query,
-    conn,
-    params=('00-0019596', 2024, 1, 'passing')
-)
+with psycopg2.connect(**get_db_config()) as conn:
+    df = pd.read_sql_query(QUERY, conn, params={"player_id": "00-0019596", "season": 2019, "week": 1})
 ```
 
-**Usage in R:**
-```r
-library(DBI)
-library(RPostgres)
+(`00-0019596` is Tom Brady: `current_team` says TB, but in 2019 week 1 he played for NE.)
 
-conn <- dbConnect(
-    Postgres(),
-    host = "localhost", port = 5544, dbname = "devdb01",
-    user = "dro", password = "sicillionbillions"
-)
-
-query <- "
-SELECT pgs.stat_yards, pgs.stat_attempts, g.spread_close
-FROM mart.player_game_stats pgs
-LEFT JOIN mart.player_hierarchy ph USING(player_id)
-LEFT JOIN games g ON
-    g.season = pgs.season
-    AND g.week = pgs.week
-    AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
-WHERE pgs.player_id = $1
-    AND pgs.season = $2
-    AND pgs.week = $3
-    AND pgs.stat_category = $4
-LIMIT 1;
-"
-
-df <- dbGetQuery(conn, query, params = list('00-0019596', 2024, 1, 'passing'))
-```
-
----
-
-### Pattern 3: Player Historical Stats (Rolling Window)
-
-**Use Case:** Get player's last N games for rolling features
+### Pattern 3: a player's last N games before a date
 
 ```sql
-SELECT
-    pgs.season,
-    pgs.week,
-    pgs.stat_yards,
-    pgs.stat_attempts,
-    pgs.stat_touchdowns,
-    g.kickoff,
-    g.game_id
-
+SELECT pgs.season, pgs.week, pgs.stat_yards, pgs.stat_attempts, g.game_id, g.kickoff
 FROM mart.player_game_stats pgs
-LEFT JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
-LEFT JOIN games g ON
-    g.season = pgs.season
-    AND g.week = pgs.week
-    AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
-
+JOIN games g ON g.season = pgs.season AND g.week = pgs.week
+JOIN (SELECT DISTINCT game_id, passer_player_id AS player_id FROM plays
+      WHERE passer_player_id = '00-0019596') pg
+  ON pg.game_id = g.game_id AND pg.player_id = pgs.player_id
 WHERE pgs.player_id = '00-0019596'
-    AND pgs.stat_category = 'passing'
-    AND pgs.season >= 2020  -- Filter to recent seasons
-
-ORDER BY g.kickoff DESC  -- Most recent first
-
-LIMIT 8;  -- Last 8 games
+  AND pgs.stat_category = 'passing'
+  AND pgs.week >= 1
+  AND g.kickoff < TIMESTAMPTZ '2020-10-01 00:00 America/New_York'   -- the prediction time
+ORDER BY g.kickoff DESC
+LIMIT 8;
 ```
 
-**Performance:** Uses `idx_player_game_stats_lookup` + `games_season_week_kickoff`
-
----
-
-### Pattern 4: All Active QBs (Current Season)
-
-**Use Case:** Get all active QBs for current week predictions
-
-```sql
-SELECT DISTINCT
-    ph.player_id,
-    ph.player_name,
-    ph.current_team,
-    ph.years_exp
-
-FROM mart.player_hierarchy ph
-INNER JOIN mart.player_game_stats pgs ON ph.player_id = pgs.player_id
-
-WHERE ph.position_group = 'QB'
-    AND pgs.season = 2024  -- Current season
-    AND pgs.stat_category = 'passing'
-    AND pgs.stat_attempts >= 10  -- Minimum attempts
-
-ORDER BY ph.player_name;
-```
-
----
-
-### Pattern 5: Team Schedule Lookup
-
-**Use Case:** Find upcoming games for a team
+### Pattern 4: cover, edge and line in the correct sign
 
 ```sql
 SELECT
     g.game_id,
-    g.season,
-    g.week,
-    g.kickoff,
-    g.home_team,
-    g.away_team,
-    g.spread_close,
-    g.total_close
-
+    g.home_score - g.away_score                             AS home_margin,
+    g.spread_close,                                          -- expected home margin
+    (g.home_score - g.away_score) - g.spread_close           AS home_cover_margin,
+    CASE WHEN (g.home_score - g.away_score) > g.spread_close THEN 1
+         WHEN (g.home_score - g.away_score) < g.spread_close THEN 0 END AS home_covered,  -- NULL = push
+    -g.spread_close                                          AS book_home_line  -- sportsbook sign
 FROM games g
+WHERE g.season = 2018 AND g.game_id = '2018_01_BUF_BAL';
+-- 47-3, spread_close 7.5: home_cover_margin 36.5, home_covered 1, book_home_line -7.5
+```
 
-WHERE (g.home_team = 'KC' OR g.away_team = 'KC')  -- Team filter
-    AND g.season = 2024
-    AND g.game_status = 'scheduled'  -- Upcoming games only
+A model's edge is `pred_home_margin - g.spread_close`. Python code uses
+`nfl_analytics/utils/spread_convention.py` for the same rules.
 
+### Pattern 5: local kickoff hour, weekday and date
+
+```sql
+SELECT g.game_id,
+       g.kickoff                                                      AS kickoff_utc,
+       (g.kickoff AT TIME ZONE 'America/New_York')::date              AS game_date_et,
+       extract(hour FROM g.kickoff AT TIME ZONE 'America/New_York')   AS hour_et,
+       extract(isodow FROM g.kickoff AT TIME ZONE 'America/New_York') AS isodow_et   -- 7 = Sunday
+FROM games g
+WHERE g.game_id = '2025_22_SEA_NE';
+-- 2026-02-08 23:30 UTC; 2026-02-08, 18, 7
+```
+
+### Pattern 6: odds snapshots in nflverse sign
+
+```sql
+SELECT o.game_id, o.bookmaker, o.market_type, o.last_update,
+       -o.home_spread AS home_line_nflverse_sign,
+       g.spread_close
+FROM odds_history o
+JOIN games g ON g.game_id = o.game_id
+WHERE o.game_id = '2023_01_CIN_CLE'
+ORDER BY o.last_update;
+```
+
+`market_type` names the backfill request, not the opening or closing line; the close is
+`games.spread_close`. The table has no Rams games and almost no night games (a Thursday opener
+such as `2023_01_DET_KC` returns nothing). Keep row-level results private: the data is licensed.
+
+### Pattern 7: a team's games in a season
+
+```sql
+SELECT g.game_id, g.week, g.kickoff, g.home_team, g.away_team, g.spread_close, g.total_close,
+       g.home_score, g.away_score
+FROM games g
+WHERE 'KC' IN (g.home_team, g.away_team)
+  AND g.season = 2024
 ORDER BY g.kickoff;
 ```
 
----
+`games` has no status column; an unplayed game has NULL scores (devdb01 currently has none).
 
-## Index Usage Guide
+## Indexes that exist
 
-### mart.player_game_stats Indexes
+| Relation | Indexes |
+|---|---|
+| `games` | `games_pkey (game_id)`, `games_season_week_idx (season, week)`, `games_kickoff_idx`, `games_home_team_idx`, `games_away_team_idx` |
+| `plays` | `plays_pkey (game_id, play_id)`, `plays_game_id_idx`, `plays_posteam_idx`, `plays_quarter_idx` |
+| `mart.player_game_stats` | `idx_player_game_stats_unique (player_id, season, week, stat_category)`, `_player_id`, `_season_week`, `_category`, `_position_group` |
+| `mart.player_hierarchy` | `idx_player_hierarchy_player_id` (unique), `_position_group`, `_team` |
 
-```sql
--- 1. Unique constraint (enforces data integrity)
-idx_player_game_stats_unique: (player_id, season, week, stat_category)
--- Use: Primary key, prevents duplicates
+The November 2025 optimization reports in `db/` describe further indexes
+(`idx_player_game_stats_lookup`, `idx_games_season_week_kickoff`, `idx_games_betting_context`, ...)
+that do not exist in devdb01. Pattern 1 over all passing rows takes well under a second.
 
--- 2. Player lookup
-idx_player_game_stats_player_id: (player_id)
--- Use: Get all stats for a player across all games
-
--- 3. Season/week lookup
-idx_player_game_stats_season_week: (season, week)
--- Use: Get all players for a specific game week
-
--- 4. Stat category filter
-idx_player_game_stats_category: (stat_category)
--- Use: Filter by passing/rushing/receiving
-
--- 5. Position group filter
-idx_player_game_stats_position_group: (position_group)
--- Use: Filter by QB/RB/WR/TE
-
--- 6. Composite lookup (MOST EFFICIENT)
-idx_player_game_stats_lookup: (player_id, season, week)
-    WHERE stat_category IN ('passing', 'rushing', 'receiving')
--- Use: Single player-game lookups (PREFERRED for predictions)
-```
-
-### games Indexes
+## Checks
 
 ```sql
--- 1. Primary key
-games_pkey: (game_id)
+-- player_game_stats has no game_id (expect 0 rows)
+SELECT column_name FROM information_schema.columns
+WHERE table_schema = 'mart' AND table_name = 'player_game_stats' AND column_name = 'game_id';
 
--- 2. Team lookups
-games_home_team_idx: (home_team)
-games_away_team_idx: (away_team)
-
--- 3. Season/week lookup (CRITICAL for joins)
-games_season_week_idx: (season, week)
--- Use: Joining to player_game_stats
-
--- 4. Betting context (composite)
-idx_games_betting_context: (game_id, season, week, spread_close, total_close,
-                             home_team, away_team)
-    WHERE spread_close IS NOT NULL AND total_close IS NOT NULL
--- Use: Feature engineering with betting lines
+-- pooled home cover rate with the correct rule (expect about 0.49)
+SELECT avg(((home_score - away_score) > spread_close)::int)
+FROM games
+WHERE spread_close IS NOT NULL AND (home_score - away_score) <> spread_close;
 ```
 
-### mart.player_hierarchy Indexes
-
-```sql
--- 1. Primary key
-idx_player_hierarchy_player_id: (player_id) UNIQUE
-
--- 2. Position group filter
-idx_player_hierarchy_position_group: (position_group)
-
--- 3. Position + team composite
-idx_player_hierarchy_position_team: (position_group, current_team, player_id)
-
--- 4. Team lookup
-idx_player_hierarchy_team: (current_team)
-```
-
----
-
-## Performance Notes
-
-### Query Optimization Checklist
-
-**✅ DO:**
-1. Always use parameterized queries (`%s`, `$1`, etc.) to prevent SQL injection
-2. Use `LEFT JOIN` for games (some stats may not have betting lines)
-3. Filter on indexed columns (`player_id`, `season`, `week`, `stat_category`)
-4. Use `LIMIT` for single-row lookups
-5. Use `EXPLAIN ANALYZE` to verify index usage
-
-**❌ DON'T:**
-1. Use `SELECT *` in production (specify columns explicitly)
-2. Join without `(season, week)` composite key
-3. Assume `game_id` exists in `player_game_stats`
-4. Use `game_date`, `spread_line`, `total_line` (wrong column names)
-5. Use bare `LA` for team abbreviation
-
-### Connection Pooling (CRITICAL for backtests)
-
-**Problem:** Creating new connections is expensive (100-150ms overhead)
-
-**Solution:** Use connection pooling
-
-```python
-from psycopg2 import pool
-
-# Initialize once at startup
-db_pool = pool.SimpleConnectionPool(
-    minconn=2,
-    maxconn=8,
-    host="localhost", port=5544, database="devdb01",
-    user="dro", password="sicillionbillions"
-)
-
-# In process_game():
-conn = db_pool.getconn()
-try:
-    df = pd.read_sql_query(query, conn, params=(player_id, season, week, 'passing'))
-finally:
-    db_pool.putconn(conn)
-```
-
-**Savings:** 100-150ms per query = 18-24 minutes for 148-game backtest
-
----
-
-## Verification
-
-### Quick Sanity Checks
-
-```sql
--- 1. Verify player_game_stats does NOT have game_id
-SELECT column_name
-FROM information_schema.columns
-WHERE table_schema = 'mart'
-    AND table_name = 'player_game_stats'
-    AND column_name = 'game_id';
--- Expected: 0 rows
-
--- 2. Verify games HAS game_id
-SELECT column_name
-FROM information_schema.columns
-WHERE table_schema = 'public'
-    AND table_name = 'games'
-    AND column_name = 'game_id';
--- Expected: 1 row
-
--- 3. Test canonical join pattern
-SELECT COUNT(*)
-FROM mart.player_game_stats pgs
-LEFT JOIN mart.player_hierarchy ph ON pgs.player_id = ph.player_id
-LEFT JOIN games g ON
-    g.season = pgs.season
-    AND g.week = pgs.week
-    AND (g.home_team = ph.current_team OR g.away_team = ph.current_team)
-WHERE pgs.stat_category = 'passing'
-    AND pgs.season = 2024;
--- Expected: ~500+ rows (all 2024 passing stats with game context)
-```
-
----
-
-## Troubleshooting
-
-### Error: "column pgs.game_id does not exist"
-
-**Cause:** Trying to join `player_game_stats` via `game_id`
-
-**Fix:** Use Pattern 1 or Pattern 2 (join via `season, week`)
-
-### Error: "column g.game_date does not exist"
-
-**Cause:** Using wrong column name
-
-**Fix:** Use `g.kickoff` instead
-
-### Error: "more than one row returned by a subquery"
-
-**Cause:** Not filtering to specific player's team (multi-team players)
-
-**Fix:** Add team filter in games join: `(home_team = current_team OR away_team = current_team)`
-
-### Slow Query (>1 second)
-
-**Diagnosis:** Run `EXPLAIN ANALYZE`
-
-```sql
-EXPLAIN ANALYZE
-SELECT ...
-FROM mart.player_game_stats pgs
-...
-```
-
-**Common Issues:**
-- Missing `WHERE stat_category = 'passing'` (uses partial index)
-- Not using `(player_id, season, week)` filter (forces seq scan)
-- Joining games without `season, week` filter
-
----
-
-## References
-
-- **Full Schema Audit:** `docs/database/DATABASE_SCHEMA_AUDIT.md` (removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`)
-- **Quick Reference:** [DATABASE_QUICK_REFERENCE.md](DATABASE_QUICK_REFERENCE.md)
-- **Production Code:** `R/train_hierarchical_v2_production.R` (canonical example)
-- **Performance Analysis:** `docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md`
-
----
-
-**Last Updated:** November 14, 2025
-**Version:** 1.0
-**Maintainer:** Claude Code (Sonnet 4.5)
+`uv run python -m nfl_analytics.utils.sql_validator "<query>"` catches mistakes 1 and 2 before a
+query runs.

@@ -38,8 +38,8 @@ any of them was played (they kicked off 2025-12-11 to 2025-12-15). Their closing
 - That day `nflreadr::load_schedules(1999:2025)` loaded nflverse schedules into devdb01
   `games`, copying `spread_line` into `spread_close` (`tmp_rovodev_ingest_schedules_direct.R`,
   commit 3c29d9c, 2025-12-07 16:56 UTC). The values here come from the backup taken
-  afterwards, `backups/nfl_analytics_20251207_154232_pg17.dump` (local, not in git; file name
-  time 2025-12-07 15:42:32 local), table `public.games`, rows with season 2025 and week 15.
+  afterwards, `backups/nfl_analytics_20251207_154232_pg17.dump` (in Git LFS; file name time
+  2025-12-07 15:42:32 local), table `public.games`, rows with season 2025 and week 15.
   The 2025-12-07 20:19 and 2025-12-08 backups hold the same values.
 - sha256 `21e6eaa8eee67240773e4eceeadef8ec0cd8812983d1ab98257e09577fb8521b`.
 - Example: `2025_15_IND_SEA` was 3.5 (SEA favored by 3.5) on 2025-12-07 and closed 13.5;

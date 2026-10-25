@@ -1,317 +1,72 @@
 # Architecture Reference
 
-**Last Updated:** December 20, 2025
-**Version:** 4.5
-**Purpose:** Complete directory structure reference for NFL Analytics project
+**Updated:** 2026-10-25. A map of what is left after the October 2026 prune and what each part is
+for. Everything removed is at tag `archive/pre-prune-2026-10` ([../HISTORY.md](../HISTORY.md)).
 
----
-
-## Complete Directory Tree
+## Data flow that still works
 
 ```
-nfl-analytics/
-├── nfl_analytics/                                   # Python modules
-│   ├── causal/                           # Causal inference framework (8 modules)
-│   │   ├── panel_constructor.py          # Build longitudinal datasets
-│   │   ├── treatment_definitions.py      # Define shock events
-│   │   ├── confounder_identification.py  # Identify confounding
-│   │   ├── synthetic_control.py          # Counterfactual estimation
-│   │   ├── diff_in_diff.py               # DiD estimators
-│   │   ├── structural_causal_models.py   # Causal DAGs
-│   │   ├── model_integration.py          # Integrate with BNN
-│   │   └── validation.py                 # Validation/backtesting
-│   ├── compute/                          # Distributed compute system
-│   │   ├── statistics/                   # Statistical testing
-│   │   ├── hardware/                     # M4 vs 4090 routing
-│   │   ├── task_queue.py                 # Task management (WAL mode)
-│   │   ├── adaptive_scheduler.py         # Multi-armed bandit
-│   │   └── worker.py                     # Worker processes
-│   ├── features/                         # Feature engineering
-│   │   ├── asof_features.py              # Leakage-safe as-of features
-│   │   ├── asof_features_unified.py      # 342-feature unified set
-│   │   ├── bayesian_player_features.py   # Extract from posteriors
-│   │   ├── defensive_situational_strength.py        # Phase 2.4
-│   │   ├── defensive_game_script_indicators.py      # Phase 2.5
-│   │   ├── vegas_line_bias_features.py              # Phase 3
-│   │   ├── environmental_contextual_features.py     # Phase 3
-│   │   └── feature_interactions.py                  # Phase 3.5
-│   ├── models/                           # ML models
-│   │   ├── bayesian_neural_network.py    # BNN with PyMC
-│   │   ├── train_bnn_passing.py          # Passing yards BNN
-│   │   ├── train_bnn_rushing.py          # Rushing yards BNN
-│   │   ├── bnn_multioutput_pytorch.py    # Multi-output BNN (v3.1)
-│   │   ├── bnn_calibrated_v2.py          # Calibrated BNN (T=0.75)
-│   │   ├── xgboost_gpu_v3.py             # GPU-accelerated XGBoost
-│   │   └── props_predictor.py            # Unified prediction interface
-│   ├── ensemble/                         # Ensemble methods
-│   │   ├── enhanced_ensemble_v3.py       # 4-way ensemble
-│   │   └── stacked_meta_learner.py       # Meta-learning
-│   ├── optimization/                     # Risk/optimization
-│   │   └── portfolio_optimizer.py        # Correlation-adjusted Kelly
-│   ├── rl/                               # Reinforcement learning
-│   │   ├── dataset.py                    # RL logged dataset
-│   │   ├── cql_agent.py                  # Conservative Q-Learning
-│   │   └── ope_gate.py                   # Off-policy evaluation
-│   ├── production/                       # Production services
-│   │   └── cql_bet_sizer.py              # CQL bet sizing (4 risk gates)
-│   ├── backtest/                         # Backtesting
-│   │   ├── baseline_glm.py               # GLM baseline
-│   │   ├── harness.py                    # Systematic backtesting
-│   │   ├── bayesian_props_backtest.py    # Bayesian validation
-│   │   └── comprehensive_safe_backtest.py # Leakage-free backtest
-│   └── validation/                       # Data quality
-│       └── data_quality_checks.py        # Validation framework
-│
-├── R/                                    # R statistical models
-│   ├── bayesian_player_props.R           # v1.0 baseline hierarchical
-│   ├── bayesian_receiving_with_qb_chemistry.R  # QB-WR dyadic effects
-│   ├── train_and_save_passing_model.R    # v2.5 fixed pipeline
-│   ├── advanced_priors_elicitation.R     # v3.0 empirical Bayes
-│   ├── bayesian_team_ratings_brms.R      # Team hierarchical model
-│   ├── extract_bayesian_ratings.R        # Database export utility
-│   └── state_space/                      # State-space models
-│       ├── train_simplified_random_walk.R  # v2 canonical training
-│       ├── training_window_ablation.R      # Ablation study framework
-│       └── validate_2025_holdout.R         # 2025 validation
-│
-├── data/                                 # Data ingestion scripts
-│   ├── ingest_schedules.R                # Schedule ingestion
-│   ├── ingest_pbp.R                      # Play-by-play ingestion
-│   └── ingest_odds_history.py            # Historical odds (API)
-│
-├── db/                                   # SQL schema and migrations
-│   ├── 001_init.sql                      # Core schema
-│   ├── 002_timescale.sql                 # Timescale setup
-│   ├── 023_player_hierarchy_schema.sql   # Player hierarchy
-│   ├── 025_model_registry.sql            # ML model tracking
-│   ├── 026_canonical_training_window.sql # Canonical window registry
-│   └── migrations/                       # Schema migrations
-│
-├── analysis/                             # Analysis outputs
-│   ├── dissertation/                     # Dissertation (LaTeX)
-│   │   ├── main/                         # Main dissertation
-│   │   │   ├── main.tex                  # 693-page dissertation
-│   │   │   └── main.pdf                  # Compiled PDF
-│   │   ├── chapter_1_introduction/       # Chapter 1
-│   │   ├── chapter_2_literature_review/  # Chapter 2
-│   │   ├── chapter_3_data_foundation/    # Chapter 3
-│   │   ├── chapter_4_baseline_modeling/  # Chapter 4
-│   │   ├── chapter_5_reinforcement_learning/ # Chapter 5
-│   │   ├── chapter_6_advanced_bayesian/  # Chapter 6
-│   │   ├── chapter_7_causal_inference/   # Chapter 7
-│   │   ├── chapter_8_results_discussion/ # Chapter 8
-│   │   ├── chapter_9_production_deployment/ # Chapter 9
-│   │   ├── chapter_10_conclusion/        # Chapter 10
-│   │   ├── chapter_11_offline_rl_bet_sizing/ # Chapter 11
-│   │   ├── chapter_12_profit_optimization/   # Chapter 12
-│   │   ├── appendix/                     # Consolidated appendices
-│   │   ├── figures/                      # Figure generation
-│   │   │   ├── out/                      # Generated LaTeX tables/figures
-│   │   │   └── R/                        # R figure scripts
-│   │   ├── style/                        # LaTeX styles
-│   │   │   ├── tikz_diagram_style.tex    # Standardized TikZ style
-│   │   │   └── dissertation_preamble.tex # LaTeX preamble
-│   │   └── docs/                         # Dissertation documentation
-│   ├── features/                         # Feature engineering outputs
-│   ├── results/                          # Experiment results
-│   ├── calibration/                      # Calibration studies
-│   └── reports/                          # Analysis reports
-│
-├── models/                               # Trained models
-│   ├── bayesian/                         # Bayesian models
-│   │   ├── simplified_random_walk_v2.rds      # 14MB - v2 canonical (APPROVED)
-│   │   ├── passing_yards_hierarchical_v1.rds  # 22MB - v1.0 baseline
-│   │   ├── passing_informative_priors_v1.rds  # 5.2MB - v3.0
-│   │   ├── receiving_qb_chemistry_v1.rds      # 210MB - v3.0 QB-WR
-│   │   ├── bnn_passing_v1.pkl                 # 80MB - v3.0 BNN
-│   │   ├── bnn_multioutput_v1_final.pt        # 59KB - v3.1 multi-output
-│   │   └── player_skill_trajectories_v1.csv   # State-space output
-│   ├── cql/                              # CQL models
-│   │   ├── best_model.pth                # 207KB - trained CQL
-│   │   └── cql_training_log.json         # Training metrics
-│   └── xgboost/                          # XGBoost models
-│       └── v2_1.pkl                      # GPU-trained XGBoost
-│
-├── tests/                                # Test suite
-│   ├── unit/                             # Unit tests
-│   │   └── test_*.py                     # Unit test modules
-│   ├── integration/                      # Integration tests
-│   │   ├── test_temporal_leakage.py      # Leakage detection (10 tests)
-│   │   └── test_*.py                     # Other integration tests
-│   ├── e2e/                              # End-to-end tests
-│   └── README.md                         # Testing documentation
-│
-├── scripts/                              # Automation scripts
-│   ├── dev/                              # Development scripts
-│   │   └── init_dev.sh                   # Initialize dev environment
-│   ├── setup_testing.sh                  # Setup testing environment
-│   ├── gpu_training_orchestrator.py      # GPU training coordinator
-│   └── train_all_phases_scaled.py        # Scaled training pipeline
-│
-├── containers/                           # Docker files (Phase 1+)
-│   ├── Dockerfile.api                    # FastAPI prediction service
-│   ├── Dockerfile.streamlit              # Streamlit dashboard
-│   ├── Dockerfile.worker                 # Celery workers (Phase 2)
-│   ├── Dockerfile.jupyter                # Jupyter notebooks (Phase 2)
-│   └── Dockerfile.gpu-trainer            # GPU training (Phase 3)
-│
-├── docs/                                 # Project documentation
-│   ├── CAUSAL_INFERENCE_FRAMEWORK.md     # Causal inference guide
-│   ├── ADVANCED_BAYESIAN_V3.md           # v3.0 technical docs
-│   ├── BAYESIAN_ENHANCEMENTS_v2.md       # v2.5 enhancements
-│   ├── STATE_SPACE_FINAL_DECISION.md     # State-space GO/NO-GO
-│   ├── TRAINING_WINDOW_ABLATION_RESULTS.md # Ablation study (500+ lines)
-│   ├── BNN_CALIBRATION_COMPLETE.md       # BNN calibration validation
-│   ├── AUTOMATED_LEAKAGE_TESTS_COMPLETE.md # Leakage test suite
-│   ├── DATABASE_SCHEMA_AUDIT.md          # Comprehensive schema audit
-│   ├── ARCHITECTURE_REFERENCE.md         # This file
-│   ├── database/                         # Database docs
-│   │   ├── schema.md                     # Schema documentation
-│   │   ├── erd.md                        # Entity-relationship diagram
-│   │   └── DATABASE_QUICK_REFERENCE.md   # Quick lookup guide
-│   ├── guides/                           # User guides
-│   │   └── COMMON_TASKS_REFERENCE.md     # Task cookbook
-│   ├── milestones/                       # Milestone summaries
-│   │   ├── CQL_COMPLETE_SUMMARY.md       # CQL training complete
-│   │   ├── BAYESIAN_PROPS_COMPLETE.md    # Bayesian methodology
-│   │   └── RECENT_WORK_HISTORY.md        # Historical work log
-│   └── COMPONENT_DEEP_DIVES.md           # Component usage details
-│
-├── .github/workflows/                    # CI/CD workflows
-│   ├── test.yml                          # Test suite workflow
-│   ├── pre-commit.yml                    # Code quality checks
-│   └── data-quality.yml                  # Nightly data validation
-│
-├── dashboard/                            # Monitoring dashboard
-│   ├── Dockerfile.streamlit              # Streamlit container
-│   └── streamlit_app.py                  # Dashboard app
-│
-├── mcp_server/                           # Model Context Protocol server
-│   ├── Dockerfile                        # MCP container
-│   └── server.py                         # FastMCP server
-│
-├── prometheus/                           # Prometheus config
-│   └── prometheus.yml                    # Scrape configs
-│
-├── grafana/                              # Grafana dashboards
-│   └── provisioning/                     # Dashboard provisioning
-│
-├── pgdata/                               # PostgreSQL data volume
-├── run_compute.py                        # Compute system entry point
-├── docker-compose.yml                    # Docker services (Phase 1)
-├── docker-compose.dev.yml                # Dev services (Phase 2)
-├── docker-compose.gpu.yml                # GPU services (Phase 3)
-├── pyproject.toml                      # Python dependencies (+ uv.lock)
-├── renv.lock                             # R package versions
-├── pytest.ini                            # Test configuration
-├── .pre-commit-config.yaml               # Pre-commit hooks
-├── .env                                  # Environment variables (DO NOT COMMIT)
-├── .env.example                          # Environment template
-├── README.md                             # Project overview
-├── CLAUDE.md                             # AI assistant context (refactored)
-├── PROJECT_STATUS.md                     # Current project status
-├── DOCUMENTATION_INDEX.md                # Complete documentation catalog
-└── PHASE_PLAN.md                         # 24-week implementation plan
+nflverse games.csv ──┐
+data/*.csv ──────────┼──> nfl_analytics.evaluation.market_benchmark ──> report (ATS, MAE, log-loss, CLV)
+devdb01 games ───────┘          ▲ predictions CSV (game_id, expected home margin)
+                                 │
+models/production/game_outcome_v2 + GameFeatureExtractor (devdb01) ──> 2025 run, frozen
 ```
 
----
+There is no ingestion pipeline: devdb01 holds 1999-2025, and newer games come straight from the
+nflverse release files (`--nflverse-csv`).
 
-## Key Directory Purposes
+## `nfl_analytics/` (61 files)
 
-### `/py` - Python ML/Data Pipeline
-- **causal/**: Causal inference framework (DiD, synthetic control, SCM)
-- **compute/**: Distributed compute coordination (Mac M4 ↔ Windows RTX 4090)
-- **features/**: Feature engineering (leakage-safe, temporal, contextual)
-- **models/**: ML models (BNN, XGBoost, ensemble)
-- **rl/**: Reinforcement learning (CQL bet sizing)
-- **production/**: Production services (API, bet sizer)
-- **backtest/**: Systematic backtesting framework
-- **validation/**: Data quality checks
+| Path | What it is | Status |
+|---|---|---|
+| `evaluation/market_benchmark/` | the grading tool: `market.py` (loaders for `--db`, `--nflverse-csv`, `--market-csv`), `baselines.py` (walk-forward Elo and power ratings), `metrics.py` (ATS at real prices, MAE with Diebold-Mariano, log-loss against the de-vigged market, information regression, CLV), `guardrails.py`, `predict.py` (prospective predictions), `report.py`, `__main__.py` (CLI) | live; unit-tested |
+| `utils/spread_convention.py` | the sign convention: `home_cover`, `home_cover_margin`, `model_edge`, `book_home_line`, `implied_home_win_prob`, `assert_nflverse_convention` | live; unit-tested |
+| `utils/db_config.py` | connection settings from `DB_*` variables | live |
+| `utils/sql_validator.py` | schema-aware query checker (`python -m nfl_analytics.utils.sql_validator "<query>"`) | live (needs the database) |
+| `utils/team_mapping.py` | team code conversions (`LA` ↔ `LAR` and franchise history) | live |
+| `utils/data_leakage_detector.py` | DataFrame and code-pattern leakage checks used by the temporal-safety tests | live; misses the leaks found later ([TEMPORAL_SAFETY_TESTING_FRAMEWORK.md](../TEMPORAL_SAFETY_TESTING_FRAMEWORK.md)) |
+| `utils/calibration.py`, `utils/psycopg_pool.py` | reliability curves and Brier/log-loss helpers; a psycopg 3 pool | imported by kept code |
+| `analysis/statistical_tests.py` | Diebold-Mariano, Holm step-down and other tests used by `market_benchmark` | live; unit-tested |
+| `models/game_outcome_model_fixed.py` | `GameOutcomeModel`: loads, trains and predicts the three v2 XGBoost boosters; refuses a DO NOT DEPLOY directory unless `allow_frozen_reference=True` | frozen reference |
+| `models/state_space.py`, `models/generate_state_space_predictions.py` | Kalman team ratings (sign fixed 2026-10-24) and the generator of `models/state_space/predictions_historical.csv` | provenance of the state-space grade |
+| `models/power_ratings_model.py` | the point-differential model behind the retracted 74.9% claim; its `--sweep` tunes on the evaluation seasons | historical; the canonical baseline is in `market_benchmark/baselines.py` |
+| `models/evidential_regression.py`, `models/config/xgboost_params.py` | an evidential props model (needs torch); v2's XGBoost parameters | kept because kept code imports them |
+| `features/game_feature_extractor.py` and the feature modules beside it (`team_offensive_features`, `team_defensive_features`, `nextgen_features`, `qbr_features`, `opponent_adjusted_features`, `opponent_strength`, `turnover_luck`, `possession_value`, `playcalling_features`, `primetime_features`, `synthetic_*`, `research_driven_features`, `line_movement_features`, `player_aggregation_features`) | v2's 382-input feature extraction from devdb01; it now returns 338 features (no `sem_*`, failing `syn_*`) and v2 zero-fills the rest | frozen with v2 |
+| `features/asof_features.py`, `asof_features_unified.py`, `enhanced_travel_features.py` | as-of team features for the GLM walk-forward (team-side `prev_spread_close` since 2026-10-24) | tested; provenance |
+| `features/kickoff_time.py` | `kickoff_wall_clock`: Eastern wall-clock times from the UTC `kickoff` | live |
+| `features/catalog.yaml` | feature catalog read by `scripts/audit_leakage.py` (its `source_script` fields name removed modules) | metadata |
+| `backtest/baseline_glm.py`, `backtest/harness.py`, `backtest/harness_multimodel.py` | the October 2025 GLM/XGB walk-forward behind `analysis/results/multimodel_predictions.csv`; `harness_multimodel.py` fails at import (`DEFAULT_FEATURE_COLUMNS`) | provenance only |
+| `services/game_outcome_runs.py` | writes v2 predictions to `ml.game_outcome_predictions`; refuses v2 unless asked | frozen with v2 |
+| `config/settings.py`, `config/constants.py`, `config/feature_weights.py` + `feature_weights.yaml` | settings and the feature-group switches (Kalman/GP off; its comments still give the retracted ADR-015 rationale) | imported by kept code |
 
-### `/R` - Statistical Models
-- Bayesian hierarchical models (brms, Stan)
-- State-space models (random walk, AR(1))
-- QB-WR chemistry (dyadic random effects)
-- Empirical Bayes priors
-- Model training scripts
+## `scripts/`
 
-### `/db` - Database Schema
-- SQL migrations (001-026)
-- Schema definitions
-- Model registry
-- Canonical training window tracking
+| Path | What it is |
+|---|---|
+| `final_evaluation/` | the canonical evaluation: `grade_game_outcome_v2_2025.py`, `export_game_outcome_v2_2025.py`, `grade_baselines.py`, `grade_state_space_walkforward.py`, `regrade_walkforward_2004_2024.py`, `prospective_2026.py`, `check_claims.py` (the retraction ledger; reproduces only from a worktree of `archive/pre-prune-2026-10`) |
+| `odds_history_panel.py` | re-timed private odds panel and the aggregate line-movement results |
+| `market_facts.py` | market facts from nflverse schedules |
+| `backfill_historical_odds.py` | the December 2025 Odds API backfill (provenance; its matcher has the bugs in POSTMORTEMS §7) |
+| `train_game_outcome_model.py`, `generate_2025_game_predictions_fixed.py` | how v2 was trained and how its 2025 run was made (provenance; v2 is frozen) |
+| `build_travel_distance_matrix.py`, `calculate_travel_features.py`, `extract_international_games.py`, `extract_weather_features.py`, `load_coaching_data.py`, `scrape_coaching_*.py` | provenance of the tables in `data/` and of `coaching_staff` |
+| `refresh_marts.py`, `pipeline_health_check.py` | refresh the matviews; a pre-prediction data check (it still suggests the removed R ingest scripts) |
+| `audit_leakage.py` | static leakage audit over `features/catalog.yaml` |
+| `analysis/run_reports.sh`, `chapter_management/`, `utils/` (bibliography and LaTeX helpers), `generate_*_figure*.py`, `generate_mcmc_traces_figure.R`, `validate_conformal_bnn.py`, `validate_evidential.py` | dissertation tooling; `generate_gnn_calibration_plot.py` draws its figure from random noise (ERRATA P46) |
+| `dev/init_dev.sh`, `dev/check_spread_sign_hook.py`, `maintenance/backup.sh`, `maintenance/restore.sh` | database bootstrap (schema snapshot into an empty devdb01), the sign guard's self-test, backup and restore ([../../db/README.md](../../db/README.md), Makefile) |
 
-### `/analysis` - Research Outputs
-- **dissertation/**: 693-page LaTeX dissertation
-- **features/**: Feature engineering outputs
-- **results/**: Experiment results (ablation, backtest, calibration)
-- **reports/**: Analysis reports
+## Other directories
 
-### `/models` - Trained Artifacts
-- **bayesian/**: R/PyMC models (rds, pkl, pt files)
-- **cql/**: Reinforcement learning models
-- **xgboost/**: GPU-trained XGBoost models
-
-### `/tests` - Test Suite
-- **unit/**: Fast, isolated tests (no DB)
-- **integration/**: DB-dependent tests (Docker)
-- **e2e/**: End-to-end workflow tests
-
-### `/scripts` - Automation
-- Development initialization
-- GPU training orchestration
-- Testing setup
-- Deployment automation
-
-### `/containers` - Docker Infrastructure
-- API service (FastAPI)
-- Dashboard (Streamlit)
-- Workers (Celery)
-- Jupyter/RStudio (dev tools)
-- GPU training (CUDA/MPS)
-
-### `/docs` - Documentation
-- Technical guides (causal, Bayesian, state-space)
-- Database reference
-- Milestone summaries
-- Component deep dives
-- Common tasks cookbook
-
----
-
-## Maintenance Notes
-
-### Regenerating Directory Tree
-
-Use the following command to regenerate the directory tree:
-
-```bash
-# From project root
-tree -L 3 --dirsfirst -I 'pgdata|__pycache__|*.pyc|.git|node_modules|renv' > tree_output.txt
-
-# Or for full tree:
-tree -L 4 --dirsfirst -I 'pgdata|__pycache__|*.pyc|.git|node_modules|renv|*.log|*.aux|*.bbl'
-```
-
-### Key Exclusions
-- `pgdata/`: PostgreSQL data (large, gitignored)
-- `__pycache__/`: Python bytecode
-- `.git/`: Git internals
-- `node_modules/`: Node dependencies
-- `renv/`: R package cache
-- Log files, LaTeX aux files
-
----
-
-## Cross-References
-
-- **Database Schema**: See [docs/database/DATABASE_QUICK_REFERENCE.md](../database/DATABASE_QUICK_REFERENCE.md)
-- **Component Details**: See `docs/architecture/COMPONENT_DEEP_DIVES.md` (removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`)
-- **Complete Documentation**: See DOCUMENTATION_INDEX.md (no longer in the repo; see [HISTORY](../HISTORY.md))
-- **Recent Work**: See docs/milestones/RECENT_WORK_HISTORY.md (no longer in the repo; see [HISTORY](../HISTORY.md))
-
----
-
-**Last Updated:** December 20, 2025
-**Maintainer:** Claude Code
-**Purpose:** Complete directory reference for AI assistants and developers
+| Path | Contents |
+|---|---|
+| `models/production/game_outcome_v2/` | the three frozen v2 boosters, feature names, metadata and the DO NOT DEPLOY README |
+| `models/state_space/` | the 2019-2025 state-space walk-forward probabilities, config and the 2024 tuning grid |
+| `data/` | `historical_weather_2018_2024.csv` (the benchmark's bundled market CSV and a test fixture), `game_outcome_v2_predictions_2025.csv`, stadium, distance, timezone, coaching and international-game tables |
+| `analysis/results/` | inputs of the 2004-2024 walk-forward regrade (`multimodel_predictions.csv`, `glm_baseline_preds.csv`, ...) |
+| `analysis/dissertation/` | LaTeX source, `ERRATA.md`, `ERRATA_audit.csv`; `analysis/foundation/` holds the owner's earlier essays |
+| `analysis/validation/validate_injury_weights.py` | injury-weight check |
+| `R/dissertation_figures.R` | the one R file left: dissertation figures |
+| `db/` | schema snapshot (`db/schema/`), migrations (history), materialized-view SQL, audit and optimization reports from 2025 |
+| `backups/` | three December 2025 dumps in Git LFS (pre-repair, contain licensed odds); `backups/local/` is private and gitignored |
+| `tests/` | [../../tests/README.md](../../tests/README.md) |
+| `docs/` | [../README.md](../README.md) |

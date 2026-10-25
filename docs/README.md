@@ -1,41 +1,65 @@
 # Documentation
 
-Current reference documentation. Dated session logs and reports were archived on 2026-10-24 —
-see [HISTORY.md](HISTORY.md) for the timeline and how to restore them. Docs for the subsystems
-removed in the 2026-10 prune (trading, API, operations, agents, causal designs, ensemble and R
-model guides) are in tag `archive/pre-prune-2026-10`.
+The project is a wound-down research archive; [../README.md](../README.md) has the results and
+[../PROJECT_STATUS.md](../PROJECT_STATUS.md) what is left to decide. Docs, code and data removed
+in October 2026 are in local git tags ([HISTORY.md](HISTORY.md)): `docs-archive-2026-10` for the
+~920 session logs pruned on 2026-10-24, `archive/pre-prune-2026-10` for everything the salvage
+prune removed. A path cited in a doc that no longer exists in the tree is almost always in one of
+the two (`git show archive/pre-prune-2026-10:<path>`).
 
 ## Start here
 
-- [../README.md](../README.md) — what the project is and its honest results
-- [../SETUP.md](../SETUP.md) — environment setup (uv, R, database)
-- [POSTMORTEMS.md](POSTMORTEMS.md) — failures and root causes (read §4, spread sign convention, before writing any betting math)
-- [adr/README.md](adr/README.md) — architecture decision records, with evidence quality noted
+- [../README.md](../README.md): what the project is, the canonical results, setup and commands
+- [../CLAUDE.md](../CLAUDE.md): the critical rules (spread sign, kickoff time zone, database, odds licence)
+- [POSTMORTEMS.md](POSTMORTEMS.md): what went wrong and why; read §4 (spread sign convention)
+  before writing any betting math
+- [adr/README.md](adr/README.md): design decisions, their status and how their evidence held up
 
-## Evaluation and results
+## Evaluation and results (October 2026)
 
-- [investigations/2026-10-final-evaluation/](investigations/2026-10-final-evaluation/) — final grade of the models against the closing line, the 2004–2024 walk-forward regrade and the retraction ledger
-- [investigations/2026-10-market-benchmark.md](investigations/2026-10-market-benchmark.md) — baselines vs the closing line; reproduces the 74.9% retraction
-- [investigations/2026-10-line-movement/](investigations/2026-10-line-movement/) — line movement and closing-line value from the 2020–2024 odds snapshots (aggregates only)
-- [investigations/2026-10-market-facts/](investigations/2026-10-market-facts/) — how closing lines have behaved since 1999, from nflverse schedules
-- [investigations/2026-02-season-review/](investigations/2026-02-season-review/) — full 2025 season review (WS1–WS7)
-- [TRAINING_WINDOW_ABLATION_RESULTS.md](TRAINING_WINDOW_ABLATION_RESULTS.md) — data behind the dissertation's training-window figure (`R/dissertation_figures.R`)
-- [TEMPORAL_LEAKAGE_PROTECTION.md](TEMPORAL_LEAKAGE_PROTECTION.md), [TEMPORAL_SAFETY_TESTING_FRAMEWORK.md](TEMPORAL_SAFETY_TESTING_FRAMEWORK.md)
+- [investigations/2026-10-final-evaluation/](investigations/2026-10-final-evaluation/README.md):
+  the final grade against the closing line (Game Outcome v2 on 2025, walk-forward baselines, the
+  Kalman state-space model, prospective 2026 predictions), with its
+  [retraction ledger](investigations/2026-10-final-evaluation/retraction_ledger.md) and the
+  [2004-2024 walk-forward regrade](investigations/2026-10-final-evaluation/walkforward_2004_2024.md)
+- [investigations/2026-10-market-benchmark.md](investigations/2026-10-market-benchmark.md): the
+  grading tool, its options and guardrails
+- [investigations/2026-10-line-movement/](investigations/2026-10-line-movement/README.md): line
+  movement and closing-line value from the licensed 2020-2024 odds snapshots (aggregates only)
+- [investigations/2026-10-market-facts/](investigations/2026-10-market-facts/README.md): how
+  closing lines behaved in 1999-2025, from nflverse schedules
+- [../analysis/dissertation/ERRATA.md](../analysis/dissertation/ERRATA.md): errors in the
+  dissertation and the full audit of its tables and figures
+
+## Earlier investigations
+
+- [investigations/2026-02-season-review/](investigations/2026-02-season-review/README.md): the
+  February 2026 review of the 2025 season (WS1-WS7), with notes on which findings hold
+- [TRAINING_WINDOW_ABLATION_RESULTS.md](TRAINING_WINDOW_ABLATION_RESULTS.md): the November 2025
+  training-window study behind ADR-007 (retracted; kept as the source cited by a dissertation figure)
 
 ## Data
 
-- [database/DATABASE_QUICK_REFERENCE.md](database/DATABASE_QUICK_REFERENCE.md), [database/SQL_PATTERNS.md](database/SQL_PATTERNS.md)
-- [CROSS_PLATFORM_SETUP.md](CROSS_PLATFORM_SETUP.md) — database objects created outside the migrations
+- [database/DATABASE_QUICK_REFERENCE.md](database/DATABASE_QUICK_REFERENCE.md): tables, counts,
+  semantics of `kickoff`, `spread_close` and `odds_history`, and objects created outside the migrations
+- [database/SQL_PATTERNS.md](database/SQL_PATTERNS.md): joins that work and the schema traps
+- [../db/README.md](../db/README.md): schema bootstrap, migrations history, restores
 
-## Models and methods
+## Models, features and methods
 
-- [models/GAME_OUTCOME_MODEL_GUIDE.md](models/GAME_OUTCOME_MODEL_GUIDE.md)
-- [features/NEXTGEN_FEATURES_DOCUMENTATION.md](features/NEXTGEN_FEATURES_DOCUMENTATION.md)
+- [../models/production/game_outcome_v2/README.md](../models/production/game_outcome_v2/README.md):
+  the frozen Game Outcome v2 (how it was trained, its 2025 grade, its defects; DO NOT DEPLOY)
+- [features/NEXTGEN_FEATURES_DOCUMENTATION.md](features/NEXTGEN_FEATURES_DOCUMENTATION.md): the
+  Next Gen Stats feature module
+- [TEMPORAL_SAFETY_TESTING_FRAMEWORK.md](TEMPORAL_SAFETY_TESTING_FRAMEWORK.md): what the leakage
+  tests check, and what they missed
+- [architecture/ARCHITECTURE_REFERENCE.md](architecture/ARCHITECTURE_REFERENCE.md): module and
+  script map of the pruned tree
 
-## Architecture
+## Other
 
-- [architecture/ARCHITECTURE_REFERENCE.md](architecture/ARCHITECTURE_REFERENCE.md)
-
-## Guides
-
-- [guides/DISSERTATION_STANDARDS.md](guides/DISSERTATION_STANDARDS.md)
+- [guides/DISSERTATION_STANDARDS.md](guides/DISSERTATION_STANDARDS.md): the standards the
+  dissertation was written to (and, per the errata, missed)
+- [HISTORY.md](HISTORY.md): timeline and how to restore archived docs
+- [../tests/README.md](../tests/README.md), [../SETUP.md](../SETUP.md),
+  [../CONTRIBUTING.md](../CONTRIBUTING.md)

@@ -1,477 +1,79 @@
-# Testing Infrastructure
+# Tests
 
-This directory contains the complete test suite for the NFL analytics project.
+The suite after the October 2026 prune: tests for the grading tool, the spread convention, the
+leakage detector, the kept feature code and the frozen Game Outcome v2 loader. Tests of removed
+code went with it (tag `archive/pre-prune-2026-10`).
 
-## Quick Start
-
-```bash
-# 1. Setup testing environment
-bash scripts/setup_testing.sh
-
-# 2. Run unit tests (fast, no DB required)
-pytest tests/unit -m unit
-
-# 3. Run integration tests (requires Docker + Postgres)
-docker compose up -d pg
-pytest tests/integration -m integration
-
-# 4. Run all tests with coverage
-pytest --cov=nfl_analytics --cov-report=html
-open htmlcov/index.html
-```
-
-## P0 Critical Test Suite (NEW - November 15, 2025)
-
-**Status:** ✅ COMPLETE (86 tests, 1,851 lines, 78% coverage)
-
-Three comprehensive P0 test suites for production-critical components:
-
-### 1. Ensemble v6 Integration Tests
-**File:** `tests/integration/test_ensemble_v6_integration.py` (642 lines, 31 tests)
-
-Tests ensemble v6 with XGBoost v4 Ridge Residuals:
-- XGBoost v4 model loading and prediction
-- 4-way ensemble aggregation (30/30/25/15% weights)
-- Temperature scaling v6 (T=0.5534)
-- Component failure handling (graceful degradation)
-- Performance benchmarks (<500ms inference)
-- Risk gate enforcement (MAE, calibration, Sharpe, ROI)
+## Running
 
 ```bash
-# Run ensemble v6 tests
-pytest tests/integration/test_ensemble_v6_integration.py -v
-
-# Run only critical tests
-pytest tests/integration/test_ensemble_v6_integration.py -m critical
+uv sync --extra dev
+uv run pytest -m "not integration"            # offline; what CI runs
+uv run pytest -m integration                  # 133 tests; need devdb01 with data and DB_PASSWORD
 ```
 
-### 2. Backtest Framework Tests
-**File:** `tests/integration/test_backtest_framework.py` (598 lines, 34 tests)
-
-Tests historical validation backtest framework:
-- Walk-forward validation (expanding window)
-- Rolling origin cross-validation (fixed window)
-- Risk gate enforcement (hard/soft gates)
-- All 11 backtest metrics (MAE, RMSE, Coverage, Sharpe, ROI, etc.)
-- Database connection pooling (50-100x speedup)
-- Feature caching (70-85% hit rate)
-- Temporal safety (no future data leakage)
-
-```bash
-# Run backtest tests
-pytest tests/integration/test_backtest_framework.py -v
-
-# Run performance tests (slower)
-pytest tests/integration/test_backtest_framework.py -m slow
-```
-
-### 3. Data Leakage Prevention Tests
-**File:** `tests/unit/test_data_leakage_prevention.py` (611 lines, 35 tests)
-
-Tests data leakage detection and prevention (#1 cause of betting model failure):
-- Temporal split enforcement (train always before test)
-- ASOF join validation (no future data in joins)
-- Rolling feature windows (only historical data)
-- Future data detection (negative shift detection)
-- Player contamination checks
-- Target leakage detection (outcome in features)
-- Pre-training validation gates
-
-```bash
-# Run data leakage tests
-pytest tests/unit/test_data_leakage_prevention.py -v
-
-# Run only critical tests
-pytest tests/unit/test_data_leakage_prevention.py -m critical
-```
-
-### Run All P0 Tests
-
-```bash
-# Sequential execution (~1.6 minutes)
-pytest tests/unit/test_data_leakage_prevention.py \
-       tests/integration/test_ensemble_v6_integration.py \
-       tests/integration/test_backtest_framework.py \
-       -v --cov=nfl_analytics --cov-report=html
-
-# Parallel execution (~28 seconds, 3.4x speedup)
-pytest tests/unit/test_data_leakage_prevention.py \
-       tests/integration/test_ensemble_v6_integration.py \
-       tests/integration/test_backtest_framework.py \
-       -n auto -v
-```
-
-**Documentation:** See `tests/P0_COMPLETION_GUIDE.md` for comprehensive guide
-
----
-
-## Test Structure
-
-```
-tests/
-├── unit/                           # Fast, isolated unit tests (no I/O)
-│   ├── test_odds_parsing.py
-│   └── test_data_leakage_prevention.py  # NEW: P0 data leakage tests (611 lines)
-├── integration/                    # Multi-module & database tests
-│   ├── test_odds_ingestion.py
-│   ├── test_ensemble_v6_integration.py  # NEW: P0 ensemble tests (642 lines)
-│   ├── test_backtest_framework.py       # NEW: P0 backtest tests (598 lines)
-│   └── test_temporal_safety_comprehensive.py
-├── e2e/                            # Full pipeline tests
-├── fixtures/                       # Sample data for testing
-│   └── sample_odds.py
-├── sql/                            # SQL validation scripts
-│   ├── test_schema.sql
-│   └── test_data_quality.sql
-├── conftest.py                     # Shared fixtures
-├── P0_COMPLETION_GUIDE.md          # NEW: P0 test documentation
-└── README.md                       # This file
-```
-
-## Running Tests
-
-### By Category
-```bash
-# Unit tests only (< 1s)
-pytest tests/unit -m unit
-
-# Integration tests (requires DB)
-pytest tests/integration -m integration
-
-# End-to-end tests (slow)
-pytest tests/e2e -m e2e
-
-# Critical tests only (P0)
-pytest -m critical
-
-# All tests
-pytest
-```
-
-### By File
-```bash
-# Single test file
-pytest tests/unit/test_odds_parsing.py
-
-# Single test class
-pytest tests/unit/test_odds_parsing.py::TestFlattenEvents
-
-# Single test function
-pytest tests/unit/test_odds_parsing.py::TestFlattenEvents::test_flatten_events_single_market_spread
-```
-
-### With Coverage
-```bash
-# Generate coverage report
-pytest --cov=nfl_analytics --cov-report=term-missing
-
-# HTML coverage report
-pytest --cov=nfl_analytics --cov-report=html
-open htmlcov/index.html
-
-# XML for CI/CD
-pytest --cov=nfl_analytics --cov-report=xml
-```
-
-### Other Options
-```bash
-# Run with verbose output
-pytest -v
-
-# Stop on first failure
-pytest -x
-
-# Run specific markers
-pytest -m "unit and not slow"
-
-# Run in parallel (faster)
-pytest -n auto
-
-# Show slowest tests
-pytest --durations=10
-```
-
-## Test Markers
-
-```python
-@pytest.mark.unit          # Fast unit tests (no I/O)
-@pytest.mark.integration   # Database/API integration tests
-@pytest.mark.e2e           # End-to-end pipeline tests
-@pytest.mark.critical      # P0 critical tests (must pass before deployment)
-@pytest.mark.slow          # Slow tests (>5 seconds)
-```
-
-## Integration Tests (Database Required)
-
-Integration tests need a PostgreSQL database:
-
-```bash
-# Start test database
-docker compose up -d pg
-
-# Set environment variables
-export TEST_DATABASE_URL="postgresql://testuser:testpass@localhost:5432/testdb"
-
-# Apply schema
-psql $TEST_DATABASE_URL -f db/001_init.sql
-psql $TEST_DATABASE_URL -f db/002_timescale.sql
-
-# Run integration tests
-pytest tests/integration -m integration
-```
-
-## Pre-commit Hooks
-
-Pre-commit hooks run automatically before each commit:
-
-```bash
-# Install hooks (one-time setup)
-pre-commit install
-
-# Run manually on all files
-pre-commit run --all-files
-
-# Update hook versions
-pre-commit autoupdate
-
-# Skip hooks (not recommended)
-git commit --no-verify
-```
-
-### Hooks Included
-- **black**: Python code formatting
-- **ruff**: Python linting & auto-fixing
-- **mypy**: Static type checking
-- **trailing-whitespace**: Remove trailing spaces
-- **check-yaml**: YAML syntax validation
-- **detect-secrets**: Prevent committing secrets
-
-## CI/CD (GitHub Actions)
-
-Three workflows run automatically on push/PR:
-
-### 1. Test Suite (`.github/workflows/test.yml`)
-- Unit tests on Python 3.10, 3.11, 3.12
-- Integration tests with TimescaleDB
-- Code coverage reporting (Codecov)
-- Security scanning (Bandit, Safety)
-
-### 2. Pre-commit (`.github/workflows/pre-commit.yml`)
-- Runs all pre-commit hooks
-- Ensures code quality standards
-
-### 3. Nightly Data Quality (`.github/workflows/nightly-data-quality.yml`)
-- Schema validation
-- Data integrity checks
-- Runs daily at 6am UTC
-
-## Writing Tests
-
-### Unit Test Example
-```python
-import pytest
-from nfl_analytics.ingest_odds_history import parse_iso
-
-def test_parse_iso_with_z_suffix():
-    """Test ISO timestamp parsing with Z (Zulu) timezone."""
-    result = parse_iso("2023-09-07T17:00:00Z")
-    assert result.year == 2023
-    assert result.tzinfo == dt.timezone.utc
-```
-
-### Integration Test Example
-```python
-@pytest.mark.integration
-def test_odds_insertion(db_connection):
-    """Test inserting odds into database."""
-    cursor = db_connection.cursor()
-    cursor.execute("INSERT INTO odds_history (...) VALUES (...)")
-    db_connection.commit()
-
-    cursor.execute("SELECT COUNT(*) FROM odds_history")
-    assert cursor.fetchone()[0] == 1
-```
-
-### Using Fixtures
-```python
-def test_with_sample_data(sample_odds_api_response, sample_snapshot_time):
-    """Use shared fixtures from conftest.py."""
-    rows = flatten_events([sample_odds_api_response], sample_snapshot_time)
-    assert len(rows) > 0
-```
-
-## Best Practices
-
-### 1. Test Isolation
-- Each test should be independent
-- Use fixtures for setup/teardown
-- Don't rely on test execution order
-
-### 2. Test Naming
-- Use descriptive names: `test_<function>_<scenario>_<expected>`
-- Example: `test_parse_iso_with_z_suffix`
-
-### 3. Assertions
-- One logical assertion per test
-- Use pytest's rich assertion introspection
-- Prefer `assert x == y` over `assertEqual(x, y)`
-
-### 4. Mocking
-- Mock external APIs (requests)
-- Mock time-dependent code (freezegun)
-- Don't mock internal logic (test it directly)
-
-### 5. Coverage
-- Aim for 75%+ overall coverage (P0 tests achieve 78%)
-- 80%+ for critical paths (ensemble, backtest, data leakage)
-- Don't obsess over 100%
-
-## Debugging Tests
-
-```bash
-# Print output (disable capture)
-pytest -s
-
-# Drop into debugger on failure
-pytest --pdb
-
-# Show local variables on failure
-pytest -l
-
-# Trace test execution
-pytest --trace
-
-# Re-run only failed tests
-pytest --lf
-
-# Run tests matching keyword
-pytest -k "odds and not slow"
-```
-
-## SQL Tests
-
-SQL tests validate schema and data quality:
-
-```bash
-# Run schema validation
-psql $DATABASE_URL -f tests/sql/test_schema.sql
-
-# Run data quality checks
-psql $DATABASE_URL -f tests/sql/test_data_quality.sql
-```
-
-## Troubleshooting
-
-### "Import error: No module named 'py'"
-- Ensure you're in the project root
-- Activate virtual environment: `source .venv/bin/activate`
-- Install dependencies: `uv sync --extra dev`
-
-### "Connection refused" (database tests)
-- Start Docker: `docker compose up -d pg`
-- Check port: `lsof -i :5432`
-- Wait for health check: `docker compose ps`
-
-### "Pre-commit hook failed"
-- See specific error in output
-- Fix manually or use `--no-verify` to skip
-- Update hooks: `pre-commit autoupdate`
-
-### Tests pass locally but fail in CI
-- Check Python version differences
-- Verify database schema is applied
-- Check environment variables
-
-### P0 Tests Failing (Dependencies)
-Some P0 tests may fail if dependencies are not available:
-
-1. **Ensemble v5 Not Loaded** - Skip with `pytest.skip()` if R models unavailable
-2. **XGBoost v4 Model Not Found** - Train model or skip tests
-3. **Database Not Running** - Start with `docker compose up -d pg`
-
-See `tests/P0_COMPLETION_GUIDE.md` for detailed troubleshooting.
-
-## Coverage Reports
-
-After running tests with `--cov`, view coverage:
-
-```bash
-# Terminal report
-pytest --cov=nfl_analytics --cov-report=term-missing
-
-# HTML report (interactive)
-pytest --cov=nfl_analytics --cov-report=html
-open htmlcov/index.html
-
-# Show only uncovered lines
-pytest --cov=nfl_analytics --cov-report=term-missing:skip-covered
-```
-
-### Current Coverage (with P0 tests)
-
-```
-Module                              Coverage
----------------------------------------------
-nfl_analytics/ensemble/enhanced_ensemble_v5.py     82%
-nfl_analytics/ensemble/enhanced_ensemble_v6.py     76%
-nfl_analytics/backtest/historical_validation.py    81%
-nfl_analytics/utils/data_leakage_detector.py       89%
----------------------------------------------
-Overall ensemble/backtest modules:      78%
-```
-
-## Performance
-
-### Slow Tests
-Mark slow tests explicitly:
-
-```python
-@pytest.mark.slow
-def test_full_season_ingestion():
-    # This takes > 10s
-    pass
-```
-
-Skip slow tests:
-```bash
-pytest -m "not slow"
-```
-
-### Parallel Execution
-```bash
-# Use all CPU cores
-pytest -n auto
-
-# Use 4 workers
-pytest -n 4
-```
-
-### P0 Test Performance
-
-```bash
-# Sequential: ~96 seconds (~1.6 minutes)
-pytest tests/unit/test_data_leakage_prevention.py \
-       tests/integration/test_ensemble_v6_integration.py \
-       tests/integration/test_backtest_framework.py
-
-# Parallel (4 workers): ~28 seconds (3.4x speedup)
-pytest tests/unit/test_data_leakage_prevention.py \
-       tests/integration/test_ensemble_v6_integration.py \
-       tests/integration/test_backtest_framework.py \
-       -n auto
-```
-
-## Resources
-
-- [pytest documentation](https://docs.pytest.org/)
-- [pytest-cov](https://pytest-cov.readthedocs.io/)
-- [Pre-commit hooks](https://pre-commit.com/)
-- [GitHub Actions](https://docs.github.com/en/actions)
-- [Codecov](https://docs.codecov.com/)
-- **P0 Test Guide**: `tests/P0_COMPLETION_GUIDE.md`
-
----
-
-**Last Updated**: November 15, 2025
-**Maintainer**: See CLAUDE.md for project context
-**P0 Test Suite**: 86 tests, 1,851 lines, 78% coverage (ensemble/backtest modules)
+On 2026-10-25 the offline run gave 218 passed and 1 skipped (`test_evidential_regression.py`
+needs the `torch` extra). `pyproject.toml` adds coverage options to every run; pass `--no-cov`
+to skip them.
+
+`tests/{integration,infrastructure,e2e}` are marked `integration` automatically
+(`tests/conftest.py`), and with `-m "not integration"` their modules are not even imported. Unit
+tests get a placeholder `DB_PASSWORD`; integration tests use the real environment.
+
+The infrastructure tests leave devdb01 alone. `test_backup_restore.py` runs
+`scripts/maintenance/backup.sh` (a `pg_dump` of `DB_NAME`, default devdb01) into a temporary
+directory; its restore test restores only into the database named by `POSTGRES_DB` and skips
+unless that name contains "test", and the full round-trip comparison is skipped (run it by hand).
+`test_migrations.py` checks the migration files and reads devdb01's schema; its tests that apply
+migrations are skipped (they need a clean `testdb`).
+
+## What is here
+
+| Path | What it checks |
+|---|---|
+| `unit/test_spread_convention.py` | the nflverse sign convention on real games (BUF@BAL 2018, GB@CHI 2019, CLE@NO 2018), the pooled home cover rate, that the old rule inflates it, and that prior-season power ratings are about 50% ATS once graded correctly |
+| `unit/evaluation/test_market_benchmark.py` | grading, ROI at real prices, guardrails, the information regression, and the README baseline rows through the CLI |
+| `unit/evaluation/test_market_benchmark_nflverse.py` | the `--nflverse-csv` path, predict mode and closing-line value, on the real rows in `fixtures/nflverse/` |
+| `unit/evaluation/test_holm_step_down.py` | the Holm step-down procedure in `nfl_analytics/analysis/statistical_tests.py` |
+| `unit/test_state_space_sign.py` | the state-space ATS probability and evaluation after the sign fix (pinned games, a push) |
+| `unit/test_game_outcome_import.py` | the v2 model and its prediction service import without shap or credentials; the DO NOT DEPLOY guard |
+| `unit/test_data_leakage_prevention.py`, `unit/test_data_leakage_detector_comprehensive.py` | `nfl_analytics/utils/data_leakage_detector.py` |
+| `unit/features/` | as-of features and their home/away orientation, the game feature extractor (mocked), line-movement features, temporal safety of team histories |
+| `unit/test_evidential_regression.py` | the evidential regression model (needs torch) |
+| `integration/` | database integrity, the game feature extractor on pinned games (with an as-of leak check), the SQL validator, the temporal-leakage suites |
+| `infrastructure/` | backup and restore scripts, migration files and devdb01's schema (see above) |
+| `sql/test_schema.sql`, `sql/test_data_quality.sql` | ad-hoc checks to run with psql |
+| `fixtures/nflverse/` | real nflverse rows for the benchmark tests ([README](fixtures/nflverse/README.md)) |
+| `fixtures/temporal_leakage_scenarios.py` | known-good and known-bad scenarios for the leakage tests |
+
+## CI
+
+`.github/workflows/ci.yml` runs the ruff subset (`E9,F63,F7,F82`) on `nfl_analytics tests
+scripts`, `black --check nfl_analytics tests`, and `pytest -m "not integration"` on Python 3.11,
+plus a gitleaks scan of the checked-out tree (reviewed false positives in `.gitleaksignore`).
+`temporal-safety.yml` runs `test_spread_convention.py` and the two leakage-detector test files,
+the guard's self-test (`scripts/dev/check_spread_sign_hook.py`: known wrong lines must be flagged,
+correct ones must pass), then the `spread-sign-convention` pre-commit hook over the whole tree.
+`check-links.yml` checks the relative links of every Markdown file with lychee (offline).
+`make lint` runs the same lint steps locally. No workflow has a database, so nothing marked
+`integration` runs in CI.
+
+## Integration status
+
+`tests/integration` against devdb01 on 2026-10-25, in a read-only session: 66 passed, 20 failed,
+8 errors, 3 skipped. The failures are stale expectations, not data problems: the game feature
+extractor returns 338 features where the tests expect 100, `odds_history` has no `market` column,
+pandas rejects the `H` frequency alias, a `benchmark` fixture is missing, and `LeakageIssue` is
+no longer subscriptable. In `test_data_pipeline.py` one failing query aborts the shared
+transaction, which fails the rest of that class. `tests/infrastructure` (27 tests) was not run in
+that pass.
+
+## Writing tests
+
+- Pin conventions with real games from the database or nflverse, not synthetic examples.
+- Grade covers through `nfl_analytics/utils/spread_convention.py`; the sign hook rejects
+  `margin + spread` (mark a deliberate reproduction of the old rule `# sign-ok: <reason>`).
+- Seed every random generator a test uses; an unseeded fixture made
+  `test_win_percentage_excludes_current_result` flaky after the prune.
+- Keep unit tests offline: mock connections, and mark anything that needs a service
+  `@pytest.mark.integration` or put it under `tests/integration/`.

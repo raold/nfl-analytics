@@ -1,69 +1,50 @@
 # Contributing
 
-Thank you for contributing! This project includes data pipelines, models, and analysis that can generate large artifacts. To keep the repository performant, please follow these guidelines.
+The project is wound down (see [PROJECT_STATUS.md](PROJECT_STATUS.md)); this repository is kept
+as a research archive. Changes that fix an error, improve the record or extend the grading tool
+are welcome. Read [CLAUDE.md](CLAUDE.md#critical-rules) first: the spread sign convention, the
+kickoff time zone and the database rules there apply to every change.
 
-Large files and generated artifacts
-- Do not commit large generated artifacts (results, predictions, processed data). These paths are ignored in `.gitignore`:
-  - results/  predictions/  data/processed/  logs/r_etl/
-- Prefer to publish curated artifacts via project releases or external storage, and link to them from `docs/`.
+## Before you open a pull request
 
-Git LFS for model binaries
-- **IMPORTANT**: We use Git LFS for ALL model binaries to avoid GitHub's 100MB limit
-- Currently tracked patterns (see `.gitattributes`):
-  - Python models: `*.pkl` (343MB+ via LFS)
-  - R models: `*.rds`, `*.RDS` (28MB+ via LFS)
-  - PyTorch: `*.pth`
-  - UBJSON: `*.ubj`
+- `uv sync --extra dev`, then `uv run pytest -m "not integration"`,
+  `uv run ruff check --select E9,F63,F7,F82 nfl_analytics tests scripts` and
+  `uv run black --check nfl_analytics tests`. CI runs exactly these, plus the temporal-safety
+  tests, the `spread-sign-convention` hook, a secret scan and an offline check of the links in
+  every Markdown file.
+- `uvx pre-commit@4.7.0 install` runs the same checks locally on every commit. Do not use
+  `--no-verify`.
+- Grade covers with `nfl_analytics/utils/spread_convention.py`, never with `margin + spread`. A
+  line that reproduces the old rule on purpose needs a `# sign-ok: <reason>` marker.
+- Add tests for new code; pin conventions with real games.
 
-- **Initial setup** (required once per machine):
-  ```bash
-  brew install git-lfs  # or: curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-  git lfs install
-  ```
+## Results and claims
 
-- **Before committing new model files**:
-  1. Check if file type is already tracked: `cat .gitattributes`
-  2. If not tracked, add pattern FIRST:
-     ```bash
-     git lfs track "*.newbinary"
-     git add .gitattributes
-     git commit -m "chore(lfs): track *.newbinary"
-     ```
-  3. Then add your model file:
-     ```bash
-     git add models/your_new_model.newbinary
-     git commit -m "feat: add new model"
-     ```
+- Every number in a doc, table or figure must come from a committed script that reads committed
+  data, or from a query whose text is in the doc. No typed-in or simulated numbers presented as
+  results; label simulations and projections as such.
+- Grade any model against the closing line with `nfl_analytics.evaluation.market_benchmark`, and
+  report intervals. Say which seasons a model was trained, tuned and early-stopped on.
+- Put an investigation under `docs/investigations/<yyyy-mm>-<topic>/` with its script and output,
+  and link it from [docs/README.md](docs/README.md).
 
-- **Verify LFS is working**:
-  ```bash
-  git lfs ls-files  # Should show your model files
-  ```
+## Data and large files
 
-- **Common mistakes to avoid**:
-  - ❌ Committing large files without LFS tracking → GitHub will reject push
-  - ❌ Adding to `.gitignore` when you want version control → Use LFS instead
-  - ❌ Tracking then untracking without cleaning history → Requires BFG Repo-Cleaner
+- Git LFS (`.gitattributes`) tracks `backups/*.dump`, `models/**/*.rds` and `models/**/*.pkl`;
+  at present it holds only the three December 2025 database dumps in `backups/`. Other binaries
+  are regular git blobs; keep them small.
+- Do not commit generated outputs, database dumps or row-level odds. `public.odds_history` is
+  licensed from The Odds API and must not be redistributed: private exports go to
+  `backups/local/` (gitignored).
+- Prefer small CSV or Markdown summaries over binary artifacts.
 
-- **If you accidentally commit a large file without LFS**:
-  1. Stop - don't push yet!
-  2. Add LFS tracking: `git lfs track "*.extension"`
-  3. Redo commit: `git reset --soft HEAD~1 && git add . && git commit`
+## Secrets
 
-Adding small readmes in ignored folders
-- We allow README.md inside ignored directories so users know how to reproduce contents:
-  - results/README.md, predictions/README.md, data/processed/README.md
-- If you add more ignored directories, consider adding a small README and a corresponding `!dir/README.md` exception in `.gitignore`.
+Never commit credentials. Configuration comes from environment variables (`.env.example` lists
+them; `.env` is gitignored); document variable names, not values. The development database
+password is public and must not be reused anywhere.
 
-Secrets and configuration
-- Never commit secrets. Use environment variables or a secret manager.
-- If a script needs credentials, document the variable names (e.g., `ODDS_API_KEY`) but do not print their values.
+## Commits
 
-Pull requests
-- Include tests for new modules where feasible (unit or smoke tests).
-- For heavy training/experiments, provide a small, reproducible subset or a dry-run mode.
-- For database changes, include SQL migration files and note any required environment changes.
-
-Style and docs
-- Keep docs under `docs/` up to date and add links to any external artifacts.
-- Prefer adding summary markdown tables/figures (small text assets) over committing large binary artifacts.
+Plain commit messages that say what changed and why; no co-author or AI attribution lines. The
+main branch is `main`.
