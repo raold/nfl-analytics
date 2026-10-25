@@ -306,7 +306,7 @@ tree -L 4 --dirsfirst -I 'pgdata|__pycache__|*.pyc|.git|node_modules|renv|*.log|
 ## Cross-References
 
 - **Database Schema**: See [docs/database/DATABASE_QUICK_REFERENCE.md](../database/DATABASE_QUICK_REFERENCE.md)
-- **Component Details**: See [docs/architecture/COMPONENT_DEEP_DIVES.md](COMPONENT_DEEP_DIVES.md)
+- **Component Details**: See `docs/architecture/COMPONENT_DEEP_DIVES.md` (removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`)
 - **Complete Documentation**: See DOCUMENTATION_INDEX.md (no longer in the repo; see [HISTORY](../HISTORY.md))
 - **Recent Work**: See docs/milestones/RECENT_WORK_HISTORY.md (no longer in the repo; see [HISTORY](../HISTORY.md))
 

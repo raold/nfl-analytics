@@ -2,7 +2,7 @@
 
 **Last Updated:** February 12, 2026
 **Purpose:** Quick lookup reference for database schema, connections, and critical conventions
-**Full Documentation:** See [DATABASE_SCHEMA_AUDIT.md](DATABASE_SCHEMA_AUDIT.md)
+**Full Documentation:** See `docs/database/DATABASE_SCHEMA_AUDIT.md` (removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`)
 **Health Check:** `python scripts/db_health_check.py`
 
 ---
@@ -209,7 +209,7 @@ LEFT JOIN games g ON
 
 ## Full Documentation
 
-See **[DATABASE_SCHEMA_AUDIT.md](DATABASE_SCHEMA_AUDIT.md)** for:
+See **`docs/database/DATABASE_SCHEMA_AUDIT.md`** (removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`) for:
 - Complete table inventory with all columns
 - Data quality findings and recommendations
 - Team abbreviation standards (complete list)

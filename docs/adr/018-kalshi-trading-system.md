@@ -197,8 +197,8 @@ Implemented in 6 sequential phases over a single development session. Each phase
 ### Documentation
 
 - [CLAUDE.md — Kalshi Trading System section](../../CLAUDE.md)
-- [AGENT_INFRASTRUCTURE.md — Phase 6](../agents/AGENT_INFRASTRUCTURE.md)
-- [TRADING_ROADMAP.md](../TRADING_ROADMAP.md)
+- AGENT_INFRASTRUCTURE.md — Phase 6 (`docs/agents/AGENT_INFRASTRUCTURE.md`, removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`)
+- `docs/TRADING_ROADMAP.md` (removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`)
 
 ### Code
 

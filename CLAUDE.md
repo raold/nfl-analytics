@@ -215,7 +215,7 @@ Tests under `tests/{integration,infrastructure,e2e}` are auto-marked `integratio
 
 ## Agent Infrastructure
 
-**19 specialized agents across 5 phases.** See [docs/agents/AGENT_INFRASTRUCTURE.md](docs/agents/AGENT_INFRASTRUCTURE.md)
+**19 specialized agents across 5 phases.** See `docs/agents/AGENT_INFRASTRUCTURE.md` (removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`)
 
 | Phase | Purpose | Key Agents |
 |-------|---------|------------|
@@ -543,7 +543,7 @@ NEW FEATURE
 
 **Usage:** Automatic via pre-commit hooks. Manual: `python nfl_analytics/utils/enforcement_router.py <file>`
 
-See [docs/agents/ENFORCEMENT_FRAMEWORK.md](docs/agents/ENFORCEMENT_FRAMEWORK.md)
+See `docs/agents/ENFORCEMENT_FRAMEWORK.md` (removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`)
 
 ---
 
@@ -779,7 +779,7 @@ Kalman/GP features disabled (ADR-015).
 |----------|----------|
 | Quick Start | README.md, SETUP.md, CONTRIBUTING.md |
 | Database | [DATABASE_QUICK_REFERENCE](docs/database/DATABASE_QUICK_REFERENCE.md), [SQL_PATTERNS](docs/database/SQL_PATTERNS.md) |
-| Architecture | [ARCHITECTURE_REFERENCE](docs/architecture/ARCHITECTURE_REFERENCE.md), [COMPONENT_DEEP_DIVES](docs/architecture/COMPONENT_DEEP_DIVES.md) |
+| Architecture | [ARCHITECTURE_REFERENCE](docs/architecture/ARCHITECTURE_REFERENCE.md) |
 | History | [HISTORY](docs/HISTORY.md), [POSTMORTEMS](docs/POSTMORTEMS.md), [PROJECT_STATUS](PROJECT_STATUS.md) |
 | Evaluation | [market_benchmark](nfl_analytics/evaluation/market_benchmark/), [2025 season review](docs/investigations/2026-02-season-review/) |
 | ADRs | [docs/adr/](docs/adr/) (009: Dynamic weights, 011: Feature optimization, 012: Feedback loop, 015: Kalman/GP disabled, 016: CQL target leakage, 017: 2026 season roadmap) |

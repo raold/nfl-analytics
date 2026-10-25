@@ -619,7 +619,7 @@ FROM mart.player_game_stats pgs
 
 ## References
 
-- **Full Schema Audit:** [DATABASE_SCHEMA_AUDIT.md](DATABASE_SCHEMA_AUDIT.md)
+- **Full Schema Audit:** `docs/database/DATABASE_SCHEMA_AUDIT.md` (removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`)
 - **Quick Reference:** [DATABASE_QUICK_REFERENCE.md](DATABASE_QUICK_REFERENCE.md)
 - **Production Code:** `R/train_hierarchical_v2_production.R` (canonical example)
 - **Performance Analysis:** `docs/ENSEMBLE_BACKTEST_PERFORMANCE_ESTIMATE.md`

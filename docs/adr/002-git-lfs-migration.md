@@ -344,7 +344,7 @@ Rejected due to excessive complexity with minimal benefits. Submodules are appro
 
 ### Documentation
 
-- [Git LFS Workflow Guide](../guides/GIT_LFS_WORKFLOW.md) - 425-line comprehensive guide
+- Git LFS Workflow Guide (`docs/guides/GIT_LFS_WORKFLOW.md`, removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`) - 425-line comprehensive guide
 - Session Summary (no longer in the repo; see [HISTORY](../HISTORY.md)) - Implementation details
 - [CLAUDE.md Infrastructure Section](../../CLAUDE.md#architecture) - Updated infrastructure description
 
