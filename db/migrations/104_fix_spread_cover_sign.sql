@@ -2,7 +2,7 @@
 -- Purpose: games.spread_close follows the nflverse convention (positive = home favored),
 -- so the home team covers when (home_score - away_score) - spread_close > 0.
 -- Migration 100 and db/views/materialized/05_mv_betting_features.sql used the sportsbook
--- rule (margin + spread > 0), which grades favorites as if they received the points.
+-- rule (margin + spread > 0), which grades favorites as if they received the points.  -- sign-ok: quotes the old rule
 -- See docs/POSTMORTEMS.md ("Spread sign convention").
 --
 -- DROP without CASCADE on purpose: if other views depend on these, this migration fails

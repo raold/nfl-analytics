@@ -202,12 +202,18 @@ class TestRestoreScript:
         original_games = original_meta["data_counts"]["games"]
         original_plays = original_meta["data_counts"]["plays"]
 
-        # Restore using pg_restore directly (safer for tests than running restore.sh)
-        db_url = "postgresql://dro:sicillionbillions@localhost:5544/devdb01"
-
-        # Safety check: ensure we're in test environment
-        if "test" not in os.environ.get("POSTGRES_DB", ""):
+        # Safety check: ensure we're in test environment, and restore into that database only
+        target_db = os.environ.get("POSTGRES_DB", "")
+        if "test" not in target_db:
             pytest.skip("Skipping destructive test - not in test database")
+
+        # Restore using pg_restore directly (safer for tests than running restore.sh)
+        db_url = (
+            f"postgresql://{os.environ.get('POSTGRES_USER', 'dro')}:"
+            f"{os.environ.get('POSTGRES_PASSWORD', '')}@"
+            f"{os.environ.get('POSTGRES_HOST', 'localhost')}:"
+            f"{os.environ.get('POSTGRES_PORT', '5544')}/{target_db}"
+        )
 
         try:
             # Restore

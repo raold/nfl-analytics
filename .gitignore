@@ -1,8 +1,11 @@
 # Ignore nested repo
 /data/nflverse-data/
 pgdata/
-.env
-# Note: .env.example IS tracked - it's the template for configuration
+# Secrets: every .env variant and key file; the .env.example templates stay tracked
+.env*
+!.env.example
+*.pem
+*.key
 .tmp.driveupload/
 
 # Worker logs
@@ -197,9 +200,9 @@ check_*.sh
 *.bak
 *.backup
 
-# Database backups (tracked via Git LFS)
+# Database backups. The three dumps already tracked here (Git LFS, public on GitHub) stay
+# tracked; anything new in backups/, including backups/local/ (private exports), is ignored.
 backups/*
-!backups/*.dump
 !backups/README.md
 # Large models (>2GB) - store externally, regenerate from training
 models/bayesian/simplified_random_walk_v2.rds

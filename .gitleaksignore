@@ -1,0 +1,6 @@
+# Reviewed gitleaks false positives, one fingerprint per line (file:rule:line).
+# CI scans the checked-out tree with `gitleaks dir` (.github/workflows/ci.yml, job secret-scan).
+# A fingerprint carries a line number: if the file changes above that line, update it here.
+
+# tables |= {"02_key_numbers": key, ...}: a dict of result tables, not a credential
+scripts/market_facts.py:generic-api-key:1607

@@ -32,5 +32,10 @@ jobs:
           tests/unit/test_data_leakage_prevention.py
           tests/unit/test_data_leakage_detector_comprehensive.py
 
+      # The hook must still flag known-wrong lines and pass correct ones, so that the next
+      # step's "no hits" means something.
+      - name: Self-test the spread sign guard
+        run: uv run python scripts/dev/check_spread_sign_hook.py
+
       - name: Reject sportsbook-style spread math
         run: uvx pre-commit@4.7.0 run spread-sign-convention --all-files

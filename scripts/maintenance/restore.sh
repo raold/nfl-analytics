@@ -1,150 +1,91 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Restore database from backup with validation
+# Replace devdb01 with a pg_dump custom-format backup, following the TimescaleDB procedure
+# (new database from template0, extension pinned to the backup's version,
+# timescaledb_pre_restore / timescaledb_post_restore). It asks before dropping anything and
+# first saves the current database to BACKUP_DIR as pre_restore_<time>.backup.
+#
+# usage: restore.sh [backup-file]
+#   no argument: pick a backup from BACKUP_DIR (made by backup.sh)
+#   restore.sh backups/local/devdb01_post_repair_20261024.dump   (see backups/local/README.md)
+#
+# Environment: the same DB_* variables and BACKUP_DIR as backup.sh, plus TIMESCALEDB_VERSION
+# (default: the backup's .meta file, else the version in the database being replaced). The
+# extension version must match the one the backup was taken with.
 
-BACKUP_DIR="${HOME}/nfl-analytics-backups"
-DB_URL="postgresql://dro:sicillionbillions@localhost:5544/devdb01"
+BACKUP_DIR="${BACKUP_DIR:-$HOME/nfl-analytics-backups}"
+export PGHOST="${DB_HOST:-localhost}" PGPORT="${DB_PORT:-5544}"
+export PGUSER="${DB_USER:-dro}" PGPASSWORD="${DB_PASSWORD:-sicillionbillions}"
+DB="${DB_NAME:-devdb01}"
 
-echo "=== NFL Analytics Database Restore ==="
-echo ""
+q() { psql -X -A -t -v ON_ERROR_STOP=1 -d "$1" -c "$2"; }
 
-# Check for backups
-if [ ! -d "$BACKUP_DIR" ]; then
-    echo "❌ No backup directory found at $BACKUP_DIR"
-    exit 1
-fi
-
-# List available backups
-echo "Available backups:"
-ls -1t "$BACKUP_DIR"/nfl_analytics_*.backup 2>/dev/null | head -10 | while read backup; do
-    BASE=$(basename "$backup")
-    META="${backup%.backup}.meta"
-    if [ -f "$META" ]; then
-        SIZE=$(jq -r '.backup_size' "$META" 2>/dev/null || echo "unknown")
-        GAMES=$(jq -r '.data_counts.games' "$META" 2>/dev/null || echo "?")
-        echo "  - $BASE ($SIZE, $GAMES games)"
-    else
-        echo "  - $BASE"
-    fi
-done
-
-echo ""
-echo "Enter backup filename (or 'latest' for most recent):"
-read -r BACKUP_CHOICE
-
-if [ "$BACKUP_CHOICE" = "latest" ]; then
-    BACKUP_FILE="$BACKUP_DIR/latest.backup"
-    if [ ! -f "$BACKUP_FILE" ]; then
-        echo "❌ No latest backup found"
-        exit 1
-    fi
+if [ $# -ge 1 ]; then
+  BACKUP_FILE=$1
 else
-    BACKUP_FILE="$BACKUP_DIR/$BACKUP_CHOICE"
-    if [ ! -f "$BACKUP_FILE" ]; then
-        echo "❌ Backup not found: $BACKUP_FILE"
-        exit 1
-    fi
+  shopt -s nullglob
+  backups=("$BACKUP_DIR"/nfl_analytics_*.backup) # timestamped names sort oldest first
+  echo "${#backups[@]} backups in $BACKUP_DIR; the newest 10, newest last:"
+  printf '  %s\n' "${backups[@]##*/}" | tail -n 10
+  read -r -p "Backup file name, or 'latest': " choice
+  [ "$choice" = latest ] && choice=latest.backup
+  BACKUP_FILE="$BACKUP_DIR/$choice"
+fi
+[ -f "$BACKUP_FILE" ] || { echo "Backup not found: $BACKUP_FILE" >&2; exit 1; }
+pg_restore --list "$BACKUP_FILE" > /dev/null
+
+META="${BACKUP_FILE%.*}.meta"
+TSDB_VERSION="${TIMESCALEDB_VERSION:-}"
+if [ -f "$META" ] && command -v jq > /dev/null; then
+  jq -r 'select(.data_counts) | "Backup of \(.database) taken \(.timestamp): " +
+    "\(.data_counts.games) games, \(.data_counts.plays) plays, " +
+    "\(.data_counts.odds_history) odds rows"' "$META"
+  [ -n "$TSDB_VERSION" ] || TSDB_VERSION=$(jq -r '.timescaledb_version // empty' "$META")
+fi
+DB_EXISTS=$(q postgres "SELECT count(*) FROM pg_database WHERE datname = '$DB'")
+CURRENT_TSDB=""
+if [ "$DB_EXISTS" = 1 ]; then
+  CURRENT_TSDB=$(q "$DB" "SELECT extversion FROM pg_extension WHERE extname = 'timescaledb'")
+fi
+[ -n "$TSDB_VERSION" ] || TSDB_VERSION=$CURRENT_TSDB
+
+echo ""
+echo "WARNING: database $DB on $PGHOST:$PGPORT will be DROPPED and restored from"
+echo "  $BACKUP_FILE (timescaledb ${TSDB_VERSION:-server default})"
+read -r -p "Type yes to continue: " confirm
+[ "$confirm" = yes ] || { echo "Restore cancelled"; exit 1; }
+
+if [ "$DB_EXISTS" = 1 ]; then
+  mkdir -p "$BACKUP_DIR"
+  SAFETY_BACKUP="$BACKUP_DIR/pre_restore_$(date +%Y%m%d_%H%M%S).backup"
+  pg_dump -d "$DB" --format=custom --compress=9 --no-owner --file="$SAFETY_BACKUP"
+  # restoring this copy later needs the extension version it was taken with
+  printf '{"timescaledb_version": "%s"}\n' "$CURRENT_TSDB" > "${SAFETY_BACKUP%.backup}.meta"
+  echo "Safety backup of the current $DB: $SAFETY_BACKUP"
 fi
 
-# Show backup metadata if available
-META_FILE="${BACKUP_FILE%.backup}.meta"
-if [ -f "$META_FILE" ]; then
-    echo ""
-    echo "Backup metadata:"
-    jq -r '
-        "  Timestamp: " + .timestamp,
-        "  Original size: " + .original_size,
-        "  Backup size: " + .backup_size,
-        "  Games: " + (.data_counts.games | tostring),
-        "  Plays: " + (.data_counts.plays | tostring),
-        "  Odds: " + (.data_counts.odds_history | tostring)
-    ' "$META_FILE"
+q postgres "DROP DATABASE IF EXISTS \"$DB\" WITH (FORCE)" > /dev/null
+q postgres "CREATE DATABASE \"$DB\" TEMPLATE template0" > /dev/null
+VERSION_CLAUSE=""
+[ -z "$TSDB_VERSION" ] || VERSION_CLAUSE=" VERSION '$TSDB_VERSION'"
+q "$DB" "CREATE EXTENSION timescaledb$VERSION_CLAUSE" > /dev/null
+q "$DB" "SELECT timescaledb_pre_restore()" > /dev/null
+echo "Restoring (pg_restore errors, if any, are printed below)..."
+set +e
+pg_restore -d "$DB" --no-owner "$BACKUP_FILE"
+rc=$?
+q "$DB" "SELECT timescaledb_post_restore()" > /dev/null || rc=1
+set -e
+if [ "$rc" -ne 0 ]; then
+  echo "Restore FAILED: see the errors above. 'catalog version mismatch' means TIMESCALEDB_VERSION" >&2
+  echo "must be set to the version the backup was taken with." >&2
+  [ -z "${SAFETY_BACKUP:-}" ] || echo "The previous $DB is in $SAFETY_BACKUP" >&2
+  exit "$rc"
 fi
+q "$DB" "ANALYZE" > /dev/null
 
-echo ""
-echo "⚠️  WARNING: This will REPLACE all current data!"
-echo "Current database will be backed up first."
-read -p "Continue with restore? (yes/no): " confirm
-
-if [ "$confirm" != "yes" ]; then
-    echo "Restore cancelled"
-    exit 1
-fi
-
-# Create safety backup of current state
-echo ""
-echo "Creating safety backup of current database..."
-SAFETY_BACKUP="$BACKUP_DIR/pre_restore_$(date +%Y%m%d_%H%M%S).backup"
-pg_dump $DB_URL --format=custom --compress=9 --file="$SAFETY_BACKUP"
-echo "✅ Safety backup created: $(basename $SAFETY_BACKUP)"
-
-# Drop and recreate database
-echo ""
-echo "Recreating database..."
-psql postgresql://dro:sicillionbillions@localhost:5544/postgres << EOF
-SELECT pg_terminate_backend(pid)
-FROM pg_stat_activity
-WHERE datname = 'devdb01' AND pid <> pg_backend_pid();
-DROP DATABASE IF EXISTS devdb01;
-CREATE DATABASE devdb01 OWNER dro;
-EOF
-
-# Enable TimescaleDB
-echo "Enabling TimescaleDB..."
-psql $DB_URL -c "CREATE EXTENSION IF NOT EXISTS timescaledb;"
-
-# Restore from backup
-echo ""
-echo "Restoring from backup..."
-pg_restore \
-    --dbname=$DB_URL \
-    --verbose \
-    --no-owner \
-    --jobs=4 \
-    "$BACKUP_FILE" 2>&1 | grep -E "processing|creating|restoring" || true
-
-# Verify restoration
-echo ""
-echo "Verifying restoration..."
-RESTORED_GAMES=$(psql $DB_URL -tAc "SELECT COUNT(*) FROM games;" 2>/dev/null || echo "0")
-RESTORED_PLAYS=$(psql $DB_URL -tAc "SELECT COUNT(*) FROM plays;" 2>/dev/null || echo "0")
-RESTORED_ODDS=$(psql $DB_URL -tAc "SELECT COUNT(*) FROM odds_history;" 2>/dev/null || echo "0")
-
-echo "Restored data counts:"
-echo "  Games: $RESTORED_GAMES"
-echo "  Plays: $RESTORED_PLAYS"
-echo "  Odds: $RESTORED_ODDS"
-
-# Refresh materialized views
-echo ""
-echo "Refreshing materialized views..."
-psql $DB_URL << 'EOF'
-DO $$
-DECLARE
-    r RECORD;
-BEGIN
-    FOR r IN SELECT schemaname, matviewname
-             FROM pg_matviews
-             WHERE schemaname IN ('public', 'mart')
-    LOOP
-        EXECUTE format('REFRESH MATERIALIZED VIEW %I.%I', r.schemaname, r.matviewname);
-        RAISE NOTICE 'Refreshed %.%', r.schemaname, r.matviewname;
-    END LOOP;
-END $$;
-EOF
-
-# Run ANALYZE to update statistics
-echo ""
-echo "Updating database statistics..."
-psql $DB_URL -c "ANALYZE;"
-
-echo ""
-echo "=== Restore Complete ==="
-echo "Database restored from: $(basename $BACKUP_FILE)"
-echo "Safety backup available at: $(basename $SAFETY_BACKUP)"
-echo ""
-echo "Recommended next steps:"
-echo "  1. Verify data: psql $DB_URL -c 'SELECT * FROM mart.table_stats;'"
-echo "  2. Run tests: make validate"
-echo "  3. If issues, restore safety backup: pg_restore --dbname=$DB_URL $SAFETY_BACKUP"
+count() { q "$DB" "SELECT count(*) FROM $1"; }
+echo "Restored $DB: $(count games) games, $(count plays) plays, $(count odds_history) odds rows"
+echo "=== Restore complete ==="
+[ -z "${SAFETY_BACKUP:-}" ] || echo "To undo: bash scripts/maintenance/restore.sh $SAFETY_BACKUP"

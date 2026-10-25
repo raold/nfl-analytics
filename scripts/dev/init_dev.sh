@@ -1,68 +1,39 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Local dev bootstrap: start TimescaleDB and apply schema.
-# Respects .env if present; falls back to docker-compose defaults.
+# Local dev bootstrap: start the pg-1 container (docker-compose.yml), wait until devdb01
+# accepts connections, and apply db/schema/devdb01_schema_2026-10-24.sql when the database
+# has no tables yet. A database that already has public.games is left alone.
+# This gives an empty schema. For data, restore a dump instead (db/README.md).
 
-ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")"/.. && pwd)"
+ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT_DIR"
 
-# Load env (optional)
-if [ -f .env ]; then
-  # shellcheck disable=SC1091
-  source .env
-fi
+SCHEMA=db/schema/devdb01_schema_2026-10-24.sql
+# TCP inside the container: the image's first-start init server listens on the socket only,
+# so a TCP connection succeeds only once the real server is up.
+PSQL=(docker compose exec -T pg-1 psql -h 127.0.0.1 -U dro -d devdb01 -X -v ON_ERROR_STOP=1)
 
-POSTGRES_HOST="${POSTGRES_HOST:-localhost}"
-POSTGRES_PORT="${POSTGRES_PORT:-5544}"
-POSTGRES_DB="${POSTGRES_DB:-devdb01}"
-POSTGRES_USER="${POSTGRES_USER:-dro}"
-POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-sicillionbillions}"
+echo "[init] Starting pg-1"
+docker compose up -d pg-1
 
-echo "[init] Bringing up TimescaleDB container (service: pg)"
-docker compose up -d pg
-
-echo "[init] Waiting for database readiness on ${POSTGRES_HOST}:${POSTGRES_PORT}..."
-attempts=0
-until (
-  if command -v pg_isready >/dev/null 2>&1; then
-    pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -d "$POSTGRES_DB" -U "$POSTGRES_USER" >/dev/null 2>&1
-  else
-    # Fallback: check inside the container
-    docker compose exec -T pg pg_isready -h localhost -p 5432 -d "$POSTGRES_DB" -U "$POSTGRES_USER" >/dev/null 2>&1
+echo "[init] Waiting for devdb01"
+for attempt in $(seq 60); do
+  if "${PSQL[@]}" -tAc "SELECT 1" >/dev/null 2>&1; then
+    break
   fi
-); do
-  attempts=$((attempts+1))
-  if [ "$attempts" -gt 40 ]; then
-    echo "[init] Database did not become ready in time" >&2
+  if [ "$attempt" -eq 60 ]; then
+    echo "[init] devdb01 did not accept connections within 120 s" >&2
     exit 1
   fi
-  sleep 3
+  sleep 2
 done
-echo "[init] Database is ready"
 
-echo "[init] Applying schema migrations"
-if command -v psql >/dev/null 2>&1; then
-  # Apply all migrations in order
-  for migration in db/migrations/*.sql; do
-    if [ -f "$migration" ]; then
-      echo "[init] Applying $(basename $migration)"
-      PGPASSWORD="$POSTGRES_PASSWORD" psql "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB" -v ON_ERROR_STOP=1 -f "$migration"
-    fi
-  done
-else
-  # Apply schema via container psql if host psql is unavailable
-  for migration in db/migrations/*.sql; do
-    if [ -f "$migration" ]; then
-      echo "[init] Applying $(basename $migration) via container"
-      docker compose exec -T pg psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 -f /dev/stdin < "$migration"
-    fi
-  done
+if [ "$("${PSQL[@]}" -tAc "SELECT to_regclass('public.games') IS NOT NULL")" = t ]; then
+  echo "[init] devdb01 already has public.games; schema left unchanged"
+  exit 0
 fi
 
-echo "[init] Done. Next steps:"
-echo "  - (Optional) Install Python deps: uv sync --extra dev"
-echo "  - (Optional) Install R deps: Rscript -e 'renv::restore()' or Rscript setup_packages.R"
-echo "  - Load schedules: Rscript --vanilla data/ingest_schedules.R"
-echo "  - (Optional) Ingest odds: export ODDS_API_KEY=...; python nfl_analytics/ingest_odds_history.py --start-date 2023-09-01 --end-date 2023-09-03"
-echo "  - Refresh marts: psql postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DB -c \"REFRESH MATERIALIZED VIEW mart.game_summary;\""
+echo "[init] Applying $SCHEMA"
+"${PSQL[@]}" -q -f - < "$SCHEMA" > /dev/null
+echo "[init] Done: devdb01 has the schema but no data (db/README.md explains loading data)"

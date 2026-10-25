@@ -29,3 +29,16 @@ jobs:
 
       - name: Unit tests (no database)
         run: uv run pytest -m "not integration"
+
+  # Secrets in the checked-out files (LFS pointers, not the dumps). Reviewed false positives
+  # are listed in .gitleaksignore. The image is pinned by tag and digest.
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: gitleaks (working tree)
+        run: >-
+          docker run --rm --network none -v "$PWD:/repo:ro" -w /repo
+          zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f
+          dir --no-banner --redact --exit-code 1 .

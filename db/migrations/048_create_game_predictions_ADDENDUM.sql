@@ -396,7 +396,9 @@ BEGIN
 
     -- Betting outcomes
     IF NEW.sportsbook_spread IS NOT NULL THEN
-      NEW.spread_cover := (NEW.actual_spread + NEW.sportsbook_spread) > 0;
+      -- Home cover: sportsbook_spread holds games.spread_close (nflverse sign, positive =
+      -- home favored). Sign fixed 2026-10-25; it used to add the line.
+      NEW.spread_cover := (NEW.actual_spread - NEW.sportsbook_spread) > 0;
     END IF;
 
     IF NEW.sportsbook_total IS NOT NULL THEN

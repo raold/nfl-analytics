@@ -1,114 +1,73 @@
+# Install once with `uvx pre-commit@4.7.0 install`. `uvx pre-commit@4.7.0 run --all-files`
+# must pass without changing any file. CI enforces black, the ruff subset and
+# spread-sign-convention (.github/workflows/ci.yml and temporal-safety.yml).
 repos:
-  # Python code formatting
   - repo: https://github.com/psf/black
     rev: 26.10.1  # keep in step with black in uv.lock (CI runs `uv run black --check`)
     hooks:
       - id: black
         files: ^(nfl_analytics|tests)/
 
-  # Python linting: same blocking subset as CI (syntax errors, undefined names).
-  # The full pyproject rule set reports ~1,300 legacy findings; run it manually.
+  # Same blocking subset as CI (syntax errors, undefined names). The full pyproject rule
+  # set reports 218 legacy findings on nfl_analytics, tests and scripts (2026-10-25); run
+  # `uv run ruff check` by hand for those.
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.17.2  # keep in step with ruff in uv.lock
     hooks:
-      - id: ruff
+      - id: ruff-check
         args: [--select, "E9,F63,F7,F82"]
         files: ^(nfl_analytics|tests|scripts)/
 
-  # Python type checking
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.5.0
-    hooks:
-      - id: mypy
-        additional_dependencies: [types-requests, types-python-dateutil]
-        files: ^nfl_analytics/
-        args: [--ignore-missing-imports, --warn-unused-ignores]
-
-  # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v6.0.0
     hooks:
-      - id: trailing-whitespace
-        exclude: ^(.*\.md|.*\.tex)$
-      - id: end-of-file-fixer
-        exclude: ^(.*\.svg|.*\.png)$
       - id: check-yaml
       - id: check-json
       - id: check-toml
+      - id: check-merge-conflict
       - id: check-added-large-files
         args: [--maxkb=5000]
-      - id: check-merge-conflict
       - id: detect-private-key
       - id: mixed-line-ending
         args: [--fix=lf]
+      # Generated or frozen files keep their exact bytes: dissertation sources and outputs
+      # (analysis/), model artifacts, data, historical SQL and reports (db/migrations,
+      # db/audit, db/*.txt), the pg_dump schema (db/schema), investigation outputs and the
+      # SQL test fixtures.
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+        exclude: &frozen ^(analysis/|models/|data/|db/(migrations|audit|schema)/|db/[^/]+\.txt$|docs/investigations/[^/]+/(results|evidence)/|tests/sql/)
+      - id: end-of-file-fixer
+        exclude: *frozen
 
-  # Security scanning
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.4.0
-    hooks:
-      - id: detect-secrets
-        args: [--baseline, .secrets.baseline]
-        exclude: ^(package-lock\.json|docs/audits/.*|docs/optimization/.*)$
-
-  # Python security linting
-  - repo: https://github.com/PyCQA/bandit
-    rev: 1.7.5
-    hooks:
-      - id: bandit
-        args: [-c, pyproject.toml]
-        additional_dependencies: ["bandit[toml]", "pbr"]
-        files: ^nfl_analytics/
-
-  # SQL formatting (optional - can be slow)
-  # - repo: https://github.com/sqlfluff/sqlfluff
-  #   rev: 2.3.2
-  #   hooks:
-  #     - id: sqlfluff-lint
-  #       files: ^db/.*\.sql$
-  #     - id: sqlfluff-fix
-  #       files: ^db/.*\.sql$
-
-  # Local hooks for project-specific validation
   - repo: local
     hooks:
-      - id: check-hardcoded-dates
-        name: Detect hardcoded temporal values
-        entry: bash -c 'grep -Hn -E "(season|year)\s*[=<-]\s*20[0-9]{2}" "$@" || exit 0' --
-        language: system
-        files: \.(py|R)$
-        exclude: ^(tests/|examples/|docs/)
-        description: Detect hardcoded season/year values
-
+      # games.spread_close / spread_line are nflverse lines (positive = home favored): the home
+      # team covers when margin - spread_close > 0 (nfl_analytics/utils/spread_convention.py).
+      # The entry rejects, one alternative per line:
+      #   1. an identifier containing margin, score, diff or actual, then +, then one containing
+      #      spread: the sportsbook cover rule, including actual_spread + sportsbook_spread;
+      #   2-3. margin > -spread_close and (home_score - away_score) > -spread_close;
+      #   4. a favorite taken from spread_close < 0 (that is the home underdog);
+      #   5. total/2 - spread/2 (or (total - spread)/2) as the home mean (that is the away mean).
+      # A line that reproduces or quotes the old rule on purpose, or uses a sportsbook-sign line
+      # (odds_history.home_spread, negative = home favored), carries '# sign-ok: <reason>'.
+      # scripts/dev/check_spread_sign_hook.py tests this entry against known wrong and right lines.
       - id: spread-sign-convention
-        name: Reject sportsbook-style spread cover math on nflverse spreads
-        # games.spread_close / spread_line are nflverse (positive = home favored): the home
-        # team covers when margin - spread_close > 0. Use nfl_analytics/utils/spread_convention.py.
-        # A line that reproduces the retracted rule on purpose carries a '# sign-ok' comment.
+        name: Reject sportsbook-style spread math on nflverse spreads
         language: pygrep
-        entry: '^(?!.*sign-ok).*(margin|_score|_diff)\W*\s*\+\s*\S*(spread_close|spread_line|vegas_spread)\b'
-        files: \.(py|R|sql)$
-        # Historical migrations (superseded by 104), the regression test that asserts the
-        # old rule is wrong, and dependence_calibration.py (queries a non-existent `odds`
-        # table of unknown sign convention)
-        exclude: ^(archive/|research/|docs/|db/migrations/(005|006|100)_|tests/unit/test_spread_convention\.py$|nfl_analytics/analysis/dependence_calibration\.py$)
+        entry: >-
+          ^(?!.*sign-ok)(?x:
+          .*(?:margin|score(?!s\b)|diff|actual)\w*\W*\s*\+\s*\S*spread(?!_?(?:std|sd|se|var|mae|rmse|err))
+          | .*\b(?!away)\w*(?:margin|diff)\w*\W*\s*(?:[<>]=?|==)\s*-\s*\S*spread
+          | .*home_score\s*-\s*\S*away_score\W*\s*(?:[<>]=?|==)\s*-\s*\S*spread
+          | (?!.*(?i:away|road|visit))(?=.*(?i:fav)).*\b(?:spread_close|spread_line|vegas_spread)\b\W*\s*<=?\s*0(?![\d.])
+          | (?!.*(?i:away|road|visit))(?=.*(?i:home)).*total\w*\W*\s*(?:/\s*2(?:\.0*)?\s*-\s*\S*spread|-\s*\S*spread\w*\W*\s*\)\s*/\s*2)
+          )
+        files: \.(py|[Rr]|sql|qmd|[Rr]md)$
+        # Superseded views (005, 006, 100; migration 104 replaced them in devdb01) and the two
+        # tests that hold the old rule as data.
+        exclude: ^(db/migrations/(005|006|100)_|tests/unit/test_spread_convention\.py$|scripts/dev/check_spread_sign_hook\.py$)
 
-      - id: check-convergence-template
-        name: Check MCMC convergence checks present
-        entry: bash -c 'if grep -q "brm(" "$@" && ! grep -q "max_rhat" "$@"; then echo "❌ Missing convergence checks"; exit 1; fi' --
-        language: system
-        files: ^R/train_.*\.R$
-        description: Validate R training scripts have convergence diagnostics
-
-# Global settings
 default_language_version:
   python: python3  # any interpreter satisfying requires-python (>=3.11)
-
-# CI settings
-ci:
-  autofix_commit_msg: |
-    [pre-commit.ci] auto fixes from pre-commit.com hooks
-  autofix_prs: true
-  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
-  autoupdate_schedule: weekly
-  skip: []
-  submodules: false

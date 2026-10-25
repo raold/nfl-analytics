@@ -21,7 +21,7 @@ jobs:
         with:
           args: >-
             --offline --no-progress
-            './*.md' 'docs/**/*.md' 'tests/*.md'
+            '**/*.md'
           fail: true
 
   # Non-blocking: external sites go down; report, don't fail.
@@ -34,5 +34,5 @@ jobs:
         with:
           args: >-
             --no-progress --max-retries 2 --timeout 20
-            './*.md' 'docs/**/*.md' 'tests/*.md'
+            '**/*.md'
           fail: false
