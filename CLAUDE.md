@@ -65,7 +65,7 @@ Python ≥ 3.11 with [uv](https://docs.astral.sh/uv/); CI uses 3.11. The depende
 
 ```bash
 uv sync --extra dev                          # core + test and lint tools
-uv run pytest -m "not integration"           # offline suite, what CI runs (218 passed, 1 skipped at 43104ea)
+uv run pytest -m "not integration"           # offline suite, what CI runs (227 passed, 1 skipped on 2026-10-25)
 uv run pytest -m integration                 # 133 tests; need devdb01 and DB_PASSWORD (tests/integration: 66 pass, 28 fail or error)
 uv run ruff check --select E9,F63,F7,F82 nfl_analytics tests scripts
 uv run black --check nfl_analytics tests     # black 26.10.1, line length 100

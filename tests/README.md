@@ -12,7 +12,7 @@ uv run pytest -m "not integration"            # offline; what CI runs
 uv run pytest -m integration                  # 133 tests; need devdb01 with data and DB_PASSWORD
 ```
 
-On 2026-10-25 the offline run gave 218 passed and 1 skipped (`test_evidential_regression.py`
+On 2026-10-25 the offline run gave 227 passed and 1 skipped (`test_evidential_regression.py`
 needs the `torch` extra). `pyproject.toml` adds coverage options to every run; pass `--no-cov`
 to skip them.
 

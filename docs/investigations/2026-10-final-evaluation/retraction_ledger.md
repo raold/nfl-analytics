@@ -50,8 +50,9 @@ re-run show no edge. The numbers that do hold up all say the same thing:
   - "check_claims Cnn" means rows with that claim id in `results/claims_checks.csv`. The wind
     rows are in `results/claims_checks_nflverse.csv`.
   - "walk-forward" means `regrade_walkforward_2004_2024.py` and `walkforward_2004_2024.md`.
-  - "Per survey" means I did not re-run the check. The named survey report (in the salvage
-    scratch area) holds the evidence. The usual reason is that the inputs no longer exist.
+  - "Per survey" means I did not re-run the check. The named survey report holds the evidence;
+    the owner's private copy is in `backups/local/salvage_session_2026-10-24/survey-out/` (not
+    in the repository). The usual reason is that the inputs no longer exist.
   - Database checks ran in a read-only session against devdb01 after today's repair of
     `game_type` and `kickoff`.
 - **Grading:** home covers iff margin - spread_close > 0, pushes excluded; edge = predicted home

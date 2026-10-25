@@ -245,8 +245,9 @@ investigation" the text credits. See `retraction_ledger.md`, rows C06-C08, for e
 
 ## Reproduce
 
+From the repository root:
+
 ```bash
-cd /home/dro/rice/nfl-analytics
 uv run --no-sync python scripts/final_evaluation/regrade_walkforward_2004_2024.py
 ```
 
