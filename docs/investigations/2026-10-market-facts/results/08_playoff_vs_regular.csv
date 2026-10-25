@@ -1,0 +1,4 @@
+window,sample,strata,reg_games,reg_mae,reg_ci_low,reg_ci_high,post_games,post_mae,post_ci_low,post_ci_high,post_minus_reg,diff_ci_low,diff_ci_high,permutation_p_two_sided,p_random_reg_subset_mae_le_post
+1999-2025,pooled,season,6967,10.2635,10.069,10.4581,309,10.4223,9.4546,11.3901,0.158802,-0.828129,1.14573,0.744313,
+2025,last historical season,none,272,9.72243,8.82702,10.6178,13,8.57692,3.59097,13.5629,-1.1455,-6.18729,3.89629,0.59947,0.2973
+2026 holdout,holdout,none,94,9.23936,7.73434,10.7444,0,,,,,,,,

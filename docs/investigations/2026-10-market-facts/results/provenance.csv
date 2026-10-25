@@ -1,0 +1,16 @@
+item,value
+source_url,https://github.com/nflverse/nflverse-data/releases/download/schedules/games.csv
+file_name,games.csv
+sha256,5d882d05c73ab11758cfe70e71e994e50b53e39b974943368dfee500f9a50693
+bytes,2186406
+file_mtime_utc,2026-10-24T20:54:34+00:00
+rows,7548
+seasons_in_file,1999-2026
+completed_games,7370
+historical_window,1999-2025
+historical_completed_games,7276
+holdout_season,2026
+holdout_scheduled_games,272
+holdout_completed_games,94
+holdout_last_completed_week,7
+holdout_last_completed_gameday,2026-10-22

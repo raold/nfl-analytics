@@ -1,0 +1,9 @@
+id,family,hypothesis,window,n,estimate,null_value,test,p_value,sensitivity_test,p_sensitivity,p_holm,reject_at_5pct_holm,p_holm_sensitivity,reject_at_5pct_holm_sensitivity
+W1,wind,under rate at wind >= 15 mph > 0.5000,1999-2025,674,0.569733,0.5,"exact binomial, one-sided",0.00016693,"Wald z, week-clustered SE, one-sided",0.00016524,0.00116851,True,0.00115668,True
+W2,wind,under rate at wind >= 15 mph > 0.5238,1999-2025,674,0.569733,0.52381,"exact binomial, one-sided",0.00931805,"Wald z, week-clustered SE, one-sided",0.00903116,0.0559083,False,0.054187,False
+W3,wind,slope of (total - closing total) on wind != 0 (points per mph),1999-2025,5205,-0.181476,0,"OLS, week-clustered SE, two-sided",1.92103e-07,same test (SE already week-clustered),1.92103e-07,1.53682e-06,True,1.53682e-06,True
+T1,teaser,Wong leg win rate > two-team break-even at -110 (0.7237),1999-2025,1391,0.746945,0.723747,"exact binomial, one-sided",0.027598,"Wald z, week-clustered SE, one-sided",0.0345126,0.13799,False,0.172563,False
+T2,teaser,Wong leg win rate > two-team break-even at -120 (0.7385),1999-2025,1391,0.746945,0.738549,"exact binomial, one-sided",0.248424,"Wald z, week-clustered SE, one-sided",0.25525,0.993695,False,1,False
+T3,teaser,Wong leg win rate > two-team break-even at -130 (0.7518),1999-2025,1391,0.746945,0.751809,"exact binomial, one-sided",0.675513,"Wald z, week-clustered SE, one-sided",0.648511,1,False,1,False
+P1,playoffs,closing-line MAE differs between playoffs and regular season,1999-2025,7276,0.158802,0,"permutation (strata: season), two-sided",0.744313,same test (permutation),0.744313,1,False,1,False
+P2,playoffs,closing-line MAE differs between playoffs and regular season,2025,285,-1.1455,0,"permutation (strata: none), two-sided",0.59947,same test (permutation),0.59947,1,False,1,False
