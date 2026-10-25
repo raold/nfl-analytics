@@ -1,0 +1,188 @@
+table,row,column_graded,metric,printed,reproduced_from_csv,matches_printed,corrected,note
+betting_performance_table.tex,GLM,glm,bets,3826.0,3826.0,True,3826.0,payoff fixed
+betting_performance_table.tex,GLM,glm,win_rate,0.51,0.5101934134866701,True,0.5101934134866701,payoff fixed
+betting_performance_table.tex,GLM,glm,roi_pct,-7.45,-7.451123889179298,True,-2.59943924345388,payoff fixed
+betting_performance_table.tex,GLM,glm,sharpe,-1.22,-1.2228513903756368,True,-0.4491599411280715,payoff fixed
+betting_performance_table.tex,MEAN(GLM+XGB),ens_mean_glm_xgb,bets,3963.0,3963.0,True,3963.0,payoff fixed
+betting_performance_table.tex,MEAN(GLM+XGB),ens_mean_glm_xgb,win_rate,0.507,0.5074438556649004,True,0.5074438556649004,payoff fixed
+betting_performance_table.tex,MEAN(GLM+XGB),ens_mean_glm_xgb,roi_pct,-8.0,-8.003785011355031,True,-3.1243548276099364,payoff fixed
+betting_performance_table.tex,MEAN(GLM+XGB),ens_mean_glm_xgb,sharpe,-1.31,-1.3134306267121316,True,-0.5398107416915003,payoff fixed
+betting_performance_table.tex,XGB,xgb,bets,4419.0,4419.0,True,4419.0,payoff fixed
+betting_performance_table.tex,XGB,xgb,win_rate,0.501,0.5005657388549446,True,0.5005657388549446,payoff fixed
+betting_performance_table.tex,XGB,xgb,roi_pct,-9.39,-9.386286490156143,True,-4.43744985496513,payoff fixed
+betting_performance_table.tex,XGB,xgb,sharpe,-1.54,-1.5401510949820572,True,-0.7666063803038853,payoff fixed
+betting_performance_table.tex,GLM+XGB (stack),ens_stack_glm_xgb,bets,1139.0,1139.0,True,1139.0,payoff fixed
+betting_performance_table.tex,GLM+XGB (stack),ens_stack_glm_xgb,win_rate,0.5,0.5004389815627743,True,0.5004389815627743,payoff fixed
+betting_performance_table.tex,GLM+XGB (stack),ens_stack_glm_xgb,roi_pct,-9.41,-9.411764705882353,True,-4.461648974379439,payoff fixed
+betting_performance_table.tex,GLM+XGB (stack),ens_stack_glm_xgb,sharpe,-1.54,-1.5438279095660647,True,-0.7705355370066339,payoff fixed
+betting_performance_table.tex,GLM+STATE (stack),ens_stack_glm_state,bets,1100.0,1100.0,True,1400.0,state column sign-fixed and stack refit
+betting_performance_table.tex,GLM+STATE (stack),ens_stack_glm_state,win_rate,0.5,0.5,True,0.5242857142857142,state column sign-fixed and stack refit
+betting_performance_table.tex,GLM+STATE (stack),ens_stack_glm_state,roi_pct,-9.5,-9.5,True,0.09090909090909095,state column sign-fixed and stack refit
+betting_performance_table.tex,GLM+STATE (stack),ens_stack_glm_state,sharpe,-1.56,-1.5582764209092195,True,0.01572001252844452,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Stack(GLM+XGB+State),ens_stack_glm_xgb_state,brier,0.2515,0.2515023293826892,True,0.2509582604972654,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Stack(GLM+XGB+State),ens_stack_glm_xgb_state,log_loss,0.6966,0.6965517921403875,True,0.6953219323134451,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Stack(GLM+XGB+State),ens_stack_glm_xgb_state,accuracy_at_0.55,0.511,0.5109423042141437,True,0.5127509495387954,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Stack(GLM+XGB+State),ens_stack_glm_xgb_state,roi_pct_home_bets_p>=0.55,-13.5,-13.478632478632473,True,-5.549450549450547,state column sign-fixed and stack refit; home bets 117 -> 91
+multimodel_comparison_table.tex,Stack(GLM+XGB),ens_stack_glm_xgb,brier,0.2517,0.2516535027459137,True,0.2516535027459137,unchanged
+multimodel_comparison_table.tex,Stack(GLM+XGB),ens_stack_glm_xgb,log_loss,0.6973,0.6973190574829576,True,0.6973190574829576,unchanged
+multimodel_comparison_table.tex,Stack(GLM+XGB),ens_stack_glm_xgb,accuracy_at_0.55,0.512,0.5116657623440043,True,0.5116657623440043,unchanged
+multimodel_comparison_table.tex,Stack(GLM+XGB),ens_stack_glm_xgb,roi_pct_home_bets_p>=0.55,-11.5,-11.53684210526316,True,-11.53684210526316,unchanged; home bets 95 -> 95
+multimodel_comparison_table.tex,Stack(GLM+State),ens_stack_glm_state,brier,0.2517,0.25170478045590505,True,0.2507393325485529,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Stack(GLM+State),ens_stack_glm_state,log_loss,0.6971,0.6971178584636704,True,0.6948348529941477,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Stack(GLM+State),ens_stack_glm_state,accuracy_at_0.55,0.512,0.5120274914089347,True,0.5118466268764695,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Stack(GLM+State),ens_stack_glm_state,roi_pct_home_bets_p>=0.55,-7.9,-7.8865248226950335,True,-10.229999999999997,state column sign-fixed and stack refit; home bets 141 -> 100
+multimodel_comparison_table.tex,Stack(XGB+State),ens_stack_xgb_state,brier,0.2519,0.25186207686919926,True,0.25112054473237977,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Stack(XGB+State),ens_stack_xgb_state,log_loss,0.6976,0.6975925554902418,True,0.6956972863357743,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Stack(XGB+State),ens_stack_xgb_state,accuracy_at_0.55,0.51,0.5100379815518177,True,0.512389220473865,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Stack(XGB+State),ens_stack_xgb_state,roi_pct_home_bets_p>=0.55,-17.2,-17.233333333333334,True,-7.870588235294115,state column sign-fixed and stack refit; home bets 120 -> 85
+multimodel_comparison_table.tex,GLM (baseline),glm,brier,0.2552,0.25524235273871093,True,0.25524235273871093,unchanged
+multimodel_comparison_table.tex,GLM (baseline),glm,log_loss,0.7055,0.7054955590804964,True,0.7054955590804964,unchanged
+multimodel_comparison_table.tex,GLM (baseline),glm,accuracy_at_0.55,0.51,0.5100379815518177,True,0.5100379815518177,unchanged
+multimodel_comparison_table.tex,GLM (baseline),glm,roi_pct_home_bets_p>=0.55,-6.3,-6.3233890214797155,True,-6.3233890214797155,unchanged; home bets 838 -> 838
+multimodel_comparison_table.tex,Mean(GLM+XGB),ens_mean_glm_xgb,brier,0.2567,0.2566556999255907,True,0.2566556999255907,unchanged
+multimodel_comparison_table.tex,Mean(GLM+XGB),ens_mean_glm_xgb,log_loss,0.7078,0.7078142577196238,True,0.7078142577196238,unchanged
+multimodel_comparison_table.tex,Mean(GLM+XGB),ens_mean_glm_xgb,accuracy_at_0.55,0.513,0.5129318140712606,True,0.5129318140712606,unchanged
+multimodel_comparison_table.tex,Mean(GLM+XGB),ens_mean_glm_xgb,roi_pct_home_bets_p>=0.55,-4.5,-4.500000000000001,True,-4.500000000000001,unchanged; home bets 904 -> 904
+multimodel_comparison_table.tex,Mean(GLM+XGB+State),ens_mean_glm_xgb_state,brier,0.2615,0.2615032820298246,True,0.25559508037199435,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Mean(GLM+XGB+State),ens_mean_glm_xgb_state,log_loss,0.7176,0.7175813774931199,True,0.705059653420984,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Mean(GLM+XGB+State),ens_mean_glm_xgb_state,accuracy_at_0.55,0.497,0.49719659974678965,True,0.5203472599023331,state column sign-fixed and stack refit
+multimodel_comparison_table.tex,Mean(GLM+XGB+State),ens_mean_glm_xgb_state,roi_pct_home_bets_p>=0.55,-8.3,-8.261204164780445,True,-1.3850437549721535,state column sign-fixed and stack refit; home bets 2209 -> 1257
+multimodel_comparison_table.tex,XGBoost,xgb,brier,0.2643,0.2643477940981727,True,0.2643477940981727,unchanged
+multimodel_comparison_table.tex,XGBoost,xgb,log_loss,0.726,0.7260159700524116,True,0.7260159700524116,unchanged
+multimodel_comparison_table.tex,XGBoost,xgb,accuracy_at_0.55,0.514,0.5136552722011214,True,0.5136552722011214,unchanged
+multimodel_comparison_table.tex,XGBoost,xgb,roi_pct_home_bets_p>=0.55,-4.2,-4.19585987261146,True,-4.19585987261146,unchanged; home bets 1256 -> 1256
+clv_distribution_table.tex,GLM,glm,mean_bps,14.9,14.930163080815841,True,14.930163080815841,"outcome-signed (p - 0.5), not closing-line value; t=1.35, p=0.18 as published"
+clv_distribution_table.tex,GLM,glm,median_bps,8.1,8.071064713029985,True,8.071064713029985,"outcome-signed (p - 0.5), not closing-line value; t=1.35, p=0.18 as published"
+clv_distribution_table.tex,GLM,glm,std_bps,820.6,820.631339615994,True,820.631339615994,"outcome-signed (p - 0.5), not closing-line value; t=1.35, p=0.18 as published"
+clv_distribution_table.tex,MEAN(GLM+XGB),ens_mean_glm_xgb,mean_bps,8.7,8.730634523033087,True,8.730634523033087,"outcome-signed (p - 0.5), not closing-line value; t=0.75, p=0.45 as published"
+clv_distribution_table.tex,MEAN(GLM+XGB),ens_mean_glm_xgb,median_bps,-9.1,-9.060265492606412,True,-9.060265492606412,"outcome-signed (p - 0.5), not closing-line value; t=0.75, p=0.45 as published"
+clv_distribution_table.tex,MEAN(GLM+XGB),ens_mean_glm_xgb,std_bps,867.7,867.7190174710253,True,867.7190174710253,"outcome-signed (p - 0.5), not closing-line value; t=0.75, p=0.45 as published"
+clv_distribution_table.tex,XGB,xgb,mean_bps,2.5,2.531105965250334,True,2.531105965250334,"outcome-signed (p - 0.5), not closing-line value; t=0.16, p=0.88 as published"
+clv_distribution_table.tex,XGB,xgb,median_bps,2.5,2.4687009169432894,True,2.4687009169432894,"outcome-signed (p - 0.5), not closing-line value; t=0.16, p=0.88 as published"
+clv_distribution_table.tex,XGB,xgb,std_bps,1208.4,1208.4486700578784,True,1208.4486700578784,"outcome-signed (p - 0.5), not closing-line value; t=0.16, p=0.88 as published"
+clv_distribution_table.tex,GLM+XGB (stack),ens_stack_glm_xgb,mean_bps,4.3,4.298129153099852,True,4.298129153099852,"outcome-signed (p - 0.5), not closing-line value; t=0.70, p=0.48 as published"
+clv_distribution_table.tex,GLM+XGB (stack),ens_stack_glm_xgb,median_bps,20.9,20.876444344728462,True,20.876444344728462,"outcome-signed (p - 0.5), not closing-line value; t=0.70, p=0.48 as published"
+clv_distribution_table.tex,GLM+XGB (stack),ens_stack_glm_xgb,std_bps,456.5,456.4545710952448,True,456.4545710952448,"outcome-signed (p - 0.5), not closing-line value; t=0.70, p=0.48 as published"
+clv_distribution_table.tex,GLM+STATE (stack),ens_stack_glm_state,mean_bps,3.6,3.550808112234211,True,6.707373383971341,"outcome-signed (p - 0.5), not closing-line value; t=0.58, p=0.56 as published"
+clv_distribution_table.tex,GLM+STATE (stack),ens_stack_glm_state,median_bps,27.4,27.41984522649732,True,14.608945047234755,"outcome-signed (p - 0.5), not closing-line value; t=0.58, p=0.56 as published"
+clv_distribution_table.tex,GLM+STATE (stack),ens_stack_glm_state,std_bps,453.9,453.884102517083,True,375.48302155419174,"outcome-signed (p - 0.5), not closing-line value; t=0.58, p=0.56 as published"
+per_season_top3_table.tex / oos_record_table.tex,2015 glm,glm,brier,0.2539,0.25388257131256986,True,0.25388257131256986,home bets at p>=0.55: 36 -> 36
+per_season_top3_table.tex / oos_record_table.tex,2015 glm,glm,log_loss,0.7011,0.7011060381375318,True,0.7011060381375318,home bets at p>=0.55: 36 -> 36
+per_season_top3_table.tex / oos_record_table.tex,2015 glm,glm,accuracy_pct,53.3,53.30739299610895,True,53.30739299610895,home bets at p>=0.55: 36 -> 36
+per_season_top3_table.tex / oos_record_table.tex,2015 glm,glm,roi_pct,-4.5,-4.500000000000003,True,-4.500000000000003,home bets at p>=0.55: 36 -> 36
+per_season_top3_table.tex / oos_record_table.tex,2016 glm,glm,brier,0.2459,0.2458968499634566,True,0.2458968499634566,home bets at p>=0.55: 31 -> 31
+per_season_top3_table.tex / oos_record_table.tex,2016 glm,glm,log_loss,0.6844,0.684379188042582,True,0.684379188042582,home bets at p>=0.55: 31 -> 31
+per_season_top3_table.tex / oos_record_table.tex,2016 glm,glm,accuracy_pct,54.2,54.19847328244275,True,54.19847328244275,home bets at p>=0.55: 31 -> 31
+per_season_top3_table.tex / oos_record_table.tex,2016 glm,glm,roi_pct,29.4,29.387096774193544,True,29.387096774193544,home bets at p>=0.55: 31 -> 31
+per_season_top3_table.tex / oos_record_table.tex,2017 glm,glm,brier,0.253,0.2530300340706412,True,0.2530300340706412,home bets at p>=0.55: 48 -> 48
+per_season_top3_table.tex / oos_record_table.tex,2017 glm,glm,log_loss,0.6983,0.6983347161556958,True,0.6983347161556958,home bets at p>=0.55: 48 -> 48
+per_season_top3_table.tex / oos_record_table.tex,2017 glm,glm,accuracy_pct,50.2,50.19305019305019,True,50.19305019305019,home bets at p>=0.55: 48 -> 48
+per_season_top3_table.tex / oos_record_table.tex,2017 glm,glm,roi_pct,3.5,3.4583333333333335,True,3.4583333333333335,home bets at p>=0.55: 48 -> 48
+per_season_top3_table.tex / oos_record_table.tex,2018 glm,glm,brier,0.2552,0.25515398930068306,True,0.25515398930068306,home bets at p>=0.55: 32 -> 32
+per_season_top3_table.tex / oos_record_table.tex,2018 glm,glm,log_loss,0.7037,0.7036634399479142,True,0.7036634399479142,home bets at p>=0.55: 32 -> 32
+per_season_top3_table.tex / oos_record_table.tex,2018 glm,glm,accuracy_pct,50.4,50.3875968992248,True,50.3875968992248,home bets at p>=0.55: 32 -> 32
+per_season_top3_table.tex / oos_record_table.tex,2018 glm,glm,roi_pct,-22.4,-22.40625,True,-22.40625,home bets at p>=0.55: 32 -> 32
+per_season_top3_table.tex / oos_record_table.tex,2019 glm,glm,brier,0.2508,0.2507938658177215,True,0.2507938658177215,home bets at p>=0.55: 28 -> 28
+per_season_top3_table.tex / oos_record_table.tex,2019 glm,glm,log_loss,0.6948,0.6947677816934547,True,0.6947677816934547,home bets at p>=0.55: 28 -> 28
+per_season_top3_table.tex / oos_record_table.tex,2019 glm,glm,accuracy_pct,53.7,53.69649805447471,True,53.69649805447471,home bets at p>=0.55: 28 -> 28
+per_season_top3_table.tex / oos_record_table.tex,2019 glm,glm,roi_pct,-25.0,-24.964285714285715,True,-24.964285714285715,home bets at p>=0.55: 28 -> 28
+per_season_top3_table.tex / oos_record_table.tex,2020 glm,glm,brier,0.2554,0.25540038725532055,True,0.25540038725532055,home bets at p>=0.55: 21 -> 21
+per_season_top3_table.tex / oos_record_table.tex,2020 glm,glm,log_loss,0.7067,0.7067253041810657,True,0.7067253041810657,home bets at p>=0.55: 21 -> 21
+per_season_top3_table.tex / oos_record_table.tex,2020 glm,glm,accuracy_pct,50.9,50.92936802973978,True,50.92936802973978,home bets at p>=0.55: 21 -> 21
+per_season_top3_table.tex / oos_record_table.tex,2020 glm,glm,roi_pct,0.0,0.0476190476190466,True,0.0476190476190466,home bets at p>=0.55: 21 -> 21
+per_season_top3_table.tex / oos_record_table.tex,2021 glm,glm,brier,0.2502,0.2502231804227651,True,0.2502231804227651,home bets at p>=0.55: 27 -> 27
+per_season_top3_table.tex / oos_record_table.tex,2021 glm,glm,log_loss,0.6937,0.6936516817364144,True,0.6936516817364144,home bets at p>=0.55: 27 -> 27
+per_season_top3_table.tex / oos_record_table.tex,2021 glm,glm,accuracy_pct,49.8,49.8220640569395,True,49.8220640569395,home bets at p>=0.55: 27 -> 27
+per_season_top3_table.tex / oos_record_table.tex,2021 glm,glm,roi_pct,-22.2,-22.185185185185187,True,-22.185185185185187,home bets at p>=0.55: 27 -> 27
+per_season_top3_table.tex / oos_record_table.tex,2022 glm,glm,brier,0.2537,0.2536689473907286,True,0.2536689473907286,home bets at p>=0.55: 31 -> 31
+per_season_top3_table.tex / oos_record_table.tex,2022 glm,glm,log_loss,0.7005,0.7005312858837991,True,0.7005312858837991,home bets at p>=0.55: 31 -> 31
+per_season_top3_table.tex / oos_record_table.tex,2022 glm,glm,accuracy_pct,50.4,50.36496350364964,True,50.36496350364964,home bets at p>=0.55: 31 -> 31
+per_season_top3_table.tex / oos_record_table.tex,2022 glm,glm,roi_pct,-7.6,-7.580645161290321,True,-7.580645161290321,home bets at p>=0.55: 31 -> 31
+per_season_top3_table.tex / oos_record_table.tex,2023 glm,glm,brier,0.2539,0.2538846927626427,True,0.2538846927626427,home bets at p>=0.55: 19 -> 19
+per_season_top3_table.tex / oos_record_table.tex,2023 glm,glm,log_loss,0.701,0.7009698671621105,True,0.7009698671621105,home bets at p>=0.55: 19 -> 19
+per_season_top3_table.tex / oos_record_table.tex,2023 glm,glm,accuracy_pct,49.1,49.07749077490775,True,49.07749077490775,home bets at p>=0.55: 19 -> 19
+per_season_top3_table.tex / oos_record_table.tex,2023 glm,glm,roi_pct,-19.6,-19.57894736842105,True,-19.57894736842105,home bets at p>=0.55: 19 -> 19
+per_season_top3_table.tex / oos_record_table.tex,2024 glm,glm,brier,0.2546,0.25456132642182616,True,0.25456132642182616,home bets at p>=0.55: 8 -> 8
+per_season_top3_table.tex / oos_record_table.tex,2024 glm,glm,log_loss,0.7023,0.7023196657727815,True,0.7023196657727815,home bets at p>=0.55: 8 -> 8
+per_season_top3_table.tex / oos_record_table.tex,2024 glm,glm,accuracy_pct,48.0,48.04270462633452,True,48.04270462633452,home bets at p>=0.55: 8 -> 8
+per_season_top3_table.tex / oos_record_table.tex,2024 glm,glm,roi_pct,-4.5,-4.499999999999998,True,-4.499999999999998,home bets at p>=0.55: 8 -> 8
+per_season_top3_table.tex / oos_record_table.tex,2015 xgb,xgb,brier,0.2639,0.2638693414263355,True,0.2638693414263355,home bets at p>=0.55: 56 -> 56
+per_season_top3_table.tex / oos_record_table.tex,2015 xgb,xgb,log_loss,0.7221,0.7220818885029215,True,0.7220818885029215,home bets at p>=0.55: 56 -> 56
+per_season_top3_table.tex / oos_record_table.tex,2015 xgb,xgb,accuracy_pct,51.0,50.97276264591439,True,50.97276264591439,home bets at p>=0.55: 56 -> 56
+per_season_top3_table.tex / oos_record_table.tex,2015 xgb,xgb,roi_pct,-14.7,-14.732142857142858,True,-14.732142857142858,home bets at p>=0.55: 56 -> 56
+per_season_top3_table.tex / oos_record_table.tex,2016 xgb,xgb,brier,0.255,0.254953796637786,True,0.254953796637786,home bets at p>=0.55: 48 -> 48
+per_season_top3_table.tex / oos_record_table.tex,2016 xgb,xgb,log_loss,0.705,0.7049592473597941,True,0.7049592473597941,home bets at p>=0.55: 48 -> 48
+per_season_top3_table.tex / oos_record_table.tex,2016 xgb,xgb,accuracy_pct,51.5,51.526717557251914,True,51.526717557251914,home bets at p>=0.55: 48 -> 48
+per_season_top3_table.tex / oos_record_table.tex,2016 xgb,xgb,roi_pct,3.5,3.4583333333333335,True,3.4583333333333335,home bets at p>=0.55: 48 -> 48
+per_season_top3_table.tex / oos_record_table.tex,2017 xgb,xgb,brier,0.2585,0.25852848827975916,True,0.25852848827975916,home bets at p>=0.55: 65 -> 65
+per_season_top3_table.tex / oos_record_table.tex,2017 xgb,xgb,log_loss,0.7132,0.7132240781937869,True,0.7132240781937869,home bets at p>=0.55: 65 -> 65
+per_season_top3_table.tex / oos_record_table.tex,2017 xgb,xgb,accuracy_pct,53.7,53.66795366795367,True,53.66795366795367,home bets at p>=0.55: 65 -> 65
+per_season_top3_table.tex / oos_record_table.tex,2017 xgb,xgb,roi_pct,14.6,14.600000000000001,True,14.600000000000001,home bets at p>=0.55: 65 -> 65
+per_season_top3_table.tex / oos_record_table.tex,2018 xgb,xgb,brier,0.2586,0.25857906055574764,True,0.25857906055574764,home bets at p>=0.55: 59 -> 59
+per_season_top3_table.tex / oos_record_table.tex,2018 xgb,xgb,log_loss,0.7123,0.7123227932444931,True,0.7123227932444931,home bets at p>=0.55: 59 -> 59
+per_season_top3_table.tex / oos_record_table.tex,2018 xgb,xgb,accuracy_pct,51.6,51.55038759689923,True,51.55038759689923,home bets at p>=0.55: 59 -> 59
+per_season_top3_table.tex / oos_record_table.tex,2018 xgb,xgb,roi_pct,-9.4,-9.35593220338983,True,-9.35593220338983,home bets at p>=0.55: 59 -> 59
+per_season_top3_table.tex / oos_record_table.tex,2019 xgb,xgb,brier,0.2534,0.25335531170915543,True,0.25335531170915543,home bets at p>=0.55: 40 -> 40
+per_season_top3_table.tex / oos_record_table.tex,2019 xgb,xgb,log_loss,0.7006,0.7006296464525548,True,0.7006296464525548,home bets at p>=0.55: 40 -> 40
+per_season_top3_table.tex / oos_record_table.tex,2019 xgb,xgb,accuracy_pct,54.5,54.474708171206224,True,54.474708171206224,home bets at p>=0.55: 40 -> 40
+per_season_top3_table.tex / oos_record_table.tex,2019 xgb,xgb,roi_pct,-14.1,-14.05,True,-14.05,home bets at p>=0.55: 40 -> 40
+per_season_top3_table.tex / oos_record_table.tex,2020 xgb,xgb,brier,0.2636,0.26363332061936623,True,0.26363332061936623,home bets at p>=0.55: 41 -> 41
+per_season_top3_table.tex / oos_record_table.tex,2020 xgb,xgb,log_loss,0.7214,0.7214394227224077,True,0.7214394227224077,home bets at p>=0.55: 41 -> 41
+per_season_top3_table.tex / oos_record_table.tex,2020 xgb,xgb,accuracy_pct,49.4,49.44237918215613,True,49.44237918215613,home bets at p>=0.55: 41 -> 41
+per_season_top3_table.tex / oos_record_table.tex,2020 xgb,xgb,roi_pct,-11.5,-11.487804878048783,True,-11.487804878048783,home bets at p>=0.55: 41 -> 41
+per_season_top3_table.tex / oos_record_table.tex,2021 xgb,xgb,brier,0.2529,0.25289602714283804,True,0.25289602714283804,home bets at p>=0.55: 46 -> 46
+per_season_top3_table.tex / oos_record_table.tex,2021 xgb,xgb,log_loss,0.6999,0.6998688938497829,True,0.6998688938497829,home bets at p>=0.55: 46 -> 46
+per_season_top3_table.tex / oos_record_table.tex,2021 xgb,xgb,accuracy_pct,55.9,55.871886120996436,True,55.871886120996436,home bets at p>=0.55: 46 -> 46
+per_season_top3_table.tex / oos_record_table.tex,2021 xgb,xgb,roi_pct,20.4,20.41304347826087,True,20.41304347826087,home bets at p>=0.55: 46 -> 46
+per_season_top3_table.tex / oos_record_table.tex,2022 xgb,xgb,brier,0.2546,0.25463845442460487,True,0.25463845442460487,home bets at p>=0.55: 42 -> 42
+per_season_top3_table.tex / oos_record_table.tex,2022 xgb,xgb,log_loss,0.7029,0.7029498870961374,True,0.7029498870961374,home bets at p>=0.55: 42 -> 42
+per_season_top3_table.tex / oos_record_table.tex,2022 xgb,xgb,accuracy_pct,52.2,52.18978102189781,True,52.18978102189781,home bets at p>=0.55: 42 -> 42
+per_season_top3_table.tex / oos_record_table.tex,2022 xgb,xgb,roi_pct,4.6,4.595238095238095,True,4.595238095238095,home bets at p>=0.55: 42 -> 42
+per_season_top3_table.tex / oos_record_table.tex,2023 xgb,xgb,brier,0.2537,0.25374799515892854,True,0.25374799515892854,home bets at p>=0.55: 45 -> 45
+per_season_top3_table.tex / oos_record_table.tex,2023 xgb,xgb,log_loss,0.701,0.7009968428734925,True,0.7009968428734925,home bets at p>=0.55: 45 -> 45
+per_season_top3_table.tex / oos_record_table.tex,2023 xgb,xgb,accuracy_pct,50.6,50.55350553505535,True,50.55350553505535,home bets at p>=0.55: 45 -> 45
+per_season_top3_table.tex / oos_record_table.tex,2023 xgb,xgb,roi_pct,-2.4,-2.377777777777778,True,-2.377777777777778,home bets at p>=0.55: 45 -> 45
+per_season_top3_table.tex / oos_record_table.tex,2024 xgb,xgb,brier,0.2602,0.2601807975543334,True,0.2601807975543334,home bets at p>=0.55: 49 -> 49
+per_season_top3_table.tex / oos_record_table.tex,2024 xgb,xgb,log_loss,0.7141,0.7141208952612583,True,0.7141208952612583,home bets at p>=0.55: 49 -> 49
+per_season_top3_table.tex / oos_record_table.tex,2024 xgb,xgb,accuracy_pct,49.8,49.8220640569395,True,49.8220640569395,home bets at p>=0.55: 49 -> 49
+per_season_top3_table.tex / oos_record_table.tex,2024 xgb,xgb,roi_pct,5.2,5.244897959183674,True,5.244897959183674,home bets at p>=0.55: 49 -> 49
+per_season_top3_table.tex / oos_record_table.tex,2015 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,brier,0.2491,0.24912444833876168,True,0.2483827948539797,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2015 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,log_loss,0.6914,0.6913960208597594,True,0.6899104401481678,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2015 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,accuracy_pct,53.3,53.30739299610895,True,53.30739299610895,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2015 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,roi_pct,0.0,0.0,True,0.0,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2016 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,brier,0.2498,0.24977390515115577,True,0.249610937829379,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2016 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,log_loss,0.6927,0.6926945055817259,True,0.692368627487894,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2016 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,accuracy_pct,50.0,50.0,True,50.0,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2016 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,roi_pct,0.0,0.0,True,0.0,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2017 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,brier,0.2503,0.25029221243673827,True,0.2502810873764633,home bets at p>=0.55: 0 -> 1; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2017 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,log_loss,0.6937,0.6937268773841573,True,0.693704853024322,home bets at p>=0.55: 0 -> 1; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2017 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,accuracy_pct,48.6,48.64864864864865,True,49.034749034749034,home bets at p>=0.55: 0 -> 1; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2017 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,roi_pct,0.0,0.0,True,91.0,home bets at p>=0.55: 0 -> 1; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2018 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,brier,0.2498,0.2498495315415379,True,0.24932977838542902,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2018 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,log_loss,0.6928,0.6928472165441891,True,0.6918058002999964,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2018 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,accuracy_pct,52.7,52.71317829457365,True,52.71317829457365,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2018 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,roi_pct,0.0,0.0,True,0.0,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2019 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,brier,0.2486,0.24864023157371024,True,0.24909356131542534,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2019 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,log_loss,0.6904,0.6904259626705997,True,0.6913305268113714,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2019 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,accuracy_pct,56.0,56.03112840466926,True,56.03112840466926,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2019 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,roi_pct,0.0,0.0,True,0.0,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2020 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,brier,0.2504,0.2503699038559004,True,0.25043206421355974,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2020 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,log_loss,0.6939,0.6938883008082268,True,0.6940119203730489,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2020 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,accuracy_pct,50.6,50.55762081784386,True,50.55762081784386,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2020 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,roi_pct,0.0,0.0,True,0.0,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2021 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,brier,0.2499,0.24985902551435188,True,0.2493405525665417,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2021 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,log_loss,0.6929,0.6928656678765512,True,0.6918275125407896,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2021 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,accuracy_pct,51.6,51.60142348754449,True,51.60142348754449,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2021 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,roi_pct,0.0,0.0,True,0.0,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2022 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,brier,0.2503,0.2503424660468065,True,0.2501724217971804,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2022 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,log_loss,0.6938,0.6938323001028144,True,0.693491715348376,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2022 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,accuracy_pct,50.7,50.72992700729927,True,50.72992700729927,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2022 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,roi_pct,0.0,0.0,True,0.0,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2023 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,brier,0.2505,0.2504822410305223,True,0.25071539085578987,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2023 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,log_loss,0.6941,0.6941123067517901,True,0.6945783618806496,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2023 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,accuracy_pct,50.2,50.184501845018445,True,50.184501845018445,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2023 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,roi_pct,0.0,0.0,True,0.0,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2024 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,brier,0.2511,0.2510588235721664,True,0.2510432710853225,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2024 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,log_loss,0.6953,0.6952660808774069,True,0.6952364506562909,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2024 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,accuracy_pct,48.0,48.04270462633452,True,48.04270462633452,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit
+per_season_top3_table.tex / oos_record_table.tex,2024 ens_stack_glm_xgb_state,ens_stack_glm_xgb_state,roi_pct,0.0,0.0,True,0.0,home bets at p>=0.55: 0 -> 0; state column sign-fixed and stack refit

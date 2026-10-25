@@ -1,0 +1,152 @@
+claim,check,value,n,source,note
+C04,rows / prediction runs / created_at,285 / 1 / 2026-02-12 14:46 to 2026-02-12 14:46,,ml.game_outcome_predictions JOIN games,
+C04,vegas_spread equals games.spread_close,285 of 285,,ml.game_outcome_predictions JOIN games,
+C04,"spread MAE model vs closing line, all games",11.05 vs 9.67,285.0,ml.game_outcome_predictions JOIN games,
+C04,"spread MAE model vs closing line, regular season",11.14 vs 9.72,272.0,ml.game_outcome_predictions JOIN games,
+C02,ATS all games (side = sign(pred - line)),"139-145-1, 48.9% [43.2%, 54.7%], ROI -6.6%",285.0,ml.game_outcome_predictions JOIN games,
+C02,ATS |edge| > 2,"105-102-1, 50.7% [44.0%, 57.5%], ROI -3.2%",,ml.game_outcome_predictions JOIN games,
+C02,ATS |edge| >= 2,"105-104-1, 50.2% [43.5%, 57.0%], ROI -4.1%",,ml.game_outcome_predictions JOIN games,
+C02,ATS |edge| >= 1,"124-129-1, 49.0% [42.9%, 55.1%], ROI -6.4%",,ml.game_outcome_predictions JOIN games,
+C02,"ATS regular season, |edge| >= 1 (market_benchmark's rule)","117-124-1, 48.5% [42.3%, 54.8%], ROI -7.3%",,ml.game_outcome_predictions JOIN games,
+C02,old rule (pred + line vs margin + line) agreement,75.4%,281.0,ml.game_outcome_predictions JOIN games,what a margin + spread_close grader reports for this model
+C30,ATS regular season |edge| > 2,"98-99-1, 49.7% [42.8%, 56.7%], ROI -5.0%",,ml.game_outcome_predictions JOIN games,
+C30,ATS playoffs (weeks 19-21) |edge| > 2,"7-2-0, 77.8% [45.3%, 93.7%], ROI +48.5%",,ml.game_outcome_predictions JOIN games,one-sided binomial p vs 50% = 0.09
+C30,ATS all postseason incl. Super Bowl |edge| > 2,"7-3-0, 70.0% [39.7%, 89.2%], ROI +33.6%",,ml.game_outcome_predictions JOIN games,
+C03,"straight-up winner, model P(home win) > 0.5",162/285 = 56.8%; 162/284 = 57.0% excl. ties,285.0,ml.game_outcome_predictions JOIN games,
+C03,"straight-up winner, closing-spread favorite",187/284 = 65.8%,284.0,ml.game_outcome_predictions JOIN games,
+C03,win-prob log-loss model vs de-vigged moneyline,0.6871 vs 0.6070,284.0,ml.game_outcome_predictions JOIN games,
+C03,win-prob Brier model vs de-vigged moneyline,0.2467 vs 0.2109,284.0,ml.game_outcome_predictions JOIN games,
+C26,"spread head straight-up side, sign(pred) == sign(margin)",148/284 = 52.1%,284.0,ml.game_outcome_predictions JOIN games,the number stored as ats_win_pct
+C26,ATS all games for comparison,"139-145-1, 48.9% [43.2%, 54.7%], ROI -6.6%",285.0,ml.game_outcome_predictions JOIN games,
+C02,ml.model_metrics run 17 ats_roi_pct (stored),-3.2,,ml.model_metrics,"{""model"": ""Game Outcome v2"", ""source"": ""2025 full season (208 bets)""}"
+C26,ml.model_metrics run 17 ats_win_pct (stored),52.1,,ml.model_metrics,"{""model"": ""Game Outcome v2"", ""source"": ""2025 full season""}"
+C17,ml.model_metrics run 17 spread_mae (stored),10.45,,ml.model_metrics,"{""model"": ""Game Outcome v2"", ""source"": ""2024 holdout""}"
+C17,ml.model_metrics run 17 spread_mae (stored),11.05,,ml.model_metrics,"{""model"": ""Game Outcome v2"", ""source"": ""2025 full season (285 games)""}"
+C17,ml.model_metrics run 17 win_prob_accuracy (stored),0.629,,ml.model_metrics,"{""model"": ""Game Outcome v2"", ""source"": ""2024 holdout""}"
+C17,ml.model_metrics run 17 win_prob_auc (stored),0.691,,ml.model_metrics,"{""model"": ""Game Outcome v2"", ""source"": ""2024 holdout""}"
+C27,ATS with 0 <= |edge| < 1,"15-16-0, 48.4% [32.0%, 65.2%], ROI -7.6%",31.0,ml.game_outcome_predictions JOIN games,
+C27,ATS with 1 <= |edge| < 2,"19-25-0, 43.2% [29.7%, 57.8%], ROI -17.6%",44.0,ml.game_outcome_predictions JOIN games,
+C27,ATS with 2 <= |edge| < 3,"17-13-0, 56.7% [39.2%, 72.6%], ROI +8.2%",30.0,ml.game_outcome_predictions JOIN games,
+C27,ATS with 3 <= |edge| < 4,"23-11-1, 67.6% [50.8%, 80.9%], ROI +29.1%",35.0,ml.game_outcome_predictions JOIN games,
+C27,ATS with 4 <= |edge| < 5,"9-12-0, 42.9% [24.5%, 63.5%], ROI -18.2%",21.0,ml.game_outcome_predictions JOIN games,
+C27,ATS with 5 <= |edge| < 7,"15-34-0, 30.6% [19.5%, 44.5%], ROI -41.6%",49.0,ml.game_outcome_predictions JOIN games,
+C27,ATS with 7 <= |edge| < 10,"26-23-0, 53.1% [39.4%, 66.3%], ROI +1.3%",49.0,ml.game_outcome_predictions JOIN games,
+C27,ATS with 10 <= |edge| < inf,"15-11-0, 57.7% [38.9%, 74.5%], ROI +10.1%",26.0,ml.game_outcome_predictions JOIN games,
+C29,"spread MAE model vs closing line, regular season",11.14 vs 9.72,272.0,ml.game_outcome_predictions JOIN games,
+C29,"spread MAE model vs closing line, playoffs weeks 19-21",8.42 vs 8.33,12.0,ml.game_outcome_predictions JOIN games,
+C29,"spread MAE model vs closing line, Super Bowl",17.40 vs 11.50,1.0,ml.game_outcome_predictions JOIN games,
+C29,share of random 12-game regular-season subsets with model MAE <= 8.42,0.13,20000.0,ml.game_outcome_predictions JOIN games,
+C29,"closing-line MAE 1999-2025, regular season",10.26,6967.0,games,
+C29,"closing-line MAE 1999-2025, postseason",10.42,309.0,games,
+C16,stored v2 on 2025 weeks 3-13: spread MAE model vs closing line,11.09 vs 10.00,162.0,ml.game_outcome_predictions JOIN games,ADR-014 compares v2.1 on these games (10.70) with v2's 2024 validation MAE (10.45)
+C01,"2025 weeks 1-14, |edge| >= 0: old rule (pred + line, margin + line)","151-53-3, 74.0% [67.6%, 79.6%], ROI +41.3%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2025 weeks 1-14, |edge| >= 0: correct rule","89-118-1, 43.0% [36.4%, 49.8%], ROI -17.9%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2025 weeks 1-14, |edge| >= 1: old rule (pred + line, margin + line)","148-51-3, 74.4% [67.9%, 79.9%], ROI +42.0%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2025 weeks 1-14, |edge| >= 1: correct rule","74-100-1, 42.5% [35.4%, 50.0%], ROI -18.8%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2025 weeks 1-14, |edge| >= 2: old rule (pred + line, margin + line)","142-45-3, 75.9% [69.3%, 81.5%], ROI +45.0%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2025 weeks 1-14, |edge| >= 2: correct rule","68-90-1, 43.0% [35.6%, 50.8%], ROI -17.8%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2025 weeks 1-14, |edge| >= 3: old rule (pred + line, margin + line)","136-39-2, 77.7% [71.0%, 83.2%], ROI +48.4%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2025 weeks 1-14, |edge| >= 3: correct rule","61-80-1, 43.3% [35.4%, 51.5%], ROI -17.4%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2020-2025, |edge| >= 0: old rule (pred + line, margin + line)","1159-430-24, 72.9% [70.7%, 75.1%], ROI +39.2%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2020-2025, |edge| >= 0: correct rule","765-813-33, 48.5% [46.0%, 50.9%], ROI -7.4%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2020-2025, |edge| >= 1: old rule (pred + line, margin + line)","1110-386-23, 74.2% [71.9%, 76.4%], ROI +41.7%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2020-2025, |edge| >= 1: correct rule","679-726-29, 48.3% [45.7%, 50.9%], ROI -7.7%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2020-2025, |edge| >= 2: old rule (pred + line, margin + line)","1061-332-20, 76.2% [73.9%, 78.3%], ROI +45.4%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2020-2025, |edge| >= 2: correct rule","600-636-26, 48.5% [45.8%, 51.3%], ROI -7.3%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2020-2025, |edge| >= 3: old rule (pred + line, margin + line)","999-298-19, 77.0% [74.7%, 79.2%], ROI +47.0%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2020-2025, |edge| >= 3: correct rule","508-566-24, 47.3% [44.3%, 50.3%], ROI -9.7%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2019-2024, |edge| >= 0: old rule (pred + line, margin + line)","1148-428-22, 72.8% [70.6%, 75.0%], ROI +39.1%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2019-2024, |edge| >= 0: correct rule","770-783-42, 49.6% [47.1%, 52.1%], ROI -5.3%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2019-2024, |edge| >= 1: old rule (pred + line, margin + line)","1095-382-20, 74.1% [71.8%, 76.3%], ROI +41.5%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2019-2024, |edge| >= 1: correct rule","688-704-37, 49.4% [46.8%, 52.0%], ROI -5.6%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2019-2024, |edge| >= 2: old rule (pred + line, margin + line)","1047-329-17, 76.1% [73.8%, 78.3%], ROI +45.3%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2019-2024, |edge| >= 2: correct rule","603-607-34, 49.8% [47.0%, 52.6%], ROI -4.9%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2019-2024, |edge| >= 3: old rule (pred + line, margin + line)","985-302-17, 76.5% [74.1%, 78.8%], ROI +46.1%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"2019-2024, |edge| >= 3: correct rule","511-539-31, 48.7% [45.7%, 51.7%], ROI -7.1%",,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C01,"per season, all bets: old rule vs correct rule",2019: 73.6% vs 49.4%; 2020: 74.1% vs 50.6%; 2021: 71.2% vs 51.5%; 2022: 72.3% vs 49.4%; 2023: 74.3% vs 48.0%; 2024: 71.7% vs 48.5%; 2025: 74.2% vs 43.0%,,games (Dec-9 method rebuilt: last season's point differential per game + 2.5 HFA),
+C42,repo power_ratings_model 2025 (weeks >= 5),"127-93-1, 57.7% [51.1%, 64.1%], ROI +10.2%",221.0,games,model MAE 10.57 vs line 9.91
+C42,repo power_ratings_model 2020-2025 pooled,"666-620-24, 51.8% [49.1%, 54.5%], ROI -1.1%",,games,
+C05,"README baseline power ratings, 2019-2024, |edge| >= 1","609-608-31, 50.0% [47.2%, 52.8%], ROI -4.5%",1599.0,data/historical_weather_2018_2024.csv,
+C05,"README baseline Elo, 2019-2024, |edge| >= 1","581-596-31, 49.4% [46.5%, 52.2%], ROI -5.8%",1599.0,data/historical_weather_2018_2024.csv,
+C15,"home cover rate by rest difference, 2025, correct rule",away +3 or more: 41.9% (n=31); away +1..2: 50.0% (n=26); equal: 51.1% (n=174); home +1..2: 70.8% (n=24); home +3 or more: 41.4% (n=29),284.0,games.home_rest / away_rest (nflverse),
+C15,"home cover rate by rest difference, 2025, old rule",away +3 or more: 40.0% (n=30); away +1..2: 56.0% (n=25); equal: 54.3% (n=173); home +1..2: 66.7% (n=24); home +3 or more: 69.0% (n=29),281.0,games.home_rest / away_rest (nflverse),
+C15,"home cover rate by rest difference, 2006-2024, correct rule",away +3 or more: 47.6% (n=552); away +1..2: 49.5% (n=366); equal: 48.9% (n=3283); home +1..2: 48.3% (n=298); home +3 or more: 49.0% (n=512),5011.0,games.home_rest / away_rest (nflverse),
+C15,"corr(rest difference, ATS margin), 2025",+0.073,284.0,games.home_rest / away_rest (nflverse),
+C15,"corr(rest difference, ATS margin), 2006-2024",+0.009,5011.0,games.home_rest / away_rest (nflverse),
+C15,"ADR-013 query (home-game rest, pushes as no-cover), weeks <= 16, correct rule",r = +0.137; 3-5: 37.5% (n=8); 6-7: 37.8% (n=45); 8-10: 40.0% (n=10); 11+: 52.4% (n=63),126.0,games (kickoff dates in America/New_York),"ADR-013 printed r = 0.1698 on 139 games; 8-10d 64.3%, 11+d 59.3%"
+C15,"ADR-013 query (home-game rest, pushes as no-cover), weeks <= 16, old rule",r = +0.013; 3-5: 62.5% (n=8); 6-7: 44.4% (n=45); 8-10: 70.0% (n=10); 11+: 50.8% (n=63),126.0,games (kickoff dates in America/New_York),"ADR-013 printed r = 0.1698 on 139 games; 8-10d 64.3%, 11+d 59.3%"
+C15,"ADR-013 query (home-game rest, pushes as no-cover), all weeks, correct rule",r = +0.136; 3-5: 44.4% (n=9); 6-7: 40.0% (n=60); 8-10: 53.3% (n=15); 11+: 56.3% (n=71),155.0,games (kickoff dates in America/New_York),"ADR-013 printed r = 0.1698 on 139 games; 8-10d 64.3%, 11+d 59.3%"
+C15,"ADR-013 query (home-game rest, pushes as no-cover), all weeks, old rule",r = +0.058; 3-5: 55.6% (n=9); 6-7: 46.7% (n=60); 8-10: 60.0% (n=15); 11+: 53.5% (n=71),155.0,games (kickoff dates in America/New_York),"ADR-013 printed r = 0.1698 on 139 games; 8-10d 64.3%, 11+d 59.3%"
+C18,"2024 (val, in-sample): stored accuracy_ats",0.8456,285.0,models/state_space/*_metrics.json,
+C18,"2024 (val, in-sample): old formula and old label (reproduction)","accuracy 0.8456, Brier 0.134",285.0,games + StateSpaceRatings(config.json) fit on 2019-2024,
+C18,"2024 (val, in-sample): correct formula and label","accuracy 0.6584, Brier 0.220, MAE 9.15 vs line 9.70",281.0,games + StateSpaceRatings(config.json) fit on 2019-2024,
+C18,2025 first 107 games (test): stored accuracy_ats,0.7473,107.0,models/state_space/*_metrics.json,
+C18,2025 first 107 games (test): old formula and old label (reproduction),"accuracy 0.7383, Brier 0.174",107.0,games + StateSpaceRatings(config.json) fit on 2019-2024,
+C18,2025 first 107 games (test): correct formula and label,"accuracy 0.5234, Brier 0.270, MAE 10.64 vs line 9.44",107.0,games + StateSpaceRatings(config.json) fit on 2019-2024,
+C19,target equals home straight-up win,1.0000,1776.0,models/ensemble/game_outcome/predictions_all_games_2019_2025.csv + games,
+C19,straight-up accuracy 2019-2023 ('train'): ensemble vs closing favorite,81.5% vs 65.5%,1385.0,models/ensemble/game_outcome/predictions_all_games_2019_2025.csv + games,
+C19,"ATS 2019-2023 ('train'), margin = 13.5 * Phi^-1(p), |edge| >= 1","913-368-37, 71.3% [68.7%, 73.7%], ROI +36.1%",1390.0,models/ensemble/game_outcome/predictions_all_games_2019_2025.csv + games,
+C19,straight-up accuracy 2024 ('val'): ensemble vs closing favorite,77.2% vs 70.5%,285.0,models/ensemble/game_outcome/predictions_all_games_2019_2025.csv + games,
+C19,"ATS 2024 ('val'), margin = 13.5 * Phi^-1(p), |edge| >= 1","173-91-4, 65.5% [59.6%, 71.0%], ROI +25.1%",285.0,models/ensemble/game_outcome/predictions_all_games_2019_2025.csv + games,
+C19,straight-up accuracy 2025 ('test'): ensemble vs closing favorite,58.5% vs 68.9%,106.0,models/ensemble/game_outcome/predictions_all_games_2019_2025.csv + games,
+C19,"ATS 2025 ('test'), margin = 13.5 * Phi^-1(p), |edge| >= 1","51-55-0, 48.1% [38.8%, 57.5%], ROI -8.1%",107.0,models/ensemble/game_outcome/predictions_all_games_2019_2025.csv + games,
+C20,stored outcome agreement with old rule / correct rule,0.999 / 0.702,910.0,models/ensemble/backtest/trades.csv,
+C20,trades regraded with the correct rule,"552-331-27, 62.5% [59.3%, 65.6%], ROI +19.3%",910.0,models/ensemble/backtest/trades.csv,
+C20,regraded win rate by season,2022: 56.9% (n=260); 2023: 63.5% (n=260); 2024: 64.8% (n=273); 2025: 68.9% (n=90),910.0,models/ensemble/backtest/trades.csv,
+C21,stored outcome agreement with old rule / correct rule,1.000 / 0.705,796.0,models/ensemble/realistic_backtest/trades.csv,
+C21,trades regraded with the correct rule,"382-389-25, 49.5% [46.0%, 53.1%], ROI -5.4%",796.0,models/ensemble/realistic_backtest/trades.csv,
+C21,regraded win rate by season,2022: 48.7% (n=265); 2023: 51.2% (n=252); 2024: 48.8% (n=254),796.0,models/ensemble/realistic_backtest/trades.csv,
+C22,stored results,"{""n_games"": 285, ""n_bets"": 178, ""bet_rate"": 0.624561403508772, ""win_rate"": 0.7134831460674157, ""expected_roi"": 18.94831460674157, ""avg_edge"": 0.24362713524640636, ""avg_kelly"": 0.10209425850805387}",,analysis/ensemble/bayesian_xgb_2024_test.json,
+C22,"xgb_prob_home vs bayesian_prob_home + N(0, 0.05) with seed 42 (max abs diff)",1.11e-16,285.0,analysis/ensemble/bayesian_xgb_2024_test.json,nfl_analytics/production/ensemble_bayesian_xgb.py simulate branch
+C22,stored home_cover_margin equals margin + spread_close (old rule),1.000,285.0,analysis/ensemble/bayesian_xgb_2024_test.json,
+C22,distinct Bayesian ratings per team over the season,1,285.0,analysis/ensemble/bayesian_xgb_2024_test.json,one static rating per team
+C22,bets regraded with the correct rule,"100-76-2, 56.8% [49.4%, 63.9%], ROI +8.5%",178.0,analysis/ensemble/bayesian_xgb_2024_test.json,
+C23,stored baseline / semantic accuracy,0.7538 / 0.7590,195.0,data/semantic_ab_test_results.json,
+C23,generator contains `baseline_accuracy = 0.749`,True,,scripts/ab_test_semantic_features.py,
+C23,"generator contains `games[""home_covered""].values.copy()`",True,,scripts/ab_test_semantic_features.py,
+C23,generator contains `np.random.random`,True,,scripts/ab_test_semantic_features.py,
+C25,quick A/B control_spread distinct values,2.5,195.0,data/quick_ab_test_semantic.csv,
+C25,quick A/B straight-up accuracy control / treatment,54.9% / 54.9%,195.0,data/quick_ab_test_semantic.csv,
+C25,"quick A/B ATS, control_spread","89-89-1, 50.0% [42.7%, 57.3%], ROI -4.5%",195.0,data/quick_ab_test_semantic.csv + games,
+C25,"quick A/B ATS, treatment_spread","101-93-1, 52.1% [45.1%, 59.0%], ROI -0.6%",195.0,data/quick_ab_test_semantic.csv + games,
+C09,"zero-skill same-game attempts x 2024 league YPA (7.19), 2025 weeks 1-12",MAE 45.28,330.0,"mart.player_game_stats (passing, attempts >= 10, week >= 1)","uses the game's own attempts, as the props models did"
+C09,"constant 2024 mean yards, 2025 weeks 1-12",MAE 55.79,330.0,"mart.player_game_stats (passing, attempts >= 10, week >= 1)",
+C09,"player's mean over earlier games (pre-game only), 2025 weeks 1-12",MAE 57.26,322.0,"mart.player_game_stats (passing, attempts >= 10, week >= 1)",
+C09,"zero-skill same-game attempts x 2024 league YPA (7.19), 2025 weeks 1-5",MAE 48.44,155.0,"mart.player_game_stats (passing, attempts >= 10, week >= 1)","uses the game's own attempts, as the props models did"
+C09,"constant 2024 mean yards, 2025 weeks 1-5",MAE 53.93,155.0,"mart.player_game_stats (passing, attempts >= 10, week >= 1)",
+C09,"player's mean over earlier games (pre-game only), 2025 weeks 1-5",MAE 56.82,149.0,"mart.player_game_stats (passing, attempts >= 10, week >= 1)",
+C36,tables named like prop/player_line in devdb01,none,0.0,information_schema.tables,
+C36,odds_history market types (row counts),"closing: 59920, game_lines: 32, opening: 57314",117266.0,public.odds_history (aggregate only),
+C31,"train 1999-2019 -> test 2020-2024 (fixed_backtest, printed 60.2%), correct label (pushes dropped)","accuracy 50.7% [48.0%, 53.3%]",1376.0,as-of features rebuilt from devdb01 with nfl_analytics/features/asof_features.py,"features: spread_close, total_close, prior_epa_mean_diff, epa_pp_last3_diff, margin_last3_diff, prior_win_pct_diff, rest_diff, qb_change_diff, coach_change_diff"
+C31,"train 2022-2023 -> test 2024 (recent_seasons_test, printed 62.8%), correct label (pushes dropped)","accuracy 46.3% [40.5%, 52.1%]",281.0,as-of features rebuilt from devdb01 with nfl_analytics/features/asof_features.py,"features: spread_close, total_close, prior_epa_mean_diff, epa_pp_last3_diff, margin_last3_diff, prior_win_pct_diff, rest_diff, qb_change_diff, coach_change_diff"
+C31,"train 1999-2019 -> test 2020-2024 (fixed_backtest, printed 60.2%), old label margin + spread > 0 (pushes as 0)","accuracy 76.8% [74.5%, 78.9%]",1408.0,as-of features rebuilt from devdb01 with nfl_analytics/features/asof_features.py,"features: spread_close, total_close, prior_epa_mean_diff, epa_pp_last3_diff, margin_last3_diff, prior_win_pct_diff, rest_diff, qb_change_diff, coach_change_diff"
+C31,"train 2022-2023 -> test 2024 (recent_seasons_test, printed 62.8%), old label margin + spread > 0 (pushes as 0)","accuracy 79.6% [74.6%, 83.9%]",285.0,as-of features rebuilt from devdb01 with nfl_analytics/features/asof_features.py,"features: spread_close, total_close, prior_epa_mean_diff, epa_pp_last3_diff, margin_last3_diff, prior_win_pct_diff, rest_diff, qb_change_diff, coach_change_diff"
+C32,"corr(wind, total points), outdoor 2018-2024",-0.098,1147.0,"weather (data_source historical_csv = nflverse mph, 2018-2024) JOIN games",
+C32,"corr(wind, total - closing total), outdoor 2018-2024",-0.071,1147.0,"weather (data_source historical_csv = nflverse mph, 2018-2024) JOIN games",
+C32,"unders, outdoor 2018-2024, all","594/1131 = 52.5%, one-sided p = 0.0479",1131.0,"weather (data_source historical_csv = nflverse mph, 2018-2024) JOIN games",
+C32,"unders, outdoor 2018-2024, wind >= 15 mph","76/133 = 57.1%, one-sided p = 0.0591",133.0,"weather (data_source historical_csv = nflverse mph, 2018-2024) JOIN games",
+C32,multimodel_weather_comparison.csv accuracy by model,"GLM: 0.918, XGBoost: 0.953, State-Space: 0.721",1139.0,analysis/results/multimodel_weather_comparison.csv,same harness without weather: 50-51% (walkforward_2004_2024_metrics.csv)
+C40,"6-point teaser legs won, both sides, 2020-2024",70.7%,2788.0,games,
+C40,"two-leg 6-point teaser EV at decimal 1.8 (notebook 04), independent legs",-10.0%,2788.0,games,break-even leg rate 74.5%
+C40,"two-leg 6-point teaser EV at decimal -120, independent legs",-8.4%,2788.0,games,break-even leg rate 73.9%
+C41,action = 1 rows: reward r > 0 agrees with old rule / correct rule,1.000 / 0.761,652.0,data/rl_logged.csv,
+C41,"corr(p_hat, home margin of the same game)",+0.898,1675.0,data/rl_logged.csv,p_hat is built from the predicted game's own EPA
+C41,"ATS of p_hat as a margin (13.5 * Phi^-1(p)), |edge| >= 1","1369-194-40, 87.6% [85.9%, 89.1%], ROI +67.2%",1675.0,data/rl_logged.csv,
+C35,cvar_benchmark_table.tex: printed numbers present as literals in generate_missing_tables.py,25 of 25,25.0,scripts/utils/generate_missing_tables.py,
+C35,utilization_adjusted_sharpe_table.tex: printed numbers present as literals in generate_missing_tables.py,20 of 20,20.0,scripts/utils/generate_missing_tables.py,
+C35,cvar_benchmark_table rows where Worst% is milder than CVaR95% (impossible),5 of 5,5.0,analysis/dissertation/figures/out/cvar_benchmark_table.tex,
+C33,generate_zero_bet_weeks.py reads any data / says 'plausible',True / True,,nfl_analytics/analysis/generate_zero_bet_weeks.py,
+C34,experiment functions by metrics-dict values,"all literal: 29, mixed: 8, all computed: 3, no metrics dict: 0; no data read: 22",40.0,nfl_analytics/experiments/experiment_executor.py (AST),
+C28,EDGE_C_STATS literal,"""edge_name"": ""Lingering Fatigue (Edge C)"", ""sample_size"": 24, ""short_rest_sample"": 14, ""avg_penalty_yards"": -209.8, ""short_rest_penalty"": -195.6, ""std_penalty_yards"": 74.67, ""p_value"": 0.0, ""t_statist",,scripts/edge_c_dashboard.py,
+C37,player_props_v1 test_mae / same-game features,"12.128 / log_attempts, yards_per_attempt, td_rate",,models/xgboost/player_props_v1_metadata.json,yards = attempts x yards_per_attempt of the same game
+C36,"nfl_analytics/backtest/historical_validation_5way.py builds the prop line from noise (`np.random.uniform(-15, 15)`)",lines 166,,nfl_analytics/backtest/historical_validation_5way.py,
+C36,"nfl_analytics/backtest/historical_validation_4way_optimized.py builds the prop line from noise (`np.random.uniform(-15, 15)`)",lines 635,,nfl_analytics/backtest/historical_validation_4way_optimized.py,
+C36,nfl_analytics/backtests/comprehensive_ensemble_backtest.py builds the prop line from noise (`np.random.normal(1`),"lines 243, 248, 270",,nfl_analytics/backtests/comprehensive_ensemble_backtest.py,
+C36,nfl_analytics/backtests/bayesian_props_backtest_2024.py builds the prop line from noise (`* np.random.uniform(`),lines 341,,nfl_analytics/backtests/bayesian_props_backtest_2024.py,
+C31,analysis/backtest/fixed_backtest_results.json test_accuracy (stored),0.6023,1403.0,analysis/backtest/fixed_backtest_results.json,
+C31,analysis/backtest/recent_seasons_test_results.json test_accuracy (stored),0.6281,285.0,analysis/backtest/recent_seasons_test_results.json,
+C20,models/ensemble/backtest/summary.json win_rate / final_bankroll (stored),0.7681 / 9.2e+33,910.0,models/ensemble/backtest/summary.json,
+C21,models/ensemble/realistic_backtest/summary.json win_rate / final_bankroll (stored),0.6319 / 6.26e+05,796.0,models/ensemble/realistic_backtest/summary.json,
+C41,ope_grid_table.tex median DR (printed),0.2301,,analysis/dissertation/figures/out/ope_grid_table.tex,
+C17,spread_model.json early-stopping best_score vs metadata validation spread_mae,10.449868 vs 10.449868 (best_iteration 37),,models/production/game_outcome_v2/,the validation metric is the early-stopping objective on the same season
+C17,total_model.json early-stopping best_score vs metadata validation total_mae,10.080146 vs 10.080147 (best_iteration 38),,models/production/game_outcome_v2/,the validation metric is the early-stopping objective on the same season

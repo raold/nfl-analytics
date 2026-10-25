@@ -1,0 +1,14 @@
+check,value,note
+rows in multimodel_predictions.csv,5529,
+rows matched to devdb01 games,5529,
+pushes among those rows (margin - spread_close == 0),0,
+agreement of `actual` with margin - spread_close > 0,1.0,n=5529
+agreement of `actual` with the old rule margin + spread_close > 0,0.7306927111593416,n=5529
+agreement of `actual` with home straight-up win,0.8332429010671007,n=5529
+pooled home cover rate (actual),0.48706818592873935,n=5529
+playoff games included (current games.game_type != REG),237,
+seasons,2004-2024,21
+rows in glm_baseline_preds.csv,5529,
+glm_baseline_preds spread_close vs devdb01 (max abs diff),0.0,
+glm_baseline_preds home_cover agreement with margin - spread_close > 0,1.0,n=5529
+glm_baseline_preds pred_cover_prob vs multimodel glm (max abs diff),2.6068036618198676e-13,same GLM run

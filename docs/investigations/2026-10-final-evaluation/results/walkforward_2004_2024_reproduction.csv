@@ -1,0 +1,14 @@
+column,check,value
+state,max abs diff: refit + old formula Phi((mu + spread)/sd) vs published,2.220446049250313e-16
+state,"corr(p, spread_close)",0.7950382592301756
+state_fixed,"corr(p, spread_close)",-0.08077155449183432
+glm,"corr(p, spread_close)",0.006273629434670514
+xgb,"corr(p, spread_close)",0.04858799808151249
+ens_mean_glm_xgb,max abs diff: rebuilt from published base columns,0.0
+ens_stack_glm_xgb,max abs diff: rebuilt from published base columns,9.43689570931383e-16
+ens_mean_glm_state,max abs diff: rebuilt from published base columns,0.0
+ens_stack_glm_state,max abs diff: rebuilt from published base columns,6.106226635438361e-16
+ens_mean_xgb_state,max abs diff: rebuilt from published base columns,0.0
+ens_stack_xgb_state,max abs diff: rebuilt from published base columns,8.326672684688674e-16
+ens_mean_glm_xgb_state,max abs diff: rebuilt from published base columns,0.0
+ens_stack_glm_xgb_state,max abs diff: rebuilt from published base columns,5.218048215738236e-15

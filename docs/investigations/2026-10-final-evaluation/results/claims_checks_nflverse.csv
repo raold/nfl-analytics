@@ -1,0 +1,5 @@
+claim,check,value,n,source,note
+C32,"unders, nflverse 1999-2025 outdoor, all","2788/5444 = 51.2%, one-sided p = 0.0379",5444.0,"nflverse schedules (games.csv), outdoor/open roofs",
+C32,"unders, nflverse 1999-2025 outdoor, wind >= 15 mph","384/674 = 57.0%, one-sided p = 0.0002",674.0,"nflverse schedules (games.csv), outdoor/open roofs",
+C32,"unders, nflverse 1999-2012, wind >= 15 mph","236/407 = 58.0%, one-sided p = 0.0007",407.0,"nflverse schedules (games.csv), outdoor/open roofs",
+C32,"unders, nflverse 2013-2025, wind >= 15 mph","148/267 = 55.4%, one-sided p = 0.0432",267.0,"nflverse schedules (games.csv), outdoor/open roofs",
