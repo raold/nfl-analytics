@@ -27,9 +27,10 @@ due to increased public attention and betting volume.
 - No leakage concerns
 
 **Note on Kickoff Times**:
-- Kickoff is stored as TIMESTAMP in PostgreSQL with +00 timezone
-- However, values appear to be ET times (not true UTC)
-- We identify games by day-of-week + hour patterns (treating hours as ET)
+- games.kickoff is the true UTC instant (timestamptz) since the 2026-10-24 repair; before it,
+  2000-2024 rows held ET wall-clock time labelled UTC and 2025 rows held the date only
+- The queries convert with `kickoff AT TIME ZONE 'America/New_York'`, so day-of-week and hour
+  are ET (identical to the pre-repair values for 2000-2024; see features/kickoff_time.py)
 - TNF: Thursday DOW=4, hour >= 19 (7pm+ ET)
 - SNF: Sunday DOW=0, hour >= 19 (7pm+ ET)
 - MNF: Monday DOW=1, hour >= 19 (7pm+ ET)
@@ -112,8 +113,8 @@ class PrimetimeFeaturesEngine:
             kickoff,
             home_team,
             away_team,
-            EXTRACT(DOW FROM kickoff) as day_of_week,
-            EXTRACT(HOUR FROM kickoff) as kickoff_hour
+            EXTRACT(DOW FROM kickoff AT TIME ZONE 'America/New_York') as day_of_week,
+            EXTRACT(HOUR FROM kickoff AT TIME ZONE 'America/New_York') as kickoff_hour
         FROM games
         WHERE game_id = %(game_id)s;
         """
@@ -131,8 +132,8 @@ class PrimetimeFeaturesEngine:
     def _compute_features_from_row(self, row: pd.Series) -> dict[str, Any]:
         """Compute primetime features from a game row.
 
-        Note: Database stores kickoff times in what appears to be ET
-        but labeled as +00 (UTC). We treat hour values as ET times.
+        Note: day_of_week and kickoff_hour must be US/Eastern (the queries above use
+        ``kickoff AT TIME ZONE 'America/New_York'``; games.kickoff itself is UTC).
         """
         day_of_week = int(row["day_of_week"]) if pd.notna(row["day_of_week"]) else -1
         kickoff_hour = int(row["kickoff_hour"]) if pd.notna(row["kickoff_hour"]) else -1
@@ -234,8 +235,8 @@ class PrimetimeFeaturesEngine:
             kickoff,
             home_team,
             away_team,
-            EXTRACT(DOW FROM kickoff) as day_of_week,
-            EXTRACT(HOUR FROM kickoff) as kickoff_hour
+            EXTRACT(DOW FROM kickoff AT TIME ZONE 'America/New_York') as day_of_week,
+            EXTRACT(HOUR FROM kickoff AT TIME ZONE 'America/New_York') as kickoff_hour
         FROM games
         WHERE season = %(season)s AND week = %(week)s;
         """
@@ -277,8 +278,8 @@ class PrimetimeFeaturesEngine:
             g.home_score,
             g.away_score,
             g.spread_close,
-            EXTRACT(DOW FROM g.kickoff) as day_of_week,
-            EXTRACT(HOUR FROM g.kickoff) as kickoff_hour
+            EXTRACT(DOW FROM g.kickoff AT TIME ZONE 'America/New_York') as day_of_week,
+            EXTRACT(HOUR FROM g.kickoff AT TIME ZONE 'America/New_York') as kickoff_hour
         FROM games g
         WHERE g.season BETWEEN %(start)s AND %(end)s
           AND g.spread_close IS NOT NULL

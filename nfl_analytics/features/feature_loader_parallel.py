@@ -506,9 +506,10 @@ class ParallelFeatureLoader:
                 COALESCE(NULLIF(g.home_rest::text, '')::numeric, 7) as home_rest,
                 CASE WHEN COALESCE(NULLIF(g.away_rest::text, '')::numeric, 7) <= 5 THEN 1 ELSE 0 END as away_short_rest,
 
-                -- Game timing
-                EXTRACT(DOW FROM g.kickoff) as day_of_week,
-                CASE WHEN EXTRACT(DOW FROM g.kickoff) = 4 THEN 1 ELSE 0 END as is_thursday_night,
+                -- Game timing (kickoff is a UTC instant; weekday is taken in ET)
+                EXTRACT(DOW FROM g.kickoff AT TIME ZONE 'America/New_York') as day_of_week,
+                CASE WHEN EXTRACT(DOW FROM g.kickoff AT TIME ZONE 'America/New_York') = 4
+                     THEN 1 ELSE 0 END as is_thursday_night,
 
                 -- Rivalry
                 t_home.team_division as home_division,

@@ -141,7 +141,7 @@ def main() -> None:
         from games
         where kickoff is not null
           and game_id not in (select game_id from weather)
-          and EXTRACT(YEAR FROM kickoff) >= 2020
+          and EXTRACT(YEAR FROM kickoff AT TIME ZONE 'America/New_York') >= 2020
         order by kickoff
         """,
         engine,

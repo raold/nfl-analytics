@@ -39,6 +39,8 @@ import psycopg
 from scipy.stats import norm
 from sklearn.metrics import brier_score_loss, log_loss, mean_absolute_error
 
+from nfl_analytics.utils.spread_convention import home_cover, model_edge
+
 # ============================================================================
 # Database Connection
 # ============================================================================
@@ -222,11 +224,13 @@ class StateSpaceRatings:
         """
         Predict P(home covers spread).
 
-        Home covers if: home_score - away_score + spread > 0
+        ``spread`` is ``games.spread_close`` (nflverse ``spread_line``): the expected HOME
+        margin, positive when the home team is favored. Home covers iff
+        home_score - away_score - spread > 0 (see nfl_analytics/utils/spread_convention.py),
+        so with margin ~ N(mean, std): P(cover) = Phi((mean - spread) / std).
         """
         mean_margin, std_margin = self.predict_margin(home_team, away_team)
-        adjusted_margin = mean_margin + spread
-        return norm.cdf(adjusted_margin / std_margin)
+        return norm.cdf(model_edge(mean_margin, spread) / std_margin)
 
     def get_ratings_df(self) -> pd.DataFrame:
         """Return history as DataFrame."""
@@ -246,7 +250,8 @@ def evaluate_model(model: StateSpaceRatings, df: pd.DataFrame) -> dict[str, floa
     - MAE (margin prediction)
     - Brier score (win probability)
     - Log loss (win probability)
-    - ATS accuracy (if spread available)
+    - ATS Brier, log loss and accuracy (if spread available), graded with
+      spread_convention.home_cover; pushes have no ATS result and are excluded
     """
     margins_pred = []
     margins_true = []
@@ -270,12 +275,14 @@ def evaluate_model(model: StateSpaceRatings, df: pd.DataFrame) -> dict[str, floa
         probs_win.append(prob_win)
         actuals_win.append(1.0 if margin_true > 0 else 0.0)
 
-        # Predict ATS if spread available
+        # Predict ATS if spread available (spread_close: positive = home favored)
         if pd.notna(row.get("spread_close")):
             spread = float(row["spread_close"])
-            prob_ats = model.predict_prob_ats(home_team, away_team, spread)
-            probs_ats.append(prob_ats)
-            actuals_ats.append(1.0 if (margin_true + spread) > 0 else 0.0)
+            covered = home_cover(margin_true, spread)
+            if np.isnan(covered):  # push or missing margin: no ATS result
+                continue
+            probs_ats.append(model.predict_prob_ats(home_team, away_team, spread))
+            actuals_ats.append(covered)
 
     metrics = {
         "n_games": len(df),
@@ -288,6 +295,7 @@ def evaluate_model(model: StateSpaceRatings, df: pd.DataFrame) -> dict[str, floa
     }
 
     if probs_ats:
+        metrics["n_ats"] = len(probs_ats)
         metrics["brier_ats"] = brier_score_loss(actuals_ats, probs_ats)
         metrics["logloss_ats"] = log_loss(actuals_ats, probs_ats)
         metrics["accuracy_ats"] = float(
@@ -345,13 +353,12 @@ def main():
             q=args.q, r=args.r, init_variance=args.init_variance, hfa_init=args.hfa_init
         )
 
-        # Restore ratings from CSV
+        # Restore ratings from CSV (history rows are in time order, so the last row per team wins)
         for _, row in ratings_df.iterrows():
             team = row["team"]
             rating = row["rating"]
             variance = row.get("variance", args.init_variance)  # Default if not in CSV
-            model.ratings[team] = rating
-            model.variances[team] = variance
+            model.ratings[team] = (float(rating), float(variance))
 
         print(f"Restored ratings for {len(model.ratings)} teams")
 

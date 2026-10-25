@@ -15,6 +15,9 @@ This model predicts:
 - Total points (over/under)
 - Win probability
 
+The saved Game Outcome v2 (models/production/game_outcome_v2) is a frozen reference with
+no edge over the closing line: do not retrain or deploy it (see its README.md).
+
 Author: Claude Code
 Date: November 29, 2025
 """
@@ -23,12 +26,12 @@ import json
 import logging
 import pickle
 import time
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-import shap
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, roc_auc_score
 
@@ -42,6 +45,33 @@ logger = logging.getLogger(__name__)
 
 # Note: VALID_TEAMS imported from nfl_analytics.utils.team_mapping
 # Includes both canonical (LAR, LAC, LV) and database (LA, SD, OAK) abbreviations
+
+
+def _feature_group(name: str) -> str:
+    """Group of a model input name: its prefix, ignoring a home_/away_ side ('sem', 'ngs')."""
+    parts = name.split("_")
+    if parts[0] in ("home", "away") and len(parts) > 1:
+        return parts[1]
+    return parts[0]
+
+
+def summarize_missing_features(missing: list[str]) -> str:
+    """Compact description of missing inputs by group, e.g. 'sem_* x38, syn_* x12'."""
+    counts = Counter(_feature_group(name) for name in missing)
+    return ", ".join(f"{group}_* x{n}" for group, n in counts.most_common())
+
+
+FROZEN_REFERENCE_MARKER = "DO NOT DEPLOY"
+
+
+def is_frozen_reference(model_dir) -> bool:
+    """True if ``model_dir`` holds a frozen reference model (its README.md says DO NOT DEPLOY)."""
+    try:
+        return FROZEN_REFERENCE_MARKER in (Path(model_dir) / "README.md").read_text(
+            encoding="utf-8"
+        )
+    except OSError:
+        return False
 
 
 class GameOutcomeModel:
@@ -405,7 +435,22 @@ class GameOutcomeModel:
                 f"Could not extract features for {away_team}@{home_team} Week {week}: {e}"
             )
 
-        # 2. Prepare feature vector (match training feature order)
+        # 2. Prepare feature vector (match training feature order). The frozen v2 model
+        # expects 382 names; inputs the extractor no longer produces (sem_* since the
+        # semantic group was removed, syn_* while that query fails) are zero-filled as
+        # before, and reported once per call.
+        missing = [col for col in self.feature_names if col not in features]
+        if missing:
+            logger.warning(
+                "%d of %d model features missing for %s@%s %s week %s, zero-filled: %s",
+                len(missing),
+                len(self.feature_names),
+                away_team,
+                home_team,
+                season,
+                week,
+                summarize_missing_features(missing),
+            )
         X = np.array([[features.get(col, 0.0) for col in self.feature_names]])
 
         # 3. Predict (no scaling needed for XGBoost)
@@ -511,6 +556,10 @@ class GameOutcomeModel:
         FIXED: Properly store SHAP values separately from explainers
         """
         try:
+            # shap is only in the optional 'causal' extra; import it here so the module
+            # (and prediction) works without it
+            import shap
+
             # Sample subset for SHAP (SHAP is slow on large datasets)
             n_samples = min(100, len(X_val))
             X_sample = X_val[:n_samples]
@@ -587,8 +636,20 @@ class GameOutcomeModel:
 
         logger.info(f"Models saved to {self.model_dir}")
 
-    def load_models(self):
-        """Load trained models from disk."""
+    def load_models(self, allow_frozen_reference: bool = False):
+        """Load trained models from disk.
+
+        A directory marked as a frozen reference (README.md says DO NOT DEPLOY, as
+        models/production/game_outcome_v2 does) loads only with allow_frozen_reference=True,
+        so code that loads a default model directory implicitly (the Kalshi strategies'
+        lazy loader, the prediction service) cannot pick it up by accident.
+        """
+        if is_frozen_reference(self.model_dir) and not allow_frozen_reference:
+            raise RuntimeError(
+                f"{self.model_dir} is a frozen reference model with no edge over the closing "
+                "line (see its README.md) and must not be deployed. Pass "
+                "allow_frozen_reference=True to load it for evaluation or postmortems."
+            )
         try:
             # Load XGBoost models
             self.spread_model = xgb.XGBRegressor()

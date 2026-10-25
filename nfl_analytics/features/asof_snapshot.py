@@ -45,14 +45,15 @@ def build_snapshot(conn: psycopg.Connection, cutoff_iso: str) -> pd.DataFrame:
       select
         home_team,
         away_team,
-        date(commence_time) as gdate,
+        date(commence_time AT TIME ZONE 'America/New_York') as gdate,  -- ET game date
         market_key,
         outcome_name,
         outcome_point,
         outcome_price,
         snapshot_at,
         row_number() over (
-          partition by home_team, away_team, date(commence_time), market_key, outcome_name
+          partition by home_team, away_team, date(commence_time AT TIME ZONE 'America/New_York'),
+                       market_key, outcome_name
           order by snapshot_at desc
         ) as rk
       from odds_history
@@ -85,7 +86,7 @@ def build_snapshot(conn: psycopg.Connection, cutoff_iso: str) -> pd.DataFrame:
     left join weather w on w.game_id = g.game_id
     left join odds_pivot o
       on o.home_team = g.home_team and o.away_team = g.away_team
-      and (g.kickoff is null or o.gdate = date(g.kickoff))
+      and (g.kickoff is null or o.gdate = date(g.kickoff AT TIME ZONE 'America/New_York'))
     where (g.kickoff is null or g.kickoff <= %(cutoff)s)
     order by g.season, g.week, g.game_id
     """

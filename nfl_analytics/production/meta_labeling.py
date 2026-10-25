@@ -209,8 +209,8 @@ class MetaLabelingClassifier:
             g.home_score,
             g.away_score,
             g.game_type,
-            EXTRACT(DOW FROM g.kickoff) as day_of_week,
-            EXTRACT(HOUR FROM g.kickoff) as kickoff_hour,
+            EXTRACT(DOW FROM g.kickoff AT TIME ZONE 'America/New_York') as day_of_week,
+            EXTRACT(HOUR FROM g.kickoff AT TIME ZONE 'America/New_York') as kickoff_hour,
 
             -- Compute margin for outcome
             (g.home_score - g.away_score) as margin,
@@ -272,13 +272,12 @@ class MetaLabelingClassifier:
         # Market context (from data)
         # Detect primetime: TNF (Thursday night), SNF (Sunday night), MNF (Monday)
         # DOW: 0=Sunday, 1=Monday, 2=Tuesday, ..., 4=Thursday, 5=Friday, 6=Saturday
-        # UTC offset means Thursday 8pm ET = Friday ~1am UTC (DOW=5, hour<=5)
-        # Monday 8pm ET = Tuesday ~1am UTC (DOW=2, hour<=5)
-        # Sunday night = Monday ~1am UTC (DOW=1, hour<=5)
+        # day_of_week and kickoff_hour are US/Eastern (the query converts the UTC kickoff),
+        # matching features/primetime_features.py: evening = 7pm ET or later
         df["is_primetime"] = (
-            (df["day_of_week"] == 5) & (df["kickoff_hour"] <= 5)  # TNF
-            | (df["day_of_week"] == 2) & (df["kickoff_hour"] <= 5)  # MNF
-            | (df["day_of_week"] == 1) & (df["kickoff_hour"] <= 5)  # SNF
+            (df["day_of_week"] == 4) & (df["kickoff_hour"] >= 19)  # TNF
+            | (df["day_of_week"] == 1) & (df["kickoff_hour"] >= 19)  # MNF
+            | (df["day_of_week"] == 0) & (df["kickoff_hour"] >= 19)  # SNF
         ).astype(int)
         # Divisional playoff (from game_type)
         df["is_divisional"] = (df["game_type"] == "DIV").astype(int)

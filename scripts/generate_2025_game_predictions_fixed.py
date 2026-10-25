@@ -22,6 +22,12 @@ def main():
     parser.add_argument("--season", type=int, default=DEFAULT_TARGET_SEASON, help="Season year to predict")
     parser.add_argument("--week", type=int, default=None, help="Optional week to limit predictions")
     parser.add_argument("--dry-run", action="store_true", help="Skip writing to database")
+    parser.add_argument(
+        "--allow-frozen-reference",
+        action="store_true",
+        help="Load a model directory marked DO NOT DEPLOY (models/production/game_outcome_v2) "
+        "for postmortem regeneration; its predictions are not fit for betting",
+    )
     args = parser.parse_args()
 
     print("\n" + "=" * 60)
@@ -35,6 +41,7 @@ def main():
         selected_week=args.week,
         dry_run=args.dry_run,
         verbose=True,
+        allow_frozen_reference=args.allow_frozen_reference,
     )
 
     print("\n" + "=" * 60)

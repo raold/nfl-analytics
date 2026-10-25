@@ -22,10 +22,18 @@ from nfl_analytics.models.game_outcome_model_fixed import GameOutcomeModel
 from nfl_analytics.config.settings import get_settings
 
 logger = logging.getLogger(__name__)
-settings = get_settings()
-DB_CONFIG = settings.database.psycopg_kwargs()
-TABLE_NAME = settings.game_outcome_table
+TABLE_NAME = get_settings().game_outcome_table
+# Frozen reference model (DO NOT DEPLOY): see models/production/game_outcome_v2/README.md
 DEFAULT_MODEL_DIR = "models/production/game_outcome_v2"
+
+
+def _db_config() -> Dict[str, Any]:
+    """psycopg2 connection kwargs, resolved when a query runs (needs DB_PASSWORD then).
+
+    Resolving them at import time made this module, the API route and the CLI scripts
+    unimportable without database credentials.
+    """
+    return get_settings().database.psycopg_kwargs()
 
 
 def _safe_float(value):
@@ -64,7 +72,7 @@ def _fetch_games(target_season: int) -> pd.DataFrame:
         AND g.week <= 22
     ORDER BY g.week, g.kickoff
     """
-    with psycopg2.connect(**DB_CONFIG) as conn:
+    with psycopg2.connect(**_db_config()) as conn:
         df = pd.read_sql_query(query, conn, params=(target_season,))
         return df
 
@@ -121,7 +129,7 @@ def _store_predictions(predictions_df: pd.DataFrame, prediction_run_id: uuid4) -
     """
 
     # FIXED: Use context manager to prevent connection leaks
-    with psycopg2.connect(**DB_CONFIG) as conn:
+    with psycopg2.connect(**_db_config()) as conn:
         with conn.cursor() as cur:
             try:
                 execute_batch(cur, insert_query, records, page_size=100)
@@ -139,8 +147,13 @@ def run_game_outcome_predictions(
     model_dir: Optional[str] = None,
     dry_run: bool = False,
     verbose: bool = False,
+    allow_frozen_reference: bool = False,
 ) -> Dict[str, Any]:
-    """Generate predictions for a season (optionally a single week)."""
+    """Generate predictions for a season (optionally a single week).
+
+    The default model (Game Outcome v2) is a frozen reference: it loads only with
+    allow_frozen_reference=True (see GameOutcomeModel.load_models).
+    """
     games_df = _fetch_games(target_season)
     if games_df.empty:
         raise ValueError(f"No games found for season {target_season}")
@@ -161,7 +174,7 @@ def run_game_outcome_predictions(
         )
 
     model = GameOutcomeModel(model_dir=model_dir or DEFAULT_MODEL_DIR)
-    model.load_models()
+    model.load_models(allow_frozen_reference=allow_frozen_reference)
 
     all_predictions: List[Dict[str, Any]] = []
 

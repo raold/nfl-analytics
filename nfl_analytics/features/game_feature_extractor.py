@@ -13,7 +13,8 @@ for game outcome predictions. Single entry point that coordinates feature extrac
 TeamOffensiveFeatures, TeamDefensiveFeatures, NextGen Stats, QBR, Possession Value,
 Playcalling, Opponent-Adjusted, and mart.team_injury_load.
 
-**Features Extracted (383 total = 305 base + 37 synthetic + 6 rest/BTB + 18 Kalman + 17 GP):**
+**Features Extracted** (groups below; the semantic sem_* group was removed and the Kalman/GP
+groups are no longer constructed, 2026-10-24 - see the note at the imports):
 
 1. Home Team Offensive (27):
    - Prefix: 'home_off_'
@@ -217,35 +218,13 @@ try:
 except ImportError:
     ResearchDrivenEngine = None
 
-# Semantic features (LLM-derived sentiment, NER, media signals)
-try:
-    from nfl_analytics.semantic.features.semantic_features import SemanticFeatureExtractor
-except ImportError:
-    SemanticFeatureExtractor = None
-
-# Kalman EPA Filter (Dec 28, 2025 - S1.1)
-# State-space model for EPA trend detection with regime change indicators
-try:
-    from nfl_analytics.features.kalman_epa_filter import KalmanEPAFilter
-except ImportError:
-    KalmanEPAFilter = None
-
-# GP Injury Recovery (Dec 28, 2025 - S1.2)
-# Gaussian Process model for injury recovery curves with uncertainty
-try:
-    from nfl_analytics.features.gp_injury_recovery import InjuryRecoveryGP
-except ImportError:
-    InjuryRecoveryGP = None
-
-# Feature weights configuration (Dec 31, 2025)
-# Controls which feature groups are enabled/disabled via config
-try:
-    from nfl_analytics.config.feature_weights import is_feature_enabled
-except ImportError:
-    # Fallback: all features enabled if config module not available
-    def is_feature_enabled(group_name: str) -> bool:
-        return True
-
+# Removed groups (2026-10-24):
+# - Semantic (sem_*, nfl_analytics.semantic): values were computed as of datetime.now() rather
+#   than kickoff (look-ahead for any past game), with live ESPN scraping and hard-coded mock
+#   tweets as fallbacks. News history cannot be backfilled, so the group is gone.
+# - Kalman EPA (kal_*) and GP injury recovery (gp_*): disabled by ADR-015 and no longer
+#   constructed. No saved model uses them.
+# Game Outcome v2 still lists the 38 sem_* names; GameOutcomeModel.predict zero-fills them.
 
 import os
 
@@ -416,32 +395,6 @@ class GameFeatureExtractor:
         else:
             self.research_engine = None
             logger.warning("Research-Driven extractor unavailable")
-
-        # Semantic features (LLM-derived from news/social media)
-        if SemanticFeatureExtractor:
-            self.semantic_extractor = SemanticFeatureExtractor()
-            logger.info("Semantic Feature extractor initialized (26 features)")
-        else:
-            self.semantic_extractor = None
-            logger.warning("Semantic Feature extractor unavailable")
-
-        # Kalman EPA Filter (Dec 28, 2025 - S1.1)
-        # State-space EPA trends with regime change detection
-        if KalmanEPAFilter:
-            self.kalman_filter = KalmanEPAFilter(db_config=db_config)
-            logger.info("Kalman EPA Filter initialized (18 features)")
-        else:
-            self.kalman_filter = None
-            logger.warning("Kalman EPA Filter unavailable")
-
-        # GP Injury Recovery (Dec 28, 2025 - S1.2)
-        # Gaussian Process recovery curves with uncertainty
-        if InjuryRecoveryGP:
-            self.gp_recovery = InjuryRecoveryGP(db_config=db_config)
-            logger.info("GP Injury Recovery initialized (8 features per injury)")
-        else:
-            self.gp_recovery = None
-            logger.warning("GP Injury Recovery unavailable")
 
         # Database connection for function-based extractors
         self.db_config = db_config or {
@@ -816,78 +769,8 @@ class GameFeatureExtractor:
             except Exception as e:
                 logger.warning(f"Failed to extract research-driven features: {e}")
 
-        # Add semantic features (26 features)
-        # LLM-derived sentiment, NER injury severity, media buzz, public overreaction
-        if self.semantic_extractor:
-            try:
-                semantic_features = self.semantic_extractor.extract_features(
-                    home_team, away_team, season, week
-                )
-                features.update({f"sem_{k}": v for k, v in semantic_features.items()})
-                logger.debug(f"Added {len(semantic_features)} semantic features")
-            except Exception as e:
-                logger.warning(f"Failed to extract semantic features: {e}")
-
-        # ========================================================================
-        # Dec 28, 2025 Features (S1.1 + S1.2) - Kalman EPA + GP Injury Recovery
-        # ========================================================================
-
-        # Add Kalman EPA features (18 features: 8 per team + 2 matchup)
-        # State-space EPA trends with regime change detection
-        # DISABLED via feature_weights.yaml (Dec 31, 2025) - provides negative signal
-        if self.kalman_filter and is_feature_enabled("kalman_epa"):
-            try:
-                kalman_matchup = self.kalman_filter.get_matchup_features(
-                    home_team, away_team, season, week
-                )
-                features.update({f"kal_{k}": v for k, v in kalman_matchup.items()})
-                logger.debug(
-                    f"Added {len(kalman_matchup)} Kalman EPA features "
-                    f"(home_epa={kalman_matchup.get('home_kalman_epa', 0):.3f}, "
-                    f"regime_diff={kalman_matchup.get('home_kalman_regime_change', 0) - kalman_matchup.get('away_kalman_regime_change', 0)})"
-                )
-            except Exception as e:
-                logger.warning(f"Failed to extract Kalman EPA features: {e}")
-        elif self.kalman_filter and not is_feature_enabled("kalman_epa"):
-            logger.debug("Kalman EPA features DISABLED via feature_weights config")
-
-        # Add GP Injury Recovery features (aggregated by team)
-        # Note: This is a placeholder - full implementation requires player-level injury data
-        # For now, we use the exponential baseline which doesn't require player lookups
-        # DISABLED via feature_weights.yaml (Dec 31, 2025) - GP never trains, uses fake data
-        if self.gp_recovery and is_feature_enabled("gp_injury"):
-            try:
-                # Get team-level injury severity from existing features
-                home_severity = features.get("home_injury_severity_index", 0)
-                away_severity = features.get("away_injury_severity_index", 0)
-
-                # Approximate days since return based on severity
-                # High severity = recent injury = fewer days recovered
-                home_days = max(0, int(14 - home_severity * 2))  # 0-14 days
-                away_days = max(0, int(14 - away_severity * 2))
-
-                # Get GP recovery features for home team
-                home_gp = self.gp_recovery.get_recovery_features(home_days, "unknown")
-                features.update({f"gp_home_{k}": v for k, v in home_gp.items()})
-
-                # Get GP recovery features for away team
-                away_gp = self.gp_recovery.get_recovery_features(away_days, "unknown")
-                features.update({f"gp_away_{k}": v for k, v in away_gp.items()})
-
-                # Add differential
-                features["gp_recovery_diff"] = home_gp.get("gp_recovery_pct", 100) - away_gp.get(
-                    "gp_recovery_pct", 100
-                )
-
-                logger.debug(
-                    f"Added {len(home_gp) * 2 + 1} GP recovery features "
-                    f"(home={home_gp.get('gp_recovery_pct', 100):.1f}%, "
-                    f"away={away_gp.get('gp_recovery_pct', 100):.1f}%)"
-                )
-            except Exception as e:
-                logger.warning(f"Failed to extract GP recovery features: {e}")
-        elif self.gp_recovery and not is_feature_enabled("gp_injury"):
-            logger.debug("GP Injury Recovery features DISABLED via feature_weights config")
+        # Semantic (sem_*), Kalman (kal_*) and GP (gp_*) groups were removed; see the note
+        # at the imports.
 
         # Validate: Check for NaN values
         nan_features = [k for k, v in features.items() if pd.isna(v)]
@@ -1079,7 +962,9 @@ class GameFeatureExtractor:
         """
         Compute rest differential and related features from games table.
 
-        Uses kickoff timestamps to calculate days since last game for each team.
+        Uses kickoff times on the US/Eastern wall clock (games.kickoff is a UTC instant) to
+        calculate days since last game for each team, so a Sunday-to-Sunday gap is exactly
+        7.0 days across the November DST change, as in the pre-repair data the models saw.
         Positive rest_differential means home team has more rest.
 
         Args:
@@ -1114,10 +999,10 @@ class GameFeatureExtractor:
             conn = psycopg2.connect(**self.db_config)
             try:
                 with conn.cursor() as cur:
-                    # Get current game kickoff
+                    # Get current game kickoff (ET wall clock, naive timestamp)
                     cur.execute(
                         """
-                        SELECT kickoff FROM games
+                        SELECT kickoff AT TIME ZONE 'America/New_York' FROM games
                         WHERE season = %s AND week = %s
                         AND home_team = %s AND away_team = %s
                         """,
@@ -1135,7 +1020,7 @@ class GameFeatureExtractor:
                     # Get home team's previous game (as home OR away)
                     cur.execute(
                         """
-                        SELECT MAX(kickoff) FROM games
+                        SELECT MAX(kickoff AT TIME ZONE 'America/New_York') FROM games
                         WHERE season = %s AND week < %s
                         AND (home_team = %s OR away_team = %s)
                         AND kickoff IS NOT NULL
@@ -1147,7 +1032,7 @@ class GameFeatureExtractor:
                     # Get away team's previous game (as home OR away)
                     cur.execute(
                         """
-                        SELECT MAX(kickoff) FROM games
+                        SELECT MAX(kickoff AT TIME ZONE 'America/New_York') FROM games
                         WHERE season = %s AND week < %s
                         AND (home_team = %s OR away_team = %s)
                         AND kickoff IS NOT NULL

@@ -5,8 +5,18 @@ Power Ratings Model - Point Differential Baseline
 Calculates team power ratings from exponentially weighted point differential
 and applies a fixed 2.5-point home field advantage to generate spread predictions.
 
-Investigation finding: "Simple point differential + 2.5 HFA achieved +43% ROI
-on 2025 holdout. Single highest-ROI opportunity with lowest effort."
+No edge. The "+43% ROI on the 2025 holdout" once quoted here came from grading with the
+sportsbook cover rule on nflverse lines (the spread sign bug; docs/POSTMORTEMS.md) and is
+retracted. Graded correctly with the defaults, 2025 is 127-93-1 (57.7% ATS, weeks 5-22) and
+2019-2024 is 627-634-32 (49.7%). One season of ~220 bets has a 95% interval of about
++/-6.6 points around 50%, so a single season's figure is noise.
+
+The canonical baseline is nfl_analytics.evaluation.market_benchmark.baselines.
+power_ratings_walkforward (season-average margin blended with last season's rating, graded by
+the market benchmark). The two implementations disagree: on 2025 it is 47.9% ATS (136-148-1,
+all 285 games) against 57.7% here, and on identical games (2025 regular season, weeks 5-18)
+47.3% against 58.0%. That gap is single-season noise between two similar rating rules, not
+evidence for either; quote the market_benchmark number.
 
 Spread convention (nflverse): positive = home favored, actual = home - away score.
 
@@ -14,6 +24,10 @@ Usage:
     python nfl_analytics/models/power_ratings_model.py --seasons 2020-2025
     python nfl_analytics/models/power_ratings_model.py --seasons 2025 --min-edge 1.5
     python nfl_analytics/models/power_ratings_model.py --seasons 2020-2025 --sweep
+
+--sweep is a forking-paths search: it picks HFA, half-life and edge threshold by ROI on the
+same seasons it reports, so its best row is tuned on the evaluation data and is not an
+out-of-sample result.
 """
 
 import argparse
@@ -307,7 +321,14 @@ def main() -> None:
     parser.add_argument(
         "--min-edge", type=float, default=0.0, help="Min model-vs-Vegas edge to bet (default: 0.0)"
     )
-    parser.add_argument("--sweep", action="store_true", help="Parameter sweep across HFA/HL/edge")
+    parser.add_argument(
+        "--sweep",
+        action="store_true",
+        help=(
+            "Parameter sweep across HFA/HL/edge. Tunes on the evaluation seasons "
+            "(forking paths): the best row is in-sample, not a holdout result"
+        ),
+    )
     args = parser.parse_args()
     seasons = parse_seasons(args.seasons)
 
@@ -340,7 +361,8 @@ def main() -> None:
                         best_params = {"hfa": hfa, "half_life": hl, "min_edge": edge}
         print(
             f"\nBest: HFA={best_params.get('hfa')}, HL={best_params.get('half_life')}, "
-            f"Edge={best_params.get('min_edge')}, ROI={best_roi:+.1f}%"
+            f"Edge={best_params.get('min_edge')}, ROI={best_roi:+.1f}% "
+            "(in-sample: chosen on the same seasons it is scored on)"
         )
     else:
         results = run_backtest(seasons, args.half_life, args.hfa, args.min_games, args.min_edge)

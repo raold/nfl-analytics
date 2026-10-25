@@ -18,6 +18,12 @@ This directory contains feature engineering modules that transform raw NFL data 
 2. **Database Schema Standards:** Follow [DATABASE_SCHEMA_AUDIT.md](../../docs/database/DATABASE_SCHEMA_AUDIT.md)
    - Use `kickoff` not `game_date`
    - Use `spread_close` not `spread_line`
+   - `kickoff` is the true UTC instant (since 2026-10-24). Derive hour, weekday, date and
+     rest days on the US/Eastern wall clock: `kickoff AT TIME ZONE 'America/New_York'` in SQL,
+     `kickoff_time.kickoff_wall_clock()` in pandas. For 2000-2024 this reproduces exactly the
+     values models were trained on.
+   - `spread_close` is the expected HOME margin (positive = home favored). Team-level spread
+     features use `+spread_close` for the home team and `-spread_close` for the away team.
 3. **Modular Design:** Each module focuses on a specific feature category
 4. **Validation:** Built-in data quality checks and validation
 

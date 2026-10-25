@@ -102,8 +102,8 @@ def prepare_training_data(
         g.home_score,
         g.away_score,
         g.game_type,
-        EXTRACT(DOW FROM g.kickoff) as day_of_week,
-        EXTRACT(HOUR FROM g.kickoff) as kickoff_hour,
+        EXTRACT(DOW FROM g.kickoff AT TIME ZONE 'America/New_York') as day_of_week,
+        EXTRACT(HOUR FROM g.kickoff AT TIME ZONE 'America/New_York') as kickoff_hour,
         (g.home_score - g.away_score) as margin,
         (g.home_score + g.away_score) as total_points
 
@@ -185,11 +185,11 @@ def _add_meta_features(df: pd.DataFrame, bet_type: str) -> pd.DataFrame:
     df["weight_concentration"] = np.random.beta(2, 5, n) * 0.6 + 0.2
 
     # === MARKET CONTEXT ===
-    # Primetime detection
+    # Primetime detection (day_of_week/kickoff_hour are US/Eastern; evening = 7pm ET or later)
     df["is_primetime"] = (
-        ((df["day_of_week"] == 5) & (df["kickoff_hour"] <= 5))  # TNF
-        | ((df["day_of_week"] == 2) & (df["kickoff_hour"] <= 5))  # MNF
-        | ((df["day_of_week"] == 1) & (df["kickoff_hour"] <= 5))  # SNF
+        ((df["day_of_week"] == 4) & (df["kickoff_hour"] >= 19))  # TNF
+        | ((df["day_of_week"] == 1) & (df["kickoff_hour"] >= 19))  # MNF
+        | ((df["day_of_week"] == 0) & (df["kickoff_hour"] >= 19))  # SNF
     ).astype(int)
 
     # Divisional games

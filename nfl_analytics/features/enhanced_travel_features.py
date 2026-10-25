@@ -22,6 +22,8 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from nfl_analytics.features.kickoff_time import kickoff_wall_clock
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -174,12 +176,13 @@ class EnhancedTravelFeatures:
         if not pd.api.types.is_datetime64_any_dtype(df["kickoff"]):
             df["kickoff"] = pd.to_datetime(df["kickoff"])
 
-        # Get kickoff hour in UTC
-        df["kickoff_hour_utc"] = df["kickoff"].dt.hour
+        # Kickoff hour on the US/Eastern wall clock. games.kickoff is a UTC instant; models
+        # were trained on ET hours (the pre-repair column held ET labelled UTC).
+        df["kickoff_hour_et"] = kickoff_wall_clock(df["kickoff"]).dt.hour
 
         # Calculate body clock hour (away team's perception of time)
         df["body_clock_hour"] = (
-            ((df["kickoff_hour_utc"] + df["away_tz_offset"]) % 24).fillna(12).astype(int)
+            ((df["kickoff_hour_et"] + df["away_tz_offset"]) % 24).fillna(12).astype(int)
         )  # Default to noon if missing
 
         # Circadian penalty for early morning games (3am-6am body clock)
@@ -283,8 +286,9 @@ class EnhancedTravelFeatures:
         if not pd.api.types.is_datetime64_any_dtype(df["kickoff"]):
             df["kickoff"] = pd.to_datetime(df["kickoff"])
 
-        # Thursday Night Football flag
-        df["is_thursday_night"] = (df["kickoff"].dt.dayofweek == 3).astype(int)  # Thursday = 3
+        # Thursday Night Football flag (weekday on the US/Eastern wall clock; Thursday = 3)
+        weekday_et = kickoff_wall_clock(df["kickoff"]).dt.day_of_week
+        df["is_thursday_night"] = (weekday_et == 3).astype(int)
 
         # TNF home advantage (scaled to 0.0 initially, XGBoost can learn from data)
         # User hypothesis: May have statistically significant impact despite null research findings

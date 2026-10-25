@@ -154,7 +154,7 @@ def check_injury_status(player_id: str, game_date: datetime, db_conn) -> tuple[b
                     SELECT week FROM games
                     WHERE game_id = (
                         SELECT game_id FROM games
-                        WHERE kickoff::DATE = %s::DATE
+                        WHERE (kickoff AT TIME ZONE 'America/New_York')::DATE = %s::DATE
                         LIMIT 1
                     )
                 )

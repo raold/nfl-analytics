@@ -66,8 +66,8 @@ def fix_kickoff_times():
 
         updates = []
         for game_id, season, week, kickoff_ts, home_team, away_team in games:
-            # Get the date from the current kickoff (which has correct date, wrong time)
-            game_date = kickoff_ts.date()
+            # Game date on the US/Eastern wall clock (games.kickoff is a UTC instant)
+            game_date = kickoff_ts.astimezone(et_tz).date()
             day_of_week = game_date.weekday()
 
             # Determine if this is a primetime game based on team matchup and week
@@ -85,7 +85,7 @@ def fix_kickoff_times():
             elif day_of_week == 6:
                 # Simple heuristic: first game alphabetically on Sunday might be London game
                 # Last game might be SNF
-                games_on_date = [g for g in games if g[3].date() == game_date]
+                games_on_date = [g for g in games if g[3].astimezone(et_tz).date() == game_date]
                 if games_on_date:
                     if game_id == games_on_date[0][0]:
                         # Could be London game

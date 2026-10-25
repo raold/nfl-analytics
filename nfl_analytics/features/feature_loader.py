@@ -178,9 +178,10 @@ class AdvancedFeatureLoader:
             g.season,
             g.week,
 
-            -- Game timing
-            EXTRACT(DOW FROM g.kickoff) as day_of_week,
-            CASE WHEN EXTRACT(DOW FROM g.kickoff) = 4 THEN 1 ELSE 0 END as is_thursday_night,
+            -- Game timing (kickoff is a UTC instant; weekday is taken in ET)
+            EXTRACT(DOW FROM g.kickoff AT TIME ZONE 'America/New_York') as day_of_week,
+            CASE WHEN EXTRACT(DOW FROM g.kickoff AT TIME ZONE 'America/New_York') = 4
+                 THEN 1 ELSE 0 END as is_thursday_night,
 
             -- Weather
             g.temp,

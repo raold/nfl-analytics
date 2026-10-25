@@ -21,6 +21,8 @@ import numpy as np
 import pandas as pd
 import psycopg
 
+from nfl_analytics.features.kickoff_time import kickoff_wall_clock
+
 SQL_TEAM_BASE = """
 WITH team_games AS (
     SELECT g.game_id,
@@ -302,9 +304,11 @@ def compute_team_history(df: pd.DataFrame) -> pd.DataFrame:
     )
 
     team_df["prev_kickoff"] = team_group["kickoff"].shift(1)
-    team_df["rest_days"] = (team_df["kickoff"] - team_df["prev_kickoff"]).dt.total_seconds() / (
-        24 * 3600
-    )
+    # Rest on the US/Eastern wall clock (kickoff is a UTC instant; see features/kickoff_time.py)
+    kickoff_et = kickoff_wall_clock(team_df["kickoff"])
+    team_df["rest_days"] = (
+        kickoff_et - kickoff_et.groupby(team_df["team"]).shift(1)
+    ).dt.total_seconds() / (24 * 3600)
     team_df["rest_days"] = team_df["rest_days"].fillna(7.0)
     team_df["rest_lt_6"] = (team_df["rest_days"] < 6).astype(float)
     team_df["rest_gt_13"] = (team_df["rest_days"] > 13).astype(float)
@@ -313,7 +317,12 @@ def compute_team_history(df: pd.DataFrame) -> pd.DataFrame:
     team_df["prev_margin"] = team_group["_margin_f"].shift(1)
     team_df["prev_points_for"] = team_group["_points_for_f"].shift(1)
     team_df["prev_points_against"] = team_group["_points_against_f"].shift(1)
-    team_df["prev_spread_close"] = team_group["spread_close"].shift(1)
+    # Line from this team's side in its previous game: spread_close is the expected HOME
+    # margin (nflverse, positive = home favored), so away rows use -spread_close
+    # (+7 = the team was a 7-point favorite, home or away).
+    spread_close = pd.to_numeric(team_df["spread_close"], errors="coerce")
+    team_spread = spread_close.where(team_df["is_home"].astype(bool), -spread_close)
+    team_df["prev_spread_close"] = team_spread.groupby(team_df["team"]).shift(1)
 
     prev_is_home = team_group["is_home"].shift(1)
     team_df["travel_change"] = np.where(

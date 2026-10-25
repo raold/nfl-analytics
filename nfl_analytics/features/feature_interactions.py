@@ -67,8 +67,9 @@ class FeatureInteractionEngine:
             g.season,
             g.week,
             g.kickoff,
-            EXTRACT(DOW FROM g.kickoff) as day_of_week,
-            EXTRACT(HOUR FROM g.kickoff) as game_hour,
+            -- kickoff is a UTC instant; weekday and hour are taken in ET
+            EXTRACT(DOW FROM g.kickoff AT TIME ZONE 'America/New_York') as day_of_week,
+            EXTRACT(HOUR FROM g.kickoff AT TIME ZONE 'America/New_York') as game_hour,
             g.home_team,
             g.away_team,
             g.stadium,

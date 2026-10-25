@@ -17,6 +17,7 @@ import time
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
+from zoneinfo import ZoneInfo
 
 import psycopg
 import requests
@@ -352,8 +353,8 @@ def main():
         dates_to_fetch = set()
         for game in games_to_fetch[: args.max_calls]:
             if game.kickoff:
-                # Fetch for game date
-                dates_to_fetch.add(game.kickoff.date())
+                # Fetch for game date (US/Eastern; kickoff is a UTC instant)
+                dates_to_fetch.add(game.kickoff.astimezone(ZoneInfo("America/New_York")).date())
 
         print(f"\nFetching odds for {len(dates_to_fetch)} dates...")
 
@@ -386,7 +387,7 @@ def main():
                         """
                         UPDATE games
                         SET odds_last_fetched = NOW()
-                        WHERE DATE(kickoff) = %s
+                        WHERE DATE(kickoff AT TIME ZONE 'America/New_York') = %s
                     """,
                         (date,),
                     )
