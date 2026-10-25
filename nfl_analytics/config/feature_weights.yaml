@@ -3,13 +3,12 @@
 # Set weight=0.0 to disable feature groups without removing code.
 # This allows easy re-enabling for future experiments.
 #
-# Updated: 2025-12-31
-# Rationale: ADR-015 - Kalman/GP features provide negative signal
-#
-# Evidence (A/B Test Results):
-#   - v2 Baseline: 69.1% ML accuracy, 10.45 spread MAE
-#   - v2.1 (with Kalman/GP): 58.9% ML accuracy, 10.70 spread MAE
-#   - Impact: -10.2pp accuracy, +0.25 MAE (WORSE)
+# Updated: 2025-12-31; reasons corrected 2026-10-25
+# Rationale: ADR-015 disabled the Kalman/GP groups. The "A/B test" first cited for it (v2 10.45
+# spread MAE vs v2.1 10.70) is not evidence either way: 10.45 is v2's 2024 early-stopping score,
+# 10.70 is v2.1 early-stopped on 2025, so the two are different seasons, each tuned on the season
+# reported (docs/investigations/2026-10-final-evaluation/retraction_ledger.md C16, C17). The GP
+# group stays off on engineering grounds: it never trains and its inputs are estimated.
 
 feature_groups:
   # =====================================================
@@ -18,7 +17,7 @@ feature_groups:
 
   kalman_epa:
     weight: 0.0
-    reason: "DISABLED: -10.2pp accuracy drop in A/B test (ADR-014)"
+    reason: "DISABLED (ADR-015); the A/B comparison once cited is invalid (retraction ledger C16)"
     disabled_date: "2025-12-31"
     features:
       - "kal_home_*"      # 8 home team Kalman features
@@ -49,13 +48,19 @@ feature_groups:
 
   semantic:
     weight: 1.0
-    reason: "A/B test ongoing - currently enabled for continued evaluation"
+    # The semantic stack was removed in the 2026-10 prune (tag archive/pre-prune-2026-10). Its A/B
+    # tests were simulated or had no valid control, and its training inputs used look-ahead
+    # (retraction ledger C23-C25).
+    reason: "No A/B test is running; the semantic stack was removed (retraction ledger C23-C25)"
     features:
       - "sem_*"           # 38 semantic LLM-derived features
 
   rest_differential:
     weight: 1.0
-    reason: "Strong signal: +25pp ATS swing for 3+ day advantage (validated)"
+    # The "+25pp ATS swing" (ADR-013) was the spread sign bug. Graded correctly, home teams with
+    # 3+ more days of rest covered 41.4% in 2025 (n = 29) and 49.0% in 2006-2024 (n = 512);
+    # corr(rest difference, ATS margin) = +0.009 (retraction ledger C15).
+    reason: "Enabled as an ordinary input; no ATS signal (the +25pp claim was a sign bug, C15)"
     features:
       - "rest_*"
       - "is_*_short_week"

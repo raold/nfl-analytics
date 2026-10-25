@@ -1,5 +1,12 @@
 #!/usr/bin/env Rscript
 #
+# Produces made-up numbers for dissertation figures and tables: the speedup factors, epoch times
+# and GPU utilizations below are typed literals with no timing or GPU log behind them; the
+# convergence plot is computed from figures/data/gnn_training_history.csv, and the audit rates
+# that figure computed-but-wrong. See analysis/dissertation/ERRATA.md (full audit rows
+# P10-P13, T125, T259, X02) and ERRATA_audit.csv. Not evidence; do not regenerate figures or
+# tables from it.
+#
 # Generate figures for GNN GPU Optimization study
 #
 # Creates:

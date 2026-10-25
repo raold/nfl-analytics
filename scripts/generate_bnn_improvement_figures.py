@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# Produces made-up numbers for dissertation figures: the coverage values and improvements below
+# are typed literals, some matching no experiment. They are fig:phase_improvements_breakdown and
+# fig:improvement_hierarchy (see analysis/dissertation/ERRATA.md, full audit rows P14 and P15,
+# and ERRATA_audit.csv). Not evidence; do not regenerate figures from it.
 """
 Generate BNN Calibration Improvement Figures for Dissertation
 

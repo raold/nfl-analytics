@@ -49,7 +49,9 @@ repos:
       #      spread: the sportsbook cover rule, including actual_spread + sportsbook_spread;
       #   2-3. margin > -spread_close and (home_score - away_score) > -spread_close;
       #   4. a favorite taken from spread_close < 0 (that is the home underdog);
-      #   5. total/2 - spread/2 (or (total - spread)/2) as the home mean (that is the away mean).
+      #   5. total/2 - spread/2 (or (total - spread)/2) as the home mean (that is the away mean);
+      #   6. rule 1 with the operands reversed, compared with 0 or the away score: spread_close +
+      #      margin > 0, spread_close + home_score - away_score > 0 (not a negated -spread).
       # A line that reproduces or quotes the old rule on purpose, or uses a sportsbook-sign line
       # (odds_history.home_spread, negative = home favored), carries '# sign-ok: <reason>'.
       # scripts/dev/check_spread_sign_hook.py tests this entry against known wrong and right lines.
@@ -63,6 +65,7 @@ repos:
           | .*home_score\s*-\s*\S*away_score\W*\s*(?:[<>]=?|==)\s*-\s*\S*spread
           | (?!.*(?i:away|road|visit))(?=.*(?i:fav)).*\b(?:spread_close|spread_line|vegas_spread)\b\W*\s*<=?\s*0(?![\d.])
           | (?!.*(?i:away|road|visit))(?=.*(?i:home)).*total\w*\W*\s*(?:/\s*2(?:\.0*)?\s*-\s*\S*spread|-\s*\S*spread\w*\W*\s*\)\s*/\s*2)
+          | .*(?:^|[\s(=,\[])[\w.$]*(?:\[["']?)?\w*spread(?!_?(?:std|sd|se|var|mae|rmse|err))\w*\W*\s*\+\s*\S*(?:margin|score|diff|actual)\w*\W*\s*(?:-\s*\S*score\w*\W*\s*)?(?:[<>]=?|==)\s*(?:0(?![\d.])|\S*score)
           )
         files: \.(py|[Rr]|sql|qmd|[Rr]md)$
         # Superseded views (005, 006, 100; migration 104 replaced them in devdb01) and the two

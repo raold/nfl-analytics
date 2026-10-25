@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+# Produces made-up numbers for a dissertation figure: the observed frequencies are the bin
+# centres x 0.96 + 0.02 plus seeded noise (np.random.seed(42)) and the bin counts are Poisson
+# draws, not model output. The coordinates in fig:gnn_calibration were retyped from it (see
+# analysis/dissertation/ERRATA.md, full audit row P46, and ERRATA_audit.csv). Not evidence; do
+# not regenerate figures from it.
 """
 Generate GNN Calibration Reliability Plot for Dissertation
 

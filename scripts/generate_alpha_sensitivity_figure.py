@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# Produces made-up numbers for a dissertation figure: growth, drawdown and utilization are
+# closed-form curves in alpha (e.g. 0.15 * (1 - alpha) ** 1.5 - 0.02), not results of any
+# Kelly-LCB or RL run. They are fig:alpha-sensitivity (see analysis/dissertation/ERRATA.md,
+# full audit row P01, and ERRATA_audit.csv). Not evidence; do not regenerate figures from it.
 """
 Generate Alpha Sensitivity Figure for Dissertation
 

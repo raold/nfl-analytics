@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+# NOT the trainer of Game Outcome v2, and not runnable as locked. v2 came from
+# GameOutcomeModel.train(seasons=[2022, 2023, 2024]) in
+# nfl_analytics/models/game_outcome_model_fixed.py on 2025-12-23
+# (models/production/game_outcome_v2/README.md, which also explains why v2 cannot be retrained
+# from devdb01). This earlier trainer (last changed 2025-12-07) fits its own three boosters on
+# 2020-2023 and writes models/game_outcome/*_<timestamp>.json as soon as it runs (no options).
+# It imports nfl_analytics.utils.psycopg_pool, which needs psycopg-pool, a package that
+# pyproject.toml does not declare.
 """
 Train Game Outcome Model for Spread, Total, and Moneyline Predictions
 ======================================================================

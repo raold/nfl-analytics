@@ -17,7 +17,8 @@ jobs:
           python-version: '3.11'
           enable-cache: true
 
-      # torch and causal (shap, mapie) are optional extras; their tests skip when absent
+      # torch is an optional extra and is not installed here, so
+      # tests/unit/test_evidential_regression.py skips (the run's only skip)
       - name: Install dependencies
         run: uv sync --frozen --extra dev
 

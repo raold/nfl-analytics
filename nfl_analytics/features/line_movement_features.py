@@ -21,9 +21,17 @@ to detect sharp money, market consensus, and line value opportunities.
 | opening_consensus | AVG(open) across books | Opening market consensus |
 | closing_vs_opening_consensus | closing - opening_consensus | Movement from opening consensus |
 
-**Temporal Safety:**
-All features use ONLY lines available BEFORE the game starts.
-Opening lines represent early-week consensus; closing lines represent final market.
+**What "open" and "close" are here (corrected 2026-10-25):**
+The `opening` and `closing` labels in odds_history are not the opening and closing lines.
+scripts/backfill_historical_odds.py requested both on game day: `opening` at 14:00 UTC and
+`closing` 30 minutes before the day's earliest kickoff as then stored (Eastern time labelled
+UTC, so 4.5-5.5 hours early). For a 1 pm ET slate the `closing` pull came before the `opening`
+one, and `opening` is after kickoff for the 09:30 ET London games, so "movement" is the change
+between two game-day snapshots, not open to close, and not every line predates kickoff. Rams
+games and most night games are missing, and there are no opening or closing rows for 2025 or
+2026
+(docs/POSTMORTEMS.md section 7; docs/investigations/2026-10-line-movement/README.md;
+defect 1 in models/production/game_outcome_v2/README.md).
 
 **Sharp Money Indicators:**
 - Large movements (>1.5 pts) typically indicate sharp/professional action
@@ -31,7 +39,8 @@ Opening lines represent early-week consensus; closing lines represent final mark
 - Low dispersion + large movement = strong sharp consensus
 
 **Data Source:**
-- odds_history table with 'opening' and 'closing' market_type records
+- odds_history table with 'opening' and 'closing' market_type records (the game-day
+  snapshots described above)
 - 57K opening + 60K closing = 117K total odds records (2020-2024)
 - Multiple bookmakers per game for consensus calculations
 

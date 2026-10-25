@@ -51,6 +51,14 @@ WRONG = [
     "lambda_home <- total_line/2 - spread_line/2",  # notebooks/11_*.qmd:51
     "mu_home = (total_close - spread_close) / 2",
     "home_mean = total_close / 2.0 - spread_close / 2.0",
+    # the sportsbook cover rule with the operands reversed (2026-10 review)
+    "home_cover = (spread_close + margin) > 0",
+    'df["cover"] = df["spread_close"] + df["home_margin"] > 0',
+    "covered = np.where(g.spread_close + g.home_score - g.away_score > 0, 1, 0)",
+    "CASE WHEN g.spread_close + g.home_score > g.away_score THEN 1 ELSE 0 END",
+    "home_cover <- df$spread_line + df$margin > 0",
+    "hit = vegas_spread + score_diff >= 0",
+    'c = float(row["spread_close"]) + row["actual_margin"] > 0',
 ]
 
 # Correct nflverse math, away-side forms and look-alikes: the hook must pass each of these.
@@ -75,6 +83,12 @@ RIGHT = [
     "            home_win = 1 if actual_spread > 0 else 0",
     '    mkt.add_argument("--market-csv", help="CSV export of games (scores + spread_close)")',
     'old = (m["margin"] + m["spread_close"] > 0).astype(int)  # sign-ok: reproduces the old rule',
+    # reversed operands that are correct: the away side covers, or the line is negated
+    "away_covers = spread_close - home_margin > 0",
+    'away_cover = df["spread_close"] - df["home_margin"] > 0',
+    "home_cover = -spread_close + home_margin > 0",
+    'home_cover = (-df["spread_close"] + df["home_margin"]) > 0',
+    "CASE WHEN g.spread_close - (g.home_score - g.away_score) > 0 THEN 1 END",
 ]
 
 

@@ -1,4 +1,13 @@
 #!/usr/bin/env Rscript
+# Produces made-up numbers for dissertation figures. Every figure here is typed or simulated
+# data, not results: generate_ensemble_progression() plots typed targets (P07),
+# generate_bnn_calibration() a "simulated calibration curve" of nine typed points (P02),
+# generate_training_window_ablation() typed MAEs, SEs and p-values (P29 = P51),
+# generate_feature_importance() typed importances (P09), and generate_temporal_roi() a seeded
+# random walk (set.seed(42), rnorm; P28). See analysis/dissertation/ERRATA.md (full audit rows
+# P02, P07, P09, P28, P29, P51; errata D1, D2) and ERRATA_audit.csv. Not evidence; do not
+# regenerate figures from it.
+#
 # dissertation_figures.R
 # Centralized figure generation for PhD dissertation
 #

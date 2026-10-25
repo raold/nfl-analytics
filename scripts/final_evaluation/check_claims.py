@@ -29,9 +29,16 @@ Usage:
   the DB_* environment variables, see nfl_analytics/utils/db_config.py)
 
 The re-checks read artifacts that the 2026-10 prune removed from the working tree (simulated
-A/B results, ensemble backtests, state-space metric JSONs, ...). To reproduce the committed
-outputs, run the script from a worktree of the tag taken just before the prune:
+A/B results, ensemble backtests, state-space metric JSONs, ...; CHECK_INPUTS). When any is
+missing the script stops before writing anything (exit 2): a run on the pruned tree would
+replace the committed outputs with "check raised" rows. To reproduce the committed outputs, run
+the copy in a worktree of the tag taken just before the prune, from the repository root:
   git worktree add ../nfl-analytics-pre-prune archive/pre-prune-2026-10
+  uv run --no-sync python ../nfl-analytics-pre-prune/scripts/final_evaluation/check_claims.py \\
+      --out-dir /tmp/claims_check     # then compare with results/claims_*.csv
+  git worktree remove ../nfl-analytics-pre-prune
+--allow-missing runs on the tree as it is (for example to list where the claims appear in it
+now) and writes only to an --out-dir other than the committed results directory.
 """
 
 from __future__ import annotations
@@ -43,6 +50,7 @@ import io
 import json
 import math
 import re
+import sys
 import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -64,6 +72,43 @@ WIN_PROFIT = 100 / 110
 BREAKEVEN = 110 / 210
 SEED = 20261024
 RELOCATED = {"OAK": "LV", "SD": "LAC", "STL": "LA"}  # old code -> code the next season uses
+# Files the re-checks open besides devdb01, the claim scan and the --nflverse-games file. Most
+# were removed from the working tree by the 2026-10 prune; archive/pre-prune-2026-10 has all.
+CHECK_INPUTS = [
+    "analysis/backtest/fixed_backtest_results.json",
+    "analysis/backtest/recent_seasons_test_results.json",
+    "analysis/dissertation/figures/out/cvar_benchmark_table.tex",
+    "analysis/dissertation/figures/out/ope_grid_table.tex",
+    "analysis/dissertation/figures/out/utilization_adjusted_sharpe_table.tex",
+    "analysis/ensemble/bayesian_xgb_2024_test.json",
+    "analysis/results/multimodel_weather_comparison.csv",
+    "data/historical_weather_2018_2024.csv",
+    "data/quick_ab_test_semantic.csv",
+    "data/rl_logged.csv",
+    "data/semantic_ab_test_results.json",
+    "models/ensemble/backtest/summary.json",
+    "models/ensemble/backtest/trades.csv",
+    "models/ensemble/game_outcome/predictions_all_games_2019_2025.csv",
+    "models/ensemble/realistic_backtest/summary.json",
+    "models/ensemble/realistic_backtest/trades.csv",
+    "models/production/game_outcome_v2/metadata.json",
+    "models/production/game_outcome_v2/spread_model.json",
+    "models/production/game_outcome_v2/total_model.json",
+    "models/state_space/config.json",
+    "models/state_space/predictions_historical.csv",
+    "models/state_space/test_metrics.json",
+    "models/state_space/val_metrics.json",
+    "models/xgboost/player_props_v1_metadata.json",
+    "nfl_analytics/analysis/generate_zero_bet_weeks.py",
+    "nfl_analytics/backtest/historical_validation_4way_optimized.py",
+    "nfl_analytics/backtest/historical_validation_5way.py",
+    "nfl_analytics/backtests/bayesian_props_backtest_2024.py",
+    "nfl_analytics/backtests/comprehensive_ensemble_backtest.py",
+    "nfl_analytics/experiments/experiment_executor.py",
+    "scripts/ab_test_semantic_features.py",
+    "scripts/edge_c_dashboard.py",
+    "scripts/utils/generate_missing_tables.py",
+]
 
 # ----------------------------------------------------------------------------
 # Claims and where to look for them
@@ -732,7 +777,8 @@ def check_v2_2025(db, games, res: Results):
         fmt_record(*rec),
         source=src,
     )
-    bug_edge, bug_cm = v["pred_home_spread"] + v["spread_close"], v["margin"] + v["spread_close"]  # sign-ok: reproduces the retracted rule on purpose
+    bug_edge = v["pred_home_spread"] + v["spread_close"]  # sign-ok: old rule on purpose
+    bug_cm = v["margin"] + v["spread_close"]  # sign-ok: old rule on purpose
     wins, losses, _ = ats(bug_edge, bug_cm)
     res.add(
         "C02",
@@ -924,7 +970,9 @@ def check_power_ratings_dec9(games, res: Results):
     ):
         s = d[mask]
         for t in (0, 1, 2, 3):
-            bug = ats(s["pred"] + s["spread_close"], s["margin"] + s["spread_close"], min_edge=t)  # sign-ok: reproduces the retracted rule on purpose
+            old_edge = s["pred"] + s["spread_close"]  # sign-ok: old rule on purpose
+            old_cover = s["margin"] + s["spread_close"]  # sign-ok: old rule on purpose
+            bug = ats(old_edge, old_cover, min_edge=t)
             ok = ats(model_edge(s["pred"], s["spread_close"]), s["cover_margin"], min_edge=t)
             res.add(
                 "C01",
@@ -935,7 +983,9 @@ def check_power_ratings_dec9(games, res: Results):
             res.add("C01", f"{label}, |edge| >= {t}: correct rule", fmt_record(*ok), source=src)
     per_season = []
     for season, s in d.groupby("season"):
-        old = ats(s["pred"] + s["spread_close"], s["margin"] + s["spread_close"])  # sign-ok: reproduces the retracted rule on purpose
+        old_edge = s["pred"] + s["spread_close"]  # sign-ok: old rule on purpose
+        old_cover = s["margin"] + s["spread_close"]  # sign-ok: old rule on purpose
+        old = ats(old_edge, old_cover)
         new = ats(model_edge(s["pred"], s["spread_close"]), s["cover_margin"])
         per_season.append(
             f"{season}: {old[0] / (old[0] + old[1]):.1%} vs {new[0] / (new[0] + new[1]):.1%}"
@@ -1008,7 +1058,7 @@ def check_rest(db, games, res: Results):
     g["old_cover"] = np.where(
         g["margin"] + g["spread_close"] > 0,  # sign-ok: reproduces the retracted rule on purpose
         1.0,
-        np.where(g["margin"] + g["spread_close"] < 0, 0.0, np.nan),  # sign-ok: reproduces the retracted rule on purpose
+        np.where(g["margin"] + g["spread_close"] < 0, 0.0, np.nan),  # sign-ok: old rule on purpose
     )
     src = "games.home_rest / away_rest (nflverse)"
     for label, mask, col in (
@@ -1052,9 +1102,10 @@ def check_rest(db, games, res: Results):
     h["bucket"] = pd.cut(h["home_rest"], [0, 5, 7, 10, 15], labels=["3-5", "6-7", "8-10", "11+"])
     for label, mask in (("weeks <= 16", h["week"] <= 16), ("all weeks", h["week"] > 0)):
         s = h[mask]
+        old_cov = (s["margin"] + s["spread_close"] > 0).astype(float)  # sign-ok: old rule
         for rule, cov in (
             ("correct", (s["margin"] - s["spread_close"] > 0).astype(float)),
-            ("old", (s["margin"] + s["spread_close"] > 0).astype(float)),  # sign-ok: reproduces the retracted rule on purpose
+            ("old", old_cov),
         ):
             parts = [
                 f"{b}: {cov[s['bucket'] == b].mean():.1%} (n={int((s['bucket'] == b).sum())})"
@@ -1187,7 +1238,7 @@ def check_trade_logs(games, res: Results):
         )
         side = np.where(t["bet_side"] == "home", 1.0, -1.0)
         rec = ats(side, t["cover_margin"])
-        old = np.sign(t["margin"] + t["spread_close"]) * side > 0  # sign-ok: reproduces the retracted rule on purpose
+        old = np.sign(t["margin"] + t["spread_close"]) * side > 0  # sign-ok: old rule on purpose
         res.add(
             cid,
             "stored outcome agreement with old rule / correct rule",
@@ -1219,7 +1270,8 @@ def check_bayes_xgb(games, res: Results):
         path,
         "nfl_analytics/production/ensemble_bayesian_xgb.py simulate branch",
     )
-    old = g["home_cover_margin"] == g["home_margin"] + g["spread_close"]  # sign-ok: reproduces the retracted rule on purpose
+    old_cover = g["home_margin"] + g["spread_close"]  # sign-ok: old rule on purpose
+    old = g["home_cover_margin"] == old_cover
     res.add(
         "C22",
         "stored home_cover_margin equals margin + spread_close (old rule)",  # sign-ok: reproduces the retracted rule on purpose
@@ -1396,11 +1448,10 @@ def check_nov2025_backtests(games, res: Results):
     d = feats[feats["season"].between(1999, 2024) & feats["spread_close"].notna()].copy()
     d = d[d["home_score"].notna()]
     margin = d["home_score"] - d["away_score"]
+    old_label = (margin + d["spread_close"] > 0).astype(float)  # sign-ok: old rule on purpose
     labels = {
         "correct label (pushes dropped)": home_cover(margin, d["spread_close"]),
-        "old label margin + spread > 0 (pushes as 0)": (margin + d["spread_close"] > 0).astype(  # sign-ok: reproduces the retracted rule on purpose
-            float
-        ),
+        "old label margin + spread > 0 (pushes as 0)": old_label,  # sign-ok: old rule on purpose
     }
     src = "as-of features rebuilt from devdb01 with nfl_analytics/features/asof_features.py"
     for name, y in labels.items():
@@ -1518,7 +1569,8 @@ def check_rl_logged(games, res: Results):
         games[["game_id", "margin", "cover_margin"]], on="game_id", suffixes=("", "_db")
     )
     act = r[r["action"] == 1]
-    old = act["home_score"] - act["away_score"] + act["spread_close"] > 0  # sign-ok: reproduces the retracted rule on purpose
+    act_margin = act["home_score"] - act["away_score"]
+    old = act_margin + act["spread_close"] > 0  # sign-ok: old rule on purpose
     res.add(
         "C41",
         "action = 1 rows: reward r > 0 agrees with old rule / correct rule",
@@ -1759,11 +1811,41 @@ def parse_args() -> argparse.Namespace:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--out-dir", type=Path, default=OUT_DIR)
     ap.add_argument("--nflverse-games", type=Path, help="nflverse schedules games.csv (optional)")
+    ap.add_argument(
+        "--allow-missing",
+        action="store_true",
+        help="run although inputs are missing (only with an --out-dir outside results/)",
+    )
     return ap.parse_args()
 
 
-def main() -> None:
+def missing_inputs() -> list[str]:
+    """CHECK_INPUTS and the claims' named source artifacts that are not in this tree."""
+    paths = set(CHECK_INPUTS) | {f for c in CLAIMS for f in c.extra_files}
+    return sorted(p for p in paths if not (REPO / p).is_file())
+
+
+def main() -> int:
     args = parse_args()
+    missing = missing_inputs()
+    if missing and not args.allow_missing:
+        print(
+            f"{len(missing)} inputs of the re-checks are not in {REPO}, e.g. {missing[0]}; the "
+            "2026-10 prune removed them. Nothing was written. Run the script from a worktree of "
+            "archive/pre-prune-2026-10 (see its docstring), or pass --allow-missing with a "
+            "scratch --out-dir.",
+            file=sys.stderr,
+        )
+        return 2
+    if missing and args.out_dir.resolve() == OUT_DIR.resolve():
+        print(
+            f"--allow-missing would overwrite the committed outputs in {OUT_DIR} with errored "
+            "rows; give a scratch --out-dir",
+            file=sys.stderr,
+        )
+        return 2
+    if missing:
+        print(f"{len(missing)} inputs missing; their checks record 'check raised'", file=sys.stderr)
     args.out_dir.mkdir(parents=True, exist_ok=True)
     build = dissertation_build_files()
     locs = locate(build)
@@ -1814,7 +1896,8 @@ def main() -> None:
     with pd.option_context("display.max_colwidth", 140, "display.width", 250):
         print(out[["claim", "check", "value", "n"]].to_string(index=False))
     print(f"\nWrote claims_locations.csv, claims_summary.csv, claims_checks*.csv to {args.out_dir}")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

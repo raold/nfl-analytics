@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+# PROVENANCE ONLY; DO NOT RUN. This is the script that filled public.odds_history on
+# 2025-12-07/08, kept to document how those rows were made. Its "closing" and "opening"
+# requests are mistimed game-day snapshots, not closing and opening lines, and its matcher
+# drops games: it maps the Rams to LAR where games uses LA, and compares the API's UTC date
+# with the stored kickoff date (docs/POSTMORTEMS.md section 7). A run also spends paid Odds
+# API quota.
 """
 Backfill historical odds from The Odds API.
 
