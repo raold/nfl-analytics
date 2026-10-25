@@ -116,6 +116,8 @@ logs/r_etl/
 
 # Allow README files in ignored dirs
 !results/README.md
+# Investigation outputs are small, reviewed, and part of the record
+!docs/investigations/*/results/
 !predictions/README.md
 
 # Processed datasets

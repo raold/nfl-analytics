@@ -83,8 +83,9 @@ repos:
         name: Reject sportsbook-style spread cover math on nflverse spreads
         # games.spread_close / spread_line are nflverse (positive = home favored): the home
         # team covers when margin - spread_close > 0. Use nfl_analytics/utils/spread_convention.py.
+        # A line that reproduces the retracted rule on purpose carries a '# sign-ok' comment.
         language: pygrep
-        entry: '(margin|_score|_diff)\W*\s*\+\s*\S*(spread_close|spread_line|vegas_spread)\b'
+        entry: '^(?!.*sign-ok).*(margin|_score|_diff)\W*\s*\+\s*\S*(spread_close|spread_line|vegas_spread)\b'
         files: \.(py|R|sql)$
         # Historical migrations (superseded by 104), the regression test that asserts the
         # old rule is wrong, and dependence_calibration.py (queries a non-existent `odds`
