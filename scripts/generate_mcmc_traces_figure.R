@@ -41,7 +41,7 @@ theme_dissertation <- function(base_size = 11) {
     )
 }
 
-# Try to load actual model, otherwise simulate realistic traces
+# Load the fitted model. There is no simulated fallback: a trace figure must show real draws.
 generate_trace_data <- function() {
   model_path <- "models/bayesian/passing_yards_hierarchical_v2.rds"
 
@@ -88,68 +88,12 @@ generate_trace_data <- function() {
     })
   }
 
-  # Fallback: simulate realistic MCMC traces
-  message("Generating simulated MCMC traces for illustration...")
-
-  set.seed(42)
-  n_iter <- 2000
-  n_chains <- 4
-
-  # Simulate well-mixed chains for different parameter types
-  # Intercept (large positive value)
-  intercept_traces <- lapply(1:n_chains, function(c) {
-    # Start from different initial values, converge
-    init <- 200 + rnorm(1, 0, 30)
-    warmup <- cumsum(rnorm(500, (230 - init)/500, 5))
-    samples <- 230 + rnorm(1500, 0, 8)
-    data.frame(
-      iteration = 1:n_iter,
-      chain = factor(c),
-      value = c(init + warmup, samples),
-      parameter = "Intercept"
-    )
-  }) %>% bind_rows()
-
-  # Coefficient (small positive effect)
-  coef1_traces <- lapply(1:n_chains, function(c) {
-    init <- rnorm(1, 0, 0.5)
-    warmup <- cumsum(rnorm(500, (0.15 - init)/500, 0.02))
-    samples <- 0.15 + rnorm(1500, 0, 0.05)
-    data.frame(
-      iteration = 1:n_iter,
-      chain = factor(c),
-      value = c(init + warmup, samples),
-      parameter = "EPA effect"
-    )
-  }) %>% bind_rows()
-
-  # Coefficient (negative effect)
-  coef2_traces <- lapply(1:n_chains, function(c) {
-    init <- rnorm(1, 0, 0.3)
-    warmup <- cumsum(rnorm(500, (-0.08 - init)/500, 0.02))
-    samples <- -0.08 + rnorm(1500, 0, 0.04)
-    data.frame(
-      iteration = 1:n_iter,
-      chain = factor(c),
-      value = c(init + warmup, samples),
-      parameter = "Opponent adj."
-    )
-  }) %>% bind_rows()
-
-  # Sigma (residual SD)
-  sigma_traces <- lapply(1:n_chains, function(c) {
-    init <- abs(rnorm(1, 50, 10))
-    warmup <- cumsum(rnorm(500, (35 - init)/500, 2))
-    samples <- 35 + abs(rnorm(1500, 0, 2))
-    data.frame(
-      iteration = 1:n_iter,
-      chain = factor(c),
-      value = abs(c(init + warmup, samples)),
-      parameter = "Sigma"
-    )
-  }) %>% bind_rows()
-
-  bind_rows(intercept_traces, coef1_traces, coef2_traces, sigma_traces)
+  stop(
+    "Could not extract MCMC draws from ", model_path, ". ",
+    "The brms fits in models/bayesian/ were removed in the 2026-10 prune; restore the file from ",
+    "tag archive/pre-prune-2026-10 (git LFS) to regenerate this figure. ",
+    "The script no longer simulates traces."
+  )
 }
 
 # Create trace plot

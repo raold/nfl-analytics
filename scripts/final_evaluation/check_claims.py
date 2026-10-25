@@ -27,6 +27,11 @@ Usage:
   uv run --no-sync python scripts/final_evaluation/check_claims.py --nflverse-games games.csv
   (--nflverse-games adds the 1999-2025 wind check from nflverse schedules; DB connection from
   the DB_* environment variables, see nfl_analytics/utils/db_config.py)
+
+The re-checks read artifacts that the 2026-10 prune removed from the working tree (simulated
+A/B results, ensemble backtests, state-space metric JSONs, ...). To reproduce the committed
+outputs, run the script from a worktree of the tag taken just before the prune:
+  git worktree add ../nfl-analytics-pre-prune archive/pre-prune-2026-10
 """
 
 from __future__ import annotations
