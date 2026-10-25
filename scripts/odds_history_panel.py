@@ -26,7 +26,7 @@ Usage:
     uv run python scripts/odds_history_panel.py
     # optional: check the backfill read the pre-repair kickoffs (dump made right after it)
     docker exec -i nfl-analytics-pg-1 pg_restore -a -t games -f - \\
-        < backups/nfl_analytics_20251208_odds_complete.dump > /tmp/games_20251208.copy
+        < backups/local/nfl_analytics_20251208_odds_complete.dump > /tmp/games_20251208.copy
     uv run python scripts/odds_history_panel.py --dump-games-copy /tmp/games_20251208.copy
 """
 
