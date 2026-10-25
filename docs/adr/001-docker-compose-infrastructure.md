@@ -288,7 +288,7 @@ Rejected due to incompatibility with project requirements. Real-time betting nee
 ### Documentation
 
 - Docker Compose Documentation (no longer in the repo; see [HISTORY](../HISTORY.md)) - Implementation details
-- [Grafana Dashboard Configuration](../../grafana/provisioning/dashboards/nfl-analytics-system.json) - 27-panel dashboard
+- Grafana Dashboard Configuration (`grafana/provisioning/dashboards/nfl-analytics-system.json`, removed in the 2026-10 prune; tag `archive/pre-prune-2026-10`) - 27-panel dashboard
 - Session Summary (no longer in the repo; see [HISTORY](../HISTORY.md)) - Context and timeline
 
 ### External Resources
