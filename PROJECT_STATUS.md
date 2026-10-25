@@ -58,12 +58,16 @@ The ten owner decisions listed here before the push, and what came of them:
    into `backups/local/`, everything in them is in the repository, its git objects or the live
    database. Deleting them is left to the owner (open item 7). Details are in the private note in
    `backups/local/`.
-6. **Sibyl handoff.** Implemented in the private Sibyl repository on branch
-   `claude/nfl-sign-convention-2026-10-25`, for a draft pull request. It grades spreads through a
-   ported convention helper, guarded by a lint and by a runtime check, stops filing news under
-   weeks it postdates, and marks Sibyl's bundled v2 do-not-deploy. Each head was panel-reviewed
-   before publication. Merging and deploying are the Sibyl operator's decisions. Sibyl's
-   `[domains.nfl]` stays disabled and its copy of Game Outcome v2 is not deployed.
+6. **Sibyl handoff.** Implemented in the private Sibyl repository as draft pull request #2718
+   (branch `claude/nfl-sign-convention-2026-10-25`).
+   - It grades spreads through a ported convention helper, guarded by a lint and by a runtime
+     check.
+   - It stops filing news under weeks it postdates.
+   - It marks Sibyl's bundled v2 do-not-deploy.
+
+   Each head was panel-reviewed before publication. Merging and deploying are the Sibyl
+   operator's decisions. Sibyl's `[domains.nfl]` stays disabled and its copy of Game Outcome v2
+   is not deployed.
 7. **The database v2 was trained on.** Not checked: the machine it was most likely on is not
    reachable from this one (open item 5). devdb01 does not reproduce it: no `semantic` schema, no
    feedback-loop tables, no 2025 odds snapshots (one `game_lines` row) and no 2025 injuries.
@@ -93,9 +97,9 @@ The ten owner decisions listed here before the push, and what came of them:
    development-database password and placeholder values, not live credentials. Resolve them as
    false positives in the GitGuardian dashboard, or remove the app; it is not a required check.
 5. Export the database v2 was trained on, or record it as lost (private note, item 7).
-6. Review the Sibyl pull request from `claude/nfl-sign-convention-2026-10-25`, starting with its
-   "Production effect" section (the news timer and the weekly NFL train unit on gmk), and merge it
-   or not. The NFL items it leaves open are in Sibyl's TODOS.
+6. Review Sibyl draft pull request #2718, starting with its "Production effect" section (the
+   news timer and the weekly NFL train unit on gmk), and merge it or not. The NFL items it leaves
+   open are in Sibyl's TODOS and in its Review section.
 7. The machine-specific chores in the private note in `backups/local/`, chiefly deleting the
    audited sync-daemon copies (one `sudo rm` command there).
 8. Optional, once week 8 is final (Monday 2026-11-02): grade the prospective week 7-8
